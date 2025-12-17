@@ -33,12 +33,28 @@ const userSchema = new mongoose.Schema({
         enum: ['customer', 'admin'],
         default: 'customer'
     },
-    kycStatus: {
-        type: String,
-        enum: ['not_submitted', 'pending', 'approved', 'rejected'],
-        default: 'not_submitted'
-    },
-    // We can add more specific KYC fields later (e.g., document URLs)
+    kyc: {
+        status: {
+            type: String,
+            enum: ['not_submitted', 'pending', 'approved', 'rejected'],
+            default: 'not_submitted'
+        },
+        documentType: {
+            type: String, // e.g., 'Aadhar', 'PAN', 'Passport'
+        },
+        documentNumber: {
+            type: String,
+        },
+        documentImage: {
+            type: String, // URL to the uploaded image
+        },
+        submittedAt: {
+            type: Date
+        },
+        rejectionReason: {
+            type: String
+        }
+    }
 }, {
     timestamps: true
 });

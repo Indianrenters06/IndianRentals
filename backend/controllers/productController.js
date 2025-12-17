@@ -1,4 +1,5 @@
 const Product = require('../models/Product');
+const Category = require('../models/Category');
 
 // @desc    Fetch all products
 // @route   GET /api/products
@@ -64,6 +65,18 @@ const createProduct = async (req, res) => {
             condition
         } = req.body;
 
+        // Check if category exists, if not create it
+        if (category) {
+            const categoryExists = await Category.findOne({ name: category });
+            if (!categoryExists) {
+                await Category.create({
+                    name: category,
+                    description: `${category} category`,
+                    isActive: true
+                });
+            }
+        }
+
         const product = new Product({
             name,
             description,
@@ -105,6 +118,18 @@ const updateProduct = async (req, res) => {
         const product = await Product.findById(req.params.id);
 
         if (product) {
+            // If category is being updated, check if it exists or create it
+            if (category && category !== product.category) {
+                const categoryExists = await Category.findOne({ name: category });
+                if (!categoryExists) {
+                    await Category.create({
+                        name: category,
+                        description: `${category} category`,
+                        isActive: true
+                    });
+                }
+            }
+
             product.name = name || product.name;
             product.description = description || product.description;
             product.category = category || product.category;
