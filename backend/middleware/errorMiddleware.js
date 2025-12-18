@@ -5,10 +5,30 @@ const notFound = (req, res, next) => {
 };
 
 const errorHandler = (err, req, res, next) => {
-    const statusCode = res.statusCode === 200 ? 500 : res.statusCode;
+    let statusCode = res.statusCode === 200 ? 500 : res.statusCode;
+    let message = err.message;
+
+    // Mongoose bad ObjectId (CastError)
+    if (err.name === 'CastError' && err.kind === 'ObjectId') {
+        message = `Resource not found`;
+        statusCode = 404;
+    }
+
+    // Mongoose duplicate key
+    if (err.code === 11000) {
+        message = 'Duplicate field value entered';
+        statusCode = 400;
+    }
+
+    // Mongoose validation error
+    if (err.name === 'ValidationError') {
+        message = Object.values(err.errors).map((val) => val.message).join(', ');
+        statusCode = 400;
+    }
+
     res.status(statusCode);
     res.json({
-        message: err.message,
+        message,
         stack: process.env.NODE_ENV === 'production' ? null : err.stack,
     });
 };

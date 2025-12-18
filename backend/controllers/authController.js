@@ -1,74 +1,73 @@
+const asyncHandler = require('express-async-handler');
 const User = require('../models/User');
 const generateToken = require('../utils/generateToken');
 
-//register
-const registerUser = async (req, res) => {
-    try {
-        const { name, email, password, phone, role } = req.body;
+// @desc    Register a new user
+// @route   POST /api/auth/register
+// @access  Public
+const registerUser = asyncHandler(async (req, res) => {
+    const { name, email, password, phone, role } = req.body;
 
-        const userExists = await User.findOne({ email });
+    const userExists = await User.findOne({ email });
 
-        if (userExists) {
-            return res.status(400).json({ message: 'User already exists' });
-        }
+    if (userExists) {
+        res.status(400);
+        throw new Error('User already exists');
+    }
 
+    const user = await User.create({
+        name,
+        email,
+        password,
+        phone,
+        role: role || 'customer',
+    });
 
-        const user = await User.create({
-            name,
-            email,
-            password,
-            phone,
-            role: role || 'customer'
+    if (user) {
+        const token = generateToken(res, user._id);
+        res.status(201).json({
+            _id: user._id,
+            name: user.name,
+            email: user.email,
+            role: user.role,
+            phone: user.phone,
+            kycStatus: user.kycStatus,
+            token: token,
         });
-
-        if (user) {
-            const token = generateToken(res, user._id);
-            res.status(201).json({
-                _id: user._id,
-                name: user.name,
-                email: user.email,
-                role: user.role,
-                phone: user.phone,
-                kycStatus: user.kycStatus,
-                token: token
-            });
-        } else {
-            res.status(400).json({ message: 'Invalid user data' });
-        }
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: error.message || 'Server error' });
+    } else {
+        res.status(400);
+        throw new Error('Invalid user data');
     }
-};
+});
 
-//login
-const loginUser = async (req, res) => {
-    try {
-        const { email, password } = req.body;
+// @desc    Auth user & get token
+// @route   POST /api/auth/login
+// @access  Public
+const loginUser = asyncHandler(async (req, res) => {
+    const { email, password } = req.body;
 
-        const user = await User.findOne({ email }).select('+password');
+    const user = await User.findOne({ email }).select('+password');
 
-        if (user && (await user.matchPassword(password))) {
-            const token = generateToken(res, user._id);
-            res.json({
-                _id: user._id,
-                name: user.name,
-                email: user.email,
-                role: user.role,
-                phone: user.phone,
-                kycStatus: user.kycStatus,
-                token: token
-            });
-        } else {
-            res.status(401).json({ message: 'Invalid email or password' });
-        }
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: 'Server error' });
+    if (user && (await user.matchPassword(password))) {
+        const token = generateToken(res, user._id);
+        res.json({
+            _id: user._id,
+            name: user.name,
+            email: user.email,
+            role: user.role,
+            phone: user.phone,
+            kycStatus: user.kycStatus,
+            token: token,
+        });
+    } else {
+        res.status(401);
+        throw new Error('Invalid email or password');
     }
-};
+});
 
-//logout
+// @desc    Logout user / clear cookie
+// @route   POST /api/auth/logout
+// @access  Public
 const logoutUser = (req, res) => {
     res.cookie('jwt', '', {
         httpOnly: true,

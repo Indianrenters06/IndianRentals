@@ -60,6 +60,8 @@ const rentalRoutes = require('./routes/rentalRoutes');
 app.use('/api/rentals', rentalRoutes);
 const userRoutes = require('./routes/userRoutes');
 app.use('/api/users', userRoutes);
+const uploadRoutes = require('./routes/uploadRoutes');
+app.use('/api/upload', uploadRoutes);
 
 app.get('/', (req, res) => {
   res.send('API is running...');
