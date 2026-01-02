@@ -42,6 +42,14 @@ const productSchema = new mongoose.Schema({
     isActive: {
         type: Boolean,
         default: true
+    },
+    city: {
+        type: String,
+        required: [true, 'Please provide the city where the product is located']
+    },
+    state: {
+        type: String,
+        required: [true, 'Please provide the state where the product is located']
     }
 }, {
     timestamps: true

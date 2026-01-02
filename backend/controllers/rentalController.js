@@ -1,6 +1,7 @@
 const asyncHandler = require('express-async-handler');
 const Rental = require('../models/Rental');
 const Product = require('../models/Product');
+const { RENTAL_STATUS } = require('../config/constants');
 
 // @desc    Create new rental order
 // @route   POST /api/rentals
@@ -112,11 +113,11 @@ const updateRentalStatus = asyncHandler(async (req, res) => {
         rental.status = status;
 
         // Auto update booleans based on status
-        if (status === 'Delivered' || status === 'Active') {
+        if (status === RENTAL_STATUS.DELIVERED || status === RENTAL_STATUS.ACTIVE) {
             rental.isDelivered = true;
             rental.deliveredAt = Date.now();
         }
-        if (status === 'Returned') {
+        if (status === RENTAL_STATUS.RETURNED) {
             rental.isReturned = true;
             rental.returnedAt = Date.now();
         }

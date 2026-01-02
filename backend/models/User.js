@@ -54,6 +54,23 @@ const userSchema = new mongoose.Schema({
         rejectionReason: {
             type: String
         }
+    },
+    isEmailVerified: {
+        type: Boolean,
+        default: false,
+    },
+    isPhoneVerified: {
+        type: Boolean,
+        default: false,
+    },
+    emailOtp: {
+        type: String,
+    },
+    phoneOtp: {
+        type: String,
+    },
+    otpExpires: {
+        type: Date,
     }
 }, {
     timestamps: true

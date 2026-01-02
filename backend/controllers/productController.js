@@ -1,29 +1,65 @@
 const asyncHandler = require('express-async-handler');
 const Product = require('../models/Product');
 const Category = require('../models/Category');
+const { PAGE_SIZE } = require('../config/constants');
 
-// @desc    Fetch all products
+// @desc    Fetch all products with advanced filtering
 // @route   GET /api/products
 // @access  Public
 const getProducts = asyncHandler(async (req, res) => {
-    const pageSize = 10;
     const page = Number(req.query.pageNumber) || 1;
 
-    const keyword = req.query.keyword
-        ? {
-            name: {
-                $regex: req.query.keyword,
-                $options: 'i',
-            },
-        }
-        : {};
+    // Base query object
+    const query = {};
 
-    const count = await Product.countDocuments({ ...keyword });
-    const products = await Product.find({ ...keyword })
-        .limit(pageSize)
-        .skip(pageSize * (page - 1));
+    // Keyword Search (searches name, description, brand, etc.)
+    if (req.query.keyword) {
+        query.$or = [
+            { name: { $regex: req.query.keyword, $options: 'i' } },
+            { description: { $regex: req.query.keyword, $options: 'i' } },
+            { brand: { $regex: req.query.keyword, $options: 'i' } },
+            { category: { $regex: req.query.keyword, $options: 'i' } },
+        ];
+    }
 
-    res.json({ products, page, pages: Math.ceil(count / pageSize) });
+    // Filter by Categories (e.g., ?category=Electronics,Furniture)
+    if (req.query.category) {
+        const categories = req.query.category.split(',');
+        query.category = { $in: categories };
+    }
+
+    // Filter by Brand (e.g., ?brand=Dell,HP)
+    if (req.query.brand) {
+        const brands = req.query.brand.split(',');
+        query.brand = { $in: brands };
+    }
+
+    // Filter by Price Range (e.g., ?minPrice=100&maxPrice=5000)
+    if (req.query.minPrice || req.query.maxPrice) {
+        query.rentalPrice = {};
+        if (req.query.minPrice) query.rentalPrice.$gte = Number(req.query.minPrice);
+        if (req.query.maxPrice) query.rentalPrice.$lte = Number(req.query.maxPrice);
+    }
+
+    // Filter by Minimum Rating (e.g., ?rating=4)
+    if (req.query.rating) {
+        query.rating = { $gte: Number(req.query.rating) };
+    }
+
+    // Filter by Location (Exact Match for City/State)
+    if (req.query.city) {
+        query.city = { $regex: req.query.city, $options: 'i' };
+    }
+    if (req.query.state) {
+        query.state = { $regex: req.query.state, $options: 'i' };
+    }
+
+    const count = await Product.countDocuments(query);
+    const products = await Product.find(query)
+        .limit(PAGE_SIZE)
+        .skip(PAGE_SIZE * (page - 1));
+
+    res.json({ products, page, pages: Math.ceil(count / PAGE_SIZE) });
 });
 
 // @desc    Fetch single product
@@ -54,6 +90,8 @@ const createProduct = asyncHandler(async (req, res) => {
         securityDeposit,
         stock,
         condition,
+        city,
+        state,
     } = req.body;
 
     // Check if category exists, if not create it
@@ -78,6 +116,8 @@ const createProduct = asyncHandler(async (req, res) => {
         securityDeposit,
         stock,
         condition,
+        city,
+        state,
     });
 
     const createdProduct = await product.save();
@@ -99,6 +139,8 @@ const updateProduct = asyncHandler(async (req, res) => {
         stock,
         condition,
         isActive,
+        city,
+        state,
     } = req.body;
 
     const product = await Product.findById(req.params.id);
@@ -125,6 +167,8 @@ const updateProduct = asyncHandler(async (req, res) => {
         product.securityDeposit = securityDeposit || product.securityDeposit;
         product.stock = stock || product.stock;
         product.condition = condition || product.condition;
+        product.city = city || product.city;
+        product.state = state || product.state;
         product.isActive = isActive !== undefined ? isActive : product.isActive;
 
         const updatedProduct = await product.save();
