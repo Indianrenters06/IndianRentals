@@ -8,6 +8,9 @@ const Navbar = () => {
     const [isScrolled, setIsScrolled] = useState(false);
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const [selectedCity, setSelectedCity] = useState("Delhi");
+    const [isCityDropdownOpen, setIsCityDropdownOpen] = useState(false);
+
+    const cities = ["Delhi", "Mumbai", "Bangalore", "Hyderabad", "Pune", "Chennai", "Gurgaon", "Noida"];
 
     // Handle scroll effect
     useEffect(() => {
@@ -28,96 +31,140 @@ const Navbar = () => {
         { name: "AV Products", href: "/category/av-products" },
         { name: "Office Equipment", href: "/category/office-equipment" },
         { name: "DSLR Cameras", href: "/category/dslr" },
+        { name: "More", href: "/more" },
+        { name: "Latest Launch", href: "/latest" },
+        { name: "Deals %", href: "/deals" },
     ];
 
     return (
         <header
-            className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${isScrolled ? "bg-white shadow-md py-2" : "bg-white/90 backdrop-blur-md py-4"
-                }`}
+            className="relative bg-white shadow-xs z-50 pb-3"
         >
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div className="flex items-center justify-between">
+            {/* Top Promotional Banner */}
+            <div className="bg-[#FFC107] text-black text-xs font-bold text-center py-1.5 px-4 tracking-wide">
+                ♥ SAVE Extra 5% up to ₹100 on UPI Orders ♥
+            </div>
+
+            {/* Top Bar */}
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-3">
+                <div className="flex items-center justify-between gap-4">
                     {/* Logo Section */}
                     <Link href="/" className="shrink-0 flex items-center gap-2">
-                        {/* Placeholder Logo */}
-                        <div className="w-10 h-10 bg-indigo-600 rounded-lg flex items-center justify-center text-white font-bold text-xl">
-                            IR
+                        {/* Logo Icon */}
+                        <div className="w-10 h-10 flex items-center justify-center relative">
+                            <span className="text-4xl font-bold text-green-600 font-serif italic">i</span>
+                            <div className="absolute -top-1 -right-1 w-2 h-2 bg-red-500 rounded-full"></div>
                         </div>
-                        <span className="text-2xl font-bold bg-clip-text text-transparent bg-linear-to-r from-indigo-600 to-blue-500">
-                            IndianRenters
-                        </span>
+
+                        <div className="flex flex-col -space-y-1">
+                            <div className="flex items-baseline">
+                                <span className="text-2xl font-bold text-orange-600">
+                                    Indian
+                                </span>
+                                <span className="text-2xl font-bold text-blue-700">
+                                    Renters
+                                </span>
+                                <span className="text-sm font-medium text-blue-500 ml-0.5">.com</span>
+                            </div>
+                            <span className="text-[10px] text-gray-500 font-medium tracking-wide italic pl-0.5">
+                                You Name it We Rent it
+                            </span>
+                        </div>
                     </Link>
 
                     {/* Search Bar - Desktop */}
-                    <div className="hidden md:flex flex-1 max-w-lg mx-8 relative">
+                    <div className="hidden md:flex flex-1 max-w-xl mx-auto relative group">
+                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <FaSearch className="text-gray-400 group-focus-within:text-indigo-600" />
+                        </div>
                         <input
                             type="text"
-                            placeholder="Search for MacBook, DSLR, Projectors..."
-                            className="w-full px-4 py-2.5 rounded-full border border-gray-200 bg-gray-50 focus:bg-white focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none transition-all duration-200 text-sm"
+                            placeholder="Search for MacBook Pro 14..."
+                            className="w-full pl-10 pr-4 py-2.5 rounded-full border border-gray-200 bg-gray-50 focus:bg-white focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 outline-none transition-all duration-200 text-sm"
                         />
-                        <button className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center bg-indigo-600 text-white rounded-full hover:bg-indigo-700 transition-colors">
-                            <FaSearch size={14} />
-                        </button>
                     </div>
 
                     {/* Right Actions */}
                     <div className="hidden md:flex items-center gap-6">
                         {/* Location Selector */}
-                        <div className="flex items-center gap-2 text-gray-600 cursor-pointer hover:text-indigo-600 transition-colors">
-                            <FaMapMarkerAlt size={16} />
-                            <span className="text-sm font-medium">{selectedCity}</span>
-                            <FaChevronDown size={10} />
+                        <div className="relative">
+                            <button
+                                className="flex items-center gap-2 text-gray-700 hover:text-indigo-600 transition-colors focus:outline-none font-medium"
+                                onClick={() => setIsCityDropdownOpen(!isCityDropdownOpen)}
+                            >
+                                <FaMapMarkerAlt size={16} />
+                                <span className="text-sm">{selectedCity}</span>
+                                <FaChevronDown size={10} className={`transform transition-transform duration-200 ${isCityDropdownOpen ? 'rotate-180' : ''}`} />
+                            </button>
+
+                            {/* City Dropdown */}
+                            <AnimatePresence>
+                                {isCityDropdownOpen && (
+                                    <motion.div
+                                        initial={{ opacity: 0, y: 10 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        exit={{ opacity: 0, y: 10 }}
+                                        className="absolute top-full right-0 mt-2 w-40 bg-white rounded-xl shadow-xl border border-gray-100 py-2 z-50"
+                                    >
+                                        {cities.map((city) => (
+                                            <button
+                                                key={city}
+                                                className={`w-full text-left px-4 py-2 text-sm hover:bg-gray-50 transition-colors ${selectedCity === city ? "text-indigo-600 font-medium" : "text-gray-600"
+                                                    }`}
+                                                onClick={() => {
+                                                    setSelectedCity(city);
+                                                    setIsCityDropdownOpen(false);
+                                                }}
+                                            >
+                                                {city}
+                                            </button>
+                                        ))}
+                                    </motion.div>
+                                )}
+                            </AnimatePresence>
                         </div>
 
-                        {/* Auth Buttons */}
-                        <div className="flex items-center gap-3">
-                            <button className="px-6 py-2 text-sm font-semibold text-whitefrontend v bg-indigo-700 hover:bg-indigo-500 rounded-full transition-colors">
-                                Login/Register
+                        {/* Login/Register Button - Yellow */}
+                        <button className="px-6 py-2 text-sm font-bold text-gray-900 bg-[#FFC107] hover:bg-[#FFD54F] rounded-full transition-colors shadow-sm">
+                            Login/Register
+                        </button>
+
+                        {/* Wishlist & Cart */}
+                        <div className="flex items-center gap-4 text-gray-600">
+                            <button className="hover:text-indigo-600 transition-colors">
+                                <FaHeart size={20} />
+                            </button>
+                            <button className="relative hover:text-indigo-600 transition-colors">
+                                <span className="absolute -top-1.5 -right-1.5 w-4 h-4 bg-red-500 text-[10px] text-white flex items-center justify-center rounded-full">2</span>
+                                <FaShoppingCart size={20} />
                             </button>
                         </div>
-
-                        {/* Wishlist */}
-                        <button className="p-2 text-gray-600 hover:text-indigo-600 transition-colors">
-                            <FaHeart size={20} />
-                        </button>
-
-                        {/* Cart */}
-                        <button className="relative p-2 text-gray-600 hover:text-indigo-600 transition-colors">
-                            <span className="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full ring-2 ring-white"></span>
-                            <FaShoppingCart size={20} />
-                        </button>
-
-                        {/* Hamburger Menu (Desktop & Mobile) */}
-                        <button
-                            className="p-2 text-gray-600 hover:text-indigo-600 transition-colors"
-                            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                        >
-                            {isMobileMenuOpen ? <FaTimes size={24} /> : <FaBars size={24} />}
-                        </button>
                     </div>
 
-                    {/* Mobile Hamburger (Visible only on mobile) */}
+                    {/* Mobile Menu Button */}
                     <div className="md:hidden flex items-center gap-4">
                         <button
                             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                            className="text-gray-600 focus:outline-none"
+                            className="text-gray-600 focus:outline-none p-2"
                         >
                             {isMobileMenuOpen ? <FaTimes size={24} /> : <FaBars size={24} />}
                         </button>
                     </div>
                 </div>
+            </div>
 
-                {/* Secondary Nav - Categories */}
-                <div className="hidden md:flex items-center justify-center py-3 border-t border-gray-100 mt-2">
-                    <div className="flex items-center space-x-8">
+            {/* Secondary Nav - Categories */}
+            <div className="hidden md:block border-t border-gray-100 bg-white">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <div className="flex items-center justify-center space-x-8 py-3 overflow-x-auto">
                         {navLinks.map((link) => (
                             <Link
                                 key={link.name}
                                 href={link.href}
-                                className="text-sm font-medium text-gray-600 hover:text-indigo-600 transition-colors relative group"
+                                className="text-[13px] font-medium text-gray-600 hover:text-indigo-600 whitespace-nowrap transition-colors relative group uppercase tracking-wide"
                             >
                                 {link.name}
-                                <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-indigo-600 transition-all duration-300 group-hover:w-full"></span>
+                                <span className="absolute -bottom-3 left-0 w-0 h-0.5 bg-indigo-600 transition-all duration-300 group-hover:w-full"></span>
                             </Link>
                         ))}
                     </div>
@@ -131,7 +178,7 @@ const Navbar = () => {
                         initial={{ opacity: 0, height: 0 }}
                         animate={{ opacity: 1, height: "auto" }}
                         exit={{ opacity: 0, height: 0 }}
-                        className="md:hidden bg-white border-t border-gray-100 overflow-hidden"
+                        className="md:hidden bg-white border-t border-gray-100 overflow-hidden shadow-lg"
                     >
                         <div className="px-4 py-4 space-y-4">
                             {/* Mobile Search */}
@@ -150,7 +197,7 @@ const Navbar = () => {
                                     <Link
                                         key={link.name}
                                         href={link.href}
-                                        className="text-gray-600 font-medium hover:text-indigo-600"
+                                        className="text-gray-600 font-medium hover:text-indigo-600 border-b border-gray-50 pb-2 last:border-0"
                                         onClick={() => setIsMobileMenuOpen(false)}
                                     >
                                         {link.name}
@@ -159,14 +206,26 @@ const Navbar = () => {
                             </div>
 
                             {/* Mobile Auth */}
-                            <div className="pt-4 border-t border-gray-100">
-                                <button className="w-full py-2 bg-indigo-600 text-white rounded-lg font-semibold mb-2">
+                            <div className="pt-4 mt-2">
+                                <button className="w-full py-2.5 bg-[#FFC107] text-gray-900 rounded-lg font-bold mb-3 shadow-sm">
                                     Login / Register
                                 </button>
-                                <div className="flex items-center justify-between mt-4 text-gray-600">
-                                    <span className="flex items-center gap-2">
-                                        <FaMapMarkerAlt /> {selectedCity}
-                                    </span>
+                                <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                                    <div className="flex items-center gap-2 relative w-full">
+                                        <FaMapMarkerAlt className="text-gray-500" />
+                                        <select
+                                            value={selectedCity}
+                                            onChange={(e) => setSelectedCity(e.target.value)}
+                                            className="appearance-none bg-transparent font-medium text-gray-700 focus:outline-none w-full cursor-pointer"
+                                        >
+                                            {cities.map((city) => (
+                                                <option key={city} value={city}>
+                                                    {city}
+                                                </option>
+                                            ))}
+                                        </select>
+                                        <FaChevronDown size={10} className="absolute right-0 text-gray-400 pointer-events-none" />
+                                    </div>
                                 </div>
                             </div>
                         </div>
