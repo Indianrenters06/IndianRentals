@@ -1,14 +1,19 @@
 "use client";
+import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { FaSearch, FaUser, FaShoppingCart, FaMapMarkerAlt, FaBars, FaTimes, FaChevronDown, FaHeart } from "react-icons/fa";
+import Image from "next/image";
+import { FaSearch, FaUser, FaShoppingCart, FaMapMarkerAlt, FaBars, FaTimes, FaChevronDown, FaHeart, FaSignOutAlt } from "react-icons/fa";
 import { motion, AnimatePresence } from "framer-motion";
 
 const Navbar = () => {
+    const router = useRouter();
     const [isScrolled, setIsScrolled] = useState(false);
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const [selectedCity, setSelectedCity] = useState("Delhi");
     const [isCityDropdownOpen, setIsCityDropdownOpen] = useState(false);
+    const [userInfo, setUserInfo] = useState(null);
+    const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
 
     const cities = ["Delhi", "Mumbai", "Bangalore", "Hyderabad", "Pune", "Chennai", "Gurgaon", "Noida"];
 
@@ -22,8 +27,37 @@ const Navbar = () => {
             }
         };
         window.addEventListener("scroll", handleScroll);
-        return () => window.removeEventListener("scroll", handleScroll);
+
+        // Check for user info
+        const checkUserInfo = () => {
+            const storedUserInfo = localStorage.getItem("userInfo");
+            if (storedUserInfo) {
+                setUserInfo(JSON.parse(storedUserInfo));
+            } else {
+                setUserInfo(null);
+            }
+        };
+
+        checkUserInfo();
+
+        window.addEventListener("userInfoChanged", checkUserInfo);
+        // Listen for storage events (in case login happens in another tab/window)
+        window.addEventListener("storage", checkUserInfo);
+
+        return () => {
+            window.removeEventListener("scroll", handleScroll);
+            window.removeEventListener("userInfoChanged", checkUserInfo);
+            window.removeEventListener("storage", checkUserInfo);
+        };
     }, []);
+
+    const handleLogout = () => {
+        localStorage.removeItem("userInfo");
+        setUserInfo(null);
+        setIsProfileDropdownOpen(false);
+        router.push("/login"); // or router.push('/')
+        // Optionally dispatch a custom event if other components need to know
+    };
 
     const navLinks = [
         { name: "Apple Products", href: "/category/apple" },
@@ -41,35 +75,23 @@ const Navbar = () => {
             className="relative bg-white shadow-xs z-50 pb-3"
         >
             {/* Top Promotional Banner */}
-            <div className="bg-[#FFC107] text-black text-xs font-bold text-center py-1.5 px-4 tracking-wide">
+            <div className="bg-amber-300 text-black text-xs font-bold text-center py-1 px-4 tracking-wide">
                 ♥ SAVE Extra 5% up to ₹100 on UPI Orders ♥
             </div>
 
             {/* Top Bar */}
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-3">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 ">
                 <div className="flex items-center justify-between gap-4">
                     {/* Logo Section */}
-                    <Link href="/" className="shrink-0 flex items-center gap-2">
-                        {/* Logo Icon */}
-                        <div className="w-10 h-10 flex items-center justify-center relative">
-                            <span className="text-4xl font-bold text-green-600 font-serif italic">i</span>
-                            <div className="absolute -top-1 -right-1 w-2 h-2 bg-red-500 rounded-full"></div>
-                        </div>
-
-                        <div className="flex flex-col -space-y-1">
-                            <div className="flex items-baseline">
-                                <span className="text-2xl font-bold text-orange-600">
-                                    Indian
-                                </span>
-                                <span className="text-2xl font-bold text-blue-700">
-                                    Renters
-                                </span>
-                                <span className="text-sm font-medium text-blue-500 ml-0.5">.com</span>
-                            </div>
-                            <span className="text-[10px] text-gray-500 font-medium tracking-wide italic pl-0.5">
-                                You Name it We Rent it
-                            </span>
-                        </div>
+                    <Link href="/" className="shrink-0">
+                        <Image
+                            src="/logo-v2.png"
+                            alt="Indian Renters - You Name it We Rent it"
+                            width={280}
+                            height={75}
+                            className="h-20 w-auto object-contain"
+                            priority
+                        />
                     </Link>
 
                     {/* Search Bar - Desktop */}
@@ -124,10 +146,54 @@ const Navbar = () => {
                             </AnimatePresence>
                         </div>
 
-                        {/* Login/Register Button - Yellow */}
-                        <button className="px-6 py-2 text-sm font-bold text-gray-900 bg-[#FFC107] hover:bg-[#FFD54F] rounded-full transition-colors shadow-sm">
-                            Login/Register
-                        </button>
+                        {/* Login/Register or Profile */}
+                        {userInfo ? (
+                            <div className="relative">
+                                <button
+                                    className="flex items-center gap-2 text-gray-700 hover:text-indigo-600 transition-colors focus:outline-none"
+                                    onClick={() => setIsProfileDropdownOpen(!isProfileDropdownOpen)}
+                                >
+                                    <div className="w-9 h-9 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 border border-indigo-200">
+                                        <FaUser size={14} />
+                                    </div>
+                                    <span className="text-sm font-medium hidden lg:block max-w-[100px] truncate">
+                                        {userInfo.name || userInfo.email}
+                                    </span>
+                                </button>
+
+                                {/* Profile Dropdown */}
+                                <AnimatePresence>
+                                    {isProfileDropdownOpen && (
+                                        <motion.div
+                                            initial={{ opacity: 0, y: 10 }}
+                                            animate={{ opacity: 1, y: 0 }}
+                                            exit={{ opacity: 0, y: 10 }}
+                                            className="absolute top-full right-0 mt-2 w-48 bg-white/60 backdrop-blur-lg rounded-xl shadow-xl border border-gray-100 py-2 z-50 overflow-hidden"
+                                        >
+                                            <div className="px-4 py-3 border-b border-gray-50">
+                                                <p className="text-sm font-bold text-gray-900 truncate">{userInfo.name || "User"}</p>
+                                                <p className="text-xs text-gray-500 truncate">{userInfo.email}</p>
+                                            </div>
+
+                                            <Link href="/profile" className="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors" onClick={() => setIsProfileDropdownOpen(false)}>
+                                                <FaUser size={14} className="text-gray-400" /> My Profile
+                                            </Link>
+
+                                            <button
+                                                onClick={handleLogout}
+                                                className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors text-left"
+                                            >
+                                                <FaSignOutAlt size={14} /> Logout
+                                            </button>
+                                        </motion.div>
+                                    )}
+                                </AnimatePresence>
+                            </div>
+                        ) : (
+                            <Link href="/login" className="px-6 py-2 text-sm font-bold text-gray-900 bg-[#FFC107] hover:bg-[#FFD54F] rounded-full transition-colors shadow-sm">
+                                Login/Register
+                            </Link>
+                        )}
 
                         {/* Wishlist & Cart */}
                         <div className="flex items-center gap-4 text-gray-600">
@@ -135,7 +201,6 @@ const Navbar = () => {
                                 <FaHeart size={20} />
                             </button>
                             <button className="relative hover:text-indigo-600 transition-colors">
-                                <span className="absolute -top-1.5 -right-1.5 w-4 h-4 bg-red-500 text-[10px] text-white flex items-center justify-center rounded-full">2</span>
                                 <FaShoppingCart size={20} />
                             </button>
                         </div>
@@ -207,10 +272,34 @@ const Navbar = () => {
 
                             {/* Mobile Auth */}
                             <div className="pt-4 mt-2">
-                                <button className="w-full py-2.5 bg-[#FFC107] text-gray-900 rounded-lg font-bold mb-3 shadow-sm">
-                                    Login / Register
-                                </button>
-                                <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                                {userInfo ? (
+                                    <div className="space-y-3">
+                                        <div className="flex items-center gap-3 p-3 bg-indigo-50 rounded-xl">
+                                            <div className="w-10 h-10 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 border border-indigo-200">
+                                                <FaUser size={16} />
+                                            </div>
+                                            <div className="flex-1 min-w-0">
+                                                <p className="text-sm font-bold text-gray-900 truncate">{userInfo.name || "User"}</p>
+                                                <p className="text-xs text-gray-500 truncate">{userInfo.email}</p>
+                                            </div>
+                                        </div>
+                                        <Link href="/profile" className="block w-full py-2 px-4 text-sm font-medium text-gray-700 bg-gray-50 rounded-lg text-center" onClick={() => setIsMobileMenuOpen(false)}>
+                                            My Profile
+                                        </Link>
+                                        <button
+                                            onClick={handleLogout}
+                                            className="block w-full py-2 px-4 text-sm font-medium text-red-600 bg-red-50 rounded-lg text-center"
+                                        >
+                                            Logout
+                                        </button>
+                                    </div>
+                                ) : (
+                                    <Link href="/login" className="block w-full text-center py-2.5 bg-amber-300 text-gray-900 rounded-lg font-bold mb-3 shadow-sm" onClick={() => setIsMobileMenuOpen(false)}>
+                                        Login / Register
+                                    </Link>
+                                )}
+
+                                <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg mt-3">
                                     <div className="flex items-center gap-2 relative w-full">
                                         <FaMapMarkerAlt className="text-gray-500" />
                                         <select

@@ -1,4 +1,4 @@
-const express = require('express');
+const express = require('express'); // server entry point
 const mongoose = require('mongoose');
 const cors = require('cors');
 const morgan = require('morgan');

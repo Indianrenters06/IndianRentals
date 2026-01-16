@@ -3,6 +3,7 @@ const User = require('../models/User');
 const generateToken = require('../utils/generateToken');
 
 const sendEmail = require('../utils/sendEmail');
+const sendSMS = require('../utils/sendSMS');
 
 // Generate 6-digit OTP
 const generateOTP = () => {
@@ -53,8 +54,15 @@ const registerUser = asyncHandler(async (req, res) => {
             // Don't fail the registration, just let them resend or handle it
         }
 
-        // Send SMS (Mock for now)
-        console.log(`[MOCK SMS] To: ${user.phone}, Message: Your Phone OTP is: ${phoneOtp}`);
+        // Send SMS
+        try {
+            await sendSMS({
+                phone: user.phone,
+                message: `Your Phone OTP is: ${phoneOtp}`,
+            });
+        } catch (error) {
+            console.error('SMS send failed:', error);
+        }
 
         res.status(201).json({
             message: 'Registration successful. Please verify your email and phone.',
@@ -155,8 +163,15 @@ const loginUser = asyncHandler(async (req, res) => {
             console.error('Email send failed:', error);
         }
 
-        // Mock SMS
-        console.log(`[MOCK SMS] To: ${user.phone}, Message: Your Login OTP is: ${phoneOtp}`);
+        // Send SMS
+        try {
+            await sendSMS({
+                phone: user.phone,
+                message: `Your Login OTP is: ${phoneOtp}`,
+            });
+        } catch (error) {
+            console.error('SMS send failed:', error);
+        }
 
         res.json({
             message: 'OTP sent to email and phone',
@@ -181,9 +196,142 @@ const logoutUser = (req, res) => {
     res.status(200).json({ message: 'Logged out successfully' });
 };
 
+// @desc    Send OTP for Login (Email or Phone)
+// @route   POST /api/auth/send-otp
+// @access  Public
+const sendLoginOtp = asyncHandler(async (req, res) => {
+    const { identifier } = req.body;
+
+    if (!identifier) {
+        res.status(400);
+        throw new Error('Please provide email or phone number');
+    }
+
+    // Check if identifier is email or phone
+    const isEmail = identifier.includes('@');
+    const query = isEmail ? { email: identifier } : { phone: identifier };
+
+    const user = await User.findOne(query);
+
+    if (!user) {
+        res.status(404);
+        throw new Error('User not found');
+    }
+
+    const otp = generateOTP();
+    const otpExpires = Date.now() + 10 * 60 * 1000; // 10 minutes
+
+    user.otpExpires = otpExpires;
+
+    if (isEmail) {
+        user.emailOtp = otp;
+        user.phoneOtp = undefined; // Clear other OTP to avoid confusion? Or just keep it.
+
+        await user.save();
+
+        const message = `Your Login OTP for IndianRentals is: ${otp}`;
+        try {
+            await sendEmail({
+                email: user.email,
+                subject: 'IndianRentals - Login OTP',
+                message,
+            });
+        } catch (error) {
+            console.error('Email send failed:', error);
+            res.status(500);
+            throw new Error('Email could not be sent');
+        }
+        res.json({ message: 'OTP sent to your email', type: 'email' });
+
+    } else {
+        user.phoneOtp = otp;
+        user.emailOtp = undefined;
+
+        await user.save();
+
+        // Send SMS
+        try {
+            await sendSMS({
+                phone: user.phone,
+                message: `Your Login OTP is: ${otp}`,
+            });
+        } catch (error) {
+            console.error('SMS send failed:', error);
+            // res.status(500);
+            // throw new Error('SMS could not be sent');
+        }
+        res.json({
+            message: 'OTP sent to your phone',
+            type: 'phone',
+            debugOtp: otp
+        });
+    }
+});
+
+// @desc    Verify Login OTP
+// @route   POST /api/auth/verify-login
+// @access  Public
+const verifyLoginOtp = asyncHandler(async (req, res) => {
+    const { identifier, otp } = req.body;
+
+    if (!identifier || !otp) {
+        res.status(400);
+        throw new Error('Please provide identifier and OTP');
+    }
+
+    const isEmail = identifier.includes('@');
+    const query = isEmail ? { email: identifier } : { phone: identifier };
+
+    const user = await User.findOne(query);
+
+    if (!user) {
+        res.status(404);
+        throw new Error('User not found');
+    }
+
+    if (user.otpExpires < Date.now()) {
+        res.status(400);
+        throw new Error('OTP expired. Please request a new one.');
+    }
+
+    let isValid = false;
+    if (isEmail) {
+        isValid = user.emailOtp === otp;
+    } else {
+        isValid = user.phoneOtp === otp;
+    }
+
+    if (!isValid) {
+        res.status(400);
+        throw new Error('Invalid OTP');
+    }
+
+    // Success
+    user.isEmailVerified = true;
+    if (!isEmail) user.isPhoneVerified = true;
+
+    user.emailOtp = undefined;
+    user.phoneOtp = undefined;
+    user.otpExpires = undefined;
+    await user.save();
+
+    const token = generateToken(res, user._id);
+
+    res.json({
+        _id: user._id,
+        name: user.name,
+        email: user.email,
+        phone: user.phone,
+        role: user.role,
+        token: token,
+    });
+});
+
 module.exports = {
     registerUser,
     loginUser,
     logoutUser,
     verifyOtp,
+    sendLoginOtp,
+    verifyLoginOtp,
 };
