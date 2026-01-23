@@ -5,6 +5,10 @@ import Link from "next/link";
 import Image from "next/image";
 import { FaSearch, FaUser, FaShoppingCart, FaMapMarkerAlt, FaBars, FaTimes, FaChevronDown, FaHeart, FaSignOutAlt } from "react-icons/fa";
 import { motion, AnimatePresence } from "framer-motion";
+import AuthModal from "./AuthModal";
+
+import { useSelector } from "react-redux";
+import { selectCartTotalQuantity } from "../redux/features/cartSlice";
 
 const Navbar = () => {
     const router = useRouter();
@@ -14,6 +18,10 @@ const Navbar = () => {
     const [isCityDropdownOpen, setIsCityDropdownOpen] = useState(false);
     const [userInfo, setUserInfo] = useState(null);
     const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
+    const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+
+    // Redux Cart Selector
+    const totalQuantity = useSelector(selectCartTotalQuantity);
 
     const cities = ["Delhi", "Mumbai", "Bangalore", "Hyderabad", "Pune", "Chennai", "Gurgaon", "Noida"];
 
@@ -190,9 +198,12 @@ const Navbar = () => {
                                 </AnimatePresence>
                             </div>
                         ) : (
-                            <Link href="/login" className="px-6 py-2 text-sm font-bold text-gray-900 bg-[#FFC107] hover:bg-[#FFD54F] rounded-full transition-colors shadow-sm">
+                            <button
+                                onClick={() => setIsAuthModalOpen(true)}
+                                className="px-6 py-2 text-sm font-bold text-gray-900 bg-[#FFC107] hover:bg-[#FFD54F] rounded-full transition-colors shadow-sm"
+                            >
                                 Login/Register
-                            </Link>
+                            </button>
                         )}
 
                         {/* Wishlist & Cart */}
@@ -200,9 +211,14 @@ const Navbar = () => {
                             <button className="hover:text-indigo-600 transition-colors">
                                 <FaHeart size={20} />
                             </button>
-                            <button className="relative hover:text-indigo-600 transition-colors">
+                            <Link href="/cart" className="relative hover:text-indigo-600 transition-colors">
                                 <FaShoppingCart size={20} />
-                            </button>
+                                {totalQuantity > 0 && (
+                                    <span className="absolute -top-2 -right-2 bg-red-500 text-white text-[10px] font-bold w-4 h-4 flex items-center justify-center rounded-full">
+                                        {totalQuantity}
+                                    </span>
+                                )}
+                            </Link>
                         </div>
                     </div>
 
@@ -294,9 +310,15 @@ const Navbar = () => {
                                         </button>
                                     </div>
                                 ) : (
-                                    <Link href="/login" className="block w-full text-center py-2.5 bg-amber-300 text-gray-900 rounded-lg font-bold mb-3 shadow-sm" onClick={() => setIsMobileMenuOpen(false)}>
+                                    <button
+                                        onClick={() => {
+                                            setIsMobileMenuOpen(false);
+                                            setIsAuthModalOpen(true);
+                                        }}
+                                        className="block w-full text-center py-2.5 bg-amber-300 text-gray-900 rounded-lg font-bold mb-3 shadow-sm"
+                                    >
                                         Login / Register
-                                    </Link>
+                                    </button>
                                 )}
 
                                 <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg mt-3">
@@ -321,6 +343,12 @@ const Navbar = () => {
                     </motion.div>
                 )}
             </AnimatePresence>
+
+            <AuthModal
+                isOpen={isAuthModalOpen}
+                onClose={() => setIsAuthModalOpen(false)}
+                initialView="login"
+            />
         </header>
     );
 };

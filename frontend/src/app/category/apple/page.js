@@ -22,53 +22,53 @@ const topCategories = [
 const appleProducts = [
     {
         name: "MacBook Pro",
-        image: "/macbook-pro-new.jpg", // MacBook Pro like
-        href: "/product/macbook-pro"
+        image: "/macbook-pro-new.jpg",
+        href: "/category/apple/macbook-pro"
     },
     {
         name: "iPhone",
-        image: "https://images.unsplash.com/photo-1510557880182-3d4d3cba35a5?q=80&w=800&auto=format&fit=crop", // iPhone
-        href: "/product/iphone"
+        image: "https://images.unsplash.com/photo-1510557880182-3d4d3cba35a5?q=80&w=800&auto=format&fit=crop",
+        href: "/category/apple/iphone"
     },
     {
         name: "Mac Mini",
-        image: "/mac-mini-new.jpg", // Mac Mini generic
-        href: "/product/mac-mini"
+        image: "/mac-mini-new.jpg",
+        href: "/category/apple/mac-mini"
     },
     {
         name: "Mac Studio",
-        image: "/mac-studio-new.jpg", // Mac Studio
-        href: "/product/mac-studio"
+        image: "/mac-studio-new.jpg",
+        href: "/category/apple/mac-studio"
     },
     {
         name: "MacBook Air",
-        image: "https://images.unsplash.com/photo-1611186871348-b1ce696e52c9?q=80&w=800&auto=format&fit=crop", // MacBook Air
-        href: "/product/macbook-air"
+        image: "https://images.unsplash.com/photo-1611186871348-b1ce696e52c9?q=80&w=800&auto=format&fit=crop",
+        href: "/category/apple/macbook-air"
     },
     {
         name: "Apple Studio Display",
-        image: "https://images.unsplash.com/photo-1527443224154-c4a3942d3acf?q=80&w=800&auto=format&fit=crop", // Monitor
-        href: "/product/studio-display"
+        image: "https://images.unsplash.com/photo-1527443224154-c4a3942d3acf?q=80&w=800&auto=format&fit=crop",
+        href: "/category/apple/studio-display"
     },
     {
         name: "Apple XDR Display",
-        image: "/apple-xdr-display-new.jpg", // Monitor
-        href: "/product/xdr-display"
+        image: "/apple-xdr-display-new.jpg",
+        href: "/category/apple/xdr-display"
     },
     {
         name: "Mac Pro",
-        image: "/mac-pro-new.jpg", // Tower
-        href: "/product/mac-pro"
+        image: "/mac-pro-new.jpg",
+        href: "/category/apple/mac-pro"
     },
     {
         name: "iMac",
-        image: "https://images.unsplash.com/photo-1496181133206-80ce9b88a853?q=80&w=800&auto=format&fit=crop", // iMac
-        href: "/product/imac"
+        image: "https://images.unsplash.com/photo-1496181133206-80ce9b88a853?q=80&w=800&auto=format&fit=crop",
+        href: "/category/apple/imac"
     },
     {
         name: "iPad",
-        image: "/ipad-new.jpg", // iPad
-        href: "/product/ipad"
+        image: "/ipad-new.jpg",
+        href: "/category/apple/ipad"
     },
 ];
 

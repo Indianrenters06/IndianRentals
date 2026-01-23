@@ -18,7 +18,6 @@ export default function Home() {
       <FeatureSection />
       <WhyChooseUs />
       <Testimonials />
-      <Footer />
     </main>
   );
 }

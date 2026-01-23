@@ -81,82 +81,87 @@ const BestRentedProducts = () => {
                 {/* Grid */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
                     {products.map((product, index) => (
-                        <motion.div
+                        <Link
+                            href={product.name.includes("MacBook") || product.name.includes("iPhone") ? "/products/macbook-pro-14-m4" : "#"}
                             key={product.id}
-                            initial={{ opacity: 0, y: 20 }}
-                            whileInView={{ opacity: 1, y: 0 }}
-                            viewport={{ once: true }}
-                            transition={{ duration: 0.5, delay: index * 0.1 }}
-                            className="group bg-white rounded-3xl p-4 shadow-sm hover:shadow-xl transition-all duration-300 border border-transparent hover:border-gray-100 flex flex-col"
+                            className="block h-full"
                         >
-                            {/* Image Container */}
-                            <div className="relative aspect-square rounded-2xl bg-gray-100 overflow-hidden mb-4 group-hover:bg-gray-50 transition-colors">
+                            <motion.div
+                                initial={{ opacity: 0, y: 20 }}
+                                whileInView={{ opacity: 1, y: 0 }}
+                                viewport={{ once: true }}
+                                transition={{ duration: 0.5, delay: index * 0.1 }}
+                                className="group bg-white rounded-3xl p-4 shadow-sm hover:shadow-xl transition-all duration-300 border border-transparent hover:border-gray-100 flex flex-col h-full"
+                            >
+                                {/* Image Container */}
+                                <div className="relative aspect-square rounded-2xl bg-gray-100 overflow-hidden mb-4 group-hover:bg-gray-50 transition-colors">
 
-                                {/* Badges */}
-                                <div className="absolute top-3 left-3 z-10 flex gap-2">
-                                    {product.discount && (
-                                        <span className="bg-[#FF4757] text-white text-xs font-bold px-3 py-1 rounded-full shadow-sm">
-                                            {product.discount}
-                                        </span>
-                                    )}
-                                    {product.isNew && (
-                                        <span className="bg-[#2ED573] text-white text-xs font-bold px-3 py-1 rounded-full shadow-sm">
-                                            NEW
-                                        </span>
-                                    )}
-                                </div>
-
-                                {/* Favorite Button */}
-                                <button className="absolute top-3 right-3 z-10 p-2 bg-white/80 backdrop-blur-sm hover:bg-white text-gray-400 hover:text-red-500 rounded-full shadow-sm transition-all transform hover:scale-110">
-                                    <FaHeart size={16} />
-                                </button>
-
-                                {/* Image Placeholder (Replace with actual Image component) */}
-                                <div className="w-full h-full flex items-center justify-center text-gray-300 group-hover:scale-105 transition-transform duration-500">
-                                    {/* Assuming we might not have images yet, using a styled placeholder */}
-                                    <div className="text-center p-6">
-                                        <FaBolt className="mx-auto mb-2 text-4xl opacity-20" />
-                                        <span className="text-sm font-medium opacity-50">{product.category}</span>
+                                    {/* Badges */}
+                                    <div className="absolute top-3 left-3 z-10 flex gap-2">
+                                        {product.discount && (
+                                            <span className="bg-[#FF4757] text-white text-xs font-bold px-3 py-1 rounded-full shadow-sm">
+                                                {product.discount}
+                                            </span>
+                                        )}
+                                        {product.isNew && (
+                                            <span className="bg-[#2ED573] text-white text-xs font-bold px-3 py-1 rounded-full shadow-sm">
+                                                NEW
+                                            </span>
+                                        )}
                                     </div>
-                                </div>
 
-                                {/* Overlay Button */}
-                                <div className="absolute inset-x-4 bottom-4 translate-y-full opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300">
-                                    <button className="w-full py-3 bg-gray-900 text-white font-bold rounded-xl shadow-lg hover:bg-black transition-colors">
-                                        Quick Rent
+                                    {/* Favorite Button */}
+                                    <button className="absolute top-3 right-3 z-10 p-2 bg-white/80 backdrop-blur-sm hover:bg-white text-gray-400 hover:text-red-500 rounded-full shadow-sm transition-all transform hover:scale-110">
+                                        <FaHeart size={16} />
                                     </button>
-                                </div>
-                            </div>
 
-                            {/* Content */}
-                            <div className="flex flex-col flex-grow">
-                                <div className="flex items-center justify-between mb-2">
-                                    <span className="text-xs font-bold text-gray-400 uppercase tracking-wider">{product.category}</span>
-                                    <div className="flex items-center gap-1 text-[#FFC107] text-xs font-bold">
-                                        <FaStar />
-                                        <span>{product.rating}</span>
-                                        <span className="text-gray-300 font-normal">({product.reviews})</span>
+                                    {/* Image Placeholder (Replace with actual Image component) */}
+                                    <div className="w-full h-full flex items-center justify-center text-gray-300 group-hover:scale-105 transition-transform duration-500">
+                                        {/* Assuming we might not have images yet, using a styled placeholder */}
+                                        <div className="text-center p-6">
+                                            <FaBolt className="mx-auto mb-2 text-4xl opacity-20" />
+                                            <span className="text-sm font-medium opacity-50">{product.category}</span>
+                                        </div>
+                                    </div>
+
+                                    {/* Overlay Button */}
+                                    <div className="absolute inset-x-4 bottom-4 translate-y-full opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300">
+                                        <button className="w-full py-3 bg-gray-900 text-white font-bold rounded-xl shadow-lg hover:bg-black transition-colors">
+                                            Quick Rent
+                                        </button>
                                     </div>
                                 </div>
 
-                                <h3 className="text-lg font-bold text-gray-900 mb-1 leading-snug group-hover:text-[#0A99FF] transition-colors line-clamp-2">
-                                    {product.name}
-                                </h3>
-
-                                <div className="mt-auto pt-4 flex items-end justify-between border-t border-gray-50">
-                                    <div>
-                                        <p className="text-xs text-gray-400 line-through font-medium">₹{product.originalPrice}/mo</p>
-                                        <p className="text-xl font-black text-gray-900">
-                                            ₹{product.rentPrice}
-                                            <span className="text-xs text-gray-500 font-medium ml-1">/mo</span>
-                                        </p>
+                                {/* Content */}
+                                <div className="flex flex-col flex-grow">
+                                    <div className="flex items-center justify-between mb-2">
+                                        <span className="text-xs font-bold text-gray-400 uppercase tracking-wider">{product.category}</span>
+                                        <div className="flex items-center gap-1 text-[#FFC107] text-xs font-bold">
+                                            <FaStar />
+                                            <span>{product.rating}</span>
+                                            <span className="text-gray-300 font-normal">({product.reviews})</span>
+                                        </div>
                                     </div>
-                                    <button className="p-2 rounded-full border border-gray-100 text-gray-400 group-hover:border-[#0A99FF] group-hover:text-[#0A99FF] transition-all">
-                                        <FaBolt />
-                                    </button>
+
+                                    <h3 className="text-lg font-bold text-gray-900 mb-1 leading-snug group-hover:text-[#0A99FF] transition-colors line-clamp-2">
+                                        {product.name}
+                                    </h3>
+
+                                    <div className="mt-auto pt-4 flex items-end justify-between border-t border-gray-50">
+                                        <div>
+                                            <p className="text-xs text-gray-400 line-through font-medium">₹{product.originalPrice}/mo</p>
+                                            <p className="text-xl font-black text-gray-900">
+                                                ₹{product.rentPrice}
+                                                <span className="text-xs text-gray-500 font-medium ml-1">/mo</span>
+                                            </p>
+                                        </div>
+                                        <button className="p-2 rounded-full border border-gray-100 text-gray-400 group-hover:border-[#0A99FF] group-hover:text-[#0A99FF] transition-all">
+                                            <FaBolt />
+                                        </button>
+                                    </div>
                                 </div>
-                            </div>
-                        </motion.div>
+                            </motion.div>
+                        </Link>
                     ))}
                 </div>
 

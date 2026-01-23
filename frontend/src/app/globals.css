@@ -1,1 +1,37 @@
 @import "tailwindcss";
+
+@layer base {
+    /* Tailwind base styles */
+}
+
+@layer components {
+    input[type=range] {
+        -webkit-appearance: none;
+        appearance: none;
+        width: 100%;
+        background: transparent;
+    }
+
+    input[type=range]::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        height: 20px;
+        width: 20px;
+        border-radius: 50%;
+        background: #FF8A00;
+        border: 3px solid white;
+        box-shadow: 0 0 0 1px #FF8A00;
+        cursor: pointer;
+        margin-top: -9px;
+    }
+
+    input[type=range]::-webkit-slider-runnable-track {
+        width: 100%;
+        height: 3px;
+        background: #FF8A00;
+        cursor: pointer;
+    }
+
+    input[type=range]:focus {
+        outline: none;
+    }
+}

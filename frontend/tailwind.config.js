@@ -6,7 +6,21 @@ module.exports = {
         "./src/pages/**/*.{js,ts,jsx,tsx,mdx}",
     ],
     theme: {
-        extend: {},
+        extend: {
+            fontFamily: {
+                sans: [
+                    "var(--font-inter)",
+                    "-apple-system",
+                    "BlinkMacSystemFont",
+                    "SF Pro Display",
+                    "Segoe UI",
+                    "Roboto",
+                    "Helvetica Neue",
+                    "Arial",
+                    "sans-serif"
+                ],
+            },
+        },
     },
     plugins: [],
 }

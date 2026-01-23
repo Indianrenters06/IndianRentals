@@ -3,7 +3,11 @@ import "./globals.css";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 
-const inter = Inter({ subsets: ["latin"] });
+const inter = Inter({
+  subsets: ["latin"],
+  variable: "--font-inter",
+  display: "swap",
+});
 
 export const metadata = {
   title: "Indian Rentals",
@@ -12,15 +16,19 @@ export const metadata = {
 
 
 
+import { ReduxProvider } from "../redux/provider";
+
+import ClientLayout from "../components/ClientLayout";
+
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
-      <body className={`${inter.className} bg-gray-50`}>
-        <Navbar />
-        <main>
-          {children}
-        </main>
-        <Footer />
+      <body className={`${inter.variable} font-sans bg-gray-50`}>
+        <ReduxProvider>
+          <ClientLayout>
+            {children}
+          </ClientLayout>
+        </ReduxProvider>
       </body>
     </html>
   );
