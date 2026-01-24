@@ -1,6 +1,10 @@
 "use client";
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { FaStar } from 'react-icons/fa';
+import gsap from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+
+gsap.registerPlugin(ScrollTrigger);
 
 const GoogleLogo = () => (
     <span className="flex items-center font-bold text-xl font-product-sans leading-none tracking-tight">
@@ -24,52 +28,150 @@ const reviews = [
     },
     {
         id: 2,
-        name: "John Doe",
-        role: "AI Engineer",
-        text: "Lorem ipsum dolor sit amet consectetur. Eget pretium risus odio eu commodo amet pretium. Interdum purus sapien facilisi at senectus tempus nisi nulla. Ultricies condimentum mi ultrices integer.",
+        name: "Sarah Smith",
+        role: "Creative Director",
+        text: "Amazing service! The equipment was top-notch and the delivery was right on time. Highly recommended for any serious creative professional.",
         bg: "bg-[#E3F2FD]", // Lighter Blue
         stars: 5,
     },
     {
         id: 3,
-        name: "John Doe",
-        role: "AI Engineer",
-        text: "Lorem ipsum dolor sit amet consectetur. Eget pretium risus odio eu commodo amet pretium. Interdum purus sapien facilisi at senectus tempus nisi nulla. Ultricies condimentum mi ultrices integer.",
+        name: "Mike Johnson",
+        role: "Photographer",
+        text: "I was skeptical at first, but IndianRenters exceeded my expectations. The camera gear was in pristine condition.",
         bg: "bg-[#E8F5E9]", // Lighter Green
         stars: 5,
     },
     {
         id: 4,
-        name: "John Doe",
-        role: "AI Engineer",
-        text: "Lorem ipsum dolor sit amet consectetur. Eget pretium risus odio eu commodo amet pretium. Interdum purus sapien facilisi at senectus tempus nisi nulla. Ultricies condimentum mi ultrices integer.",
+        name: "Emily Davis",
+        role: "Startup Founder",
+        text: "Renting laptops for my team was seamless. Saved us a ton of capital upfront. Great support team as well!",
         bg: "bg-[#F3E5F5]", // Lighter Purple
         stars: 5,
     },
     {
         id: 5,
-        name: "John Doe",
-        role: "AI Engineer",
-        text: "Lorem ipsum dolor sit amet consectetur. Eget pretium risus odio eu commodo amet pretium. Interdum purus sapien facilisi at senectus tempus nisi nulla. Ultricies condimentum mi ultrices integer.",
+        name: "David Wilson",
+        role: "Freelancer",
+        text: "The flexibility of renting for short projects is a game changer. I can take on more work without worrying about equipment costs.",
         bg: "bg-[#FFF3E0]", // Lighter Orange
         stars: 5,
     },
     {
         id: 6,
-        name: "John Doe",
-        role: "AI Engineer",
-        text: "Lorem ipsum dolor sit amet consectetur. Eget pretium risus odio eu commodo amet pretium. Interdum purus sapien facilisi at senectus tempus nisi nulla. Ultricies condimentum mi ultrices integer.",
+        name: "Lisa Anderson",
+        role: "Event Planner",
+        text: "Used their service for a corporate event. Projectors and screens were perfect. Setup assistance was very helpful.",
         bg: "bg-[#FCE4EC]", // Lighter Pink
         stars: 4,
     },
 ];
 
 const Testimonials = () => {
+    const wrapperRef = useRef(null);
+    const row1Ref = useRef(null);
+    const row2Ref = useRef(null);
+
+    useEffect(() => {
+        let ctx = gsap.context(() => {
+            const rows = [
+                { ref: row1Ref.current, dir: -1 }, // Left
+                { ref: row2Ref.current, dir: 1 }   // Right
+            ];
+
+            rows.forEach((row, index) => {
+                if (!row.ref) return;
+
+                const content = row.ref;
+                const totalWidth = content.scrollWidth;
+                const uniqueWidth = totalWidth / 4; // Since we quadrupled the items
+
+                if (row.dir === 1) {
+                    // Start offset for Right scrolling so it has space to move into
+                    gsap.set(content, { x: -uniqueWidth * 2 });
+                } else {
+                    gsap.set(content, { x: 0 });
+                }
+
+                // Create the infinite horizontal loop tween
+                const tween = gsap.to(content, {
+                    x: (row.dir === -1) ? -uniqueWidth : (row.dir === 1 ? -uniqueWidth : 0), // wait, math fix below
+                    // Logic to loop:
+                    // Left moving: 0 -> -uniqueWidth (then repeat resets to 0)
+                    // Right moving: -uniqueWidth * 2 -> -uniqueWidth (then repeat resets to -uniqueWidth*2)
+                    x: (row.dir === -1)
+                        ? `-=${uniqueWidth}`
+                        : `+=${uniqueWidth}`,
+
+                    duration: 30 + (index * 5),
+                    ease: "none",
+                    repeat: -1,
+                });
+
+                // Scroll Velocity Reactivity
+                ScrollTrigger.create({
+                    trigger: wrapperRef.current,
+                    start: "top bottom",
+                    end: "bottom top",
+                    onUpdate: (self) => {
+                        let v = self.getVelocity();
+                        let timeScale = 1 + Math.abs(v) / 300;
+
+                        gsap.to(tween, {
+                            timeScale: timeScale,
+                            duration: 0.5,
+                            overwrite: true,
+                            onComplete: () => gsap.to(tween, { timeScale: 1, duration: 0.5 })
+                        });
+                    }
+                });
+            });
+
+        }, wrapperRef);
+
+        return () => ctx.revert();
+    }, []);
+
+    // Split Reviews into two rows
+    const topReviews = reviews.slice(0, 3);
+    const bottomReviews = reviews.slice(3, 6);
+
+    // Quadruple items for seamless infinite loop buffer
+    const row1Items = [...topReviews, ...topReviews, ...topReviews, ...topReviews];
+    const row2Items = [...bottomReviews, ...bottomReviews, ...bottomReviews, ...bottomReviews];
+
+    const ReviewCard = ({ review }) => (
+        <div
+            className={`${review.bg} w-[250px] md:w-[400px] shrink-0 rounded-[2rem] p-6 lg:p-7 flex flex-col h-[230px] transition-all hover:-translate-y-1 hover:shadow-lg duration-300 select-none mr-6`}
+        >
+            <div className="mb-4">
+                <h3 className="text-lg font-bold text-gray-900 leading-none mb-1">{review.name}</h3>
+                <p className="text-sm font-medium text-gray-500">{review.role}</p>
+            </div>
+
+            <p className="text-[#333] text-[15px] leading-[1.6] mb-4 grow font-medium line-clamp-4">
+                {review.text}
+            </p>
+
+            <div className="flex items-end justify-between mt-auto">
+                <div className="translate-y-1">
+                    <GoogleLogo />
+                </div>
+                <div className="flex text-[#F4B400] gap-0.5 text-lg">
+                    {[...Array(5)].map((_, j) => (
+                        <FaStar key={j} className={j < review.stars ? "text-[#FAB005]" : "text-gray-300"} />
+                    ))}
+                </div>
+            </div>
+        </div>
+    );
+
     return (
-        <section className="py-20 bg-white relative overflow-hidden">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+        <section ref={wrapperRef} className="py-20 bg-white relative overflow-hidden">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 mb-12">
                 {/* Header */}
-                <div className="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-6">
+                <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
                     <div className="space-y-4 max-w-2xl">
                         <h2 className="text-4xl md:text-5xl font-bold text-gray-900 tracking-tight">
                             What Our <span className="text-[#0A99FF]">Customers</span> Say
@@ -80,7 +182,7 @@ const Testimonials = () => {
                     </div>
 
                     {/* Google Reviews Badge */}
-                    <div className="flex items-center gap-4 bg-white border border-gray-100 px-6 py-3 rounded-2xl shadow-sm hover:shadow-md transition-shadow cursor-pointer">
+                    <div className="flex items-center gap-4 bg-white border border-gray-100 px-6 py-3 rounded-2xl shadow-sm hover:shadow-md transition-shadow cursor-pointer hidden md:flex">
                         <GoogleLogo />
                         <div className="flex flex-col border-l border-gray-200 pl-4">
                             <span className="text-xs text-gray-500 font-bold uppercase tracking-wider">5000+ reviews</span>
@@ -93,46 +195,38 @@ const Testimonials = () => {
                         </div>
                     </div>
                 </div>
+            </div>
 
-                {/* Reviews Grid */}
-                <div className="relative -mx-4 sm:-mx-0">
+            {/* Horizontal Marquee Rows Container */}
+            <div className="relative w-full space-y-8 pb-8">
 
-                    {/* Gradient Fades for Visual Flair */}
-                    <div className="absolute left-0 top-0 bottom-0 w-32 bg-linear-to-r from-white via-white/80 to-transparent z-20 pointer-events-none hidden md:block"></div>
-                    <div className="absolute right-0 top-0 bottom-0 w-32 bg-linear-to-l from-white via-white/80 to-transparent z-20 pointer-events-none hidden md:block"></div>
+                {/* Left/Right Gradient Fades */}
+                <div className="absolute left-0 top-0 bottom-0 w-32 bg-linear-to-r from-white to-transparent z-20 pointer-events-none hidden md:block"></div>
+                <div className="absolute right-0 top-0 bottom-0 w-32 bg-linear-to-l from-white to-transparent z-20 pointer-events-none hidden md:block"></div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8 mb-16 px-4 sm:px-0">
-                        {reviews.map((review) => (
-                            <div
-                                key={review.id}
-                                className={`${review.bg} rounded-[2rem] p-6 lg:p-7 flex flex-col h-full transition-all hover:-translate-y-1 hover:shadow-lg duration-300`}
-                            >
-                                <div className="mb-4">
-                                    <h3 className="text-lg font-bold text-gray-900 leading-none mb-1">{review.name}</h3>
-                                    <p className="text-sm font-medium text-gray-500">{review.role}</p>
-                                </div>
-
-                                <p className="text-[#333] text-[15px] leading-[1.6] mb-8 grow font-medium">
-                                    {review.text}
-                                </p>
-
-                                <div className="flex items-end justify-between mt-auto">
-                                    <div className="translate-y-1">
-                                        <GoogleLogo />
-                                    </div>
-                                    <div className="flex text-[#F4B400] gap-0.5 text-lg">
-                                        {[...Array(5)].map((_, i) => (
-                                            <FaStar key={i} className={i < review.stars ? "text-[#FAB005]" : "text-gray-300"} />
-                                        ))}
-                                    </div>
-                                </div>
-                            </div>
+                {/* Row 1: Moves Left */}
+                <div className="w-full overflow-hidden">
+                    <div ref={row1Ref} className="flex w-max pl-4">
+                        {row1Items.map((review, i) => (
+                            <ReviewCard key={`r1-${i}`} review={review} />
                         ))}
                     </div>
                 </div>
 
-                {/* Read All Reviews Button */}
-                <div className="flex justify-center pt-4">
+                {/* Row 2: Moves Right */}
+                <div className="w-full overflow-hidden">
+                    <div ref={row2Ref} className="flex w-max pl-4">
+                        {row2Items.map((review, i) => (
+                            <ReviewCard key={`r2-${i}`} review={review} />
+                        ))}
+                    </div>
+                </div>
+
+            </div>
+
+            {/* Read All Reviews Button */}
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-30 pt-4">
+                <div className="flex justify-center">
                     <button className="px-10 py-4 bg-[#007AFF] text-white font-bold rounded-full hover:bg-blue-600 transition-all shadow-lg hover:shadow-blue-200 hover:-translate-y-1">
                         Read All Reviews
                     </button>
