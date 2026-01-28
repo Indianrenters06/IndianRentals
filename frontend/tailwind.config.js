@@ -12,7 +12,6 @@ module.exports = {
                     "var(--font-inter)",
                     "-apple-system",
                     "BlinkMacSystemFont",
-                    "SF Pro Display",
                     "Segoe UI",
                     "Roboto",
                     "Helvetica Neue",

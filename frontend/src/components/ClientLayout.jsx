@@ -16,7 +16,7 @@ export default function ClientLayout({ children }) {
             <main>
                 {children}
             </main>
-            {!isCheckoutFlow && <Footer />}
+            {!isCheckoutFlow && !pathname.startsWith('/profile') && <Footer />}
         </>
     );
 }

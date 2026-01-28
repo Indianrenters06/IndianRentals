@@ -23,7 +23,7 @@ import ClientLayout from "../components/ClientLayout";
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
-      <body className={`${inter.variable} font-sans bg-gray-50`}>
+      <body className={`${inter.variable} font-sans bg-gray-50 antialiased`}>
         <ReduxProvider>
           <ClientLayout>
             {children}

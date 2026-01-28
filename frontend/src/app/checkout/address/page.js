@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { FaUserCircle, FaTrashAlt, FaPlus, FaArrowRight } from 'react-icons/fa';
+import { FaUserCircle, FaTrashAlt, FaPlus, FaArrowRight, FaCheck } from 'react-icons/fa';
 import { BsCheckCircleFill, BsCreditCard } from 'react-icons/bs';
 import { HiOutlineSparkles } from 'react-icons/hi';
 import { FiEdit2 } from 'react-icons/fi';
@@ -139,22 +139,27 @@ export default function AddressPage() {
                                 {addresses.map((addr) => (
                                     <div
                                         key={addr.id}
-                                        className={`bg-white border ${selectedAddressId === addr.id ? 'border-black ring-1 ring-black' : 'border-gray-200'} rounded-2xl p-6 relative cursor-pointer hover:shadow-sm transition-all`}
+                                        className={`bg-white border-2 overflow-hidden ${selectedAddressId === addr.id ? 'border-[#007AFF]' : 'border-gray-200'} rounded-2xl p-2 relative cursor-pointer hover:shadow-sm transition-all`}
                                         onClick={() => setSelectedAddressId(addr.id)}
                                     >
+                                        {selectedAddressId === addr.id && (
+                                            <div className="absolute top-0 right-0 bg-[#007AFF] w-7 h-6 rounded-bl-[1rem] flex items-center-safe justify-center">
+                                                <FaCheck className="text-white text-l translate-x-1.5 -translate-y-1.5" />
+                                            </div>
+                                        )}
                                         <div className="flex items-start gap-4">
                                             <div className="mt-1 text-gray-800">
                                                 <FaUserCircle size={40} className="text-gray-600" />
                                             </div>
                                             <div className="flex-1">
-                                                <h3 className="text-lg font-medium text-gray-900">{addr.name}</h3>
-                                                <p className="text-gray-600 mt-1 text-[15px] leading-relaxed">
-                                                    {addr.addressLine} <span className="text-gray-300 mx-1">|</span>
-                                                    {addr.city} <span className="text-gray-300 mx-1">|</span>
-                                                    {addr.pincode} <span className="text-gray-300 mx-1">|</span>
+                                                <h3 className="text-l font-medium text-gray-700">{addr.name}</h3>
+                                                <p className="text-gray-800 mt-1 text-[15px] leading-relaxed font-medium">
+                                                    {addr.addressLine} <span className="text-gray-600 mx-1">|</span>
+                                                    {addr.city} <span className="text-gray-600 mx-1">|</span>
+                                                    {addr.pincode} <span className="text-gray-600 mx-1">|</span>
                                                     {addr.state}
                                                 </p>
-                                                <p className="text-gray-500 mt-2 text-sm font-medium">{addr.phone}</p>
+                                                <p className="text-gray-500 mt-2 text-sm font-semibold">{addr.phone}</p>
                                             </div>
 
                                             {/* Actions */}
