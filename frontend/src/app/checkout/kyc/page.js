@@ -232,6 +232,9 @@ export default function KYCPage() {
         documents: { identityProof: 'Voter ID', addressProof: 'House Electricity Bill' }
     });
 
+    // Checkbox state for Step 4
+    const [isDocumentsChecked, setIsDocumentsChecked] = useState(false);
+
     const handleDocumentChange = (type, value) => {
         setFormData(prev => ({
             ...prev,
@@ -320,6 +323,11 @@ export default function KYCPage() {
     };
 
     const handleNext = () => {
+        if (currentStep === 4 && !isDocumentsChecked) {
+            alert("Please check the box to proceed.");
+            return;
+        }
+
         if (currentStep < 4) setCurrentStep(currentStep + 1);
         else if (currentStep === 4) setCurrentStep(5);
     };
@@ -341,55 +349,208 @@ export default function KYCPage() {
         <div className="min-h-screen bg-gray-50 font-sans mt-8">
             <div className="max-w-6xl mx-auto px-8 py-4">
                 {/* Breadcrumb - Matches design */}
-                <div className="text-xs text-gray-500 mb-6 flex items-center gap-2">
-                    <Link href="/" className="hover:text-black font-medium font-sans">Product-Page</Link>
-                    <span>›</span>
-                    <Link href="/cart" className="hover:text-black font-medium font-sans">Cart</Link>
-                    <span>›</span>
-                    <Link href="/checkout/address" className="hover:text-black font-medium font-sans">Address</Link>
-                    <span>›</span>
-                    <span className="text-black font-medium font-sans">Verification</span>
-                </div>
+                {currentStep !== 5 && (
+                    <div className="text-xs text-gray-500 mb-6 flex items-center gap-2">
+                        <Link href="/" className="hover:text-black font-medium font-sans">Product-Page</Link>
+                        <span>›</span>
+                        <Link href="/cart" className="hover:text-black font-medium font-sans">Cart</Link>
+                        <span>›</span>
+                        <Link href="/checkout/address" className="hover:text-black font-medium font-sans">Address</Link>
+                        <span>›</span>
+                        <span className="text-black font-medium font-sans">Verification</span>
+                    </div>
+                )}
 
                 {currentStep === 5 ? (
-                    <div className="flex justify-center items-center min-h-[60vh]">
-                        <div className="bg-white rounded-3xl p-12 shadow-sm border border-gray-100 max-w-2xl w-full text-center relative">
+                    <div className="flex justify-center items-center min-h-[60vh] px-4">
+                        <div className="relative w-full max-w-lg bg-white rounded-2xl shadow-lg px-8 py-12 text-center">
+
+                            {/* Back Button */}
                             <button
-                                onClick={() => setCurrentStep(4)}
-                                className="absolute top-8 left-8 flex items-center gap-2 text-red-500 border border-red-500 rounded-full px-4 py-1.5 hover:bg-red-50 transition-colors text-sm font-medium"
+                                onClick={() => setCurrentStep(1)}
+                                className="absolute top-6 left-6 flex items-center gap-2 text-red-500 border border-red-500 rounded-full px-4 py-1.5 text-sm font-medium hover:bg-red-50 transition"
                             >
-                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7"></path></svg>
+                                <svg
+                                    className="w-4 h-4"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    viewBox="0 0 24 24"
+                                >
+                                    <path
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        strokeWidth="2"
+                                        d="M15 19l-7-7 7-7"
+                                    />
+                                </svg>
                                 Back
                             </button>
 
-                            <div className="flex justify-center mb-8 mt-4">
-                                <div className="relative w-24 h-24 bg-blue-50 rounded-full flex items-center justify-center">
-                                    <div className="absolute inset-0 rounded-full border-4 border-l-blue-500 border-t-blue-500 border-r-gray-200 border-b-gray-200 transform -rotate-45"></div>
-                                    <svg className="w-10 h-10 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
-                                    <div className="absolute -bottom-2 -right-2 bg-blue-500 rounded-full p-1.5 border-4 border-white">
-                                        <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-                                    </div>
+                            {/* Illustration */}
+                            <div className="flex justify-center mb-10 mt-4">
+                                <div className="relative w-56 h-56 flex items-center justify-center">
+
+                                    {/* Blue Glow */}
+                                    <div className="absolute inset-6 rounded-full bg-blue-500/10 blur-2xl"></div>
+
+                                    <svg
+                                        viewBox="0 0 200 200"
+                                        className="relative z-10 w-full h-full"
+                                        fill="none"
+                                    >
+                                        <defs>
+                                            <linearGradient id="badgeGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                                                <stop offset="0%" stopColor="#4facfe" />
+                                                <stop offset="100%" stopColor="#00f2fe" />
+                                            </linearGradient>
+                                            <filter id="badgeShadow" x="-50%" y="-50%" width="200%" height="200%">
+                                                <feDropShadow dx="2" dy="3" stdDeviation="3" floodColor="#2563EB" floodOpacity="0.3" />
+                                            </filter>
+                                        </defs>
+
+                                        {/* Grey Ring */}
+                                        <circle
+                                            cx="100"
+                                            cy="100"
+                                            r="80"
+                                            stroke="#E5E7EB"
+                                            strokeWidth="10"
+                                        />
+
+                                        {/* Blue Segment Arc */}
+                                        <path
+                                            d="M 100 20 A 80 80 0 0 0 43.4 156.6"
+                                            stroke="#0B5ED7"
+                                            strokeWidth="10"
+                                            strokeLinecap="round"
+                                            fill="none"
+                                        />
+
+                                        {/* Inner Circle */}
+                                        <circle cx="100" cy="100" r="58" fill="#F8FAFF" />
+
+                                        {/* Document Stack */}
+                                        <g transform="translate(72, 56)">
+                                            {/* Back Paper */}
+                                            <rect x="-12" y="10" width="60" height="80" rx="4" fill="#F3F4F6" />
+
+                                            {/* Front Paper Main Body */}
+                                            <path
+                                                d="M0 0 H45 L60 15 V80 H0 V0 Z"
+                                                fill="white"
+                                            />
+
+                                            {/* Fold Corner */}
+                                            <path
+                                                d="M45 0 V15 H60"
+                                                fill="#E5E7EB"
+                                            />
+
+                                            {/* Content: Image Placeholder */}
+                                            <rect x="10" y="12" width="20" height="20" fill="#E5E7EB" />
+
+                                            {/* Content: Lines */}
+                                            <rect x="10" y="42" width="40" height="3" rx="1.5" fill="#E5E7EB" />
+                                            <rect x="10" y="50" width="40" height="3" rx="1.5" fill="#E5E7EB" />
+                                            <rect x="10" y="58" width="40" height="3" rx="1.5" fill="#E5E7EB" />
+                                            <rect x="10" y="66" width="28" height="3" rx="1.5" fill="#E5E7EB" />
+                                            <rect x="36" y="12" width="14" height="20" fill="#F9FAFB" /> {/* Decoration next to image if needed, or just leave blank */}
+                                        </g>
+
+                                        {/* Check Badge */}
+                                        <g transform="translate(40, 84)">
+                                            <circle
+                                                cx="12"
+                                                cy="12"
+                                                r="14"
+                                                fill="#0B5ED7"
+                                                filter="url(#badgeShadow)"
+                                                stroke="white"
+                                                strokeWidth="3"
+                                            />
+                                            <path
+                                                d="M7 12 L11 16 L17 8"
+                                                stroke="white"
+                                                strokeWidth="2.5"
+                                                strokeLinecap="round"
+                                                strokeLinejoin="round"
+                                            />
+                                        </g>
+
+                                        {/* Magnifier */}
+                                        <g transform="translate(112, 112)">
+                                            {/* Top Right Arc */}
+                                            <path
+                                                d="M 20.0 -11.0 A 31 31 0 0 1 51.0 20.0"
+                                                stroke="#0B5ED7"
+                                                strokeWidth="1.5"
+                                                strokeLinecap="round"
+                                                fill="none"
+                                            />
+                                            {/* Bottom Left Arc */}
+                                            <path
+                                                d="M 20.0 51.0 A 31 31 0 0 1 -11.0 20.0"
+                                                stroke="#0B5ED7"
+                                                strokeWidth="1.5"
+                                                strokeLinecap="round"
+                                                fill="none"
+                                            />
+                                            {/* Handle Neck */}
+                                            <path
+                                                d="M38 38 L43 43"
+                                                stroke="#0B5ED7"
+                                                strokeWidth="4"
+                                                strokeLinecap="round"
+                                            />
+                                            {/* Handle Grip */}
+                                            <path
+                                                d="M43 43 L60 60"
+                                                stroke="#0B5ED7"
+                                                strokeWidth="9"
+                                                strokeLinecap="round"
+                                            />
+                                            {/* Lens */}
+                                            <circle
+                                                cx="20"
+                                                cy="20"
+                                                r="25"
+                                                stroke="#0B5ED7"
+                                                strokeWidth="6"
+                                                strokeLinecap="round"
+                                                fill="none"
+                                            />
+                                        </g>
+                                    </svg>
                                 </div>
                             </div>
 
-                            <h2 className="text-3xl font-semibold text-[#0056D2] mb-4">KYC in Progress</h2>
-                            <p className="text-gray-600 mb-8 max-w-lg mx-auto leading-relaxed">
-                                We are now reviewing your documents. This typically takes 24-48 hours. We will notify you via email as soon its complete.
+                            {/* Title */}
+                            <h2 className="text-4xl font-semibold text-[#0B5ED7] mb-4">
+                                KYC in Progress
+                            </h2>
+
+                            {/* Description */}
+                            <p className="text-gray-900 text-[15px] font-medium max-w-xl mx-auto mb-6">
+                                We are now reviewing your documents. This typically takes 24–48 hours.
+                                We will notify you via email as soon as it’s complete.
                             </p>
 
-                            <div className="flex justify-center gap-4">
+                            {/* Buttons */}
+                            <div className="flex justify-center gap-6">
                                 <Link
                                     href="/profile/orders"
-                                    className="bg-[#007bff] hover:bg-[#0069d9] text-white font-medium py-3 px-8 rounded-full transition-all shadow-md"
+                                    className="bg-[#3B82F6] hover:bg-[#2563EB] text-white px-6 py-2 rounded-3xl font-normal shadow-lg transition"
                                 >
                                     Go To My Orders
                                 </Link>
-                                <button className="bg-[#333] hover:bg-black text-white font-medium py-3 px-8 rounded-full transition-all shadow-md">
+
+                                <button className="bg-[#4B5563] hover:bg-[#374151] text-white px-6 py-2 rounded-3xl font-normal shadow-lg transition">
                                     KYC Documentation
                                 </button>
                             </div>
                         </div>
                     </div>
+
                 ) : (
                     <div className="flex flex-col lg:flex-row gap-8">
                         {/* Left Column: KYC Form */}
@@ -780,7 +941,12 @@ export default function KYCPage() {
                                             </div>
 
                                             <div className="flex items-start gap-3 mb-8">
-                                                <input type="checkbox" className="mt-1 w-4 h-4 rounded border-gray-300 text-black focus:ring-black" />
+                                                <input
+                                                    type="checkbox"
+                                                    checked={isDocumentsChecked}
+                                                    onChange={(e) => setIsDocumentsChecked(e.target.checked)}
+                                                    className="mt-1 w-4 h-4 rounded border-gray-300 text-black focus:ring-black cursor-pointer"
+                                                />
                                                 <p className="text-xs text-gray-600 leading-relaxed">
                                                     By checking this box, I acknowledge that I have read and accepted the <span className="font-bold">**Privacy Policy**</span>, and I <span className="text-red-500">*</span> consent to the use of my provided documents and data for the sole purpose of identity verification and rental agreement processing.
                                                 </p>

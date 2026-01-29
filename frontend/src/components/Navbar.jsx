@@ -88,7 +88,7 @@ const Navbar = () => {
             </div>
 
             {/* Top Bar */}
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 ">
+            <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 ">
                 <div className="flex items-center justify-between gap-4">
                     {/* Logo Section */}
                     <Link href="/" className="shrink-0">
@@ -235,14 +235,14 @@ const Navbar = () => {
             </div>
 
             {/* Secondary Nav - Categories */}
-            <div className="hidden md:block border-t border-gray-100 bg-white">
+            <div className="hidden md:block border-t border-b border-gray-200 bg-white">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div className="flex items-center justify-center space-x-8 py-3 overflow-x-auto">
+                    <div className="flex items-center justify-center space-x-8 py-1 overflow-x-auto">
                         {navLinks.map((link) => (
                             <Link
                                 key={link.name}
                                 href={link.href}
-                                className="text-[13px] font-medium text-gray-600 hover:text-indigo-600 whitespace-nowrap transition-colors relative group uppercase tracking-wide"
+                                className="text-[14px] font-medium text-gray-600 hover:text-black whitespace-nowrap transition-colors relative group tracking-wide"
                             >
                                 {link.name}
                                 <span className="absolute -bottom-3 left-0 w-0 h-0.5 bg-indigo-600 transition-all duration-300 group-hover:w-full"></span>

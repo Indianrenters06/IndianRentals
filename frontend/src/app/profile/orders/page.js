@@ -131,14 +131,14 @@ export default function MyOrdersPage() {
     };
 
     return (
-        <div className="bg-white min-h-screen rounded-2xl p-6 border border-gray-100 relative">
+        <div className="relative">
             {/* Dashed Border Effect (Optional, mimicking the container) */}
 
             {/* Top Toggle */}
-            <div className="flex gap-4 mb-8">
+            <div className="flex gap-4 mb-6">
                 <button
                     onClick={() => handleViewChange('orders')}
-                    className={`px-8 py-2.5 rounded-full text-lg font-medium transition-all ${viewType === 'orders'
+                    className={`px-8 py-1 rounded-full text-lg font-normal transition-all ${viewType === 'orders'
                         ? 'bg-[#333] text-white shadow-md'
                         : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                         }`}
@@ -147,9 +147,9 @@ export default function MyOrdersPage() {
                 </button>
                 <button
                     onClick={() => handleViewChange('subscriptions')}
-                    className={`px-8 py-2.5 rounded-full text-lg font-medium transition-all ${viewType === 'subscriptions'
+                    className={`px-8 py-1 rounded-full text-lg font-normal transition-all ${viewType === 'subscriptions'
                         ? 'bg-[#333] text-white shadow-md'
-                        : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                         }`}
                 >
                     Subscriptions
@@ -157,14 +157,14 @@ export default function MyOrdersPage() {
             </div>
 
             {/* Tabs */}
-            <div className="flex items-center gap-8 border-b border-gray-200 mb-6 overflow-x-auto pb-1 scrollbar-hide">
+            <div className="flex items-center gap-8 border-b border-gray-200 mb-2 overflow-x-auto pb-1 scrollbar-hide">
                 {currentTabs.map((tab) => (
                     <button
                         key={tab}
                         onClick={() => setActiveTab(tab)}
-                        className={`text-sm font-medium whitespace-nowrap pb-3 border-b-2 transition-colors ${activeTab === tab
+                        className={`text-md font-medium whitespace-nowrap pb-3 border-b-2 transition-colors ${activeTab === tab
                             ? 'border-[#3b82f6] text-[#3b82f6]'
-                            : 'border-transparent text-gray-600 hover:text-gray-900'
+                            : 'border-transparent text-gray-800 hover:text-gray-900'
                             }`}
                     >
                         {tab}
@@ -183,7 +183,7 @@ export default function MyOrdersPage() {
             )}
 
             {/* Info Banner */}
-            <div className="bg-gray-100 rounded-lg p-3 mb-6 flex items-start gap-2 text-xs text-gray-500">
+            <div className="bg-gray-100 rounded-lg p-3 mb-2 flex items-start gap-2 text-xs text-gray-500">
                 <PiInfo size={16} className="mt-0.5 flex-shrink-0" />
                 <p>
                     {viewType === 'subscriptions'
@@ -198,33 +198,33 @@ export default function MyOrdersPage() {
             {/* Orders List */}
             <div className="space-y-6">
                 {filteredOrders.map((order) => (
-                    <div key={order.id} className="border border-gray-200 rounded-2xl p-6 hover:shadow-sm transition-shadow">
+                    <div key={order.id} className="border border-gray-300 rounded-2xl p-4 hover:shadow-sm transition-shadow">
                         {/* Header Info Grid */}
-                        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-6 text-sm">
+                        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4  text-sm">
                             <div>
                                 <p className="text-gray-500 text-xs mb-1">Order Date</p>
-                                <p className="font-bold text-gray-800">{order.date}</p>
+                                <p className="font-semibold text-gray-800">{order.date}</p>
                             </div>
                             <div>
                                 <p className="text-gray-500 text-xs mb-1">Order No.</p>
-                                <p className="font-bold text-gray-800">{order.id}</p>
+                                <p className="font-semibold text-gray-800">{order.id}</p>
                             </div>
                             <div className="lg:col-span-1">
                                 <p className="text-gray-500 text-xs mb-1">Delivery to</p>
-                                <p className="font-bold text-gray-800 truncate" title={order.deliveryTo}>{order.deliveryTo}</p>
+                                <p className="font-semibold text-gray-800 truncate" title={order.deliveryTo}>{order.deliveryTo}</p>
                             </div>
                             <div>
                                 <p className="text-gray-500 text-xs mb-1">Monthly Rent</p>
-                                <p className="font-bold text-gray-800">₹{order.monthlyRent}/mo</p>
+                                <p className="font-semibold text-gray-800">₹{order.monthlyRent}/mo</p>
                             </div>
                             <div>
                                 <p className="text-gray-500 text-xs mb-1">Security Amount</p>
-                                <p className="font-bold text-gray-800">₹{parseFloat(order.securityAmount).toFixed(2)}</p>
+                                <p className="font-semibold text-gray-800">₹{parseFloat(order.securityAmount).toFixed(2)}</p>
                             </div>
                             <div>
                                 <p className="text-gray-500 text-xs mb-1">Partial Amount</p>
                                 <div className="flex justify-between items-start gap-2">
-                                    <p className="font-bold text-gray-800">₹{order.partialAmount}</p>
+                                    <p className="font-semibold text-gray-800">₹{order.partialAmount}</p>
                                     <span className={`text-[10px] px-3 py-1 rounded-full font-medium whitespace-nowrap ${getStatusStyle(order.status)}`}>
                                         {order.status === 'Active' ? 'Active Order' : order.status === 'Inactive' ? 'Inactive Order' : order.status === 'Failed' ? 'Order Failed' : order.status}
                                     </span>
@@ -232,7 +232,7 @@ export default function MyOrdersPage() {
                             </div>
                         </div>
 
-                        <div className="h-px bg-gray-100 w-full mb-6"></div>
+                        <div className="h-px bg-gray-100 w-full mb-2"></div>
 
                         {/* Product Details */}
                         <div className="flex flex-col md:flex-row gap-6 items-start">
@@ -248,7 +248,7 @@ export default function MyOrdersPage() {
 
                             {/* Product Info */}
                             <div className="flex-1">
-                                <h3 className="font-medium text-gray-800 text-base mb-3 leading-tight">
+                                <h3 className="font-semibold text-gray-700 text-base mb-3 leading-tight">
                                     {order.productName}
                                 </h3>
                                 <div className="flex flex-wrap gap-3 text-xs">
@@ -269,7 +269,7 @@ export default function MyOrdersPage() {
                                             <button className="bg-[#333] hover:bg-black text-white text-sm font-medium py-2 px-4 rounded-full transition-colors shadow-sm w-full whitespace-nowrap">
                                                 Rent Again
                                             </button>
-                                            <button className="bg-[#007bff] hover:bg-[#0069d9] text-white text-sm font-medium py-2 px-4 rounded-full transition-colors shadow-sm w-full">
+                                            <button className="bg-[#007bff] hover:bg-[#0069d9] text-white text-sm font-medium py-2 px-3 rounded-full transition-colors shadow-sm w-full">
                                                 Invoices
                                             </button>
                                         </>
@@ -293,10 +293,10 @@ export default function MyOrdersPage() {
                                     </button>
                                 ) : (
                                     <>
-                                        <button className="bg-[#007bff] hover:bg-[#0069d9] text-white text-sm font-medium py-2 px-4 rounded-full transition-colors shadow-sm w-full">
+                                        <button className="bg-[#007bff] hover:bg-[#0069d9] text-white text-sm font-medium py-1 px-2 rounded-full transition-colors shadow-sm w-full">
                                             Invoices
                                         </button>
-                                        <button className="text-gray-800 text-sm font-medium hover:underline text-center w-full">
+                                        <button className="text-gray-800 text-xs font-semibold underline text-center w-full">
                                             Cancel My Order
                                         </button>
                                     </>

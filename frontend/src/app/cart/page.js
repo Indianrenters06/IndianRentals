@@ -183,6 +183,31 @@ export default function CartPage() {
     const payToday = cartItems.length > 0 ? 600 : 0;
     const savedAmount = 4030.00;
 
+    // Empty Cart State
+    if (cartItems.length === 0) {
+        return (
+            <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center p-4 font-sans">
+                <div className="bg-white p-10 rounded-3xl shadow-lg text-center max-w-md w-full border border-gray-100">
+                    <div className="w-20 h-20 bg-blue-50 rounded-full flex items-center justify-center mx-auto mb-6">
+                        <FaShoppingCart className="text-[#3B82F6] text-3xl" />
+                    </div>
+                    <h2 className="text-2xl font-bold text-gray-900 mb-3">Your Cart is Empty</h2>
+                    <p className="text-gray-500 mb-8 leading-relaxed">
+                        Looks like you haven't added anything to your cart yet.
+                        <br />
+                        Click below to start shopping!
+                    </p>
+                    <Link
+                        href="/categories"
+                        className="inline-block bg-[#3B82F6] hover:bg-[#2563EB] text-white px-8 py-3 rounded-full font-medium transition-all shadow-md hover:shadow-lg w-full"
+                    >
+                        Click to order something
+                    </Link>
+                </div>
+            </div>
+        );
+    }
+
     return (
         <div className="min-h-screen bg-gray-50 py-4 px-4 font-sans">
             <div className="max-w-7xl mx-auto">
