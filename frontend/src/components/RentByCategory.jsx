@@ -3,23 +3,60 @@ import React from 'react';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation, Autoplay } from 'swiper/modules';
 import Link from 'next/link';
+import Image from 'next/image';
 import { FaLaptop, FaCamera, FaDesktop, FaTabletAlt, FaMobileAlt, FaArrowRight } from 'react-icons/fa';
 
 // Import Swiper styles
 import 'swiper/css';
 import 'swiper/css/navigation';
 
-const categories = [
-    { id: 1, name: "MacBook", icon: <FaLaptop size={40} />, color: "bg-gray-100" },
-    { id: 2, name: "DSLR", icon: <FaCamera size={40} />, color: "bg-gray-100" },
-    { id: 3, name: "All in One", icon: <FaDesktop size={40} />, color: "bg-gray-100" },
-    { id: 4, name: "iPad", icon: <FaTabletAlt size={40} />, color: "bg-gray-100" },
-    { id: 5, name: "SmartPhone", icon: <FaMobileAlt size={40} />, color: "bg-gray-100" },
-    { id: 6, name: "Desktop", icon: <FaDesktop size={40} />, color: "bg-gray-100" }, // Using generic desktop icon
-    { id: 7, name: "Gaming", icon: <FaLaptop size={40} />, color: "bg-gray-100" },
-];
-
 const RentByCategory = () => {
+    const [displayCategories, setDisplayCategories] = React.useState([]);
+    const [loading, setLoading] = React.useState(true);
+
+    React.useEffect(() => {
+        const fetchCategories = async () => {
+            try {
+                const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/categories`);
+                if (!response.ok) throw new Error('Failed to fetch');
+                const data = await response.json();
+
+                // Define the specific order requested
+                const targetOrder = ["MacBook", "DSLR", "All in One", "iPad", "SmartPhone", "Desktop"];
+
+                // Map the data to the target order
+                const sortedCategories = targetOrder.map(name => {
+                    const found = data.find(c => c.name.toLowerCase() === name.toLowerCase());
+                    return found ? found : null;
+                }).filter(item => item !== null);
+
+                // If for some reason we missed some (shouldn't happen with updated seeder), 
+                // we could modify this logic, but strictly following the requested list is safer for now.
+                setDisplayCategories(sortedCategories);
+            } catch (err) {
+                console.error(err);
+                // Fallback or leave empty? Maybe leave empty to avoid confusion if backend fails
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchCategories();
+    }, []);
+
+    const getIconForCategory = (name) => {
+        const lowerName = name.toLowerCase();
+        if (lowerName.includes('macbook')) return <FaLaptop size={40} />;
+        if (lowerName.includes('dslr') || lowerName.includes('camera')) return <FaCamera size={40} />;
+        if (lowerName.includes('all in one')) return <FaDesktop size={40} />;
+        if (lowerName.includes('ipad')) return <FaTabletAlt size={40} />;
+        if (lowerName.includes('smartphone') || lowerName.includes('phone')) return <FaMobileAlt size={40} />;
+        if (lowerName.includes('desktop')) return <FaDesktop size={40} />;
+        return <FaLaptop size={40} />;
+    };
+
+    if (loading) return null; // Or a spinner
+
     return (
         <section className="py-20 bg-white">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -30,7 +67,7 @@ const RentByCategory = () => {
                         className="hidden md:inline-flex items-center gap-2 px-6 py-2 bg-[#FFC107] hover:bg-[#FFD54F] text-black font-bold rounded-full transition-colors"
                     >
                         Explore
-                        <FaArrowRight size={14} />
+                        <FaArrowRight size={8} />
                     </Link>
                 </div>
 
@@ -57,13 +94,24 @@ const RentByCategory = () => {
                         }}
                         className="py-4 !overflow-visible"
                     >
-                        {categories.map((cat) => (
-                            <SwiperSlide key={cat.id}>
+                        {displayCategories.map((cat) => (
+                            <SwiperSlide key={cat._id}>
                                 <div className="group flex flex-col items-center p-6 bg-white border border-gray-100 rounded-[2rem] hover:shadow-lg transition-all duration-300 cursor-pointer h-full aspect-[4/5] justify-between">
-                                    <div className={`w-full flex-1 flex items-center justify-center ${cat.color} rounded-2xl mb-4 group-hover:scale-105 transition-transform duration-300`}>
-                                        <div className="text-gray-700 group-hover:text-indigo-600 transition-colors">
-                                            {cat.icon}
-                                        </div>
+                                    <div className="w-full flex-1 flex items-center justify-center bg-gray-100 rounded-2xl mb-4 group-hover:scale-105 transition-transform duration-300 overflow-hidden relative">
+                                        {cat.image ? (
+                                            <div className="relative w-full h-full p-4">
+                                                <Image
+                                                    src={cat.image}
+                                                    alt={cat.name}
+                                                    fill
+                                                    className="object-contain"
+                                                />
+                                            </div>
+                                        ) : (
+                                            <div className="text-gray-700 group-hover:text-indigo-600 transition-colors">
+                                                {getIconForCategory(cat.name)}
+                                            </div>
+                                        )}
                                     </div>
                                     <h3 className="text-base font-bold text-gray-900 group-hover:text-indigo-600 transition-colors text-center">
                                         {cat.name}

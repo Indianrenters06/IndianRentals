@@ -1,5 +1,6 @@
 "use client";
 import React from 'react';
+import Image from 'next/image';
 import { FaLaptopCode, FaUserCheck, FaShieldAlt, FaBoxOpen, FaArrowRight } from 'react-icons/fa';
 
 const steps = [
@@ -92,9 +93,12 @@ const RentalProcess = () => {
 
                 {/* Bottom Image Placeholder */}
                 <div className="mt-16 rounded-3xl overflow-hidden shadow-lg h-96 relative">
-                    <div className="absolute inset-0 bg-gray-200 flex items-center justify-center">
-                        <span className="text-gray-400 font-bold text-xl">Process / Lifestyle Image Workspace</span>
-                    </div>
+                    <Image
+                        src="https://res.cloudinary.com/dgkckcdk8/image/upload/v1769959582/indian-rentals/zojf5e2uxucfqpju6qpa.jpg"
+                        alt="Rental Process Lifestyle"
+                        fill
+                        className="object-cover"
+                    />
                     {/* Decorative Gradients */}
                     <div className="absolute top-0 right-0 w-full h-full bg-linear-to-b from-transparent to-black/50"></div>
                 </div>

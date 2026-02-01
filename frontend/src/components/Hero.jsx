@@ -66,6 +66,7 @@ const Hero = () => {
                             </div>
                         </div>
 
+
                         {/* Image Content */}
                         <motion.div
                             initial={{ opacity: 0, x: 20 }}
@@ -73,10 +74,15 @@ const Hero = () => {
                             transition={{ duration: 0.6, delay: 0.3 }}
                             className="relative flex justify-center md:justify-end items-center"
                         >
-                            {/* Empty container for the laptop image */}
-                            <div className="relative w-full max-w-lg">
-                                {/* Invisible spacer */}
-                                <div className="aspect-16/10 w-full"></div>
+                            <div className="relative w-full max-w-[600px] aspect-[16/10]">
+                                <Image
+                                    src="https://res.cloudinary.com/dgkckcdk8/image/upload/v1769946716/indian-rentals/fj8ptqbhppbstdd0hs4i.png"
+                                    alt="Premium Laptop Rental"
+                                    fill
+                                    className="object-contain drop-shadow-2xl hover:scale-105 transition-transform duration-500"
+                                    priority
+                                    sizes="(max-width: 768px) 100vw, 600px"
+                                />
                             </div>
                         </motion.div>
                     </div>

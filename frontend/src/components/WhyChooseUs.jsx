@@ -39,14 +39,13 @@ const WhyChooseUs = () => {
                     {/* Image Content */}
                     <div className="order-1 md:order-2 relative">
                         {/* Main Image Placeholder */}
-                        <div className="relative rounded-2xl overflow-hidden shadow-2xl">
-                            <div className="aspect-4/3 bg-gray-200 w-full flex items-center justify-center text-gray-400">
-                                {/* Replace with actual image */}
-                                <div className="text-center p-8">
-                                    <span className="block text-4xl mb-2">👥</span>
-                                    Team Meeting / Office Image
-                                </div>
-                            </div>
+                        <div className="relative rounded-2xl overflow-hidden shadow-2xl aspect-[4/3]">
+                            <Image
+                                src="https://res.cloudinary.com/dgkckcdk8/image/upload/v1769961565/indian-rentals/anmpufdlxxxblkxqxpds.jpg"
+                                alt="Why Choose Us"
+                                fill
+                                className="object-cover"
+                            />
                         </div>
 
                         {/* Decorative elements */}

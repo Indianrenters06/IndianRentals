@@ -1,49 +1,77 @@
 "use client";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
+import { getCategories } from "../../services/categoryService";
 
-const categories = [
+// Initial static structure to MATCH THE DESIGN EXACTLY
+const initialCategories = [
     {
         id: 1,
         title: "Apple Products",
-        // iMac, MacBook, iPad cluster
-        image: "https://images.unsplash.com/photo-1611186871348-b1ce696e52c9?q=80&w=800&auto=format&fit=crop",
+        defaultImage: "https://images.unsplash.com/photo-1611186871348-b1ce696e52c9?q=80&w=800&auto=format&fit=crop",
         href: "/category/apple"
     },
     {
         id: 2,
         title: "IT Products",
-        // Desktop/Laptop setup
-        image: "/it-products-new.jpg",
-        href: "/category/it-products",
-        objectFit: "cover"
+        defaultImage: "/it-products-new.jpg",
+        href: "/category/it-products"
     },
     {
         id: 3,
         title: "AV Products",
-        // Projector/Audio
-        image: "https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?q=80&w=800&auto=format&fit=crop",
+        defaultImage: "https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?q=80&w=800&auto=format&fit=crop",
         href: "/category/av-products"
     },
     {
         id: 4,
         title: "Office Equipment",
-        // Printer
-        image: "/office-equipment-new.jpg",
+        defaultImage: "/office-equipment-new.jpg",
         href: "/category/office-equipment"
     },
     {
         id: 5,
         title: "DSLR Cameras",
-        // Camera kit
-        image: "https://images.unsplash.com/photo-1516035069371-29a1b244cc32?q=80&w=800&auto=format&fit=crop",
+        defaultImage: "https://res.cloudinary.com/dgkckcdk8/image/upload/v1769967871/indian-rentals/ea5ryxbvie8spmdb9slz.jpg",
         href: "/category/dslr"
     }
 ];
 
 const CategoriesPage = () => {
+    // We will merge backend data into this structure
+    const [categories, setCategories] = useState(initialCategories.map(c => ({ ...c, image: c.defaultImage })));
+
+    useEffect(() => {
+        const fetchCategories = async () => {
+            try {
+                const backendCategories = await getCategories();
+
+                // Merge logic: If backend has a category with a matching name (approx), use its image
+                const merged = initialCategories.map(staticCat => {
+                    const found = backendCategories.find(bc =>
+                        bc.name.toLowerCase().includes(staticCat.title.toLowerCase().split(' ')[0]) || // Match 'Apple' in 'Apple Products'
+                        (staticCat.title.includes('Camera') && bc.name.includes('Camera'))
+                    );
+
+                    if (found && found.image) {
+                        return { ...staticCat, image: found.image };
+                    }
+                    return { ...staticCat, image: staticCat.defaultImage };
+                });
+
+                setCategories(merged);
+            } catch (error) {
+                console.error("Failed to fetch categories", error);
+                // Fallback to static images if fetch fails
+                setCategories(initialCategories.map(c => ({ ...c, image: c.defaultImage })));
+            }
+        };
+
+        fetchCategories();
+    }, []);
+
     return (
         <div className="min-h-screen bg-white">
             <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
@@ -80,13 +108,19 @@ const CategoriesPage = () => {
                                     <div className="relative h-56 w-full flex items-center justify-center mb-4 overflow-hidden rounded-2xl bg-white">
                                         {/* Image Container with hover effect */}
                                         <div className="relative w-full h-full transform group-hover:scale-105 transition-transform duration-500">
-                                            <Image
-                                                src={category.image}
-                                                alt={category.title}
-                                                fill
-                                                className={`object-${category.objectFit || "contain"}`}
-                                                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                                            />
+                                            {category.image ? (
+                                                <Image
+                                                    src={category.image}
+                                                    alt={category.title}
+                                                    fill
+                                                    className="object-contain"
+                                                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                                                />
+                                            ) : (
+                                                <div className="w-full h-full flex items-center justify-center bg-gray-100 text-gray-400">
+                                                    <span className="text-sm">No Image</span>
+                                                </div>
+                                            )}
                                         </div>
                                     </div>
 

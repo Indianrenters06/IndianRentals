@@ -1,81 +1,46 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { PiInfo, PiSmileySad } from 'react-icons/pi';
+
+import { getMyOrders } from '../../../services/orderService';
 
 export default function MyOrdersPage() {
     const [activeTab, setActiveTab] = useState('All Orders');
     const [viewType, setViewType] = useState('orders'); // 'orders' | 'subscriptions'
+    const [orders, setOrders] = useState([]);
+    const [loading, setLoading] = useState(true);
 
-    // Dummy Order Data matching the screenshot
-    const orders = [
-        {
-            id: '4479',
-            date: '25-Aug-25',
-            deliveryTo: 'Harshit Aggarwal',
-            monthlyRent: 1100,
-            securityAmount: 5000,
-            partialAmount: 600,
-            status: 'Under Review',
-            productName: 'MacBook Pro M4 Pro | 24 GB RAM | 512GB SSD | Silver',
-            planDuration: '3 months',
-            rentalPeriod: '25th Aug 2025 to 25th Nov 2025',
-            image: '/macbook-placeholder.jpg',
-        },
-        {
-            id: '4480',
-            date: '26-Aug-25',
-            deliveryTo: 'Harshit Aggarwal',
-            monthlyRent: 1100,
-            securityAmount: 5000,
-            partialAmount: 600,
-            status: 'Pending',
-            productName: 'MacBook Pro M4 Pro | 24 GB RAM | 512GB SSD | Silver',
-            planDuration: '3 months',
-            rentalPeriod: '26th Aug 2025 to 26th Nov 2025',
-            image: '/macbook-placeholder.jpg',
-        },
-        {
-            id: '4481',
-            date: '20-Aug-25',
-            deliveryTo: 'Harshit Aggarwal',
-            monthlyRent: 1100,
-            securityAmount: 5000,
-            partialAmount: 600,
-            status: 'Active', // Maps to 'Active Orders'
-            productName: 'MacBook Pro M4 Pro | 24 GB RAM | 512GB SSD | Silver',
-            planDuration: '3 months',
-            rentalPeriod: '25th Aug 2025 to 25th Nov 2025',
-            image: '/macbook-placeholder.jpg',
-        },
-        {
-            id: '4482',
-            date: '15-Jan-25',
-            deliveryTo: 'Harshit Aggarwal',
-            monthlyRent: 1100,
-            securityAmount: 5000,
-            partialAmount: 600,
-            status: 'Inactive', // Maps to 'Inactive Orders'
-            productName: 'MacBook Pro M4 Pro | 24 GB RAM | 512GB SSD | Silver',
-            planDuration: '3 months',
-            rentalPeriod: '15th Jan 2025 to 15th Apr 2025',
-            image: '/macbook-placeholder.jpg',
-        },
-        {
-            id: '4483',
-            date: '10-Feb-25',
-            deliveryTo: 'Harshit Aggarwal',
-            monthlyRent: 1100,
-            securityAmount: 5000,
-            partialAmount: 600,
-            status: 'Failed', // Maps to 'Order Failed'
-            productName: 'MacBook Pro M4 Pro | 24 GB RAM | 512GB SSD | Silver',
-            planDuration: '3 months',
-            rentalPeriod: '10th Feb 2025 to 10th May 2025',
-            image: '/macbook-placeholder.jpg',
-        }
-    ];
+    useEffect(() => {
+        const fetchOrders = async () => {
+            try {
+                const data = await getMyOrders();
+                // Map backend data to frontend structure
+                const mappedOrders = data.map(order => ({
+                    id: order._id.substring(order._id.length - 6).toUpperCase(), // Use last 6 chars
+                    fullId: order._id,
+                    date: new Date(order.createdAt).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: '2-digit' }).replace(/ /g, '-'),
+                    deliveryTo: (order.shippingAddress && order.shippingAddress.name) ? order.shippingAddress.name : 'Customer',
+                    monthlyRent: order.orderItems && order.orderItems[0] ? order.orderItems[0].price : 0,
+                    securityAmount: order.orderItems && order.orderItems[0] ? order.orderItems[0].securityDeposit : 0,
+                    partialAmount: order.totalPrice,
+                    status: order.isPaid ? (order.isDelivered ? 'Active' : 'Pending') : 'Inactive', // Infer status logic
+                    productName: order.orderItems && order.orderItems[0] ? order.orderItems[0].name : 'Rental Product',
+                    planDuration: '3 months', // Placeholder
+                    rentalPeriod: `${new Date(order.createdAt).toLocaleDateString('en-GB')} to ...`,
+                    image: order.orderItems && order.orderItems[0] ? order.orderItems[0].image : '/macbook-placeholder.jpg',
+                }));
+                setOrders(mappedOrders);
+            } catch (error) {
+                console.error("Failed to fetch orders:", error);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchOrders();
+    }, []);
 
     const orderTabs = [
         'All Orders',

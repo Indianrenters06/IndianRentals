@@ -162,7 +162,13 @@ const updateProduct = asyncHandler(async (req, res) => {
         product.description = description || product.description;
         product.category = category || product.category;
         product.brand = brand || product.brand;
-        product.images = images || product.images;
+
+        if (images) {
+            product.images = images;
+        } else if (req.body.image) {
+            product.images = [req.body.image];
+        }
+
         product.rentalPrice = rentalPrice || product.rentalPrice;
         product.securityDeposit = securityDeposit || product.securityDeposit;
         product.stock = stock || product.stock;

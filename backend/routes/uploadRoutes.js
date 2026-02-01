@@ -12,18 +12,21 @@ cloudinary.config({
     api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
+// Use memory storage for Cloudinary direct upload
 const upload = multer();
 
-// @desc    Upload image to Cloudinary
+// @desc    Upload image(s) to Cloudinary
 // @route   POST /api/upload
 // @access  Private/Admin
-router.post('/', protect, admin, upload.single('image'), async (req, res) => {
+router.post('/', upload.array('image'), async (req, res) => { // Supports single or multiple
     try {
-        if (!req.file) {
-            return res.status(400).json({ message: 'No file uploaded' });
+        if (!req.files || req.files.length === 0) {
+            // Fallback check if single file was sent improperly or without 'image' key
+            if (req.file) req.files = [req.file]; // Should not happen with upload.array but safe
+            else return res.status(400).json({ message: 'No files uploaded' });
         }
 
-        const streamUpload = (req) => {
+        const uploadToCloudinary = (file) => {
             return new Promise((resolve, reject) => {
                 const stream = cloudinary.uploader.upload_stream(
                     {
@@ -31,21 +34,22 @@ router.post('/', protect, admin, upload.single('image'), async (req, res) => {
                     },
                     (error, result) => {
                         if (result) {
-                            resolve(result);
+                            resolve(result.secure_url);
                         } else {
                             reject(error);
                         }
                     }
                 );
-                streamifier.createReadStream(req.file.buffer).pipe(stream);
+                streamifier.createReadStream(file.buffer).pipe(stream);
             });
         };
 
-        const result = await streamUpload(req);
+        const imageUrls = await Promise.all(req.files.map(file => uploadToCloudinary(file)));
 
         res.json({
-            message: 'Image uploaded',
-            image: result.secure_url,
+            message: 'Images uploaded successfully',
+            images: imageUrls,
+            image: imageUrls[0] // Backward compatibility
         });
     } catch (error) {
         console.error(error);

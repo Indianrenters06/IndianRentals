@@ -119,10 +119,10 @@ export default function ProfileLayout({ children }) {
                                     x="1" y="1"
                                     width="calc(100% - 2px)"
                                     height="calc(100% - 2px)"
-                                    rx="32" ry="32"
-                                    stroke="#E5E7EB"
-                                    strokeWidth="1.5"
-                                    strokeDasharray="14 10"
+                                    rx="10" ry="10"
+                                    stroke="#D3D3D3"
+                                    strokeWidth="1"
+                                    strokeDasharray="12 10"
                                     fill="none"
                                 />
                             </svg>

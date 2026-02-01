@@ -1,15 +1,16 @@
 "use client";
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { FaArrowLeft, FaChevronRight } from 'react-icons/fa';
 import { motion } from 'framer-motion';
 import { useRouter } from 'next/navigation';
+import { getCategories } from '../../../services/categoryService';
 
 // Data for Top Navigation Bar (Categories)
 const topCategories = [
     { name: "Desktop", icon: "https://img.icons8.com/ios/100/imac.png" },
-    { name: "MacBook", icon: "https://img.icons8.com/ios/100/macbook.png" }, // Using generic icons for now as per design
+    { name: "MacBook", icon: "https://img.icons8.com/ios/100/macbook.png" },
     { name: "All In One", icon: "https://img.icons8.com/ios/100/monitor.png" },
     { name: "Tablet", icon: "https://img.icons8.com/ios/100/ipad.png" },
     { name: "Mac Studio", icon: "https://img.icons8.com/ios/100/mac-mini.png" },
@@ -19,7 +20,7 @@ const topCategories = [
 ];
 
 // Data for Apple Products Grid
-const appleProducts = [
+const initialAppleProducts = [
     {
         name: "MacBook Pro",
         image: "/macbook-pro-new.jpg",
@@ -74,6 +75,26 @@ const appleProducts = [
 
 const AppleCategoryPage = () => {
     const router = useRouter();
+    const [products, setProducts] = useState(initialAppleProducts);
+
+    useEffect(() => {
+        const fetchImages = async () => {
+            try {
+                const categories = await getCategories();
+                const merged = initialAppleProducts.map(p => {
+                    const cat = categories.find(c => c.name === p.name);
+                    if (cat && cat.image) {
+                        return { ...p, image: cat.image };
+                    }
+                    return p;
+                });
+                setProducts(merged);
+            } catch (err) {
+                console.error("Error fetching categories:", err);
+            }
+        };
+        fetchImages();
+    }, []);
 
     return (
         <div className="min-h-screen bg-white pb-20">
@@ -84,7 +105,6 @@ const AppleCategoryPage = () => {
                         {topCategories.map((cat, index) => (
                             <Link key={index} href="/category/all" className="flex flex-col items-center min-w-[80px] group cursor-pointer">
                                 <div className="w-16 h-12 mb-3 relative flex items-center justify-center opacity-70 group-hover:opacity-100 transition-opacity">
-                                    {/* Using simple img tags for icons to avoid Next.js Image strict config issues with external icon providers if not configured */}
                                     <img src={cat.icon} alt={cat.name} className="h-full object-contain" />
                                 </div>
                                 <span className="text-xs font-medium text-gray-600 group-hover:text-black whitespace-nowrap">
@@ -92,7 +112,6 @@ const AppleCategoryPage = () => {
                                 </span>
                             </Link>
                         ))}
-                        {/* Scroll arrow indicator */}
                         <div className="flex items-center justify-center w-8 h-8 rounded-full bg-gray-100 text-gray-400">
                             <FaChevronRight size={12} />
                         </div>
@@ -114,7 +133,7 @@ const AppleCategoryPage = () => {
 
                 {/* Product Grid */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
-                    {appleProducts.map((product, index) => (
+                    {products.map((product, index) => (
                         <motion.div
                             key={product.name}
                             initial={{ opacity: 0, scale: 0.95 }}
@@ -125,13 +144,19 @@ const AppleCategoryPage = () => {
                             <Link href={product.href} className="block">
                                 <div className="bg-[#F5F5F7] rounded-2xl aspect-square mb-3 transition-transform duration-300 group-hover:scale-[1.02] overflow-hidden relative">
                                     <div className="relative w-full h-full">
-                                        <Image
-                                            src={product.image}
-                                            alt={product.name}
-                                            fill
-                                            className="object-cover"
-                                            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 33vw, 20vw"
-                                        />
+                                        {product.image ? (
+                                            <Image
+                                                src={product.image}
+                                                alt={product.name}
+                                                fill
+                                                className="object-cover"
+                                                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 33vw, 20vw"
+                                            />
+                                        ) : (
+                                            <div className="w-full h-full flex items-center justify-center bg-gray-100 text-gray-400">
+                                                <span>No Image</span>
+                                            </div>
+                                        )}
                                     </div>
                                 </div>
                                 <h3 className="text-center text-sm font-medium text-gray-900 group-hover:text-blue-600 transition-colors">

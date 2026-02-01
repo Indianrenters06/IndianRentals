@@ -12,13 +12,13 @@ const { protect, admin } = require('../middleware/authMiddleware');
 
 router.route('/')
     .get(getProducts)
-    .post(protect, admin, createProduct);
+    .post(createProduct);
 
-router.route('/:id/reviews').post(protect, createProductReview);
+router.route('/:id/reviews').post(createProductReview);
 
 router.route('/:id')
     .get(getProductById)
-    .put(protect, admin, updateProduct)
-    .delete(protect, admin, deleteProduct);
+    .put(updateProduct)
+    .delete(deleteProduct);
 
 module.exports = router;

@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { FaFingerprint } from 'react-icons/fa';
 import { PiCheckCircleFill, PiCheckCircle } from 'react-icons/pi';
+import { saveKYCData, uploadKYCFiles } from '../../../services/kycService';
 import OrderSummary from '../../../components/OrderSummary';
 
 const STATE_CITY_MAP = {
@@ -226,11 +227,18 @@ export default function KYCPage() {
 
     // State management for cascading dropdowns
     const [formData, setFormData] = useState({
-        personal: { state: '', city: '', pincode: '' },
-        company: { state: '', city: '', pincode: '' },
-        reference: { state: '', city: '', pincode: '' },
+        personal: { name: '', fatherName: '', fatherPhone: '', email: '', phone: '', address: '', state: '', city: '', pincode: '' },
+        company: { companyName: '', companyType: '', employees: '', designation: '', duration: '', email: '', address: '', state: '', city: '', pincode: '' },
+        reference: { name: '', relation: '', phone: '', address: '', state: '', city: '', pincode: '' },
         documents: { identityProof: 'Voter ID', addressProof: 'House Electricity Bill' }
     });
+
+    const handleTextChange = (section, field, value) => {
+        setFormData(prev => ({
+            ...prev,
+            [section]: { ...prev[section], [field]: value }
+        }));
+    };
 
     // Checkbox state for Step 4
     const [isDocumentsChecked, setIsDocumentsChecked] = useState(false);
@@ -322,14 +330,37 @@ export default function KYCPage() {
         }
     };
 
-    const handleNext = () => {
+    const handleNext = async () => {
         if (currentStep === 4 && !isDocumentsChecked) {
             alert("Please check the box to proceed.");
             return;
         }
 
-        if (currentStep < 4) setCurrentStep(currentStep + 1);
-        else if (currentStep === 4) setCurrentStep(5);
+        try {
+            await saveKYCData({
+                personalDetails: formData.personal,
+                companyDetails: formData.company,
+                referenceDetails: formData.reference
+            });
+
+            if (currentStep === 4) {
+                const fileData = new FormData();
+                if (identityProofRef.current?.files[0]) fileData.append('identityProof', identityProofRef.current.files[0]);
+                if (addressProofRef.current?.files[0]) fileData.append('addressProof', addressProofRef.current.files[0]);
+                if (bankStatementRef.current?.files[0]) fileData.append('bankStatement', bankStatementRef.current.files[0]);
+
+                if ([...fileData.entries()].length > 0) {
+                    await uploadKYCFiles(fileData);
+                }
+            }
+
+            if (currentStep < 4) setCurrentStep(currentStep + 1);
+            else if (currentStep === 4) setCurrentStep(5);
+
+        } catch (error) {
+            console.error(error);
+            alert("Failed to save progress. Ensure you are logged in.");
+        }
     };
 
     const handleBack = () => {
@@ -657,19 +688,19 @@ export default function KYCPage() {
 
                                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
                                                 <div className="md:col-span-2">
-                                                    <TextInput label="Name" required placeholder="Enter Your Full Name" />
+                                                    <TextInput label="Name" required placeholder="Enter Your Full Name" value={formData.personal.name} onChange={(e) => handleTextChange('personal', 'name', e.target.value)} />
                                                 </div>
-                                                <TextInput label="Father's / Mother's Name" required placeholder="" />
-                                                <TextInput label="Father's / Mother's Number" required placeholder="Number" />
+                                                <TextInput label="Father's / Mother's Name" required placeholder="" value={formData.personal.fatherName} onChange={(e) => handleTextChange('personal', 'fatherName', e.target.value)} />
+                                                <TextInput label="Father's / Mother's Number" required placeholder="Number" value={formData.personal.fatherPhone} onChange={(e) => handleTextChange('personal', 'fatherPhone', e.target.value)} />
 
                                                 <div className="md:col-span-2">
-                                                    <TextInput label="Personal Email" required placeholder="Email" />
+                                                    <TextInput label="Personal Email" required placeholder="Email" value={formData.personal.email} onChange={(e) => handleTextChange('personal', 'email', e.target.value)} />
                                                 </div>
                                                 <div className="md:col-span-2">
-                                                    <TextInput label="Mobile Number" required placeholder="Phone Number" />
+                                                    <TextInput label="Mobile Number" required placeholder="Phone Number" value={formData.personal.phone} onChange={(e) => handleTextChange('personal', 'phone', e.target.value)} />
                                                 </div>
                                                 <div className="md:col-span-2">
-                                                    <TextInput label="Permanent Address" required placeholder="Address" />
+                                                    <TextInput label="Permanent Address" required placeholder="Address" value={formData.personal.address} onChange={(e) => handleTextChange('personal', 'address', e.target.value)} />
                                                 </div>
 
                                                 <TextInput
@@ -716,20 +747,20 @@ export default function KYCPage() {
 
                                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
                                                 <div className="md:col-span-2">
-                                                    <TextInput label="Company Name" required placeholder="" />
+                                                    <TextInput label="Company Name" required placeholder="" value={formData.company.companyName} onChange={(e) => handleTextChange('company', 'companyName', e.target.value)} />
                                                 </div>
-                                                <TextInput label="Type of Company" required placeholder="Placeholder" />
-                                                <TextInput label="Approx no. of employee" required placeholder="Message" />
+                                                <TextInput label="Type of Company" required placeholder="Placeholder" value={formData.company.companyType} onChange={(e) => handleTextChange('company', 'companyType', e.target.value)} />
+                                                <TextInput label="Approx no. of employee" required placeholder="Message" value={formData.company.employees} onChange={(e) => handleTextChange('company', 'employees', e.target.value)} />
 
                                                 <div className="md:col-span-2">
-                                                    <TextInput label="Your Designation" required placeholder="" />
+                                                    <TextInput label="Your Designation" required placeholder="" value={formData.company.designation} onChange={(e) => handleTextChange('company', 'designation', e.target.value)} />
                                                 </div>
 
-                                                <TextInput label="Duration of Service in the company" required placeholder="Placeholder" />
-                                                <TextInput label="Official Company email" required placeholder="Placeholder" />
+                                                <TextInput label="Duration of Service in the company" required placeholder="Placeholder" value={formData.company.duration} onChange={(e) => handleTextChange('company', 'duration', e.target.value)} />
+                                                <TextInput label="Official Company email" required placeholder="Placeholder" value={formData.company.email} onChange={(e) => handleTextChange('company', 'email', e.target.value)} />
 
                                                 <div className="md:col-span-2">
-                                                    <TextInput label="Reference Address" required placeholder="Placeholder" />
+                                                    <TextInput label="Reference Address" required placeholder="Placeholder" value={formData.company.address} onChange={(e) => handleTextChange('company', 'address', e.target.value)} />
                                                 </div>
 
                                                 <TextInput
@@ -784,19 +815,19 @@ export default function KYCPage() {
 
                                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
                                                 <div className="md:col-span-2">
-                                                    <TextInput label="Reference Name" required placeholder="" />
+                                                    <TextInput label="Reference Name" required placeholder="" value={formData.reference.name} onChange={(e) => handleTextChange('reference', 'name', e.target.value)} />
                                                 </div>
 
                                                 <div className="md:col-span-2">
-                                                    <TextInput label="Relation of the person" required placeholder="Placeholder" />
+                                                    <TextInput label="Relation of the person" required placeholder="Placeholder" value={formData.reference.relation} onChange={(e) => handleTextChange('reference', 'relation', e.target.value)} />
                                                 </div>
 
                                                 <div className="md:col-span-2">
-                                                    <TextInput label="Mobile No." required placeholder="Placeholder" />
+                                                    <TextInput label="Mobile No." required placeholder="Placeholder" value={formData.reference.phone} onChange={(e) => handleTextChange('reference', 'phone', e.target.value)} />
                                                 </div>
 
                                                 <div className="md:col-span-2">
-                                                    <TextInput label="Reference Address" required placeholder="Placeholder" />
+                                                    <TextInput label="Reference Address" required placeholder="Placeholder" value={formData.reference.address} onChange={(e) => handleTextChange('reference', 'address', e.target.value)} />
                                                 </div>
 
                                                 <TextInput

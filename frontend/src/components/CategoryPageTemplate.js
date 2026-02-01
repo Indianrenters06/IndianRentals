@@ -1,31 +1,59 @@
 "use client";
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { FaHeart, FaChevronDown, FaInfoCircle, FaArrowLeft } from 'react-icons/fa';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+
+import { getProducts } from '../services/productService';
 
 // Component factory to generate pages with specific configuration
 const createCategoryPage = (config) => {
     return () => {
         const router = useRouter();
         const [currentPage, setCurrentPage] = useState(1);
+        const [products, setProducts] = useState([]);
+        const [loading, setLoading] = useState(true);
         const itemsPerPage = 10;
 
         // Use state for sorting/filtering in a real app
         const [selectedDuration, setSelectedDuration] = useState("3 months");
         const [selectedSort, setSelectedSort] = useState("Most Popular");
 
-        const products = Array(20).fill(null).map((_, i) => ({
-            id: i + 1,
-            name: config.productNamePrefix + (i % 2 === 0 ? " Pro" : " Max"),
-            description: config.productDescription,
-            originalPrice: config.basePrice * 1.5,
-            rentPrice: config.basePrice,
-            discount: "20% off",
-            image: config.image,
-            isNew: i % 3 === 0,
-        }));
+        useEffect(() => {
+            const fetchAndFilterProducts = async () => {
+                try {
+                    setLoading(true);
+                    const { products: fetchedProducts } = await getProducts({ keyword: config.productNamePrefix });
+
+                    // The backend typically handles the filtering via keyword search, but we can do a safety check
+                    const filtered = fetchedProducts;
+
+                    if (filtered.length > 0) {
+                        const mappedProducts = filtered.map(p => ({
+                            id: p._id,
+                            name: p.name,
+                            description: p.description || config.productDescription,
+                            originalPrice: Math.round((p.rentalPrice || config.basePrice) * 1.5),
+                            rentPrice: p.rentalPrice || config.basePrice,
+                            discount: "20% off", // Mock discount logic for now
+                            image: (p.images && p.images.length > 0) ? p.images[0] : config.image,
+                            isNew: p.condition === 'New',
+                        }));
+                        setProducts(mappedProducts);
+                    } else {
+                        setProducts([]);
+                    }
+                } catch (err) {
+                    console.error("Failed to fetch products for category", err);
+                    setProducts([]);
+                } finally {
+                    setLoading(false);
+                }
+            };
+
+            fetchAndFilterProducts();
+        }, []);
 
         const Sidebar = () => {
             const categories = [
@@ -82,7 +110,7 @@ const createCategoryPage = (config) => {
             <div className="bg-fuchsia-50 rounded-[28px] p-3 border border-gray-100 hover:shadow-[0_8px_30px_rgb(0,0,0,0.04)] transition-all duration-300 relative flex flex-col h-full group hover:-translate-y-1">
                 <div className="absolute top-5 left-5 z-10"><span className="bg-[#FF3B30] text-white text-[10px] font-light px-2.5 py-1 rounded-md uppercase tracking-wider shadow-sm">{product.discount}</span></div>
                 <button className="absolute top-5 right-5 z-10 w-8 h-8 flex items-center justify-center rounded-full bg-white border border-gray-200 text-gray-400 hover:text-[#FF3B30] transition-colors duration-200"><FaHeart size={14} /></button>
-                <Link href="/products/macbook-pro-14-m4" className="contents">
+                <Link href={`/products/${product.id}`} className="contents">
                     <div className="relative w-full aspect-[7/8] mb-3 flex items-center justify-center rounded-[32px] overflow-hidden cursor-pointer">
                         <div className="absolute inset-0 pointer-events-none" />
                         <Image src={product.image} alt={product.name} fill className="object-contain p-6 pb-14 group-hover:scale-105 transition-transform duration-500 drop-shadow-xl" />
