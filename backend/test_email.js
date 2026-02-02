@@ -1,22 +1,32 @@
-const dotenv = require('dotenv');
-dotenv.config(); // Load env vars first
-const sendEmail = require('./utils/sendEmail');
+require('dotenv').config();
+const nodemailer = require('nodemailer');
 
-const testEmailSending = async () => {
-    console.log('--- TESTING EMAIL SENDING ---');
+const sendEmail = async () => {
+    console.log('Testing email sending...');
     console.log('User:', process.env.EMAIL_USER);
-    // Don't log the password
+    // Don't log password
 
     try {
-        await sendEmail({
-            email: process.env.EMAIL_USER, // Send to self
-            subject: 'IndianRentals Test Email',
-            message: 'If you are reading this, your email configuration is working perfectly! 🚀',
+        const transporter = nodemailer.createTransport({
+            service: 'gmail',
+            auth: {
+                user: process.env.EMAIL_USER,
+                pass: process.env.EMAIL_PASS,
+            },
         });
-        console.log('✅ Email sent successfully!');
+
+        const mailOptions = {
+            from: `IndianRentals <${process.env.EMAIL_USER}>`,
+            to: process.env.EMAIL_USER, // Send to self
+            subject: 'Test Email form IndianRentals Debug',
+            text: 'This is a test email to verify credentials.',
+        };
+
+        const info = await transporter.sendMail(mailOptions);
+        console.log('Email sent successfully:', info.response);
     } catch (error) {
-        console.error('❌ Email failed:', error);
+        console.error('Email send failed:', error);
     }
 };
 
-testEmailSending();
+sendEmail();
