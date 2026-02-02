@@ -239,7 +239,8 @@ const sendLoginOtp = asyncHandler(async (req, res) => {
         } catch (error) {
             console.error('Email send failed:', error);
             res.status(500);
-            throw new Error('Email could not be sent');
+            // DEBUG: Return exact error message to frontend to see why it failed (e.g., Auth failed, Connection refused)
+            throw new Error('Email error: ' + error.message);
         }
         res.json({ message: 'OTP sent to your email', type: 'email' });
 
