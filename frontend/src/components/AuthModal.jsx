@@ -3,6 +3,7 @@ import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { FaEnvelope, FaLock, FaGoogle, FaApple, FaArrowRight, FaPhone, FaArrowLeft, FaTimes, FaUser } from "react-icons/fa";
 import { useRouter } from "next/navigation";
+import { API_BASE_URL } from "../services/apiConfig";
 
 
 const AuthModal = ({ isOpen, onClose, initialView = "login" }) => {
@@ -50,7 +51,7 @@ const AuthModal = ({ isOpen, onClose, initialView = "login" }) => {
         setError(null);
 
         try {
-            const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/send-otp`, {
+            const res = await fetch(`${API_BASE_URL}/api/auth/send-otp`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ identifier }),
@@ -77,7 +78,7 @@ const AuthModal = ({ isOpen, onClose, initialView = "login" }) => {
         setError(null);
 
         try {
-            const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/verify-login`, {
+            const res = await fetch(`${API_BASE_URL}/api/auth/verify-login`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ identifier, otp }),
@@ -115,7 +116,7 @@ const AuthModal = ({ isOpen, onClose, initialView = "login" }) => {
         }
 
         try {
-            const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/register`, {
+            const res = await fetch(`${API_BASE_URL}/api/auth/register`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",

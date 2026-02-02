@@ -1,6 +1,8 @@
 import axios from 'axios';
 
-const API_URL = `${process.env.NEXT_PUBLIC_API_URL}/api/rentals`;
+import { API_BASE_URL } from './apiConfig';
+
+const API_URL = `${API_BASE_URL}/api/rentals`;
 
 const getToken = () => {
     if (typeof window !== 'undefined') {

@@ -1,6 +1,8 @@
 import axios from 'axios';
 
-const API_URL = `${process.env.NEXT_PUBLIC_API_URL}/api/kyc`;
+import { API_BASE_URL } from './apiConfig';
+
+const API_URL = `${API_BASE_URL}/api/kyc`;
 
 const getToken = () => {
     if (typeof window !== 'undefined') {

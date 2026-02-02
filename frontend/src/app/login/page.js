@@ -4,6 +4,7 @@ import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { FaEnvelope, FaLock, FaGoogle, FaApple, FaArrowRight, FaPhone, FaArrowLeft } from "react-icons/fa";
 import { useRouter } from "next/navigation";
+import { API_BASE_URL } from "../../services/apiConfig";
 
 const LoginPage = () => {
     const router = useRouter();
@@ -20,7 +21,7 @@ const LoginPage = () => {
         setError(null);
 
         try {
-            const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/send-otp`, {
+            const res = await fetch(`${API_BASE_URL}/api/auth/send-otp`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ identifier }),
@@ -47,7 +48,7 @@ const LoginPage = () => {
         setError(null);
 
         try {
-            const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/verify-login`, {
+            const res = await fetch(`${API_BASE_URL}/api/auth/verify-login`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ identifier, otp }),

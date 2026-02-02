@@ -4,6 +4,7 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import { FaUser, FaEnvelope, FaLock, FaPhone, FaArrowRight } from "react-icons/fa";
 import { useRouter } from "next/navigation";
+import { API_BASE_URL } from "../../services/apiConfig";
 
 const RegisterPage = () => {
     const router = useRouter();
@@ -33,7 +34,7 @@ const RegisterPage = () => {
         }
 
         try {
-            const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/register`, {
+            const res = await fetch(`${API_BASE_URL}/api/auth/register`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
