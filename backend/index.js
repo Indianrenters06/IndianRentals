@@ -69,6 +69,47 @@ app.get('/', (req, res) => {
   res.send('API is running...');
 });
 
+// Temporary Debug Route for Email
+const sendEmail = require('./utils/sendEmail');
+app.get('/api/test-email', async (req, res) => {
+  try {
+    const testUser = process.env.EMAIL_USER;
+    if (!testUser) throw new Error("EMAIL_USER env var is missing");
+
+    // Remove the timeout logic for this test or make it longer to see real error
+    console.log("Attempting to send test email to:", testUser);
+
+    await sendEmail({
+      email: testUser,
+      subject: "Production Test Email",
+      message: "If you get this, Brevo is working on Render!"
+    });
+
+    res.json({
+      success: true,
+      message: "Email sent successfully",
+      config: {
+        host: process.env.EMAIL_HOST,
+        port: process.env.EMAIL_PORT,
+        user: process.env.EMAIL_USER,
+        // pass: process.env.EMAIL_PASS ? "******" : "MISSING"
+      }
+    });
+  } catch (error) {
+    console.error("Test Email Failed:", error);
+    res.status(500).json({
+      success: false,
+      error: error.message,
+      stack: error.stack,
+      config: {
+        host: process.env.EMAIL_HOST,
+        port: process.env.EMAIL_PORT,
+        user: process.env.EMAIL_USER,
+      }
+    });
+  }
+});
+
 // Error Handling Middleware
 const { notFound, errorHandler } = require('./middleware/errorMiddleware');
 
