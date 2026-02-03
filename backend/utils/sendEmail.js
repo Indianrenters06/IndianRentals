@@ -31,9 +31,9 @@ const sendEmail = async (options) => {
         html,
     };
 
-    // Race condition: Timeout after 3 seconds to prevent UI hanging
+    // Race condition: Timeout after 8 seconds to prevent UI hanging
     const timeout = new Promise((_, reject) =>
-        setTimeout(() => reject(new Error('Email request timed out')), 3000)
+        setTimeout(() => reject(new Error('Email request timed out')), 8000)
     );
 
     await Promise.race([
