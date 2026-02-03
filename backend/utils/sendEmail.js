@@ -19,15 +19,27 @@ const sendEmail = async (options) => {
             user: process.env.EMAIL_USER,
             pass: process.env.EMAIL_PASS ? process.env.EMAIL_PASS.trim() : "",
         },
+        connectionTimeout: 10000, // 10 seconds
+        greetingTimeout: 5000,    // 5 seconds
     });
 
-    await transporter.sendMail({
+    const mailOptions = {
         from: `"IndianRentals" <${process.env.EMAIL_FROM || process.env.EMAIL_USER}>`,
         to: email,
         subject,
         text: message,
         html,
-    });
+    };
+
+    // Race condition: Timeout after 3 seconds to prevent UI hanging
+    const timeout = new Promise((_, reject) =>
+        setTimeout(() => reject(new Error('Email request timed out')), 3000)
+    );
+
+    await Promise.race([
+        transporter.sendMail(mailOptions),
+        timeout
+    ]);
 };
 
 module.exports = sendEmail;

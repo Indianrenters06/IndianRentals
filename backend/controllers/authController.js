@@ -231,6 +231,9 @@ const sendLoginOtp = asyncHandler(async (req, res) => {
 
         const message = `Your Login OTP for IndianRentals is: ${otp}`;
         try {
+            // Making email sending asynchronous but not blocking the response if it takes too long
+            // or we could await it with a timeout. 
+            // Better: await it but catch error so flow continues.
             await sendEmail({
                 email: user.email,
                 subject: 'IndianRentals - Login OTP',
