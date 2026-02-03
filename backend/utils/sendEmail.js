@@ -13,14 +13,14 @@ const sendEmail = async (options) => {
 
     const transporter = nodemailer.createTransport({
         host: process.env.EMAIL_HOST || "smtp-relay.brevo.com",
-        port: Number(process.env.EMAIL_PORT) || 587,
+        port: Number(process.env.EMAIL_PORT) || 2525, // Fallback to 2525 if not set
         secure: false, // true for 465, false for 587
         auth: {
             user: process.env.EMAIL_USER,
             pass: process.env.EMAIL_PASS ? process.env.EMAIL_PASS.trim() : "",
         },
-        connectionTimeout: 10000, // 10 seconds
-        greetingTimeout: 5000,    // 5 seconds
+        connectionTimeout: 20000,
+        greetingTimeout: 10000,
     });
 
     const mailOptions = {
@@ -31,9 +31,9 @@ const sendEmail = async (options) => {
         html,
     };
 
-    // Race condition: Timeout after 8 seconds to prevent UI hanging
+    // Race condition: Timeout after 15 seconds to prevent UI hanging
     const timeout = new Promise((_, reject) =>
-        setTimeout(() => reject(new Error('Email request timed out')), 8000)
+        setTimeout(() => reject(new Error('Email request timed out')), 15000)
     );
 
     await Promise.race([
