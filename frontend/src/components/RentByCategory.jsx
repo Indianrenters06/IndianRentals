@@ -5,6 +5,7 @@ import { Navigation, Autoplay } from 'swiper/modules';
 import Link from 'next/link';
 import Image from 'next/image';
 import { FaLaptop, FaCamera, FaDesktop, FaTabletAlt, FaMobileAlt, FaArrowRight } from 'react-icons/fa';
+import { getCategories } from '../services/categoryService';
 
 // Import Swiper styles
 import 'swiper/css';
@@ -17,9 +18,7 @@ const RentByCategory = () => {
     React.useEffect(() => {
         const fetchCategories = async () => {
             try {
-                const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/categories`);
-                if (!response.ok) throw new Error('Failed to fetch');
-                const data = await response.json();
+                const data = await getCategories();
 
                 // Define the specific order requested
                 const targetOrder = ["MacBook", "DSLR", "All in One", "iPad", "SmartPhone", "Desktop"];
