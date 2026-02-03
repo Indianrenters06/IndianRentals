@@ -23,18 +23,37 @@ const RentByCategory = () => {
                 // Define the specific order requested
                 const targetOrder = ["MacBook", "DSLR", "All in One", "iPad", "SmartPhone", "Desktop"];
 
-                // Map the data to the target order
-                const sortedCategories = targetOrder.map(name => {
+                // 1. Strict Match
+                let sortedCategories = targetOrder.map(name => {
                     const found = data.find(c => c.name.toLowerCase() === name.toLowerCase());
                     return found ? found : null;
                 }).filter(item => item !== null);
 
-                // If for some reason we missed some (shouldn't happen with updated seeder), 
-                // we could modify this logic, but strictly following the requested list is safer for now.
+                // 2. Loose Match (if strict match yields nothing)
+                if (sortedCategories.length === 0 && data.length > 0) {
+                    sortedCategories = targetOrder.map(name => {
+                        const found = data.find(c => c.name.toLowerCase().includes(name.toLowerCase()));
+                        return found ? found : null;
+                    }).filter(item => item !== null);
+                }
+
+                // 3. Fallback (if still nothing, just show what we have, prioritizing those with images)
+                if (sortedCategories.length === 0 && data.length > 0) {
+                    sortedCategories = data
+                        .filter(c => c.image) // Prefer with images
+                        .slice(0, 10);
+
+                    if (sortedCategories.length === 0) {
+                        sortedCategories = data.slice(0, 10); // Take anything
+                    }
+                }
+
+                // Deduplicate based on ID
+                sortedCategories = Array.from(new Map(sortedCategories.map(item => [item._id, item])).values());
+
                 setDisplayCategories(sortedCategories);
             } catch (err) {
-                console.error(err);
-                // Fallback or leave empty? Maybe leave empty to avoid confusion if backend fails
+                console.error("Failed to fetch categories:", err);
             } finally {
                 setLoading(false);
             }
@@ -91,11 +110,11 @@ const RentByCategory = () => {
                                 slidesPerView: 6,
                             },
                         }}
-                        className="py-4 !overflow-visible"
+                        className="py-4 overflow-visible!"
                     >
                         {displayCategories.map((cat) => (
                             <SwiperSlide key={cat._id}>
-                                <div className="group flex flex-col items-center p-6 bg-white border border-gray-100 rounded-[2rem] hover:shadow-lg transition-all duration-300 cursor-pointer h-full aspect-[4/5] justify-between">
+                                <div className="group flex flex-col items-center p-6 bg-white border border-gray-100 rounded-4xl hover:shadow-lg transition-all duration-300 cursor-pointer h-full aspect-4/5 justify-between">
                                     <div className="w-full flex-1 flex items-center justify-center bg-gray-100 rounded-2xl mb-4 group-hover:scale-105 transition-transform duration-300 overflow-hidden relative">
                                         {cat.image ? (
                                             <div className="relative w-full h-full p-4">
