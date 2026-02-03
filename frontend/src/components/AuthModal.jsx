@@ -34,7 +34,10 @@ const AuthModal = ({ isOpen, onClose, initialView = "login" }) => {
         if (isOpen) {
             setError(null);
             setLoading(false);
-            // preserve view if switching, or reset? Let's keep view state management in parent or just use local "view" state which initialized from prop.
+            // Reset fields
+            setLoginStep(1);
+            setIdentifier("");
+            setOtp("");
         }
     }, [isOpen]);
 

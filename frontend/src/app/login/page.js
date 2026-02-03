@@ -15,6 +15,14 @@ const LoginPage = () => {
     const [error, setError] = useState(null);
     const [otpType, setOtpType] = useState("email"); // 'email' or 'phone' for UI hints
 
+    // Reset state on mount
+    React.useEffect(() => {
+        setStep(1);
+        setIdentifier("");
+        setOtp("");
+        setError(null);
+    }, []);
+
     const handleSendOtp = async (e) => {
         e.preventDefault();
         setLoading(true);
