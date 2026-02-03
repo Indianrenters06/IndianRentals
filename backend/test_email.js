@@ -3,17 +3,19 @@ const nodemailer = require('nodemailer');
 
 const sendEmail = async () => {
     console.log('Testing email sending...');
+    console.log('Host:', process.env.EMAIL_HOST);
+    console.log('Port:', process.env.EMAIL_PORT);
     console.log('User:', process.env.EMAIL_USER);
-    // Don't log password
+    console.log('Pass Length:', process.env.EMAIL_PASS ? process.env.EMAIL_PASS.length : 0);
 
     try {
         const transporter = nodemailer.createTransport({
-            host: 'smtp.gmail.com',
-            port: 465,
-            secure: true,
+            host: process.env.EMAIL_HOST || 'smtp.gmail.com',
+            port: Number(process.env.EMAIL_PORT) || 587,
+            secure: process.env.EMAIL_PORT == 465, // true for 465, false for others
             auth: {
                 user: process.env.EMAIL_USER,
-                pass: process.env.EMAIL_PASS.replace(/\s+/g, ''), // Remove spaces
+                pass: process.env.EMAIL_PASS ? process.env.EMAIL_PASS.trim() : '',
             },
         });
 
