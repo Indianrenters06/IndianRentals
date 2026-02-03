@@ -1,31 +1,33 @@
-const nodemailer = require('nodemailer');
+const nodemailer = require("nodemailer");
 
 const sendEmail = async (options) => {
-    // For development/mocking if no credentials
+    const { email, subject, message, html } = options;
+
+    if (!email || !subject) {
+        throw new Error("Email and subject are required");
+    }
+
     if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
-        console.log(`[MOCK EMAIL] To: ${options.email}, Subject: ${options.subject}, Text: ${options.message}`);
-        return;
+        throw new Error("Email credentials missing");
     }
 
     const transporter = nodemailer.createTransport({
-        host: process.env.EMAIL_HOST || 'smtp.gmail.com',
-        port: Number(process.env.EMAIL_PORT) || 465,
-        secure: process.env.EMAIL_SECURE === 'true' || true, // true for 465, false for 587
+        host: "smtp.gmail.com",
+        port: 587,
+        secure: false,
         auth: {
             user: process.env.EMAIL_USER,
-            pass: process.env.EMAIL_PASS ? process.env.EMAIL_PASS.replace(/\s+/g, '') : '',
+            pass: process.env.EMAIL_PASS.trim(),
         },
     });
 
-    const mailOptions = {
-        from: `IndianRentals <${process.env.EMAIL_USER}>`,
-        to: options.email,
-        subject: options.subject,
-        text: options.message,
-        html: options.html, // Optional HTML support
-    };
-
-    await transporter.sendMail(mailOptions);
+    await transporter.sendMail({
+        from: `"IndianRentals" <${process.env.EMAIL_USER}>`,
+        to: email,
+        subject,
+        text: message,
+        html,
+    });
 };
 
 module.exports = sendEmail;
