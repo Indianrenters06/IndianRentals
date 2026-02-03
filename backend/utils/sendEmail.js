@@ -19,8 +19,8 @@ const sendEmail = async (options) => {
             user: process.env.EMAIL_USER,
             pass: process.env.EMAIL_PASS ? process.env.EMAIL_PASS.trim() : "",
         },
-        connectionTimeout: 20000,
-        greetingTimeout: 10000,
+        connectionTimeout: 10000,
+        greetingTimeout: 5000,
     });
 
     const mailOptions = {
@@ -31,9 +31,9 @@ const sendEmail = async (options) => {
         html,
     };
 
-    // Race condition: Timeout after 15 seconds to prevent UI hanging
+    // Race condition: Timeout after 5 seconds to prevent UI hanging
     const timeout = new Promise((_, reject) =>
-        setTimeout(() => reject(new Error('Email request timed out')), 15000)
+        setTimeout(() => reject(new Error('Email request timed out')), 5000)
     );
 
     await Promise.race([
