@@ -122,8 +122,10 @@ const Navbar = () => {
                                 className="flex items-center gap-2 text-gray-700 hover:text-indigo-600 transition-colors focus:outline-none font-medium"
                                 onClick={() => setIsCityDropdownOpen(!isCityDropdownOpen)}
                             >
-                                <FaMapMarkerAlt size={16} />
-                                <span className="text-sm">{selectedCity}</span>
+                                <div className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-gray-600">
+                                    <FaMapMarkerAlt size={16} />
+                                </div>
+                                <span className="text-sm font-bold">{selectedCity}</span>
                                 <FaChevronDown size={10} className={`transform transition-transform duration-200 ${isCityDropdownOpen ? 'rotate-180' : ''}`} />
                             </button>
 
@@ -153,223 +155,224 @@ const Navbar = () => {
                                 )}
                             </AnimatePresence>
                         </div>
-
-                        {/* Login/Register or Profile */}
-                        {userInfo ? (
-                            <div className="relative">
-                                <button
-                                    className="flex items-center gap-2 text-gray-700 hover:text-indigo-600 transition-colors focus:outline-none"
-                                    onClick={() => setIsProfileDropdownOpen(!isProfileDropdownOpen)}
-                                >
-                                    <div className="w-9 h-9 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 border border-indigo-200">
-                                        <FaUser size={14} />
-                                    </div>
-                                    <span className="text-sm font-medium hidden lg:block max-w-[100px] truncate">
-                                        {userInfo.name || userInfo.email}
-                                    </span>
-                                </button>
-
-                                {/* Profile Dropdown */}
-                                <AnimatePresence>
-                                    {isProfileDropdownOpen && (
-                                        <motion.div
-                                            initial={{ opacity: 0, y: 10 }}
-                                            animate={{ opacity: 1, y: 0 }}
-                                            exit={{ opacity: 0, y: 10 }}
-                                            className="absolute top-full right-0 mt-2 w-48 bg-white/60 backdrop-blur-lg rounded-xl shadow-xl border border-gray-100 py-2 z-50 overflow-hidden"
-                                        >
-                                            <div className="px-4 py-3 border-b border-gray-50">
-                                                <p className="text-sm font-bold text-gray-900 truncate">{userInfo.name || "User"}</p>
-                                                <p className="text-xs text-gray-500 truncate">{userInfo.email}</p>
-                                            </div>
-
-                                            <Link href="/profile" className="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors" onClick={() => setIsProfileDropdownOpen(false)}>
-                                                <FaUser size={14} className="text-gray-400" /> My Profile
-                                            </Link>
-
-                                            <button
-                                                onClick={handleLogout}
-                                                className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors text-left"
-                                            >
-                                                <FaSignOutAlt size={14} /> Logout
-                                            </button>
-                                        </motion.div>
-                                    )}
-                                </AnimatePresence>
-                            </div>
-                        ) : (
-                            <button
-                                onClick={() => setIsAuthModalOpen(true)}
-                                className="px-6 py-2 text-sm font-bold text-gray-900 bg-[#FFC107] hover:bg-[#FFD54F] rounded-full transition-colors shadow-sm"
-                            >
-                                Login/Register
-                            </button>
-                        )}
-
-                        {/* Wishlist & Cart */}
-                        <div className="flex items-center gap-4 text-gray-600">
-                            <button className="hover:text-indigo-600 transition-colors">
-                                <FaHeart size={20} />
-                            </button>
-                            <Link href="/cart" className="relative hover:text-indigo-600 transition-colors">
-                                <FaShoppingCart size={20} />
-                                {totalQuantity > 0 && (
-                                    <span className="absolute -top-2 -right-2 bg-red-500 text-white text-[10px] font-bold w-4 h-4 flex items-center justify-center rounded-full">
-                                        {totalQuantity}
-                                    </span>
-                                )}
-                            </Link>
-                        </div>
                     </div>
 
-                    {/* Mobile Controls (Location + Cart + Menu) */}
-                    <div className="md:hidden flex items-center gap-3">
-                        {/* Mobile Location Pill */}
-                        <button
-                            onClick={() => setIsCityDropdownOpen(!isCityDropdownOpen)}
-                            className="flex items-center gap-1.5 px-3 py-1.5 bg-gray-100 rounded-full text-xs font-bold text-gray-700 hover:bg-gray-200"
-                        >
-                            <FaMapMarkerAlt size={12} className="text-indigo-600" />
-                            {selectedCity}
-                        </button>
+                    {/* Login/Register or Profile */}
+                    {userInfo ? (
+                        <div className="relative">
+                            <button
+                                className="flex items-center gap-2 text-gray-700 hover:text-indigo-600 transition-colors focus:outline-none"
+                                onClick={() => setIsProfileDropdownOpen(!isProfileDropdownOpen)}
+                            >
+                                <div className="w-9 h-9 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 border border-indigo-200">
+                                    <FaUser size={14} />
+                                </div>
+                                <span className="text-sm font-medium hidden lg:block max-w-[100px] truncate">
+                                    {userInfo.name || userInfo.email}
+                                </span>
+                            </button>
 
-                        {/* Mobile Cart */}
-                        <Link href="/cart" className="relative text-gray-700 hover:text-indigo-600 p-1">
+                            {/* Profile Dropdown */}
+                            <AnimatePresence>
+                                {isProfileDropdownOpen && (
+                                    <motion.div
+                                        initial={{ opacity: 0, y: 10 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        exit={{ opacity: 0, y: 10 }}
+                                        className="absolute top-full right-0 mt-2 w-48 bg-white/60 backdrop-blur-lg rounded-xl shadow-xl border border-gray-100 py-2 z-50 overflow-hidden"
+                                    >
+                                        <div className="px-4 py-3 border-b border-gray-50">
+                                            <p className="text-sm font-bold text-gray-900 truncate">{userInfo.name || "User"}</p>
+                                            <p className="text-xs text-gray-500 truncate">{userInfo.email}</p>
+                                        </div>
+
+                                        <Link href="/profile" className="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors" onClick={() => setIsProfileDropdownOpen(false)}>
+                                            <FaUser size={14} className="text-gray-400" /> My Profile
+                                        </Link>
+
+                                        <button
+                                            onClick={handleLogout}
+                                            className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors text-left"
+                                        >
+                                            <FaSignOutAlt size={14} /> Logout
+                                        </button>
+                                    </motion.div>
+                                )}
+                            </AnimatePresence>
+                        </div>
+                    ) : (
+                        <button
+                            onClick={() => setIsAuthModalOpen(true)}
+                            className="px-6 py-2 text-sm font-bold text-gray-900 bg-[#FFC107] hover:bg-[#FFD54F] rounded-full transition-colors shadow-sm"
+                        >
+                            Login/Register
+                        </button>
+                    )}
+
+                    {/* Wishlist & Cart */}
+                    <div className="flex items-center gap-4 text-gray-600">
+                        <button className="hover:text-indigo-600 transition-colors">
+                            <FaHeart size={20} />
+                        </button>
+                        <Link href="/cart" className="relative hover:text-indigo-600 transition-colors">
                             <FaShoppingCart size={20} />
                             {totalQuantity > 0 && (
-                                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[9px] font-bold w-3.5 h-3.5 flex items-center justify-center rounded-full border border-white">
+                                <span className="absolute -top-2 -right-2 bg-red-500 text-white text-[10px] font-bold w-4 h-4 flex items-center justify-center rounded-full">
                                     {totalQuantity}
                                 </span>
                             )}
                         </Link>
-
-                        {/* Mobile Menu Toggle */}
-                        <button
-                            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                            className="text-gray-800 focus:outline-none p-1"
-                        >
-                            {isMobileMenuOpen ? <FaTimes size={24} /> : <FaBars size={24} />}
-                        </button>
                     </div>
                 </div>
-            </div>
 
-            {/* Secondary Nav - Categories */}
-            <div className="hidden md:block border-t border-b border-gray-200 bg-white">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div className="flex items-center justify-center space-x-8 py-1 overflow-x-auto">
-                        {navLinks.map((link) => (
-                            <Link
-                                key={link.name}
-                                href={link.href}
-                                className="text-[14px] font-medium text-gray-600 hover:text-black whitespace-nowrap transition-colors relative group tracking-wide"
-                            >
-                                {link.name}
-                                <span className="absolute -bottom-3 left-0 w-0 h-0.5 bg-indigo-600 transition-all duration-300 group-hover:w-full"></span>
-                            </Link>
-                        ))}
-                    </div>
-                </div>
-            </div>
-
-            {/* Mobile Menu */}
-            <AnimatePresence>
-                {isMobileMenuOpen && (
-                    <motion.div
-                        initial={{ opacity: 0, height: 0 }}
-                        animate={{ opacity: 1, height: "auto" }}
-                        exit={{ opacity: 0, height: 0 }}
-                        className="md:hidden bg-white border-t border-gray-100 overflow-hidden shadow-lg"
+                {/* Mobile Controls (Location + Cart + Menu) */}
+                <div className="md:hidden flex items-center gap-3">
+                    {/* Mobile Location Pill */}
+                    <button
+                        onClick={() => setIsCityDropdownOpen(!isCityDropdownOpen)}
+                        className="flex items-center gap-1.5 px-3 py-1.5 bg-gray-100 rounded-full text-xs font-bold text-gray-700 hover:bg-gray-200"
                     >
-                        <div className="px-4 py-4 space-y-4">
-                            {/* Mobile Search */}
-                            <div className="relative">
-                                <input
-                                    type="text"
-                                    placeholder="Search..."
-                                    className="w-full px-4 py-2 rounded-lg bg-gray-50 border border-gray-200 focus:ring-2 focus:ring-indigo-500 outline-none"
-                                />
-                                <FaSearch className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400" />
-                            </div>
+                        <FaMapMarkerAlt size={12} className="text-indigo-600" />
+                        {selectedCity}
+                    </button>
 
-                            {/* Mobile Links */}
-                            <div className="flex flex-col space-y-3">
-                                {navLinks.map((link) => (
-                                    <Link
-                                        key={link.name}
-                                        href={link.href}
-                                        className="text-gray-600 font-medium hover:text-indigo-600 border-b border-gray-50 pb-2 last:border-0"
-                                        onClick={() => setIsMobileMenuOpen(false)}
-                                    >
-                                        {link.name}
-                                    </Link>
-                                ))}
-                            </div>
+                    {/* Mobile Cart */}
+                    <Link href="/cart" className="relative text-gray-700 hover:text-indigo-600 p-1">
+                        <FaShoppingCart size={20} />
+                        {totalQuantity > 0 && (
+                            <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[9px] font-bold w-3.5 h-3.5 flex items-center justify-center rounded-full border border-white">
+                                {totalQuantity}
+                            </span>
+                        )}
+                    </Link>
 
-                            {/* Mobile Auth */}
-                            <div className="pt-4 mt-2">
-                                {userInfo ? (
-                                    <div className="space-y-3">
-                                        <div className="flex items-center gap-3 p-3 bg-indigo-50 rounded-xl">
-                                            <div className="w-10 h-10 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 border border-indigo-200">
-                                                <FaUser size={16} />
-                                            </div>
-                                            <div className="flex-1 min-w-0">
-                                                <p className="text-sm font-bold text-gray-900 truncate">{userInfo.name || "User"}</p>
-                                                <p className="text-xs text-gray-500 truncate">{userInfo.email}</p>
-                                            </div>
-                                        </div>
-                                        <Link href="/profile" className="block w-full py-2 px-4 text-sm font-medium text-gray-700 bg-gray-50 rounded-lg text-center" onClick={() => setIsMobileMenuOpen(false)}>
-                                            My Profile
-                                        </Link>
-                                        <button
-                                            onClick={handleLogout}
-                                            className="block w-full py-2 px-4 text-sm font-medium text-red-600 bg-red-50 rounded-lg text-center"
-                                        >
-                                            Logout
-                                        </button>
-                                    </div>
-                                ) : (
-                                    <button
-                                        onClick={() => {
-                                            setIsMobileMenuOpen(false);
-                                            setIsAuthModalOpen(true);
-                                        }}
-                                        className="block w-full text-center py-2.5 bg-amber-300 text-gray-900 rounded-lg font-bold mb-3 shadow-sm"
-                                    >
-                                        Login / Register
-                                    </button>
-                                )}
+                    {/* Mobile Menu Toggle */}
+                    <button
+                        onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                        className="text-gray-800 focus:outline-none p-1"
+                    >
+                        {isMobileMenuOpen ? <FaTimes size={24} /> : <FaBars size={24} />}
+                    </button>
+                </div>
+            </div>
+        </div>
 
-                                <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg mt-3">
-                                    <div className="flex items-center gap-2 relative w-full">
-                                        <FaMapMarkerAlt className="text-gray-500" />
-                                        <select
-                                            value={selectedCity}
-                                            onChange={(e) => setSelectedCity(e.target.value)}
-                                            className="appearance-none bg-transparent font-medium text-gray-700 focus:outline-none w-full cursor-pointer"
-                                        >
-                                            {cities.map((city) => (
-                                                <option key={city} value={city}>
-                                                    {city}
-                                                </option>
-                                            ))}
-                                        </select>
-                                        <FaChevronDown size={10} className="absolute right-0 text-gray-400 pointer-events-none" />
-                                    </div>
+        {/* Secondary Nav - Categories */ }
+    <div className="hidden md:block border-t border-b border-gray-200 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="flex items-center justify-center space-x-8 py-1 overflow-x-auto">
+                {navLinks.map((link) => (
+                    <Link
+                        key={link.name}
+                        href={link.href}
+                        className="text-[14px] font-medium text-gray-600 hover:text-black whitespace-nowrap transition-colors relative group tracking-wide"
+                    >
+                        {link.name}
+                        <span className="absolute -bottom-3 left-0 w-0 h-0.5 bg-indigo-600 transition-all duration-300 group-hover:w-full"></span>
+                    </Link>
+                ))}
+            </div>
+        </div>
+    </div>
+
+    {/* Mobile Menu */ }
+        <AnimatePresence>
+            {isMobileMenuOpen && (
+        <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: "auto" }}
+            exit={{ opacity: 0, height: 0 }}
+            className="md:hidden bg-white border-t border-gray-100 overflow-hidden shadow-lg"
+        >
+            <div className="px-4 py-4 space-y-4">
+                {/* Mobile Search */}
+                <div className="relative">
+                    <input
+                        type="text"
+                        placeholder="Search..."
+                        className="w-full px-4 py-2 rounded-lg bg-gray-50 border border-gray-200 focus:ring-2 focus:ring-indigo-500 outline-none"
+                    />
+                    <FaSearch className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                </div>
+
+                {/* Mobile Links */}
+                <div className="flex flex-col space-y-3">
+                    {navLinks.map((link) => (
+                        <Link
+                            key={link.name}
+                            href={link.href}
+                            className="text-gray-600 font-medium hover:text-indigo-600 border-b border-gray-50 pb-2 last:border-0"
+                            onClick={() => setIsMobileMenuOpen(false)}
+                        >
+                            {link.name}
+                        </Link>
+                    ))}
+                </div>
+
+                {/* Mobile Auth */}
+                <div className="pt-4 mt-2">
+                    {userInfo ? (
+                        <div className="space-y-3">
+                            <div className="flex items-center gap-3 p-3 bg-indigo-50 rounded-xl">
+                                <div className="w-10 h-10 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 border border-indigo-200">
+                                    <FaUser size={16} />
+                                </div>
+                                <div className="flex-1 min-w-0">
+                                    <p className="text-sm font-bold text-gray-900 truncate">{userInfo.name || "User"}</p>
+                                    <p className="text-xs text-gray-500 truncate">{userInfo.email}</p>
                                 </div>
                             </div>
+                            <Link href="/profile" className="block w-full py-2 px-4 text-sm font-medium text-gray-700 bg-gray-50 rounded-lg text-center" onClick={() => setIsMobileMenuOpen(false)}>
+                                My Profile
+                            </Link>
+                            <button
+                                onClick={handleLogout}
+                                className="block w-full py-2 px-4 text-sm font-medium text-red-600 bg-red-50 rounded-lg text-center"
+                            >
+                                Logout
+                            </button>
                         </div>
-                    </motion.div>
-                )}
-            </AnimatePresence>
+                    ) : (
+                        <button
+                            onClick={() => {
+                                setIsMobileMenuOpen(false);
+                                setIsAuthModalOpen(true);
+                            }}
+                            className="block w-full text-center py-2.5 bg-amber-300 text-gray-900 rounded-lg font-bold mb-3 shadow-sm"
+                        >
+                            Login / Register
+                        </button>
+                    )}
 
-            <AuthModal
-                isOpen={isAuthModalOpen}
-                onClose={() => setIsAuthModalOpen(false)}
-                initialView="login"
-            />
-        </header>
+                    <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg mt-3">
+                        <div className="flex items-center gap-2 relative w-full">
+                            <FaMapMarkerAlt className="text-gray-500" />
+                            <select
+                                value={selectedCity}
+                                onChange={(e) => setSelectedCity(e.target.value)}
+                                className="appearance-none bg-transparent font-medium text-gray-700 focus:outline-none w-full cursor-pointer"
+                            >
+                                {cities.map((city) => (
+                                    <option key={city} value={city}>
+                                        {city}
+                                    </option>
+                                ))}
+                            </select>
+                            <FaChevronDown size={10} className="absolute right-0 text-gray-400 pointer-events-none" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </motion.div>
+    )}
+            </AnimatePresence >
+
+    <AuthModal
+        isOpen={isAuthModalOpen}
+        onClose={() => setIsAuthModalOpen(false)}
+        initialView="login"
+    />
+        </header >
     );
 };
 

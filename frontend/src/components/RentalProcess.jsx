@@ -69,22 +69,27 @@ const RentalProcess = () => {
                     {steps.map((step) => (
                         <div
                             key={step.id}
-                            className={`relative p-8 rounded-3xl border border-gray-100 shadow-sm hover:shadow-xl transition-all duration-300 h-full flex flex-col ${step.bg}`}
+                            className={`relative p-6 sm:p-8 rounded-[2rem] border border-transparent shadow-sm flex flex-col justify-between min-h-[320px] transition-all duration-300 ${step.id === 1 ? 'bg-[#FFC107] text-black' : 'bg-white text-gray-900 border-gray-100 hover:shadow-xl'
+                                }`}
                         >
-                            <div className="mb-4 text-gray-800">
-                                {step.icon}
+                            <div className="flex flex-col items-start gap-4">
+                                <div className={`text-4xl mb-2 ${step.id === 1 ? 'text-black' : 'text-gray-900'}`}>
+                                    {step.icon}
+                                </div>
+
+                                <div>
+                                    <h3 className={`text-xl font-bold mb-3 ${step.id === 1 ? 'text-black' : 'text-gray-900'}`}>
+                                        {step.title}
+                                    </h3>
+
+                                    <p className={`text-sm leading-relaxed ${step.id === 1 ? 'text-gray-900/80 font-medium' : 'text-gray-500'}`}>
+                                        {step.description}
+                                    </p>
+                                </div>
                             </div>
 
-                            <h3 className="text-lg font-bold text-gray-900 mb-3">
-                                {step.title}
-                            </h3>
-
-                            <p className="text-sm text-gray-600 leading-relaxed mb-8">
-                                {step.description}
-                            </p>
-
-                            {/* Big Number Background */}
-                            <div className={`absolute bottom-2 right-4 text-6xl font-bold ${step.numberColor} opacity-50`}>
+                            {/* Big Number */}
+                            <div className={`absolute bottom-4 right-6 text-7xl font-bold opacity-20 ${step.id === 1 ? 'text-black' : 'text-gray-300'}`}>
                                 {step.id}
                             </div>
                         </div>

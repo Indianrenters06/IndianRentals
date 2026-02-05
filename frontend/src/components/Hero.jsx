@@ -24,13 +24,10 @@ const Hero = () => {
                                 initial={{ opacity: 0, y: 20 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 transition={{ duration: 0.5 }}
-                                className="font-bold tracking-tight"
+                                className="font-bold tracking-tight text-white"
                             >
-                                {/* Adjusted size: 54px -> 44px for a cleaner fit */}
-                                <h1 className="text-2xl md:text-4xl lg:text-[44px] leading-[1.2] font-bold whitespace-nowrap">
-                                    The Tech That Powers
-                                </h1>
-                                <h1 className="text-2xl md:text-4xl lg:text-[44px] leading-[1.2] font-bold whitespace-nowrap">
+                                <h1 className="text-3xl md:text-4xl lg:text-[44px] leading-[1.2] font-bold">
+                                    The Tech That Powers <br className="md:hidden" />
                                     Your Ambition. On Demand.
                                 </h1>
                             </motion.div>
@@ -39,11 +36,11 @@ const Hero = () => {
                                 initial={{ opacity: 0, y: 20 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 transition={{ duration: 0.5, delay: 0.1 }}
-                                className="text-sm md:text-[15px] leading-snug opacity-90 font-normal space-y-[2px]"
+                                className="text-sm md:text-[15px] leading-snug text-white/90 font-medium space-y-1"
                             >
-                                <p className="whitespace-nowrap">Get the latest MacBooks, Workstations, Cameras, and more.</p>
-                                <p className="whitespace-nowrap">Delivered to your door with flexible monthly plans.</p>
-                                <p className="whitespace-nowrap">Upgrade your toolkit, not your expenses.</p>
+                                <p>Get the latest MacBooks, Workstations, Cameras,</p>
+                                <p>Delivered to your door with flexible monthly</p>
+                                <p>Upgrade your toolkit, not your expenses.</p>
                             </motion.div>
 
                             <motion.div

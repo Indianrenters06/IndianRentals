@@ -85,14 +85,20 @@ const BestRentedProducts = () => {
                                         />
 
                                         {/* Content Overlay */}
-                                        <div className="absolute inset-0 p-4 md:p-6 flex flex-col justify-end text-center">
+                                        <div className="absolute inset-0 p-4 md:p-6 flex flex-col justify-end text-center z-10">
+                                            {/* Decorative Arrows */}
+                                            <div className="absolute top-1/2 left-3 -translate-y-1/2 text-white/60 text-lg md:text-xl font-bold">
+                                                &lt;
+                                            </div>
+                                            <div className="absolute top-1/2 right-3 -translate-y-1/2 text-white/60 text-lg md:text-xl font-bold">
+                                                &gt;
+                                            </div>
+
                                             <div className="mb-2">
-                                                <div className="flex justify-center items-center gap-4 text-white mb-1">
-                                                    <span>&lt;</span>
-                                                    <h3 className="text-lg md:text-2xl font-bold">Apple Products</h3>
-                                                    <span>&gt;</span>
-                                                </div>
-                                                <p className="text-white/90 text-xs md:text-sm font-medium">
+                                                <h3 className="text-xl md:text-2xl font-bold text-white leading-tight drop-shadow-md">
+                                                    Apple <br /> Products
+                                                </h3>
+                                                <p className="text-blue-50 text-[10px] md:text-xs font-medium opacity-90 leading-snug mt-1">
                                                     MacBooks | iPads | iPhones | Mac Studio | Mac Mini
                                                 </p>
                                             </div>

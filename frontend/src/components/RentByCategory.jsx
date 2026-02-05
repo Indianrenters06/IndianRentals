@@ -112,26 +112,37 @@ const RentByCategory = () => {
                         }}
                         className="py-4 overflow-visible!"
                     >
+                        <div className="swiper-button-prev !text-gray-900 !w-10 !h-10 !bg-white !rounded-full !shadow-md after:!text-sm backdrop-blur-sm hidden md:flex"></div>
+                        <div className="swiper-button-next !text-gray-900 !w-10 !h-10 !bg-white !rounded-full !shadow-md after:!text-sm backdrop-blur-sm hidden md:flex"></div>
+
                         {displayCategories.map((cat) => (
                             <SwiperSlide key={cat._id}>
-                                <div className="group flex flex-col items-center p-6 bg-white border border-gray-100 rounded-4xl hover:shadow-lg transition-all duration-300 cursor-pointer h-full aspect-4/5 justify-between">
-                                    <div className="w-full flex-1 flex items-center justify-center bg-gray-100 rounded-2xl mb-4 group-hover:scale-105 transition-transform duration-300 overflow-hidden relative">
+                                <div className="group flex flex-col items-center p-4 bg-white border border-gray-50 rounded-3xl hover:border-gray-200 transition-all duration-300 cursor-pointer h-full relative">
+                                    {/* Mobile Arrow Overlay - Decorative based on screenshot */}
+                                    <div className="md:hidden absolute top-1/2 left-1 -translate-y-1/2 z-10 opacity-30">
+                                        <span className="text-blue-500 text-2xl">&lt;</span>
+                                    </div>
+                                    <div className="md:hidden absolute top-1/2 right-1 -translate-y-1/2 z-10 opacity-30">
+                                        <span className="text-blue-500 text-2xl">&gt;</span>
+                                    </div>
+
+                                    <div className="w-full aspect-square flex items-center justify-center mb-3 relative">
                                         {cat.image ? (
-                                            <div className="relative w-full h-full p-4">
+                                            <div className="relative w-full h-full p-2">
                                                 <Image
                                                     src={cat.image}
                                                     alt={cat.name}
                                                     fill
-                                                    className="object-contain"
+                                                    className="object-contain drop-shadow-sm"
                                                 />
                                             </div>
                                         ) : (
-                                            <div className="text-gray-700 group-hover:text-indigo-600 transition-colors">
+                                            <div className="text-gray-400 group-hover:text-indigo-600 transition-colors">
                                                 {getIconForCategory(cat.name)}
                                             </div>
                                         )}
                                     </div>
-                                    <h3 className="text-base font-bold text-gray-900 group-hover:text-indigo-600 transition-colors text-center">
+                                    <h3 className="text-sm font-bold text-gray-900 text-center">
                                         {cat.name}
                                     </h3>
                                 </div>

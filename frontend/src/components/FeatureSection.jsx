@@ -38,8 +38,8 @@ text-transparent tracking-normal">Macbook Air</span>
                     {/* Center Image & "Air" Text */}
                     <div className="w-full lg:w-[60%] relative flex flex-col items-center justify-center h-[500px] md:h-[600px]">
                         {/* Background Air Text - Massive Watermark */}
-                        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full flex items-center justify-center pointer-events-none select-none z-0">
-                            <span className="text-[22rem] font-bold text-[#E6F0FF] leading-none tracking-widest opacity-100">
+                        <div className="hidden md:flex absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full items-center justify-center pointer-events-none select-none z-0">
+                            <span className="text-[12rem] md:text-[22rem] font-bold text-[#E6F0FF] leading-none tracking-widest opacity-100">
                                 Air
                             </span>
                         </div>

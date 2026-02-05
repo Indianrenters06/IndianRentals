@@ -5,9 +5,9 @@ import { motion } from 'framer-motion';
 
 const WhyChooseUs = () => {
     return (
-        <section className="py-20 bg-[#FFFCF8] overflow-hidden">
+        <section className="py-12 md:py-20 bg-white overflow-hidden">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div className="grid md:grid-cols-2 gap-16 items-center">
+                <div className="grid md:grid-cols-2 gap-8 md:gap-16 items-center">
 
                     {/* Text Content */}
                     <div className="order-2 md:order-1 space-y-8">
