@@ -251,124 +251,123 @@ const Navbar = () => {
                     </button>
                 </div>
             </div>
-        </div>
 
-        {/* Secondary Nav - Categories */ }
-    <div className="hidden md:block border-t border-b border-gray-200 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex items-center justify-center space-x-8 py-1 overflow-x-auto">
-                {navLinks.map((link) => (
-                    <Link
-                        key={link.name}
-                        href={link.href}
-                        className="text-[14px] font-medium text-gray-600 hover:text-black whitespace-nowrap transition-colors relative group tracking-wide"
-                    >
-                        {link.name}
-                        <span className="absolute -bottom-3 left-0 w-0 h-0.5 bg-indigo-600 transition-all duration-300 group-hover:w-full"></span>
-                    </Link>
-                ))}
+            {/* Secondary Nav - Categories */}
+            <div className="hidden md:block border-t border-b border-gray-200 bg-white">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <div className="flex items-center justify-center space-x-8 py-1 overflow-x-auto">
+                        {navLinks.map((link) => (
+                            <Link
+                                key={link.name}
+                                href={link.href}
+                                className="text-[14px] font-medium text-gray-600 hover:text-black whitespace-nowrap transition-colors relative group tracking-wide"
+                            >
+                                {link.name}
+                                <span className="absolute -bottom-3 left-0 w-0 h-0.5 bg-indigo-600 transition-all duration-300 group-hover:w-full"></span>
+                            </Link>
+                        ))}
+                    </div>
+                </div>
             </div>
-        </div>
-    </div>
 
-    {/* Mobile Menu */ }
-        <AnimatePresence>
-            {isMobileMenuOpen && (
-                <motion.div
-                    initial={{ opacity: 0, height: 0 }}
-                    animate={{ opacity: 1, height: "auto" }}
-                    exit={{ opacity: 0, height: 0 }}
-                    className="md:hidden bg-white border-t border-gray-100 overflow-hidden shadow-lg"
-                >
-                    <div className="px-4 py-4 space-y-4">
-                        {/* Mobile Search */}
-                        <div className="relative">
-                            <input
-                                type="text"
-                                placeholder="Search..."
-                                className="w-full px-4 py-2 rounded-lg bg-gray-50 border border-gray-200 focus:ring-2 focus:ring-indigo-500 outline-none"
-                            />
-                            <FaSearch className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400" />
-                        </div>
+            {/* Mobile Menu */}
+            <AnimatePresence>
+                {isMobileMenuOpen && (
+                    <motion.div
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: "auto" }}
+                        exit={{ opacity: 0, height: 0 }}
+                        className="md:hidden bg-white border-t border-gray-100 overflow-hidden shadow-lg"
+                    >
+                        <div className="px-4 py-4 space-y-4">
+                            {/* Mobile Search */}
+                            <div className="relative">
+                                <input
+                                    type="text"
+                                    placeholder="Search..."
+                                    className="w-full px-4 py-2 rounded-lg bg-gray-50 border border-gray-200 focus:ring-2 focus:ring-indigo-500 outline-none"
+                                />
+                                <FaSearch className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                            </div>
 
-                        {/* Mobile Links */}
-                        <div className="flex flex-col space-y-3">
-                            {navLinks.map((link) => (
-                                <Link
-                                    key={link.name}
-                                    href={link.href}
-                                    className="text-gray-600 font-medium hover:text-indigo-600 border-b border-gray-50 pb-2 last:border-0"
-                                    onClick={() => setIsMobileMenuOpen(false)}
-                                >
-                                    {link.name}
-                                </Link>
-                            ))}
-                        </div>
-
-                        {/* Mobile Auth */}
-                        <div className="pt-4 mt-2">
-                            {userInfo ? (
-                                <div className="space-y-3">
-                                    <div className="flex items-center gap-3 p-3 bg-indigo-50 rounded-xl">
-                                        <div className="w-10 h-10 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 border border-indigo-200">
-                                            <FaUser size={16} />
-                                        </div>
-                                        <div className="flex-1 min-w-0">
-                                            <p className="text-sm font-bold text-gray-900 truncate">{userInfo.name || "User"}</p>
-                                            <p className="text-xs text-gray-500 truncate">{userInfo.email}</p>
-                                        </div>
-                                    </div>
-                                    <Link href="/profile" className="block w-full py-2 px-4 text-sm font-medium text-gray-700 bg-gray-50 rounded-lg text-center" onClick={() => setIsMobileMenuOpen(false)}>
-                                        My Profile
+                            {/* Mobile Links */}
+                            <div className="flex flex-col space-y-3">
+                                {navLinks.map((link) => (
+                                    <Link
+                                        key={link.name}
+                                        href={link.href}
+                                        className="text-gray-600 font-medium hover:text-indigo-600 border-b border-gray-50 pb-2 last:border-0"
+                                        onClick={() => setIsMobileMenuOpen(false)}
+                                    >
+                                        {link.name}
                                     </Link>
-                                    <button
-                                        onClick={handleLogout}
-                                        className="block w-full py-2 px-4 text-sm font-medium text-red-600 bg-red-50 rounded-lg text-center"
-                                    >
-                                        Logout
-                                    </button>
-                                </div>
-                            ) : (
-                                <button
-                                    onClick={() => {
-                                        setIsMobileMenuOpen(false);
-                                        setIsAuthModalOpen(true);
-                                    }}
-                                    className="block w-full text-center py-2.5 bg-amber-300 text-gray-900 rounded-lg font-bold mb-3 shadow-sm"
-                                >
-                                    Login / Register
-                                </button>
-                            )}
+                                ))}
+                            </div>
 
-                            <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg mt-3">
-                                <div className="flex items-center gap-2 relative w-full">
-                                    <FaMapMarkerAlt className="text-gray-500" />
-                                    <select
-                                        value={selectedCity}
-                                        onChange={(e) => setSelectedCity(e.target.value)}
-                                        className="appearance-none bg-transparent font-medium text-gray-700 focus:outline-none w-full cursor-pointer"
+                            {/* Mobile Auth */}
+                            <div className="pt-4 mt-2">
+                                {userInfo ? (
+                                    <div className="space-y-3">
+                                        <div className="flex items-center gap-3 p-3 bg-indigo-50 rounded-xl">
+                                            <div className="w-10 h-10 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 border border-indigo-200">
+                                                <FaUser size={16} />
+                                            </div>
+                                            <div className="flex-1 min-w-0">
+                                                <p className="text-sm font-bold text-gray-900 truncate">{userInfo.name || "User"}</p>
+                                                <p className="text-xs text-gray-500 truncate">{userInfo.email}</p>
+                                            </div>
+                                        </div>
+                                        <Link href="/profile" className="block w-full py-2 px-4 text-sm font-medium text-gray-700 bg-gray-50 rounded-lg text-center" onClick={() => setIsMobileMenuOpen(false)}>
+                                            My Profile
+                                        </Link>
+                                        <button
+                                            onClick={handleLogout}
+                                            className="block w-full py-2 px-4 text-sm font-medium text-red-600 bg-red-50 rounded-lg text-center"
+                                        >
+                                            Logout
+                                        </button>
+                                    </div>
+                                ) : (
+                                    <button
+                                        onClick={() => {
+                                            setIsMobileMenuOpen(false);
+                                            setIsAuthModalOpen(true);
+                                        }}
+                                        className="block w-full text-center py-2.5 bg-amber-300 text-gray-900 rounded-lg font-bold mb-3 shadow-sm"
                                     >
-                                        {cities.map((city) => (
-                                            <option key={city} value={city}>
-                                                {city}
-                                            </option>
-                                        ))}
-                                    </select>
-                                    <FaChevronDown size={10} className="absolute right-0 text-gray-400 pointer-events-none" />
+                                        Login / Register
+                                    </button>
+                                )}
+
+                                <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg mt-3">
+                                    <div className="flex items-center gap-2 relative w-full">
+                                        <FaMapMarkerAlt className="text-gray-500" />
+                                        <select
+                                            value={selectedCity}
+                                            onChange={(e) => setSelectedCity(e.target.value)}
+                                            className="appearance-none bg-transparent font-medium text-gray-700 focus:outline-none w-full cursor-pointer"
+                                        >
+                                            {cities.map((city) => (
+                                                <option key={city} value={city}>
+                                                    {city}
+                                                </option>
+                                            ))}
+                                        </select>
+                                        <FaChevronDown size={10} className="absolute right-0 text-gray-400 pointer-events-none" />
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                </motion.div>
-            )}
-        </AnimatePresence>
+                    </motion.div>
+                )}
+            </AnimatePresence>
 
-        <AuthModal
-            isOpen={isAuthModalOpen}
-            onClose={() => setIsAuthModalOpen(false)}
-            initialView="login"
-        />
-    </header >
+            <AuthModal
+                isOpen={isAuthModalOpen}
+                onClose={() => setIsAuthModalOpen(false)}
+                initialView="login"
+            />
+        </header >
     );
 };
 
