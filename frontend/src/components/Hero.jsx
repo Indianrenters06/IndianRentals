@@ -10,10 +10,10 @@ const Hero = () => {
         <section className="bg-white py-6 px-4 sm:px-6 lg:px-8">
             <div className="max-w-[1400px] mx-auto relative">
                 {/* Dynamic Background Shape */}
-                <div className="absolute inset-0 bg-[#00A8FF] rounded-[2.5rem]"></div>
+                <div className="absolute inset-0 bg-[#00A8FF] rounded-3xl md:rounded-[2.5rem]"></div>
 
                 {/* Background Pattern/Gradient (Subtle) */}
-                <div className="absolute inset-0 bg-gradient-to-r from-transparent to-white/10 rounded-[2.5rem]"></div>
+                <div className="absolute inset-0 bg-gradient-to-r from-transparent to-white/10 rounded-3xl md:rounded-[2.5rem]"></div>
 
                 <div className="relative z-10 px-6 py-8 md:px-12 md:py-12 h-full flex items-center justify-center">
                     <div className="grid md:grid-cols-2 gap-4 lg:gap-12 items-center w-full max-w-6xl mx-auto">
@@ -27,10 +27,10 @@ const Hero = () => {
                                 className="font-bold tracking-tight"
                             >
                                 {/* Adjusted size: 54px -> 44px for a cleaner fit */}
-                                <h1 className="text-[26px] md:text-4xl lg:text-[44px] leading-[1.2] font-bold whitespace-nowrap">
+                                <h1 className="text-2xl md:text-4xl lg:text-[44px] leading-[1.2] font-bold whitespace-nowrap">
                                     The Tech That Powers
                                 </h1>
-                                <h1 className="text-[26px] md:text-4xl lg:text-[44px] leading-[1.2] font-bold whitespace-nowrap">
+                                <h1 className="text-2xl md:text-4xl lg:text-[44px] leading-[1.2] font-bold whitespace-nowrap">
                                     Your Ambition. On Demand.
                                 </h1>
                             </motion.div>

@@ -103,7 +103,7 @@ const Navbar = () => {
                     </Link>
 
                     {/* Search Bar - Desktop */}
-                    <div className="hidden md:flex flex-1 max-w-xl mx-auto relative group">
+                    <div className="hidden lg:flex flex-1 max-w-xl mx-auto relative group">
                         <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                             <FaSearch className="text-gray-400 group-focus-within:text-indigo-600" />
                         </div>
@@ -222,11 +222,31 @@ const Navbar = () => {
                         </div>
                     </div>
 
-                    {/* Mobile Menu Button */}
-                    <div className="md:hidden flex items-center gap-4">
+                    {/* Mobile Controls (Location + Cart + Menu) */}
+                    <div className="md:hidden flex items-center gap-3">
+                        {/* Mobile Location Pill */}
+                        <button
+                            onClick={() => setIsCityDropdownOpen(!isCityDropdownOpen)}
+                            className="flex items-center gap-1.5 px-3 py-1.5 bg-gray-100 rounded-full text-xs font-bold text-gray-700 hover:bg-gray-200"
+                        >
+                            <FaMapMarkerAlt size={12} className="text-indigo-600" />
+                            {selectedCity}
+                        </button>
+
+                        {/* Mobile Cart */}
+                        <Link href="/cart" className="relative text-gray-700 hover:text-indigo-600 p-1">
+                            <FaShoppingCart size={20} />
+                            {totalQuantity > 0 && (
+                                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[9px] font-bold w-3.5 h-3.5 flex items-center justify-center rounded-full border border-white">
+                                    {totalQuantity}
+                                </span>
+                            )}
+                        </Link>
+
+                        {/* Mobile Menu Toggle */}
                         <button
                             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                            className="text-gray-600 focus:outline-none p-2"
+                            className="text-gray-800 focus:outline-none p-1"
                         >
                             {isMobileMenuOpen ? <FaTimes size={24} /> : <FaBars size={24} />}
                         </button>

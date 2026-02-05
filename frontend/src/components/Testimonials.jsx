@@ -197,8 +197,8 @@ const Testimonials = () => {
                 </div>
             </div>
 
-            {/* Horizontal Marquee Rows Container */}
-            <div className="relative w-full space-y-8 pb-8">
+            {/* Horizontal Marquee Rows Container - Desktop */}
+            <div className="relative w-full space-y-8 pb-8 hidden lg:block">
 
                 {/* Left/Right Gradient Fades */}
                 <div className="absolute left-0 top-0 bottom-0 w-32 bg-linear-to-r from-white to-transparent z-20 pointer-events-none hidden md:block"></div>
@@ -221,7 +221,38 @@ const Testimonials = () => {
                         ))}
                     </div>
                 </div>
+            </div>
 
+            {/* Static Grid - Mobile/Tablet */}
+            <div className="lg:hidden px-4 mb-8">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    {reviews.slice(0, 4).map((review) => (
+                        <div
+                            key={review.id}
+                            className={`${review.bg} w-full rounded-3xl p-6 flex flex-col min-h-[200px] shadow-sm`}
+                        >
+                            <div className="mb-4">
+                                <h3 className="text-lg font-bold text-gray-900 leading-none mb-1">{review.name}</h3>
+                                <p className="text-sm font-medium text-gray-500">{review.role}</p>
+                            </div>
+
+                            <p className="text-[#333] text-sm leading-[1.6] mb-4 grow font-medium line-clamp-4">
+                                {review.text}
+                            </p>
+
+                            <div className="flex items-end justify-between mt-auto">
+                                <div className="translate-y-1">
+                                    <GoogleLogo />
+                                </div>
+                                <div className="flex text-[#F4B400] gap-0.5 text-base">
+                                    {[...Array(5)].map((_, j) => (
+                                        <FaStar key={j} className={j < review.stars ? "text-[#FAB005]" : "text-gray-300"} />
+                                    ))}
+                                </div>
+                            </div>
+                        </div>
+                    ))}
+                </div>
             </div>
 
             {/* Read All Reviews Button */}
