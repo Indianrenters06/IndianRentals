@@ -15,7 +15,7 @@ const BestRentedProducts = () => {
             try {
                 const { products: apiProducts } = await getProducts();
                 // Map API data to component structure
-                const mappedProducts = (apiProducts || []).slice(0, 3).map(p => ({
+                const mappedProducts = (apiProducts || []).slice(0, 4).map(p => ({
                     id: p._id,
                     name: p.name,
                     category: p.category,
@@ -28,14 +28,7 @@ const BestRentedProducts = () => {
                     isNew: p.condition === 'New',
                 }));
 
-                // Insert Promo Card at index 1
-                const productsWithPromo = [
-                    mappedProducts[0],
-                    { isPromo: true, id: 'promo-apple' },
-                    ...mappedProducts.slice(1)
-                ].filter(Boolean);
-
-                setProducts(productsWithPromo);
+                setProducts(mappedProducts);
             } catch (error) {
                 console.error("Failed to fetch products", error);
             }
@@ -69,52 +62,6 @@ const BestRentedProducts = () => {
                 {/* Grid */}
                 <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-8">
                     {products.map((product, index) => {
-                        if (product.isPromo) {
-                            return (
-                                <div key={product.id} className="block h-full relative group cursor-pointer">
-                                    <div className="h-full w-full rounded-2xl md:rounded-3xl overflow-hidden relative shadow-sm hover:shadow-xl transition-all duration-300">
-                                        {/* Background Gradient */}
-                                        <div className="absolute inset-0 bg-linear-to-br from-[#4facfe] to-[#00f2fe] opacity-90"></div>
-                                        <div className="absolute inset-0 bg-linear-to-b from-transparent to-black/60"></div>
-
-                                        {/* Image */}
-                                        <img
-                                            src="https://res.cloudinary.com/dgkckcdk8/image/upload/v1769946716/indian-rentals/fj8ptqbhppbstdd0hs4i.png"
-                                            alt="Apple Products"
-                                            className="absolute inset-0 w-full h-full object-cover object-center transform group-hover:scale-105 transition-transform duration-700"
-                                        />
-
-                                        {/* Content Overlay */}
-                                        <div className="absolute inset-0 p-4 md:p-6 flex flex-col justify-end text-center z-10">
-                                            {/* Decorative Arrows */}
-                                            <div className="absolute top-1/2 left-3 -translate-y-1/2 text-white/60 text-lg md:text-xl font-bold">
-                                                &lt;
-                                            </div>
-                                            <div className="absolute top-1/2 right-3 -translate-y-1/2 text-white/60 text-lg md:text-xl font-bold">
-                                                &gt;
-                                            </div>
-
-                                            <div className="mb-2">
-                                                <h3 className="text-xl md:text-2xl font-bold text-white leading-tight drop-shadow-md">
-                                                    Apple <br /> Products
-                                                </h3>
-                                                <p className="text-blue-50 text-[10px] md:text-xs font-medium opacity-90 leading-snug mt-1">
-                                                    MacBooks | iPads | iPhones | Mac Studio | Mac Mini
-                                                </p>
-                                            </div>
-
-                                            {/* Dots */}
-                                            <div className="flex justify-center gap-1.5 mt-2">
-                                                <span className="w-1.5 h-1.5 rounded-full bg-white"></span>
-                                                <span className="w-1.5 h-1.5 rounded-full bg-white/50"></span>
-                                                <span className="w-1.5 h-1.5 rounded-full bg-white/50"></span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            );
-                        }
-
                         return (
                             <div
                                 key={product.id}
