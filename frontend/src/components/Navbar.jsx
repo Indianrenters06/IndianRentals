@@ -87,17 +87,29 @@ const Navbar = () => {
             {/* Top Bar */}
             <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 ">
                 <div className="flex items-center justify-between gap-4">
-                    {/* Logo Section */}
-                    <Link href="/" className="shrink-0">
-                        <Image
-                            src="/logo-v2.png"
-                            alt="Indian Renters - You Name it We Rent it"
-                            width={280}
-                            height={75}
-                            className="h-20 w-auto object-contain"
-                            priority
-                        />
-                    </Link>
+
+                    {/* Left Section: Mobile Menu + Logo */}
+                    <div className="flex items-center gap-3 md:gap-4">
+                        {/* Mobile Menu Toggle */}
+                        <button
+                            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                            className="md:hidden text-gray-800 focus:outline-none p-1"
+                        >
+                            {isMobileMenuOpen ? <FaTimes size={24} /> : <FaBars size={24} />}
+                        </button>
+
+                        {/* Logo */}
+                        <Link href="/" className="shrink-0">
+                            <Image
+                                src="/logo-v2.png"
+                                alt="Indian Renters - You Name it We Rent it"
+                                width={280}
+                                height={75}
+                                className="h-16 md:h-20 w-auto object-contain"
+                                priority
+                            />
+                        </Link>
+                    </div>
 
                     {/* Search Bar - Desktop */}
                     <div className="hidden lg:flex flex-1 max-w-xl mx-auto relative group">
@@ -111,7 +123,7 @@ const Navbar = () => {
                         />
                     </div>
 
-                    {/* Right Actions */}
+                    {/* Right Actions (Desktop) */}
                     <div className="hidden md:flex items-center gap-6">
                         {/* Location Selector */}
                         <div className="relative">
@@ -151,108 +163,100 @@ const Navbar = () => {
                                 )}
                             </AnimatePresence>
                         </div>
+
+
+                        {/* Login/Register or Profile (Desktop) */}
+                        {userInfo ? (
+                            <div className="relative">
+                                <button
+                                    className="flex items-center gap-2 text-gray-700 hover:text-indigo-600 transition-colors focus:outline-none"
+                                    onClick={() => setIsProfileDropdownOpen(!isProfileDropdownOpen)}
+                                >
+                                    <div className="w-9 h-9 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 border border-indigo-200">
+                                        <FaUser size={14} />
+                                    </div>
+                                    <span className="text-sm font-medium hidden lg:block max-w-[100px] truncate">
+                                        {userInfo.name || userInfo.email}
+                                    </span>
+                                </button>
+
+                                {/* Profile Dropdown */}
+                                <AnimatePresence>
+                                    {isProfileDropdownOpen && (
+                                        <motion.div
+                                            initial={{ opacity: 0, y: 10 }}
+                                            animate={{ opacity: 1, y: 0 }}
+                                            exit={{ opacity: 0, y: 10 }}
+                                            className="absolute top-full right-0 mt-2 w-48 bg-white/60 backdrop-blur-lg rounded-xl shadow-xl border border-gray-100 py-2 z-50 overflow-hidden"
+                                        >
+                                            <div className="px-4 py-3 border-b border-gray-50">
+                                                <p className="text-sm font-bold text-gray-900 truncate">{userInfo.name || "User"}</p>
+                                                <p className="text-xs text-gray-500 truncate">{userInfo.email}</p>
+                                            </div>
+
+                                            <Link href="/profile" className="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors" onClick={() => setIsProfileDropdownOpen(false)}>
+                                                <FaUser size={14} className="text-gray-400" /> My Profile
+                                            </Link>
+
+                                            <button
+                                                onClick={handleLogout}
+                                                className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors text-left"
+                                            >
+                                                <FaSignOutAlt size={14} /> Logout
+                                            </button>
+                                        </motion.div>
+                                    )}
+                                </AnimatePresence>
+                            </div>
+                        ) : (
+                            <button
+                                onClick={() => setIsAuthModalOpen(true)}
+                                className="px-6 py-2 text-sm font-bold text-gray-900 bg-[#FFC107] hover:bg-[#FFD54F] rounded-full transition-colors shadow-sm"
+                            >
+                                Login/Register
+                            </button>
+                        )}
+
+                        {/* Wishlist & Cart (Desktop) */}
+                        <div className="flex items-center gap-4 text-gray-600">
+                            <button className="hover:text-indigo-600 transition-colors">
+                                <FaHeart size={20} />
+                            </button>
+                            <Link href="/cart" className="relative hover:text-indigo-600 transition-colors">
+                                <FaShoppingCart size={20} />
+                                {totalQuantity > 0 && (
+                                    <span className="absolute -top-2 -right-2 bg-red-500 text-white text-[10px] font-bold w-4 h-4 flex items-center justify-center rounded-full">
+                                        {totalQuantity}
+                                    </span>
+                                )}
+                            </Link>
+                        </div>
                     </div>
 
-                    {/* Login/Register or Profile */}
-                    {userInfo ? (
-                        <div className="relative">
-                            <button
-                                className="flex items-center gap-2 text-gray-700 hover:text-indigo-600 transition-colors focus:outline-none"
-                                onClick={() => setIsProfileDropdownOpen(!isProfileDropdownOpen)}
-                            >
-                                <div className="w-9 h-9 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 border border-indigo-200">
-                                    <FaUser size={14} />
-                                </div>
-                                <span className="text-sm font-medium hidden lg:block max-w-[100px] truncate">
-                                    {userInfo.name || userInfo.email}
-                                </span>
-                            </button>
 
-                            {/* Profile Dropdown */}
-                            <AnimatePresence>
-                                {isProfileDropdownOpen && (
-                                    <motion.div
-                                        initial={{ opacity: 0, y: 10 }}
-                                        animate={{ opacity: 1, y: 0 }}
-                                        exit={{ opacity: 0, y: 10 }}
-                                        className="absolute top-full right-0 mt-2 w-48 bg-white/60 backdrop-blur-lg rounded-xl shadow-xl border border-gray-100 py-2 z-50 overflow-hidden"
-                                    >
-                                        <div className="px-4 py-3 border-b border-gray-50">
-                                            <p className="text-sm font-bold text-gray-900 truncate">{userInfo.name || "User"}</p>
-                                            <p className="text-xs text-gray-500 truncate">{userInfo.email}</p>
-                                        </div>
-
-                                        <Link href="/profile" className="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors" onClick={() => setIsProfileDropdownOpen(false)}>
-                                            <FaUser size={14} className="text-gray-400" /> My Profile
-                                        </Link>
-
-                                        <button
-                                            onClick={handleLogout}
-                                            className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors text-left"
-                                        >
-                                            <FaSignOutAlt size={14} /> Logout
-                                        </button>
-                                    </motion.div>
-                                )}
-                            </AnimatePresence>
-                        </div>
-                    ) : (
+                    {/* Mobile Controls (Right: Location + Cart) */}
+                    <div className="md:hidden flex items-center gap-3">
+                        {/* Mobile Location Pill */}
                         <button
-                            onClick={() => setIsAuthModalOpen(true)}
-                            className="px-6 py-2 text-sm font-bold text-gray-900 bg-[#FFC107] hover:bg-[#FFD54F] rounded-full transition-colors shadow-sm"
+                            onClick={() => setIsCityDropdownOpen(!isCityDropdownOpen)}
+                            className="flex items-center gap-1.5 px-3 py-1.5 bg-gray-50/80 border border-gray-200 rounded-full text-xs font-bold text-gray-700 hover:bg-gray-100"
                         >
-                            Login/Register
+                            <FaMapMarkerAlt size={12} className="text-gray-500" />
+                            {selectedCity}
                         </button>
-                    )}
 
-                    {/* Wishlist & Cart */}
-                    <div className="flex items-center gap-4 text-gray-600">
-                        <button className="hover:text-indigo-600 transition-colors">
-                            <FaHeart size={20} />
-                        </button>
-                        <Link href="/cart" className="relative hover:text-indigo-600 transition-colors">
+                        {/* Mobile Cart */}
+                        <Link href="/cart" className="relative text-gray-700 hover:text-indigo-600 p-1">
                             <FaShoppingCart size={20} />
                             {totalQuantity > 0 && (
-                                <span className="absolute -top-2 -right-2 bg-red-500 text-white text-[10px] font-bold w-4 h-4 flex items-center justify-center rounded-full">
+                                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[9px] font-bold w-3.5 h-3.5 flex items-center justify-center rounded-full border border-white">
                                     {totalQuantity}
                                 </span>
                             )}
                         </Link>
                     </div>
                 </div>
-
-                {/* Mobile Controls (Location + Cart + Menu) */}
-                <div className="md:hidden flex items-center gap-3">
-                    {/* Mobile Location Pill */}
-                    <button
-                        onClick={() => setIsCityDropdownOpen(!isCityDropdownOpen)}
-                        className="flex items-center gap-1.5 px-3 py-1.5 bg-gray-100 rounded-full text-xs font-bold text-gray-700 hover:bg-gray-200"
-                    >
-                        <FaMapMarkerAlt size={12} className="text-indigo-600" />
-                        {selectedCity}
-                    </button>
-
-                    {/* Mobile Cart */}
-                    <Link href="/cart" className="relative text-gray-700 hover:text-indigo-600 p-1">
-                        <FaShoppingCart size={20} />
-                        {totalQuantity > 0 && (
-                            <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[9px] font-bold w-3.5 h-3.5 flex items-center justify-center rounded-full border border-white">
-                                {totalQuantity}
-                            </span>
-                        )}
-                    </Link>
-
-                    {/* Mobile Menu Toggle */}
-                    <button
-                        onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                        className="text-gray-800 focus:outline-none p-1"
-                    >
-                        {isMobileMenuOpen ? <FaTimes size={24} /> : <FaBars size={24} />}
-                    </button>
-                </div>
-            </div>
-
-            {/* Secondary Nav - Categories */}
+            </div>      {/* Secondary Nav - Categories */}
             <div className="hidden md:block border-t border-b border-gray-200 bg-white">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="flex items-center justify-center space-x-8 py-1 overflow-x-auto">

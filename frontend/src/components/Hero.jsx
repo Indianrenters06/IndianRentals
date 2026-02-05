@@ -2,7 +2,7 @@
 import { motion } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
-import { FaArrowRight } from "react-icons/fa";
+import { FaArrowRight, FaChevronLeft, FaChevronRight } from "react-icons/fa";
 
 // Note: You can replace this placeholder image path with the actual image provided by the user later.
 const Hero = () => {
@@ -14,6 +14,14 @@ const Hero = () => {
 
                 {/* Background Pattern/Gradient (Subtle) */}
                 <div className="absolute inset-0 bg-gradient-to-r from-transparent to-white/10 rounded-3xl md:rounded-[2.5rem]"></div>
+
+                {/* Navigation Arrows */}
+                <button className="absolute left-4 md:left-8 top-1/2 -translate-y-1/2 z-30 w-10 h-10 flex items-center justify-center rounded-full bg-white/20 hover:bg-white/40 text-white backdrop-blur-sm transition-all hidden md:flex">
+                    <FaChevronLeft size={20} />
+                </button>
+                <button className="absolute right-4 md:right-8 top-1/2 -translate-y-1/2 z-30 w-10 h-10 flex items-center justify-center rounded-full bg-white/20 hover:bg-white/40 text-white backdrop-blur-sm transition-all hidden md:flex">
+                    <FaChevronRight size={20} />
+                </button>
 
                 <div className="relative z-10 px-6 py-8 md:px-12 md:py-12 h-full flex items-center justify-center">
                     <div className="grid md:grid-cols-2 gap-4 lg:gap-12 items-center w-full max-w-6xl mx-auto">
