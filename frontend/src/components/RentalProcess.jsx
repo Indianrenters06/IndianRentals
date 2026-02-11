@@ -1,6 +1,7 @@
 "use client";
 import React from 'react';
 import Image from 'next/image';
+import Link from 'next/link';
 import { FaLaptopCode, FaUserCheck, FaShieldAlt, FaBoxOpen, FaArrowRight } from 'react-icons/fa';
 
 const steps = [
@@ -56,12 +57,12 @@ const RentalProcess = () => {
                     </div>
 
                     <div className="flex items-center gap-4">
-                        <button className="px-6 py-2.5 bg-[#FFC107] text-black font-bold rounded-full hover:bg-[#FFD54F] transition-colors shadow-lg">
+                        <Link href="/rental-process" className="px-6 py-2.5 bg-[#FFC107] text-black font-bold rounded-full hover:bg-[#FFD54F] transition-colors shadow-lg">
                             Rental Process
-                        </button>
-                        <button className="px-6 py-2.5 bg-gray-800 text-white font-bold rounded-full hover:bg-gray-700 transition-colors">
+                        </Link>
+                        <Link href="/contact" className="px-6 py-2.5 bg-gray-800 text-white font-bold rounded-full hover:bg-gray-700 transition-colors">
                             Contact
-                        </button>
+                        </Link>
                     </div>
                 </div>
 

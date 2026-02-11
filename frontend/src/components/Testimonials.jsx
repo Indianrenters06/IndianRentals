@@ -7,7 +7,7 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 gsap.registerPlugin(ScrollTrigger);
 
 const GoogleLogo = () => (
-    <span className="flex items-center font-bold text-xl font-product-sans leading-none tracking-tight">
+    <span className="flex items-center font-bold text-xl leading-none tracking-tight">
         <span className="text-[#4285F4]">G</span>
         <span className="text-[#EA4335]">o</span>
         <span className="text-[#FBBC05]">o</span>

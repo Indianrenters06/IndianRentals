@@ -9,7 +9,7 @@ module.exports = {
         extend: {
             fontFamily: {
                 sans: [
-                    "var(--font-inter)",
+                    "var(--font-manrope)",
                     "-apple-system",
                     "BlinkMacSystemFont",
                     "Segoe UI",
@@ -18,6 +18,7 @@ module.exports = {
                     "Arial",
                     "sans-serif"
                 ],
+                manrope: ["var(--font-manrope)"],
             },
         },
     },

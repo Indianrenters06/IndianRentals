@@ -187,7 +187,7 @@ export default function ProductPage() {
 
                                 {/* Quantity Row inside Card */}
                                 <div className="flex items-center gap-6 ">
-                                    <span className="text-[14px] italic text-[#1D1D1F] font-serif">Quantity</span>
+                                    <span className="text-[14px] italic text-[#1D1D1F]">Quantity</span>
                                     <div className="flex items-center border border-gray-300 rounded-lg h-4 px-2 gap-3 bg-white">
                                         <button onClick={() => setQuantity(Math.max(1, quantity - 1))} className="text-gray-400 hover:text-black transition-colors"><FaMinus size={8} /></button>
                                         <span className="text-[14px] font-medium w-4 text-center text-[#1D1D1F]">{quantity}</span>

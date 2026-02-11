@@ -72,6 +72,8 @@ const Navbar = () => {
         { name: "AV Products", href: "/category/av-products" },
         { name: "Office Equipment", href: "/category/office-equipment" },
         { name: "DSLR Cameras", href: "/category/dslr" },
+        { name: "About Us", href: "/about" },
+        { name: "Contact", href: "/contact" },
         { name: "More", href: "/more" },
         { name: "Latest Launch", href: "/latest" },
         { name: "Deals %", href: "/deals" },
