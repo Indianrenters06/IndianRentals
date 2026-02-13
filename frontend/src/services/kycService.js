@@ -43,9 +43,34 @@ export const getKYCStatus = async () => {
     const token = getToken();
     const config = {
         headers: {
-            Authorization: `Bearer ${token}`
+            'Authorization': `Bearer ${token}`
         }
     };
     const response = await axios.get(API_URL, config);
+    return response.data;
+};
+
+// Admin: Get all KYC requests
+export const getAllKYC = async () => {
+    const token = getToken();
+    const config = {
+        headers: {
+            'Authorization': `Bearer ${token}`
+        }
+    };
+    const response = await axios.get(`${API_URL}/admin/all`, config);
+    return response.data;
+};
+
+// Admin: Update KYC status
+export const updateKYCStatus = async (id, statusData) => {
+    const token = getToken();
+    const config = {
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+        }
+    };
+    const response = await axios.put(`${API_URL}/admin/${id}`, statusData, config);
     return response.data;
 };

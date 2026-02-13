@@ -1,3 +1,4 @@
+const path = require('path'); // Import path
 const express = require('express'); // server entry point
 const mongoose = require('mongoose');
 const cors = require('cors');
@@ -18,6 +19,9 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cors());
 app.use(cookieParser());
 app.use(morgan('combined'));
+
+// Serve Static Uploads
+app.use('/uploads', express.static(path.join(__dirname, '/uploads')));
 
 // Logger setup (basic)
 const logger = winston.createLogger({
@@ -64,6 +68,10 @@ const uploadRoutes = require('./routes/uploadRoutes');
 app.use('/api/upload', uploadRoutes);
 const kycRoutes = require('./routes/kycRoutes');
 app.use('/api/kyc', kycRoutes);
+const adminRoutes = require('./routes/adminRoutes'); // Admin Dashboard
+app.use('/api/admin', adminRoutes);
+const testimonialRoutes = require('./routes/testimonialRoutes'); // Testimonials
+app.use('/api/testimonials', testimonialRoutes);
 
 app.get('/', (req, res) => {
   res.send('API is running...');

@@ -1,4 +1,56 @@
 const KYC = require('../models/KYC');
+const User = require('../models/User');
+
+// @desc    Get All KYC Requests (Admin)
+// @route   GET /api/kyc/admin/all
+// @access  Private/Admin
+exports.getAllKYC = async (req, res) => {
+    try {
+        const kycList = await KYC.find({}).populate('user', 'name email phone');
+        res.status(200).json(kycList);
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: 'Server Error' });
+    }
+};
+
+// @desc    Update KYC Status (Admin)
+// @route   PUT /api/kyc/admin/:id
+// @access  Private/Admin
+exports.updateKYCStatus = async (req, res) => {
+    try {
+        const { status, rejectionReason } = req.body;
+
+        // Find KYC record
+        const kyc = await KYC.findById(req.params.id);
+        if (!kyc) {
+            return res.status(404).json({ message: 'KYC record not found' });
+        }
+
+        // Update KYC record
+        kyc.status = status;
+        if (status === 'rejected') {
+            kyc.rejectionReason = rejectionReason;
+        }
+        await kyc.save();
+
+        // SYNC: Update User model status
+        const user = await User.findById(kyc.user);
+        if (user) {
+            user.kyc.status = status;
+            if (status === 'rejected') {
+                user.kyc.rejectionReason = rejectionReason;
+            }
+            await user.save();
+        }
+
+        res.status(200).json({ message: `KYC ${status}`, kyc });
+
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: 'Server Error' });
+    }
+};
 
 // @desc    Create or Update KYC
 // @route   POST /api/kyc
