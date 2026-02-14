@@ -18,7 +18,7 @@ const upload = multer();
 // @desc    Upload image(s) to Cloudinary
 // @route   POST /api/upload
 // @access  Private/Admin
-router.post('/', upload.array('image'), async (req, res) => { // Supports single or multiple
+router.post('/', protect, admin, upload.array('image'), async (req, res) => { // Supports single or multiple
     try {
         if (!req.files || req.files.length === 0) {
             // Fallback check if single file was sent improperly or without 'image' key

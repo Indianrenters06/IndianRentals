@@ -1,8 +1,8 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { FaFingerprint, FaCheck, FaCloudUploadAlt, FaFileAlt } from 'react-icons/fa';
-import { saveKYCData, uploadKYCFiles } from '../../../services/kycService';
+import { FaFingerprint, FaCheck, FaCloudUploadAlt, FaFileAlt, FaSpinner, FaExclamationTriangle, FaEye } from 'react-icons/fa';
+import { saveKYCData, uploadKYCFiles, getKYCStatus } from '../../../services/kycService';
 import Swal from 'sweetalert2';
 import { useRouter } from 'next/navigation';
 
@@ -13,9 +13,41 @@ export default function KYCPage() {
     const [loading, setLoading] = useState(false);
     const [errors, setErrors] = useState({});
 
+    // KYC Status State
+    const [kycStatus, setKycStatus] = useState('loading'); // loading, not_submitted, pending, approved, rejected
+    const [kycData, setKycData] = useState(null);
+
     useEffect(() => {
-        console.log('KYC Page Mounted. Current Step:', currentStep, 'Customer Type:', customerType);
-    }, [currentStep, customerType]);
+        fetchKYC();
+    }, []);
+
+    const fetchKYC = async () => {
+        try {
+            const data = await getKYCStatus();
+            if (data && (data.status || data.personalDetails)) {
+                setKycData(data);
+                const status = data.status ? data.status.toLowerCase() : 'pending';
+                setKycStatus(status);
+
+                if (status === 'rejected') {
+                    setFormData(prev => ({
+                        ...prev,
+                        personalDetails: data.personalDetails || prev.personalDetails,
+                        companyDetails: data.companyDetails || prev.companyDetails,
+                        documents: { ...prev.documents, ...data.documents } // Keep existing uploads if valid, or just simple
+                    }));
+                    if (data.companyDetails && data.companyDetails.companyName) {
+                        setCustomerType('Company');
+                    }
+                }
+            } else {
+                setKycStatus('not_submitted');
+            }
+        } catch (err) {
+            console.error('Error fetching KYC:', err);
+            setKycStatus('not_submitted');
+        }
+    };
 
     // Form State
     const [formData, setFormData] = useState({
@@ -65,7 +97,10 @@ export default function KYCPage() {
 
     const validateStep3 = () => {
         const { aadharFront, aadharBack, panCard } = formData.documents;
+        // Only validate if we are NOT in rejected state (where they might just want to update one file)
+        // actually for simplicity, require re-upload if empty, or assume pre-filled if string (URL)
         let newErrors = {};
+        // If it's a file object or a string (URL), it is valid
         if (!aadharFront) newErrors.aadharFront = 'Aadhar Front is required';
         if (!aadharBack) newErrors.aadharBack = 'Aadhar Back is required';
         if (!panCard) newErrors.panCard = 'PAN Card is required';
@@ -74,19 +109,17 @@ export default function KYCPage() {
     };
 
     const handleNext = () => {
-        console.log('Attempting Next from Step:', currentStep);
         if (currentStep === 1) {
-            if (!validateStep1()) { console.log('Step 1 Validation Failed', errors); return; }
+            if (!validateStep1()) { return; }
         }
         if (currentStep === 2 && customerType === 'Company') {
-            if (!validateStep2()) { console.log('Step 2 Validation Failed', errors); return; }
+            if (!validateStep2()) { return; }
         }
         if (currentStep === 3) {
-            if (!validateStep3()) { console.log('Step 3 Validation Failed', errors); return; }
+            if (!validateStep3()) { return; }
         }
 
         if (currentStep === 1 && customerType === 'Customer') {
-            console.log('Skipping Step 2 for Customer');
             setCurrentStep(3);
         } else if (currentStep < 4) {
             setCurrentStep(prev => prev + 1);
@@ -107,24 +140,31 @@ export default function KYCPage() {
         setLoading(true);
         try {
             const docFormData = new FormData();
-            if (formData.documents.aadharFront) docFormData.append('identityProof', formData.documents.aadharFront);
-            if (formData.documents.aadharBack) docFormData.append('addressProof', formData.documents.aadharBack);
-            if (formData.documents.panCard) docFormData.append('bankStatement', formData.documents.panCard);
+            // Append files only if they are File objects (new uploads)
+            if (formData.documents.aadharFront instanceof File) docFormData.append('identityProof', formData.documents.aadharFront);
+            if (formData.documents.aadharBack instanceof File) docFormData.append('addressProof', formData.documents.aadharBack);
+            if (formData.documents.panCard instanceof File) docFormData.append('bankStatement', formData.documents.panCard);
 
             let uploadedDocs = {};
-            if (formData.documents.aadharFront || formData.documents.aadharBack || formData.documents.panCard) {
+            if ([...docFormData.entries()].length > 0) {
                 uploadedDocs = await uploadKYCFiles(docFormData);
             }
+
+            // If we have existing docs and didn't upload new ones, preserve them?
+            // backend should handle merging ideally, or we send existing URLs back?
+            // For now assuming backend handles it or we send just new ones.
 
             const kycPayload = {
                 personalDetails: formData.personalDetails,
                 companyDetails: customerType === 'Company' ? formData.companyDetails : {},
                 referenceDetails: {},
-                documents: uploadedDocs
+                documents: uploadedDocs // Send only new uploads or merged?
             };
 
             await saveKYCData(kycPayload);
-            Swal.fire({ title: 'Application Submitted!', text: 'Your KYC is under review.', icon: 'success', confirmButtonText: 'Go to Profile' }).then(() => router.push('/profile'));
+            Swal.fire({ title: 'Application Submitted!', text: 'Your KYC is under review.', icon: 'success', confirmButtonText: 'OK' }).then(() => {
+                fetchKYC(); // Refresh state
+            });
         } catch (error) {
             console.error(error);
             Swal.fire({ title: 'Submission Failed', text: error.response?.data?.message || 'Try again.', icon: 'error' });
@@ -133,10 +173,66 @@ export default function KYCPage() {
         }
     };
 
+    if (kycStatus === 'loading') {
+        return <div className="flex justify-center items-center h-64"><FaSpinner className="animate-spin text-3xl text-gray-400" /></div>;
+    }
+
+    // View for Submitted/Approved/Pending
+    if (kycStatus === 'pending' || kycStatus === 'approved') {
+        const isApproved = kycStatus === 'approved';
+        return (
+            <div className="relative rounded-2xl p-8 bg-white shadow-sm border border-gray-100">
+                <div className="flex flex-col items-center justify-center text-center py-10">
+                    <div className={`w-20 h-20 rounded-full flex items-center justify-center mb-6 ${isApproved ? 'bg-green-100 text-green-600' : 'bg-blue-100 text-blue-600'}`}>
+                        {isApproved ? <FaCheck size={40} /> : <FaFingerprint size={40} />}
+                    </div>
+                    <h2 className="text-2xl font-semibold text-gray-800 mb-2">
+                        {isApproved ? 'KYC Verified' : 'Verification In Progress'}
+                    </h2>
+                    <p className="text-gray-500 max-w-md mb-8">
+                        {isApproved
+                            ? 'Your identity has been verified. You can now place orders without restriction.'
+                            : 'We are reviewing your documents. This usually takes 24-48 hours.'}
+                    </p>
+
+                    <div className="w-full max-w-2xl text-left bg-gray-50 rounded-xl p-6 border border-gray-200">
+                        <h3 className="font-semibold text-gray-800 mb-4 flex items-center gap-2">
+                            <FaFileAlt className="text-gray-400" /> Submitted Documents
+                        </h3>
+                        <div className="space-y-3">
+                            {kycData?.documents && Object.entries(kycData.documents).map(([key, url]) => (
+                                <div key={key} className="flex items-center justify-between p-3 bg-white rounded-lg border border-gray-200">
+                                    <span className="text-sm font-medium text-gray-600 capitalize">{key.replace(/([A-Z])/g, ' $1').trim()}</span>
+                                    {url ? (
+                                        <a href={url} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-800 text-xs flex items-center gap-1 font-medium">
+                                            <FaEye /> View Document
+                                        </a>
+                                    ) : (
+                                        <span className="text-xs text-gray-400 italic">Not Uploaded</span>
+                                    )}
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        );
+    }
+
     return (
         <div className="relative rounded-2xl p-6 bg-white shadow-sm border border-gray-100">
+            {kycStatus === 'rejected' && (
+                <div className="mb-6 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl flex items-start gap-3">
+                    <FaExclamationTriangle className="mt-1 flex-shrink-0" />
+                    <div>
+                        <p className="font-semibold">KYC Application Rejected</p>
+                        <p className="text-sm">Please review the errors and resubmit your documents.</p>
+                    </div>
+                </div>
+            )}
+
             <div className="flex items-center justify-between mb-8">
-                <h1 className="text-3xl font-medium text-gray-700">KYC & Documentation V2</h1>
+                <h1 className="text-3xl font-medium text-gray-700">KYC & Documentation</h1>
             </div>
 
             <div className="flex bg-gray-100 p-1 rounded-full w-fit mb-8">
@@ -241,7 +337,7 @@ const TextInput = ({ label, required, placeholder, value, onChange, error }) => 
 const FileUploadInput = ({ label, file, onChange, error }) => (
     <div className={`border-2 border-dashed rounded-xl p-6 flex flex-col items-center justify-center text-center hover:bg-gray-50 transition-colors cursor-pointer relative ${error ? 'border-red-400 bg-red-50' : 'border-gray-300'}`}>
         <input type="file" className="absolute inset-0 w-full h-full opacity-0 cursor-pointer" onChange={onChange} accept="image/*,application/pdf" />
-        {file ? (<div className="text-green-600"><FaFileAlt size={32} className="mb-2 mx-auto" /><p className="text-sm font-medium truncate max-w-[150px]">{file.name}</p><p className="text-xs text-gray-400">Click to change</p></div>) : (<div className={error ? "text-red-500" : "text-gray-400"}><FaCloudUploadAlt size={32} className="mb-2 mx-auto" /><p className="text-sm font-medium text-gray-600">{label}</p><p className="text-xs">Drag & drop or Click to Upload</p></div>)}
+        {file ? (<div className="text-green-600"><FaFileAlt size={32} className="mb-2 mx-auto" /><p className="text-sm font-medium truncate max-w-[150px]">{typeof file === 'string' ? 'Uploaded Document' : file.name}</p><p className="text-xs text-gray-400">Click to change</p></div>) : (<div className={error ? "text-red-500" : "text-gray-400"}><FaCloudUploadAlt size={32} className="mb-2 mx-auto" /><p className="text-sm font-medium text-gray-600">{label}</p><p className="text-xs">Drag & drop or Click to Upload</p></div>)}
         {error && <p className="text-red-500 text-xs mt-2 absolute -bottom-5 left-0 w-full text-center">{error}</p>}
     </div>
 );

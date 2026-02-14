@@ -7,6 +7,7 @@ import { FaFingerprint } from 'react-icons/fa';
 import { PiCheckCircleFill, PiCheckCircle } from 'react-icons/pi';
 import { saveKYCData, uploadKYCFiles } from '../../../services/kycService';
 import OrderSummary from '../../../components/OrderSummary';
+import Swal from 'sweetalert2';
 
 const STATE_CITY_MAP = {
     "Andhra Pradesh": [
@@ -217,15 +218,17 @@ const ADDRESS_PROOFS = [
 
 export default function KYCPage() {
     const router = useRouter();
-    const [customerType, setCustomerType] = useState('Customer'); // Customer | Company
+    const [customerType, setCustomerType] = useState('Customer');
     const [currentStep, setCurrentStep] = useState(1);
+    const [loading, setLoading] = useState(false);
+    const [errors, setErrors] = useState({});
 
     // Refs for file uploads
     const identityProofRef = useRef(null);
     const addressProofRef = useRef(null);
     const bankStatementRef = useRef(null);
 
-    // State management for cascading dropdowns
+    // Form data state
     const [formData, setFormData] = useState({
         personal: { name: '', fatherName: '', fatherPhone: '', email: '', phone: '', address: '', state: '', city: '', pincode: '' },
         company: { companyName: '', companyType: '', employees: '', designation: '', duration: '', email: '', address: '', state: '', city: '', pincode: '' },
@@ -233,28 +236,14 @@ export default function KYCPage() {
         documents: { identityProof: 'Voter ID', addressProof: 'House Electricity Bill' }
     });
 
+    const [isDocumentsChecked, setIsDocumentsChecked] = useState(false);
+
     const handleTextChange = (section, field, value) => {
         setFormData(prev => ({
             ...prev,
             [section]: { ...prev[section], [field]: value }
         }));
-    };
-
-    // Checkbox state for Step 4
-    const [isDocumentsChecked, setIsDocumentsChecked] = useState(false);
-
-    const handleDocumentChange = (type, value) => {
-        setFormData(prev => ({
-            ...prev,
-            documents: { ...prev.documents, [type]: value }
-        }));
-    };
-
-    const handleStateChange = (section, value) => {
-        setFormData(prev => ({
-            ...prev,
-            [section]: { ...prev[section], state: value, city: '' } // Reset city when state changes
-        }));
+        if (errors[field]) setErrors(prev => ({ ...prev, [field]: '' }));
     };
 
     const handleCityChange = (section, value) => {
@@ -262,109 +251,133 @@ export default function KYCPage() {
             ...prev,
             [section]: { ...prev[section], city: value }
         }));
+        if (errors.city) setErrors(prev => ({ ...prev, city: '' }));
+    };
+
+    const handleStateChange = (section, value) => {
+        setFormData(prev => ({
+            ...prev,
+            [section]: { ...prev[section], state: value, city: '' }
+        }));
+        if (errors.state) setErrors(prev => ({ ...prev, state: '' }));
     };
 
     const handlePincodeChange = async (section, value) => {
-        // Allow only numbers
         if (!/^\d*$/.test(value)) return;
+        setFormData(prev => ({ ...prev, [section]: { ...prev[section], pincode: value } }));
+        if (errors.pincode) setErrors(prev => ({ ...prev, pincode: '' }));
 
-        setFormData(prev => ({
-            ...prev,
-            [section]: { ...prev[section], pincode: value }
-        }));
-
-        // Fetch city/state if pincode is 6 digits
         if (value.length === 6) {
             try {
                 const response = await fetch(`https://api.postalpincode.in/pincode/${value}`);
                 const data = await response.json();
-
-                if (data[0].Status === "Success" && data[0].PostOffice && data[0].PostOffice.length > 0) {
+                if (data[0].Status === "Success" && data[0].PostOffice?.length > 0) {
                     const details = data[0].PostOffice[0];
                     const fetchedState = details.State;
                     let fetchedCity = details.District;
 
-                    // Normalize city names to match our list
-                    // API returns "Nilgiris" / "The Nilgiris" for Ooty
-                    const CITY_NORMALIZATION = {
-                        "Nilgiris": "Ooty",
-                        "The Nilgiris": "Ooty",
-                        "Bangalore Urban": "Bangalore",
-                        "Bengaluru": "Bangalore",
-                        "Mysuru": "Mysore",
-                        "Tumakuru": "Tumkur",
-                        "Belagavi": "Belgaum",
-                        "Kalaburagi": "Gulbarga",
-                        "Vijayapura": "Bijapur",
-                        "Shivamogga": "Shimoga",
-                        "Thiruvananthapuram": "Thiruvananthapuram", // Matches
-                        "Ernakulam": "Kochi", // Common mapping
-                        "Cochin": "Kochi",
-                        "Prayagraj": "Allahabad", // Legacy mapping if needed
-                        "Gurugram": "Gurgaon"
-                    };
+                    const CITY_NORMALIZATION = { "Nilgiris": "Ooty", "The Nilgiris": "Ooty", "Bangalore Urban": "Bangalore", "Bengaluru": "Bangalore", "Mysuru": "Mysore", "Tumakuru": "Tumkur", "Belagavi": "Belgaum", "Kalaburagi": "Gulbarga", "Vijayapura": "Bijapur", "Shivamogga": "Shimoga", "Thiruvananthapuram": "Thiruvananthapuram", "Ernakulam": "Kochi", "Cochin": "Kochi", "Prayagraj": "Allahabad", "Gurugram": "Gurgaon" };
+                    if (CITY_NORMALIZATION[fetchedCity]) fetchedCity = CITY_NORMALIZATION[fetchedCity];
 
-                    if (CITY_NORMALIZATION[fetchedCity]) {
-                        fetchedCity = CITY_NORMALIZATION[fetchedCity];
-                    }
-
-                    // Check if the fetched city exists in our map for that state
-                    // This prevents selecting the first alphabetical city (e.g. Alandur) by mistake
-                    // if the API returns a district we don't support.
                     const availableCities = STATE_CITY_MAP[fetchedState] || [];
                     const isCityAvailable = availableCities.includes(fetchedCity);
 
-                    setFormData(prev => ({
-                        ...prev,
-                        [section]: {
-                            ...prev[section],
-                            state: fetchedState,
-                            // Only auto-select if we have an exact match in our list
-                            city: isCityAvailable ? fetchedCity : ''
-                        }
-                    }));
+                    setFormData(prev => ({ ...prev, [section]: { ...prev[section], state: fetchedState, city: isCityAvailable ? fetchedCity : '' } }));
                 }
-            } catch (error) {
-                console.error("Error fetching pincode details:", error);
-            }
+            } catch (err) { console.error(err); }
         }
+    };
+
+    const validateStep1 = () => {
+        const { name, fatherName, fatherPhone, email, phone, address, state, city, pincode } = formData.personal;
+        let newErrors = {};
+        if (!name) newErrors.name = 'Required';
+        if (!fatherName) newErrors.fatherName = 'Required';
+        if (!fatherPhone) newErrors.fatherPhone = 'Required';
+        if (!email) newErrors.email = 'Required';
+        if (!phone) newErrors.phone = 'Required';
+        if (!address) newErrors.address = 'Required';
+        if (!state) newErrors.state = 'Required';
+        if (!city) newErrors.city = 'Required';
+        if (!pincode) newErrors.pincode = 'Required';
+        setErrors(newErrors);
+        return Object.keys(newErrors).length === 0;
+    };
+
+    const validateStep2 = () => {
+        const { companyName, companyType, employees, designation, duration, email } = formData.company;
+        let newErrors = {};
+        if (!companyName) newErrors.companyName = 'Required';
+        if (!companyType) newErrors.companyType = 'Required';
+        if (!employees) newErrors.employees = 'Required';
+        if (!designation) newErrors.designation = 'Required';
+        if (!duration) newErrors.duration = 'Required';
+        if (!email) newErrors.email = 'Required';
+        setErrors(newErrors);
+        return Object.keys(newErrors).length === 0;
     };
 
     const handleNext = async () => {
-        if (currentStep === 4 && !isDocumentsChecked) {
-            alert("Please check the box to proceed.");
-            return;
+        console.log('Next clicked. Step:', currentStep);
+        if (currentStep === 1) {
+            if (!validateStep1()) { console.log('Step 1 invalid', errors); return; }
         }
 
-        try {
-            await saveKYCData({
-                personalDetails: formData.personal,
-                companyDetails: formData.company,
-                referenceDetails: formData.reference
-            });
+        if (currentStep === 2 && customerType === 'Company') {
+            if (!validateStep2()) return;
+        }
 
-            if (currentStep === 4) {
-                const fileData = new FormData();
-                if (identityProofRef.current?.files[0]) fileData.append('identityProof', identityProofRef.current.files[0]);
-                if (addressProofRef.current?.files[0]) fileData.append('addressProof', addressProofRef.current.files[0]);
-                if (bankStatementRef.current?.files[0]) fileData.append('bankStatement', bankStatementRef.current.files[0]);
-
-                if ([...fileData.entries()].length > 0) {
-                    await uploadKYCFiles(fileData);
-                }
+        if (currentStep === 4) {
+            if (!isDocumentsChecked) {
+                Swal.fire({ icon: 'warning', title: 'Action Required', text: 'Please check the confirmation box.' });
+                return;
             }
-
-            if (currentStep < 4) setCurrentStep(currentStep + 1);
-            else if (currentStep === 4) setCurrentStep(5);
-
-        } catch (error) {
-            console.error(error);
-            alert("Failed to save progress. Ensure you are logged in.");
         }
+
+        if (currentStep === 1 && customerType === 'Customer') {
+            setCurrentStep(3);
+        } else if (currentStep < 5) {
+            if (currentStep === 4) {
+                setLoading(true);
+                try {
+                    const fileData = new FormData();
+                    if (identityProofRef.current?.files[0]) fileData.append('identityProof', identityProofRef.current.files[0]);
+                    if (addressProofRef.current?.files[0]) fileData.append('addressProof', addressProofRef.current.files[0]);
+                    if (bankStatementRef.current?.files[0]) fileData.append('bankStatement', bankStatementRef.current.files[0]);
+
+                    let uploadedDocs = {};
+                    if ([...fileData.entries()].length > 0) {
+                        uploadedDocs = await uploadKYCFiles(fileData);
+                    }
+
+                    await saveKYCData({
+                        personalDetails: formData.personal,
+                        companyDetails: customerType === 'Company' ? formData.company : {},
+                        referenceDetails: formData.reference,
+                        documents: uploadedDocs
+                    });
+
+                    setCurrentStep(5);
+                } catch (error) {
+                    console.error(error);
+                    Swal.fire({ icon: 'error', title: 'Error', text: 'Failed to submit KYC.' });
+                } finally {
+                    setLoading(false);
+                }
+            } else {
+                setCurrentStep(prev => prev + 1);
+            }
+        }
+        window.scrollTo(0, 0);
     };
 
     const handleBack = () => {
-        if (currentStep > 1) setCurrentStep(currentStep - 1);
+        if (currentStep === 3 && customerType === 'Customer') {
+            setCurrentStep(1);
+        } else if (currentStep > 1) {
+            setCurrentStep(prev => prev - 1);
+        }
+        window.scrollTo(0, 0);
     };
 
     // Mock calculations
@@ -379,7 +392,7 @@ export default function KYCPage() {
     return (
         <div className="min-h-screen bg-gray-50 font-sans mt-8">
             <div className="max-w-6xl mx-auto px-8 py-4">
-                {/* Breadcrumb - Matches design */}
+                {/* Breadcrumb */}
                 {currentStep !== 5 && (
                     <div className="text-xs text-gray-500 mb-6 flex items-center gap-2">
                         <Link href="/" className="hover:text-black font-medium font-sans">Product-Page</Link>
@@ -401,248 +414,62 @@ export default function KYCPage() {
                                 onClick={() => setCurrentStep(1)}
                                 className="absolute top-6 left-6 flex items-center gap-2 text-red-500 border border-red-500 rounded-full px-4 py-1.5 text-sm font-medium hover:bg-red-50 transition"
                             >
-                                <svg
-                                    className="w-4 h-4"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    viewBox="0 0 24 24"
-                                >
-                                    <path
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                        strokeWidth="2"
-                                        d="M15 19l-7-7 7-7"
-                                    />
-                                </svg>
+                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7" /></svg>
                                 Back
                             </button>
 
                             {/* Illustration */}
                             <div className="flex justify-center mb-10 mt-4">
                                 <div className="relative w-56 h-56 flex items-center justify-center">
-
-                                    {/* Blue Glow */}
                                     <div className="absolute inset-6 rounded-full bg-blue-500/10 blur-2xl"></div>
-
-                                    <svg
-                                        viewBox="0 0 200 200"
-                                        className="relative z-10 w-full h-full"
-                                        fill="none"
-                                    >
-                                        <defs>
-                                            <linearGradient id="badgeGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                                                <stop offset="0%" stopColor="#4facfe" />
-                                                <stop offset="100%" stopColor="#00f2fe" />
-                                            </linearGradient>
-                                            <filter id="badgeShadow" x="-50%" y="-50%" width="200%" height="200%">
-                                                <feDropShadow dx="2" dy="3" stdDeviation="3" floodColor="#2563EB" floodOpacity="0.3" />
-                                            </filter>
-                                        </defs>
-
-                                        {/* Grey Ring */}
-                                        <circle
-                                            cx="100"
-                                            cy="100"
-                                            r="80"
-                                            stroke="#E5E7EB"
-                                            strokeWidth="10"
-                                        />
-
-                                        {/* Blue Segment Arc */}
-                                        <path
-                                            d="M 100 20 A 80 80 0 0 0 43.4 156.6"
-                                            stroke="#0B5ED7"
-                                            strokeWidth="10"
-                                            strokeLinecap="round"
-                                            fill="none"
-                                        />
-
-                                        {/* Inner Circle */}
+                                    <svg viewBox="0 0 200 200" className="relative z-10 w-full h-full" fill="none">
+                                        <circle cx="100" cy="100" r="80" stroke="#E5E7EB" strokeWidth="10" />
+                                        <path d="M 100 20 A 80 80 0 0 0 43.4 156.6" stroke="#0B5ED7" strokeWidth="10" strokeLinecap="round" fill="none" />
                                         <circle cx="100" cy="100" r="58" fill="#F8FAFF" />
-
-                                        {/* Document Stack */}
-                                        <g transform="translate(72, 56)">
-                                            {/* Back Paper */}
-                                            <rect x="-12" y="10" width="60" height="80" rx="4" fill="#F3F4F6" />
-
-                                            {/* Front Paper Main Body */}
-                                            <path
-                                                d="M0 0 H45 L60 15 V80 H0 V0 Z"
-                                                fill="white"
-                                            />
-
-                                            {/* Fold Corner */}
-                                            <path
-                                                d="M45 0 V15 H60"
-                                                fill="#E5E7EB"
-                                            />
-
-                                            {/* Content: Image Placeholder */}
-                                            <rect x="10" y="12" width="20" height="20" fill="#E5E7EB" />
-
-                                            {/* Content: Lines */}
-                                            <rect x="10" y="42" width="40" height="3" rx="1.5" fill="#E5E7EB" />
-                                            <rect x="10" y="50" width="40" height="3" rx="1.5" fill="#E5E7EB" />
-                                            <rect x="10" y="58" width="40" height="3" rx="1.5" fill="#E5E7EB" />
-                                            <rect x="10" y="66" width="28" height="3" rx="1.5" fill="#E5E7EB" />
-                                            <rect x="36" y="12" width="14" height="20" fill="#F9FAFB" /> {/* Decoration next to image if needed, or just leave blank */}
-                                        </g>
-
-                                        {/* Check Badge */}
                                         <g transform="translate(40, 84)">
-                                            <circle
-                                                cx="12"
-                                                cy="12"
-                                                r="14"
-                                                fill="#0B5ED7"
-                                                filter="url(#badgeShadow)"
-                                                stroke="white"
-                                                strokeWidth="3"
-                                            />
-                                            <path
-                                                d="M7 12 L11 16 L17 8"
-                                                stroke="white"
-                                                strokeWidth="2.5"
-                                                strokeLinecap="round"
-                                                strokeLinejoin="round"
-                                            />
-                                        </g>
-
-                                        {/* Magnifier */}
-                                        <g transform="translate(112, 112)">
-                                            {/* Top Right Arc */}
-                                            <path
-                                                d="M 20.0 -11.0 A 31 31 0 0 1 51.0 20.0"
-                                                stroke="#0B5ED7"
-                                                strokeWidth="1.5"
-                                                strokeLinecap="round"
-                                                fill="none"
-                                            />
-                                            {/* Bottom Left Arc */}
-                                            <path
-                                                d="M 20.0 51.0 A 31 31 0 0 1 -11.0 20.0"
-                                                stroke="#0B5ED7"
-                                                strokeWidth="1.5"
-                                                strokeLinecap="round"
-                                                fill="none"
-                                            />
-                                            {/* Handle Neck */}
-                                            <path
-                                                d="M38 38 L43 43"
-                                                stroke="#0B5ED7"
-                                                strokeWidth="4"
-                                                strokeLinecap="round"
-                                            />
-                                            {/* Handle Grip */}
-                                            <path
-                                                d="M43 43 L60 60"
-                                                stroke="#0B5ED7"
-                                                strokeWidth="9"
-                                                strokeLinecap="round"
-                                            />
-                                            {/* Lens */}
-                                            <circle
-                                                cx="20"
-                                                cy="20"
-                                                r="25"
-                                                stroke="#0B5ED7"
-                                                strokeWidth="6"
-                                                strokeLinecap="round"
-                                                fill="none"
-                                            />
+                                            <circle cx="12" cy="12" r="14" fill="#0B5ED7" stroke="white" strokeWidth="3" />
+                                            <path d="M7 12 L11 16 L17 8" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
                                         </g>
                                     </svg>
                                 </div>
                             </div>
 
-                            {/* Title */}
-                            <h2 className="text-4xl font-semibold text-[#0B5ED7] mb-4">
-                                KYC in Progress
-                            </h2>
-
-                            {/* Description */}
+                            <h2 className="text-4xl font-semibold text-[#0B5ED7] mb-4">KYC in Progress</h2>
                             <p className="text-gray-900 text-[15px] font-medium max-w-xl mx-auto mb-6">
                                 We are now reviewing your documents. This typically takes 24–48 hours.
                                 We will notify you via email as soon as it’s complete.
                             </p>
 
-                            {/* Buttons */}
                             <div className="flex justify-center gap-6">
-                                <Link
-                                    href="/profile/orders"
-                                    className="bg-[#3B82F6] hover:bg-[#2563EB] text-white px-6 py-2 rounded-3xl font-normal shadow-lg transition"
-                                >
-                                    Go To My Orders
-                                </Link>
-
-                                <button className="bg-[#4B5563] hover:bg-[#374151] text-white px-6 py-2 rounded-3xl font-normal shadow-lg transition">
-                                    KYC Documentation
-                                </button>
+                                <Link href="/profile/orders" className="bg-[#3B82F6] hover:bg-[#2563EB] text-white px-6 py-2 rounded-3xl font-normal shadow-lg transition">Go To My Orders</Link>
+                                <button className="bg-[#4B5563] hover:bg-[#374151] text-white px-6 py-2 rounded-3xl font-normal shadow-lg transition">KYC Documentation</button>
                             </div>
                         </div>
                     </div>
-
                 ) : (
                     <div className="flex flex-col lg:flex-row gap-8">
-                        {/* Left Column: KYC Form */}
                         <div className="lg:w-2/3">
                             <div className="relative rounded-2xl p-6 bg-gray-50/50">
-                                <svg className="absolute inset-0 w-full h-full pointer-events-none" style={{ overflow: 'visible' }}>
-                                    <rect x="1" y="1" width="calc(100% - 2px)" height="calc(100% - 2px)" rx="16" ry="16" fill="none" stroke="#D1D5DB" strokeWidth="1" strokeDasharray="12 8" />
-                                </svg>
-
                                 <div className="flex items-center gap-4 mb-6">
                                     <h1 className="text-3xl font-semibold text-gray-900">KYC & Documentation</h1>
                                 </div>
 
                                 {/* Customer Type Toggle */}
                                 <div className="flex gap-4 mb-6">
-                                    <button
-                                        onClick={() => setCustomerType('Customer')}
-                                        className={`px-12 py-2.5 rounded-full text-lg font-medium transition-all ${customerType === 'Customer' ? 'bg-[#1D1D1F] text-white shadow-md' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}
-                                    >
-                                        Customer
-                                    </button>
-                                    <button
-                                        onClick={() => setCustomerType('Company')}
-                                        className={`px-12 py-2.5 rounded-full text-lg font-medium transition-all ${customerType === 'Company' ? 'bg-[#1D1D1F] text-white shadow-md' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}
-                                    >
-                                        Company
-                                    </button>
+                                    <button onClick={() => { setCustomerType('Customer'); setCurrentStep(1); setErrors({}); }} className={`px-12 py-2.5 rounded-full text-lg font-medium transition-all ${customerType === 'Customer' ? 'bg-[#1D1D1F] text-white shadow-md' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}>Customer</button>
+                                    <button onClick={() => { setCustomerType('Company'); setCurrentStep(1); setErrors({}); }} className={`px-12 py-2.5 rounded-full text-lg font-medium transition-all ${customerType === 'Company' ? 'bg-[#1D1D1F] text-white shadow-md' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}>Company</button>
                                 </div>
 
-                                {/* Green Banner */}
                                 <div className="bg-[#E8F5E9] border border-[#4CAF50] rounded-xl p-4 mb-5 flex items-center gap-3">
-                                    <div className="w-5 h-5 rounded-full bg-[#C8E6C9] flex items-center justify-center text-[#2E7D32]">
-                                        <FaFingerprint size={14} />
-                                    </div>
+                                    <div className="w-5 h-5 rounded-full bg-[#C8E6C9] flex items-center justify-center text-[#2E7D32]"><FaFingerprint size={14} /></div>
                                     <span className="text-[#1B5E20] font-medium text-sm">Complete KYC to complete your order</span>
                                 </div>
 
-                                {/* Orange Warning Box */}
-                                <div className="bg-[#FFF8E1] border border-[#FFD54F] rounded-2xl p-5 mb-8">
-                                    <h3 className="text-gray-800 font-medium mb-3 text-sm">Keep your documents handy (physical or digital)</h3>
-                                    <ul className="text-gray-600 text-sm space-y-2 pl-1 font-normal">
-                                        <li className="flex items-center gap-2"><span className="w-1 h-1 bg-gray-400 rounded-full"></span> Aadhar Card / Voter ID / Passport</li>
-                                        <li className="flex items-center gap-2"><span className="w-1 h-1 bg-gray-400 rounded-full"></span> Rental Agreement / House Electricity Bill</li>
-                                        <li className="flex items-center gap-2"><span className="w-1 h-1 bg-gray-400 rounded-full"></span> Bank Statement → 3 Months</li>
-                                    </ul>
-                                </div>
-
-                                <div className="h-px bg-gray-200 w-full mb-8"></div>
-
-                                {/* Form Container */}
                                 <div className="bg-white rounded-3xl p-8 shadow-sm border border-gray-100">
-
                                     {/* Stepper */}
                                     <div className="w-full max-w-3xl mx-auto mb-12 mt-4 px-4">
                                         <div className="flex items-center justify-between w-full">
-                                            {[
-                                                { id: 1, label: 'Personal Details' },
-                                                { id: 2, label: 'Company Details' },
-                                                { id: 3, label: 'Reference Only' },
-                                                { id: 4, label: 'Documents Upload' },
-                                            ].map((step, index, arr) => {
+                                            {[{ id: 1, label: 'Personal Details' }, { id: 2, label: 'Company Details' }, { id: 3, label: 'Reference Only' }, { id: 4, label: 'Documents Upload' }].map((step, index, arr) => {
                                                 const isLast = index === arr.length - 1;
                                                 const isCompleted = step.id < currentStep;
                                                 const isActive = step.id === currentStep;
@@ -650,29 +477,15 @@ export default function KYCPage() {
 
                                                 return (
                                                     <React.Fragment key={step.id}>
-                                                        {/* Step Circle & Label */}
                                                         <div className="flex flex-col items-center relative">
-                                                            <div
-                                                                className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold transition-all duration-300 z-10 border-[1.5px]
-                                                                ${isCompleted ? 'bg-[#00c853] border-[#00c853] text-white' :
-                                                                        isActive ? 'bg-white border-[#00c853] text-[#00c853] ring-4 ring-green-50' :
-                                                                            'bg-white border-gray-200 text-gray-300'}`}
-                                                            >
+                                                            <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold transition-all duration-300 z-10 border-[1.5px] ${isCompleted ? 'bg-[#00c853] border-[#00c853] text-white' : isActive ? 'bg-white border-[#00c853] text-[#00c853] ring-4 ring-green-50' : 'bg-white border-gray-200 text-gray-300'}`}>
                                                                 {isCompleted ? <PiCheckCircleFill size={16} /> : step.id}
                                                             </div>
-                                                            <div className={`absolute top-10 w-32 text-center text-[10px] uppercase font-semibold tracking-wide transition-colors duration-300
-                                                                ${isActive || isCompleted ? 'text-black' : 'text-gray-300'}`}>
-                                                                {step.label}
-                                                            </div>
+                                                            <div className={`absolute top-10 w-32 text-center text-[10px] uppercase font-semibold tracking-wide transition-colors duration-300 ${isActive || isCompleted ? 'text-black' : 'text-gray-300'}`}>{step.label}</div>
                                                         </div>
-
-                                                        {/* Connector Line */}
                                                         {!isLast && (
                                                             <div className="flex-1 h-[2px] mx-2 bg-gray-100 rounded-full overflow-hidden">
-                                                                <div
-                                                                    className={`h-full bg-[#00c853] transition-all duration-500 ease-out`}
-                                                                    style={{ width: isLineActive ? '100%' : '0%' }}
-                                                                ></div>
+                                                                <div className={`h-full bg-[#00c853] transition-all duration-500 ease-out`} style={{ width: isLineActive ? '100%' : '0%' }}></div>
                                                             </div>
                                                         )}
                                                     </React.Fragment>
@@ -685,58 +498,19 @@ export default function KYCPage() {
                                         <>
                                             <h2 className="text-xl font-medium text-gray-700 mb-2">Personal Details</h2>
                                             <div className="h-px bg-gray-600 w-full mb-4"></div>
-
                                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
-                                                <div className="md:col-span-2">
-                                                    <TextInput label="Name" required placeholder="Enter Your Full Name" value={formData.personal.name} onChange={(e) => handleTextChange('personal', 'name', e.target.value)} />
-                                                </div>
-                                                <TextInput label="Father's / Mother's Name" required placeholder="" value={formData.personal.fatherName} onChange={(e) => handleTextChange('personal', 'fatherName', e.target.value)} />
-                                                <TextInput label="Father's / Mother's Number" required placeholder="Number" value={formData.personal.fatherPhone} onChange={(e) => handleTextChange('personal', 'fatherPhone', e.target.value)} />
-
-                                                <div className="md:col-span-2">
-                                                    <TextInput label="Personal Email" required placeholder="Email" value={formData.personal.email} onChange={(e) => handleTextChange('personal', 'email', e.target.value)} />
-                                                </div>
-                                                <div className="md:col-span-2">
-                                                    <TextInput label="Mobile Number" required placeholder="Phone Number" value={formData.personal.phone} onChange={(e) => handleTextChange('personal', 'phone', e.target.value)} />
-                                                </div>
-                                                <div className="md:col-span-2">
-                                                    <TextInput label="Permanent Address" required placeholder="Address" value={formData.personal.address} onChange={(e) => handleTextChange('personal', 'address', e.target.value)} />
-                                                </div>
-
-                                                <TextInput
-                                                    label="City"
-                                                    required
-                                                    placeholder="Select City"
-                                                    isSelect
-                                                    options={formData.personal.state ? STATE_CITY_MAP[formData.personal.state] : []}
-                                                    value={formData.personal.city}
-                                                    onChange={(e) => handleCityChange('personal', e.target.value)}
-                                                />
-                                                <TextInput
-                                                    label="State"
-                                                    required
-                                                    placeholder="Select State"
-                                                    isSelect
-                                                    options={INDIAN_STATES}
-                                                    value={formData.personal.state}
-                                                    onChange={(e) => handleStateChange('personal', e.target.value)}
-                                                />
-                                                <TextInput
-                                                    label="Pincode"
-                                                    required
-                                                    placeholder=""
-                                                    value={formData.personal.pincode}
-                                                    onChange={(e) => handlePincodeChange('personal', e.target.value)}
-                                                />
-                                                <TextInput label="Country" required placeholder="India" isSelect options={["India"]} />
+                                                <div className="md:col-span-2"><TextInput label="Name" required error={errors.name} value={formData.personal.name} onChange={(e) => handleTextChange('personal', 'name', e.target.value)} /></div>
+                                                <TextInput label="Father's / Mother's Name" required error={errors.fatherName} value={formData.personal.fatherName} onChange={(e) => handleTextChange('personal', 'fatherName', e.target.value)} />
+                                                <TextInput label="Father's / Mother's Number" required error={errors.fatherPhone} value={formData.personal.fatherPhone} onChange={(e) => handleTextChange('personal', 'fatherPhone', e.target.value)} />
+                                                <div className="md:col-span-2"><TextInput label="Personal Email" required error={errors.email} value={formData.personal.email} onChange={(e) => handleTextChange('personal', 'email', e.target.value)} /></div>
+                                                <div className="md:col-span-2"><TextInput label="Mobile Number" required error={errors.phone} value={formData.personal.phone} onChange={(e) => handleTextChange('personal', 'phone', e.target.value)} /></div>
+                                                <div className="md:col-span-2"><TextInput label="Permanent Address" required error={errors.address} value={formData.personal.address} onChange={(e) => handleTextChange('personal', 'address', e.target.value)} /></div>
+                                                <TextInput label="City" required error={errors.city} value={formData.personal.city} onChange={(e) => handleCityChange('personal', e.target.value)} />
+                                                <TextInput label="State" required isSelect options={INDIAN_STATES} error={errors.state} value={formData.personal.state} onChange={(e) => handleStateChange('personal', e.target.value)} />
+                                                <TextInput label="Pincode" required error={errors.pincode} value={formData.personal.pincode} onChange={(e) => handlePincodeChange('personal', e.target.value)} />
+                                                <TextInput label="Country" required isSelect options={["India"]} value="India" readOnly />
                                             </div>
-
-                                            <button
-                                                onClick={handleNext}
-                                                className="w-full bg-[#333] hover:bg-black text-white font-medium py-1 rounded-full transition-all text-lg"
-                                            >
-                                                Start my KYC process
-                                            </button>
+                                            <button onClick={handleNext} className="w-full bg-[#333] hover:bg-black text-white font-medium py-3 rounded-full transition-all text-lg">{customerType === 'Customer' ? 'Proceed to Reference' : 'Proceed to Company Details'}</button>
                                         </>
                                     )}
 
@@ -744,265 +518,81 @@ export default function KYCPage() {
                                         <>
                                             <h2 className="text-xl font-medium text-gray-700 mb-2">Company Details</h2>
                                             <div className="h-px bg-gray-600 w-full mb-4"></div>
-
                                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
-                                                <div className="md:col-span-2">
-                                                    <TextInput label="Company Name" required placeholder="" value={formData.company.companyName} onChange={(e) => handleTextChange('company', 'companyName', e.target.value)} />
-                                                </div>
-                                                <TextInput label="Type of Company" required placeholder="Placeholder" value={formData.company.companyType} onChange={(e) => handleTextChange('company', 'companyType', e.target.value)} />
-                                                <TextInput label="Approx no. of employee" required placeholder="Message" value={formData.company.employees} onChange={(e) => handleTextChange('company', 'employees', e.target.value)} />
-
-                                                <div className="md:col-span-2">
-                                                    <TextInput label="Your Designation" required placeholder="" value={formData.company.designation} onChange={(e) => handleTextChange('company', 'designation', e.target.value)} />
-                                                </div>
-
-                                                <TextInput label="Duration of Service in the company" required placeholder="Placeholder" value={formData.company.duration} onChange={(e) => handleTextChange('company', 'duration', e.target.value)} />
-                                                <TextInput label="Official Company email" required placeholder="Placeholder" value={formData.company.email} onChange={(e) => handleTextChange('company', 'email', e.target.value)} />
-
-                                                <div className="md:col-span-2">
-                                                    <TextInput label="Reference Address" required placeholder="Placeholder" value={formData.company.address} onChange={(e) => handleTextChange('company', 'address', e.target.value)} />
-                                                </div>
-
-                                                <TextInput
-                                                    label="City"
-                                                    required
-                                                    placeholder="Select City"
-                                                    isSelect
-                                                    options={formData.company.state ? STATE_CITY_MAP[formData.company.state] : []}
-                                                    value={formData.company.city}
-                                                    onChange={(e) => handleCityChange('company', e.target.value)}
-                                                />
-                                                <TextInput
-                                                    label="State"
-                                                    required
-                                                    placeholder="Select State"
-                                                    isSelect
-                                                    options={INDIAN_STATES}
-                                                    value={formData.company.state}
-                                                    onChange={(e) => handleStateChange('company', e.target.value)}
-                                                />
-                                                <TextInput
-                                                    label="Pincode"
-                                                    required
-                                                    placeholder=""
-                                                    value={formData.company.pincode}
-                                                    onChange={(e) => handlePincodeChange('company', e.target.value)}
-                                                />
-                                                <TextInput label="Country" required placeholder="India" isSelect options={["India"]} />
+                                                <div className="md:col-span-2"><TextInput label="Company Name" required error={errors.companyName} value={formData.company.companyName} onChange={(e) => handleTextChange('company', 'companyName', e.target.value)} /></div>
+                                                <TextInput label="Type of Company" required error={errors.companyType} value={formData.company.companyType} onChange={(e) => handleTextChange('company', 'companyType', e.target.value)} />
+                                                <TextInput label="No. of Employees" required error={errors.employees} value={formData.company.employees} onChange={(e) => handleTextChange('company', 'employees', e.target.value)} />
+                                                <div className="md:col-span-2"><TextInput label="Designation" required error={errors.designation} value={formData.company.designation} onChange={(e) => handleTextChange('company', 'designation', e.target.value)} /></div>
+                                                <TextInput label="Duration" required error={errors.duration} value={formData.company.duration} onChange={(e) => handleTextChange('company', 'duration', e.target.value)} />
+                                                <TextInput label="Company Email" required error={errors.email} value={formData.company.email} onChange={(e) => handleTextChange('company', 'email', e.target.value)} />
                                             </div>
-
                                             <div className="flex gap-4">
-                                                <button
-                                                    onClick={handleBack}
-                                                    className="w-1/2 bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium py-2 rounded-full transition-all text-lg"
-                                                >
-                                                    Start my KYC process
-                                                </button>
-                                                <button
-                                                    onClick={handleNext}
-                                                    className="w-1/2 bg-[#333] hover:bg-black text-white font-medium py-2 rounded-full transition-all text-lg shadow-lg"
-                                                >
-                                                    Next
-                                                </button>
+                                                <button onClick={handleBack} className="w-1/2 bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium py-2 rounded-full transition-all text-lg">Back</button>
+                                                <button onClick={handleNext} className="w-1/2 bg-[#333] hover:bg-black text-white font-medium py-2 rounded-full transition-all text-lg">Next</button>
                                             </div>
                                         </>
                                     )}
 
                                     {currentStep === 3 && (
                                         <>
-                                            <h2 className="text-xl font-medium text-gray-700 mb-2">Reference Only</h2>
+                                            <h2 className="text-xl font-medium text-gray-700 mb-2">Reference Details</h2>
                                             <div className="h-px bg-gray-600 w-full mb-4"></div>
-
                                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
-                                                <div className="md:col-span-2">
-                                                    <TextInput label="Reference Name" required placeholder="" value={formData.reference.name} onChange={(e) => handleTextChange('reference', 'name', e.target.value)} />
-                                                </div>
-
-                                                <div className="md:col-span-2">
-                                                    <TextInput label="Relation of the person" required placeholder="Placeholder" value={formData.reference.relation} onChange={(e) => handleTextChange('reference', 'relation', e.target.value)} />
-                                                </div>
-
-                                                <div className="md:col-span-2">
-                                                    <TextInput label="Mobile No." required placeholder="Placeholder" value={formData.reference.phone} onChange={(e) => handleTextChange('reference', 'phone', e.target.value)} />
-                                                </div>
-
-                                                <div className="md:col-span-2">
-                                                    <TextInput label="Reference Address" required placeholder="Placeholder" value={formData.reference.address} onChange={(e) => handleTextChange('reference', 'address', e.target.value)} />
-                                                </div>
-
-                                                <TextInput
-                                                    label="City"
-                                                    required
-                                                    placeholder="Select City"
-                                                    isSelect
-                                                    options={formData.reference.state ? STATE_CITY_MAP[formData.reference.state] : []}
-                                                    value={formData.reference.city}
-                                                    onChange={(e) => handleCityChange('reference', e.target.value)}
-                                                />
-                                                <TextInput
-                                                    label="State"
-                                                    required
-                                                    placeholder="Select State"
-                                                    isSelect
-                                                    options={INDIAN_STATES}
-                                                    value={formData.reference.state}
-                                                    onChange={(e) => handleStateChange('reference', e.target.value)}
-                                                />
-                                                <TextInput
-                                                    label="Pincode"
-                                                    required
-                                                    placeholder=""
-                                                    value={formData.reference.pincode}
-                                                    onChange={(e) => handlePincodeChange('reference', e.target.value)}
-                                                />
-                                                <TextInput label="Country" required placeholder="India" isSelect options={["India"]} />
+                                                <div className="md:col-span-2"><TextInput label="Reference Name" value={formData.reference.name} onChange={(e) => handleTextChange('reference', 'name', e.target.value)} /></div>
+                                                <TextInput label="Relation" value={formData.reference.relation} onChange={(e) => handleTextChange('reference', 'relation', e.target.value)} />
+                                                <TextInput label="Phone" value={formData.reference.phone} onChange={(e) => handleTextChange('reference', 'phone', e.target.value)} />
+                                                <div className="md:col-span-2"><TextInput label="Address" value={formData.reference.address} onChange={(e) => handleTextChange('reference', 'address', e.target.value)} /></div>
+                                                <TextInput label="City" value={formData.reference.city} onChange={(e) => handleCityChange('reference', e.target.value)} />
+                                                <TextInput label="State" isSelect options={INDIAN_STATES} value={formData.reference.state} onChange={(e) => handleStateChange('reference', e.target.value)} />
+                                                <TextInput label="Pincode" value={formData.reference.pincode} onChange={(e) => handlePincodeChange('reference', e.target.value)} />
                                             </div>
-
                                             <div className="flex gap-4">
-                                                <button
-                                                    onClick={handleBack}
-                                                    className="w-1/2 bg-[#333] hover:bg-black text-white font-medium py-2 rounded-full transition-all text-lg"
-                                                >
-                                                    Start my KYC process
-                                                </button>
-                                                <button
-                                                    onClick={handleNext}
-                                                    className="w-1/2 bg-[#333] hover:bg-black text-white font-medium py-2 rounded-full transition-all text-lg shadow-lg"
-                                                >
-                                                    Next
-                                                </button>
+                                                <button onClick={handleBack} className="w-1/2 bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium py-2 rounded-full transition-all text-lg">Back</button>
+                                                <button onClick={handleNext} className="w-1/2 bg-[#333] hover:bg-black text-white font-medium py-2 rounded-full transition-all text-lg">Proceed to Documents</button>
                                             </div>
                                         </>
                                     )}
 
                                     {currentStep === 4 && (
                                         <>
-                                            <h2 className="text-xl font-medium text-gray-700 mb-2">Documents Upload</h2>
-                                            <div className="h-px bg-gray-600 w-full mb-6"></div>
-
+                                            <h2 className="text-xl font-medium text-gray-700 mb-2">Document Upload</h2>
+                                            <div className="h-px bg-gray-600 w-full mb-4"></div>
                                             <div className="space-y-6 mb-8">
-                                                {/* Identity Proof */}
                                                 <div>
-                                                    <TextInput
-                                                        label="Identity Proof"
-                                                        required
-                                                        placeholder="Select Identity Proof"
-                                                        isSelect
-                                                        options={IDENTITY_PROOFS}
-                                                        value={formData.documents.identityProof}
-                                                        onChange={(e) => handleDocumentChange('identityProof', e.target.value)}
-                                                    />
-                                                    <div className="p-1 mb-1 mt-3">
-                                                        <label className="block text-xs font-medium text-gray-700 mb-1.5">
-                                                            {formData.documents.identityProof} <span className="text-red-500">*</span>
-                                                        </label>
-                                                        <input
-                                                            type="file"
-                                                            ref={identityProofRef}
-                                                            className="hidden"
-                                                            accept="image/*,.pdf"
-                                                            onChange={(e) => console.log(e.target.files[0])}
-                                                        />
-                                                        <button
-                                                            onClick={() => identityProofRef.current.click()}
-                                                            className="flex items-center gap-2 text-blue-600 border border-gray-300 rounded-lg px-4 py-2 hover:bg-gray-50 transition-colors text-xs font-medium"
-                                                        >
-                                                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
-                                                            Attach File
-                                                        </button>
-                                                    </div>
+                                                    <TextInput label="Identity Proof" isSelect options={["Aadhar Card", "Voter ID", "Passport", "Driving License", "PAN Card"]} value={formData.documents.identityProof} onChange={(e) => handleTextChange('documents', 'identityProof', e.target.value)} />
+                                                    <input type="file" ref={identityProofRef} accept="image/*,.pdf" className="mt-2 text-sm" />
                                                 </div>
-
-                                                <div className="h-px bg-gray-200 w-full"></div>
-
-                                                {/* Address Proof */}
                                                 <div>
-                                                    <TextInput
-                                                        label="Address Proof"
-                                                        required
-                                                        placeholder="Select Address Proof"
-                                                        isSelect
-                                                        options={ADDRESS_PROOFS}
-                                                        value={formData.documents.addressProof}
-                                                        onChange={(e) => handleDocumentChange('addressProof', e.target.value)}
-                                                    />
-                                                    <div className="p-1 mb-1 mt-3">
-                                                        <label className="block text-xs font-medium text-gray-700 mb-1.5">
-                                                            {formData.documents.addressProof} <span className="text-red-500">*</span>
-                                                        </label>
-                                                        <input
-                                                            type="file"
-                                                            ref={addressProofRef}
-                                                            className="hidden"
-                                                            accept="image/*,.pdf"
-                                                            onChange={(e) => console.log(e.target.files[0])}
-                                                        />
-                                                        <button
-                                                            onClick={() => addressProofRef.current.click()}
-                                                            className="flex items-center gap-2 text-blue-600 border border-gray-300 rounded-lg px-4 py-2 hover:bg-gray-50 transition-colors text-xs font-medium"
-                                                        >
-                                                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
-                                                            Attach File
-                                                        </button>
-                                                    </div>
+                                                    <TextInput label="Address Proof" isSelect options={["Rental Agreement", "House Electricity Bill", "Water Bill", "Gas Company Bill"]} value={formData.documents.addressProof} onChange={(e) => handleTextChange('documents', 'addressProof', e.target.value)} />
+                                                    <input type="file" ref={addressProofRef} accept="image/*,.pdf" className="mt-2 text-sm" />
                                                 </div>
-
-                                                <div className="h-px bg-gray-200 w-full"></div>
-
-                                                {/* Bank Statement */}
                                                 <div>
-                                                    <label className="block text-xs font-medium text-gray-700 mb-1.5">
-                                                        Bank Statement → 3 Months <span className="text-red-500">*</span>
-                                                    </label>
-                                                    <input
-                                                        type="file"
-                                                        ref={bankStatementRef}
-                                                        className="hidden"
-                                                        accept="image/*,.pdf"
-                                                        onChange={(e) => console.log(e.target.files[0])}
-                                                    />
-                                                    <button
-                                                        onClick={() => bankStatementRef.current.click()}
-                                                        className="flex items-center gap-2 text-blue-600 border border-gray-300 rounded-lg px-4 py-2 hover:bg-gray-50 transition-colors text-xs font-medium"
-                                                    >
-                                                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
-                                                        Attach File
-                                                    </button>
+                                                    <label className="block text-xs font-medium text-gray-700 mb-1.5">Bank Statement (Last 3 months)</label>
+                                                    <input type="file" ref={bankStatementRef} accept="image/*,.pdf" className="text-sm" />
+                                                </div>
+                                                <div className="flex items-center gap-2 mt-4 bg-yellow-50 p-3 rounded-lg border border-yellow-200">
+                                                    <input type="checkbox" checked={isDocumentsChecked} onChange={(e) => setIsDocumentsChecked(e.target.checked)} className="w-5 h-5 rounded border-gray-300" />
+                                                    <label className="text-sm text-gray-800">I confirm that the uploaded documents are valid and belong to me.</label>
                                                 </div>
                                             </div>
-
-                                            <div className="flex items-start gap-3 mb-8">
-                                                <input
-                                                    type="checkbox"
-                                                    checked={isDocumentsChecked}
-                                                    onChange={(e) => setIsDocumentsChecked(e.target.checked)}
-                                                    className="mt-1 w-4 h-4 rounded border-gray-300 text-black focus:ring-black cursor-pointer"
-                                                />
-                                                <p className="text-xs text-gray-600 leading-relaxed">
-                                                    By checking this box, I acknowledge that I have read and accepted the <span className="font-bold">**Privacy Policy**</span>, and I <span className="text-red-500">*</span> consent to the use of my provided documents and data for the sole purpose of identity verification and rental agreement processing.
-                                                </p>
+                                            <div className="flex gap-4">
+                                                <button onClick={handleBack} className="w-1/2 bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium py-2 rounded-full transition-all text-lg">Back</button>
+                                                <button onClick={handleNext} disabled={loading} className="w-1/2 bg-green-600 hover:bg-green-700 text-white font-medium py-2 rounded-full transition-all text-lg">{loading ? 'Submitting...' : 'Submit Application'}</button>
                                             </div>
-
-                                            <button className="w-full bg-[#333] hover:bg-black text-white font-medium py-3 rounded-full transition-all text-lg shadow-lg" onClick={handleNext}>
-                                                Start my KYC process
-                                            </button>
                                         </>
                                     )}
                                 </div>
                             </div>
                         </div>
 
-                        {/* Right Column: Order Summary */}
                         <div className="lg:w-1/3">
                             <OrderSummary
-                                securityAmount={securityAmount}
-                                deliveryCharges={deliveryCharges}
                                 monthlyRentTotal={monthlyRentTotal}
                                 totalGST={totalGST}
                                 totalOneTime={totalOneTime}
                                 payToday={payToday}
                                 savedAmount={savedAmount}
-                                paymentConfirmed={true} // Enable the confirmed state
+                                paymentConfirmed={true}
                                 showButton={false}
                             />
                         </div>
@@ -1013,45 +603,24 @@ export default function KYCPage() {
     );
 }
 
-const TextInput = ({ label, required, placeholder, isSelect, options, value, onChange }) => (
+const TextInput = ({ label, required, placeholder, isSelect, options, value, onChange, error, readOnly }) => (
     <div className="w-full">
-        <label className="block text-xs font-medium text-gray-700 mb-1.5">
-            {label} {required && <span className="text-red-500">*</span>}
-        </label>
+        <label className="block text-xs font-medium text-gray-700 mb-1.5">{label} {required && <span className="text-red-500">*</span>}</label>
         <div className="relative">
             {isSelect ? (
-                options && options.length > 0 ? (
-                    <div className="relative">
-                        <select
-                            className="w-full appearance-none border border-gray-300 rounded-lg px-2 py-2 bg-white text-gray-700 text-sm focus:outline-none focus:border-black transition-colors font-sans cursor-pointer"
-                            value={value}
-                            onChange={onChange}
-                        >
-                            <option value="" disabled className="text-gray-400">{placeholder || 'Select'}</option>
-                            {options.map((opt, idx) => (
-                                <option key={idx} value={opt}>{opt}</option>
-                            ))}
-                        </select>
-                        <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-500">
-                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg>
-                        </div>
+                <div className="relative">
+                    <select className={`w-full appearance-none border rounded-lg px-2 py-2 bg-white text-gray-700 text-sm focus:outline-none transition-colors font-sans cursor-pointer ${error ? 'border-red-500 bg-red-50' : 'border-gray-200 focus:border-black'}`} value={value} onChange={onChange} disabled={readOnly}>
+                        <option value="" disabled>{placeholder || 'Select'}</option>
+                        {options && options.map((opt, idx) => <option key={idx} value={opt}>{opt}</option>)}
+                    </select>
+                    <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-500">
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg>
                     </div>
-                ) : (
-                    <div className="w-full border border-gray-300 rounded-lg px-2 py-2 bg-white text-gray-400 text-sm flex justify-between items-center cursor-pointer font-sans">
-                        <span>{placeholder || 'Select State First'}</span>
-                        <svg className="w-4 h-4 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg>
-                    </div>
-                )
+                </div>
             ) : (
-                <input
-                    type="text"
-                    className="w-full border border-gray-200 rounded-lg px-2 py-2 text-sm focus:outline-none focus:border-black transition-colors placeholder-gray-300 font-sans"
-                    placeholder={placeholder}
-                    value={value}
-                    onChange={onChange}
-                />
+                <input type="text" className={`w-full border rounded-lg px-2 py-2 text-sm focus:outline-none transition-colors placeholder-gray-300 font-sans ${error ? 'border-red-500 bg-red-50' : 'border-gray-200 focus:border-black'}`} placeholder={placeholder} value={value} onChange={onChange} readOnly={readOnly} />
             )}
         </div>
-        {!isSelect && <p className="text-[10px] text-gray-500 mt-1 font-medium">Message</p>}
+        {error && <p className="text-red-500 text-[10px] mt-1 font-medium">{error}</p>}
     </div>
 );

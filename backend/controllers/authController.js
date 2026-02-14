@@ -325,6 +325,7 @@ const verifyLoginOtp = asyncHandler(async (req, res) => {
         email: user.email,
         phone: user.phone,
         role: user.role,
+        isAdmin: user.isAdmin || false,
         token: token,
     });
 });

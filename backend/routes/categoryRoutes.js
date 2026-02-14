@@ -11,13 +11,13 @@ const { protect, admin } = require('../middleware/authMiddleware');
 
 router.route('/')
     .get(getCategories)
-    .post(createCategory);
+    .post(protect, admin, createCategory);
 
 router.route('/admin')
     .get(protect, admin, getAdminCategories);
 
 router.route('/:id')
-    .put(updateCategory)
-    .delete(deleteCategory);
+    .put(protect, admin, updateCategory)
+    .delete(protect, admin, deleteCategory);
 
 module.exports = router;
