@@ -1,13 +1,21 @@
 "use client";
-import createCategoryPage from '../../../../components/CategoryPageTemplate';
+import nextDynamic from 'next/dynamic';
 
-// Force dynamic rendering to prevent SSR issues
+const CategoryPageTemplate = nextDynamic(() => import('../../../../components/CategoryPageTemplate'), {
+    ssr: false,
+    loading: () => <div className="min-h-screen flex items-center justify-center">Loading...</div>
+});
+
 export const dynamic = 'force-dynamic';
 
-export default createCategoryPage({
-    productNamePrefix: "MacBook Air",
-    productDescription: "13.6-inch Liquid Retina display, M2 chip, 8GB RAM",
-    basePrice: 5500,
-    image: "https://images.unsplash.com/photo-1517336714731-489689fd1ca8?q=80&w=800&auto=format&fit=crop",
-    title: "MacBook Air Products"
-});
+export default function MacBookAirPage() {
+    return (
+        <CategoryPageTemplate 
+            productNamePrefix="MacBook Air"
+            productDescription="Supercharged by M2, 13-inch Liquid Retina display."
+            basePrice={6000}
+            image="https://images.unsplash.com/photo-1611186871348-b1ec696e52c9?q=80&w=800&auto=format&fit=crop"
+            title="MacBook Air Products"
+        />
+    );
+}

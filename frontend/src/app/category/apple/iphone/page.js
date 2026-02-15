@@ -1,13 +1,21 @@
 "use client";
-import createCategoryPage from '../../../../components/CategoryPageTemplate';
+import nextDynamic from 'next/dynamic';
 
-// Force dynamic rendering to prevent SSR issues
+const CategoryPageTemplate = nextDynamic(() => import('../../../../components/CategoryPageTemplate'), {
+    ssr: false,
+    loading: () => <div className="min-h-screen flex items-center justify-center">Loading...</div>
+});
+
 export const dynamic = 'force-dynamic';
 
-export default createCategoryPage({
-    productNamePrefix: "iPhone",
-    productDescription: "6.1-inch Super Retina XDR display, A16 Bionic chip",
-    basePrice: 4500,
-    image: "https://images.unsplash.com/photo-1592286927505-2fd0d113e4e7?q=80&w=800&auto=format&fit=crop",
-    title: "iPhone Products"
-});
+export default function iPhonePage() {
+    return (
+        <CategoryPageTemplate 
+            productNamePrefix="iPhone"
+            productDescription="Experience the power of iPhone with advanced camera systems."
+            basePrice={4000}
+            image="/iphone.jpg"
+            title="iPhone Products"
+        />
+    );
+}

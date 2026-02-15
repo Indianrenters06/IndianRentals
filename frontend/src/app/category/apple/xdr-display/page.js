@@ -1,13 +1,21 @@
 "use client";
-import createCategoryPage from '../../../../components/CategoryPageTemplate';
+import nextDynamic from 'next/dynamic';
 
-// Force dynamic rendering to prevent SSR issues
+const CategoryPageTemplate = nextDynamic(() => import('../../../../components/CategoryPageTemplate'), {
+    ssr: false,
+    loading: () => <div className="min-h-screen flex items-center justify-center">Loading...</div>
+});
+
 export const dynamic = 'force-dynamic';
 
-export default createCategoryPage({
-    productNamePrefix: "Pro Display XDR",
-    productDescription: "32-inch Retina 6K display, 1600 nits peak brightness",
-    basePrice: 25000,
-    image: "https://images.unsplash.com/photo-1527443224154-c4a3942d3acf?q=80&w=800&auto=format&fit=crop",
-    title: "Pro Display XDR Products"
-});
+export default function ProDisplayXDRPage() {
+    return (
+        <CategoryPageTemplate 
+            productNamePrefix="Pro Display XDR"
+            productDescription="32-inch 6K Retina display, up to 1600 nits brightness."
+            basePrice={15000}
+            image="/xdr.jpg"
+            title="Pro Display XDR Products"
+        />
+    );
+}

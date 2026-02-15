@@ -1,0 +1,33 @@
+"use client";
+import React from 'react';
+import Image from 'next/image';
+import { FaHeart } from 'react-icons/fa';
+import Link from 'next/link';
+
+const ProductCard = ({ product }) => (
+    <div className="bg-fuchsia-50 rounded-[28px] p-3 border border-gray-100 hover:shadow-[0_8px_30px_rgb(0,0,0,0.04)] transition-all duration-300 relative flex flex-col h-full group hover:-translate-y-1">
+        <div className="absolute top-5 left-5 z-10"><span className="bg-[#FF3B30] text-white text-[10px] font-light px-2.5 py-1 rounded-md uppercase tracking-wider shadow-sm">{product.discount}</span></div>
+        <button className="absolute top-5 right-5 z-10 w-8 h-8 flex items-center justify-center rounded-full bg-white border border-gray-200 text-gray-400 hover:text-[#FF3B30] transition-colors duration-200"><FaHeart size={14} /></button>
+        <Link href={`/products/${product.id}`} className="contents">
+            <div className="relative w-full aspect-[7/8] mb-3 flex items-center justify-center rounded-[32px] overflow-hidden cursor-pointer">
+                <div className="absolute inset-0 pointer-events-none" />
+                <Image src={product.image} alt={product.name} fill className="object-contain p-6 pb-14 group-hover:scale-105 transition-transform duration-500 drop-shadow-xl" />
+                <button className=" absolute bottom-2 left-4 right-4 bg-[#1D1D1F] text-white text-[14px] font-medium py-2 rounded-full hover:bg-white hover:text-black hover:scale-[1.02] active:scale-[0.98] transition-all duration-500 ease-out shadow-lg translate-y-[130%] group-hover:translate-y-0 z-20">Rent Now</button>
+            </div>
+            <div className="flex flex-col flex-1 px-1 cursor-pointer">
+                <h3 className="text-[17px] font-semibold text-[#1D1D1F] mb-1.5 leading-snug tracking-tight line-clamp-2">{product.name}</h3>
+                <p className="text-[11px] text-[#86868B]  line-clamp-2 leading-relaxed text-black">{product.description}</p>
+                <div className="mt-auto">
+                    <div className="flex items-baseline flex-wrap gap-x-2 gap-y-1">
+                        <span className="text-[13px] text-[#86868B] font-medium">from</span>
+                        <span className="text-[13px] text-[#86868B] line-through font-medium">₹{product.originalPrice}</span>
+                        <span className="text-[19px] font-bold text-[#FF3B30]">₹{product.rentPrice}</span>
+                        <span className="text-[13px] text-[#86868B] font-medium">/month</span>
+                    </div>
+                </div>
+            </div>
+        </Link>
+    </div>
+);
+
+export default ProductCard;

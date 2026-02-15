@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { FaEnvelope, FaLock, FaGoogle, FaApple, FaArrowRight, FaPhone, FaArrowLeft } from "react-icons/fa";
@@ -8,20 +8,26 @@ import { API_BASE_URL } from "../../services/apiConfig";
 
 const LoginPage = () => {
     const router = useRouter();
-    const [step, setStep] = useState(1); // 1: Input Identifier, 2: Input OTP
+    const [step, setStep] = useState(1);
     const [identifier, setIdentifier] = useState("");
     const [otp, setOtp] = useState("");
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
-    const [otpType, setOtpType] = useState("email"); // 'email' or 'phone' for UI hints
+    const [otpType, setOtpType] = useState("email");
 
-    // Reset state on mount
-    React.useEffect(() => {
+    // Use a flag to avoid SSR issues if necessary, though it should be fine.
+    const [isClient, setIsClient] = useState(false);
+    useEffect(() => {
+        setIsClient(true);
         setStep(1);
         setIdentifier("");
         setOtp("");
         setError(null);
     }, []);
+
+    if (!isClient && typeof window === 'undefined') {
+        return null; // Return null on server to avoid hydration mismatch and potential hook issues
+    }
 
     const handleSendOtp = async (e) => {
         e.preventDefault();

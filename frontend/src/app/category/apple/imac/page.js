@@ -1,13 +1,21 @@
 "use client";
-import createCategoryPage from '../../../../components/CategoryPageTemplate';
+import nextDynamic from 'next/dynamic';
 
-// Force dynamic rendering to prevent SSR issues
+const CategoryPageTemplate = nextDynamic(() => import('../../../../components/CategoryPageTemplate'), {
+    ssr: false,
+    loading: () => <div className="min-h-screen flex items-center justify-center">Loading...</div>
+});
+
 export const dynamic = 'force-dynamic';
 
-export default createCategoryPage({
-    productNamePrefix: "iMac",
-    productDescription: "24-inch 4.5K Retina display, M3 chip, Blue",
-    basePrice: 6000,
-    image: "https://images.unsplash.com/photo-1496181133206-80ce9b88a853?q=80&w=800&auto=format&fit=crop",
-    title: "iMac Products"
-});
+export default function iMacPage() {
+    return (
+        <CategoryPageTemplate 
+            productNamePrefix="iMac"
+            productDescription="The all-in-one desktop with a 24-inch 4.5K Retina display."
+            basePrice={9000}
+            image="https://images.unsplash.com/photo-1527443224154-c4a3942dca76?q=80&w=800&auto=format&fit=crop"
+            title="iMac Products"
+        />
+    );
+}

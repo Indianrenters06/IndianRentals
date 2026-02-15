@@ -1,13 +1,21 @@
 "use client";
-import createCategoryPage from '../../../../components/CategoryPageTemplate';
+import nextDynamic from 'next/dynamic';
 
-// Force dynamic rendering to prevent SSR issues
+const CategoryPageTemplate = nextDynamic(() => import('../../../../components/CategoryPageTemplate'), {
+    ssr: false,
+    loading: () => <div className="min-h-screen flex items-center justify-center">Loading...</div>
+});
+
 export const dynamic = 'force-dynamic';
 
-export default createCategoryPage({
-    productNamePrefix: "Mac Mini",
-    productDescription: "M2 Pro chip, 16GB Unified Memory, 512GB SSD",
-    basePrice: 5999,
-    image: "/mac-mini-new.jpg",
-    title: "Mac Mini Products"
-});
+export default function MacMiniPage() {
+    return (
+        <CategoryPageTemplate 
+            productNamePrefix="Mac Mini"
+            productDescription="M2 Pro chip, 16GB Unified Memory, 512GB SSD"
+            basePrice={5999}
+            image="/mac-mini-new.jpg"
+            title="Mac Mini Products"
+        />
+    );
+}

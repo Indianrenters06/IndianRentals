@@ -5,6 +5,8 @@ import Link from 'next/link';
 import { FaCheckCircle, FaHome, FaShoppingBag } from 'react-icons/fa';
 import confetti from 'canvas-confetti';
 
+export const dynamic = 'force-dynamic';
+
 export default function OrderConfirmationPage() {
 
     useEffect(() => {

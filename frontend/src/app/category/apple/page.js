@@ -1,6 +1,28 @@
 "use client";
-import createCategoryPage from '../../../../components/CategoryPageTemplate';
+import nextDynamic from 'next/dynamic';
 
-// Force dynamic rendering to prevent SSR issues
+const CategoryPageTemplate = nextDynamic(
+    () => import('@/components/CategoryPageTemplate'),
+    {
+        ssr: false,
+        loading: () => (
+            <div className="min-h-screen flex items-center justify-center">
+                Loading...
+            </div>
+        ),
+    }
+);
+
 export const dynamic = 'force-dynamic';
 
+export default function ApplePage() {
+    return (
+        <CategoryPageTemplate
+            productNamePrefix="Apple"
+            productDescription="Experience the best of Apple products."
+            basePrice={5000}
+            image="/apple-logo.jpg"
+            title="Apple Products"
+        />
+    );
+}
