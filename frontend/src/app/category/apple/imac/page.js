@@ -1,6 +1,9 @@
 "use client";
 import createCategoryPage from '../../../../components/CategoryPageTemplate';
 
+// Force dynamic rendering to prevent SSR issues
+export const dynamic = 'force-dynamic';
+
 export default createCategoryPage({
     productNamePrefix: "iMac",
     productDescription: "24-inch 4.5K Retina display, M3 chip, Blue",

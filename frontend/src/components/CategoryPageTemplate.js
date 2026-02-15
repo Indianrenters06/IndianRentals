@@ -9,7 +9,7 @@ import { getProducts } from '../services/productService';
 
 // Component factory to generate pages with specific configuration
 const createCategoryPage = (config) => {
-    return () => {
+    const CategoryPage = () => {
         const router = useRouter();
         const [currentPage, setCurrentPage] = useState(1);
         const [products, setProducts] = useState([]);
@@ -164,6 +164,11 @@ const createCategoryPage = (config) => {
             </div>
         );
     };
+
+    // Add displayName for debugging
+    CategoryPage.displayName = `CategoryPage_${config.productNamePrefix.replace(/\s+/g, '_')}`;
+
+    return CategoryPage;
 };
 
 export default createCategoryPage;
