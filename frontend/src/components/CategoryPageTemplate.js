@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { FaChevronDown, FaArrowLeft } from 'react-icons/fa';
 import { useRouter } from 'next/navigation';
-import { getProducts } from '../services/productService';
+import { getProducts } from '@/services/productService';
 import Sidebar from './Sidebar';
 import ProductCard from './ProductCard';
 

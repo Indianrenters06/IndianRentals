@@ -2,7 +2,7 @@
 const mongoose = require('mongoose');
 require('dotenv').config();
 
-const User = require('./models/User');
+const User = require('../models/User');
 
 const makeAdmin = async (email) => {
     try {

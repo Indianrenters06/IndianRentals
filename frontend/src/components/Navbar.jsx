@@ -80,15 +80,15 @@ const Navbar = () => {
     ];
 
     return (
-        <header className="relative bg-white shadow-xs z-50 pb-3">
+        <header className="relative bg-white shadow-xs z-50">
             {/* Top Promotional Banner */}
             <div className="bg-amber-300 text-black text-xs font-bold text-center py-1 px-4 tracking-wide">
                 ♥ SAVE Extra 5% up to ₹100 on UPI Orders ♥
             </div>
 
             {/* Top Bar */}
-            <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 ">
-                <div className="flex items-center justify-between gap-4">
+            <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 py-3">
+                <div className="flex items-center justify-between gap-[10px]">
 
                     {/* Left Section: Mobile Menu + Logo */}
                     <div className="flex items-center gap-3 md:gap-4">
@@ -103,11 +103,11 @@ const Navbar = () => {
                         {/* Logo */}
                         <Link href="/" className="shrink-0">
                             <Image
-                                src="/logo-v2.png"
+                                src="https://res.cloudinary.com/dpu9ikeqe/image/upload/v1771271177/1d1f7c4e3c0490bcddb69ceb328c67be2f7cf361_cf3y9m.png"
                                 alt="Indian Renters - You Name it We Rent it"
-                                width={280}
-                                height={75}
-                                className="h-16 md:h-20 w-auto object-contain"
+                                width={150}
+                                height={40}
+                                className="h-10 w-auto object-contain"
                                 priority
                             />
                         </Link>

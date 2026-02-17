@@ -11,7 +11,7 @@ const Sidebar = ({ selectedDuration, setSelectedDuration, selectedSort, setSelec
     const durations = ["1 month", "3 months", "6 months", "9 months", "18 months", "24 months"];
 
     return (
-        <aside className="w-64 flex-shrink-0 hidden lg:block pr-8 min-h-screen font-sans">
+        <aside className="w-64 shrink-0 hidden lg:block pr-8 min-h-screen font-sans">
             <div className="mb-10">
                 <h3 className="text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-6">Browse Categories</h3>
                 <ul className="space-y-4">

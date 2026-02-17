@@ -17,7 +17,7 @@ export const dynamic = 'force-dynamic';
 
 export default function ApplePage() {
     return (
-        <CategoryPageTemplate
+        <CategoryPageTemplate 
             productNamePrefix="Apple"
             productDescription="Experience the best of Apple products."
             basePrice={5000}
