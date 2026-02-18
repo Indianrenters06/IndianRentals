@@ -1,10 +1,17 @@
-import { Manrope } from "next/font/google"; // turbo
+import { Manrope, Poppins } from "next/font/google"; // turbo
 import "./globals.css";
 // ... imports
 
 const manrope = Manrope({
   subsets: ["latin"],
   variable: "--font-manrope",
+  display: "swap",
+});
+
+const poppins = Poppins({
+  subsets: ["latin"],
+  weight: ["300", "400", "500", "600", "700"],
+  variable: "--font-poppins",
   display: "swap",
 });
 
@@ -19,7 +26,7 @@ import ClientLayout from "@/components/ClientLayout";
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
-      <body className={`${manrope.variable} font-sans bg-gray-50 antialiased`}>
+      <body className={`${manrope.variable} ${poppins.variable} font-sans bg-gray-50 antialiased`}>
         <ReduxProvider>
           <ClientLayout>
             {children}

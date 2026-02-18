@@ -10,7 +10,7 @@ export default function AboutPage() {
     const [activeTab, setActiveTab] = useState('vision'); // 'vision' or 'mission'
 
     return (
-        <div className="font-sans text-gray-800 pb-20">
+        <div className="text-gray-800 pb-20">
             {/* 1. Header Image/Banner */}
             <div className="max-w-[1200px] mx-auto  sm:px-16 lg:px-3 mt-8 mb-16">
                 <div className="w-[1200px] h-[500px] relative bg-gray-200 overflow-hidden rounded-3xl opacity-100">
@@ -169,8 +169,8 @@ export default function AboutPage() {
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-50 items-center">
                     {/* Left Content (Text + Stats) */}
                     <div className="lg:order-1"> {/* Wait, screenshot has text on LEFT? Yes. */}
-                        <h2 className="w-[540px] h-[45px] text-[40px] font-semibold mb-6 font-manrope text-gray-800 leading-tight tracking-tight opacity-100">Why Choose Us?</h2>
-                        <p className="w-[540px] h-[68px] text-base font-normal mb-5 leading-tight  text-gray-800 tracking-wide opacity-100">
+                        <h2 className="w-[540px] h-[45px] text-[40px] font-semibold mb-6 font-poppins text-gray-800 leading-tight tracking-tight opacity-100">Why Choose Us?</h2>
+                        <p className="w-[540px] h-[68px] text-base font-normal mb-5 leading-tight text-gray-800 tracking-wide opacity-100 font-poppins">
                             Join thousands who've switched to the flexible, affordable way to access
                             high-end tech. IndianRenters delivers AI-ready workstations, laptops, and IT
                             gear with zero ownership hassle and instant support.
@@ -179,15 +179,15 @@ export default function AboutPage() {
                         {/* Stats Row */}
                         <div className="w-[540px] h-[79px] grid grid-cols-3 gap-[96px] pt-4 border-t border-gray-300 opacity-100">
                             <div className="w-[111px] h-[79px] opacity-100">
-                                <h3 className="w-[106px] h-[58px] text-[48px] font-normal font-manrope text-gray-800 mb-1 ml-1 opacity-100">90k+</h3>
+                                <h3 className="w-[106px] h-[58px] text-[48px] font-medium font-manrope text-gray-700 mb-1 ml-1 opacity-100">90k+</h3>
                                 <p className="text-sm text-gray-500 font-manrope">Devices in Stock</p>
                             </div>
                             <div className="w-[123px] h-[79px] opacity-100">
-                                <h3 className="w-[103px] h-[58px] text-[48px] font-normal font-manrope text-gray-800 mb-1 opacity-100">30k+</h3>
+                                <h3 className="w-[103px] h-[58px] text-[48px] font-medium font-manrope text-gray-700 mb-1 opacity-100">30k+</h3>
                                 <p className="text-sm text-gray-500 font-manrope">Happy Customers</p> {/* Using 30k from screenshot */}
                             </div>
                             <div className="w-[102px] h-[79px] opacity-100">
-                                <h3 className="w-[100px] h-[58px] text-[48px] font-normal font-manrope text-gray-800 mb-1 opacity-100">401+</h3>
+                                <h3 className="w-[100px] h-[58px] text-[48px] font-medium font-manrope text-gray-700 mb-1 opacity-100">401+</h3>
                                 <p className="text-sm text-gray-500 font-manrope">Cities Covered</p>
                             </div>
                         </div>

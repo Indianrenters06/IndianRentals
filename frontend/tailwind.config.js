@@ -19,6 +19,15 @@ module.exports = {
                     "sans-serif"
                 ],
                 manrope: ["var(--font-manrope)"],
+                apple: [
+                    "-apple-system",
+                    "BlinkMacSystemFont",
+                    "San Francisco",
+                    "Helvetica Neue",
+                    "Arial",
+                    "sans-serif"
+                ],
+                poppins: ["var(--font-poppins)", "Poppins", "sans-serif"],
             },
         },
     },
