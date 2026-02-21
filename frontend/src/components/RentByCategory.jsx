@@ -73,13 +73,16 @@ const RentByCategory = () => {
         return <FaLaptop size={40} />;
     };
 
-    if (loading) return null; // Or a spinner
+    if (loading) return null;
+
+    // On mobile: show up to 7 categories + 1 "View All" tile in a unified 4-column grid
+    const mobileCats = displayCategories.slice(0, 7);
 
     return (
-        <section className="py-20 bg-white">
+        <section className="py-8 md:py-20 bg-white">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div className="flex items-center justify-between mb-12">
-                    <h2 className="text-4xl font-bold text-gray-900 tracking-tight">Rent by Category</h2>
+                <div className="flex items-center justify-between mb-6 md:mb-12">
+                    <h2 className="text-2xl md:text-4xl font-bold text-gray-900 tracking-tight">Rent by Category</h2>
                     <Link
                         href="/categories"
                         className="hidden md:inline-flex items-center gap-2 px-6 py-2 bg-[#FFC107] hover:bg-[#FFD54F] text-black font-bold rounded-full transition-colors"
@@ -89,7 +92,42 @@ const RentByCategory = () => {
                     </Link>
                 </div>
 
-                <div className="relative">
+                {/* Mobile Grid: unified 4-column grid — categories + View All tile (all same size) */}
+                <div className="md:hidden grid grid-cols-4 gap-2">
+                    {mobileCats.map((cat) => (
+                        <Link key={cat._id} href={`/category/${cat.slug || cat._id}`} className="flex flex-col items-center">
+                            <div className="w-full aspect-square rounded-2xl bg-gray-50 border border-gray-100 flex items-center justify-center overflow-hidden relative">
+                                {cat.image ? (
+                                    <Image
+                                        src={cat.image}
+                                        alt={cat.name}
+                                        fill
+                                        className="object-contain p-2"
+                                    />
+                                ) : (
+                                    <div className="text-gray-400">
+                                        {getIconForCategory(cat.name)}
+                                    </div>
+                                )}
+                            </div>
+                            <span className="text-[10px] font-medium text-gray-600 text-center mt-1.5 leading-tight">{cat.name}</span>
+                        </Link>
+                    ))}
+
+                    {/* View All Tile — same size as category tiles */}
+                    <Link href="/categories" className="flex flex-col items-center">
+                        <div className="w-full aspect-square rounded-2xl bg-[#FFF3CD] border border-[#FFE082] flex flex-col items-center justify-center gap-1.5">
+                            <span className="text-[11px] font-semibold text-gray-700 leading-tight">View All</span>
+                            <div className="w-7 h-7 rounded-full bg-[#FFC107] flex items-center justify-center">
+                                <FaArrowRight size={10} className="text-gray-900" />
+                            </div>
+                        </div>
+                        <span className="text-[10px] font-medium text-gray-600 text-center mt-1.5 leading-tight opacity-0 select-none">_</span>
+                    </Link>
+                </div>
+
+                {/* Desktop Swiper */}
+                <div className="hidden md:block relative">
                     <Swiper
                         modules={[Navigation, Autoplay]}
                         spaceBetween={24}
@@ -112,20 +150,9 @@ const RentByCategory = () => {
                         }}
                         className="py-4 overflow-visible!"
                     >
-                        <div className="swiper-button-prev !text-gray-900 !w-10 !h-10 !bg-white !rounded-full !shadow-md after:!text-sm backdrop-blur-sm hidden md:flex"></div>
-                        <div className="swiper-button-next !text-gray-900 !w-10 !h-10 !bg-white !rounded-full !shadow-md after:!text-sm backdrop-blur-sm hidden md:flex"></div>
-
                         {displayCategories.map((cat) => (
                             <SwiperSlide key={cat._id}>
                                 <div className="group flex flex-col items-center p-4 bg-white border border-gray-50 rounded-3xl hover:border-gray-200 transition-all duration-300 cursor-pointer h-full relative">
-                                    {/* Mobile Arrow Overlay - Decorative based on screenshot */}
-                                    <div className="md:hidden absolute top-1/2 left-1 -translate-y-1/2 z-10 opacity-30">
-                                        <span className="text-blue-500 text-2xl">&lt;</span>
-                                    </div>
-                                    <div className="md:hidden absolute top-1/2 right-1 -translate-y-1/2 z-10 opacity-30">
-                                        <span className="text-blue-500 text-2xl">&gt;</span>
-                                    </div>
-
                                     <div className="w-full aspect-square flex items-center justify-center mb-3 relative">
                                         {cat.image ? (
                                             <div className="relative w-full h-full p-2">
@@ -151,7 +178,7 @@ const RentByCategory = () => {
                     </Swiper>
 
                     {/* Mobile Explore Button */}
-                    <div className="mt-8 text-center md:hidden">
+                    <div className="mt-8 text-center">
                         <Link
                             href="/categories"
                             className="inline-flex items-center gap-2 px-6 py-3 bg-[#FFC107] hover:bg-[#FFD54F] text-black font-bold rounded-full transition-colors"

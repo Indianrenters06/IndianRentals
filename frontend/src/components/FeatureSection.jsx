@@ -7,9 +7,94 @@ import { FaArrowRight, FaLaptop } from 'react-icons/fa';
 
 const FeatureSection = () => {
     return (
-        <section className="py-12 md:py-24 bg-[#F5FAFF] overflow-hidden relative">
-            <div className="max-w-[1400px] mx-auto px-6 sm:px-8 lg:px-12">
-                <div className="flex flex-col lg:flex-row items-center justify-between gap-12 lg:gap-0">
+        <section className="py-10 md:py-24 bg-[#F5FAFF] overflow-hidden relative">
+            <div className="max-w-[1400px] mx-auto px-4 sm:px-8 lg:px-12">
+
+                {/* Mobile Layout */}
+                <div className="md:hidden flex flex-col">
+                    {/* Title + CTA */}
+                    <div className="space-y-3 mb-2">
+                        <h2 className="text-5xl">
+                            <span className="font-normal bg-gradient-to-r from-[#1D334C] via-[#374E71] to-[#4E6F90] bg-clip-text text-transparent tracking-normal">
+                                MacBook Air
+                            </span>
+                        </h2>
+                        <p className="text-sm text-gray-700 font-light leading-relaxed max-w-xs">
+                            Skip the setup hassle. Get high-performance workstations pre-configured with Ollama for instant AI development. Run large language models locally.
+                        </p>
+                        <Link href="/product/macbook-air" className="inline-flex items-center gap-2 px-6 py-2.5 bg-[#FFC107] hover:bg-[#FFD54F] text-black font-medium rounded-full transition-all shadow-sm hover:shadow-md text-sm">
+                            Rent Now →
+                        </Link>
+                    </div>
+
+                    {/* Image with Air watermark */}
+                    <div className="relative flex items-center justify-center h-[220px] mt-2">
+                        {/* Air watermark for mobile */}
+                        <div className="absolute inset-0 flex items-center justify-center pointer-events-none select-none z-0">
+                            <span className="text-[7rem] font-bold text-[#DCE8F5] leading-none tracking-widest opacity-100">
+                                Air
+                            </span>
+                        </div>
+                        <motion.div
+                            initial={{ opacity: 0, scale: 0.9 }}
+                            whileInView={{ opacity: 1, scale: 1.05 }}
+                            transition={{ duration: 0.8, ease: "easeOut" }}
+                            viewport={{ once: true }}
+                            className="relative z-10 w-full h-full flex justify-center items-center"
+                        >
+                            <div className="relative w-[90%] h-full">
+                                <Image
+                                    src="https://res.cloudinary.com/dgkckcdk8/image/upload/v1769961205/indian-rentals/gfjrzgp5llzcjap30wkt.png"
+                                    alt="MacBook Air"
+                                    fill
+                                    className="object-contain drop-shadow-xl"
+                                    priority
+                                />
+                            </div>
+                        </motion.div>
+                    </div>
+
+                    {/* Stats row */}
+                    <div className="flex justify-between items-start mt-4 px-2">
+                        <div className="flex flex-col items-start">
+                            <p className="text-xs font-medium text-gray-500">Up to</p>
+                            <h4 className="font-semibold text-4xl bg-gradient-to-r from-[#1D334C] via-[#374E71] to-[#4E6F90] bg-clip-text text-transparent tracking-tighter leading-none">
+                                23x
+                            </h4>
+                            <p className="text-[10px] font-medium text-gray-500 mt-1 leading-tight max-w-[90px]">
+                                faster than the fastest Intel-based MacBook Air
+                            </p>
+                        </div>
+                        <div className="flex flex-col items-start">
+                            <p className="text-xs font-medium text-gray-500">Up to</p>
+                            <h4 className="font-semibold text-4xl bg-gradient-to-r from-[#1D334C] via-[#374E71] to-[#4E6F90] bg-clip-text text-transparent tracking-tighter leading-none">
+                                2x
+                            </h4>
+                            <p className="text-[10px] font-medium text-gray-500 mt-1 leading-tight max-w-[90px]">
+                                faster than MacBook Air(M1)
+                            </p>
+                        </div>
+                        <div className="flex flex-col items-start">
+                            <p className="text-xs font-medium text-gray-500">Up to</p>
+                            <h4 className="font-semibold text-4xl bg-gradient-to-r from-[#1D334C] via-[#374E71] to-[#4E6F90] bg-clip-text text-transparent tracking-tighter leading-none">
+                                18 hr
+                            </h4>
+                            <p className="text-[10px] font-medium text-gray-500 mt-1 leading-tight max-w-[70px]">
+                                battery life
+                            </p>
+                        </div>
+                    </div>
+
+                    {/* Built for Apple Intelligence */}
+                    <div className="text-center mt-5">
+                        <span className="text-sm font-medium bg-gradient-to-r from-[#0071E3] via-[#9F55FF] to-[#FF5555] bg-clip-text text-transparent">
+                            Built for Apple Intelligence.
+                        </span>
+                    </div>
+                </div>
+
+                {/* Desktop Layout */}
+                <div className="hidden md:flex flex-col lg:flex-row items-center justify-between gap-12 lg:gap-0">
 
                     {/* Left Content - Title & CTA */}
                     <div className="w-full lg:w-[30%] flex flex-col items-start space-y-8 z-10 pl-4">
@@ -20,7 +105,7 @@ from-[#1D334C]
 via-[#374E71] 
 to-[#4E6F90] 
 bg-clip-text 
-text-transparent tracking-normal">Macbook Air</span>
+text-transparent tracking-normal">MacBook Air</span>
                             </h2>
                             <p className="text-lg text-gray-900  max-w-xs font-light">
                                 Skip the setup hassle. Get high-performance workstations pre-configured with Ollama for instant AI development. Run large language models locally.
@@ -38,7 +123,7 @@ text-transparent tracking-normal">Macbook Air</span>
                     {/* Center Image & "Air" Text */}
                     <div className="w-full lg:w-[60%] relative flex flex-col items-center justify-center h-[500px] md:h-[600px]">
                         {/* Background Air Text - Massive Watermark */}
-                        <div className="hidden md:flex absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full items-center justify-center pointer-events-none select-none z-0">
+                        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full flex items-center justify-center pointer-events-none select-none z-0">
                             <span className="text-[12rem] md:text-[22rem] font-bold text-[#E6F0FF] leading-none tracking-widest opacity-100">
                                 Air
                             </span>
@@ -69,7 +154,7 @@ text-transparent tracking-normal">Macbook Air</span>
                     </div>
 
                     {/* Right Stats */}
-                    <div className="w-full lg:w-[20%] flex flex-row lg:flex-col justify-between lg:justify-center  lg:space-y-16 pl-6 pt-8 lg:pt-0">
+                    <div className="w-full lg:w-[20%] flex flex-row lg:flex-col justify-between lg:justify-center lg:space-y-16 pl-6 pt-8 lg:pt-0">
                         {/* Stat 1 */}
                         <div className="flex flex-col items-start">
                             <p className="text-sm font-medium text-gray-500 mb-1">Up to</p>

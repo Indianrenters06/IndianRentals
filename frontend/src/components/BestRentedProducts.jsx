@@ -7,7 +7,7 @@ import { motion } from "framer-motion";
 import { getProducts } from "../services/productService";
 import { useState, useEffect } from "react";
 
-const BestRentedProducts = () => {
+const BestRentedProducts = ({ title = "Best Rented Products" }) => {
     const [products, setProducts] = useState([]);
 
     useEffect(() => {
@@ -21,11 +21,13 @@ const BestRentedProducts = () => {
                     category: p.category,
                     image: (p.images && p.images.length > 0) ? p.images[0] : "/images/placeholder.png",
                     rating: p.rating || 4.5,
-                    reviews: p.numReviews || 0,
-                    originalPrice: Math.round((p.rentalPrice || 0) * 1.5), // Mock original price
+                    reviews: p.numReviews || 12,
+                    originalPrice: Math.round((p.rentalPrice || 0) * 1.5),
                     rentPrice: p.rentalPrice,
                     discount: p.condition === 'New' ? "NEW" : "HOT",
                     isNew: p.condition === 'New',
+                    tags: ["Quality tested", "Deep Cleaned"],
+                    statusTags: ["Like New", "In Stock"],
                 }));
 
                 setProducts(mappedProducts);
@@ -41,9 +43,9 @@ const BestRentedProducts = () => {
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
                 {/* Header */}
-                <div className="flex items-center justify-between mb-8 md:mb-12">
+                <div className="flex items-center justify-between mb-6 md:mb-12">
                     <h2 className="text-2xl md:text-5xl font-bold text-gray-900 tracking-tight">
-                        Best Rented Products
+                        {title}
                     </h2>
                     <Link
                         href="/products"
@@ -51,16 +53,10 @@ const BestRentedProducts = () => {
                     >
                         View All
                     </Link>
-                    <Link
-                        href="/products"
-                        className="md:hidden text-sm font-bold text-blue-600"
-                    >
-                        View All
-                    </Link>
                 </div>
 
                 {/* Grid */}
-                <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-8">
+                <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-8">
                     {products.map((product, index) => {
                         return (
                             <div
@@ -80,7 +76,7 @@ const BestRentedProducts = () => {
                                         {/* Badges */}
                                         <div className="absolute top-2 left-2 z-10">
                                             <span className="bg-[#FF4757] text-white text-[10px] md:text-xs font-bold px-2 py-0.5 rounded-full shadow-sm">
-                                                -20%
+                                                -20% off
                                             </span>
                                         </div>
 
@@ -90,7 +86,7 @@ const BestRentedProducts = () => {
                                         </button>
 
                                         {/* Image */}
-                                        <Link href={product.name.includes("MacBook") || product.name.includes("iPhone") ? "/products/macbook-pro-14-m4" : "/products"} className="w-full h-full flex items-center justify-center relative p-4 md:p-6">
+                                        <Link href={`/products/${product.id}`} className="w-full h-full flex items-center justify-center relative p-4 md:p-6">
                                             {product.image && product.image !== "/images/placeholder.png" ? (
                                                 <img src={product.image} alt={product.name} className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-500" />
                                             ) : (
@@ -100,40 +96,57 @@ const BestRentedProducts = () => {
                                                 </div>
                                             )}
                                         </Link>
-
-                                        {/* Overlay Button - Desktop Only or simplified on mobile */}
-                                        {/* <div className="hidden md:block absolute inset-x-4 bottom-4 translate-y-full opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300">
-                                        <Link
-                                            href="/categories"
-                                            className="block w-full py-2 bg-gray-900 text-white font-bold rounded-lg lg:rounded-xl shadow-lg hover:bg-black transition-colors text-center text-sm"
-                                        >
-                                            Rent Now
-                                        </Link>
-                                    </div> */}
                                     </div>
 
                                     {/* Content */}
-                                    <div className="flex flex-col flex-grow space-y-1 md:space-y-2">
-                                        <h3 className="text-sm md:text-lg font-bold text-gray-900 leading-snug line-clamp-2 min-h-[2.5rem] md:min-h-0">
+                                    <div className="flex flex-col flex-grow space-y-1.5 md:space-y-2">
+                                        <h3 className="text-xs md:text-lg font-bold text-gray-900 leading-snug line-clamp-2">
                                             {product.name}
                                         </h3>
 
-                                        <p className="hidden md:block text-xs text-gray-500 line-clamp-2 leading-relaxed">
-                                            {product.category} - High performance gear.
-                                        </p>
+                                        {/* Star Rating */}
+                                        <div className="flex items-center gap-1">
+                                            <FaStar size={12} className="text-[#FFC107]" />
+                                            <span className="text-xs font-semibold text-gray-700">{product.rating}</span>
+                                            <span className="text-[10px] text-gray-400">({product.reviews})</span>
+                                        </div>
 
-                                        <div className="pt-1 mt-auto">
-                                            <p className="text-xs md:text-sm text-gray-900 font-medium flex flex-wrap items-baseline gap-1.5 md:gap-2">
-                                                <span className="text-xs text-[#FF4757] font-bold text-sm md:text-base">₹{product.rentPrice}</span>
-                                                <span className="text-[10px] md:text-xs text-gray-400 line-through">₹{product.originalPrice}</span>
-                                                <span className="text-[10px] md:text-xs text-gray-500 font-normal">/mo</span>
-                                            </p>
+                                        {/* Price */}
+                                        <div className="flex flex-wrap items-baseline gap-1">
+                                            <span className="text-[10px] text-gray-500">from</span>
+                                            <span className="text-[10px] text-gray-400 line-through">₹{product.originalPrice}</span>
+                                            <span className="text-xs md:text-sm font-bold text-[#FF4757]">₹{product.rentPrice}</span>
+                                            <span className="text-[10px] text-gray-500">/month</span>
+                                        </div>
+
+                                        {/* Tags */}
+                                        <div className="flex flex-wrap gap-1 mt-1">
+                                            {product.tags && product.tags.map(tag => (
+                                                <span key={tag} className="text-[9px] md:text-[10px] px-1.5 py-0.5 rounded-full border border-gray-200 text-gray-500 font-medium">
+                                                    {tag}
+                                                </span>
+                                            ))}
+                                            {product.statusTags && product.statusTags.map(tag => (
+                                                <span key={tag} className="text-[9px] md:text-[10px] px-1.5 py-0.5 rounded-full border border-gray-200 text-gray-500 font-medium">
+                                                    {tag}
+                                                </span>
+                                            ))}
                                         </div>
                                     </div>
                                 </motion.div>
                             </div>
                         )
                     })}
+                </div>
+
+                {/* Mobile View All Button */}
+                <div className="mt-6 flex justify-center md:hidden">
+                    <Link
+                        href="/products"
+                        className="inline-flex items-center justify-center px-8 py-2.5 bg-[#FFC107] hover:bg-[#FFD54F] text-black font-bold rounded-full transition-all duration-300 shadow-sm"
+                    >
+                        View All
+                    </Link>
                 </div>
             </div>
         </section>

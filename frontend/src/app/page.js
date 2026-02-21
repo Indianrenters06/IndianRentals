@@ -13,9 +13,10 @@ export default function Home() {
     <main className="min-h-screen bg-gray-50">
       <Hero />
       <RentByCategory />
-      <BestRentedProducts />
-      <RentalProcess />
+      <BestRentedProducts title="Best Rented Products" />
       <FeatureSection />
+      <BestRentedProducts title="New Launches This Week" />
+      <RentalProcess />
       <WhyChooseUs />
       <Testimonials />
     </main>
