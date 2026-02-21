@@ -5,7 +5,7 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import { getCategories } from "../../services/categoryService";
 
-// Initial static structure to MATCH THE DESIGN EXACTLY
+// Initial static structure — matches the design
 const initialCategories = [
     {
         id: 1,
@@ -40,21 +40,20 @@ const initialCategories = [
 ];
 
 const CategoriesPage = () => {
-    // We will merge backend data into this structure
-    const [categories, setCategories] = useState(initialCategories.map(c => ({ ...c, image: c.defaultImage })));
+    const [categories, setCategories] = useState(
+        initialCategories.map(c => ({ ...c, image: c.defaultImage }))
+    );
 
     useEffect(() => {
         const fetchCategories = async () => {
             try {
                 const backendCategories = await getCategories();
 
-                // Merge logic: If backend has a category with a matching name (approx), use its image
                 const merged = initialCategories.map(staticCat => {
                     const found = backendCategories.find(bc =>
-                        bc.name.toLowerCase().includes(staticCat.title.toLowerCase().split(' ')[0]) || // Match 'Apple' in 'Apple Products'
+                        bc.name.toLowerCase().includes(staticCat.title.toLowerCase().split(' ')[0]) ||
                         (staticCat.title.includes('Camera') && bc.name.includes('Camera'))
                     );
-
                     if (found && found.image) {
                         return { ...staticCat, image: found.image };
                     }
@@ -64,7 +63,6 @@ const CategoriesPage = () => {
                 setCategories(merged);
             } catch (error) {
                 console.error("Failed to fetch categories", error);
-                // Fallback to static images if fetch fails
                 setCategories(initialCategories.map(c => ({ ...c, image: c.defaultImage })));
             }
         };
@@ -74,12 +72,14 @@ const CategoriesPage = () => {
 
     return (
         <div className="min-h-screen bg-white">
-            <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-                <div className="mb-16">
+            <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 pb-16 md:py-16">
+
+                {/* Page Header */}
+                <div className="mb-6 md:mb-16">
                     <motion.h1
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
-                        className="text-5xl font-bold text-gray-900 mb-6"
+                        className="text-3xl md:text-5xl font-bold text-gray-900 mb-3 md:mb-6"
                     >
                         All Categories
                     </motion.h1>
@@ -87,7 +87,7 @@ const CategoriesPage = () => {
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 0.1 }}
-                        className="text-lg text-gray-600 max-w-4xl leading-relaxed"
+                        className="text-sm md:text-lg text-gray-500 max-w-4xl leading-relaxed"
                     >
                         Lorem ipsum dolor sit amet consectetur. Vel libero cras laoreet ut dignissim eget.
                         Scelerisque mauris pharetra tristique cras sit malesuada. Egestas pulvinar interdum sapien et.
@@ -95,41 +95,39 @@ const CategoriesPage = () => {
                     </motion.p>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                {/* Category Grid — 2 cols on mobile, 3 cols on desktop */}
+                <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-8">
                     {categories.map((category, index) => (
                         <motion.div
                             key={category.id}
                             initial={{ opacity: 0, y: 30 }}
                             animate={{ opacity: 1, y: 0 }}
-                            transition={{ delay: index * 0.1 + 0.2 }}
+                            transition={{ delay: index * 0.08 + 0.1 }}
                         >
-                            <Link href={category.href} className="group block h-full">
-                                <div className="bg-gray-50 rounded-[2.5rem] overflow-hidden border border-gray-100 hover:shadow-xl transition-all duration-300 h-full flex flex-col p-6">
-                                    <div className="relative h-56 w-full flex items-center justify-center mb-4 overflow-hidden rounded-2xl bg-white">
-                                        {/* Image Container with hover effect */}
-                                        <div className="relative w-full h-full transform group-hover:scale-105 transition-transform duration-500">
-                                            {category.image ? (
-                                                <Image
-                                                    src={category.image}
-                                                    alt={category.title}
-                                                    fill
-                                                    className="object-contain"
-                                                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                                                />
-                                            ) : (
-                                                <div className="w-full h-full flex items-center justify-center bg-gray-100 text-gray-400">
-                                                    <span className="text-sm">No Image</span>
-                                                </div>
-                                            )}
-                                        </div>
-                                    </div>
-
-                                    <div className="p-4 text-center">
-                                        <h3 className="text-xl font-bold text-gray-900 group-hover:text-[#00A8FF] transition-colors">
-                                            {category.title}
-                                        </h3>
+                            <Link href={category.href} className="group block">
+                                {/* Card — image only, no label inside */}
+                                <div className="bg-gray-50 rounded-2xl md:rounded-[2rem] overflow-hidden border border-gray-100 hover:shadow-lg transition-all duration-300 aspect-[4/3] relative flex items-center justify-center">
+                                    <div className="relative w-full h-full transform group-hover:scale-105 transition-transform duration-500 p-4 md:p-6">
+                                        {category.image ? (
+                                            <Image
+                                                src={category.image}
+                                                alt={category.title}
+                                                fill
+                                                className="object-contain p-3 md:p-6"
+                                                sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
+                                            />
+                                        ) : (
+                                            <div className="w-full h-full flex items-center justify-center text-gray-300">
+                                                <span className="text-xs">No Image</span>
+                                            </div>
+                                        )}
                                     </div>
                                 </div>
+
+                                {/* Category name — below the card */}
+                                <p className="mt-2 md:mt-3 text-sm md:text-base font-medium text-gray-800 text-center group-hover:text-gray-600 transition-colors">
+                                    {category.title}
+                                </p>
                             </Link>
                         </motion.div>
                     ))}
