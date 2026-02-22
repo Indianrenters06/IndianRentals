@@ -5,6 +5,14 @@ import {
     FiPlus, FiEdit2, FiTrash2, FiSearch,
     FiDownload, FiX, FiPackage
 } from 'react-icons/fi';
+import {
+    Button,
+    Input,
+    Select,
+    SelectItem,
+    Chip,
+    Tooltip
+} from "@heroui/react";
 import { API_BASE_URL } from '../../../services/apiConfig';
 
 // ─── Helper: build auth headers from localStorage ───────────────────────────
@@ -418,49 +426,54 @@ export default function ProductsManagement() {
                             <p className="text-sm text-gray-600 mt-1">Manage your rental inventory</p>
                         </div>
                         <div className="flex items-center gap-3">
-                            <button className="flex items-center gap-2 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg font-medium hover:bg-gray-50 transition-colors">
-                                <FiDownload className="w-4 h-4" /> Export
-                            </button>
-                            <button
-                                onClick={() => { resetForm(); setShowAddModal(true); }}
-                                className="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-lg font-medium hover:bg-indigo-700 transition-colors"
+                            <Button variant="bordered" startContent={<FiDownload className="w-4 h-4" />}>
+                                Export
+                            </Button>
+                            <Button
+                                color="primary"
+                                onPress={() => { resetForm(); setShowAddModal(true); }}
+                                startContent={<FiPlus className="w-4 h-4" />}
                             >
-                                <FiPlus className="w-4 h-4" /> Add Product
-                            </button>
+                                Add Product
+                            </Button>
                         </div>
                     </div>
 
                     {/* Filters */}
                     <div className="flex items-center gap-4 mt-6">
                         <div className="flex-1 max-w-md relative">
-                            <FiSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-                            <input
+                            <Input
                                 type="text"
                                 placeholder="Search products..."
                                 value={searchTerm}
-                                onChange={(e) => setSearchTerm(e.target.value)}
-                                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                                onValueChange={setSearchTerm}
+                                startContent={<FiSearch className="text-gray-400 w-5 h-5 pointer-events-none" />}
+                                classNames={{
+                                    inputWrapper: "bg-white border-1 border-gray-300 shadow-none",
+                                }}
                             />
                         </div>
-                        <select
-                            value={filterCategory}
-                            onChange={(e) => setFilterCategory(e.target.value)}
-                            className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                        <Select
+                            selectedKeys={[filterCategory]}
+                            onSelectionChange={(keys) => setFilterCategory(Array.from(keys)[0])}
+                            className="w-48"
+                            aria-label="Filter Category"
+                            classNames={{
+                                trigger: "bg-white border-1 border-gray-300 shadow-none",
+                            }}
                         >
-                            <option value="all">All Categories</option>
+                            <SelectItem key="all" value="all">All Categories</SelectItem>
                             {categories.length > 0
-                                ? categories.map((c) => <option key={c._id} value={c.name}>{c.name}</option>)
-                                : (
-                                    <>
-                                        <option value="Apple">Apple</option>
-                                        <option value="IT Products">IT Products</option>
-                                        <option value="DSLR">DSLR</option>
-                                        <option value="AV Products">AV Products</option>
-                                        <option value="Office Equipment">Office Equipment</option>
-                                    </>
-                                )
+                                ? categories.map((c) => <SelectItem key={c.name} value={c.name}>{c.name}</SelectItem>)
+                                : [
+                                    <SelectItem key="Apple" value="Apple">Apple</SelectItem>,
+                                    <SelectItem key="IT Products" value="IT Products">IT Products</SelectItem>,
+                                    <SelectItem key="DSLR" value="DSLR">DSLR</SelectItem>,
+                                    <SelectItem key="AV Products" value="AV Products">AV Products</SelectItem>,
+                                    <SelectItem key="Office Equipment" value="Office Equipment">Office Equipment</SelectItem>
+                                ]
                             }
-                        </select>
+                        </Select>
                     </div>
                 </div>
             </div>
@@ -509,15 +522,15 @@ export default function ProductsManagement() {
                                             </div>
                                         </td>
                                         <td className="py-4 px-6">
-                                            <span className="px-3 py-1 text-xs font-medium bg-indigo-100 text-indigo-700 rounded-full">
+                                            <Chip color="primary" variant="flat" size="sm">
                                                 {product.category}
-                                            </span>
+                                            </Chip>
                                         </td>
                                         <td className="py-4 px-6">
                                             {product.subcategory?.name ? (
-                                                <span className="px-3 py-1 text-xs font-medium bg-purple-100 text-purple-700 rounded-full">
+                                                <Chip color="secondary" variant="flat" size="sm">
                                                     {product.subcategory.name}
-                                                </span>
+                                                </Chip>
                                             ) : (
                                                 <span className="text-xs text-gray-400">—</span>
                                             )}
@@ -526,9 +539,9 @@ export default function ProductsManagement() {
                                             <span className="font-semibold text-gray-900">₹{product.rentalPrice?.toLocaleString()}</span>
                                         </td>
                                         <td className="py-4 px-6">
-                                            <span className={`px-3 py-1 text-xs font-medium rounded-full ${product.stock > 5 ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
+                                            <Chip color={product.stock > 5 ? "success" : "danger"} variant="flat" size="sm">
                                                 {product.stock} units
-                                            </span>
+                                            </Chip>
                                         </td>
                                         <td className="py-4 px-6">
                                             <span className="text-sm text-gray-700">{product.condition}</span>
@@ -541,12 +554,16 @@ export default function ProductsManagement() {
                                         </td>
                                         <td className="py-4 px-6">
                                             <div className="flex items-center gap-2">
-                                                <button onClick={() => openEditModal(product)} className="p-2 hover:bg-indigo-50 text-indigo-600 rounded-lg transition-colors" title="Edit">
-                                                    <FiEdit2 className="w-4 h-4" />
-                                                </button>
-                                                <button onClick={() => handleDeleteProduct(product._id)} className="p-2 hover:bg-red-50 text-red-600 rounded-lg transition-colors" title="Delete">
-                                                    <FiTrash2 className="w-4 h-4" />
-                                                </button>
+                                                <Tooltip content="Edit">
+                                                    <Button isIconOnly variant="light" color="primary" size="sm" onPress={() => openEditModal(product)}>
+                                                        <FiEdit2 className="w-4 h-4" />
+                                                    </Button>
+                                                </Tooltip>
+                                                <Tooltip content="Delete">
+                                                    <Button isIconOnly variant="light" color="danger" size="sm" onPress={() => handleDeleteProduct(product._id)}>
+                                                        <FiTrash2 className="w-4 h-4" />
+                                                    </Button>
+                                                </Tooltip>
                                             </div>
                                         </td>
                                     </tr>
