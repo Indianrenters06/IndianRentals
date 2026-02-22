@@ -2,40 +2,50 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
 import {
-    FiPlus, FiEdit2, FiTrash2, FiSearch, FiFilter,
-    FiDownload, FiUpload, FiEye, FiMoreVertical, FiX, FiPackage
+    FiPlus, FiEdit2, FiTrash2, FiSearch,
+    FiDownload, FiX, FiPackage
 } from 'react-icons/fi';
+import { API_BASE_URL } from '../../../services/apiConfig';
 
-// Memoized ProductModal to prevent re-renders
-const ProductModal = React.memo(({ show, onClose, onSubmit, title, isEdit = false, formData, onInputChange }) => {
+// ─── Helper: build auth headers from localStorage ───────────────────────────
+function authHeaders() {
+    const userInfo = JSON.parse(localStorage.getItem('userInfo') || '{}');
+    return {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${userInfo.token || ''}`,
+    };
+}
+
+// ─── Product Modal ───────────────────────────────────────────────────────────
+const ProductModal = React.memo(({ show, onClose, onSubmit, title, isEdit = false, formData, onInputChange, categories }) => {
     if (!show) return null;
+
+    // Filter subcategories based on selected category
+    const parentCategory = categories.find(
+        (c) => c.name === formData.category
+    );
+    const subcategoryOptions = parentCategory?.subcategories || [];
 
     return (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
             <div className="bg-white rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
-                {/* Modal Header */}
+                {/* Header */}
                 <div className="sticky top-0 bg-white border-b border-gray-200 px-8 py-6 flex items-center justify-between rounded-t-2xl">
                     <h2 className="text-2xl font-bold text-gray-900">{title}</h2>
-                    <button
-                        onClick={onClose}
-                        type="button"
-                        className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-                    >
+                    <button onClick={onClose} type="button" className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
                         <FiX className="w-6 h-6 text-gray-500" />
                     </button>
                 </div>
 
-                {/* Modal Body */}
+                {/* Body */}
                 <form onSubmit={onSubmit} className="p-8">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+
                         {/* Product Name */}
                         <div className="md:col-span-2">
-                            <label className="block text-sm font-semibold text-gray-700 mb-2">
-                                Product Name *
-                            </label>
+                            <label className="block text-sm font-semibold text-gray-700 mb-2">Product Name *</label>
                             <input
-                                type="text"
-                                required
+                                type="text" required
                                 value={formData.name}
                                 onChange={(e) => onInputChange('name', e.target.value)}
                                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
@@ -45,12 +55,9 @@ const ProductModal = React.memo(({ show, onClose, onSubmit, title, isEdit = fals
 
                         {/* Description */}
                         <div className="md:col-span-2">
-                            <label className="block text-sm font-semibold text-gray-700 mb-2">
-                                Description *
-                            </label>
+                            <label className="block text-sm font-semibold text-gray-700 mb-2">Description *</label>
                             <textarea
-                                required
-                                rows="4"
+                                required rows="4"
                                 value={formData.description}
                                 onChange={(e) => onInputChange('description', e.target.value)}
                                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
@@ -60,29 +67,59 @@ const ProductModal = React.memo(({ show, onClose, onSubmit, title, isEdit = fals
 
                         {/* Category */}
                         <div>
-                            <label className="block text-sm font-semibold text-gray-700 mb-2">
-                                Category *
-                            </label>
+                            <label className="block text-sm font-semibold text-gray-700 mb-2">Category *</label>
                             <select
                                 required
                                 value={formData.category}
-                                onChange={(e) => onInputChange('category', e.target.value)}
+                                onChange={(e) => {
+                                    onInputChange('category', e.target.value);
+                                    onInputChange('subcategory', ''); // Reset subcategory on category change
+                                }}
                                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
                             >
                                 <option value="">Select Category</option>
-                                <option value="Apple">Apple</option>
-                                <option value="IT Products">IT Products</option>
-                                <option value="DSLR">DSLR</option>
-                                <option value="AV Products">AV Products</option>
-                                <option value="Office Equipment">Office Equipment</option>
+                                {categories.map((cat) => (
+                                    <option key={cat._id} value={cat.name}>{cat.name}</option>
+                                ))}
+                                {/* Static fallback options in case DB has none */}
+                                {categories.length === 0 && (
+                                    <>
+                                        <option value="Apple">Apple</option>
+                                        <option value="IT Products">IT Products</option>
+                                        <option value="DSLR">DSLR</option>
+                                        <option value="AV Products">AV Products</option>
+                                        <option value="Office Equipment">Office Equipment</option>
+                                    </>
+                                )}
+                            </select>
+                        </div>
+
+                        {/* Subcategory */}
+                        <div>
+                            <label className="block text-sm font-semibold text-gray-700 mb-2">
+                                Subcategory
+                                {subcategoryOptions.length === 0 && formData.category && (
+                                    <span className="ml-2 text-xs font-normal text-amber-500">
+                                        (No subcategories yet — add them first)
+                                    </span>
+                                )}
+                            </label>
+                            <select
+                                value={formData.subcategory}
+                                onChange={(e) => onInputChange('subcategory', e.target.value)}
+                                disabled={subcategoryOptions.length === 0}
+                                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all disabled:bg-gray-50 disabled:text-gray-400"
+                            >
+                                <option value="">None (Top-level only)</option>
+                                {subcategoryOptions.map((sub) => (
+                                    <option key={sub._id} value={sub._id}>{sub.name}</option>
+                                ))}
                             </select>
                         </div>
 
                         {/* Brand */}
                         <div>
-                            <label className="block text-sm font-semibold text-gray-700 mb-2">
-                                Brand
-                            </label>
+                            <label className="block text-sm font-semibold text-gray-700 mb-2">Brand</label>
                             <input
                                 type="text"
                                 value={formData.brand}
@@ -94,12 +131,9 @@ const ProductModal = React.memo(({ show, onClose, onSubmit, title, isEdit = fals
 
                         {/* Rental Price */}
                         <div>
-                            <label className="block text-sm font-semibold text-gray-700 mb-2">
-                                Rental Price (₹/month) *
-                            </label>
+                            <label className="block text-sm font-semibold text-gray-700 mb-2">Rental Price (₹/month) *</label>
                             <input
-                                type="number"
-                                required
+                                type="number" required
                                 value={formData.rentalPrice}
                                 onChange={(e) => onInputChange('rentalPrice', e.target.value)}
                                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
@@ -109,12 +143,9 @@ const ProductModal = React.memo(({ show, onClose, onSubmit, title, isEdit = fals
 
                         {/* Security Deposit */}
                         <div>
-                            <label className="block text-sm font-semibold text-gray-700 mb-2">
-                                Security Deposit (₹) *
-                            </label>
+                            <label className="block text-sm font-semibold text-gray-700 mb-2">Security Deposit (₹) *</label>
                             <input
-                                type="number"
-                                required
+                                type="number" required
                                 value={formData.securityDeposit}
                                 onChange={(e) => onInputChange('securityDeposit', e.target.value)}
                                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
@@ -124,12 +155,9 @@ const ProductModal = React.memo(({ show, onClose, onSubmit, title, isEdit = fals
 
                         {/* Stock */}
                         <div>
-                            <label className="block text-sm font-semibold text-gray-700 mb-2">
-                                Stock Quantity *
-                            </label>
+                            <label className="block text-sm font-semibold text-gray-700 mb-2">Stock Quantity *</label>
                             <input
-                                type="number"
-                                required
+                                type="number" required
                                 value={formData.stock}
                                 onChange={(e) => onInputChange('stock', e.target.value)}
                                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
@@ -139,9 +167,7 @@ const ProductModal = React.memo(({ show, onClose, onSubmit, title, isEdit = fals
 
                         {/* Condition */}
                         <div>
-                            <label className="block text-sm font-semibold text-gray-700 mb-2">
-                                Condition *
-                            </label>
+                            <label className="block text-sm font-semibold text-gray-700 mb-2">Condition *</label>
                             <select
                                 required
                                 value={formData.condition}
@@ -156,12 +182,9 @@ const ProductModal = React.memo(({ show, onClose, onSubmit, title, isEdit = fals
 
                         {/* City */}
                         <div>
-                            <label className="block text-sm font-semibold text-gray-700 mb-2">
-                                City *
-                            </label>
+                            <label className="block text-sm font-semibold text-gray-700 mb-2">City *</label>
                             <input
-                                type="text"
-                                required
+                                type="text" required
                                 value={formData.city}
                                 onChange={(e) => onInputChange('city', e.target.value)}
                                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
@@ -171,33 +194,38 @@ const ProductModal = React.memo(({ show, onClose, onSubmit, title, isEdit = fals
 
                         {/* State */}
                         <div>
-                            <label className="block text-sm font-semibold text-gray-700 mb-2">
-                                State *
-                            </label>
+                            <label className="block text-sm font-semibold text-gray-700 mb-2">State *</label>
                             <input
-                                type="text"
-                                required
+                                type="text" required
                                 value={formData.state}
                                 onChange={(e) => onInputChange('state', e.target.value)}
                                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
                                 placeholder="Maharashtra"
                             />
                         </div>
+
+                        {/* Image URLs */}
+                        <div className="md:col-span-2">
+                            <label className="block text-sm font-semibold text-gray-700 mb-2">
+                                Image URLs
+                                <span className="text-xs font-normal text-gray-400 ml-2">(comma-separated Cloudinary URLs)</span>
+                            </label>
+                            <input
+                                type="text"
+                                value={(formData.images || []).join(', ')}
+                                onChange={(e) => onInputChange('images', e.target.value.split(',').map((s) => s.trim()).filter(Boolean))}
+                                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
+                                placeholder="https://res.cloudinary.com/..."
+                            />
+                        </div>
                     </div>
 
-                    {/* Action Buttons */}
+                    {/* Buttons */}
                     <div className="flex items-center justify-end gap-3 mt-8 pt-6 border-t border-gray-200">
-                        <button
-                            type="button"
-                            onClick={onClose}
-                            className="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg font-medium hover:bg-gray-50 transition-colors"
-                        >
+                        <button type="button" onClick={onClose} className="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg font-medium hover:bg-gray-50 transition-colors">
                             Cancel
                         </button>
-                        <button
-                            type="submit"
-                            className="px-6 py-3 bg-indigo-600 text-white rounded-lg font-medium hover:bg-indigo-700 transition-colors"
-                        >
+                        <button type="submit" className="px-6 py-3 bg-indigo-600 text-white rounded-lg font-medium hover:bg-indigo-700 transition-colors">
                             {isEdit ? 'Update Product' : 'Add Product'}
                         </button>
                     </div>
@@ -209,8 +237,10 @@ const ProductModal = React.memo(({ show, onClose, onSubmit, title, isEdit = fals
 
 ProductModal.displayName = 'ProductModal';
 
+// ─── Main Component ──────────────────────────────────────────────────────────
 export default function ProductsManagement() {
     const [products, setProducts] = useState([]);
+    const [categories, setCategories] = useState([]);
     const [loading, setLoading] = useState(true);
     const [showAddModal, setShowAddModal] = useState(false);
     const [showEditModal, setShowEditModal] = useState(false);
@@ -218,132 +248,119 @@ export default function ProductsManagement() {
     const [searchTerm, setSearchTerm] = useState('');
     const [filterCategory, setFilterCategory] = useState('all');
 
-    const [formData, setFormData] = useState({
-        name: '',
-        description: '',
-        category: '',
-        brand: '',
-        rentalPrice: '',
-        securityDeposit: '',
-        stock: '',
-        condition: 'Good',
-        city: '',
-        state: '',
-        images: []
-    });
+    const emptyForm = {
+        name: '', description: '', category: '', subcategory: '',
+        brand: '', rentalPrice: '', securityDeposit: '',
+        stock: '', condition: 'Good', city: '', state: '', images: []
+    };
+    const [formData, setFormData] = useState(emptyForm);
 
-    // Helper function to handle input changes - memoized to prevent re-renders
     const handleInputChange = useCallback((field, value) => {
-        setFormData(prev => ({
-            ...prev,
-            [field]: value
-        }));
+        setFormData((prev) => ({ ...prev, [field]: value }));
     }, []);
 
     useEffect(() => {
         fetchProducts();
+        fetchCategories();
     }, []);
 
+    // ── Fetch functions ──────────────────────────────────────────────────────
 
     const fetchProducts = async () => {
         try {
-            const response = await fetch('http://localhost:5000/api/products');
-            const data = await response.json();
-            setProducts(Array.isArray(data) ? data : []);
-            setLoading(false);
-        } catch (error) {
-            console.error('Error fetching products:', error);
+            const res = await fetch(`${API_BASE_URL}/api/products`);
+            const data = await res.json();
+            setProducts(Array.isArray(data) ? data : (data.products || []));
+        } catch (err) {
+            console.error('Error fetching products:', err);
             setProducts([]);
+        } finally {
             setLoading(false);
         }
     };
 
+    const fetchCategories = async () => {
+        try {
+            // Fetch the full tree so we can show subcategory options per category
+            const res = await fetch(`${API_BASE_URL}/api/categories/tree`);
+            const data = await res.json();
+            setCategories(Array.isArray(data) ? data : []);
+        } catch (err) {
+            console.error('Error fetching categories:', err);
+        }
+    };
+
+    // ── CRUD ─────────────────────────────────────────────────────────────────
+
     const handleAddProduct = async (e) => {
-        console.log('🚀 handleAddProduct called!', e);
         e.preventDefault();
         try {
-            const userInfo = JSON.parse(localStorage.getItem('userInfo') || '{}');
-            const token = userInfo.token;
-
-            console.log('📦 Adding product:', formData);
-            console.log('🔑 Token present:', !!token);
-
-            const response = await fetch('http://localhost:5000/api/admin/products', {
+            const payload = {
+                ...formData,
+                subcategory: formData.subcategory || null,
+            };
+            const res = await fetch(`${API_BASE_URL}/api/admin/products`, {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
-                },
-                body: JSON.stringify(formData)
+                headers: authHeaders(),
+                body: JSON.stringify(payload),
             });
-
-            if (response.ok) {
-                fetchProducts();
+            if (res.ok) {
+                await fetchProducts();
                 setShowAddModal(false);
                 resetForm();
-                alert('Product added successfully!');
+                alert('✅ Product added successfully!');
             } else {
-                const error = await response.json();
-                alert(`Error: ${error.message || 'Failed to add product'}`);
+                const err = await res.json();
+                alert(`❌ Error: ${err.message || 'Failed to add product'}`);
             }
-        } catch (error) {
-            console.error('Error adding product:', error);
-            alert(`Failed to add product: ${error.message}. Check console for details.`);
+        } catch (err) {
+            console.error('Error adding product:', err);
+            alert('Failed to add product. Check console.');
         }
     };
 
     const handleEditProduct = async (e) => {
         e.preventDefault();
         try {
-            const userInfo = JSON.parse(localStorage.getItem('userInfo') || '{}');
-            const token = userInfo.token;
-
-            const response = await fetch(`http://localhost:5000/api/admin/products/${selectedProduct._id}`, {
+            const payload = {
+                ...formData,
+                subcategory: formData.subcategory || '',
+            };
+            const res = await fetch(`${API_BASE_URL}/api/admin/products/${selectedProduct._id}`, {
                 method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
-                },
-                body: JSON.stringify(formData)
+                headers: authHeaders(),
+                body: JSON.stringify(payload),
             });
-
-            if (response.ok) {
-                fetchProducts();
+            if (res.ok) {
+                await fetchProducts();
                 setShowEditModal(false);
                 resetForm();
-                alert('Product updated successfully!');
+                alert('✅ Product updated successfully!');
             } else {
-                const error = await response.json();
-                alert(`Error: ${error.message || 'Failed to update product'}`);
+                const err = await res.json();
+                alert(`❌ Error: ${err.message || 'Failed to update product'}`);
             }
-        } catch (error) {
-            console.error('Error updating product:', error);
+        } catch (err) {
+            console.error('Error updating product:', err);
         }
     };
 
     const handleDeleteProduct = async (productId) => {
         if (!confirm('Are you sure you want to delete this product?')) return;
-
         try {
-            const userInfo = JSON.parse(localStorage.getItem('userInfo') || '{}');
-            const token = userInfo.token;
-
-            const response = await fetch(`http://localhost:5000/api/admin/products/${productId}`, {
+            const res = await fetch(`${API_BASE_URL}/api/admin/products/${productId}`, {
                 method: 'DELETE',
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                }
+                headers: authHeaders(),
             });
-
-            if (response.ok) {
-                fetchProducts();
-                alert('Product deleted successfully!');
+            if (res.ok) {
+                await fetchProducts();
+                alert('✅ Product deleted successfully!');
             } else {
-                const error = await response.json();
-                alert(`Error: ${error.message || 'Failed to delete product'}`);
+                const err = await res.json();
+                alert(`❌ Error: ${err.message || 'Failed to delete product'}`);
             }
-        } catch (error) {
-            console.error('Error deleting product:', error);
+        } catch (err) {
+            console.error('Error deleting product:', err);
         }
     };
 
@@ -353,6 +370,7 @@ export default function ProductsManagement() {
             name: product.name,
             description: product.description,
             category: product.category,
+            subcategory: product.subcategory?._id || product.subcategory || '',
             brand: product.brand || '',
             rentalPrice: product.rentalPrice,
             securityDeposit: product.securityDeposit,
@@ -360,40 +378,31 @@ export default function ProductsManagement() {
             condition: product.condition,
             city: product.city,
             state: product.state,
-            images: product.images || []
+            images: product.images || [],
         });
         setShowEditModal(true);
     };
 
     const resetForm = () => {
-        setFormData({
-            name: '',
-            description: '',
-            category: '',
-            brand: '',
-            rentalPrice: '',
-            securityDeposit: '',
-            stock: '',
-            condition: 'Good',
-            city: '',
-            state: '',
-            images: []
-        });
+        setFormData(emptyForm);
         setSelectedProduct(null);
     };
 
-    const filteredProducts = products.filter(product => {
-        const matchesSearch = product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            product.category.toLowerCase().includes(searchTerm.toLowerCase());
-        const matchesCategory = filterCategory === 'all' || product.category === filterCategory;
+    // ── Filtered list ─────────────────────────────────────────────────────────
+
+    const filteredProducts = products.filter((p) => {
+        const matchesSearch =
+            p.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            p.category?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            p.brand?.toLowerCase().includes(searchTerm.toLowerCase());
+        const matchesCategory = filterCategory === 'all' || p.category === filterCategory;
         return matchesSearch && matchesCategory;
     });
-
 
     if (loading) {
         return (
             <div className="flex items-center justify-center h-screen">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600" />
             </div>
         );
     }
@@ -410,18 +419,13 @@ export default function ProductsManagement() {
                         </div>
                         <div className="flex items-center gap-3">
                             <button className="flex items-center gap-2 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg font-medium hover:bg-gray-50 transition-colors">
-                                <FiDownload className="w-4 h-4" />
-                                Export
+                                <FiDownload className="w-4 h-4" /> Export
                             </button>
                             <button
-                                onClick={() => {
-                                    console.log('➕ Add Product button clicked');
-                                    setShowAddModal(true);
-                                }}
+                                onClick={() => { resetForm(); setShowAddModal(true); }}
                                 className="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-lg font-medium hover:bg-indigo-700 transition-colors"
                             >
-                                <FiPlus className="w-4 h-4" />
-                                Add Product
+                                <FiPlus className="w-4 h-4" /> Add Product
                             </button>
                         </div>
                     </div>
@@ -444,11 +448,18 @@ export default function ProductsManagement() {
                             className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
                         >
                             <option value="all">All Categories</option>
-                            <option value="Apple">Apple</option>
-                            <option value="IT Products">IT Products</option>
-                            <option value="DSLR">DSLR</option>
-                            <option value="AV Products">AV Products</option>
-                            <option value="Office Equipment">Office Equipment</option>
+                            {categories.length > 0
+                                ? categories.map((c) => <option key={c._id} value={c.name}>{c.name}</option>)
+                                : (
+                                    <>
+                                        <option value="Apple">Apple</option>
+                                        <option value="IT Products">IT Products</option>
+                                        <option value="DSLR">DSLR</option>
+                                        <option value="AV Products">AV Products</option>
+                                        <option value="Office Equipment">Office Equipment</option>
+                                    </>
+                                )
+                            }
                         </select>
                     </div>
                 </div>
@@ -461,11 +472,9 @@ export default function ProductsManagement() {
                         <table className="w-full">
                             <thead className="bg-gray-50 border-b border-gray-200">
                                 <tr>
-                                    <th className="text-left py-4 px-6 text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                                        <input type="checkbox" className="rounded border-gray-300" />
-                                    </th>
                                     <th className="text-left py-4 px-6 text-xs font-semibold text-gray-600 uppercase tracking-wider">Product</th>
                                     <th className="text-left py-4 px-6 text-xs font-semibold text-gray-600 uppercase tracking-wider">Category</th>
+                                    <th className="text-left py-4 px-6 text-xs font-semibold text-gray-600 uppercase tracking-wider">Subcategory</th>
                                     <th className="text-left py-4 px-6 text-xs font-semibold text-gray-600 uppercase tracking-wider">Price/Month</th>
                                     <th className="text-left py-4 px-6 text-xs font-semibold text-gray-600 uppercase tracking-wider">Stock</th>
                                     <th className="text-left py-4 px-6 text-xs font-semibold text-gray-600 uppercase tracking-wider">Condition</th>
@@ -474,14 +483,19 @@ export default function ProductsManagement() {
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-gray-100">
+                                {filteredProducts.length === 0 && (
+                                    <tr>
+                                        <td colSpan={8} className="py-16 text-center text-gray-400">
+                                            <FiPackage size={36} className="mx-auto mb-3 text-gray-200" />
+                                            No products found.
+                                        </td>
+                                    </tr>
+                                )}
                                 {filteredProducts.map((product) => (
                                     <tr key={product._id} className="hover:bg-gray-50 transition-colors">
                                         <td className="py-4 px-6">
-                                            <input type="checkbox" className="rounded border-gray-300" />
-                                        </td>
-                                        <td className="py-4 px-6">
                                             <div className="flex items-center gap-3">
-                                                <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center overflow-hidden">
+                                                <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center overflow-hidden flex-shrink-0">
                                                     {product.images?.[0] ? (
                                                         <img src={product.images[0]} alt={product.name} className="w-full h-full object-cover" />
                                                     ) : (
@@ -500,11 +514,19 @@ export default function ProductsManagement() {
                                             </span>
                                         </td>
                                         <td className="py-4 px-6">
+                                            {product.subcategory?.name ? (
+                                                <span className="px-3 py-1 text-xs font-medium bg-purple-100 text-purple-700 rounded-full">
+                                                    {product.subcategory.name}
+                                                </span>
+                                            ) : (
+                                                <span className="text-xs text-gray-400">—</span>
+                                            )}
+                                        </td>
+                                        <td className="py-4 px-6">
                                             <span className="font-semibold text-gray-900">₹{product.rentalPrice?.toLocaleString()}</span>
                                         </td>
                                         <td className="py-4 px-6">
-                                            <span className={`px-3 py-1 text-xs font-medium rounded-full ${product.stock > 5 ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'
-                                                }`}>
+                                            <span className={`px-3 py-1 text-xs font-medium rounded-full ${product.stock > 5 ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
                                                 {product.stock} units
                                             </span>
                                         </td>
@@ -519,18 +541,10 @@ export default function ProductsManagement() {
                                         </td>
                                         <td className="py-4 px-6">
                                             <div className="flex items-center gap-2">
-                                                <button
-                                                    onClick={() => openEditModal(product)}
-                                                    className="p-2 hover:bg-indigo-50 text-indigo-600 rounded-lg transition-colors"
-                                                    title="Edit"
-                                                >
+                                                <button onClick={() => openEditModal(product)} className="p-2 hover:bg-indigo-50 text-indigo-600 rounded-lg transition-colors" title="Edit">
                                                     <FiEdit2 className="w-4 h-4" />
                                                 </button>
-                                                <button
-                                                    onClick={() => handleDeleteProduct(product._id)}
-                                                    className="p-2 hover:bg-red-50 text-red-600 rounded-lg transition-colors"
-                                                    title="Delete"
-                                                >
+                                                <button onClick={() => handleDeleteProduct(product._id)} className="p-2 hover:bg-red-50 text-red-600 rounded-lg transition-colors" title="Delete">
                                                     <FiTrash2 className="w-4 h-4" />
                                                 </button>
                                             </div>
@@ -541,48 +555,36 @@ export default function ProductsManagement() {
                         </table>
                     </div>
 
-                    {/* Pagination */}
+                    {/* Footer */}
                     <div className="border-t border-gray-200 px-6 py-4 flex items-center justify-between">
                         <p className="text-sm text-gray-600">
                             Showing <span className="font-semibold">{filteredProducts.length}</span> of <span className="font-semibold">{products.length}</span> products
                         </p>
-                        <div className="flex items-center gap-2">
-                            <button className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg font-medium hover:bg-gray-50 transition-colors">
-                                Previous
-                            </button>
-                            <button className="px-4 py-2 bg-indigo-600 text-white rounded-lg font-medium hover:bg-indigo-700 transition-colors">
-                                Next
-                            </button>
-                        </div>
                     </div>
                 </div>
             </div>
 
-            {/* Add Product Modal */}
+            {/* Add Modal */}
             <ProductModal
                 show={showAddModal}
-                onClose={() => {
-                    setShowAddModal(false);
-                    resetForm();
-                }}
+                onClose={() => { setShowAddModal(false); resetForm(); }}
                 onSubmit={handleAddProduct}
                 title="Add New Product"
                 formData={formData}
                 onInputChange={handleInputChange}
+                categories={categories}
             />
 
-            {/* Edit Product Modal */}
+            {/* Edit Modal */}
             <ProductModal
                 show={showEditModal}
-                onClose={() => {
-                    setShowEditModal(false);
-                    resetForm();
-                }}
+                onClose={() => { setShowEditModal(false); resetForm(); }}
                 onSubmit={handleEditProduct}
                 title="Edit Product"
                 isEdit={true}
                 formData={formData}
                 onInputChange={handleInputChange}
+                categories={categories}
             />
         </div>
     );

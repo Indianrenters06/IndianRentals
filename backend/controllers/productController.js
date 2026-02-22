@@ -54,8 +54,14 @@ const getProducts = asyncHandler(async (req, res) => {
         query.state = { $regex: req.query.state, $options: 'i' };
     }
 
+    // Filter by Subcategory ID (e.g., ?subcategory=<ObjectId>)
+    if (req.query.subcategory) {
+        query.subcategory = req.query.subcategory;
+    }
+
     const count = await Product.countDocuments(query);
     const products = await Product.find(query)
+        .populate('subcategory', 'name slug')
         .limit(PAGE_SIZE)
         .skip(PAGE_SIZE * (page - 1));
 
@@ -66,7 +72,7 @@ const getProducts = asyncHandler(async (req, res) => {
 // @route   GET /api/products/:id
 // @access  Public
 const getProductById = asyncHandler(async (req, res) => {
-    const product = await Product.findById(req.params.id);
+    const product = await Product.findById(req.params.id).populate('subcategory', 'name slug');
 
     if (product) {
         res.json(product);
@@ -84,6 +90,7 @@ const createProduct = asyncHandler(async (req, res) => {
         name,
         description,
         category,
+        subcategory,
         brand,
         images,
         rentalPrice,
@@ -96,12 +103,13 @@ const createProduct = asyncHandler(async (req, res) => {
 
     // Check if category exists, if not create it
     if (category) {
-        const categoryExists = await Category.findOne({ name: category });
+        const categoryExists = await Category.findOne({ name: category, parent: null });
         if (!categoryExists) {
             await Category.create({
                 name: category,
                 description: `${category} category`,
                 isActive: true,
+                parent: null,
             });
         }
     }
@@ -110,6 +118,7 @@ const createProduct = asyncHandler(async (req, res) => {
         name,
         description,
         category,
+        subcategory: subcategory || null,
         brand,
         images,
         rentalPrice,
@@ -121,6 +130,7 @@ const createProduct = asyncHandler(async (req, res) => {
     });
 
     const createdProduct = await product.save();
+    await createdProduct.populate('subcategory', 'name slug');
     res.status(201).json(createdProduct);
 });
 
@@ -132,6 +142,7 @@ const updateProduct = asyncHandler(async (req, res) => {
         name,
         description,
         category,
+        subcategory,
         brand,
         images,
         rentalPrice,
@@ -148,12 +159,13 @@ const updateProduct = asyncHandler(async (req, res) => {
     if (product) {
         // If category is being updated, check if it exists or create it
         if (category && category !== product.category) {
-            const categoryExists = await Category.findOne({ name: category });
+            const categoryExists = await Category.findOne({ name: category, parent: null });
             if (!categoryExists) {
                 await Category.create({
                     name: category,
                     description: `${category} category`,
                     isActive: true,
+                    parent: null,
                 });
             }
         }
@@ -161,6 +173,8 @@ const updateProduct = asyncHandler(async (req, res) => {
         product.name = name || product.name;
         product.description = description || product.description;
         product.category = category || product.category;
+        // Allow setting subcategory to null (pass empty string to clear it)
+        product.subcategory = subcategory === '' ? null : (subcategory || product.subcategory);
         product.brand = brand || product.brand;
 
         if (images) {
@@ -178,6 +192,7 @@ const updateProduct = asyncHandler(async (req, res) => {
         product.isActive = isActive !== undefined ? isActive : product.isActive;
 
         const updatedProduct = await product.save();
+        await updatedProduct.populate('subcategory', 'name slug');
         res.json(updatedProduct);
     } else {
         res.status(404);

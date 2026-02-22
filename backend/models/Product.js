@@ -10,9 +10,16 @@ const productSchema = new mongoose.Schema({
         type: String,
         required: [true, 'Please provide a product description']
     },
+    // Top-level category name string (e.g. "Apple", "IT Products")
     category: {
         type: String,
         required: [true, 'Please provide a category']
+    },
+    // Reference to the Category document for the subcategory (optional)
+    subcategory: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Category',
+        default: null
     },
     brand: {
         type: String

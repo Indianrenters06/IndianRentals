@@ -66,6 +66,7 @@ const createProduct = asyncHandler(async (req, res) => {
         name,
         description,
         category,
+        subcategory,
         brand,
         rentalPrice,
         securityDeposit,
@@ -80,6 +81,7 @@ const createProduct = asyncHandler(async (req, res) => {
         name,
         description,
         category,
+        subcategory: subcategory || null,
         brand,
         rentalPrice,
         securityDeposit,
@@ -104,11 +106,14 @@ const updateProduct = asyncHandler(async (req, res) => {
         throw new Error('Product not found');
     }
 
+    // Allow explicitly setting subcategory to null (to remove it)
+    if (req.body.subcategory === '') req.body.subcategory = null;
+
     const updatedProduct = await Product.findByIdAndUpdate(
         req.params.id,
         req.body,
         { new: true, runValidators: true }
-    );
+    ).populate('subcategory', 'name slug');
 
     res.json(updatedProduct);
 });
