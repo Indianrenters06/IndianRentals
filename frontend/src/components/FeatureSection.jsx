@@ -3,192 +3,140 @@ import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
-import { FaArrowRight, FaLaptop } from 'react-icons/fa';
+import { FaArrowRight } from 'react-icons/fa';
 
 const FeatureSection = () => {
     return (
-        <section className="py-10 md:py-24 bg-[#F5FAFF] overflow-hidden relative">
-            <div className="max-w-[1400px] mx-auto px-4 sm:px-8 lg:px-12">
+        <section className="py-12 md:py-20 bg-white overflow-hidden relative">
+            <div className="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8">
 
-                {/* Mobile Layout */}
-                <div className="md:hidden flex flex-col">
-                    {/* Title + CTA */}
-                    <div className="space-y-3 mb-2">
-                        <h2 className="text-5xl">
-                            <span className="font-normal bg-gradient-to-r from-[#1D334C] via-[#374E71] to-[#4E6F90] bg-clip-text text-transparent tracking-normal">
-                                MacBook Air
-                            </span>
-                        </h2>
-                        <p className="text-sm text-gray-700 font-light leading-relaxed max-w-xs">
-                            Skip the setup hassle. Get high-performance workstations pre-configured with Ollama for instant AI development. Run large language models locally.
-                        </p>
-                        <Link href="/product/macbook-air" className="inline-flex items-center gap-2 px-6 py-2.5 bg-[#FFC107] hover:bg-[#FFD54F] text-black font-medium rounded-full transition-all shadow-sm hover:shadow-md text-sm">
-                            Rent Now →
-                        </Link>
-                    </div>
+                {/* Inner solid blue background container */}
+                <div className="bg-[#e4effc] rounded-[1.8rem] relative p-8 md:p-12 lg:p-14 flex flex-col lg:flex-row items-center justify-between gap-10 lg:gap-6">
 
-                    {/* Image with Air watermark */}
-                    <div className="relative flex items-center justify-center h-[220px] mt-2">
-                        {/* Air watermark for mobile */}
-                        <div className="absolute inset-0 flex items-center justify-center pointer-events-none select-none z-0">
-                            <span className="text-[7rem] font-bold text-[#DCE8F5] leading-none tracking-widest opacity-100">
-                                Air
-                            </span>
-                        </div>
-                        <motion.div
-                            initial={{ opacity: 0, scale: 0.9 }}
-                            whileInView={{ opacity: 1, scale: 1.05 }}
-                            transition={{ duration: 0.8, ease: "easeOut" }}
-                            viewport={{ once: true }}
-                            className="relative z-10 w-full h-full flex justify-center items-center"
-                        >
-                            <div className="relative w-[90%] h-full">
-                                <Image
-                                    src="https://res.cloudinary.com/dgkckcdk8/image/upload/v1769961205/indian-rentals/gfjrzgp5llzcjap30wkt.png"
-                                    alt="MacBook Air"
-                                    fill
-                                    className="object-contain drop-shadow-xl"
-                                    priority
-                                />
-                            </div>
-                        </motion.div>
-                    </div>
-
-                    {/* Stats row */}
-                    <div className="flex justify-between items-start mt-4 px-2">
-                        <div className="flex flex-col items-start">
-                            <p className="text-xs font-medium text-gray-500">Up to</p>
-                            <h4 className="font-semibold text-4xl bg-gradient-to-r from-[#1D334C] via-[#374E71] to-[#4E6F90] bg-clip-text text-transparent tracking-tighter leading-none">
-                                23x
-                            </h4>
-                            <p className="text-[10px] font-medium text-gray-500 mt-1 leading-tight max-w-[90px]">
-                                faster than the fastest Intel-based MacBook Air
-                            </p>
-                        </div>
-                        <div className="flex flex-col items-start">
-                            <p className="text-xs font-medium text-gray-500">Up to</p>
-                            <h4 className="font-semibold text-4xl bg-gradient-to-r from-[#1D334C] via-[#374E71] to-[#4E6F90] bg-clip-text text-transparent tracking-tighter leading-none">
-                                2x
-                            </h4>
-                            <p className="text-[10px] font-medium text-gray-500 mt-1 leading-tight max-w-[90px]">
-                                faster than MacBook Air(M1)
-                            </p>
-                        </div>
-                        <div className="flex flex-col items-start">
-                            <p className="text-xs font-medium text-gray-500">Up to</p>
-                            <h4 className="font-semibold text-4xl bg-gradient-to-r from-[#1D334C] via-[#374E71] to-[#4E6F90] bg-clip-text text-transparent tracking-tighter leading-none">
-                                18 hr
-                            </h4>
-                            <p className="text-[10px] font-medium text-gray-500 mt-1 leading-tight max-w-[70px]">
-                                battery life
-                            </p>
-                        </div>
-                    </div>
-
-                    {/* Built for Apple Intelligence */}
-                    <div className="text-center mt-5">
-                        <span className="text-sm font-medium bg-gradient-to-r from-[#0071E3] via-[#9F55FF] to-[#FF5555] bg-clip-text text-transparent">
-                            Built for Apple Intelligence.
+                    {/* Background "Air" watermark */}
+                    <div className="absolute top-1/2 left-1/2 -translate-y-1/2 -translate-x-1/2 pointer-events-none select-none z-0">
+                        <span className="text-[180px] md:text-[280px] lg:text-[400px] font-semibold text-blue-200/25 tracking-tighter leading-none">
+                            Air
                         </span>
                     </div>
-                </div>
 
-                {/* Desktop Layout */}
-                <div className="hidden md:flex flex-col lg:flex-row items-center justify-between gap-12 lg:gap-0">
+                    {/* Left content */}
+                    <div className="lg:w-[32%] w-full z-10 relative">
+                        <motion.h1
+                            initial={{ opacity: 0, y: 20 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            viewport={{ once: true }}
+                            className="text-4xl md:text-5xl lg:text-[52px] font-normal tracking-tight text-[#1a2b4c] leading-tight mb-5"
+                        >
+                            MacBook Air
+                        </motion.h1>
 
-                    {/* Left Content - Title & CTA */}
-                    <div className="w-full lg:w-[30%] flex flex-col items-start space-y-8 z-10 pl-4">
-                        <div className="space-y-5">
-                            <h2 className="text-6xl md:text-5xl lg:text-5xl">
-                                <span className="font-normal bg-gradient-to-r 
-from-[#1D334C] 
-via-[#374E71] 
-to-[#4E6F90] 
-bg-clip-text 
-text-transparent tracking-normal">MacBook Air</span>
-                            </h2>
-                            <p className="text-lg text-gray-900  max-w-xs font-light">
-                                Skip the setup hassle. Get high-performance workstations pre-configured with Ollama for instant AI development. Run large language models locally.
-                            </p>
-                        </div>
+                        <motion.p
+                            initial={{ opacity: 0, y: 20 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            viewport={{ once: true }}
+                            transition={{ delay: 0.1 }}
+                            className="text-[#4a5568] text-[14px] md:text-[15px] leading-relaxed mb-8 max-w-[280px] font-medium"
+                        >
+                            Skip the setup hassle. Get high-performance workstations pre-configured with Ollama for instant AI development. Run large language models locally.
+                        </motion.p>
 
-                        <div>
-                            <Link href="/product/macbook-air" className="inline-flex items-center gap-2 px-7 py-3.5 bg-[#FFC107] hover:bg-[#FFD54F] text-black font-medium rounded-full transition-all shadow-sm hover:shadow-md text-base">
+                        <motion.div
+                            initial={{ opacity: 0, y: 20 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            viewport={{ once: true }}
+                            transition={{ delay: 0.2 }}
+                        >
+                            <Link
+                                href="/store"
+                                className="inline-flex items-center gap-2 bg-[#ffc53d] text-[#1a2b4c] px-6 py-2.5 rounded-full font-medium transition-all hover:bg-[#ffb50f] hover:scale-105 shadow-sm text-sm"
+                            >
                                 Rent Now
-                                <FaArrowRight size={14} />
+                                <FaArrowRight size={12} />
                             </Link>
-                        </div>
+                        </motion.div>
                     </div>
 
-                    {/* Center Image & "Air" Text */}
-                    <div className="w-full lg:w-[60%] relative flex flex-col items-center justify-center h-[500px] md:h-[600px]">
-                        {/* Background Air Text - Massive Watermark */}
-                        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full flex items-center justify-center pointer-events-none select-none z-0">
-                            <span className="text-[12rem] md:text-[22rem] font-bold text-[#E6F0FF] leading-none tracking-widest opacity-100">
-                                Air
-                            </span>
-                        </div>
-
-                        {/* Floating Laptop */}
+                    {/* Center Content (Laptop) */}
+                    <div className="lg:w-[48%] w-full flex flex-col items-center justify-center relative z-10 mt-6 lg:mt-0 lg:-translate-x-10">
                         <motion.div
                             initial={{ opacity: 0, scale: 0.9 }}
-                            whileInView={{ opacity: 1, scale: 1.1 }}
-                            transition={{ duration: 0.8, ease: "easeOut" }}
+                            whileInView={{ opacity: 1, scale: 1 }}
                             viewport={{ once: true }}
-                            className="relative z-10 w-full flex justify-center"
+                            transition={{ duration: 0.5, delay: 0.2 }}
+                            className="relative w-full max-w-[600px] aspect-[16/10] flex items-center justify-center drop-shadow-2xl"
                         >
-                            <div className="relative w-[80%] aspect-[16/10] flex items-center justify-center">
-                                <Image
-                                    src="https://res.cloudinary.com/dgkckcdk8/image/upload/v1769961205/indian-rentals/gfjrzgp5llzcjap30wkt.png"
-                                    alt="MacBook Air"
-                                    fill
-                                    className="object-center drop-shadow-2xl"
-                                    priority
-                                />
-                            </div>
+                            <Image
+                                src="https://res.cloudinary.com/dgkckcdk8/image/upload/v1769961205/indian-rentals/gfjrzgp5llzcjap30wkt.png"
+                                alt="MacBook Air"
+                                fill
+                                className="object-contain hover:scale-105 transition-transform duration-500 scale-110"
+                                priority
+                                sizes="(max-width: 768px) 100vw, 600px"
+                            />
                         </motion.div>
 
-                        <h3 className="text-2xl md:text-4xl font-semibold text-center z-20 text-[#1d1d1f] mt-8 tracking-tight">
-                            <span className="bg-gradient-to-r from-[#0071E3] via-[#9F55FF] to-[#FF5555] bg-clip-text text-transparent">Built for Apple Intelligence.</span>
-                        </h3>
+                        <motion.div
+                            initial={{ opacity: 0 }}
+                            whileInView={{ opacity: 1 }}
+                            viewport={{ once: true }}
+                            transition={{ delay: 0.5 }}
+                            className="text-center mt-6 lg:mt-2 relative"
+                        >
+                            <h3 className="text-lg md:text-xl font-medium tracking-tight">
+                                <span className="text-[#3b82f6]">Built for </span>
+                                <span className="bg-clip-text text-transparent bg-gradient-to-r from-purple-500 via-pink-500 to-orange-500">
+                                    Apple Intelligence.
+                                </span>
+                            </h3>
+                        </motion.div>
                     </div>
 
-                    {/* Right Stats */}
-                    <div className="w-full lg:w-[20%] flex flex-row lg:flex-col justify-between lg:justify-center lg:space-y-16 pl-6 pt-8 lg:pt-0">
+                    {/* Right Content (Stats) */}
+                    <div className="lg:w-[16%] w-full flex flex-row lg:flex-col justify-between gap-6 lg:gap-10 z-10 mt-10 lg:mt-0">
                         {/* Stat 1 */}
-                        <div className="flex flex-col items-start">
-                            <p className="text-sm font-medium text-gray-500 mb-1">Up to</p>
-                            <h4 className="font-semibold text-5xl lg:text-6xl bg-gradient-to-r 
-from-[#1D334C] 
-via-[#374E71] 
-to-[#4E6F90] 
-bg-clip-text 
-text-transparent tracking-tighter leading-none">23x</h4>
-                            <p className="text-xs font-medium text-gray-500 mt-2 leading-tight max-w-[100px]">faster than fast Intel-based MacBook Air</p>
-                        </div>
+                        <motion.div
+                            initial={{ opacity: 0, x: 20 }}
+                            whileInView={{ opacity: 1, x: 0 }}
+                            viewport={{ once: true }}
+                            transition={{ delay: 0.3 }}
+                        >
+                            <p className="text-xs text-[#718096] font-medium mb-1">Up to</p>
+                            <h4 className="text-3xl md:text-4xl lg:text-[42px] font-normal tracking-tight text-[#1a2b4c] leading-none mb-2">23x</h4>
+                            <p className="text-[11px] text-[#718096] leading-snug">
+                                faster than the fastest<br />Intel-based<br />MacBook Air
+                            </p>
+                        </motion.div>
+
                         {/* Stat 2 */}
-                        <div className="flex flex-col items-start">
-                            <p className="text-sm font-medium text-gray-500 mb-1">Up to</p>
-                            <h4 className="font-semibold text-5xl lg:text-6xl bg-gradient-to-r 
-from-[#1D334C] 
-via-[#374E71] 
-to-[#4E6F90] 
-bg-clip-text 
-text-transparent tracking-tighter leading-none">2x</h4>
-                            <p className="text-xs font-medium text-gray-500 mt-2 leading-tight max-w-[100px]">faster than MacBook Air (M1)</p>
-                        </div>
+                        <motion.div
+                            initial={{ opacity: 0, x: 20 }}
+                            whileInView={{ opacity: 1, x: 0 }}
+                            viewport={{ once: true }}
+                            transition={{ delay: 0.4 }}
+                        >
+                            <p className="text-xs text-[#718096] font-medium mb-1">Up to</p>
+                            <h4 className="text-3xl md:text-4xl lg:text-[42px] font-normal tracking-tight text-[#1a2b4c] leading-none mb-2">2x</h4>
+                            <p className="text-[11px] text-[#718096] leading-snug">
+                                faster than<br />MacBook<br />Air(M1)
+                            </p>
+                        </motion.div>
+
                         {/* Stat 3 */}
-                        <div className="flex flex-col items-start">
-                            <p className="text-sm font-medium text-gray-500 mb-1">Up to</p>
-                            <h4 className="font-semibold text-5xl lg:text-6xl bg-gradient-to-r 
-from-[#1D334C] 
-via-[#374E71] 
-to-[#4E6F90] 
-bg-clip-text 
-text-transparent tracking-tighter leading-none">18 hr</h4>
-                            <p className="text-xs font-medium text-gray-500 mt-2 leading-tight max-w-[100px]">battery life</p>
-                        </div>
+                        <motion.div
+                            initial={{ opacity: 0, x: 20 }}
+                            whileInView={{ opacity: 1, x: 0 }}
+                            viewport={{ once: true }}
+                            transition={{ delay: 0.5 }}
+                        >
+                            <p className="text-xs text-[#718096] font-medium mb-1">Up to</p>
+                            <h4 className="text-3xl md:text-4xl lg:text-[42px] font-normal tracking-tight text-[#15803d] leading-none mb-2">18 hr</h4>
+                            <p className="text-[11px] text-[#718096] leading-snug">
+                                battery life
+                            </p>
+                        </motion.div>
                     </div>
+
                 </div>
             </div>
         </section>

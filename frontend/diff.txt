@@ -1,0 +1,13 @@
+diff --git a/frontend/src/components/Hero.jsx b/frontend/src/components/Hero.jsx
+index 0a1dec0..6e91fb5 100644
+--- a/frontend/src/components/Hero.jsx
++++ b/frontend/src/components/Hero.jsx
+@@ -25,7 +25,7 @@ const Hero = () => {
+ 
+     return (
+         <section className="bg-white py-4 md:py-6 px-4 sm:px-6 lg:px-8">
+-            <div className="max-w-[1400px] mx-auto relative">
++            <div className="max-w-[1200px] mx-auto relative">
+ 
+                 {/* Mobile: Card-style horizontal carousel peek */}
+                 <div className="md:hidden relative overflow-hidden">

@@ -3,7 +3,7 @@ import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { FaSearch, FaUser, FaShoppingCart, FaMapMarkerAlt, FaBars, FaTimes, FaChevronDown, FaHeart, FaSignOutAlt } from "react-icons/fa";
+import { FaSearch, FaUser, FaShoppingCart, FaMapMarkerAlt, FaBars, FaTimes, FaChevronDown, FaHeart, FaSignOutAlt, FaLocationArrow } from "react-icons/fa";
 import { motion, AnimatePresence } from "framer-motion";
 import AuthModal from "./AuthModal";
 import { useSelector } from "react-redux";
@@ -13,7 +13,8 @@ const Navbar = () => {
     const router = useRouter();
     const [isScrolled, setIsScrolled] = useState(false);
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-    const [selectedCity, setSelectedCity] = useState("Delhi");
+    const [selectedCity, setSelectedCity] = useState("");
+    const [locationInput, setLocationInput] = useState("");
     const [isCityDropdownOpen, setIsCityDropdownOpen] = useState(false);
     const [userInfo, setUserInfo] = useState(null);
     const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
@@ -22,8 +23,7 @@ const Navbar = () => {
     // Redux Cart Selector
     const totalQuantity = useSelector(selectCartTotalQuantity);
 
-    const cities = ["Delhi", "Mumbai", "Bangalore", "Hyderabad", "Pune", "Chennai", "Gurgaon", "Noida"];
-
+    // Removed fixed cities array
     // Handle scroll effect
     useEffect(() => {
         const handleScroll = () => {
@@ -45,7 +45,16 @@ const Navbar = () => {
             }
         };
 
+        const loadLocation = () => {
+            const storedLocation = localStorage.getItem("userLocation");
+            if (storedLocation) {
+                setSelectedCity(storedLocation);
+                setLocationInput(storedLocation);
+            }
+        };
+
         checkUserInfo();
+        loadLocation();
 
         window.addEventListener("userInfoChanged", checkUserInfo);
         // Listen for storage events (in case login happens in another tab/window)
@@ -57,6 +66,45 @@ const Navbar = () => {
             window.removeEventListener("storage", checkUserInfo);
         };
     }, []);
+
+    const fetchLocation = () => {
+        if (!navigator.geolocation) {
+            alert("Geolocation is not supported by your browser");
+            return;
+        }
+
+        setLocationInput("Fetching...");
+
+        navigator.geolocation.getCurrentPosition(
+            async (position) => {
+                try {
+                    const { latitude, longitude } = position.coords;
+                    const response = await fetch(`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${latitude}&longitude=${longitude}&localityLanguage=en`);
+                    const data = await response.json();
+
+                    const city = data.city || data.locality || data.principalSubdivision;
+                    if (city) {
+                        setSelectedCity(city);
+                        setLocationInput(city);
+                        localStorage.setItem('userLocation', city);
+                        setIsCityDropdownOpen(false);
+                    } else {
+                        setLocationInput("");
+                        alert("Could not determine city from location.");
+                    }
+                } catch (error) {
+                    console.error("Error fetching location:", error);
+                    setLocationInput("");
+                    alert("Failed to fetch location data.");
+                }
+            },
+            (error) => {
+                console.error("Error getting location:", error);
+                setLocationInput("");
+                alert("Please allow location access to use this feature.");
+            }
+        );
+    };
 
     const handleLogout = () => {
         localStorage.removeItem("userInfo");
@@ -127,40 +175,79 @@ const Navbar = () => {
 
                     {/* Right Actions (Desktop) */}
                     <div className="hidden md:flex items-center gap-6">
-                        {/* Location Selector */}
                         <div className="relative">
                             <button
                                 className="flex items-center gap-2 text-gray-700 hover:text-indigo-600 transition-colors focus:outline-none font-medium"
                                 onClick={() => setIsCityDropdownOpen(!isCityDropdownOpen)}
                             >
-                                <div className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-gray-600">
+                                <div className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-gray-600 shrink-0">
                                     <FaMapMarkerAlt size={16} />
                                 </div>
-                                <span className="text-sm font-bold">{selectedCity}</span>
-                                <FaChevronDown size={10} className={`transform transition-transform duration-200 ${isCityDropdownOpen ? 'rotate-180' : ''}`} />
+                                <span className="text-sm font-bold truncate max-w-[150px]">
+                                    {selectedCity || "Enter your location"}
+                                </span>
+                                <FaChevronDown size={10} className={`transform transition-transform duration-200 shrink-0 ${isCityDropdownOpen ? 'rotate-180' : ''}`} />
                             </button>
 
-                            {/* City Dropdown */}
+                            {/* City Dropdown -> Location Input Modal/Popover */}
                             <AnimatePresence>
                                 {isCityDropdownOpen && (
                                     <motion.div
                                         initial={{ opacity: 0, y: 10 }}
                                         animate={{ opacity: 1, y: 0 }}
                                         exit={{ opacity: 0, y: 10 }}
-                                        className="absolute top-full right-0 mt-2 w-40 bg-white rounded-xl shadow-xl border border-gray-100 py-2 z-50"
+                                        className="absolute top-full right-0 mt-2 w-72 bg-white rounded-xl shadow-xl border border-gray-100 p-4 z-50"
                                     >
-                                        {cities.map((city) => (
+                                        <label className="block text-sm font-bold text-gray-800 mb-2">
+                                            Enter your location
+                                        </label>
+                                        <div className="flex flex-col gap-3">
+                                            <input
+                                                type="text"
+                                                value={locationInput}
+                                                onChange={(e) => setLocationInput(e.target.value)}
+                                                placeholder="e.g. MG Road, Bangalore"
+                                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-sm"
+                                                autoFocus
+                                                onKeyDown={(e) => {
+                                                    if (e.key === 'Enter') {
+                                                        const val = locationInput.trim();
+                                                        if (val) {
+                                                            setSelectedCity(val);
+                                                            localStorage.setItem('userLocation', val);
+                                                            setIsCityDropdownOpen(false);
+                                                        }
+                                                    }
+                                                }}
+                                            />
                                             <button
-                                                key={city}
-                                                className={`w-full text-left px-4 py-2 text-sm hover:bg-gray-50 transition-colors ${selectedCity === city ? "text-indigo-600 font-medium" : "text-gray-600"}`}
+                                                className="w-full bg-indigo-600 text-white font-bold text-sm py-2 rounded-lg hover:bg-indigo-700 transition"
                                                 onClick={() => {
-                                                    setSelectedCity(city);
-                                                    setIsCityDropdownOpen(false);
+                                                    const val = locationInput.trim();
+                                                    if (val && val !== "Fetching...") {
+                                                        setSelectedCity(val);
+                                                        localStorage.setItem('userLocation', val);
+                                                        setIsCityDropdownOpen(false);
+                                                    }
                                                 }}
                                             >
-                                                {city}
+                                                Save Location
                                             </button>
-                                        ))}
+
+                                            <div className="relative flex items-center py-1">
+                                                <div className="grow border-t border-gray-100"></div>
+                                                <span className="shrink-0 mx-2 text-gray-400 text-xs">OR</span>
+                                                <div className="grow border-t border-gray-100"></div>
+                                            </div>
+
+                                            <button
+                                                className="w-full flex items-center justify-center gap-2 bg-gray-50 text-indigo-600 border border-indigo-100 font-bold text-sm py-2 rounded-lg hover:bg-indigo-50 transition"
+                                                onClick={fetchLocation}
+                                            >
+                                                <FaLocationArrow size={12} />
+                                                Use my current location
+                                            </button>
+                                        </div>
                                     </motion.div>
                                 )}
                             </AnimatePresence>
@@ -241,10 +328,10 @@ const Navbar = () => {
                         {/* Mobile Location Pill */}
                         <button
                             onClick={() => setIsCityDropdownOpen(!isCityDropdownOpen)}
-                            className="flex items-center gap-1.5 px-3 py-1.5 bg-gray-50/80 border border-gray-200 rounded-full text-xs font-bold text-gray-700 hover:bg-gray-100"
+                            className="flex items-center gap-1.5 px-3 py-1.5 bg-gray-50/80 border border-gray-200 rounded-full text-xs font-bold text-gray-700 hover:bg-gray-100 max-w-[140px]"
                         >
-                            <FaMapMarkerAlt size={12} className="text-gray-500" />
-                            {selectedCity}
+                            <FaMapMarkerAlt size={12} className="text-gray-500 shrink-0" />
+                            <span className="truncate">{selectedCity || "Location"}</span>
                         </button>
 
                         {/* Mobile Cart */}
@@ -345,21 +432,49 @@ const Navbar = () => {
                                     </button>
                                 )}
 
-                                <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg mt-3">
-                                    <div className="flex items-center gap-2 relative w-full">
-                                        <FaMapMarkerAlt className="text-gray-500" />
-                                        <select
-                                            value={selectedCity}
-                                            onChange={(e) => setSelectedCity(e.target.value)}
-                                            className="appearance-none bg-transparent font-medium text-gray-700 focus:outline-none w-full cursor-pointer"
+                                <div className="p-4 bg-gray-50 rounded-lg mt-3">
+                                    <label className="block text-sm font-bold text-gray-800 mb-2">
+                                        Enter your location
+                                    </label>
+                                    <div className="flex flex-col gap-3 relative w-full">
+                                        <div className="flex gap-2 w-full">
+                                            <div className="relative flex-1">
+                                                <FaMapMarkerAlt className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                                                <input
+                                                    type="text"
+                                                    value={locationInput}
+                                                    onChange={(e) => setLocationInput(e.target.value)}
+                                                    placeholder="Your location"
+                                                    className="w-full pl-9 pr-3 py-2 border border-gray-200 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm"
+                                                />
+                                            </div>
+                                            <button
+                                                className="bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-indigo-700 transition"
+                                                onClick={() => {
+                                                    const val = locationInput.trim();
+                                                    if (val && val !== "Fetching...") {
+                                                        setSelectedCity(val);
+                                                        localStorage.setItem('userLocation', val);
+                                                    }
+                                                }}
+                                            >
+                                                Save
+                                            </button>
+                                        </div>
+
+                                        <div className="relative flex items-center py-1">
+                                            <div className="grow border-t border-gray-200"></div>
+                                            <span className="shrink-0 mx-2 text-gray-400 text-xs">OR</span>
+                                            <div className="grow border-t border-gray-200"></div>
+                                        </div>
+
+                                        <button
+                                            className="w-full flex items-center justify-center gap-2 bg-white text-indigo-600 border border-indigo-200 font-bold text-sm py-2 rounded-lg hover:bg-indigo-50 transition"
+                                            onClick={fetchLocation}
                                         >
-                                            {cities.map((city) => (
-                                                <option key={city} value={city}>
-                                                    {city}
-                                                </option>
-                                            ))}
-                                        </select>
-                                        <FaChevronDown size={10} className="absolute right-0 text-gray-400 pointer-events-none" />
+                                            <FaLocationArrow size={12} />
+                                            Use my current location
+                                        </button>
                                     </div>
                                 </div>
                             </div>
