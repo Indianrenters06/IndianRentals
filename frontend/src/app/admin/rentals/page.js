@@ -5,6 +5,21 @@ import {
     FiSearch, FiFilter, FiDownload, FiEye, FiCheck, FiX,
     FiPackage, FiUser, FiCalendar, FiDollarSign, FiMapPin
 } from 'react-icons/fi';
+import {
+    Input,
+    Select,
+    SelectItem,
+    Button,
+    Avatar,
+    Chip,
+    Table,
+    TableHeader,
+    TableBody,
+    TableColumn,
+    TableRow,
+    TableCell,
+    Tooltip
+} from "@heroui/react";
 
 export default function RentalsManagement() {
     const [rentals, setRentals] = useState([]);
@@ -75,11 +90,11 @@ export default function RentalsManagement() {
 
     const getStatusBadge = (rental) => {
         if (rental.isDelivered) {
-            return <span className="px-3 py-1 text-xs font-medium bg-green-100 text-green-700 rounded-full">Delivered</span>;
+            return <Chip color="success" size="sm" variant="flat">Delivered</Chip>;
         } else if (rental.isPaid) {
-            return <span className="px-3 py-1 text-xs font-medium bg-blue-100 text-blue-700 rounded-full">Paid</span>;
+            return <Chip color="primary" size="sm" variant="flat">Paid</Chip>;
         } else {
-            return <span className="px-3 py-1 text-xs font-medium bg-yellow-100 text-yellow-700 rounded-full">Pending</span>;
+            return <Chip color="warning" size="sm" variant="flat">Pending</Chip>;
         }
     };
 
@@ -102,34 +117,39 @@ export default function RentalsManagement() {
                             <p className="text-sm text-gray-600 mt-1">Track and manage all rental orders</p>
                         </div>
                         <div className="flex items-center gap-3">
-                            <button className="flex items-center gap-2 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg font-medium hover:bg-gray-50 transition-colors">
-                                <FiDownload className="w-4 h-4" />
+                            <Button variant="bordered" startContent={<FiDownload className="w-4 h-4" />}>
                                 Export Report
-                            </button>
+                            </Button>
                         </div>
                     </div>
 
                     {/* Filters */}
                     <div className="flex items-center gap-4 mt-6">
                         <div className="flex-1 max-w-md relative">
-                            <FiSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-                            <input
+                            <Input
                                 type="text"
                                 placeholder="Search by customer name or email..."
                                 value={searchTerm}
-                                onChange={(e) => setSearchTerm(e.target.value)}
-                                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                                onValueChange={setSearchTerm}
+                                startContent={<FiSearch className="text-gray-400 w-5 h-5 pointer-events-none" />}
+                                classNames={{
+                                    inputWrapper: "bg-white border-1 border-gray-300 shadow-none",
+                                }}
                             />
                         </div>
-                        <select
-                            value={filterStatus}
-                            onChange={(e) => setFilterStatus(e.target.value)}
-                            className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                        <Select
+                            selectedKeys={[filterStatus]}
+                            onSelectionChange={(keys) => setFilterStatus(Array.from(keys)[0])}
+                            className="w-48"
+                            aria-label="Filter Status"
+                            classNames={{
+                                trigger: "bg-white border-1 border-gray-300 shadow-none",
+                            }}
                         >
-                            <option value="all">All Status</option>
-                            <option value="paid">Paid</option>
-                            <option value="pending">Pending</option>
-                        </select>
+                            <SelectItem key="all" value="all">All Status</SelectItem>
+                            <SelectItem key="paid" value="paid">Paid</SelectItem>
+                            <SelectItem key="pending" value="pending">Pending</SelectItem>
+                        </Select>
                     </div>
                 </div>
             </div>
@@ -174,9 +194,10 @@ export default function RentalsManagement() {
                                         </td>
                                         <td className="py-4 px-6">
                                             <div className="flex items-center gap-3">
-                                                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white font-semibold">
-                                                    {rental.user?.name?.charAt(0).toUpperCase() || 'U'}
-                                                </div>
+                                                <Avatar
+                                                    name={rental.user?.name?.charAt(0).toUpperCase() || 'U'}
+                                                    classNames={{ base: "bg-gradient-to-br from-indigo-500 to-purple-600 text-white font-semibold" }}
+                                                />
                                                 <div>
                                                     <p className="font-semibold text-gray-900">{rental.user?.name || 'Unknown'}</p>
                                                     <p className="text-sm text-gray-500">{rental.user?.email}</p>
@@ -212,27 +233,30 @@ export default function RentalsManagement() {
                                         </td>
                                         <td className="py-4 px-6">
                                             <div className="flex items-center gap-2">
-                                                <button
-                                                    className="p-2 hover:bg-indigo-50 text-indigo-600 rounded-lg transition-colors"
-                                                    title="View Details"
-                                                >
-                                                    <FiEye className="w-4 h-4" />
-                                                </button>
+                                                <Tooltip content="View Details">
+                                                    <Button isIconOnly variant="light" size="sm" color="primary">
+                                                        <FiEye className="w-4 h-4" />
+                                                    </Button>
+                                                </Tooltip>
                                                 {!rental.isPaid && (
-                                                    <button
-                                                        onClick={() => updateRentalStatus(rental._id, { isPaid: true, paidAt: new Date() })}
-                                                        className="px-3 py-1 text-xs font-medium bg-green-100 text-green-700 rounded-lg hover:bg-green-200 transition-colors"
+                                                    <Button
+                                                        size="sm"
+                                                        color="success"
+                                                        variant="flat"
+                                                        onPress={() => updateRentalStatus(rental._id, { isPaid: true, paidAt: new Date() })}
                                                     >
                                                         Mark Paid
-                                                    </button>
+                                                    </Button>
                                                 )}
                                                 {rental.isPaid && !rental.isDelivered && (
-                                                    <button
-                                                        onClick={() => updateRentalStatus(rental._id, { isDelivered: true, deliveredAt: new Date() })}
-                                                        className="px-3 py-1 text-xs font-medium bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition-colors"
+                                                    <Button
+                                                        size="sm"
+                                                        color="primary"
+                                                        variant="flat"
+                                                        onPress={() => updateRentalStatus(rental._id, { isDelivered: true, deliveredAt: new Date() })}
                                                     >
                                                         Mark Delivered
-                                                    </button>
+                                                    </Button>
                                                 )}
                                             </div>
                                         </td>
@@ -260,12 +284,12 @@ export default function RentalsManagement() {
                                 Showing <span className="font-semibold">{filteredRentals.length}</span> of <span className="font-semibold">{rentals.length}</span> rentals
                             </p>
                             <div className="flex items-center gap-2">
-                                <button className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg font-medium hover:bg-gray-50 transition-colors">
+                                <Button variant="bordered">
                                     Previous
-                                </button>
-                                <button className="px-4 py-2 bg-indigo-600 text-white rounded-lg font-medium hover:bg-indigo-700 transition-colors">
+                                </Button>
+                                <Button color="primary">
                                     Next
-                                </button>
+                                </Button>
                             </div>
                         </div>
                     )}

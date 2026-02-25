@@ -1,4 +1,8 @@
 @import "tailwindcss";
+@import "../../node_modules/@heroui/theme/dist/utilities.css";
+
+@source "../../node_modules/@heroui/theme/dist";
+@plugin "./hero.js";
 
 @theme {
     --font-sans: var(--font-manrope), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;

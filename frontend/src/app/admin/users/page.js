@@ -5,6 +5,17 @@ import {
     FiSearch, FiFilter, FiDownload, FiEdit2, FiTrash2,
     FiMail, FiPhone, FiMapPin, FiCalendar, FiMoreVertical
 } from 'react-icons/fi';
+import {
+    Input,
+    Select,
+    SelectItem,
+    Button,
+    Card,
+    CardBody,
+    CardHeader,
+    Avatar,
+    Chip
+} from "@heroui/react";
 
 export default function UsersManagement() {
     const [users, setUsers] = useState([]);
@@ -92,34 +103,39 @@ export default function UsersManagement() {
                             <p className="text-sm text-gray-600 mt-1">Manage all registered users</p>
                         </div>
                         <div className="flex items-center gap-3">
-                            <button className="flex items-center gap-2 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg font-medium hover:bg-gray-50 transition-colors">
-                                <FiDownload className="w-4 h-4" />
+                            <Button variant="bordered" startContent={<FiDownload className="w-4 h-4" />}>
                                 Export Users
-                            </button>
+                            </Button>
                         </div>
                     </div>
 
                     {/* Filters */}
                     <div className="flex items-center gap-4 mt-6">
                         <div className="flex-1 max-w-md relative">
-                            <FiSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-                            <input
+                            <Input
                                 type="text"
                                 placeholder="Search users by name or email..."
                                 value={searchTerm}
-                                onChange={(e) => setSearchTerm(e.target.value)}
-                                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                                onValueChange={setSearchTerm}
+                                startContent={<FiSearch className="text-gray-400 w-5 h-5 pointer-events-none" />}
+                                classNames={{
+                                    inputWrapper: "bg-white border-1 border-gray-300 shadow-none",
+                                }}
                             />
                         </div>
-                        <select
-                            value={filterRole}
-                            onChange={(e) => setFilterRole(e.target.value)}
-                            className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                        <Select
+                            selectedKeys={[filterRole]}
+                            onSelectionChange={(keys) => setFilterRole(Array.from(keys)[0])}
+                            className="w-48"
+                            aria-label="Filter Roles"
+                            classNames={{
+                                trigger: "bg-white border-1 border-gray-300 shadow-none",
+                            }}
                         >
-                            <option value="all">All Roles</option>
-                            <option value="admin">Admins</option>
-                            <option value="user">Users</option>
-                        </select>
+                            <SelectItem key="all" value="all">All Roles</SelectItem>
+                            <SelectItem key="admin" value="admin">Admins</SelectItem>
+                            <SelectItem key="user" value="user">Users</SelectItem>
+                        </Select>
                     </div>
                 </div>
             </div>
@@ -128,32 +144,37 @@ export default function UsersManagement() {
             <div className="px-8 py-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {filteredUsers.map((user) => (
-                        <div key={user._id} className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-md transition-all duration-300">
+                        <Card key={user._id} className="shadow-sm border-none p-2 bg-white hover:shadow-md transition-shadow">
                             {/* User Header */}
-                            <div className="flex items-start justify-between mb-4">
+                            <CardHeader className="flex items-start justify-between pb-0">
                                 <div className="flex items-center gap-3">
-                                    <div className="w-12 h-12 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white font-bold text-lg">
-                                        {user.name?.charAt(0).toUpperCase() || 'U'}
-                                    </div>
+                                    <Avatar
+                                        name={user.name?.charAt(0).toUpperCase() || 'U'}
+                                        classNames={{
+                                            base: "bg-gradient-to-br from-indigo-500 to-purple-600 text-white font-bold",
+                                        }}
+                                        size="md"
+                                    />
                                     <div>
                                         <h3 className="font-bold text-gray-900">{user.name || 'Unnamed User'}</h3>
-                                        <span className={`inline-block px-2 py-1 text-xs font-medium rounded-full ${user.isAdmin
-                                            ? 'bg-purple-100 text-purple-700'
-                                            : 'bg-blue-100 text-blue-700'
-                                            }`}>
+                                        <Chip
+                                            size="sm"
+                                            color={user.isAdmin ? "secondary" : "primary"}
+                                            variant="flat"
+                                        >
                                             {user.isAdmin ? 'Admin' : 'User'}
-                                        </span>
+                                        </Chip>
                                     </div>
                                 </div>
                                 <div className="relative group">
-                                    <button className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
+                                    <Button isIconOnly variant="light" size="sm">
                                         <FiMoreVertical className="w-5 h-5 text-gray-500" />
-                                    </button>
+                                    </Button>
                                 </div>
-                            </div>
+                            </CardHeader>
 
                             {/* User Details */}
-                            <div className="space-y-3">
+                            <CardBody className="space-y-3 pt-6">
                                 <div className="flex items-center gap-2 text-sm text-gray-600">
                                     <FiMail className="w-4 h-4 text-gray-400" />
                                     <span className="truncate">{user.email}</span>
@@ -174,23 +195,22 @@ export default function UsersManagement() {
                                     <FiCalendar className="w-4 h-4 text-gray-400" />
                                     <span>Joined {new Date(user.createdAt).toLocaleDateString()}</span>
                                 </div>
-                            </div>
+                            </CardBody>
 
                             {/* Actions */}
-                            <div className="flex items-center gap-2 mt-6 pt-4 border-t border-gray-200">
-                                <button className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-indigo-50 text-indigo-600 rounded-lg font-medium hover:bg-indigo-100 transition-colors">
-                                    <FiEdit2 className="w-4 h-4" />
+                            <div className="flex items-center gap-2 mt-2 px-3 pb-3 border-t border-gray-100 pt-4">
+                                <Button className="flex-1 text-indigo-600 bg-indigo-50 font-medium" onPress={() => { }} startContent={<FiEdit2 />}>
                                     Edit
-                                </button>
-                                <button
-                                    onClick={() => handleDeleteUser(user._id)}
-                                    className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-red-50 text-red-600 rounded-lg font-medium hover:bg-red-100 transition-colors"
+                                </Button>
+                                <Button
+                                    className="flex-1 text-red-600 bg-red-50 font-medium"
+                                    onPress={() => handleDeleteUser(user._id)}
+                                    startContent={<FiTrash2 />}
                                 >
-                                    <FiTrash2 className="w-4 h-4" />
                                     Delete
-                                </button>
+                                </Button>
                             </div>
-                        </div>
+                        </Card>
                     ))}
                 </div>
 
