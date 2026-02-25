@@ -1,8 +1,8 @@
 "use client";
 import DynamicCategoryPage from '../../../components/DynamicCategoryPage';
 import { TbPrinter, TbScan } from 'react-icons/tb';
-import { MdOutlineShredding, MdOutlineBarcode, MdOutlineFax, MdOutlineBadge } from 'react-icons/md';
-import { AiOutlineIdcard } from 'react-icons/ai';
+import { MdOutlineShredding, MdOutlineFax, MdOutlineBadge } from 'react-icons/md';
+import { AiOutlineIdcard, AiOutlineBarcode } from 'react-icons/ai';
 
 const filterChips = [
     { label: "Shredder", Icon: MdOutlineShredding },
@@ -10,7 +10,7 @@ const filterChips = [
     { label: "Lamination", Icon: AiOutlineIdcard },
     { label: "FAX", Icon: MdOutlineFax },
     { label: "Scanner", Icon: TbScan },
-    { label: "Barcode", Icon: MdOutlineBarcode },
+    { label: "Barcode", Icon: AiOutlineBarcode },
     { label: "Card Print", Icon: AiOutlineIdcard },
     { label: "POS", Icon: TbPrinter },
 ];

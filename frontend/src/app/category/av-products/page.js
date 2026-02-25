@@ -1,13 +1,14 @@
 "use client";
 import DynamicCategoryPage from '../../../components/DynamicCategoryPage';
-import { TbDeviceProjector, TbDeviceTv, TbSpeaker, TbMicrophone, TbWall } from 'react-icons/tb';
+import { TbDeviceProjector, TbDeviceTv, TbMicrophone, TbWall } from 'react-icons/tb';
 import { MdOutlineTouchApp, MdOutlineVideocam } from 'react-icons/md';
 import { BiSignal5 } from 'react-icons/bi';
+import { FiSpeaker } from 'react-icons/fi';
 
 const filterChips = [
     { label: "Projector", Icon: TbDeviceProjector },
     { label: "Television", Icon: TbDeviceTv },
-    { label: "Sound System", Icon: TbSpeaker },
+    { label: "Sound System", Icon: FiSpeaker },
     { label: "Touch Screen", Icon: MdOutlineTouchApp },
     { label: "Conferencing", Icon: BiSignal5 },
     { label: "Microphone", Icon: TbMicrophone },
