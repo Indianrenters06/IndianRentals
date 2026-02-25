@@ -1,5 +1,4 @@
 @import "tailwindcss";
-@import "../../node_modules/@heroui/theme/dist/utilities.css";
 
 @source "../../node_modules/@heroui/theme/dist";
 @plugin "./hero.js";
