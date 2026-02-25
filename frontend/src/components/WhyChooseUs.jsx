@@ -12,7 +12,7 @@ const WhyChooseUs = () => {
                     {/* Text Content - always first on mobile */}
                     <div className="space-y-6">
                         <div className="space-y-3">
-                            <h2 className="text-2xl md:text-4xl font-bold text-gray-900">
+                            <h2 className="text-4xl font-semibold font-manrope text-gray-900">
                                 Why Choose Us?
                             </h2>
                             <p className="text-gray-600 leading-relaxed text-sm md:text-lg">

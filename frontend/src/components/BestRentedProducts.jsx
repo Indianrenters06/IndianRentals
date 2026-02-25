@@ -44,7 +44,7 @@ const BestRentedProducts = ({ title = "Best Rented Products" }) => {
 
                 {/* Header */}
                 <div className="flex items-center justify-between mb-6 md:mb-12">
-                    <h2 className="text-2xl md:text-5xl font-bold text-gray-900 tracking-tight">
+                    <h2 className="text-4xl font-semibold font-manrope text-gray-900 tracking-tight">
                         {title}
                     </h2>
                     <Link

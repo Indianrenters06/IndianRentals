@@ -161,7 +161,7 @@ const Testimonials = () => {
                 {/* Header */}
                 <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
                     <div className="space-y-2 md:space-y-4 max-w-2xl">
-                        <h2 className="text-2xl md:text-5xl font-bold text-gray-900 tracking-tight">
+                        <h2 className="text-4xl font-semibold font-manrope text-gray-900 tracking-tight">
                             What Our <span className="text-[#0A99FF]">Customers</span> Say
                         </h2>
                         <p className="text-gray-600 text-sm md:text-lg">

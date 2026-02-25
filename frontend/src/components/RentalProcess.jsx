@@ -45,7 +45,7 @@ const RentalProcess = () => {
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="flex flex-col md:flex-row md:items-end justify-between mb-8 md:mb-12 gap-4">
                     <div>
-                        <h2 className="text-2xl md:text-4xl font-bold text-gray-900 mb-2">
+                        <h2 className="text-4xl font-semibold font-manrope text-gray-900 mb-2">
                             Rental Process
                         </h2>
                         <p className="text-gray-600 max-w-2xl text-sm md:text-lg">
