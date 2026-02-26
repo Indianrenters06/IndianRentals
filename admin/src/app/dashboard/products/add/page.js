@@ -168,88 +168,94 @@ export default function AddProduct() {
                             </h3>
                             <Divider className="bg-slate-100 dark:bg-slate-800" />
 
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                <Input
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-10">
+                                <div className="space-y-2">
+                                    <Input
+                                        isRequired
+                                        label="Product Name"
+                                        labelPlacement="outside"
+                                        name="name"
+                                        value={formData.name}
+                                        onChange={handleInputChange}
+                                        placeholder="Enter product title"
+                                        variant="bordered"
+                                        classNames={{
+                                            label: "text-slate-700 dark:text-slate-200 font-bold text-sm mb-2",
+                                            inputWrapper: "h-12 border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950/60 transition-all shadow-sm focus-within:ring-2 focus-within:ring-indigo-500/20"
+                                        }}
+                                    />
+                                </div>
+                                <div className="space-y-2">
+                                    <Input
+                                        label="Brand Name"
+                                        labelPlacement="outside"
+                                        name="brand"
+                                        value={formData.brand}
+                                        onChange={handleInputChange}
+                                        placeholder="e.g. Sony, Nikon"
+                                        variant="bordered"
+                                        classNames={{
+                                            label: "text-slate-700 dark:text-slate-200 font-bold text-sm mb-2",
+                                            inputWrapper: "h-12 border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950/60 transition-all shadow-sm focus-within:ring-2 focus-within:ring-indigo-500/20"
+                                        }}
+                                    />
+                                </div>
+                            </div>
+
+                            <div className="space-y-2 mt-4">
+                                <Textarea
                                     isRequired
-                                    label="Product Name"
-                                    name="name"
-                                    value={formData.name}
-                                    onChange={handleInputChange}
-                                    placeholder="Enter product title"
-                                    variant="bordered"
+                                    label="Product Description"
                                     labelPlacement="outside"
-                                    classNames={{
-                                        label: "text-slate-700 dark:text-slate-200 font-bold text-sm",
-                                        inputWrapper: "h-12 border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-950/40 focus-within:border-indigo-500 transition-all shadow-none"
-                                    }}
-                                />
-                                <Input
-                                    label="Brand Name"
-                                    name="brand"
-                                    value={formData.brand}
+                                    name="description"
+                                    value={formData.description}
                                     onChange={handleInputChange}
-                                    placeholder="e.g. Sony, Nikon"
+                                    placeholder="Describe features, colors, condition etc."
                                     variant="bordered"
-                                    labelPlacement="outside"
+                                    minRows={4}
                                     classNames={{
-                                        label: "text-slate-700 dark:text-slate-200 font-bold text-sm",
-                                        inputWrapper: "h-12 border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-950/40 focus-within:border-indigo-500 transition-all shadow-none"
+                                        label: "text-slate-700 dark:text-slate-200 font-bold text-sm mb-2",
+                                        inputWrapper: "border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950/60 transition-all shadow-sm focus-within:ring-2 focus-within:ring-indigo-500/20"
                                     }}
                                 />
                             </div>
 
-                            <Textarea
-                                isRequired
-                                label="Product Description"
-                                name="description"
-                                value={formData.description}
-                                onChange={handleInputChange}
-                                placeholder="Describe features, colors, condition etc."
-                                variant="bordered"
-                                labelPlacement="outside"
-                                minRows={4}
-                                classNames={{
-                                    label: "text-slate-700 dark:text-slate-200 font-bold text-sm",
-                                    inputWrapper: "border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-950/40 focus-within:border-indigo-500 transition-all shadow-none"
-                                }}
-                            />
-
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-10 mt-4">
                                 <Select
                                     isRequired
-                                    label="Category"
+                                    label="Primary Category"
+                                    labelPlacement="outside"
                                     placeholder="Select a category"
                                     variant="bordered"
-                                    labelPlacement="outside"
                                     selectedKeys={formData.category ? [formData.category] : []}
                                     onSelectionChange={(keys) => handleSelectChange('category', Array.from(keys)[0])}
                                     classNames={{
-                                        label: "text-slate-700 dark:text-slate-200 font-bold text-sm",
-                                        trigger: "h-12 border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-950/40 focus-within:border-indigo-500 transition-all shadow-none"
+                                        label: "text-slate-700 dark:text-slate-200 font-bold text-sm mb-2",
+                                        trigger: "h-12 border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950/60 transition-all shadow-sm focus-within:ring-2 focus-within:ring-indigo-500/20"
                                     }}
                                 >
                                     {categories.map((cat) => (
-                                        <SelectItem key={cat._id} value={cat._id} className="text-slate-800 dark:text-slate-200">
+                                        <SelectItem key={cat._id} value={cat._id}>
                                             {cat.name}
                                         </SelectItem>
                                     ))}
                                 </Select>
 
                                 <Select
-                                    label="Subcategory (Optional)"
-                                    placeholder="Select sub-category"
-                                    variant="bordered"
+                                    label="Sub-Category (Optional)"
                                     labelPlacement="outside"
+                                    placeholder="Choose sub-cat"
+                                    variant="bordered"
                                     isDisabled={subcategories.length === 0}
                                     selectedKeys={formData.subcategory ? [formData.subcategory] : []}
                                     onSelectionChange={(keys) => handleSelectChange('subcategory', Array.from(keys)[0])}
                                     classNames={{
-                                        label: "text-slate-700 dark:text-slate-200 font-bold text-sm",
-                                        trigger: "h-12 border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-950/40 focus-within:border-indigo-500 transition-all shadow-none"
+                                        label: "text-slate-700 dark:text-slate-200 font-bold text-sm mb-2",
+                                        trigger: "h-12 border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950/60 transition-all shadow-sm focus-within:ring-2 focus-within:ring-indigo-500/20"
                                     }}
                                 >
                                     {subcategories.map((subcat) => (
-                                        <SelectItem key={subcat._id} value={subcat._id} className="text-slate-800 dark:text-slate-200">
+                                        <SelectItem key={subcat._id} value={subcat._id}>
                                             {subcat.name}
                                         </SelectItem>
                                     ))}
@@ -264,133 +270,141 @@ export default function AddProduct() {
                             </h3>
                             <Divider className="bg-slate-100 dark:bg-slate-800" />
 
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-10">
                                 <Input
                                     isRequired
                                     type="number"
-                                    label="Rental Price (₹)"
+                                    label="Daily Rent (₹)"
+                                    labelPlacement="outside"
                                     name="rentalPrice"
                                     value={formData.rentalPrice}
                                     onChange={handleInputChange}
                                     placeholder="0.00"
                                     variant="bordered"
-                                    labelPlacement="outside"
-                                    startContent={<span className="text-slate-500 text-sm">₹</span>}
+                                    startContent={<span className="text-indigo-500 font-bold text-sm">₹</span>}
                                     classNames={{
-                                        label: "text-slate-700 dark:text-slate-200 font-bold text-sm",
-                                        inputWrapper: "h-12 border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-950/40 focus-within:border-indigo-500 transition-all shadow-none"
+                                        label: "text-slate-700 dark:text-slate-200 font-bold text-sm mb-2",
+                                        inputWrapper: "h-12 border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950/60 transition-all shadow-sm focus-within:ring-2 focus-within:ring-indigo-500/20"
                                     }}
                                 />
                                 <Input
                                     isRequired
                                     type="number"
                                     label="Security Deposit (₹)"
+                                    labelPlacement="outside"
                                     name="securityDeposit"
                                     value={formData.securityDeposit}
                                     onChange={handleInputChange}
                                     placeholder="0.00"
                                     variant="bordered"
-                                    labelPlacement="outside"
-                                    startContent={<span className="text-slate-500 text-sm">₹</span>}
+                                    startContent={<span className="text-indigo-500 font-bold text-sm">₹</span>}
                                     classNames={{
-                                        label: "text-slate-700 dark:text-slate-200 font-bold text-sm",
-                                        inputWrapper: "h-12 border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-950/40 focus-within:border-indigo-500 transition-all shadow-none"
+                                        label: "text-slate-700 dark:text-slate-200 font-bold text-sm mb-2",
+                                        inputWrapper: "h-12 border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950/60 transition-all shadow-sm focus-within:ring-2 focus-within:ring-indigo-500/20"
                                     }}
                                 />
                                 <Input
                                     isRequired
                                     type="number"
-                                    label="Units in Stock"
+                                    label="Stock Quantity"
+                                    labelPlacement="outside"
                                     name="stock"
                                     value={formData.stock}
                                     onChange={handleInputChange}
                                     placeholder="1"
                                     variant="bordered"
-                                    labelPlacement="outside"
-                                    startContent={<FiBox className="text-slate-500 text-sm" />}
+                                    startContent={<FiBox className="text-indigo-500 text-sm" />}
                                     classNames={{
-                                        label: "text-slate-700 dark:text-slate-200 font-bold text-sm",
-                                        inputWrapper: "h-12 border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-950/40 focus-within:border-indigo-500 transition-all shadow-none"
+                                        label: "text-slate-700 dark:text-slate-200 font-bold text-sm mb-2",
+                                        inputWrapper: "h-12 border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950/60 transition-all shadow-sm focus-within:ring-2 focus-within:ring-indigo-500/20"
                                     }}
                                 />
                                 <Select
                                     isRequired
                                     label="Item Condition"
-                                    variant="bordered"
                                     labelPlacement="outside"
+                                    variant="bordered"
                                     placeholder="Condition"
                                     selectedKeys={[formData.condition]}
                                     onSelectionChange={(keys) => handleSelectChange('condition', Array.from(keys)[0])}
                                     classNames={{
-                                        label: "text-slate-700 dark:text-slate-200 font-bold text-sm",
-                                        trigger: "h-12 border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-950/40 focus-within:border-indigo-500 transition-all shadow-none"
+                                        label: "text-slate-700 dark:text-slate-200 font-bold text-sm mb-2",
+                                        trigger: "h-12 border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950/60 transition-all shadow-sm focus-within:ring-2 focus-within:ring-indigo-500/20"
                                     }}
                                 >
-                                    <SelectItem key="New" value="New" className="text-slate-800 dark:text-slate-200">New</SelectItem>
-                                    <SelectItem key="Good" value="Good" className="text-slate-800 dark:text-slate-200">Good</SelectItem>
-                                    <SelectItem key="Fair" value="Fair" className="text-slate-800 dark:text-slate-200">Fair</SelectItem>
+                                    <SelectItem key="New" value="New">New</SelectItem>
+                                    <SelectItem key="Good" value="Good">Good</SelectItem>
+                                    <SelectItem key="Fair" value="Fair">Fair</SelectItem>
                                 </Select>
                             </div>
                         </div>
 
                         {/* Location & Media */}
-                        <div className="space-y-4">
-                            <h3 className="text-lg font-semibold text-slate-900 dark:text-white flex items-center gap-2">
-                                <FiMapPin className="text-rose-500" /> Location & Media
-                            </h3>
-                            <Divider className="bg-slate-100 dark:bg-slate-800" />
+                        {/* Location & Media */}
+                        <div className="space-y-8">
+                            <div className="space-y-3">
+                                <h3 className="text-lg font-semibold text-slate-900 dark:text-white flex items-center gap-2">
+                                    <FiMapPin className="text-rose-500" /> Location & Media
+                                </h3>
+                                <Divider className="bg-slate-100 dark:bg-slate-800" />
+                            </div>
 
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-10">
                                 <Input
                                     isRequired
-                                    label="City"
+                                    label="Pickup City"
+                                    labelPlacement="outside"
                                     name="city"
                                     value={formData.city}
                                     onChange={handleInputChange}
                                     placeholder="e.g. Bangalore"
                                     variant="bordered"
-                                    labelPlacement="outside"
                                     classNames={{
-                                        label: "text-slate-700 dark:text-slate-200 font-bold text-sm",
-                                        inputWrapper: "h-12 border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-950/40 focus-within:border-indigo-500 transition-all shadow-none"
+                                        label: "text-slate-700 dark:text-slate-200 font-bold text-sm mb-2",
+                                        inputWrapper: "h-12 border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950/60 transition-all shadow-sm focus-within:ring-2 focus-within:ring-indigo-500/20"
                                     }}
                                 />
                                 <Input
                                     isRequired
                                     label="State"
+                                    labelPlacement="outside"
                                     name="state"
                                     value={formData.state}
                                     onChange={handleInputChange}
                                     placeholder="e.g. Karnataka"
                                     variant="bordered"
-                                    labelPlacement="outside"
                                     classNames={{
-                                        label: "text-slate-700 dark:text-slate-200 font-bold text-sm",
-                                        inputWrapper: "h-12 border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-950/40 focus-within:border-indigo-500 transition-all shadow-none"
+                                        label: "text-slate-700 dark:text-slate-200 font-bold text-sm mb-2",
+                                        inputWrapper: "h-12 border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950/60 transition-all shadow-sm focus-within:ring-2 focus-within:ring-indigo-500/20"
                                     }}
                                 />
                             </div>
 
-                            <Input
-                                label="Product Image URL (Cloudinary URL)"
-                                name="image"
-                                value={formData.image}
-                                onChange={handleInputChange}
-                                placeholder="https://res.cloudinary.com/..."
-                                variant="bordered"
-                                labelPlacement="outside"
-                                startContent={<FiImage className="text-slate-500 text-sm" />}
-                                classNames={{
-                                    label: "text-slate-700 dark:text-slate-200 font-bold text-sm",
-                                    inputWrapper: "h-12 border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-950/40 focus-within:border-indigo-500 transition-all shadow-none"
-                                }}
-                            />
+                            <div className="space-y-6">
+                                <Input
+                                    label="Product Images (Cloudinary URL)"
+                                    labelPlacement="outside"
+                                    name="image"
+                                    value={formData.image}
+                                    onChange={handleInputChange}
+                                    placeholder="https://res.cloudinary.com/..."
+                                    variant="bordered"
+                                    startContent={<FiImage className="text-indigo-500 text-sm" />}
+                                    classNames={{
+                                        label: "text-slate-700 dark:text-slate-200 font-bold text-sm mb-2",
+                                        inputWrapper: "h-12 border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950/60 transition-all shadow-sm focus-within:ring-2 focus-within:ring-indigo-500/20"
+                                    }}
+                                />
 
-                            {formData.image && (
-                                <div className="mt-4 p-2 border border-slate-200 dark:border-slate-800 rounded-xl w-32 h-32 flex items-center justify-center bg-slate-50 dark:bg-slate-900/50">
-                                    <img src={formData.image} alt="Preview" className="max-w-full max-h-full object-contain rounded-lg" />
-                                </div>
-                            )}
+                                {formData.image && (
+                                    <div className="p-4 border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-3xl w-full max-w-sm overflow-hidden bg-slate-50 dark:bg-slate-900/40">
+                                        <p className="text-[10px] uppercase font-bold text-slate-400 mb-3 tracking-widest text-center">Visual Preview</p>
+                                        <div className="h-48 flex items-center justify-center bg-white dark:bg-slate-950 rounded-2xl overflow-hidden shadow-inner border border-slate-100 dark:border-slate-800/50">
+                                            <img src={formData.image} alt="Preview" className="max-w-full max-h-full object-contain p-2" />
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
                         </div>
 
                         <div className="flex justify-end pt-4">
