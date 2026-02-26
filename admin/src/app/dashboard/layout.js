@@ -1,17 +1,15 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "@heroui/react";
 import { usePathname } from 'next/navigation';
+import { motion, AnimatePresence } from "framer-motion";
 import {
-  Navbar,
-  NavbarBrand,
-  NavbarContent,
-  NavbarItem,
   Sidebar,
   SidebarItem,
   SidebarSection,
   User,
+  Avatar,
   Button,
   Dropdown,
   DropdownTrigger,
@@ -26,12 +24,92 @@ import {
 } from 'react-icons/fi';
 
 import { useRouter } from "next/navigation";
+import { ThemeToggle } from "../../components/ThemeToggle";
 
 export default function DashboardLayout({ children }) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [openMenus, setOpenMenus] = useState({});
+  const [adminInfo, setAdminInfo] = useState({ name: 'Admin', role: 'admin' });
+  const [notifications, setNotifications] = useState([]);
+  const [unreadCount, setUnreadCount] = useState(0);
+
   const pathname = usePathname();
   const router = useRouter();
+
+  // Fetch notifications
+  const fetchNotifications = async () => {
+    try {
+      const token = localStorage.getItem("adminToken");
+      if (!token) return;
+
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000"}/api/notifications`, {
+        headers: { "Authorization": `Bearer ${token}` }
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setNotifications(data);
+      }
+
+      const countRes = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000"}/api/notifications/unread-count`, {
+        headers: { "Authorization": `Bearer ${token}` }
+      });
+      if (countRes.ok) {
+        const countData = await countRes.json();
+        setUnreadCount(countData.count);
+      }
+    } catch (error) {
+      console.error("Failed to load notifications", error);
+    }
+  };
+
+  const markAllAsRead = async () => {
+    try {
+      const token = localStorage.getItem("adminToken");
+      await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000"}/api/notifications/read-all`, {
+        method: 'PUT',
+        headers: { "Authorization": `Bearer ${token}` }
+      });
+      fetchNotifications();
+    } catch (error) {
+      console.error("Failed to mark all as read", error);
+    }
+  };
+
+  const markAsRead = async (id) => {
+    try {
+      const token = localStorage.getItem("adminToken");
+      await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000"}/api/notifications/${id}/read`, {
+        method: 'PUT',
+        headers: { "Authorization": `Bearer ${token}` }
+      });
+      fetchNotifications();
+    } catch (error) {
+      console.error("Failed to mark as read", error);
+    }
+  };
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const storedInfo = localStorage.getItem("adminInfo");
+      if (storedInfo) {
+        try {
+          const parsed = JSON.parse(storedInfo);
+          setAdminInfo(parsed.user || parsed);
+        } catch (err) {
+          console.error("Failed to parse admin data", err);
+        }
+      }
+    }
+
+    fetchNotifications();
+
+    // Setup basic polling to fake realtime updates for dashboard
+    const interval = setInterval(() => {
+      fetchNotifications();
+    }, 30000);
+
+    return () => clearInterval(interval);
+  }, []);
 
   const toggleMenu = (menuName) => {
     setOpenMenus(prev => ({
@@ -88,7 +166,7 @@ export default function DashboardLayout({ children }) {
       ]
     },
     {
-      name: 'KYC Mgt', icon: FiShield, path: '/dashboard/kyc',
+      name: 'KYC ', icon: FiShield, path: '/dashboard/kyc',
       submenu: [
         { name: 'Pending', path: '/dashboard/kyc/pending' },
         { name: 'Under Review', path: '/dashboard/kyc/review' },
@@ -174,19 +252,18 @@ export default function DashboardLayout({ children }) {
   };
 
   return (
-    <div className="flex bg-slate-900 border-none m-0 p-0 text-slate-100 min-h-screen relative z-10 w-full">
+    <div className="flex bg-slate-50 dark:bg-slate-900 border-none m-0 p-0 text-slate-800 dark:text-slate-100 h-screen overflow-hidden relative z-10 w-full transition-colors duration-300">
       {/* Sidebar */}
       <aside
         className={`${isSidebarOpen ? "w-72" : "w-0"
-          } transition-all duration-300 border-r border-slate-800/60 bg-slate-950/80 backdrop-blur-3xl flex flex-col overflow-hidden h-screen sticky top-0`}
+          } transition-all duration-300 border-r border-slate-200 dark:border-slate-800/60 bg-white dark:bg-slate-950 flex flex-col overflow-hidden h-screen sticky top-0`}
       >
-        <div className="h-20 flex items-center px-6 border-b border-slate-800/60 flex-shrink-0 bg-transparent">
-          <div className="h-9 w-9 bg-gradient-to-tr from-indigo-500 to-purple-600 rounded-xl mr-3 shadow-lg shadow-indigo-500/20 flex items-center justify-center text-white font-bold tracking-tighter">
-            IR
-          </div>
-          <span className="font-bold text-xl tracking-tight text-white">
-            Indian<span className="text-indigo-400 font-light">Rentals</span>
-          </span>
+        <div className="h-16 flex items-center px-6 border-b border-slate-200 dark:border-slate-800/60 shrink-0 bg-transparent">
+          <img
+            src="https://res.cloudinary.com/dpu9ikeqe/image/upload/v1771271177/1d1f7c4e3c0490bcddb69ceb328c67be2f7cf361_cf3y9m.png"
+            alt="Logo"
+            className="h-10 w-auto object-contain"
+          />
         </div>
 
         <nav className="flex-1 overflow-y-auto px-4 py-6 scrollbar-hide">
@@ -202,29 +279,29 @@ export default function DashboardLayout({ children }) {
                     <button
                       onClick={() => toggleMenu(item.name)}
                       className={`w-full flex items-center justify-between px-4 py-3 rounded-xl transition-all duration-200 group ${isActive
-                        ? 'bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 shadow-inner'
-                        : 'text-slate-400 hover:bg-slate-800/50 hover:text-slate-200'
+                        ? 'bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-500/20 shadow-inner'
+                        : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800/50 hover:text-slate-900 dark:hover:text-slate-200'
                         }`}
                     >
                       <div className="flex items-center gap-3">
-                        <item.icon className={`w-5 h-5 shrink-0 ${isActive ? 'text-indigo-400' : 'text-slate-500 group-hover:text-slate-400'}`} />
+                        <item.icon className={`w-5 h-5 shrink-0 ${isActive ? 'text-indigo-600 dark:text-indigo-400' : 'text-slate-500 dark:text-slate-500 group-hover:text-slate-700 dark:group-hover:text-slate-400'}`} />
                         <span className="font-medium text-sm text-left truncate tracking-wide">{item.name}</span>
                       </div>
                       {isSubmenuOpen ?
-                        <FiChevronDown className="w-4 h-4 text-slate-500 group-hover:text-slate-300 shrink-0" /> :
-                        <FiChevronRight className="w-4 h-4 text-slate-600 group-hover:text-slate-400 shrink-0" />
+                        <FiChevronDown className="w-4 h-4 text-slate-500 group-hover:text-slate-700 dark:group-hover:text-slate-300 shrink-0" /> :
+                        <FiChevronRight className="w-4 h-4 text-slate-400 dark:text-slate-600 group-hover:text-slate-600 dark:group-hover:text-slate-400 shrink-0" />
                       }
                     </button>
                   ) : (
                     <Link
                       href={item.path}
                       className={`w-full flex items-center justify-between px-4 py-3 rounded-xl transition-all duration-200 group ${isActive
-                        ? 'bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 shadow-inner'
-                        : 'text-slate-400 hover:bg-slate-800/50 hover:text-slate-200'
+                        ? 'bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-500/20 shadow-inner'
+                        : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800/50 hover:text-slate-900 dark:hover:text-slate-200'
                         }`}
                     >
                       <div className="flex items-center gap-3">
-                        <item.icon className={`w-5 h-5 shrink-0 ${isActive ? 'text-indigo-400' : 'text-slate-500 group-hover:text-slate-400'}`} />
+                        <item.icon className={`w-5 h-5 shrink-0 ${isActive ? 'text-indigo-600 dark:text-indigo-400' : 'text-slate-500 dark:text-slate-500 group-hover:text-slate-700 dark:group-hover:text-slate-400'}`} />
                         <span className="font-medium text-sm truncate tracking-wide">{item.name}</span>
                       </div>
                     </Link>
@@ -232,7 +309,7 @@ export default function DashboardLayout({ children }) {
 
                   {/* Render Submenu */}
                   {hasSubmenu && isSubmenuOpen && (
-                    <div className="ml-9 mt-1 mb-2 space-y-1 border-l border-slate-800 pl-3">
+                    <div className="ml-9 mt-1 mb-2 space-y-1 border-l border-slate-200 dark:border-slate-800 pl-3">
                       {item.submenu.map(subItem => {
                         const isSubActive = pathname === subItem.path;
                         return (
@@ -240,8 +317,8 @@ export default function DashboardLayout({ children }) {
                             key={subItem.path}
                             href={subItem.path}
                             className={`block px-4 py-2 text-sm rounded-lg transition-all duration-200 w-full text-left ${isSubActive
-                                ? 'bg-indigo-500/10 text-indigo-300 font-medium tracking-wide'
-                                : 'text-slate-500 hover:bg-slate-800/40 hover:text-slate-300'
+                              ? 'bg-indigo-50 dark:bg-indigo-500/10 text-indigo-700 dark:text-indigo-300 font-medium tracking-wide'
+                              : 'text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800/40 hover:text-slate-800 dark:hover:text-slate-300'
                               }`}
                           >
                             {subItem.name}
@@ -256,10 +333,11 @@ export default function DashboardLayout({ children }) {
           </div>
         </nav>
 
-        <div className="p-4 border-t border-slate-800/60 flex-shrink-0 bg-slate-950/40">
+        {/* Sidebar Footer with Sign Out */}
+        <div className="mt-auto px-4 py-2 border-t border-slate-200 dark:border-slate-800/60 bg-slate-50 dark:bg-slate-950/40">
           <button
             onClick={handleLogout}
-            className="w-full flex items-center px-4 py-3 text-slate-400 hover:text-red-400 hover:bg-red-500/10 rounded-xl transition-colors text-sm font-medium tracking-wide"
+            className="w-full flex items-center px-4 py-2 text-slate-500 dark:text-slate-400 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-xl transition-colors text-sm font-medium tracking-wide"
           >
             <FiLogOut className="w-5 h-5 mr-3" />
             Sign Out
@@ -268,41 +346,91 @@ export default function DashboardLayout({ children }) {
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1 flex flex-col min-h-screen w-full relative">
+      <main className="flex-1 flex flex-col h-screen overflow-y-auto w-full relative bg-slate-50 dark:bg-slate-900 transition-colors duration-300">
         {/* Header */}
-        <header className="h-20 border-b border-slate-800/60 bg-slate-950/50 backdrop-blur-2xl flex items-center justify-between px-8 sticky top-0 z-40 flex-shrink-0">
+        <header className="h-16 border-b border-slate-200 dark:border-slate-800/60 bg-white/80 dark:bg-slate-950/50 backdrop-blur-2xl flex items-center justify-between px-8 sticky top-0 z-40 shrink-0 transition-colors duration-300">
           <div className="flex items-center gap-4">
             <button
               onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-              className="p-2 hover:bg-slate-800/80 rounded-xl transition-colors text-slate-400 hover:text-slate-200"
+              className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800/80 rounded-xl transition-colors text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200"
             >
               {isSidebarOpen ? <FiX className="w-5 h-5" /> : <FiMenu className="w-5 h-5" />}
             </button>
 
             <div className="hidden md:flex relative group">
-              <FiSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-indigo-400 transition-colors w-4 h-4" />
+              <FiSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500 group-focus-within:text-indigo-500 dark:group-focus-within:text-indigo-400 transition-colors w-4 h-4" />
               <input
                 type="text"
                 placeholder="Search Admin..."
-                className="bg-slate-900/50 border border-slate-800 rounded-xl pl-10 pr-4 py-2 text-sm text-slate-200 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-all w-64 focus:w-80"
+                className="bg-slate-100 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 rounded-xl pl-10 pr-4 py-2 text-sm text-slate-900 dark:text-slate-200 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-all w-64 focus:w-80"
               />
             </div>
           </div>
 
           <div className="flex items-center gap-5">
-            <button className="relative p-2 text-slate-400 hover:text-slate-200 hover:bg-slate-800/80 rounded-xl transition-all">
-              <FiBell className="w-5 h-5" />
-              <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full border border-slate-900"></span>
-            </button>
+            <ThemeToggle />
 
-            <div className="h-8 w-[1px] bg-slate-800"></div>
+            <Dropdown placement="bottom-end" className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 w-80">
+              <DropdownTrigger>
+                <button className="relative p-2 text-slate-400 hover:text-slate-200 hover:bg-slate-800/80 rounded-xl transition-all">
+                  <FiBell className="w-5 h-5" />
+                  {unreadCount > 0 && (
+                    <span className="absolute top-1 right-1 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 border-2 border-slate-900 text-[9px] font-bold text-white">
+                      {unreadCount > 9 ? '9+' : unreadCount}
+                    </span>
+                  )}
+                </button>
+              </DropdownTrigger>
+              <DropdownMenu aria-label="Notifications" variant="flat" className="p-0">
+                <DropdownItem isReadOnly key="header" className="h-14 gap-2 opacity-100 hover:bg-transparent rounded-none border-b border-slate-200 dark:border-slate-800">
+                  <div className="flex justify-between items-center w-full">
+                    <span className="font-semibold text-sm text-slate-900 dark:text-white">Notifications</span>
+                    {unreadCount > 0 && (
+                      <Button size="sm" variant="light" color="primary" onClick={(e) => { e.preventDefault(); markAllAsRead(); }} className="text-xs">
+                        Mark all read
+                      </Button>
+                    )}
+                  </div>
+                </DropdownItem>
+                {notifications.length === 0 ? (
+                  <DropdownItem isReadOnly key="empty" className="h-24 text-center text-slate-500 opacity-100 disabled pointer-events-none">
+                    No new notifications
+                  </DropdownItem>
+                ) : (
+                  notifications.slice(0, 5).map(note => (
+                    <DropdownItem
+                      key={note._id}
+                      className={`py-3 rounded-none border-b border-slate-100 dark:border-slate-800/50 ${!note.isRead ? 'bg-indigo-50/50 dark:bg-indigo-500/10' : ''}`}
+                      onClick={() => {
+                        if (!note.isRead) markAsRead(note._id);
+                      }}
+                    >
+                      <div className="flex flex-col gap-1">
+                        <span className={`text-sm ${!note.isRead ? 'font-semibold text-indigo-600 dark:text-indigo-400' : 'text-slate-700 dark:text-slate-300'}`}>
+                          {note.title}
+                        </span>
+                        <span className="text-xs text-slate-500 line-clamp-2">{note.message}</span>
+                        <span className="text-[10px] text-slate-400 mt-1">
+                          {new Date(note.createdAt).toLocaleDateString()} at {new Date(note.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                        </span>
+                      </div>
+                    </DropdownItem>
+                  ))
+                )}
+                <DropdownItem key="view-all" className="h-12 text-center opacity-100 text-indigo-500 font-medium rounded-none hover:bg-slate-50 dark:hover:bg-slate-800/50">
+                  View All Notifications
+                </DropdownItem>
+              </DropdownMenu>
+            </Dropdown>
 
-            <Dropdown placement="bottom-end" className="bg-slate-900 border border-slate-800">
+            <div className="h-8 w-px bg-slate-300 dark:bg-slate-800"></div>
+
+            <Dropdown placement="bottom-end" className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800">
               <DropdownTrigger>
                 <div className="flex items-center gap-3 cursor-pointer hover:opacity-80 transition-opacity">
                   <div className="hidden md:flex flex-col items-end">
-                    <span className="text-sm font-medium text-slate-200">Admin User</span>
-                    <span className="text-xs text-slate-500">Superadmin</span>
+                    <span className="text-sm font-medium text-slate-900 dark:text-slate-200">{adminInfo?.name || 'Admin'}</span>
+                    <span className="text-xs text-slate-500 capitalize">{adminInfo?.role || 'Administrator'}</span>
                   </div>
                   <User
                     as="button"
@@ -318,13 +446,13 @@ export default function DashboardLayout({ children }) {
                 </div>
               </DropdownTrigger>
               <DropdownMenu aria-label="User Actions" variant="flat">
-                <DropdownItem key="profile" className="text-slate-300">
+                <DropdownItem key="profile" className="text-slate-700 dark:text-slate-300">
                   Profile Settings
                 </DropdownItem>
-                <DropdownItem key="company" className="text-slate-300">
+                <DropdownItem key="company" className="text-slate-700 dark:text-slate-300">
                   Global Config
                 </DropdownItem>
-                <DropdownItem key="logout" color="danger" className="text-red-400" onClick={handleLogout}>
+                <DropdownItem key="logout" color="danger" className="text-red-600 dark:text-red-400" onClick={handleLogout}>
                   Sign Out
                 </DropdownItem>
               </DropdownMenu>
@@ -333,7 +461,7 @@ export default function DashboardLayout({ children }) {
         </header>
 
         {/* Page Content */}
-        <div className="flex-1 w-full bg-slate-900/40 relative z-10 overflow-x-hidden">
+        <div className="flex-1 w-full bg-slate-50 dark:bg-slate-900/40 relative z-10 overflow-x-hidden p-6 md:p-8">
           {children}
         </div>
       </main>

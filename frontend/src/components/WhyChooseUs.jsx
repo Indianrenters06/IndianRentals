@@ -6,7 +6,7 @@ import { motion } from 'framer-motion';
 const WhyChooseUs = () => {
     return (
         <section className="py-10 md:py-20 bg-[#FFFDF7] overflow-hidden">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="grid md:grid-cols-2 gap-8 md:gap-16 items-center">
 
                     {/* Text Content - always first on mobile */}

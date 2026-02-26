@@ -24,8 +24,8 @@ const Hero = () => {
     const [activeSlide, setActiveSlide] = useState(0);
 
     return (
-        <section className="bg-white py-4 md:py-6 px-4 sm:px-6 lg:px-8">
-            <div className="max-w-[1400px] mx-auto relative">
+        <section className="bg-white py-4 md:py-6">
+            <div className="max-w-[1440px] mx-auto px-6 sm:px-8 lg:px-6 relative">
 
                 {/* Mobile: Card-style horizontal carousel peek */}
                 <div className="md:hidden relative overflow-hidden">

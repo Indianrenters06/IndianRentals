@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@custom-variant dark (&:is(.dark, .dark *));
 
 @theme {
   --color-brand-50: #eef2ff;
@@ -13,12 +14,12 @@
 
 @layer utilities {
   .glass {
-    @apply bg-white/5 backdrop-blur-xl border border-white/10 shadow-2xl;
+    @apply bg-slate-100/10 dark:bg-slate-900/50 backdrop-blur-xl border border-slate-200/20 dark:border-white/10 shadow-xl dark:shadow-2xl transition-all duration-300;
   }
 }
 
 body {
-  @apply bg-slate-900 text-slate-100 antialiased min-h-screen selection:bg-brand-500 selection:text-white;
+  @apply bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-slate-100 antialiased min-h-screen selection:bg-brand-500 selection:text-white transition-colors duration-300;
 }
 
 /* Custom scrollbar */

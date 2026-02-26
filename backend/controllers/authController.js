@@ -1,6 +1,7 @@
 const asyncHandler = require('express-async-handler');
 const User = require('../models/User');
 const generateToken = require('../utils/generateToken');
+const { createNotification } = require('./notificationController');
 
 const sendEmail = require('../utils/sendEmail');
 const sendSMS = require('../utils/sendSMS');
@@ -9,6 +10,35 @@ const sendSMS = require('../utils/sendSMS');
 const generateOTP = () => {
     return Math.floor(100000 + Math.random() * 900000).toString();
 };
+
+// @desc    Register a new user & Send OTPs
+// @route   POST /api/auth/register
+// @access  Public
+const adminLogin = asyncHandler(async (req, res) => {
+    const { email, password } = req.body;
+
+    const user = await User.findOne({ email }).select('+password');
+
+    if (user && (await user.matchPassword(password))) {
+        if (user.role !== 'admin') {
+            res.status(401);
+            throw new Error('Not authorized as an admin');
+        }
+
+        const token = generateToken(res, user._id);
+
+        res.json({
+            _id: user._id,
+            name: user.name,
+            email: user.email,
+            role: user.role,
+            token: token,
+        });
+    } else {
+        res.status(401);
+        throw new Error('Invalid email or password');
+    }
+});
 
 // @desc    Register a new user & Send OTPs
 // @route   POST /api/auth/register
@@ -63,6 +93,13 @@ const registerUser = asyncHandler(async (req, res) => {
         } catch (error) {
             console.error('SMS send failed:', error);
         }
+
+        await createNotification({
+            title: 'New User Registered',
+            message: `User ${name} (${email}) just joined IndianRentals.`,
+            type: 'user',
+            relatedId: user._id
+        });
 
         res.status(201).json({
             message: 'Registration successful. Please verify your email and phone.',
@@ -337,4 +374,5 @@ module.exports = {
     verifyOtp,
     sendLoginOtp,
     verifyLoginOtp,
+    adminLogin,
 };

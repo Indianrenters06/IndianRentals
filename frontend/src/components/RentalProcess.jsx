@@ -42,7 +42,7 @@ const steps = [
 const RentalProcess = () => {
     return (
         <section className="py-10 md:py-20 bg-gray-50">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="flex flex-col md:flex-row md:items-end justify-between mb-8 md:mb-12 gap-4">
                     <div>
                         <h2 className="text-4xl font-semibold font-manrope text-gray-900 mb-2">

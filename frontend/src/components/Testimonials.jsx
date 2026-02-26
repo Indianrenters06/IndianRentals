@@ -157,7 +157,7 @@ const Testimonials = () => {
 
     return (
         <section ref={wrapperRef} className="py-10 md:py-20 bg-white relative overflow-hidden">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 mb-8">
+            <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 relative z-10 mb-8">
                 {/* Header */}
                 <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
                     <div className="space-y-2 md:space-y-4 max-w-2xl">
@@ -238,7 +238,7 @@ const Testimonials = () => {
             </div>
 
             {/* Read All Reviews Button */}
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-30 pt-2">
+            <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 relative z-30 pt-2">
                 <div className="flex justify-center">
                     <button className="px-8 py-3 md:px-10 md:py-4 bg-[#007AFF] text-white font-bold rounded-full hover:bg-blue-600 transition-all shadow-lg hover:shadow-blue-200 hover:-translate-y-1 text-sm md:text-base">
                         Read All Reviews

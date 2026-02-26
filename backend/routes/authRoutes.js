@@ -4,11 +4,13 @@ const {
     registerUser,
     loginUser,
     logoutUser,
-    verifyOtp
+    verifyOtp,
+    adminLogin
 } = require('../controllers/authController');
 
 router.post('/register', registerUser);
 router.post('/login', loginUser);
+router.post('/admin-login', adminLogin);
 router.post('/logout', logoutUser);
 router.post('/verify', verifyOtp);
 router.post('/send-otp', require('../controllers/authController').sendLoginOtp);

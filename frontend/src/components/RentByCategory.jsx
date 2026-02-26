@@ -80,7 +80,7 @@ const RentByCategory = () => {
 
     return (
         <section className="py-8 md:py-20 bg-white">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="flex items-center justify-between mb-6 md:mb-12">
                     <h2 className="text-4xl font-semibold font-manrope text-gray-900 tracking-tight">Rent by Category</h2>
                     <Link
@@ -148,7 +148,7 @@ const RentByCategory = () => {
                                 slidesPerView: 6,
                             },
                         }}
-                        className="py-4 overflow-visible!"
+                        className="py-4"
                     >
                         {displayCategories.map((cat) => (
                             <SwiperSlide key={cat._id}>

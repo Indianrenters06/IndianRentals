@@ -3,6 +3,7 @@ const User = require('../models/User');
 const Product = require('../models/Product');
 const Rental = require('../models/Rental');
 const KYC = require('../models/KYC');
+const Notification = require('../models/Notification');
 
 // @desc    Get admin dashboard statistics
 // @route   GET /api/admin/stats
@@ -37,6 +38,12 @@ const getDashboardStats = asyncHandler(async (req, res) => {
     const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
     const activeNow = await User.countDocuments({ lastLogin: { $gte: oneDayAgo } });
 
+    // 8. Pending KYC count
+    const pendingKYC = await KYC.countDocuments({ status: 'pending' });
+
+    // 9. Recent Notifications
+    const recentNotifications = await Notification.find({}).sort({ createdAt: -1 }).limit(5);
+
     res.json({
         totalUsers,
         totalProducts,
@@ -44,7 +51,9 @@ const getDashboardStats = asyncHandler(async (req, res) => {
         totalRevenue,
         recentRentals,
         lowStockProducts,
-        activeNow
+        activeNow,
+        pendingKYC,
+        recentNotifications
     });
 });
 

@@ -2,6 +2,7 @@ const asyncHandler = require('express-async-handler');
 const Rental = require('../models/Rental');
 const Product = require('../models/Product');
 const { RENTAL_STATUS } = require('../config/constants');
+const { createNotification } = require('./notificationController');
 
 // @desc    Create new rental order
 // @route   POST /api/rentals
@@ -35,6 +36,14 @@ const addRentalItems = asyncHandler(async (req, res) => {
         });
 
         const createdRental = await rental.save();
+
+        await createNotification({
+            title: 'New Rental Order',
+            message: `Order ${createdRental._id.toString().slice(-6)} placed for ₹${totalPrice}.`,
+            type: 'order',
+            relatedId: createdRental._id
+        });
+
         res.status(201).json(createdRental);
     }
 });

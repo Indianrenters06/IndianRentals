@@ -16,7 +16,7 @@ const makeAdmin = async (email) => {
             process.exit(1);
         }
 
-        user.isAdmin = true;
+        user.role = 'admin';
         await user.save();
 
         console.log(`✅ User ${user.name} (${user.email}) is now an admin!`);

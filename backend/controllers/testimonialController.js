@@ -1,5 +1,6 @@
 const asyncHandler = require('express-async-handler');
 const Testimonial = require('../models/Testimonial');
+const { createNotification } = require('./notificationController');
 
 // @desc    Get all testimonials
 // @route   GET /api/testimonials
@@ -32,6 +33,14 @@ const createTestimonial = asyncHandler(async (req, res) => {
     });
 
     const createdTestimonial = await testimonial.save();
+
+    await createNotification({
+        title: 'New Testimonial Submission',
+        message: `A new testimonial from ${name} is awaiting approval.`,
+        type: 'user',
+        relatedId: createdTestimonial._id
+    });
+
     res.status(201).json(createdTestimonial);
 });
 

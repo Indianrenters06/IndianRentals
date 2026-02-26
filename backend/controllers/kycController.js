@@ -1,5 +1,6 @@
 const KYC = require('../models/KYC');
 const User = require('../models/User');
+const { createNotification } = require('./notificationController');
 
 // @desc    Get All KYC Requests (Admin)
 // @route   GET /api/kyc/admin/all
@@ -83,6 +84,14 @@ exports.createOrUpdateKYC = async (req, res) => {
         // Create
         kyc = new KYC(kycFields);
         await kyc.save();
+
+        await createNotification({
+            title: 'New KYC Submission',
+            message: `User ${req.user.name} submitted their KYC details for review.`,
+            type: 'kyc',
+            relatedId: kyc._id
+        });
+
         res.status(201).json(kyc);
 
     } catch (err) {
@@ -143,6 +152,13 @@ exports.uploadKYCDocuments = async (req, res) => {
                 status: 'pending' // Just uploading docs, maybe details missing
             });
             await kyc.save();
+
+            await createNotification({
+                title: 'New KYC Documents',
+                message: `User ${req.user.name} uploaded new KYC documents.`,
+                type: 'kyc',
+                relatedId: kyc._id
+            });
         }
 
         res.status(200).json(kyc);

@@ -8,7 +8,7 @@ import { FaArrowRight } from 'react-icons/fa';
 const FeatureSection = () => {
     return (
         <section className="py-12 md:py-20 bg-white overflow-hidden relative">
-            <div className="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
 
                 {/* Inner solid blue background container */}
                 <div className="bg-[#e4effc] rounded-[1.8rem] relative p-8 md:p-12 lg:p-14 flex flex-col lg:flex-row items-center justify-between gap-10 lg:gap-6">

@@ -70,8 +70,21 @@ const kycRoutes = require('./routes/kycRoutes');
 app.use('/api/kyc', kycRoutes);
 const adminRoutes = require('./routes/adminRoutes'); // Admin Dashboard
 app.use('/api/admin', adminRoutes);
+
 const testimonialRoutes = require('./routes/testimonialRoutes'); // Testimonials
 app.use('/api/testimonials', testimonialRoutes);
+
+const cmsRoutes = require('./routes/cmsRoutes');
+app.use('/api/cms', cmsRoutes);
+
+const settingsRoutes = require('./routes/settingsRoutes');
+app.use('/api/settings', settingsRoutes);
+
+const couponRoutes = require('./routes/couponRoutes');
+app.use('/api/coupons', couponRoutes);
+
+const notificationRoutes = require('./routes/notificationRoutes');
+app.use('/api/notifications', notificationRoutes);
 
 app.get('/', (req, res) => {
   res.send('API is running...');

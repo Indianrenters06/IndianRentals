@@ -42,45 +42,33 @@ export default function UsersManagement() {
 
     const fetchUsers = async () => {
         try {
-            const userInfo = JSON.parse(localStorage.getItem('userInfo') || '{}');
-            const token = userInfo.token;
+            setLoading(true);
+            const token = localStorage.getItem('adminToken');
 
-            // In our mock dashboard, we'll populate mock users until the backend is fully wired.
-            // If API fails, fall back to stunning mock data.
-            try {
-                const response = await fetch('http://localhost:5000/api/admin/users', {
-                    headers: {
-                        'Authorization': `Bearer ${token}`
-                    }
-                });
-                if (response.ok) {
-                    const data = await response.json();
-                    if (Array.isArray(data) && data.length > 0) {
-                        setUsers(data);
-                        setLoading(false);
-                        return;
-                    }
+            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/admin/users`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
                 }
-            } catch (err) {
-                console.warn("API not reachable, falling back to mock users data");
-            }
+            });
 
-            // Mock data fallback
+            if (response.ok) {
+                const data = await response.json();
+                setUsers(data);
+            } else {
+                // Fallback to mock if API fails for demo
+                throw new Error("API failed");
+            }
+        } catch (error) {
+            console.error('Error fetching users:', error);
+            // Mock data fallback for missing backend endpoints
             setUsers([
                 { _id: "1", name: "Rahul Sharma", email: "rahul.s@example.com", phone: "+91 9876543210", city: "Mumbai", state: "Maharashtra", isAdmin: true, createdAt: "2023-01-15T10:00:00Z" },
                 { _id: "2", name: "Sneha Menon", email: "sneha.m@example.com", phone: "+91 9876543211", city: "Bangalore", state: "Karnataka", isAdmin: false, createdAt: "2023-03-22T14:30:00Z" },
                 { _id: "3", name: "Amit Kumar", email: "amit.k@example.com", phone: "+91 9876543212", city: "Delhi", state: "Delhi", isAdmin: false, createdAt: "2023-05-10T09:15:00Z" },
                 { _id: "4", name: "Priya Desai", email: "priya.d@example.com", phone: "+91 9876543213", city: "Pune", state: "Maharashtra", isAdmin: false, createdAt: "2023-07-05T16:45:00Z" },
-                { _id: "5", name: "Vikram Singh", email: "vikram.s@example.com", phone: "+91 9876543214", city: "Jaipur", state: "Rajasthan", isAdmin: false, createdAt: "2023-08-11T11:20:00Z" },
-                { _id: "6", name: "Neha Gupta", email: "neha.g@example.com", phone: "+91 9876543215", city: "Chennai", state: "Tamil Nadu", isAdmin: false, createdAt: "2023-09-30T08:00:00Z" },
-                { _id: "7", name: "Ravi Patel", email: "ravi.p@example.com", phone: "+91 9876543216", city: "Ahmedabad", state: "Gujarat", isAdmin: false, createdAt: "2023-11-12T13:10:00Z" },
-                { _id: "8", name: "Anjali Rao", email: "anjali.r@example.com", phone: "+91 9876543217", city: "Hyderabad", state: "Telangana", isAdmin: false, createdAt: "2024-01-05T15:25:00Z" },
-                { _id: "9", name: "Karan Johar", email: "karan.j@example.com", phone: "+91 9876543218", city: "Mumbai", state: "Maharashtra", isAdmin: false, createdAt: "2024-02-18T10:50:00Z" }
+                { _id: "5", name: "Vikram Singh", email: "vikram.s@example.com", phone: "+91 9876543214", city: "Jaipur", state: "Rajasthan", isAdmin: false, createdAt: "2023-08-11T11:20:00Z" }
             ]);
-            setLoading(false);
-
-        } catch (error) {
-            console.error('Error fetching users:', error);
+        } finally {
             setLoading(false);
         }
     };

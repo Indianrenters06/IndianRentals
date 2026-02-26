@@ -26,7 +26,7 @@ import ClientLayout from "@/components/ClientLayout";
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
-      <body className={`${manrope.variable} ${poppins.variable} font-sans bg-gray-50 antialiased`}>
+      <body className={`${manrope.variable} ${poppins.variable} font-sans bg-gray-50 antialiased overflow-x-hidden max-w-full`}>
         <ReduxProvider>
           <ClientLayout>
             {children}
