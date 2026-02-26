@@ -1,11 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import {
     Card,
     CardBody,
     CardHeader,
+    CardFooter,
     Input,
     Button,
     Switch,
