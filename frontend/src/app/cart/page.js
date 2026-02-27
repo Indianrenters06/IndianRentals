@@ -12,7 +12,7 @@ import { AiOutlineClose } from "react-icons/ai";
 
 import { useRouter } from 'next/navigation';
 import { useSelector, useDispatch } from 'react-redux';
-import { selectCartItems, updateCartItem, removeFromCart } from '../../redux/features/cartSlice';
+import { selectCartItems, selectCartTotals, updateCartItem, removeFromCart } from '../../redux/features/cartSlice';
 import OrderSummary from '../../components/OrderSummary';
 
 const CartItem = ({ item, onUpdate, onRemove }) => {
@@ -134,56 +134,30 @@ export default function CartPage() {
     const dispatch = useDispatch();
     const router = useRouter();
     const cartItems = useSelector(selectCartItems);
+    const totals = useSelector(selectCartTotals);
+    const { securityAmount, deliveryCharges, monthlyRentTotal, totalGST, totalOneTime, payToday, savedAmount } = totals;
 
-    const [couponCode, setCouponCode] = useState("");
+    const [couponCode, setCouponCode] = useState('');
     const [isCouponApplied, setIsCouponApplied] = useState(false);
 
-    const handleApplyCoupon = () => {
-        if (couponCode.trim()) {
-            setIsCouponApplied(true);
-        }
-    };
-
-    const handleRemoveCoupon = () => {
-        setIsCouponApplied(false);
-        setCouponCode("");
-    };
+    const handleApplyCoupon = () => { if (couponCode.trim()) setIsCouponApplied(true); };
+    const handleRemoveCoupon = () => { setIsCouponApplied(false); setCouponCode(''); };
 
     const updateItem = (id, updates) => {
         let finalUpdates = { ...updates };
-
-        // If updating duration, try to find new price from item's tenures
         if (updates.duration) {
             const item = cartItems.find(i => i.id === id);
-            if (item && item.tenures) {
-                const newPlan = item.tenures.find(t => updates.duration <= t.months) || item.tenures[item.tenures.length - 1];
-                if (newPlan) {
-                    finalUpdates.monthlyRent = newPlan.price;
-                }
+            if (item?.tenures) {
+                const plan = item.tenures.find(t => updates.duration <= t.months) || item.tenures[item.tenures.length - 1];
+                if (plan) finalUpdates.monthlyRent = plan.price;
             }
         }
-
         dispatch(updateCartItem({ id, ...finalUpdates }));
     };
-
-    const removeItem = (id) => {
-        dispatch(removeFromCart(id));
-    };
-
-    // Calculations
-    const securityAmount = cartItems.reduce((acc, item) => acc + (item.refundableAmount * item.quantity), 0);
-    const deliveryCharges = cartItems.length > 0 ? 400 : 0;
-
-    const monthlyRentTotal = cartItems.reduce((acc, item) => acc + ((item.monthlyRent || item.price) * item.quantity), 0);
-    const totalGST = Math.round(monthlyRentTotal * 0.18);
-
-    const totalOneTime = securityAmount + deliveryCharges + monthlyRentTotal + totalGST;
-
-    // Partial Logic - adjusted for demo or logic
-    const payToday = cartItems.length > 0 ? 600 : 0;
-    const savedAmount = 4030.00;
+    const removeItem = (id) => dispatch(removeFromCart(id));
 
     // Empty Cart State
+
     if (cartItems.length === 0) {
         return (
             <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center p-4 font-sans">

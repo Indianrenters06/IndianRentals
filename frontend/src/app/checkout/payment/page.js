@@ -1,31 +1,28 @@
 'use client';
 
 import React, { useState } from 'react';
+
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { useSelector } from 'react-redux';
 import { FaCreditCard, FaRegCheckCircle, FaLock } from 'react-icons/fa';
 import { BsBank, BsPhone, BsWallet2 } from 'react-icons/bs';
 import { SiPaytm, SiGooglepay, SiPhonepe } from 'react-icons/si';
+import { selectCartTotals } from '../../../redux/features/cartSlice';
 import OrderSummary from '../../../components/OrderSummary';
 
 export default function PaymentPage() {
     const router = useRouter();
+    const totals = useSelector(selectCartTotals);
+    const { securityAmount, deliveryCharges, monthlyRentTotal, totalGST, totalOneTime, payToday, savedAmount } = totals;
+
     const [selectedMethod, setSelectedMethod] = useState('card');
 
     const handlePay = () => {
-        // Handle payment processing logic here
-        alert(`Processing payment via ${selectedMethod}... Success! Order Placed.`);
-        router.push('/order-confirmation'); // Navigate to success page
+        // Navigate to confirmation with real amount (Razorpay integration to be done separately)
+        const params = new URLSearchParams({ amount: String(payToday) });
+        router.push(`/order-confirmation?${params.toString()}`);
     };
-
-    // Mock calculations
-    const securityAmount = 5000;
-    const deliveryCharges = 400;
-    const monthlyRentTotal = 1100;
-    const totalGST = 120;
-    const totalOneTime = 6620;
-    const payToday = 600;
-    const savedAmount = 4030.00;
 
     const paymentMethods = [
         {

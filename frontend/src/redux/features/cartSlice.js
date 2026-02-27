@@ -84,6 +84,24 @@ export const { addToCart, removeFromCart, updateCartItemQuantity, updateCartItem
 // Selectors
 export const selectCartItems = (state) => state.cart.items;
 export const selectCartTotalQuantity = (state) => state.cart.totalQuantity;
-export const selectCartTotalAmount = (state) => state.cart.items.reduce((total, item) => total + (item.price * item.quantity), 0);
+export const selectCartTotalAmount = (state) =>
+    state.cart.items.reduce((total, item) => total + (item.price * item.quantity), 0);
+
+/**
+ * Computes all checkout totals derived from cart items.
+ * Single source of truth used by Cart, Address, KYC, and Payment pages.
+ */
+export const selectCartTotals = (state) => {
+    const items = state.cart.items;
+    const securityAmount = items.reduce((acc, i) => acc + ((i.refundableAmount || 0) * i.quantity), 0);
+    const deliveryCharges = items.length > 0 ? 400 : 0;
+    const monthlyRentTotal = items.reduce((acc, i) => acc + ((i.monthlyRent || i.price) * i.quantity), 0);
+    const totalGST = Math.round(monthlyRentTotal * 0.18);
+    const totalOneTime = securityAmount + deliveryCharges + monthlyRentTotal + totalGST;
+    // payToday = first month rent + GST + delivery (security is separate)
+    const payToday = monthlyRentTotal + totalGST + deliveryCharges;
+    const savedAmount = items.length > 0 ? Math.max(0, totalOneTime * 0.1) : 0; // 10% savings indicator
+    return { securityAmount, deliveryCharges, monthlyRentTotal, totalGST, totalOneTime, payToday, savedAmount };
+};
 
 export default cartSlice.reducer;

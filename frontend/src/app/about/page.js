@@ -1,29 +1,42 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { PiGauge, PiSmiley } from 'react-icons/pi';
 import BestRentedProducts from '../../components/BestRentedProducts';
 import FaqSection from '../../components/FaqSection';
 
+const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+
 export default function AboutPage() {
-    const [activeTab, setActiveTab] = useState('vision'); // 'vision' or 'mission'
+    const [activeTab, setActiveTab] = useState('vision');
+    const [cmsBanner, setCmsBanner] = useState({ image: null, title: null });
+
+    useEffect(() => {
+        fetch(`${API}/api/cms/about`)
+            .then(r => r.ok ? r.json() : null)
+            .then(d => {
+                if (d) setCmsBanner({ image: d.bannerImage || null, title: d.bannerTitle || null });
+            })
+            .catch(() => { });
+    }, []);
 
     return (
         <div className="text-gray-800 pb-20">
             {/* 1. Header Image/Banner */}
             <div className="max-w-[1200px] mx-auto  sm:px-16 lg:px-3 mt-8 mb-16">
                 <div className="w-[1200px] h-[500px] relative bg-gray-200 overflow-hidden rounded-3xl opacity-100">
-                    {/* Placeholder for Banner Image */}
                     <Image
-                        src="https://res.cloudinary.com/dpu9ikeqe/image/upload/v1770800853/91c997360fd8d0ad44588aaaed2a31db6de1b8db_dck9cz.jpg"
+                        src={cmsBanner.image || "https://res.cloudinary.com/dpu9ikeqe/image/upload/v1770800853/91c997360fd8d0ad44588aaaed2a31db6de1b8db_dck9cz.jpg"}
                         alt="About Us Banner"
                         fill
                         className="object-cover object-center"
                     />
                     {/* Overlay Text */}
                     <div className="absolute inset-0 flex items-center justify-center">
-                        <h1 className="text-white text-4xl md:text-6xl font-semibold drop-shadow-lg">About Us</h1>
+                        <h1 className="text-white text-4xl md:text-6xl font-semibold drop-shadow-lg">
+                            {cmsBanner.title || "About Us"}
+                        </h1>
                     </div>
                 </div>
             </div>

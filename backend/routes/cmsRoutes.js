@@ -1,10 +1,14 @@
 const express = require('express');
 const router = express.Router();
-const { getHomepageCMS, updateHomepageCMS } = require('../controllers/cmsController');
+const { getAllPages, getPage, updatePage } = require('../controllers/cmsController');
 const { protect, admin } = require('../middleware/authMiddleware');
 
-router.route('/homepage')
-    .get(getHomepageCMS) // Allow public to get it? Or maybe protect it. Let's let anyone GET it so frontend can build.
-    .put(protect, admin, updateHomepageCMS);
+// GET all pages list (admin panel)
+router.get('/', protect, admin, getAllPages);
+
+// GET / PUT a specific page by name  e.g. /api/cms/homepage
+router.route('/:page')
+    .get(getPage)                          // Public – so frontend can read it
+    .put(protect, admin, updatePage);      // Admin only
 
 module.exports = router;

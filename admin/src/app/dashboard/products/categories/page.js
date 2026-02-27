@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { motion } from "framer-motion";
+import { useState, useEffect, useCallback } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import {
     Card,
     CardBody,
@@ -14,201 +14,483 @@ import {
     ModalBody,
     ModalFooter,
     useDisclosure,
-    Table,
-    TableHeader,
-    TableColumn,
-    TableBody,
-    TableRow,
-    TableCell,
     Chip,
     Avatar,
+    Tooltip,
+    Spinner,
 } from "@heroui/react";
-import { Plus, Folder, FolderPlus, Image, Gear, Trash, PencilSimple } from "@phosphor-icons/react";
+import {
+    Plus,
+    Folder,
+    FolderPlus,
+    FolderOpen,
+    Image,
+    Trash,
+    PencilSimple,
+    CaretDown,
+    CaretRight,
+    TreeStructure,
+    Tag,
+} from "@phosphor-icons/react";
 
+const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+
+function getToken() {
+    return typeof window !== "undefined" ? localStorage.getItem("adminToken") : null;
+}
+
+// ─── Subcategory pill row ─────────────────────────────────────────────────────
+function SubcategoryRow({ sub, onDelete }) {
+    return (
+        <div className="flex items-center gap-3 px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-100 dark:border-slate-700/50 group">
+            <Tag size={13} weight="fill" className="text-indigo-400 shrink-0" />
+            <Avatar
+                src={
+                    sub.image ||
+                    `https://ui-avatars.com/api/?name=${sub.name}&size=32&background=e0e7ff&color=6366f1`
+                }
+                size="sm"
+                className="w-7 h-7 shrink-0"
+            />
+            <div className="flex flex-col flex-1 min-w-0">
+                <span className="text-sm font-semibold text-slate-800 dark:text-slate-200 truncate">
+                    {sub.name}
+                </span>
+                <span className="text-xs font-mono text-slate-400">/{sub.slug}</span>
+            </div>
+            {sub.description && (
+                <span className="hidden md:block text-xs text-slate-500 line-clamp-1 max-w-[180px]">
+                    {sub.description}
+                </span>
+            )}
+            <Chip
+                size="sm"
+                color={sub.isActive ? "success" : "default"}
+                variant="flat"
+                className="shrink-0"
+            >
+                {sub.isActive ? "Active" : "Off"}
+            </Chip>
+            <Tooltip content="Delete subcategory" color="danger" size="sm">
+                <Button
+                    isIconOnly
+                    size="sm"
+                    variant="light"
+                    className="text-slate-400 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-all duration-200"
+                    onPress={() => onDelete(sub._id)}
+                >
+                    <Trash size={14} />
+                </Button>
+            </Tooltip>
+        </div>
+    );
+}
+
+// ─── Main page ────────────────────────────────────────────────────────────────
 export default function CategoriesCMS() {
-    const { isOpen, onOpen, onOpenChange } = useDisclosure();
+    const newCatModal = useDisclosure();
+    const newSubModal = useDisclosure();
+
     const [categories, setCategories] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [formData, setFormData] = useState({
-        name: "",
-        description: "",
-        image: "",
-    });
+    const [expandedIds, setExpandedIds] = useState(new Set());
 
-    const fetchCategories = async () => {
+    // Forms
+    const [catForm, setCatForm] = useState({ name: "", description: "", image: "" });
+    const [catSaving, setCatSaving] = useState(false);
+    const [subForm, setSubForm] = useState({ name: "", description: "", image: "" });
+    const [subSaving, setSubSaving] = useState(false);
+    const [activeCat, setActiveCat] = useState(null); // parent for the sub modal
+
+    // ── Fetch ─────────────────────────────────────────────────────────────────
+    const fetchCategories = useCallback(async () => {
         try {
             setLoading(true);
-            const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000"}/api/categories`);
+            const res = await fetch(`${API}/api/categories/admin`, {
+                headers: { Authorization: `Bearer ${getToken()}` },
+            });
             if (res.ok) {
                 const data = await res.json();
-                setCategories(Array.isArray(data) ? data : data.categories || []);
+                setCategories(Array.isArray(data) ? data : []);
             }
         } catch (err) {
             console.error(err);
         } finally {
             setLoading(false);
         }
-    };
+    }, []);
 
     useEffect(() => {
         fetchCategories();
-    }, []);
+    }, [fetchCategories]);
 
-    const handleInputChange = (e) => {
-        const { name, value } = e.target;
-        setFormData(prev => ({ ...prev, [name]: value }));
+    // ── Helpers ───────────────────────────────────────────────────────────────
+    const toggleExpand = (id) => {
+        setExpandedIds((prev) => {
+            const next = new Set(prev);
+            next.has(id) ? next.delete(id) : next.add(id);
+            return next;
+        });
     };
 
+    const openSubModal = (cat) => {
+        setActiveCat(cat);
+        setSubForm({ name: "", description: "", image: "" });
+        newSubModal.onOpen();
+    };
+
+    // ── CRUD ──────────────────────────────────────────────────────────────────
     const handleCreateCategory = async (onClose) => {
         try {
-            const token = localStorage.getItem("adminToken");
-            const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000"}/api/categories`, {
+            setCatSaving(true);
+            const res = await fetch(`${API}/api/categories`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
-                    "Authorization": `Bearer ${token}`
+                    Authorization: `Bearer ${getToken()}`,
                 },
-                body: JSON.stringify(formData)
+                body: JSON.stringify(catForm),
             });
-
-            if (!res.ok) {
-                const errData = await res.json();
-                throw new Error(errData.message || "Failed to create category");
-            }
-
-            alert("Category created successfully!");
-            setFormData({ name: "", description: "", image: "" });
+            if (!res.ok) throw new Error((await res.json()).message || "Failed");
+            setCatForm({ name: "", description: "", image: "" });
             onClose();
-            fetchCategories();
+            await fetchCategories();
         } catch (err) {
             alert(err.message);
+        } finally {
+            setCatSaving(false);
         }
     };
 
-    const handleDelete = async (id) => {
-        if (!confirm("Are you sure you want to delete this category?")) return;
+    const handleCreateSubcategory = async (onClose) => {
+        if (!activeCat) return;
         try {
-            const token = localStorage.getItem("adminToken");
-            const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000"}/api/categories/${id}`, {
-                method: "DELETE",
+            setSubSaving(true);
+            const res = await fetch(`${API}/api/categories/${activeCat._id}/subcategories`, {
+                method: "POST",
                 headers: {
-                    "Authorization": `Bearer ${token}`
-                }
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${getToken()}`,
+                },
+                body: JSON.stringify(subForm),
             });
-            if (res.ok) {
-                alert("Category deleted successfully!");
-                fetchCategories();
-            } else {
-                const errData = await res.json();
-                throw new Error(errData.message || "Failed to delete");
-            }
+            if (!res.ok) throw new Error((await res.json()).message || "Failed");
+            setSubForm({ name: "", description: "", image: "" });
+            onClose();
+            setExpandedIds((prev) => new Set([...prev, activeCat._id]));
+            await fetchCategories();
+        } catch (err) {
+            alert(err.message);
+        } finally {
+            setSubSaving(false);
+        }
+    };
+
+    const handleDeleteCategory = async (id) => {
+        if (!confirm("Delete this category and ALL its subcategories?")) return;
+        try {
+            const res = await fetch(`${API}/api/categories/${id}`, {
+                method: "DELETE",
+                headers: { Authorization: `Bearer ${getToken()}` },
+            });
+            if (res.ok) await fetchCategories();
+            else alert((await res.json()).message || "Failed");
         } catch (err) {
             alert(err.message);
         }
     };
 
+    const handleDeleteSubcategory = async (subId) => {
+        if (!confirm("Delete this subcategory?")) return;
+        try {
+            const res = await fetch(`${API}/api/categories/${subId}`, {
+                method: "DELETE",
+                headers: { Authorization: `Bearer ${getToken()}` },
+            });
+            if (res.ok) await fetchCategories();
+            else alert((await res.json()).message || "Failed");
+        } catch (err) {
+            alert(err.message);
+        }
+    };
+
+    // ── Totals ────────────────────────────────────────────────────────────────
+    const totalSubs = categories.reduce((a, c) => a + (c.subcategories?.length || 0), 0);
+    const activeCount = categories.filter((c) => c.isActive).length;
+
+    // ─────────────────────────────────────────────────────────────────────────
     return (
         <div className="w-full space-y-6 pb-12">
             {/* Header */}
             <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
                 <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }}>
                     <h1 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-slate-100 mb-1">
-                        Category <span className="text-transparent bg-clip-text bg-linear-to-r from-indigo-500 to-purple-500">Management</span>
+                        Category{" "}
+                        <span className="text-transparent bg-clip-text bg-linear-to-r from-indigo-500 to-purple-500">
+                            Management
+                        </span>
                     </h1>
-                    <p className="text-slate-600 dark:text-slate-400">Organize your inventory with root categories and subcategories.</p>
+                    <p className="text-slate-600 dark:text-slate-400">
+                        Organize your inventory with root categories and subcategories.
+                    </p>
                 </motion.div>
 
-                <div className="flex items-center gap-3">
-                    <Button
-                        color="primary"
-                        variant="shadow"
-                        className="shadow-indigo-500/20 font-bold bg-indigo-600"
-                        startContent={<FolderPlus className="w-5 h-5" />}
-                        onPress={onOpen}
-                    >
-                        Add New Category
-                    </Button>
-                </div>
+                <Button
+                    color="primary"
+                    variant="shadow"
+                    className="shadow-indigo-500/20 font-bold bg-indigo-600"
+                    startContent={<FolderPlus size={18} />}
+                    onPress={newCatModal.onOpen}
+                >
+                    Add Category
+                </Button>
             </div>
 
-            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2, duration: 0.5 }}>
-                <Card className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm w-full transition-colors duration-300">
-                    <CardBody className="p-0">
-                        <Table
-                            aria-label="Categories Table"
-                            classNames={{
-                                wrapper: "p-0 rounded-none shadow-none bg-transparent m-0",
-                                table: "w-full min-w-full",
-                                thead: "bg-slate-50 dark:bg-slate-950/80",
-                                th: "text-slate-500 dark:text-slate-400 font-semibold uppercase text-xs tracking-wider py-4 border-b border-slate-200 dark:border-slate-800",
-                                td: "py-4 border-b border-slate-100 dark:border-slate-800/50",
-                                tr: "hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors group"
-                            }}
-                        >
-                            <TableHeader>
-                                <TableColumn>CATEGORY</TableColumn>
-                                <TableColumn>DESCRIPTION</TableColumn>
-                                <TableColumn>STATUS</TableColumn>
-                                <TableColumn align="center">ACTIONS</TableColumn>
-                            </TableHeader>
-                            <TableBody items={categories} isLoading={loading} emptyContent={loading ? "Loading categories..." : "No categories found."}>
-                                {(cat) => (
-                                    <TableRow key={cat._id}>
-                                        <TableCell>
-                                            <div className="flex items-center gap-4">
-                                                <Avatar src={cat.image || "https://ui-avatars.com/api/?name=" + cat.name} size="sm" isBordered className="ring-slate-200 dark:ring-slate-700" />
-                                                <div className="flex flex-col">
-                                                    <span className="text-sm font-semibold text-slate-900 dark:text-slate-200 group-hover:text-indigo-500 transition-colors">{cat.name}</span>
-                                                    <span className="text-xs text-slate-500 font-mono">/{cat.slug}</span>
+            {/* Stats strip */}
+            <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.05 }}
+                className="grid grid-cols-3 gap-4"
+            >
+                {[
+                    { label: "Categories", value: categories.length, icon: <Folder size={20} weight="duotone" />, color: "text-indigo-500", bg: "bg-indigo-50 dark:bg-indigo-500/10" },
+                    { label: "Subcategories", value: totalSubs, icon: <TreeStructure size={20} weight="duotone" />, color: "text-purple-500", bg: "bg-purple-50 dark:bg-purple-500/10" },
+                    { label: "Active", value: activeCount, icon: <Tag size={20} weight="duotone" />, color: "text-emerald-500", bg: "bg-emerald-50 dark:bg-emerald-500/10" },
+                ].map((s) => (
+                    <Card key={s.label} className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm">
+                        <CardBody className="flex flex-row items-center gap-3 p-4">
+                            <div className={`p-2.5 rounded-xl ${s.bg} ${s.color}`}>{s.icon}</div>
+                            <div>
+                                <p className="text-2xl font-black text-slate-900 dark:text-white">{s.value}</p>
+                                <p className="text-xs text-slate-500">{s.label}</p>
+                            </div>
+                        </CardBody>
+                    </Card>
+                ))}
+            </motion.div>
+
+            {/* Category list (custom layout — avoids HeroUI Table colSpan limitation) */}
+            <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.18, duration: 0.45 }}
+            >
+                <Card className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm w-full overflow-hidden">
+                    {/* Table header */}
+                    <div className="grid grid-cols-[auto_1fr_1fr_auto_auto_auto] gap-x-4 items-center px-5 py-3 bg-slate-50 dark:bg-slate-950/80 border-b border-slate-200 dark:border-slate-800">
+                        <div className="w-6" />
+                        <span className="text-xs font-semibold uppercase tracking-wider text-slate-500">Category</span>
+                        <span className="text-xs font-semibold uppercase tracking-wider text-slate-500 hidden md:block">Description</span>
+                        <span className="text-xs font-semibold uppercase tracking-wider text-slate-500">Subcats</span>
+                        <span className="text-xs font-semibold uppercase tracking-wider text-slate-500">Status</span>
+                        <span className="text-xs font-semibold uppercase tracking-wider text-slate-500 text-center">Actions</span>
+                    </div>
+
+                    {loading ? (
+                        <div className="flex items-center justify-center gap-2 py-16 text-slate-400">
+                            <Spinner size="sm" color="secondary" />
+                            <span>Loading categories…</span>
+                        </div>
+                    ) : categories.length === 0 ? (
+                        <div className="text-center py-16 text-slate-400">
+                            <Folder size={48} className="mx-auto mb-3 opacity-30" />
+                            <p>No categories found.</p>
+                        </div>
+                    ) : (
+                        <CardBody className="p-0 divide-y divide-slate-100 dark:divide-slate-800/60">
+                            {categories.map((cat, idx) => {
+                                const isExpanded = expandedIds.has(cat._id);
+                                const subCount = cat.subcategories?.length || 0;
+                                return (
+                                    <motion.div
+                                        key={cat._id}
+                                        initial={{ opacity: 0, y: 8 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        transition={{ delay: idx * 0.04 }}
+                                    >
+                                        {/* ── Main category row ─────────────────────────── */}
+                                        <div className="grid grid-cols-[auto_1fr_1fr_auto_auto_auto] gap-x-4 items-center px-5 py-4 hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors group">
+                                            {/* Expand toggle */}
+                                            <button
+                                                onClick={() => toggleExpand(cat._id)}
+                                                className="p-1 rounded-md text-slate-400 hover:text-indigo-500 hover:bg-indigo-50 dark:hover:bg-indigo-500/10 transition-colors"
+                                                aria-label={isExpanded ? "Collapse" : "Expand"}
+                                            >
+                                                {isExpanded ? (
+                                                    <CaretDown size={13} weight="bold" />
+                                                ) : (
+                                                    <CaretRight size={13} weight="bold" />
+                                                )}
+                                            </button>
+
+                                            {/* Name + avatar */}
+                                            <div className="flex items-center gap-3 min-w-0">
+                                                <Avatar
+                                                    src={cat.image || `https://ui-avatars.com/api/?name=${cat.name}`}
+                                                    size="sm"
+                                                    isBordered
+                                                    className="ring-slate-200 dark:ring-slate-700 shrink-0"
+                                                />
+                                                <div className="flex flex-col min-w-0">
+                                                    <span className="text-sm font-semibold text-slate-900 dark:text-slate-200 group-hover:text-indigo-500 transition-colors truncate">
+                                                        {cat.name}
+                                                    </span>
+                                                    <span className="text-xs text-slate-400 font-mono">/{cat.slug}</span>
                                                 </div>
                                             </div>
-                                        </TableCell>
-                                        <TableCell>
-                                            <span className="text-sm text-slate-600 dark:text-slate-400 line-clamp-1">{cat.description || "No description provided."}</span>
-                                        </TableCell>
-                                        <TableCell>
-                                            {cat.isActive ? (
-                                                <Chip size="sm" color="success" variant="flat">Active</Chip>
-                                            ) : (
-                                                <Chip size="sm" color="default" variant="flat">Disabled</Chip>
-                                            )}
-                                        </TableCell>
-                                        <TableCell>
-                                            <div className="flex justify-center items-center gap-3">
-                                                <Button isIconOnly size="sm" variant="light" className="text-slate-500 hover:text-indigo-500">
-                                                    <PencilSimple />
-                                                </Button>
-                                                <Button isIconOnly size="sm" variant="light" className="text-slate-500 hover:text-red-500" onClick={() => handleDelete(cat._id)}>
-                                                    <Trash />
-                                                </Button>
+
+                                            {/* Description */}
+                                            <span className="text-sm text-slate-500 dark:text-slate-400 line-clamp-1 hidden md:block">
+                                                {cat.description || "—"}
+                                            </span>
+
+                                            {/* Subcategory count badge */}
+                                            <Chip
+                                                size="sm"
+                                                variant="flat"
+                                                className="bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-300 font-semibold cursor-pointer"
+                                                startContent={<TreeStructure size={11} />}
+                                                onClick={() => toggleExpand(cat._id)}
+                                            >
+                                                {subCount} sub{subCount !== 1 ? "s" : ""}
+                                            </Chip>
+
+                                            {/* Status */}
+                                            <Chip
+                                                size="sm"
+                                                color={cat.isActive ? "success" : "default"}
+                                                variant="flat"
+                                            >
+                                                {cat.isActive ? "Active" : "Disabled"}
+                                            </Chip>
+
+                                            {/* Actions */}
+                                            <div className="flex items-center gap-1">
+                                                <Tooltip content="Add subcategory" color="secondary" size="sm">
+                                                    <Button
+                                                        isIconOnly
+                                                        size="sm"
+                                                        variant="flat"
+                                                        className="text-indigo-500 bg-indigo-50 dark:bg-indigo-500/10 hover:bg-indigo-100 dark:hover:bg-indigo-500/20"
+                                                        onPress={() => openSubModal(cat)}
+                                                    >
+                                                        <Plus size={14} weight="bold" />
+                                                    </Button>
+                                                </Tooltip>
+                                                <Tooltip content="Edit" size="sm">
+                                                    <Button
+                                                        isIconOnly
+                                                        size="sm"
+                                                        variant="light"
+                                                        className="text-slate-400 hover:text-indigo-500"
+                                                    >
+                                                        <PencilSimple size={14} />
+                                                    </Button>
+                                                </Tooltip>
+                                                <Tooltip content="Delete" color="danger" size="sm">
+                                                    <Button
+                                                        isIconOnly
+                                                        size="sm"
+                                                        variant="light"
+                                                        className="text-slate-400 hover:text-red-500"
+                                                        onPress={() => handleDeleteCategory(cat._id)}
+                                                    >
+                                                        <Trash size={14} />
+                                                    </Button>
+                                                </Tooltip>
                                             </div>
-                                        </TableCell>
-                                    </TableRow>
-                                )}
-                            </TableBody>
-                        </Table>
-                    </CardBody>
+                                        </div>
+
+                                        {/* ── Expanded subcategory section ───────────────── */}
+                                        <AnimatePresence>
+                                            {isExpanded && (
+                                                <motion.div
+                                                    key="subs"
+                                                    initial={{ height: 0, opacity: 0 }}
+                                                    animate={{ height: "auto", opacity: 1 }}
+                                                    exit={{ height: 0, opacity: 0 }}
+                                                    transition={{ duration: 0.22, ease: "easeInOut" }}
+                                                    className="overflow-hidden"
+                                                >
+                                                    <div className="ml-10 mr-4 pb-4 pt-1 space-y-2 border-l-2 border-indigo-100 dark:border-indigo-500/20 pl-4">
+                                                        {/* Section label + inline add button */}
+                                                        <div className="flex items-center gap-2 py-1">
+                                                            <FolderOpen
+                                                                size={13}
+                                                                className="text-indigo-400 shrink-0"
+                                                                weight="duotone"
+                                                            />
+                                                            <span className="text-xs font-semibold text-slate-400 uppercase tracking-widest">
+                                                                Subcategories of{" "}
+                                                                <span className="text-indigo-500 normal-case font-bold">
+                                                                    {cat.name}
+                                                                </span>
+                                                            </span>
+                                                            <Button
+                                                                size="sm"
+                                                                variant="flat"
+                                                                className="ml-auto h-6 px-2.5 text-xs text-indigo-600 bg-indigo-50 dark:bg-indigo-500/10 font-semibold"
+                                                                startContent={<Plus size={11} weight="bold" />}
+                                                                onPress={() => openSubModal(cat)}
+                                                            >
+                                                                Add Subcategory
+                                                            </Button>
+                                                        </div>
+
+                                                        {/* Subcategory rows */}
+                                                        {cat.subcategories && cat.subcategories.length > 0 ? (
+                                                            cat.subcategories.map((sub) => (
+                                                                <SubcategoryRow
+                                                                    key={sub._id}
+                                                                    sub={sub}
+                                                                    onDelete={handleDeleteSubcategory}
+                                                                />
+                                                            ))
+                                                        ) : (
+                                                            <div className="py-4 px-4 text-sm text-slate-400 flex items-center gap-2 rounded-xl bg-slate-50 dark:bg-slate-800/40 border border-dashed border-slate-200 dark:border-slate-700">
+                                                                <TreeStructure size={15} className="opacity-50" />
+                                                                No subcategories yet.{" "}
+                                                                <button
+                                                                    onClick={() => openSubModal(cat)}
+                                                                    className="text-indigo-500 hover:underline font-semibold"
+                                                                >
+                                                                    Add one →
+                                                                </button>
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                </motion.div>
+                                            )}
+                                        </AnimatePresence>
+                                    </motion.div>
+                                );
+                            })}
+                        </CardBody>
+                    )}
                 </Card>
             </motion.div>
 
-            {/* Modal for creating category */}
-            <Modal isOpen={isOpen} onOpenChange={onOpenChange} placement="top-center" classNames={{ base: "bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800" }}>
+            {/* ══ Modal: Add Root Category ══════════════════════════════════════ */}
+            <Modal
+                isOpen={newCatModal.isOpen}
+                onOpenChange={newCatModal.onOpenChange}
+                placement="top-center"
+                classNames={{ base: "bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800" }}
+            >
                 <ModalContent>
                     {(onClose) => (
                         <>
-                            <ModalHeader className="flex flex-col gap-1 text-slate-900 dark:text-white">
-                                <div className="flex items-center gap-2">
-                                    <Folder className="text-indigo-500" /> Add Root Category
-                                </div>
+                            <ModalHeader className="flex items-center gap-2 text-slate-900 dark:text-white">
+                                <Folder className="text-indigo-500" size={20} /> Add Root Category
                             </ModalHeader>
-                            <ModalBody>
+                            <ModalBody className="gap-4">
                                 <Input
                                     autoFocus
                                     isRequired
                                     label="Category Name"
-                                    name="name"
-                                    value={formData.name}
-                                    onChange={handleInputChange}
+                                    value={catForm.name}
+                                    onChange={(e) => setCatForm((p) => ({ ...p, name: e.target.value }))}
                                     placeholder="e.g. Photography"
                                     variant="bordered"
                                     labelPlacement="outside"
@@ -216,31 +498,32 @@ export default function CategoriesCMS() {
                                 />
                                 <Textarea
                                     label="Description"
-                                    name="description"
-                                    value={formData.description}
-                                    onChange={handleInputChange}
+                                    value={catForm.description}
+                                    onChange={(e) => setCatForm((p) => ({ ...p, description: e.target.value }))}
                                     placeholder="Short description of this category..."
                                     variant="bordered"
                                     labelPlacement="outside"
                                     classNames={{ label: "text-slate-700 dark:text-slate-300 font-medium" }}
                                 />
                                 <Input
-                                    label="Cover Image (Cloudinary URL)"
-                                    name="image"
-                                    value={formData.image}
-                                    onChange={handleInputChange}
+                                    label="Cover Image URL"
+                                    value={catForm.image}
+                                    onChange={(e) => setCatForm((p) => ({ ...p, image: e.target.value }))}
                                     placeholder="https://res.cloudinary.com/..."
                                     variant="bordered"
                                     labelPlacement="outside"
-                                    startContent={<Image className="text-slate-400" />}
+                                    startContent={<Image size={15} className="text-slate-400" />}
                                     classNames={{ label: "text-slate-700 dark:text-slate-300 font-medium" }}
                                 />
                             </ModalBody>
                             <ModalFooter>
-                                <Button color="danger" variant="flat" onPress={onClose}>
-                                    Cancel
-                                </Button>
-                                <Button color="primary" className="bg-indigo-600" onPress={() => handleCreateCategory(onClose)}>
+                                <Button color="danger" variant="flat" onPress={onClose}>Cancel</Button>
+                                <Button
+                                    color="primary"
+                                    className="bg-indigo-600"
+                                    isLoading={catSaving}
+                                    onPress={() => handleCreateCategory(onClose)}
+                                >
                                     Create Category
                                 </Button>
                             </ModalFooter>
@@ -249,6 +532,75 @@ export default function CategoriesCMS() {
                 </ModalContent>
             </Modal>
 
-        </div >
+            {/* ══ Modal: Add Subcategory ════════════════════════════════════════ */}
+            <Modal
+                isOpen={newSubModal.isOpen}
+                onOpenChange={newSubModal.onOpenChange}
+                placement="top-center"
+                classNames={{ base: "bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800" }}
+            >
+                <ModalContent>
+                    {(onClose) => (
+                        <>
+                            <ModalHeader className="flex flex-col gap-0.5 text-slate-900 dark:text-white">
+                                <div className="flex items-center gap-2">
+                                    <TreeStructure className="text-purple-500" size={20} />
+                                    Add Subcategory
+                                </div>
+                                {activeCat && (
+                                    <p className="text-sm font-normal text-slate-400 ml-7">
+                                        Under{" "}
+                                        <span className="text-indigo-500 font-semibold">{activeCat.name}</span>
+                                    </p>
+                                )}
+                            </ModalHeader>
+                            <ModalBody className="gap-4">
+                                <Input
+                                    autoFocus
+                                    isRequired
+                                    label="Subcategory Name"
+                                    value={subForm.name}
+                                    onChange={(e) => setSubForm((p) => ({ ...p, name: e.target.value }))}
+                                    placeholder="e.g. MacBook Air"
+                                    variant="bordered"
+                                    labelPlacement="outside"
+                                    classNames={{ label: "text-slate-700 dark:text-slate-300 font-medium" }}
+                                />
+                                <Textarea
+                                    label="Description"
+                                    value={subForm.description}
+                                    onChange={(e) => setSubForm((p) => ({ ...p, description: e.target.value }))}
+                                    placeholder="Short description..."
+                                    variant="bordered"
+                                    labelPlacement="outside"
+                                    classNames={{ label: "text-slate-700 dark:text-slate-300 font-medium" }}
+                                />
+                                <Input
+                                    label="Cover Image URL"
+                                    value={subForm.image}
+                                    onChange={(e) => setSubForm((p) => ({ ...p, image: e.target.value }))}
+                                    placeholder="https://res.cloudinary.com/..."
+                                    variant="bordered"
+                                    labelPlacement="outside"
+                                    startContent={<Image size={15} className="text-slate-400" />}
+                                    classNames={{ label: "text-slate-700 dark:text-slate-300 font-medium" }}
+                                />
+                            </ModalBody>
+                            <ModalFooter>
+                                <Button color="danger" variant="flat" onPress={onClose}>Cancel</Button>
+                                <Button
+                                    color="primary"
+                                    className="bg-purple-600"
+                                    isLoading={subSaving}
+                                    onPress={() => handleCreateSubcategory(onClose)}
+                                >
+                                    Add Subcategory
+                                </Button>
+                            </ModalFooter>
+                        </>
+                    )}
+                </ModalContent>
+            </Modal>
+        </div>
     );
 }

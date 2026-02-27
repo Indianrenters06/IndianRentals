@@ -3,39 +3,24 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { useSelector } from 'react-redux';
 import { FaUserCircle, FaTrashAlt, FaPlus, FaArrowRight, FaCheck } from 'react-icons/fa';
-import { BsCheckCircleFill, BsCreditCard } from 'react-icons/bs';
-import { HiOutlineSparkles } from 'react-icons/hi';
+import { BsCheckCircleFill } from 'react-icons/bs';
 import { FiEdit2 } from 'react-icons/fi';
+import { selectCartTotals } from '../../../redux/features/cartSlice';
 import OrderSummary from '../../../components/OrderSummary';
 import AddressModal from '../../../components/AddressModal';
 
-// Mock Data for Addresses (would come from Redux/API)
-const initialAddresses = [
-    {
-        id: 1,
-        name: "Harshit Aggarwal",
-        addressLine: "3002/a street no. 4, Ghee Mandi",
-        city: "New Delhi",
-        pincode: "110022",
-        state: "India", // "India" is usually Country, assumig State is Delhi or implied. Screenshot says "India" at end.
-        phone: "+91-999XXXXXX9"
-    },
-    {
-        id: 2,
-        name: "Leela Yadav",
-        addressLine: "3002/a street no. 4, Ghee Mandi",
-        city: "New Delhi",
-        pincode: "110022",
-        state: "India",
-        phone: "+91-999XXXXXX9"
-    }
-];
+// Start with no pre-filled addresses — user must add their own
+const initialAddresses = [];
 
 export default function AddressPage() {
     const router = useRouter();
+    const totals = useSelector(selectCartTotals);
+    const { securityAmount, deliveryCharges, monthlyRentTotal, totalGST, totalOneTime, payToday, savedAmount } = totals;
+
     const [addresses, setAddresses] = useState(initialAddresses);
-    const [selectedAddressId, setSelectedAddressId] = useState(initialAddresses[0]?.id || null);
+    const [selectedAddressId, setSelectedAddressId] = useState(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingAddress, setEditingAddress] = useState(null);
 
@@ -89,14 +74,6 @@ export default function AddressPage() {
         router.push('/checkout/kyc');
     };
 
-    // Mock calculations (would come from Redux)
-    const securityAmount = 5000;
-    const deliveryCharges = 400;
-    const monthlyRentTotal = 1100;
-    const totalGST = 120;
-    const totalOneTime = 6620;
-    const payToday = 600;
-    const savedAmount = 4030.00;
 
     return (
         <div className="min-h-screen bg-gray-50 font-sans">

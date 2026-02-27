@@ -77,6 +77,9 @@ app.use('/api/testimonials', testimonialRoutes);
 const cmsRoutes = require('./routes/cmsRoutes');
 app.use('/api/cms', cmsRoutes);
 
+const blogRoutes = require('./routes/blogRoutes');
+app.use('/api/blog', blogRoutes);
+
 const settingsRoutes = require('./routes/settingsRoutes');
 app.use('/api/settings', settingsRoutes);
 

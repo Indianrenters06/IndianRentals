@@ -89,9 +89,8 @@ const CategoriesPage = () => {
                         transition={{ delay: 0.1 }}
                         className="text-sm md:text-lg text-gray-500 max-w-4xl leading-relaxed"
                     >
-                        Lorem ipsum dolor sit amet consectetur. Vel libero cras laoreet ut dignissim eget.
-                        Scelerisque mauris pharetra tristique cras sit malesuada. Egestas pulvinar interdum sapien et.
-                        Consequat neque at donec turpis leo. Quis at.
+                        Browse our complete catalogue of premium rental categories — from Apple laptops and DSLR cameras
+                        to IT workstations and AV equipment. Flexible plans from 1 to 24 months with free delivery across India.
                     </motion.p>
                 </div>
 
@@ -106,7 +105,7 @@ const CategoriesPage = () => {
                         >
                             <Link href={category.href} className="group block">
                                 {/* Card — image only, no label inside */}
-                                <div className="bg-gray-50 rounded-2xl md:rounded-[2rem] overflow-hidden border border-gray-100 hover:shadow-lg transition-all duration-300 aspect-[4/3] relative flex items-center justify-center">
+                                <div className="bg-gray-50 rounded-2xl md:rounded-4xl overflow-hidden border border-gray-100 hover:shadow-lg transition-all duration-300 aspect-4/3 relative flex items-center justify-center">
                                     <div className="relative w-full h-full transform group-hover:scale-105 transition-transform duration-500 p-4 md:p-6">
                                         {category.image ? (
                                             <Image

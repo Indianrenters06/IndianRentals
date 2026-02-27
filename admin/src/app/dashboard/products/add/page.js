@@ -13,7 +13,8 @@ import {
     SelectItem,
     Divider,
 } from "@heroui/react";
-import { FloppyDisk, ArrowLeft, Image, Tag, MapPin, Cube, CurrencyInr } from "@phosphor-icons/react";
+import { FloppyDisk, ArrowLeft, Tag, MapPin, Cube, CurrencyInr } from "@phosphor-icons/react";
+import ImageUploader from "@/components/ImageUploader";
 
 export default function AddProduct() {
     const router = useRouter();
@@ -33,7 +34,8 @@ export default function AddProduct() {
         condition: "Good",
         city: "",
         state: "",
-        image: "", // We'll take a single image URL for simplicity, pushed to images array
+        images: [""],   // array of URL strings
+        isActive: true,
     });
 
     useEffect(() => {
@@ -83,6 +85,15 @@ export default function AddProduct() {
         setFormData(prev => ({ ...prev, [name]: value }));
     };
 
+    const setImage = (idx, val) =>
+        setFormData(p => { const imgs = [...p.images]; imgs[idx] = val; return { ...p, images: imgs }; });
+
+    const addImageSlot = () =>
+        setFormData(p => ({ ...p, images: [...p.images, ""] }));
+
+    const removeImage = (idx) =>
+        setFormData(p => ({ ...p, images: p.images.filter((_, i) => i !== idx) }));
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         setLoading(true);
@@ -105,7 +116,8 @@ export default function AddProduct() {
                 condition: formData.condition,
                 city: formData.city,
                 state: formData.state,
-                images: formData.image ? [formData.image] : [],
+                images: formData.images.filter(Boolean),
+                isActive: formData.isActive,
             };
 
             const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000"}/api/products`, {
@@ -405,31 +417,11 @@ export default function AddProduct() {
                                 </div>
                             </div>
 
-                            <div className="flex flex-col gap-2">
-                                <label className="text-sm font-bold text-slate-700 dark:text-slate-200">
-                                    Product Images (Cloudinary URL)
-                                </label>
-                                <Input
-                                    name="image"
-                                    value={formData.image}
-                                    onChange={handleInputChange}
-                                    placeholder="https://res.cloudinary.com/..."
-                                    variant="bordered"
-                                    startContent={<Image className="text-indigo-500 text-sm" />}
-                                    classNames={{
-                                        inputWrapper: "h-12 border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950/60 transition-all shadow-sm focus-within:ring-2 focus-within:ring-indigo-500/20"
-                                    }}
-                                />
-
-                                {formData.image && (
-                                    <div className="mt-4 p-4 border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-3xl w-full max-w-sm overflow-hidden bg-slate-50 dark:bg-slate-900/40">
-                                        <p className="text-[10px] uppercase font-bold text-slate-400 mb-3 tracking-widest text-center">Visual Preview</p>
-                                        <div className="h-48 flex items-center justify-center bg-white dark:bg-slate-950 rounded-2xl overflow-hidden shadow-inner border border-slate-100 dark:border-slate-800/50">
-                                            <img src={formData.image} alt="Preview" className="max-w-full max-h-full object-contain p-2" />
-                                        </div>
-                                    </div>
-                                )}
-                            </div>
+                            <ImageUploader
+                                multiple
+                                label="Product Images"
+                                onUploadMany={urls => setFormData(p => ({ ...p, images: urls }))}
+                            />
                         </div>
 
                         <div className="flex justify-end pt-4">

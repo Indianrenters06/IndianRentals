@@ -1,12 +1,22 @@
 'use client';
 
-import React from 'react';
-
+import React, { useEffect, useState } from 'react';
 import Image from 'next/image';
 import { FaWhatsapp, FaFacebookF, FaInstagram, FaLinkedinIn } from 'react-icons/fa';
 
+const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+
 export default function ContactPage() {
     const [selectedCity, setSelectedCity] = React.useState('Delhi');
+    const [cmsBanner, setCmsBanner] = useState({ image: null, title: null });
+
+    useEffect(() => {
+        fetch(`${API}/api/cms/contact`)
+            .then(r => r.ok ? r.json() : null)
+            .then(d => { if (d) setCmsBanner({ image: d.bannerImage || null, title: d.bannerTitle || null }); })
+            .catch(() => { });
+    }, []);
+
 
     const cityDetails = {
         'Delhi': {
@@ -58,13 +68,15 @@ export default function ContactPage() {
             <div className="max-w-[1150px] mx-auto px-3 sm:px-6 lg:px-8 mt-8">
                 <div className="w-full h-[300px] md:h-[500px] relative bg-gray-100 overflow-hidden rounded-3xl">
                     <Image
-                        src="https://res.cloudinary.com/dgkckcdk8/image/upload/v1770615662/indian-rentals/ythxavcpd8hd4yerh8y0.jpg"
+                        src={cmsBanner.image || "https://res.cloudinary.com/dgkckcdk8/image/upload/v1770615662/indian-rentals/ythxavcpd8hd4yerh8y0.jpg"}
                         alt="Contact Us"
                         fill
                         className="object-cover object-center"
                     />
                     <div className="absolute inset-0 flex items-center justify-center">
-                        <h1 className="text-white text-4xl md:text-6xl font-semibold drop-shadow-lg">Contact Us</h1>
+                        <h1 className="text-white text-4xl md:text-6xl font-semibold drop-shadow-lg">
+                            {cmsBanner.title || "Contact Us"}
+                        </h1>
                     </div>
                 </div>
             </div>
@@ -93,7 +105,7 @@ export default function ContactPage() {
                         <div className="flex flex-col gap-8 w-full max-w-[576px] min-h-[282px]">
                             {/* Address */}
                             <div className="flex gap-6 items-center">
-                                <div className="w-[68px] h-[68px] rounded-full bg-[#E6F6FD] flex items-center justify-center flex-shrink-0">
+                                <div className="w-[68px] h-[68px] rounded-full bg-[#E6F6FD] flex items-center justify-center shrink-0">
                                     <div className="w-[40px] h-[40px] rounded-full bg-white flex items-center justify-center text-[#024E82]">
                                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                             <path d="M12 21C16 16.8 20 12.6 20 8.5C20 4.35786 16.4183 1 12 1C7.58172 1 4 4.35786 4 8.5C4 12.6 8 16.8 12 21Z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
@@ -111,7 +123,7 @@ export default function ContactPage() {
 
                             {/* Phone */}
                             <div className="flex gap-6 items-center">
-                                <div className="w-[68px] h-[68px] rounded-full bg-[#E6F6FD] flex items-center justify-center flex-shrink-0">
+                                <div className="w-[68px] h-[68px] rounded-full bg-[#E6F6FD] flex items-center justify-center shrink-0">
                                     <div className="w-[40px] h-[40px] rounded-full bg-white flex items-center justify-center text-[#024E82]">
                                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                             <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
@@ -128,7 +140,7 @@ export default function ContactPage() {
 
                             {/* Email */}
                             <div className="flex gap-6 items-center">
-                                <div className="w-[68px] h-[68px] rounded-full bg-[#E6F6FD] flex items-center justify-center flex-shrink-0">
+                                <div className="w-[68px] h-[68px] rounded-full bg-[#E6F6FD] flex items-center justify-center shrink-0">
                                     <div className="w-[40px] h-[40px] rounded-full bg-white flex items-center justify-center text-[#024E82]">
                                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                             <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
@@ -146,7 +158,7 @@ export default function ContactPage() {
 
                             {/* Timings */}
                             <div className="flex gap-6 items-center">
-                                <div className="w-[68px] h-[68px] rounded-full bg-[#E6F6FD] flex items-center justify-center flex-shrink-0">
+                                <div className="w-[68px] h-[68px] rounded-full bg-[#E6F6FD] flex items-center justify-center shrink-0">
                                     <div className="w-[40px] h-[40px] rounded-full bg-white flex items-center justify-center text-[#024E82]">
                                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                             <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />

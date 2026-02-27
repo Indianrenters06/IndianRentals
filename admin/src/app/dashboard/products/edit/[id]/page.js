@@ -1,0 +1,469 @@
+"use client";
+
+import { useState, useEffect, useCallback } from "react";
+import { useRouter, useParams } from "next/navigation";
+import { motion } from "framer-motion";
+import {
+    Card, CardBody, Input, Textarea, Button,
+    Select, SelectItem, Divider, Switch, Spinner, Chip
+} from "@heroui/react";
+import {
+    FloppyDisk, ArrowLeft, Image as PhosphorImage,
+    Tag, MapPin, Cube, CurrencyInr, Plus, Trash, CheckCircle
+} from "@phosphor-icons/react";
+import ImageUploader from "@/components/ImageUploader";
+
+const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+const getToken = () => localStorage.getItem("adminToken");
+
+const WRAPPER_CLS = "h-12 border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950/60 transition-all shadow-sm focus-within:ring-2 focus-within:ring-indigo-500/20";
+
+const EMPTY = {
+    name: "", description: "", category: "", subcategory: "",
+    brand: "", rentalPrice: "", securityDeposit: "",
+    stock: "1", condition: "Good", city: "", state: "",
+    images: [""],          // array of URL strings
+    isActive: true,
+};
+
+export default function EditProduct() {
+    const router = useRouter();
+    const { id } = useParams();
+
+    const [loading, setLoading] = useState(true);
+    const [saving, setSaving] = useState(false);
+    const [saved, setSaved] = useState(false);
+    const [form, setForm] = useState(EMPTY);
+    const [categories, setCategories] = useState([]);
+    const [subcategories, setSubcategories] = useState([]);
+
+    // ── Helpers ────────────────────────────────────────────────────────────────
+    const set = (key, val) => setForm(p => ({ ...p, [key]: val }));
+
+    const setImage = (idx, val) =>
+        setForm(p => { const imgs = [...p.images]; imgs[idx] = val; return { ...p, images: imgs }; });
+
+    const addImageSlot = () =>
+        setForm(p => ({ ...p, images: [...p.images, ""] }));
+
+    const removeImage = (idx) =>
+        setForm(p => ({ ...p, images: p.images.filter((_, i) => i !== idx) }));
+
+    // ── Fetch categories ───────────────────────────────────────────────────────
+    useEffect(() => {
+        fetch(`${API}/api/categories`)
+            .then(r => r.ok ? r.json() : [])
+            .then(d => setCategories(Array.isArray(d) ? d : d.categories || []))
+            .catch(console.error);
+    }, []);
+
+    // ── Fetch subcategories when category changes ──────────────────────────────
+    useEffect(() => {
+        if (!form.category) { setSubcategories([]); return; }
+        const cat = categories.find(c => c._id === form.category || c.name === form.category);
+        if (!cat?._id) { setSubcategories([]); return; }
+        fetch(`${API}/api/categories/${cat._id}/subcategories`)
+            .then(r => r.ok ? r.json() : [])
+            .then(d => setSubcategories(Array.isArray(d) ? d : d.subcategories || []))
+            .catch(() => setSubcategories([]));
+    }, [form.category, categories]);
+
+    // ── Load existing product ──────────────────────────────────────────────────
+    const fetchProduct = useCallback(async () => {
+        try {
+            setLoading(true);
+            const res = await fetch(`${API}/api/products/${id}`);
+            if (!res.ok) throw new Error("Product not found");
+            const p = await res.json();
+
+            // Resolve the category id: stored as name string in product, match to category doc
+            const matchedCat = categories.find(c => c.name === p.category);
+
+            setForm({
+                name: p.name || "",
+                description: p.description || "",
+                category: matchedCat ? matchedCat._id : p.category || "",
+                subcategory: p.subcategory?._id || p.subcategory || "",
+                brand: p.brand || "",
+                rentalPrice: String(p.rentalPrice ?? ""),
+                securityDeposit: String(p.securityDeposit ?? ""),
+                stock: String(p.stock ?? "1"),
+                condition: p.condition || "Good",
+                city: p.city || "",
+                state: p.state || "",
+                images: p.images?.length ? p.images : [""],
+                isActive: p.isActive !== undefined ? p.isActive : true,
+            });
+        } catch (err) {
+            alert(err.message);
+            router.push("/dashboard/products");
+        } finally {
+            setLoading(false);
+        }
+    }, [id, categories, router]);
+
+    // Only fetch product once categories are loaded (so we can resolve category id)
+    useEffect(() => {
+        if (id && categories.length >= 0) fetchProduct();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [id, categories.length]);
+
+    // ── Save ──────────────────────────────────────────────────────────────────
+    const handleSave = async () => {
+        if (!form.name || !form.rentalPrice || !form.securityDeposit || !form.city || !form.state) {
+            alert("Please fill all required fields.");
+            return;
+        }
+        try {
+            setSaving(true);
+
+            // Resolve category name from selected id
+            const selCat = categories.find(c => c._id === form.category);
+            const catName = selCat ? selCat.name : form.category;
+
+            const payload = {
+                name: form.name,
+                description: form.description,
+                category: catName,
+                subcategory: form.subcategory || "",
+                brand: form.brand,
+                rentalPrice: Number(form.rentalPrice),
+                securityDeposit: Number(form.securityDeposit),
+                stock: Number(form.stock),
+                condition: form.condition,
+                city: form.city,
+                state: form.state,
+                images: form.images.filter(Boolean),
+                isActive: form.isActive,
+            };
+
+            const res = await fetch(`${API}/api/products/${id}`, {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${getToken()}`,
+                },
+                body: JSON.stringify(payload),
+            });
+
+            if (!res.ok) throw new Error((await res.json()).message || "Failed to update");
+
+            setSaved(true);
+            setTimeout(() => { setSaved(false); router.push("/dashboard/products"); }, 1500);
+        } catch (err) {
+            alert(err.message);
+        } finally {
+            setSaving(false);
+        }
+    };
+
+    // ── Loading state ─────────────────────────────────────────────────────────
+    if (loading) {
+        return (
+            <div className="h-[60vh] flex flex-col items-center justify-center gap-4">
+                <Spinner size="lg" color="secondary" />
+                <p className="text-slate-500 font-medium">Loading product…</p>
+            </div>
+        );
+    }
+
+    return (
+        <div className="w-full space-y-6 pb-12">
+            {/* Header */}
+            <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+                <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }}>
+                    <Button
+                        variant="light"
+                        className="mb-2 text-slate-500 dark:text-slate-400 p-0 hover:bg-transparent hover:text-indigo-500"
+                        startContent={<ArrowLeft />}
+                        onPress={() => router.push("/dashboard/products")}
+                    >
+                        Back to Products
+                    </Button>
+                    <h1 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-slate-100 mb-1">
+                        Edit <span className="text-transparent bg-clip-text bg-linear-to-r from-indigo-500 to-purple-500">Product</span>
+                    </h1>
+                    <p className="text-slate-600 dark:text-slate-400 text-sm font-mono">ID: {id}</p>
+                </motion.div>
+
+                <div className="flex items-center gap-3">
+                    {saved && (
+                        <Chip color="success" variant="flat" size="sm" startContent={<CheckCircle size={14} weight="fill" />}>
+                            Saved! Redirecting…
+                        </Chip>
+                    )}
+                    {/* Active / Draft toggle */}
+                    <div className="flex items-center gap-2 px-4 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900">
+                        <span className="text-sm font-medium text-slate-600 dark:text-slate-400">
+                            {form.isActive ? "Active" : "Draft"}
+                        </span>
+                        <Switch
+                            isSelected={form.isActive}
+                            onValueChange={v => set("isActive", v)}
+                            color="success"
+                            size="sm"
+                        />
+                    </div>
+                    <Button
+                        color="primary"
+                        size="lg"
+                        isLoading={saving}
+                        startContent={!saving && <FloppyDisk size={18} />}
+                        className="font-bold px-10 shadow-lg shadow-indigo-500/30 bg-indigo-600"
+                        onPress={handleSave}
+                    >
+                        Update Product
+                    </Button>
+                </div>
+            </div>
+
+            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}>
+                <Card className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm w-full">
+                    <CardBody className="p-8 space-y-10">
+
+                        {/* ── Basic Information ── */}
+                        <section className="space-y-6">
+                            <div className="space-y-1">
+                                <h3 className="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                                    <Tag className="text-indigo-500" size={18} /> Basic Information
+                                </h3>
+                                <Divider className="bg-slate-100 dark:bg-slate-800" />
+                            </div>
+
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div className="flex flex-col gap-2">
+                                    <label className="text-xs font-bold text-slate-600 dark:text-slate-300 uppercase tracking-wider">
+                                        Product Name <span className="text-rose-500">*</span>
+                                    </label>
+                                    <Input
+                                        value={form.name}
+                                        onValueChange={v => set("name", v)}
+                                        placeholder="Enter product title"
+                                        variant="bordered"
+                                        classNames={{ inputWrapper: WRAPPER_CLS }}
+                                    />
+                                </div>
+                                <div className="flex flex-col gap-2">
+                                    <label className="text-xs font-bold text-slate-600 dark:text-slate-300 uppercase tracking-wider">Brand Name</label>
+                                    <Input
+                                        value={form.brand}
+                                        onValueChange={v => set("brand", v)}
+                                        placeholder="e.g. Apple, Sony, Nikon"
+                                        variant="bordered"
+                                        classNames={{ inputWrapper: WRAPPER_CLS }}
+                                    />
+                                </div>
+                            </div>
+
+                            <div className="flex flex-col gap-2">
+                                <label className="text-xs font-bold text-slate-600 dark:text-slate-300 uppercase tracking-wider">
+                                    Description <span className="text-rose-500">*</span>
+                                </label>
+                                <Textarea
+                                    value={form.description}
+                                    onValueChange={v => set("description", v)}
+                                    placeholder="Describe features, colors, accessories included…"
+                                    variant="bordered"
+                                    minRows={4}
+                                    classNames={{ inputWrapper: "border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950/60" }}
+                                />
+                            </div>
+
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div className="flex flex-col gap-2">
+                                    <label className="text-xs font-bold text-slate-600 dark:text-slate-300 uppercase tracking-wider">
+                                        Primary Category <span className="text-rose-500">*</span>
+                                    </label>
+                                    <Select
+                                        placeholder="Select a category"
+                                        variant="bordered"
+                                        selectedKeys={form.category ? [form.category] : []}
+                                        onSelectionChange={keys => set("category", Array.from(keys)[0] || "")}
+                                        classNames={{ trigger: WRAPPER_CLS }}
+                                    >
+                                        {categories.map(cat => (
+                                            <SelectItem key={cat._id} value={cat._id}>{cat.name}</SelectItem>
+                                        ))}
+                                    </Select>
+                                </div>
+                                <div className="flex flex-col gap-2">
+                                    <label className="text-xs font-bold text-slate-600 dark:text-slate-300 uppercase tracking-wider">Sub-Category</label>
+                                    <Select
+                                        placeholder={subcategories.length ? "Choose sub-category" : "Select category first"}
+                                        variant="bordered"
+                                        isDisabled={subcategories.length === 0}
+                                        selectedKeys={form.subcategory ? [form.subcategory] : []}
+                                        onSelectionChange={keys => set("subcategory", Array.from(keys)[0] || "")}
+                                        classNames={{ trigger: WRAPPER_CLS }}
+                                    >
+                                        {subcategories.map(sub => (
+                                            <SelectItem key={sub._id} value={sub._id}>{sub.name}</SelectItem>
+                                        ))}
+                                    </Select>
+                                </div>
+                            </div>
+                        </section>
+
+                        {/* ── Pricing & Inventory ── */}
+                        <section className="space-y-6">
+                            <div className="space-y-1">
+                                <h3 className="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                                    <CurrencyInr weight="bold" className="text-indigo-500" size={18} /> Pricing & Inventory
+                                </h3>
+                                <Divider className="bg-slate-100 dark:bg-slate-800" />
+                            </div>
+
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                                <div className="flex flex-col gap-2">
+                                    <label className="text-xs font-bold text-slate-600 dark:text-slate-300 uppercase tracking-wider">
+                                        Rental Price (₹/mo) <span className="text-rose-500">*</span>
+                                    </label>
+                                    <Input
+                                        type="number"
+                                        value={form.rentalPrice}
+                                        onValueChange={v => set("rentalPrice", v)}
+                                        placeholder="0"
+                                        variant="bordered"
+                                        startContent={<span className="text-indigo-500 font-bold text-sm">₹</span>}
+                                        classNames={{ inputWrapper: WRAPPER_CLS }}
+                                    />
+                                </div>
+                                <div className="flex flex-col gap-2">
+                                    <label className="text-xs font-bold text-slate-600 dark:text-slate-300 uppercase tracking-wider">
+                                        Security Deposit (₹) <span className="text-rose-500">*</span>
+                                    </label>
+                                    <Input
+                                        type="number"
+                                        value={form.securityDeposit}
+                                        onValueChange={v => set("securityDeposit", v)}
+                                        placeholder="0"
+                                        variant="bordered"
+                                        startContent={<span className="text-indigo-500 font-bold text-sm">₹</span>}
+                                        classNames={{ inputWrapper: WRAPPER_CLS }}
+                                    />
+                                </div>
+                                <div className="flex flex-col gap-2">
+                                    <label className="text-xs font-bold text-slate-600 dark:text-slate-300 uppercase tracking-wider">
+                                        Stock Qty <span className="text-rose-500">*</span>
+                                    </label>
+                                    <Input
+                                        type="number"
+                                        value={form.stock}
+                                        onValueChange={v => set("stock", v)}
+                                        placeholder="1"
+                                        variant="bordered"
+                                        startContent={<Cube className="text-indigo-500" size={15} />}
+                                        classNames={{ inputWrapper: WRAPPER_CLS }}
+                                    />
+                                </div>
+                                <div className="flex flex-col gap-2">
+                                    <label className="text-xs font-bold text-slate-600 dark:text-slate-300 uppercase tracking-wider">
+                                        Condition <span className="text-rose-500">*</span>
+                                    </label>
+                                    <Select
+                                        variant="bordered"
+                                        selectedKeys={[form.condition]}
+                                        onSelectionChange={keys => set("condition", Array.from(keys)[0] || "Good")}
+                                        classNames={{ trigger: WRAPPER_CLS }}
+                                    >
+                                        <SelectItem key="New">New</SelectItem>
+                                        <SelectItem key="Good">Good</SelectItem>
+                                        <SelectItem key="Fair">Fair</SelectItem>
+                                    </Select>
+                                </div>
+                            </div>
+                        </section>
+
+                        {/* ── Location ── */}
+                        <section className="space-y-6">
+                            <div className="space-y-1">
+                                <h3 className="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                                    <MapPin className="text-rose-500" size={18} /> Location
+                                </h3>
+                                <Divider className="bg-slate-100 dark:bg-slate-800" />
+                            </div>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div className="flex flex-col gap-2">
+                                    <label className="text-xs font-bold text-slate-600 dark:text-slate-300 uppercase tracking-wider">
+                                        City <span className="text-rose-500">*</span>
+                                    </label>
+                                    <Input value={form.city} onValueChange={v => set("city", v)} placeholder="e.g. Bangalore" variant="bordered" classNames={{ inputWrapper: WRAPPER_CLS }} />
+                                </div>
+                                <div className="flex flex-col gap-2">
+                                    <label className="text-xs font-bold text-slate-600 dark:text-slate-300 uppercase tracking-wider">
+                                        State <span className="text-rose-500">*</span>
+                                    </label>
+                                    <Input value={form.state} onValueChange={v => set("state", v)} placeholder="e.g. Karnataka" variant="bordered" classNames={{ inputWrapper: WRAPPER_CLS }} />
+                                </div>
+                            </div>
+                        </section>
+
+                        {/* ── Images ── */}
+                        <section className="space-y-6">
+                            <div className="space-y-1">
+                                <h3 className="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                                    <PhosphorImage className="text-indigo-500" size={18} /> Product Images
+                                </h3>
+                                <Divider className="bg-slate-100 dark:bg-slate-800" />
+                            </div>
+                            <p className="text-xs text-slate-400">
+                                Upload new images or keep the existing ones. The first image is the primary listing photo.
+                            </p>
+
+                            {/* Existing images */}
+                            {form.images.filter(Boolean).length > 0 && (
+                                <div>
+                                    <p className="text-xs font-semibold text-slate-500 mb-2">Current Images</p>
+                                    <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-3">
+                                        {form.images.filter(Boolean).map((url, i) => (
+                                            <div key={i} className="relative group aspect-square rounded-xl overflow-hidden border-2 border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900">
+                                                <img src={url} alt={`img-${i + 1}`} className="w-full h-full object-cover" />
+                                                <button
+                                                    onClick={() => removeImage(i)}
+                                                    className="absolute top-1 right-1 w-5 h-5 rounded-full bg-red-500 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity text-xs font-bold hover:bg-red-600"
+                                                >
+                                                    ×
+                                                </button>
+                                                {i === 0 && (
+                                                    <div className="absolute bottom-0 left-0 right-0 text-[9px] font-bold text-center py-0.5 bg-indigo-600 text-white">
+                                                        PRIMARY
+                                                    </div>
+                                                )}
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* Upload new images */}
+                            <ImageUploader
+                                multiple
+                                label="Upload New Images"
+                                onUploadMany={newUrls =>
+                                    setForm(p => ({
+                                        ...p,
+                                        images: [...p.images.filter(Boolean), ...newUrls],
+                                    }))
+                                }
+                            />
+                        </section>
+
+                        {/* Save button */}
+                        <div className="flex justify-end pt-2">
+                            <Button
+                                color="primary"
+                                size="lg"
+                                isLoading={saving}
+                                startContent={!saving && <FloppyDisk size={18} />}
+                                className="font-bold px-12 shadow-lg shadow-indigo-500/20 bg-indigo-600"
+                                onPress={handleSave}
+                            >
+                                Update Product
+                            </Button>
+                        </div>
+                    </CardBody>
+                </Card>
+            </motion.div>
+        </div>
+    );
+}

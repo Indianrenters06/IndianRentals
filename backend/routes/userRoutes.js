@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const {
     getUserProfile,
+    updateUserProfile,
     submitKYC,
     getAllUsers,
     updateKYCStatus,
@@ -16,6 +17,7 @@ router.route('/')
 
 router.post('/kyc', protect, submitKYC);
 router.get('/profile', protect, getUserProfile);
+router.put('/profile', protect, updateUserProfile);
 
 router.put('/:id/kyc', protect, admin, updateKYCStatus);
 

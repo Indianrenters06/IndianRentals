@@ -3,9 +3,11 @@
 import React, { useState, useRef } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { useSelector } from 'react-redux';
 import { FaFingerprint } from 'react-icons/fa';
 import { PiCheckCircleFill, PiCheckCircle } from 'react-icons/pi';
 import { saveKYCData, uploadKYCFiles } from '../../../services/kycService';
+import { selectCartTotals } from '../../../redux/features/cartSlice';
 import OrderSummary from '../../../components/OrderSummary';
 import Swal from 'sweetalert2';
 
@@ -218,6 +220,9 @@ const ADDRESS_PROOFS = [
 
 export default function KYCPage() {
     const router = useRouter();
+    const totals = useSelector(selectCartTotals);
+    const { securityAmount, deliveryCharges, monthlyRentTotal, totalGST, totalOneTime, payToday, savedAmount } = totals;
+
     const [customerType, setCustomerType] = useState('Customer');
     const [currentStep, setCurrentStep] = useState(1);
     const [loading, setLoading] = useState(false);
@@ -380,14 +385,6 @@ export default function KYCPage() {
         window.scrollTo(0, 0);
     };
 
-    // Mock calculations
-    const securityAmount = 5000;
-    const deliveryCharges = 400;
-    const monthlyRentTotal = 1100;
-    const totalGST = 120;
-    const totalOneTime = 6620;
-    const payToday = 600;
-    const savedAmount = 4030.00;
 
     return (
         <div className="min-h-screen bg-gray-50 font-sans mt-8">

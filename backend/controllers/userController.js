@@ -22,6 +22,30 @@ const getUserProfile = asyncHandler(async (req, res) => {
     }
 });
 
+// @desc    Update own profile
+// @route   PUT /api/users/profile
+// @access  Private
+const updateUserProfile = asyncHandler(async (req, res) => {
+    const user = await User.findById(req.user._id);
+
+    if (user) {
+        user.name = req.body.name || user.name;
+        user.email = req.body.email || user.email;
+
+        const updated = await user.save();
+        res.json({
+            _id: updated._id,
+            name: updated.name,
+            email: updated.email,
+            phone: updated.phone,
+            role: updated.role,
+        });
+    } else {
+        res.status(404);
+        throw new Error('User not found');
+    }
+});
+
 // @desc    Submit KYC documents
 // @route   POST /api/users/kyc
 // @access  Private
@@ -136,6 +160,7 @@ const deleteUser = asyncHandler(async (req, res) => {
 
 module.exports = {
     getUserProfile,
+    updateUserProfile,
     submitKYC,
     getAllUsers,
     updateKYCStatus,
