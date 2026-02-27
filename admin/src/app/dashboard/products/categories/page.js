@@ -119,6 +119,7 @@ export default function CategoriesCMS() {
                 </motion.div>
 
                 <div className="flex items-center gap-3">
+                    <Button
                         color="primary"
                         variant="shadow"
                         className="shadow-indigo-500/20 font-bold bg-indigo-600"
@@ -190,63 +191,63 @@ export default function CategoriesCMS() {
                 </Card>
             </motion.div>
 
-            {/* Modal for creating category */ }
-    <Modal isOpen={isOpen} onOpenChange={onOpenChange} placement="top-center" classNames={{ base: "bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800" }}>
-        <ModalContent>
-            {(onClose) => (
-                <>
-                    <ModalHeader className="flex flex-col gap-1 text-slate-900 dark:text-white">
-                        <div className="flex items-center gap-2">
-                            <Folder className="text-indigo-500" /> Add Root Category
-                        </div>
-                    </ModalHeader>
-                    <ModalBody>
-                        <Input
-                            autoFocus
-                            isRequired
-                            label="Category Name"
-                            name="name"
-                            value={formData.name}
-                            onChange={handleInputChange}
-                            placeholder="e.g. Photography"
-                            variant="bordered"
-                            labelPlacement="outside"
-                            classNames={{ label: "text-slate-700 dark:text-slate-300 font-medium" }}
-                        />
-                        <Textarea
-                            label="Description"
-                            name="description"
-                            value={formData.description}
-                            onChange={handleInputChange}
-                            placeholder="Short description of this category..."
-                            variant="bordered"
-                            labelPlacement="outside"
-                            classNames={{ label: "text-slate-700 dark:text-slate-300 font-medium" }}
-                        />
-                        <Input
-                            label="Cover Image (Cloudinary URL)"
-                            name="image"
-                            value={formData.image}
-                            onChange={handleInputChange}
-                            placeholder="https://res.cloudinary.com/..."
-                            variant="bordered"
-                            labelPlacement="outside"
-                            startContent={<Image className="text-slate-400" />}
-                            classNames={{ label: "text-slate-700 dark:text-slate-300 font-medium" }}
-                        />
-                    </ModalBody>
-                    <ModalFooter>
-                        <Button color="danger" variant="flat" onPress={onClose}>
-                            Cancel
-                        </Button>
-                        <Button color="primary" className="bg-indigo-600" onPress={() => handleCreateCategory(onClose)}>
-                            Create Category
-                        </Button>
-                    </ModalFooter>
-                </>
-            )}
-        </ModalContent>
-    </Modal>
+            {/* Modal for creating category */}
+            <Modal isOpen={isOpen} onOpenChange={onOpenChange} placement="top-center" classNames={{ base: "bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800" }}>
+                <ModalContent>
+                    {(onClose) => (
+                        <>
+                            <ModalHeader className="flex flex-col gap-1 text-slate-900 dark:text-white">
+                                <div className="flex items-center gap-2">
+                                    <Folder className="text-indigo-500" /> Add Root Category
+                                </div>
+                            </ModalHeader>
+                            <ModalBody>
+                                <Input
+                                    autoFocus
+                                    isRequired
+                                    label="Category Name"
+                                    name="name"
+                                    value={formData.name}
+                                    onChange={handleInputChange}
+                                    placeholder="e.g. Photography"
+                                    variant="bordered"
+                                    labelPlacement="outside"
+                                    classNames={{ label: "text-slate-700 dark:text-slate-300 font-medium" }}
+                                />
+                                <Textarea
+                                    label="Description"
+                                    name="description"
+                                    value={formData.description}
+                                    onChange={handleInputChange}
+                                    placeholder="Short description of this category..."
+                                    variant="bordered"
+                                    labelPlacement="outside"
+                                    classNames={{ label: "text-slate-700 dark:text-slate-300 font-medium" }}
+                                />
+                                <Input
+                                    label="Cover Image (Cloudinary URL)"
+                                    name="image"
+                                    value={formData.image}
+                                    onChange={handleInputChange}
+                                    placeholder="https://res.cloudinary.com/..."
+                                    variant="bordered"
+                                    labelPlacement="outside"
+                                    startContent={<Image className="text-slate-400" />}
+                                    classNames={{ label: "text-slate-700 dark:text-slate-300 font-medium" }}
+                                />
+                            </ModalBody>
+                            <ModalFooter>
+                                <Button color="danger" variant="flat" onPress={onClose}>
+                                    Cancel
+                                </Button>
+                                <Button color="primary" className="bg-indigo-600" onPress={() => handleCreateCategory(onClose)}>
+                                    Create Category
+                                </Button>
+                            </ModalFooter>
+                        </>
+                    )}
+                </ModalContent>
+            </Modal>
 
         </div >
     );

@@ -2,7 +2,7 @@
 
 import { motion } from "framer-motion";
 import { Card, CardBody, Button, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Chip, Divider } from "@heroui/react";
-import { Plus, CurrencyInr, Zap, Target, Package } from "@phosphor-icons/react";
+import { Plus, CurrencyInr, Lightning, Target, Package } from "@phosphor-icons/react";
 
 const PLANS = [
     { id: 1, name: "Daily Essential", basePrice: "₹199", billing: "Per Day", status: "Active", items: 45 },
@@ -33,7 +33,7 @@ export default function PricingPlans() {
                             <CardBody className="p-6 space-y-4">
                                 <div className="flex justify-between items-start">
                                     <div className="p-3 bg-indigo-100 dark:bg-indigo-500/10 rounded-2xl text-indigo-600">
-                                        <Zap size={24} weight="fill" />
+                                        <Lightning size={24} weight="fill" />
                                     </div>
                                     <Chip size="sm" color={plan.status === 'Active' ? 'success' : 'default'} variant="flat">{plan.status}</Chip>
                                 </div>
