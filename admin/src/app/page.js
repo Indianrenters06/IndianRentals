@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Lock, Mail, ShieldCheck, ArrowRight, Activity, Database, Server } from "lucide-react";
+import { Lock, EnvelopeSimple, ShieldCheck, ArrowRight, ChartLineUp, Database, HardDrive } from "@phosphor-icons/react";
 import { useRouter } from "next/navigation";
 import { Card, CardBody, Input, Button } from "@heroui/react";
 import { ThemeToggle } from "../components/ThemeToggle";
@@ -76,7 +76,7 @@ export default function AdminLogin() {
               className="flex items-center gap-3"
             >
               <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white shadow-lg shadow-indigo-500/30">
-                <ShieldCheck className="w-6 h-6" />
+                <ShieldCheck className="w-6 h-6" weight="bold" />
               </div>
               <span className="text-2xl font-bold tracking-tight text-slate-800 dark:text-white">IndianRentals <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-500 to-purple-500 dark:from-indigo-400 dark:to-purple-400">Admin</span></span>
             </motion.div>
@@ -99,13 +99,13 @@ export default function AdminLogin() {
 
             <div className="flex flex-col gap-4">
               {[
-                { icon: Activity, text: "Real-time analytics and reporting" },
+                { icon: ChartLineUp, text: "Real-time analytics and reporting" },
                 { icon: Database, text: "Centralized inventory management" },
-                { icon: Server, text: "Secure infrastructure \& data protection" }
+                { icon: HardDrive, text: "Secure infrastructure \& data protection" }
               ].map((item, index) => (
                 <div key={index} className="flex items-center gap-4 text-slate-700 dark:text-slate-300">
                   <div className="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center border border-slate-200 dark:border-slate-700">
-                    <item.icon className="w-4 h-4 text-indigo-500 dark:text-indigo-400" />
+                    <item.icon className="w-4 h-4 text-indigo-500 dark:text-indigo-400" weight="bold" />
                   </div>
                   <span className="font-medium">{item.text}</span>
                 </div>
@@ -142,7 +142,7 @@ export default function AdminLogin() {
             {/* Mobile Header */}
             <div className="lg:hidden flex flex-col items-center mb-10">
               <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white shadow-xl shadow-indigo-500/30 mb-4">
-                <ShieldCheck className="w-8 h-8" />
+                <ShieldCheck className="w-8 h-8" weight="bold" />
               </div>
               <h2 className="text-2xl font-bold text-slate-900 dark:text-white text-center">IndianRentals Admin</h2>
             </div>
@@ -154,7 +154,7 @@ export default function AdminLogin() {
                   <p className="text-slate-500 dark:text-slate-400">Sign in to your administration account</p>
                 </div>
 
-                <form onSubmit={handleLogin} className="space-y-5">
+                <form onSubmit={handleLogin} className="space-y-5" autoComplete="off">
                   {error && (
                     <div className="bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/50 text-red-600 dark:text-red-400 p-3 rounded-xl text-sm font-medium">
                       {error}
@@ -163,11 +163,13 @@ export default function AdminLogin() {
                   <div className="space-y-1.5">
                     <label className="text-sm font-medium text-slate-700 dark:text-slate-300 ml-1">Email Address</label>
                     <Input
-                      type="email"
+                      type="text"
                       placeholder="admin@indianrentals.com"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
-                      startContent={<Mail className="w-5 h-5 text-slate-400 dark:text-slate-500 mr-2" />}
+                      autoComplete="off"
+                      inputProps={{ autoComplete: "off", name: "admin-email-nofill" }}
+                      startContent={<EnvelopeSimple className="w-5 h-5 text-slate-400 dark:text-slate-500 mr-2" weight="bold" />}
                       classNames={{
                         input: "bg-transparent text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-600 font-medium",
                         innerWrapper: "bg-transparent",
@@ -192,7 +194,9 @@ export default function AdminLogin() {
                       placeholder="••••••••"
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
-                      startContent={<Lock className="w-5 h-5 text-slate-400 dark:text-slate-500 mr-2" />}
+                      autoComplete="new-password"
+                      inputProps={{ autoComplete: "new-password", name: "admin-pass-nofill" }}
+                      startContent={<Lock className="w-5 h-5 text-slate-400 dark:text-slate-500 mr-2" weight="bold" />}
                       classNames={{
                         input: "bg-transparent text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-600 font-medium tracking-widest",
                         innerWrapper: "bg-transparent",
@@ -239,7 +243,7 @@ export default function AdminLogin() {
                       ) : (
                         <>
                           Secure Sign In
-                          <ArrowRight className="w-5 h-5" />
+                          <ArrowRight className="w-5 h-5" weight="bold" />
                         </>
                       )}
                     </Button>
@@ -248,7 +252,7 @@ export default function AdminLogin() {
 
                 <div className="mt-8 pt-6 border-t border-slate-200 dark:border-white/5 text-center">
                   <p className="text-xs text-slate-500 flex items-center justify-center gap-2">
-                    <ShieldCheck className="w-4 h-4" />
+                    <ShieldCheck className="w-4 h-4" weight="bold" />
                     Protected by enterprise-grade encryption
                   </p>
                 </div>

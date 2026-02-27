@@ -4,11 +4,11 @@ import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
 import {
-  FiUsers, FiTrendingUp, FiTrendingDown, FiDollarSign,
-  FiPackage, FiShoppingCart, FiArrowRight, FiZap,
-  FiActivity, FiClock, FiCheckCircle, FiMoreVertical, FiDownload,
-  FiBell, FiAlertCircle, FiUserCheck, FiShield
-} from "react-icons/fi";
+  Users, TrendUp, TrendDown, CurrencyInr,
+  Package, ShoppingCart, ArrowRight, Zap,
+  ChartLineUp, Clock, CheckCircle, DotsThreeVertical, DownloadSimple,
+  Bell, WarningCircle, UserCheck, ShieldCheck
+} from "@phosphor-icons/react";
 import {
   Card,
   CardBody,
@@ -107,17 +107,17 @@ export default function AdminDashboard() {
 
   // Derived stats using Real Data
   const stats = [
-    { label: "Total Revenue", value: `₹${parseFloat(dashboardData?.totalRevenue || 0).toLocaleString()}`, change: "+12.5%", isPositive: true, icon: FiDollarSign, color: "success" },
-    { label: "Total Orders", value: (dashboardData?.totalRentals || 0).toLocaleString(), change: "+18.1%", isPositive: true, icon: FiPackage, color: "primary" },
+    { label: "Total Revenue", value: `₹${parseFloat(dashboardData?.totalRevenue || 0).toLocaleString()}`, change: "+12.5%", isPositive: true, icon: CurrencyInr, color: "success" },
+    { label: "Total Orders", value: (dashboardData?.totalRentals || 0).toLocaleString(), change: "+18.1%", isPositive: true, icon: Package, color: "primary" },
     {
       label: "Pending KYC",
       value: (dashboardData?.pendingKYC || 0).toLocaleString(),
       change: dashboardData?.pendingKYC > 0 ? "Review Required" : "All Approved",
       isPositive: dashboardData?.pendingKYC === 0,
-      icon: FiShield,
+      icon: ShieldCheck,
       color: dashboardData?.pendingKYC > 0 ? "warning" : "success"
     },
-    { label: "Total Products", value: (dashboardData?.totalProducts || 0).toLocaleString(), change: "+2.4%", isPositive: true, icon: FiActivity, color: "secondary" },
+    { label: "Total Products", value: (dashboardData?.totalProducts || 0).toLocaleString(), change: "+2.4%", isPositive: true, icon: ChartLineUp, color: "secondary" },
   ];
 
   const recentRentals = dashboardData?.recentRentals?.map(rental => ({
@@ -218,9 +218,9 @@ export default function AdminDashboard() {
 
   const renderStatusChip = (status) => {
     switch (status) {
-      case 'Active': return <Chip size="sm" color="success" variant="flat" startContent={<FiCheckCircle className="ml-1" />}>Active</Chip>;
-      case 'Pending': return <Chip size="sm" color="warning" variant="flat" startContent={<FiClock className="ml-1" />}>Pending</Chip>;
-      case 'Overdue': return <Chip size="sm" color="danger" variant="flat" startContent={<FiActivity className="ml-1" />}>Overdue</Chip>;
+      case 'Active': return <Chip size="sm" color="success" variant="flat" startContent={<CheckCircle weight="bold" className="ml-1" />}>Active</Chip>;
+      case 'Pending': return <Chip size="sm" color="warning" variant="flat" startContent={<Clock weight="bold" className="ml-1" />}>Pending</Chip>;
+      case 'Overdue': return <Chip size="sm" color="danger" variant="flat" startContent={<ChartLineUp weight="bold" className="ml-1" />}>Overdue</Chip>;
       case 'Completed': return <Chip size="sm" color="default" variant="flat">Completed</Chip>;
       default: return <Chip size="sm" color="default" variant="flat">{status}</Chip>;
     }
@@ -247,7 +247,7 @@ export default function AdminDashboard() {
         </motion.div>
 
         <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.5 }} className="flex items-center gap-3">
-          <Button color="secondary" variant="flat" startContent={<FiDownload className="w-4 h-4" />}>
+          <Button color="secondary" variant="flat" startContent={<DownloadSimple className="w-4 h-4" />}>
             Generate Report
           </Button>
           <Button color="primary" variant="shadow" className="shadow-indigo-500/30 font-medium">
@@ -282,9 +282,9 @@ export default function AdminDashboard() {
                   <div className="flex items-center gap-2 text-sm mt-1">
                     <span className={`flex items-center font-medium ${stat.isPositive ? 'text-emerald-400' : 'text-rose-400'}`}>
                       {stat.label === "Pending KYC" ? (
-                        stat.isPositive ? <FiCheckCircle className="mr-1" /> : <FiAlertCircle className="mr-1" />
+                        stat.isPositive ? <CheckCircle weight="bold" className="mr-1" /> : <WarningCircle weight="bold" className="mr-1" />
                       ) : (
-                        stat.isPositive ? <FiTrendingUp className="mr-1" /> : <FiTrendingDown className="mr-1" />
+                        stat.isPositive ? <TrendUp weight="bold" className="mr-1" /> : <TrendDown weight="bold" className="mr-1" />
                       )}
                       {stat.change}
                     </span>
@@ -318,7 +318,7 @@ export default function AdminDashboard() {
                 <Chip size="sm" variant="flat" color="default" className="text-slate-600 dark:text-slate-300">This Week</Chip>
                 <Dropdown>
                   <DropdownTrigger>
-                    <Button isIconOnly variant="light" size="sm" className="text-slate-600 dark:text-slate-400"><FiMoreVertical /></Button>
+                    <Button isIconOnly variant="light" size="sm" className="text-slate-600 dark:text-slate-400"><DotsThreeVertical weight="bold" /></Button>
                   </DropdownTrigger>
                   <DropdownMenu aria-label="Chart Actions">
                     <DropdownItem key="monthly">View Monthly</DropdownItem>
@@ -346,7 +346,7 @@ export default function AdminDashboard() {
             <CardHeader className="px-6 py-5 border-b border-slate-200 dark:border-slate-800/60 flex justify-between">
               <div className="flex items-center gap-2">
                 <div className="p-1.5 bg-amber-500/10 text-amber-500 rounded-lg">
-                  <FiAlertCircle className="w-4 h-4" />
+                  <WarningCircle className="w-4 h-4" />
                 </div>
                 <h3 className="text-lg font-semibold text-slate-900 dark:text-white">System Alerts</h3>
               </div>
@@ -361,9 +361,9 @@ export default function AdminDashboard() {
                         note.type === 'kyc' ? 'bg-amber-500/10 text-amber-500' :
                           'bg-slate-500/10 text-slate-500'
                         }`}>
-                        {note.type === 'order' ? <FiPackage className="w-3.5 h-3.5" /> :
-                          note.type === 'kyc' ? <FiShield className="w-3.5 h-3.5" /> :
-                            <FiBell className="w-3.5 h-3.5" />}
+                        {note.type === 'order' ? <Package className="w-3.5 h-3.5" /> :
+                          note.type === 'kyc' ? <ShieldCheck className="w-3.5 h-3.5" /> :
+                            <Bell className="w-3.5 h-3.5" />}
                       </div>
                       <div className="flex-1">
                         <p className="text-sm font-semibold text-slate-900 dark:text-slate-200 line-clamp-1">{note.title}</p>
@@ -375,7 +375,7 @@ export default function AdminDashboard() {
                 </div>
               ) : (
                 <div className="flex flex-col items-center justify-center h-full py-8 text-slate-500">
-                  <FiCheckCircle className="w-8 h-8 opacity-20 mb-2" />
+                  <CheckCircle className="w-8 h-8 opacity-20 mb-2" weight="bold" />
                   <p className="text-sm">All systems clear!</p>
                 </div>
               )}
@@ -479,7 +479,7 @@ export default function AdminDashboard() {
                       <Dropdown>
                         <DropdownTrigger>
                           <Button isIconOnly size="sm" variant="light" className="text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200">
-                            <FiMoreVertical />
+                            <DotsThreeVertical weight="bold" />
                           </Button>
                         </DropdownTrigger>
                         <DropdownMenu aria-label="Table Actions" variant="flat">

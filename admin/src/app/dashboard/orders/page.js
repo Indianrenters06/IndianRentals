@@ -19,7 +19,7 @@ import {
     DropdownMenu,
     DropdownItem,
 } from "@heroui/react";
-import { FiMoreVertical, FiEye, FiCheckCircle, FiClock, FiTruck, FiRotateCcw, FiXCircle, FiShoppingCart } from "react-icons/fi";
+import { DotsThreeVertical, Eye, CheckCircle, Clock, Truck, ArrowCounterClockwise, XCircle, ShoppingCart } from "@phosphor-icons/react";
 
 export default function OrdersManagement() {
     const [orders, setOrders] = useState([]);
@@ -82,7 +82,7 @@ export default function OrdersManagement() {
             <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
                 <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }}>
                     <h1 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-slate-100 mb-1">
-                        Rental <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-500 to-indigo-600">Operations</span>
+                        Rental <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-500 to-purple-600">Operations</span>
                     </h1>
                     <p className="text-slate-600 dark:text-slate-400">Manage order lifecycle, deliveries, and returns in real-time.</p>
                 </motion.div>
@@ -136,13 +136,13 @@ export default function OrdersManagement() {
                                             <div className="flex justify-center items-center gap-2">
                                                 <Dropdown>
                                                     <DropdownTrigger>
-                                                        <Button isIconOnly size="sm" variant="light"><FiMoreVertical /></Button>
+                                                        <Button isIconOnly size="sm" variant="light"><DotsThreeVertical weight="bold" /></Button>
                                                     </DropdownTrigger>
                                                     <DropdownMenu aria-label="Order Actions">
-                                                        <DropdownItem key="view" startContent={<FiEye />}>View Order Details</DropdownItem>
-                                                        <DropdownItem key="ship" startContent={<FiTruck />} onClick={() => handleStatusUpdate(order._id, 'Delivered')}>Mark as Delivered</DropdownItem>
-                                                        <DropdownItem key="return" startContent={<FiRotateCcw />} onClick={() => handleStatusUpdate(order._id, 'Returned')}>Confirm Return</DropdownItem>
-                                                        <DropdownItem key="cancel" color="danger" className="text-danger" startContent={<FiXCircle />} onClick={() => handleStatusUpdate(order._id, 'Cancelled')}>Cancel Order</DropdownItem>
+                                                        <DropdownItem key="view" startContent={<Eye weight="bold" />}>View Order Details</DropdownItem>
+                                                        <DropdownItem key="ship" startContent={<Truck weight="bold" />} onClick={() => handleStatusUpdate(order._id, 'Delivered')}>Mark as Delivered</DropdownItem>
+                                                        <DropdownItem key="return" startContent={<ArrowCounterClockwise weight="bold" />} onClick={() => handleStatusUpdate(order._id, 'Returned')}>Confirm Return</DropdownItem>
+                                                        <DropdownItem key="cancel" color="danger" className="text-danger" startContent={<XCircle weight="bold" />} onClick={() => handleStatusUpdate(order._id, 'Cancelled')}>Cancel Order</DropdownItem>
                                                     </DropdownMenu>
                                                 </Dropdown>
                                             </div>

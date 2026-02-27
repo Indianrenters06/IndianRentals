@@ -20,7 +20,7 @@ import {
     DropdownMenu,
     DropdownItem,
 } from "@heroui/react";
-import { FiPlus, FiShoppingCart, FiSearch, FiMoreVertical, FiEdit2, FiTrash2, FiEye } from "react-icons/fi";
+import { Plus, ShoppingCart, MagnifyingGlass, DotsThreeVertical, PencilSimple, Trash, Eye } from "@phosphor-icons/react";
 
 export default function AllProducts() {
     const router = useRouter();
@@ -69,12 +69,12 @@ export default function AllProducts() {
     };
 
     return (
-        <div className="max-w-7xl mx-auto w-full space-y-6 pb-12">
+        <div className="w-full space-y-6 pb-12">
             {/* Header */}
             <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
                 <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.5 }}>
                     <h1 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-slate-100 mb-1">
-                        Inventory <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-500 to-purple-500">Catalogue</span>
+                        Inventory <span className="text-transparent bg-clip-text bg-linear-to-r from-indigo-500 to-purple-500">Catalogue</span>
                     </h1>
                     <p className="text-slate-600 dark:text-slate-400">Manage all the products actively listed on your platform.</p>
                 </motion.div>
@@ -84,7 +84,7 @@ export default function AllProducts() {
                         color="primary"
                         variant="shadow"
                         className="shadow-indigo-500/30 font-medium"
-                        startContent={<FiPlus className="w-5 h-5" />}
+                        startContent={<Plus className="w-5 h-5" />}
                         onPress={() => router.push("/dashboard/products/add")}
                     >
                         Add New Product
@@ -97,7 +97,7 @@ export default function AllProducts() {
                     <CardBody className="p-0">
                         <div className="p-4 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between bg-slate-50 dark:bg-slate-900/50">
                             <div className="relative group w-72">
-                                <FiSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-indigo-500" />
+                                <MagnifyingGlass className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-indigo-500" />
                                 <input
                                     type="text"
                                     placeholder="Search products..."
@@ -161,13 +161,13 @@ export default function AllProducts() {
                                                 <Dropdown>
                                                     <DropdownTrigger>
                                                         <Button isIconOnly size="sm" variant="light" className="text-slate-500 hover:text-indigo-500">
-                                                            <FiMoreVertical />
+                                                            <DotsThreeVertical weight="bold" />
                                                         </Button>
                                                     </DropdownTrigger>
                                                     <DropdownMenu aria-label="Product Actions">
-                                                        <DropdownItem key="view" startContent={<FiEye className="text-slate-400" />}>View Listing</DropdownItem>
-                                                        <DropdownItem key="edit" startContent={<FiEdit2 className="text-slate-400" />}>Edit Product</DropdownItem>
-                                                        <DropdownItem key="delete" className="text-danger" color="danger" startContent={<FiTrash2 />} onClick={() => handleDelete(product._id)}>
+                                                        <DropdownItem key="view" startContent={<Eye className="text-slate-400" />}>View Listing</DropdownItem>
+                                                        <DropdownItem key="edit" startContent={<PencilSimple className="text-slate-400" />}>Edit Product</DropdownItem>
+                                                        <DropdownItem key="delete" className="text-danger" color="danger" startContent={<Trash />} onClick={() => handleDelete(product._id)}>
                                                             Delete
                                                         </DropdownItem>
                                                     </DropdownMenu>

@@ -26,7 +26,7 @@ import {
     useDisclosure,
     Textarea
 } from "@heroui/react";
-import { FiShield, FiEye, FiCheckCircle, FiXCircle, FiMoreVertical, FiClock, FiFileText } from "react-icons/fi";
+import { ShieldCheck, Eye, CheckCircle, XCircle, DotsThreeVertical, Clock, FileText } from "@phosphor-icons/react";
 
 export default function KYCManagement() {
     const [kycRequests, setKycRequests] = useState([]);
@@ -92,12 +92,12 @@ export default function KYCManagement() {
     };
 
     return (
-        <div className="max-w-7xl mx-auto w-full space-y-6 pb-12">
+        <div className="w-full space-y-6 pb-12">
             {/* Header */}
             <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
                 <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }}>
                     <h1 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-slate-100 mb-1">
-                        KYC <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-500 to-orange-500">Verification Center</span>
+                        KYC <span className="text-transparent bg-clip-text bg-linear-to-r from-indigo-500 to-purple-500">Verification Center</span>
                     </h1>
                     <p className="text-slate-600 dark:text-slate-400">Review and approve documentation for platform trust & safety.</p>
                 </motion.div>
@@ -149,7 +149,7 @@ export default function KYCManagement() {
                                                     size="sm"
                                                     variant="flat"
                                                     color="primary"
-                                                    startContent={<FiEye />}
+                                                    startContent={<Eye />}
                                                     onPress={() => {
                                                         setSelectedKyc(kyc);
                                                         setModalMode("view");
@@ -169,73 +169,181 @@ export default function KYCManagement() {
             </motion.div>
 
             {/* Review Modal */}
-            <Modal isOpen={isOpen} onClose={onClose} size="3xl" scrollBehavior="inside" className="dark:bg-slate-950">
+            <Modal
+                isOpen={isOpen && !!selectedKyc}
+                onClose={() => {
+                    onClose();
+                    setSelectedKyc(null);
+                    setModalMode("view");
+                }}
+                size="4xl"
+                scrollBehavior="inside"
+                className="dark:bg-slate-950 max-h-[90vh]"
+            >
                 <ModalContent>
-                    <ModalHeader className="flex flex-col gap-1 border-b border-slate-200 dark:border-slate-800">
-                        <div className="flex items-center gap-2">
-                            <FiShield className="text-amber-500" />
-                            <span>KYC Verification - {selectedKyc?.user?.name}</span>
-                        </div>
-                    </ModalHeader>
-                    <ModalBody className="py-6 space-y-6">
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div className="space-y-4">
-                                <h4 className="text-sm font-bold uppercase text-slate-400">Personal Details</h4>
-                                <div className="space-y-2">
-                                    <p className="text-sm"><span className="text-slate-500">ID Type:</span> <span className="font-semibold">{selectedKyc?.personalDetails?.idType}</span></p>
-                                    <p className="text-sm"><span className="text-slate-500">ID Number:</span> <span className="font-semibold">{selectedKyc?.personalDetails?.idNumber}</span></p>
-                                    <p className="text-sm"><span className="text-slate-500">Address:</span> <span className="font-semibold">{selectedKyc?.personalDetails?.address}</span></p>
+                    {(onClose) => (
+                        <>
+                            <ModalHeader className="flex flex-col gap-1 border-b border-slate-200 dark:border-slate-800">
+                                <div className="flex items-center justify-between w-full pr-6">
+                                    <div className="flex items-center gap-2">
+                                        <ShieldCheck className="text-indigo-500" weight="bold" />
+                                        <span className="text-slate-900 dark:text-slate-100">KYC Verification - {selectedKyc?.user?.name || "User Details"}</span>
+                                    </div>
+                                    <Chip size="sm" variant="flat" color={selectedKyc?.status === 'approved' ? 'success' : selectedKyc?.status === 'rejected' ? 'danger' : 'warning'}>
+                                        {selectedKyc?.status?.toUpperCase()}
+                                    </Chip>
                                 </div>
-                            </div>
-                            <div className="space-y-4">
-                                <h4 className="text-sm font-bold uppercase text-slate-400">Documents</h4>
-                                <div className="grid grid-cols-2 gap-2">
-                                    {selectedKyc?.documents && Object.entries(selectedKyc.documents).map(([key, url]) => (
-                                        <div key={key} className="relative group rounded-lg overflow-hidden border border-slate-200 dark:border-slate-800 bg-slate-100 dark:bg-slate-900 aspect-square">
-                                            <img src={url} alt={key} className="w-full h-full object-cover transition-transform group-hover:scale-110" />
-                                            <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
-                                                <Button isIconOnly size="sm" variant="flat" color="primary" onClick={() => window.open(url, '_blank')}>
-                                                    <FiEye />
-                                                </Button>
-                                            </div>
-                                            <div className="absolute bottom-0 left-0 right-0 bg-black/60 p-1">
-                                                <p className="text-[10px] text-white text-center truncate uppercase">{key}</p>
-                                            </div>
+                            </ModalHeader>
+                            <ModalBody className="py-8 space-y-8 scrollbar-hide">
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+                                    <div className="space-y-6">
+                                        <div>
+                                            <h4 className="text-xs font-bold uppercase text-slate-400 tracking-wider mb-3">Personal Details</h4>
+                                            <Card className="bg-slate-50 dark:bg-slate-950/50 border-none shadow-none">
+                                                <CardBody className="p-4 space-y-3">
+                                                    <div className="flex justify-between items-center text-sm">
+                                                        <span className="text-slate-500">Full Name</span>
+                                                        <span className="font-semibold text-slate-700 dark:text-slate-200">{selectedKyc?.personalDetails?.fullName || selectedKyc?.user?.name}</span>
+                                                    </div>
+                                                    <Divider className="opacity-50" />
+                                                    <div className="flex justify-between items-center text-sm">
+                                                        <span className="text-slate-500">ID Type</span>
+                                                        <span className="font-semibold text-slate-700 dark:text-slate-200">{selectedKyc?.personalDetails?.idType || "N/A"}</span>
+                                                    </div>
+                                                    <Divider className="opacity-50" />
+                                                    <div className="flex justify-between items-center text-sm">
+                                                        <span className="text-slate-500">ID Number</span>
+                                                        <span className="font-semibold text-slate-700 dark:text-slate-200 font-mono">{selectedKyc?.personalDetails?.idNumber || "N/A"}</span>
+                                                    </div>
+                                                    <Divider className="opacity-50" />
+                                                    <div className="space-y-1">
+                                                        <span className="text-sm text-slate-500">Address</span>
+                                                        <p className="text-sm font-semibold text-slate-700 dark:text-slate-200">{selectedKyc?.personalDetails?.address || "No address provided"}</p>
+                                                    </div>
+                                                </CardBody>
+                                            </Card>
                                         </div>
-                                    ))}
-                                </div>
-                            </div>
-                        </div>
 
-                        {modalMode === "reject" && (
-                            <div className="p-4 bg-rose-500/10 border border-rose-500/20 rounded-xl space-y-3">
-                                <h4 className="text-sm font-bold text-rose-500">Rejection Reason</h4>
-                                <Textarea
-                                    placeholder="Explain why the KYC was rejected (this will be shown to the user)..."
-                                    value={rejectionReason}
-                                    onValueChange={setRejectionReason}
-                                    variant="bordered"
-                                />
-                            </div>
-                        )}
-                    </ModalBody>
-                    <ModalFooter className="border-t border-slate-200 dark:border-slate-800">
-                        {modalMode === "view" ? (
-                            <>
-                                <Button color="danger" variant="flat" startContent={<FiXCircle />} onPress={() => setModalMode("reject")}>
-                                    Reject
-                                </Button>
-                                <Button color="success" variant="shadow" className="text-white" startContent={<FiCheckCircle />} onPress={() => handleUpdateStatus(selectedKyc._id, 'approved')}>
-                                    Approve KYC
-                                </Button>
-                            </>
-                        ) : (
-                            <>
-                                <Button variant="light" onPress={() => setModalMode("view")}>Cancel</Button>
-                                <Button color="danger" variant="shadow" onPress={() => handleUpdateStatus(selectedKyc._id, 'rejected')}>Confirm Rejection</Button>
-                            </>
-                        )}
-                    </ModalFooter>
+                                        {selectedKyc?.status === 'rejected' && (
+                                            <div className="p-4 bg-rose-500/10 border border-rose-500/20 rounded-xl space-y-2">
+                                                <h4 className="text-sm font-bold text-rose-500 flex items-center gap-2">
+                                                    <XCircle weight="bold" /> Previous Rejection Reason
+                                                </h4>
+                                                <p className="text-sm text-slate-600 dark:text-slate-400">{selectedKyc.rejectionReason}</p>
+                                            </div>
+                                        )}
+                                    </div>
+
+                                    <div className="space-y-6">
+                                        <h4 className="text-xs font-bold uppercase text-slate-400 tracking-wider mb-3">Verification Documents</h4>
+                                        <div className="grid grid-cols-2 gap-3">
+                                            {selectedKyc?.documents && Object.entries(selectedKyc.documents).filter(([_, url]) => !!url).map(([key, url]) => (
+                                                <div key={key} className="flex flex-col gap-2">
+                                                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest pl-1">{key.replace(/([A-Z])/g, ' $1')}</span>
+                                                    <div className="relative group rounded-2xl overflow-hidden border border-slate-200 dark:border-slate-800 bg-slate-100 dark:bg-slate-900 aspect-4/3">
+                                                        <img
+                                                            src={url}
+                                                            alt={key}
+                                                            className="w-full h-full object-cover transition-transform group-hover:scale-105 duration-500"
+                                                            onError={(e) => { e.target.src = 'https://placehold.co/600x400/1a1a1a/ffffff?text=Image+Not+Found'; }}
+                                                        />
+                                                        <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-all duration-300 backdrop-blur-sm">
+                                                            <Button
+                                                                size="sm"
+                                                                variant="shadow"
+                                                                color="primary"
+                                                                startContent={<Eye />}
+                                                                onPress={() => window.open(url, '_blank')}
+                                                                className="rounded-full font-bold h-10 px-6"
+                                                            >
+                                                                Preview
+                                                            </Button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            ))}
+                                            {(!selectedKyc?.documents || Object.keys(selectedKyc.documents).length === 0) && (
+                                                <div className="col-span-2 py-10 flex flex-col items-center justify-center border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-2xl bg-slate-50 dark:bg-slate-950/20">
+                                                    <FileText className="text-slate-300 text-3xl mb-2" />
+                                                    <p className="text-sm text-slate-500">No documents submitted</p>
+                                                </div>
+                                            )}
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {modalMode === "reject" && (
+                                    <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="p-6 bg-rose-500/5 border border-rose-500/20 rounded-2xl space-y-4">
+                                        <h4 className="text-sm font-bold text-rose-500 flex items-center gap-2 uppercase tracking-wide">
+                                            <XCircle weight="bold" /> Decision: Reject Application
+                                        </h4>
+                                        <Textarea
+                                            placeholder="Provide a detailed explanation for the user. Mention specific documents or information that need correction..."
+                                            value={rejectionReason}
+                                            onValueChange={setRejectionReason}
+                                            variant="bordered"
+                                            classNames={{
+                                                input: "bg-white dark:bg-slate-950",
+                                                inputWrapper: "border-slate-200 dark:border-slate-800 focus-within:!border-rose-500 transition-colors"
+                                            }}
+                                            minRows={3}
+                                        />
+                                    </motion.div>
+                                )}
+                            </ModalBody>
+                            <ModalFooter className="border-t border-slate-200 dark:border-slate-800 p-6 bg-slate-50 dark:bg-slate-950/50">
+                                {modalMode === "view" ? (
+                                    <div className="flex justify-between w-full items-center">
+                                        <Button variant="light" className="text-slate-500 font-medium" onPress={onClose}>
+                                            Cancel Review
+                                        </Button>
+                                        <div className="flex gap-3">
+                                            <Button
+                                                color="danger"
+                                                variant="flat"
+                                                startContent={<XCircle weight="bold" />}
+                                                onPress={() => setModalMode("reject")}
+                                                className="font-bold px-6"
+                                            >
+                                                Mark as Rejected
+                                            </Button>
+                                            <Button
+                                                color="success"
+                                                variant="shadow"
+                                                className="text-white font-bold px-8 shadow-emerald-500/20 bg-emerald-500"
+                                                startContent={<CheckCircle weight="bold" />}
+                                                onPress={() => handleUpdateStatus(selectedKyc._id, 'approved')}
+                                            >
+                                                Approve Verification
+                                            </Button>
+                                        </div>
+                                    </div>
+                                ) : (
+                                    <div className="flex justify-end w-full gap-3">
+                                        <Button
+                                            variant="light"
+                                            className="font-medium text-slate-500"
+                                            onPress={() => {
+                                                setModalMode("view");
+                                                setRejectionReason("");
+                                            }}
+                                        >
+                                            Back to Review
+                                        </Button>
+                                        <Button
+                                            color="danger"
+                                            variant="shadow"
+                                            className="font-bold px-8 bg-rose-500 shadow-rose-500/20"
+                                            onPress={() => handleUpdateStatus(selectedKyc._id, 'rejected')}
+                                            isDisabled={!rejectionReason.trim()}
+                                        >
+                                            Confirm Rejection
+                                        </Button>
+                                    </div>
+                                )}
+                            </ModalFooter>
+                        </>
+                    )}
                 </ModalContent>
             </Modal>
         </div>

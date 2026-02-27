@@ -13,7 +13,7 @@ import {
     SelectItem,
     Divider,
 } from "@heroui/react";
-import { FiSave, FiArrowLeft, FiImage, FiTag, FiMapPin, FiBox, FiDollarSign } from "react-icons/fi";
+import { FloppyDisk, ArrowLeft, Image, Tag, MapPin, Cube, CurrencyInr } from "@phosphor-icons/react";
 
 export default function AddProduct() {
     const router = useRouter();
@@ -133,20 +133,20 @@ export default function AddProduct() {
     };
 
     return (
-        <div className="max-w-4xl mx-auto w-full space-y-6 pb-12">
+        <div className="w-full space-y-6 pb-12">
             {/* Header */}
             <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
                 <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.5 }}>
                     <Button
                         variant="light"
                         className="mb-2 text-slate-500 dark:text-slate-400 p-0 hover:bg-transparent hover:text-indigo-500"
-                        startContent={<FiArrowLeft />}
+                        startContent={<ArrowLeft />}
                         onClick={() => router.push("/dashboard/products")}
                     >
                         Back to Products
                     </Button>
                     <h1 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-slate-100 mb-1">
-                        Add New <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-500 to-purple-500">Product</span>
+                        Add New <span className="text-transparent bg-clip-text bg-linear-to-r from-indigo-500 to-purple-500">Product</span>
                     </h1>
                     <p className="text-slate-600 dark:text-slate-400">List a new item in your inventory catalogue.</p>
                 </motion.div>
@@ -165,7 +165,7 @@ export default function AddProduct() {
                         <div className="space-y-6">
                             <div className="space-y-2">
                                 <h3 className="text-lg font-semibold text-slate-900 dark:text-white flex items-center gap-2">
-                                    <FiTag className="text-indigo-500" /> Basic Information
+                                    <Tag className="text-indigo-500" /> Basic Information
                                 </h3>
                                 <Divider className="bg-slate-100 dark:bg-slate-800" />
                             </div>
@@ -273,7 +273,7 @@ export default function AddProduct() {
                         <div className="space-y-6">
                             <div className="space-y-2">
                                 <h3 className="text-lg font-semibold text-slate-900 dark:text-white flex items-center gap-2">
-                                    <FiDollarSign className="text-emerald-500" /> Pricing & Inventory
+                                    <CurrencyInr weight="bold" className="text-indigo-500" /> Pricing & Inventory
                                 </h3>
                                 <Divider className="bg-slate-100 dark:bg-slate-800" />
                             </div>
@@ -329,7 +329,7 @@ export default function AddProduct() {
                                         onChange={handleInputChange}
                                         placeholder="1"
                                         variant="bordered"
-                                        startContent={<FiBox className="text-indigo-500 text-sm" />}
+                                        startContent={<Cube className="text-indigo-500 text-sm" />}
                                         classNames={{
                                             inputWrapper: "h-12 border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950/60 transition-all shadow-sm focus-within:ring-2 focus-within:ring-indigo-500/20"
                                         }}
@@ -364,7 +364,7 @@ export default function AddProduct() {
                         <div className="space-y-6">
                             <div className="space-y-2">
                                 <h3 className="text-lg font-semibold text-slate-900 dark:text-white flex items-center gap-2">
-                                    <FiMapPin className="text-rose-500" /> Location & Media
+                                    <MapPin className="text-rose-500" /> Location & Media
                                 </h3>
                                 <Divider className="bg-slate-100 dark:bg-slate-800" />
                             </div>
@@ -415,7 +415,7 @@ export default function AddProduct() {
                                     onChange={handleInputChange}
                                     placeholder="https://res.cloudinary.com/..."
                                     variant="bordered"
-                                    startContent={<FiImage className="text-indigo-500 text-sm" />}
+                                    startContent={<Image className="text-indigo-500 text-sm" />}
                                     classNames={{
                                         inputWrapper: "h-12 border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950/60 transition-all shadow-sm focus-within:ring-2 focus-within:ring-indigo-500/20"
                                     }}
@@ -438,7 +438,7 @@ export default function AddProduct() {
                                 color="primary"
                                 size="lg"
                                 isLoading={loading}
-                                startContent={!loading && <FiSave />}
+                                startContent={!loading && <FloppyDisk />}
                                 className="font-medium px-10 shadow-lg shadow-indigo-500/30"
                             >
                                 Publish Product

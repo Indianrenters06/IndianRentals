@@ -17,11 +17,11 @@ import {
   DropdownItem,
 } from "@heroui/react";
 import {
-  FiHome, FiUsers, FiPackage, FiShoppingCart, FiFileText,
-  FiCreditCard, FiCalendar, FiSettings, FiChevronRight, FiChevronDown,
-  FiSearch, FiBell, FiSun, FiMoon, FiMenu, FiX, FiLogOut, FiShield,
-  FiLayout, FiBox, FiTag, FiBarChart2, FiMessageSquare
-} from 'react-icons/fi';
+  House, Users, Package, ShoppingCart, FileText,
+  CreditCard, Calendar, Gear, CaretRight, CaretDown,
+  MagnifyingGlass, Bell, Sun, Moon, List, X, SignOut, ShieldCheck,
+  Layout, Cube, Tag, ChartBar, ChatCenteredText
+} from '@phosphor-icons/react';
 
 import { useRouter } from "next/navigation";
 import { ThemeToggle } from "../../components/ThemeToggle";
@@ -119,9 +119,9 @@ export default function DashboardLayout({ children }) {
   };
 
   const menuItems = [
-    { name: 'Dashboard', icon: FiHome, path: '/dashboard' },
+    { name: 'Dashboard', icon: House, path: '/dashboard' },
     {
-      name: 'CMS', icon: FiLayout, path: '/dashboard/cms',
+      name: 'CMS', icon: Layout, path: '/dashboard/cms',
       submenu: [
         { name: 'Homepage', path: '/dashboard/cms/homepage' },
         { name: 'Blog', path: '/dashboard/cms/blog' },
@@ -129,7 +129,7 @@ export default function DashboardLayout({ children }) {
       ]
     },
     {
-      name: 'Products', icon: FiPackage, path: '/dashboard/products',
+      name: 'Products', icon: Package, path: '/dashboard/products',
       submenu: [
         { name: 'Add Product', path: '/dashboard/products/add' },
         { name: 'All Products', path: '/dashboard/products' },
@@ -143,7 +143,7 @@ export default function DashboardLayout({ children }) {
       ]
     },
     {
-      name: 'Inventory', icon: FiBox, path: '/dashboard/inventory',
+      name: 'Inventory', icon: Cube, path: '/dashboard/inventory',
       submenu: [
         { name: 'Available Stock', path: '/dashboard/inventory/available' },
         { name: 'Assigned Stock', path: '/dashboard/inventory/assigned' },
@@ -154,7 +154,7 @@ export default function DashboardLayout({ children }) {
       ]
     },
     {
-      name: 'Users', icon: FiUsers, path: '/dashboard/users',
+      name: 'Users', icon: Users, path: '/dashboard/users',
       submenu: [
         { name: 'All Users', path: '/dashboard/users' },
         { name: 'Active Users', path: '/dashboard/users/active' },
@@ -166,7 +166,7 @@ export default function DashboardLayout({ children }) {
       ]
     },
     {
-      name: 'KYC ', icon: FiShield, path: '/dashboard/kyc',
+      name: 'KYC ', icon: ShieldCheck, path: '/dashboard/kyc',
       submenu: [
         { name: 'Pending', path: '/dashboard/kyc/pending' },
         { name: 'Under Review', path: '/dashboard/kyc/review' },
@@ -176,7 +176,7 @@ export default function DashboardLayout({ children }) {
       ]
     },
     {
-      name: 'Orders', icon: FiShoppingCart, path: '/dashboard/orders',
+      name: 'Orders', icon: ShoppingCart, path: '/dashboard/orders',
       submenu: [
         { name: 'All Orders', path: '/dashboard/orders' },
         { name: 'Pending Orders', path: '/dashboard/orders/pending' },
@@ -187,7 +187,7 @@ export default function DashboardLayout({ children }) {
       ]
     },
     {
-      name: 'Payments', icon: FiCreditCard, path: '/dashboard/payments',
+      name: 'Payments', icon: CreditCard, path: '/dashboard/payments',
       submenu: [
         { name: 'All Transactions', path: '/dashboard/payments' },
         { name: 'Successful', path: '/dashboard/payments/successful' },
@@ -199,7 +199,7 @@ export default function DashboardLayout({ children }) {
       ]
     },
     {
-      name: 'Coupons', icon: FiTag, path: '/dashboard/coupons',
+      name: 'Coupons', icon: Tag, path: '/dashboard/coupons',
       submenu: [
         { name: 'Create Coupon', path: '/dashboard/coupons/create' },
         { name: 'Active Coupons', path: '/dashboard/coupons/active' },
@@ -209,7 +209,7 @@ export default function DashboardLayout({ children }) {
       ]
     },
     {
-      name: 'Reports', icon: FiBarChart2, path: '/dashboard/reports',
+      name: 'Reports', icon: ChartBar, path: '/dashboard/reports',
       submenu: [
         { name: 'Revenue', path: '/dashboard/reports/revenue' },
         { name: 'Rental Duration', path: '/dashboard/reports/duration' },
@@ -220,7 +220,7 @@ export default function DashboardLayout({ children }) {
       ]
     },
     {
-      name: 'Notifications', icon: FiMessageSquare, path: '/dashboard/notifications',
+      name: 'Notifications', icon: ChatCenteredText, path: '/dashboard/notifications',
       submenu: [
         { name: 'Push Notifications', path: '/dashboard/notifications/push' },
         { name: 'Email Campaigns', path: '/dashboard/notifications/email' },
@@ -231,7 +231,7 @@ export default function DashboardLayout({ children }) {
       ]
     },
     {
-      name: 'Settings', icon: FiSettings, path: '/dashboard/settings',
+      name: 'Settings', icon: Gear, path: '/dashboard/settings',
       submenu: [
         { name: 'General Settings', path: '/dashboard/settings/general' },
         { name: 'Logo & Branding', path: '/dashboard/settings/branding' },
@@ -288,8 +288,8 @@ export default function DashboardLayout({ children }) {
                         <span className="font-medium text-sm text-left truncate tracking-wide">{item.name}</span>
                       </div>
                       {isSubmenuOpen ?
-                        <FiChevronDown className="w-4 h-4 text-slate-500 group-hover:text-slate-700 dark:group-hover:text-slate-300 shrink-0" /> :
-                        <FiChevronRight className="w-4 h-4 text-slate-400 dark:text-slate-600 group-hover:text-slate-600 dark:group-hover:text-slate-400 shrink-0" />
+                        <CaretDown className="w-4 h-4 text-slate-500 group-hover:text-slate-700 dark:group-hover:text-slate-300 shrink-0" /> :
+                        <CaretRight className="w-4 h-4 text-slate-400 dark:text-slate-600 group-hover:text-slate-600 dark:group-hover:text-slate-400 shrink-0" />
                       }
                     </button>
                   ) : (
@@ -339,7 +339,7 @@ export default function DashboardLayout({ children }) {
             onClick={handleLogout}
             className="w-full flex items-center px-4 py-2 text-slate-500 dark:text-slate-400 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-xl transition-colors text-sm font-medium tracking-wide"
           >
-            <FiLogOut className="w-5 h-5 mr-3" />
+            <SignOut className="w-5 h-5 mr-3" />
             Sign Out
           </button>
         </div>
@@ -354,11 +354,11 @@ export default function DashboardLayout({ children }) {
               onClick={() => setIsSidebarOpen(!isSidebarOpen)}
               className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800/80 rounded-xl transition-colors text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200"
             >
-              {isSidebarOpen ? <FiX className="w-5 h-5" /> : <FiMenu className="w-5 h-5" />}
+              {isSidebarOpen ? <X className="w-5 h-5" /> : <List className="w-5 h-5" />}
             </button>
 
             <div className="hidden md:flex relative group">
-              <FiSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500 group-focus-within:text-indigo-500 dark:group-focus-within:text-indigo-400 transition-colors w-4 h-4" />
+              <MagnifyingGlass className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500 group-focus-within:text-indigo-500 dark:group-focus-within:text-indigo-400 transition-colors w-4 h-4" />
               <input
                 type="text"
                 placeholder="Search Admin..."
@@ -373,7 +373,7 @@ export default function DashboardLayout({ children }) {
             <Dropdown placement="bottom-end" className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 w-80">
               <DropdownTrigger>
                 <button className="relative p-2 text-slate-400 hover:text-slate-200 hover:bg-slate-800/80 rounded-xl transition-all">
-                  <FiBell className="w-5 h-5" />
+                  <Bell className="w-5 h-5" />
                   {unreadCount > 0 && (
                     <span className="absolute top-1 right-1 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 border-2 border-slate-900 text-[9px] font-bold text-white">
                       {unreadCount > 9 ? '9+' : unreadCount}
@@ -461,8 +461,10 @@ export default function DashboardLayout({ children }) {
         </header>
 
         {/* Page Content */}
-        <div className="flex-1 w-full bg-slate-50 dark:bg-slate-900/40 relative z-10 overflow-x-hidden p-6 md:p-8">
-          {children}
+        <div className="flex-1 w-full bg-slate-50 dark:bg-slate-900/40 relative z-10 overflow-x-hidden p-4 md:p-6 lg:p-8">
+          <div className="max-w-[1600px] mx-auto w-full">
+            {children}
+          </div>
         </div>
       </main>
     </div>

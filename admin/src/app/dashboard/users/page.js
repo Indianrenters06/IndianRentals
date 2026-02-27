@@ -1,11 +1,12 @@
 'use client';
 
 import { useState, useEffect, useMemo } from 'react';
+import { motion } from 'framer-motion';
 import {
-    FiSearch, FiFilter, FiDownload, FiEdit2, FiTrash2,
-    FiMail, FiPhone, FiMapPin, FiCalendar, FiMoreVertical,
-    FiUserPlus, FiShield, FiUser
-} from 'react-icons/fi';
+    MagnifyingGlass, Funnel, DownloadSimple, PencilSimple, Trash,
+    Phone, MapPin, DotsThreeVertical,
+    UserPlus, ShieldCheck, User
+} from '@phosphor-icons/react';
 import {
     Input,
     Select,
@@ -55,12 +56,11 @@ export default function UsersManagement() {
                 const data = await response.json();
                 setUsers(data);
             } else {
-                // Fallback to mock if API fails for demo
                 throw new Error("API failed");
             }
         } catch (error) {
             console.error('Error fetching users:', error);
-            // Mock data fallback for missing backend endpoints
+            // Mock data fallback
             setUsers([
                 { _id: "1", name: "Rahul Sharma", email: "rahul.s@example.com", phone: "+91 9876543210", city: "Mumbai", state: "Maharashtra", isAdmin: true, createdAt: "2023-01-15T10:00:00Z" },
                 { _id: "2", name: "Sneha Menon", email: "sneha.m@example.com", phone: "+91 9876543211", city: "Bangalore", state: "Karnataka", isAdmin: false, createdAt: "2023-03-22T14:30:00Z" },
@@ -75,28 +75,23 @@ export default function UsersManagement() {
 
     const handleDeleteUser = async (userId) => {
         if (!confirm('Are you sure you want to delete this user?')) return;
+        setUsers(users.filter(u => u._id !== userId));
+    };
 
-        try {
-            const userInfo = JSON.parse(localStorage.getItem('userInfo') || '{}');
-            const token = userInfo.token;
-
-            const response = await fetch(`http://localhost:5000/api/admin/users/${userId}`, {
-                method: 'DELETE',
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                }
-            });
-
-            if (response.ok) {
-                fetchUsers();
-            } else {
-                // If API fails, just remove from local state for mock testing
-                setUsers(users.filter(u => u._id !== userId));
-            }
-        } catch (error) {
-            console.error('Error deleting user:', error);
-            setUsers(users.filter(u => u._id !== userId));
-        }
+    const exportCSV = () => {
+        const headers = ["Name,Email,Phone,City,State,Role,Joined\n"];
+        const rows = users.map(u =>
+            `${u.name},${u.email},${u.phone || ""},${u.city || ""},${u.state || ""},${u.isAdmin ? "Admin" : "Customer"},${new Date(u.createdAt).toLocaleDateString()}`
+        ).join("\n");
+        const blob = new Blob([headers, rows], { type: 'text/csv' });
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.setAttribute('hidden', '');
+        a.setAttribute('href', url);
+        a.setAttribute('download', 'users_report.csv');
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
     };
 
     const filteredUsers = useMemo(() => {
@@ -123,12 +118,12 @@ export default function UsersManagement() {
                     <div className="flex items-center gap-3">
                         <Avatar
                             name={user.name?.charAt(0).toUpperCase() || 'U'}
-                            className="bg-gradient-to-br from-indigo-500 to-purple-500 text-white font-semibold shrink-0"
+                            className="bg-linear-to-br from-indigo-500 to-purple-500 text-white font-semibold shrink-0"
                             size="sm"
                         />
                         <div className="flex flex-col">
-                            <span className="text-sm font-semibold tracking-tight text-white">{user.name || 'Unnamed User'}</span>
-                            <span className="text-xs text-slate-400">{user.email}</span>
+                            <span className="text-sm font-semibold tracking-tight text-slate-900 dark:text-slate-100">{user.name || 'Unnamed User'}</span>
+                            <span className="text-xs text-slate-500">{user.email}</span>
                         </div>
                     </div>
                 );
@@ -138,8 +133,8 @@ export default function UsersManagement() {
                         size="sm"
                         variant="flat"
                         color={user.isAdmin ? "secondary" : "default"}
-                        startContent={user.isAdmin ? <FiShield className="w-3 h-3 ml-1" /> : <FiUser className="w-3 h-3 ml-1" />}
-                        className="font-medium bg-secondary-500/10 text-secondary-400"
+                        startContent={user.isAdmin ? <ShieldCheck className="w-3 h-3 ml-1" /> : <User className="w-3 h-3 ml-1" />}
+                        className="font-medium"
                     >
                         {user.isAdmin ? 'Admin' : 'Customer'}
                     </Chip>
@@ -148,16 +143,16 @@ export default function UsersManagement() {
                 return (
                     <div className="flex flex-col gap-1">
                         {user.phone ? (
-                            <div className="flex items-center gap-2 text-xs text-slate-400">
-                                <FiPhone className="w-3 h-3 text-indigo-400" />
+                            <div className="flex items-center gap-2 text-xs text-slate-600 dark:text-slate-400">
+                                <Phone className="w-3 h-3 text-indigo-500" />
                                 <span>{user.phone}</span>
                             </div>
                         ) : (
                             <span className="text-xs text-slate-500 italic">No phone</span>
                         )}
                         {user.city ? (
-                            <div className="flex items-center gap-2 text-xs text-slate-400">
-                                <FiMapPin className="w-3 h-3 text-indigo-400" />
+                            <div className="flex items-center gap-2 text-xs text-slate-600 dark:text-slate-400">
+                                <MapPin className="w-3 h-3 text-indigo-500" />
                                 <span>{user.city}, {user.state || 'India'}</span>
                             </div>
                         ) : null}
@@ -166,33 +161,33 @@ export default function UsersManagement() {
             case "joined":
                 return (
                     <div className="flex flex-col">
-                        <span className="text-sm text-slate-300">
+                        <span className="text-sm text-slate-600 dark:text-slate-300">
                             {new Date(user.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
                         </span>
                     </div>
                 );
             case "actions":
                 return (
-                    <div className="relative flex justify-end items-center gap-2">
+                    <div className="relative flex justify-end items-center gap-2 pr-4">
                         <Tooltip content="Edit user" color="primary" delay={0}>
                             <Button isIconOnly size="sm" variant="light" color="primary" className="text-slate-400 hover:text-indigo-400">
-                                <FiEdit2 className="w-4 h-4" />
+                                <PencilSimple className="w-4 h-4" />
                             </Button>
                         </Tooltip>
                         <Dropdown>
                             <DropdownTrigger>
-                                <Button isIconOnly size="sm" variant="light" className="text-slate-500 hover:text-slate-300">
-                                    <FiMoreVertical className="w-4 h-4" />
+                                <Button isIconOnly size="sm" variant="light" className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-300">
+                                    <DotsThreeVertical className="w-4 h-4" />
                                 </Button>
                             </DropdownTrigger>
                             <DropdownMenu aria-label="User Actions" variant="flat">
-                                <DropdownItem key="view" startContent={<FiUser />} className="text-slate-300">View Profile</DropdownItem>
-                                <DropdownItem key="orders" startContent={<FiMapPin />} className="text-slate-300">View Orders</DropdownItem>
+                                <DropdownItem key="view" startContent={<User />}>View Profile</DropdownItem>
+                                <DropdownItem key="orders" startContent={<MapPin />}>View Orders</DropdownItem>
                                 <DropdownItem
                                     key="delete"
                                     className="text-danger"
                                     color="danger"
-                                    startContent={<FiTrash2 className="text-danger" />}
+                                    startContent={<Trash className="text-danger" />}
                                     onPress={() => handleDeleteUser(user._id)}
                                 >
                                     Delete User
@@ -208,75 +203,74 @@ export default function UsersManagement() {
 
     if (loading) {
         return (
-            <div className="flex items-center justify-center h-[80vh] w-full bg-slate-900/40">
-                <Spinner size="lg" color="primary" label="Loading Users Data..." classNames={{ label: "text-slate-400 mt-4" }} />
+            <div className="flex items-center justify-center h-[60vh] w-full">
+                <Spinner size="lg" color="primary" label="Loading Users Data..." classNames={{ label: "text-slate-500 mt-4" }} />
             </div>
         );
     }
 
     return (
-        <div className="bg-slate-900/40 min-h-[calc(100vh-80px)] w-full">
-            {/* Header section with glassmorphism */}
-            <div className="px-8 py-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
-                <div>
-                    <h1 className="text-2xl font-bold text-white tracking-tight">Users Management</h1>
-                    <p className="text-sm text-slate-400 mt-1">
-                        A complete directory of all registered customers and administrators.
-                    </p>
-                </div>
+        <div className="w-full space-y-6">
+            <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+                <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }}>
+                    <h1 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-slate-100 mb-1">
+                        Users <span className="text-transparent bg-clip-text bg-linear-to-r from-indigo-500 to-purple-500">Management</span>
+                    </h1>
+                    <p className="text-slate-600 dark:text-slate-400">Complete directory of all registered customers and administrators.</p>
+                </motion.div>
                 <div className="flex flex-wrap items-center gap-3">
-                    <Button color="secondary" variant="flat" startContent={<FiDownload className="w-4 h-4" />} className="font-semibold bg-indigo-500/10 text-indigo-400 border-none">
+                    <Button
+                        color="secondary"
+                        variant="flat"
+                        startContent={<DownloadSimple className="w-4 h-4" />}
+                        className="font-semibold bg-indigo-500/10 text-indigo-600 dark:text-indigo-400"
+                        onPress={exportCSV}
+                    >
                         Export CSV
                     </Button>
-                    <Button color="primary" variant="shadow" startContent={<FiUserPlus className="w-4 h-4" />} className="font-semibold shadow-indigo-500/30">
+                    <Button color="primary" variant="shadow" startContent={<UserPlus className="w-4 h-4" />} className="font-semibold shadow-indigo-500/30">
                         Add New User
                     </Button>
                 </div>
             </div>
 
-            <div className="px-8 pb-10 max-w-[1600px] mx-auto w-full">
-                <div className="bg-slate-900 rounded-2xl shadow-lg border border-slate-800 overflow-hidden">
-                    {/* Filters Row */}
-                    <div className="px-6 py-5 bg-slate-900/50 border-b border-slate-800 flex flex-col sm:flex-row gap-4">
-                        <div className="flex-1 max-w-md">
-                            <Input
-                                isClearable
-                                className="w-full"
+            <Card className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
+                <CardBody className="p-0">
+                    <div className="px-6 py-5 bg-slate-50 dark:bg-slate-900/50 border-b border-slate-200 dark:border-slate-800 flex flex-col sm:flex-row gap-4">
+                        <div className="flex-1 max-w-md relative group">
+                            <MagnifyingGlass className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 z-10 group-focus-within:text-indigo-500 transition-colors" />
+                            <input
+                                type="text"
                                 placeholder="Search by name or email..."
-                                startContent={<FiSearch className="text-slate-500" />}
                                 value={searchTerm}
-                                onClear={() => setSearchTerm('')}
-                                onValueChange={setSearchTerm}
-                                variant="bordered"
-                                color="primary"
-                                classNames={{
-                                    inputWrapper: "border-slate-700 bg-slate-950/50 text-slate-200"
-                                }}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                                className="w-full bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 rounded-xl pl-10 pr-4 py-2 text-sm text-slate-900 dark:text-slate-200 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all h-11"
                             />
                         </div>
-                        <Select
-                            className="w-full sm:w-48"
-                            selectedKeys={[filterRole]}
-                            onSelectionChange={(keys) => setFilterRole(Array.from(keys)[0])}
-                            variant="bordered"
-                            color="primary"
-                            startContent={<FiFilter className="text-slate-500" />}
-                            aria-label="Filter Roles"
-                            classNames={{
-                                trigger: "border-slate-700 bg-slate-950/50 text-slate-200"
-                            }}
-                        >
-                            <SelectItem key="all" value="all" className="text-slate-300">All Roles</SelectItem>
-                            <SelectItem key="admin" value="admin" className="text-slate-300">Administrators</SelectItem>
-                            <SelectItem key="user" value="user" className="text-slate-300">Customers</SelectItem>
-                        </Select>
+                        <div className="w-full sm:w-48">
+                            <Select
+                                selectedKeys={[filterRole]}
+                                onSelectionChange={(keys) => setFilterRole(Array.from(keys)[0])}
+                                variant="bordered"
+                                placeholder="All Roles"
+                                startContent={<Funnel className="text-slate-400" />}
+                                aria-label="Filter Roles"
+                                classNames={{
+                                    trigger: "border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-950/50 text-slate-900 dark:text-slate-200 h-11 border-1"
+                                }}
+                            >
+                                <SelectItem key="all" value="all">All Roles</SelectItem>
+                                <SelectItem key="admin" value="admin">Administrators</SelectItem>
+                                <SelectItem key="user" value="user">Customers</SelectItem>
+                            </Select>
+                        </div>
                     </div>
 
                     <Table
                         aria-label="Users management table"
                         bottomContent={
                             filteredUsers.length > 0 ? (
-                                <div className="flex w-full justify-between items-center py-4 px-6 border-t border-slate-800/80 bg-slate-950/30">
+                                <div className="flex w-full justify-between items-center py-4 px-6 border-t border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950/30">
                                     <span className="text-sm text-slate-500">
                                         Showing {filteredUsers.length} total users
                                     </span>
@@ -297,10 +291,9 @@ export default function UsersManagement() {
                         }
                         classNames={{
                             wrapper: "p-0 rounded-none shadow-none border-none bg-transparent",
-                            table: "min-w-full w-full",
-                            thead: "bg-slate-950",
-                            th: "bg-slate-950 border-b border-slate-800 text-slate-400 text-xs font-semibold py-4 uppercase tracking-wider",
-                            td: "py-4 border-b border-slate-800/50 group-hover:bg-slate-800/30 transition-colors",
+                            thead: "bg-slate-50 dark:bg-slate-950",
+                            th: "bg-slate-50 dark:bg-slate-950 border-b border-slate-200 dark:border-slate-800 text-slate-500 dark:text-slate-400 text-xs font-semibold py-4 uppercase tracking-wider h-12 pt-4",
+                            td: "py-4 border-b border-slate-100 dark:border-slate-800/60 group-hover:bg-slate-50 dark:group-hover:bg-slate-800/30 transition-colors",
                             tr: "group"
                         }}
                     >
@@ -315,11 +308,11 @@ export default function UsersManagement() {
                             items={items}
                             emptyContent={
                                 <div className="py-16 flex flex-col justify-center items-center">
-                                    <div className="w-16 h-16 bg-slate-800 rounded-full flex items-center justify-center mb-4 text-slate-500">
-                                        <FiSearch className="w-6 h-6" />
+                                    <div className="w-16 h-16 bg-slate-100 dark:bg-slate-800 rounded-full flex items-center justify-center mb-4 text-slate-400">
+                                        <MagnifyingGlass className="w-6 h-6" />
                                     </div>
-                                    <h3 className="text-lg font-medium text-slate-200 mb-1">No users found</h3>
-                                    <p className="text-slate-500 text-sm">We couldn't find any users matching your filters.</p>
+                                    <h3 className="text-lg font-medium text-slate-900 dark:text-slate-200 mb-1">No users found</h3>
+                                    <p className="text-slate-500 text-sm text-center">We couldn't find any users matching your filters.</p>
                                 </div>
                             }
                         >
@@ -330,8 +323,8 @@ export default function UsersManagement() {
                             )}
                         </TableBody>
                     </Table>
-                </div>
-            </div>
+                </CardBody>
+            </Card>
         </div>
     );
 }
