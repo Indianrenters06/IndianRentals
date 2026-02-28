@@ -141,7 +141,7 @@ export default function BlacklistManagement() {
                 <ModalContent>
                     {(onClose) => (
                         <>
-                            <ModalHeader className="font-bold text-slate-900 dark:text-slate-100 text-rose-600">
+                            <ModalHeader className="font-bold text-rose-600 dark:text-rose-400">
                                 🚫 Add to Blacklist
                             </ModalHeader>
                             <ModalBody className="flex flex-col gap-4 py-4">

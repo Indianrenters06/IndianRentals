@@ -8,7 +8,6 @@ import {
   Sidebar,
   SidebarItem,
   SidebarSection,
-  User,
   Avatar,
   Button,
   Dropdown,
@@ -425,34 +424,55 @@ export default function DashboardLayout({ children }) {
 
             <div className="h-8 w-px bg-slate-300 dark:bg-slate-800"></div>
 
-            <Dropdown placement="bottom-end" className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800">
+            <Dropdown placement="bottom-end" className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 min-w-[220px]">
               <DropdownTrigger>
-                <div className="flex items-center gap-3 cursor-pointer hover:opacity-80 transition-opacity">
-                  <div className="hidden md:flex flex-col items-end">
-                    <span className="text-sm font-medium text-slate-900 dark:text-slate-200">{adminInfo?.name || 'Admin'}</span>
-                    <span className="text-xs text-slate-500 capitalize">{adminInfo?.role || 'Administrator'}</span>
+                <div className="flex items-center gap-3 cursor-pointer group">
+                  {/* Profile avatar with generated image from name */}
+                  <div className="relative">
+                    <Avatar
+                      isBordered
+                      color="secondary"
+                      size="md"
+                      src={`https://ui-avatars.com/api/?name=${encodeURIComponent(adminInfo?.name || 'Admin')}&background=6366f1&color=fff&bold=true&size=128`}
+                      name={adminInfo?.name?.charAt(0).toUpperCase() || 'A'}
+                      className="ring-offset-slate-950 transition-transform group-hover:scale-105"
+                    />
+                    {/* Online indicator */}
+                    <span className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-emerald-500 border-2 border-white dark:border-slate-950 rounded-full" />
                   </div>
-                  <User
-                    as="button"
-                    avatarProps={{
-                      isBordered: true,
-                      color: "secondary",
-                      name: "AD",
-                      size: "md",
-                      className: "ring-offset-slate-950"
-                    }}
-                    className="transition-transform"
-                  />
+                  {/* Name + Role */}
+                  <div className="hidden md:flex flex-col items-start">
+                    <span className="text-sm font-semibold text-slate-900 dark:text-slate-100 leading-tight">
+                      {adminInfo?.name || 'Admin'}
+                    </span>
+                    <span className="text-[11px] text-indigo-500 dark:text-indigo-400 font-medium uppercase tracking-wider">
+                      {adminInfo?.role === 'admin' ? '⬡ Admin' : adminInfo?.role || 'Admin'}
+                    </span>
+                  </div>
                 </div>
               </DropdownTrigger>
               <DropdownMenu aria-label="User Actions" variant="flat">
-                <DropdownItem key="profile" className="text-slate-700 dark:text-slate-300">
+                {/* Profile header item */}
+                <DropdownItem isReadOnly key="header" className="h-auto py-3 opacity-100 cursor-default gap-3 border-b border-slate-100 dark:border-slate-800 mb-1">
+                  <div className="flex items-center gap-3">
+                    <Avatar
+                      size="md"
+                      src={`https://ui-avatars.com/api/?name=${encodeURIComponent(adminInfo?.name || 'Admin')}&background=6366f1&color=fff&bold=true&size=128`}
+                      name={adminInfo?.name?.charAt(0).toUpperCase() || 'A'}
+                    />
+                    <div className="flex flex-col">
+                      <span className="text-sm font-bold text-slate-900 dark:text-slate-100">{adminInfo?.name || 'Admin'}</span>
+                      <span className="text-xs text-slate-500 truncate max-w-[150px]">{adminInfo?.email || 'admin@indianrentals.com'}</span>
+                    </div>
+                  </div>
+                </DropdownItem>
+                <DropdownItem key="profile" className="text-slate-700 dark:text-slate-300" startContent={<ShieldCheck className="w-4 h-4" />}>
                   Profile Settings
                 </DropdownItem>
-                <DropdownItem key="company" className="text-slate-700 dark:text-slate-300">
+                <DropdownItem key="company" className="text-slate-700 dark:text-slate-300" startContent={<Gear className="w-4 h-4" />}>
                   Global Config
                 </DropdownItem>
-                <DropdownItem key="logout" color="danger" className="text-red-600 dark:text-red-400" onClick={handleLogout}>
+                <DropdownItem key="logout" color="danger" className="text-red-600 dark:text-red-400" startContent={<SignOut className="w-4 h-4" />} onClick={handleLogout}>
                   Sign Out
                 </DropdownItem>
               </DropdownMenu>
