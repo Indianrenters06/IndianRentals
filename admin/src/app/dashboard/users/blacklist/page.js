@@ -1,15 +1,61 @@
 'use client';
 
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Card, CardBody, Button, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Chip } from "@heroui/react";
-import { ShieldSlash, MagnifyingGlass, Warning } from "@phosphor-icons/react";
+import {
+    Card, CardBody, Button, Table, TableHeader, TableColumn, TableBody,
+    TableRow, TableCell, Chip, Modal, ModalContent, ModalHeader, ModalBody,
+    ModalFooter, Input, Select, SelectItem, useDisclosure, Skeleton
+} from "@heroui/react";
+import { ShieldSlash, WarningCircle, Warning, Plus, Trash } from "@phosphor-icons/react";
 
-const BLACKLIST = [
-    { id: 1, identifier: "9876543210", type: "Phone Number", reason: "Fraudulent Identity", date: "Jan 12, 2023" },
-    { id: 2, identifier: "scammer@junk.com", type: "Email Address", reason: "Security Threat", date: "Mar 05, 2023" },
-];
+const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+
+// Blacklist is managed locally (no dedicated backend model yet)
+const LOCAL_KEY = "admin_blacklist";
+
+const loadBlacklist = () => {
+    try { return JSON.parse(localStorage.getItem(LOCAL_KEY) || "[]"); } catch { return []; }
+};
+const saveBlacklist = (list) => localStorage.setItem(LOCAL_KEY, JSON.stringify(list));
 
 export default function BlacklistManagement() {
+    const [blacklist, setBlacklist] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure();
+    const [form, setForm] = useState({ identifier: "", type: "Email Address", reason: "" });
+    const [formError, setFormError] = useState("");
+
+    useEffect(() => {
+        // Load from local storage as there's no backend model for this yet
+        setBlacklist(loadBlacklist());
+        setLoading(false);
+    }, []);
+
+    const handleAdd = () => {
+        if (!form.identifier.trim()) return setFormError("Identifier is required.");
+        if (!form.reason.trim()) return setFormError("Reason is required.");
+        setFormError("");
+        const newEntry = {
+            id: Date.now().toString(),
+            identifier: form.identifier.trim(),
+            type: form.type,
+            reason: form.reason.trim(),
+            date: new Date().toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" }),
+        };
+        const updated = [newEntry, ...blacklist];
+        setBlacklist(updated);
+        saveBlacklist(updated);
+        setForm({ identifier: "", type: "Email Address", reason: "" });
+        onClose();
+    };
+
+    const handleRemove = (id) => {
+        const updated = blacklist.filter(b => b.id !== id);
+        setBlacklist(updated);
+        saveBlacklist(updated);
+    };
+
     return (
         <div className="w-full space-y-6 pb-12">
             <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
@@ -19,46 +65,127 @@ export default function BlacklistManagement() {
                     </h1>
                     <p className="text-slate-600 dark:text-slate-400">Manage identifiers banned from accessing platform services.</p>
                 </motion.div>
-                <Button color="danger" variant="shadow" className="font-bold bg-rose-600 shadow-rose-500/20 px-6" startContent={<ShieldSlash weight="bold" />}>Add to Blacklist</Button>
+                <div className="flex items-center gap-3">
+                    {!loading && blacklist.length > 0 && (
+                        <Chip size="lg" color="danger" variant="flat" startContent={<ShieldSlash weight="bold" className="mr-1" />} className="font-bold text-sm px-3">
+                            {blacklist.length} Blacklisted
+                        </Chip>
+                    )}
+                    <Button color="danger" variant="shadow" className="font-bold bg-rose-600 shadow-rose-500/20 px-6" startContent={<ShieldSlash weight="bold" />} onPress={onOpen}>
+                        Add to Blacklist
+                    </Button>
+                </div>
             </div>
 
             <Card className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
                 <CardBody className="p-0">
-                    <Table
-                        aria-label="Blacklist table"
-                        classNames={{
-                            wrapper: "p-0 rounded-none shadow-none bg-transparent",
-                            th: "bg-slate-50 dark:bg-slate-950/80 uppercase text-xs font-bold h-12 pt-0 px-6",
-                            td: "py-4 px-6 border-b border-slate-100 dark:border-slate-800/50"
-                        }}
-                    >
-                        <TableHeader>
-                            <TableColumn>BLOCKED IDENTIFIER</TableColumn>
-                            <TableColumn>TYPE</TableColumn>
-                            <TableColumn>REASON</TableColumn>
-                            <TableColumn>LISTED ON</TableColumn>
-                            <TableColumn align="center">ACTION</TableColumn>
-                        </TableHeader>
-                        <TableBody items={BLACKLIST} emptyContent="Security perimeter clear. No active blacklists.">
-                            {(item) => (
-                                <TableRow key={item.id}>
-                                    <TableCell className="font-mono text-sm font-bold text-rose-600 dark:text-rose-400">{item.identifier}</TableCell>
-                                    <TableCell>
-                                        <Chip size="sm" variant="flat" className="font-bold uppercase tracking-wider">{item.type}</Chip>
-                                    </TableCell>
-                                    <TableCell className="text-sm font-medium text-slate-500">{item.reason}</TableCell>
-                                    <TableCell className="text-xs text-slate-400 font-bold">{item.date}</TableCell>
-                                    <TableCell>
-                                        <div className="flex justify-center">
-                                            <Button size="sm" color="default" variant="light" className="font-bold h-7">Remove</Button>
-                                        </div>
-                                    </TableCell>
-                                </TableRow>
-                            )}
-                        </TableBody>
-                    </Table>
+                    {loading ? (
+                        <div className="p-6 space-y-4">
+                            {[...Array(3)].map((_, i) => <Skeleton key={i} className="h-12 w-full rounded-xl" />)}
+                        </div>
+                    ) : (
+                        <Table
+                            aria-label="Blacklist table"
+                            classNames={{
+                                wrapper: "p-0 rounded-none shadow-none bg-transparent",
+                                th: "bg-slate-50 dark:bg-slate-950/80 uppercase text-xs font-bold h-12 pt-0 px-6",
+                                td: "py-4 px-6 border-b border-slate-100 dark:border-slate-800/50"
+                            }}
+                        >
+                            <TableHeader>
+                                <TableColumn>BLOCKED IDENTIFIER</TableColumn>
+                                <TableColumn>TYPE</TableColumn>
+                                <TableColumn>REASON</TableColumn>
+                                <TableColumn>LISTED ON</TableColumn>
+                                <TableColumn align="center">ACTION</TableColumn>
+                            </TableHeader>
+                            <TableBody items={blacklist} emptyContent="Security perimeter clear. No active blacklists.">
+                                {(item) => (
+                                    <TableRow key={item.id}>
+                                        <TableCell className="font-mono text-sm font-bold text-rose-600 dark:text-rose-400">{item.identifier}</TableCell>
+                                        <TableCell>
+                                            <Chip size="sm" variant="flat" className="font-bold uppercase tracking-wider">{item.type}</Chip>
+                                        </TableCell>
+                                        <TableCell>
+                                            <div className="flex items-center gap-2 text-sm text-slate-500">
+                                                <Warning className="text-rose-500 shrink-0" weight="bold" />
+                                                {item.reason}
+                                            </div>
+                                        </TableCell>
+                                        <TableCell className="text-xs text-slate-400 font-bold">{item.date}</TableCell>
+                                        <TableCell>
+                                            <div className="flex justify-center">
+                                                <Button
+                                                    size="sm"
+                                                    color="danger"
+                                                    variant="light"
+                                                    className="font-bold h-7"
+                                                    startContent={<Trash weight="bold" />}
+                                                    onPress={() => handleRemove(item.id)}
+                                                >
+                                                    Remove
+                                                </Button>
+                                            </div>
+                                        </TableCell>
+                                    </TableRow>
+                                )}
+                            </TableBody>
+                        </Table>
+                    )}
                 </CardBody>
             </Card>
+
+            {/* Add Blacklist Modal */}
+            <Modal isOpen={isOpen} onOpenChange={onOpenChange} size="md" placement="center"
+                classNames={{ base: "bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800" }}>
+                <ModalContent>
+                    {(onClose) => (
+                        <>
+                            <ModalHeader className="font-bold text-slate-900 dark:text-slate-100 text-rose-600">
+                                🚫 Add to Blacklist
+                            </ModalHeader>
+                            <ModalBody className="flex flex-col gap-4 py-4">
+                                <Select
+                                    label="Identifier Type"
+                                    selectedKeys={[form.type]}
+                                    onSelectionChange={(keys) => setForm(f => ({ ...f, type: [...keys][0] || "Email Address" }))}
+                                    classNames={{ trigger: "bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700" }}
+                                >
+                                    <SelectItem key="Email Address">Email Address</SelectItem>
+                                    <SelectItem key="Phone Number">Phone Number</SelectItem>
+                                    <SelectItem key="IP Address">IP Address</SelectItem>
+                                    <SelectItem key="Device ID">Device ID</SelectItem>
+                                </Select>
+                                <Input
+                                    label="Identifier"
+                                    placeholder={form.type === "Email Address" ? "e.g. fraud@spam.com" : form.type === "Phone Number" ? "e.g. 9876543210" : "Enter identifier"}
+                                    value={form.identifier}
+                                    onValueChange={(v) => setForm(f => ({ ...f, identifier: v }))}
+                                    classNames={{ inputWrapper: "bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700" }}
+                                />
+                                <Input
+                                    label="Reason"
+                                    placeholder="e.g. Fraudulent activity, Policy violation..."
+                                    value={form.reason}
+                                    onValueChange={(v) => setForm(f => ({ ...f, reason: v }))}
+                                    classNames={{ inputWrapper: "bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700" }}
+                                />
+                                {formError && (
+                                    <p className="text-sm text-rose-500 flex items-center gap-2">
+                                        <WarningCircle weight="bold" /> {formError}
+                                    </p>
+                                )}
+                            </ModalBody>
+                            <ModalFooter>
+                                <Button variant="flat" onPress={onClose}>Cancel</Button>
+                                <Button color="danger" className="bg-rose-600 font-bold" startContent={<ShieldSlash weight="bold" />} onPress={handleAdd}>
+                                    Blacklist
+                                </Button>
+                            </ModalFooter>
+                        </>
+                    )}
+                </ModalContent>
+            </Modal>
         </div>
     );
 }

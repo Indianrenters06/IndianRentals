@@ -23,7 +23,14 @@ const {
     // Payments
     getAllPayments,
     // Calendar
-    getCalendarEvents
+    getCalendarEvents,
+    // Inventory
+    getAvailableStock,
+    getAssignedInventory,
+    getReturnedInventory,
+    getDamagedInventory,
+    getStockAlerts,
+    adjustStock,
 } = require('../controllers/adminController');
 const { protect, admin } = require('../middleware/authMiddleware');
 
@@ -73,6 +80,25 @@ router.route('/payments')
 // Calendar Management
 router.route('/calendar')
     .get(protect, admin, getCalendarEvents);
+
+// Inventory Management
+router.route('/inventory/available')
+    .get(protect, admin, getAvailableStock);
+
+router.route('/inventory/assigned')
+    .get(protect, admin, getAssignedInventory);
+
+router.route('/inventory/returned')
+    .get(protect, admin, getReturnedInventory);
+
+router.route('/inventory/damaged')
+    .get(protect, admin, getDamagedInventory);
+
+router.route('/inventory/alerts')
+    .get(protect, admin, getStockAlerts);
+
+router.route('/inventory/adjustment')
+    .post(protect, admin, adjustStock);
 
 module.exports = router;
 

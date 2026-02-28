@@ -1,15 +1,56 @@
 'use client';
 
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Card, CardBody, Button, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Chip, Avatar } from "@heroui/react";
-import { Prohibit, WarningCircle, ArrowCounterClockwise } from "@phosphor-icons/react";
+import { Card, CardBody, Button, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Chip, Avatar, Skeleton } from "@heroui/react";
+import { Prohibit, WarningCircle, ArrowCounterClockwise, UserCircle } from "@phosphor-icons/react";
 
-const BLOCKED = [
-    { id: 1, name: "Vikram Singh", reason: "Multiple Payment Failures", date: "Oct 1, 2023" },
-    { id: 2, name: "Anita Rao", reason: "Policy Violation", date: "Sep 25, 2023" },
-];
+const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
 
 export default function BlockedUsers() {
+    const [blocked, setBlocked] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+    const [restoring, setRestoring] = useState({});
+
+    useEffect(() => {
+        const fetchBlocked = async () => {
+            try {
+                const token = localStorage.getItem("adminToken");
+                const res = await fetch(`${API}/api/admin/users`, {
+                    headers: { Authorization: `Bearer ${token}` },
+                });
+                if (!res.ok) throw new Error("Failed to fetch users");
+                const data = await res.json();
+                // Users who are not active / isBlocked flag
+                const blockedUsers = data.filter(u => u.isBlocked === true || u.isActive === false);
+                setBlocked(blockedUsers);
+            } catch (err) {
+                setError(err.message);
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchBlocked();
+    }, []);
+
+    const handleRestore = async (userId) => {
+        setRestoring(prev => ({ ...prev, [userId]: true }));
+        try {
+            const token = localStorage.getItem("adminToken");
+            await fetch(`${API}/api/admin/users/${userId}`, {
+                method: "PUT",
+                headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+                body: JSON.stringify({ isBlocked: false, isActive: true }),
+            });
+            setBlocked(prev => prev.filter(u => u._id !== userId));
+        } catch (err) {
+            console.error("Restore failed:", err);
+        } finally {
+            setRestoring(prev => ({ ...prev, [userId]: false }));
+        }
+    };
+
     return (
         <div className="w-full space-y-6 pb-12">
             <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
@@ -19,48 +60,83 @@ export default function BlockedUsers() {
                     </h1>
                     <p className="text-slate-600 dark:text-slate-400">Manage users who have been temporarily or permanently restricted.</p>
                 </motion.div>
+                {!loading && (
+                    <Chip size="lg" color="danger" variant="flat" startContent={<Prohibit weight="bold" className="mr-1" />} className="font-bold text-sm px-3">
+                        {blocked.length} Blocked
+                    </Chip>
+                )}
             </div>
 
             <Card className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
                 <CardBody className="p-0">
-                    <Table
-                        aria-label="Blocked users table"
-                        classNames={{
-                            wrapper: "p-0 rounded-none shadow-none bg-transparent",
-                            th: "bg-slate-50 dark:bg-slate-950/80 uppercase text-xs font-bold h-12 pt-0 px-6",
-                            td: "py-4 px-6 border-b border-slate-100 dark:border-slate-800/50"
-                        }}
-                    >
-                        <TableHeader>
-                            <TableColumn>RESTRICTED USER</TableColumn>
-                            <TableColumn>REASON FOR BLOCK</TableColumn>
-                            <TableColumn>BLOCKED ON</TableColumn>
-                            <TableColumn align="center">ACTIONS</TableColumn>
-                        </TableHeader>
-                        <TableBody items={BLOCKED} emptyContent="No blocked accounts currently.">
-                            {(user) => (
-                                <TableRow key={user.id}>
-                                    <TableCell>
-                                        <div className="flex items-center gap-3">
-                                            <Avatar name={user.name.charAt(0)} size="sm" className="bg-rose-500/10 text-rose-600 font-bold" />
-                                            <span className="text-sm font-semibold">{user.name}</span>
-                                        </div>
-                                    </TableCell>
-                                    <TableCell>
-                                        <div className="flex items-center gap-2 text-sm text-slate-500 italic">
-                                            <WarningCircle className="text-rose-500" /> {user.reason}
-                                        </div>
-                                    </TableCell>
-                                    <TableCell className="text-xs font-bold uppercase tracking-widest text-slate-400">{user.date}</TableCell>
-                                    <TableCell>
-                                        <div className="flex justify-center">
-                                            <Button size="sm" color="success" variant="flat" className="font-bold h-7" startContent={<ArrowCounterClockwise />}>Restore Access</Button>
-                                        </div>
-                                    </TableCell>
-                                </TableRow>
-                            )}
-                        </TableBody>
-                    </Table>
+                    {error ? (
+                        <div className="flex flex-col items-center justify-center py-20 gap-3 text-rose-500">
+                            <WarningCircle size={40} weight="bold" />
+                            <p className="font-semibold">{error}</p>
+                        </div>
+                    ) : loading ? (
+                        <div className="p-6 space-y-4">
+                            {[...Array(4)].map((_, i) => <Skeleton key={i} className="h-12 w-full rounded-xl" />)}
+                        </div>
+                    ) : (
+                        <Table
+                            aria-label="Blocked users table"
+                            classNames={{
+                                wrapper: "p-0 rounded-none shadow-none bg-transparent",
+                                th: "bg-slate-50 dark:bg-slate-950/80 uppercase text-xs font-bold h-12 pt-0 px-6",
+                                td: "py-4 px-6 border-b border-slate-100 dark:border-slate-800/50"
+                            }}
+                        >
+                            <TableHeader>
+                                <TableColumn>RESTRICTED USER</TableColumn>
+                                <TableColumn>EMAIL</TableColumn>
+                                <TableColumn>STATUS</TableColumn>
+                                <TableColumn>JOINED</TableColumn>
+                                <TableColumn align="center">ACTIONS</TableColumn>
+                            </TableHeader>
+                            <TableBody items={blocked} emptyContent="No blocked accounts. Platform is fully open.">
+                                {(user) => (
+                                    <TableRow key={user._id}>
+                                        <TableCell>
+                                            <div className="flex items-center gap-3">
+                                                <Avatar
+                                                    name={user.name?.charAt(0)}
+                                                    size="sm"
+                                                    src={`https://ui-avatars.com/api/?name=${encodeURIComponent(user.name || 'U')}&background=ef4444&color=fff`}
+                                                />
+                                                <span className="text-sm font-semibold text-slate-900 dark:text-slate-100">{user.name}</span>
+                                            </div>
+                                        </TableCell>
+                                        <TableCell className="text-xs text-slate-500">{user.email}</TableCell>
+                                        <TableCell>
+                                            <div className="flex items-center gap-2">
+                                                <WarningCircle className="text-rose-500" weight="bold" />
+                                                <Chip size="sm" color="danger" variant="flat" className="font-bold">Blocked</Chip>
+                                            </div>
+                                        </TableCell>
+                                        <TableCell className="text-xs text-slate-400 font-bold uppercase tracking-widest">
+                                            {new Date(user.createdAt).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })}
+                                        </TableCell>
+                                        <TableCell>
+                                            <div className="flex justify-center">
+                                                <Button
+                                                    size="sm"
+                                                    color="success"
+                                                    variant="flat"
+                                                    className="font-bold h-7"
+                                                    startContent={<ArrowCounterClockwise />}
+                                                    isLoading={restoring[user._id]}
+                                                    onPress={() => handleRestore(user._id)}
+                                                >
+                                                    Restore Access
+                                                </Button>
+                                            </div>
+                                        </TableCell>
+                                    </TableRow>
+                                )}
+                            </TableBody>
+                        </Table>
+                    )}
                 </CardBody>
             </Card>
         </div>

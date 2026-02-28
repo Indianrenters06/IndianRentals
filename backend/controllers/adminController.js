@@ -361,6 +361,149 @@ const getCalendarEvents = asyncHandler(async (req, res) => {
     res.json(events);
 });
 
+// ============= INVENTORY MANAGEMENT =============
+
+// @desc    Get available stock (products with stock > 0)
+// @route   GET /api/admin/inventory/available
+// @access  Private/Admin
+const getAvailableStock = asyncHandler(async (req, res) => {
+    const products = await Product.find({ stock: { $gt: 0 }, isActive: true })
+        .sort({ createdAt: -1 });
+    const stockItems = products.map(p => ({
+        _id: p._id,
+        name: p.name,
+        sku: `${p.category?.substring(0, 3).toUpperCase() || 'PRD'}-${p._id.toString().slice(-5).toUpperCase()}`,
+        location: `${p.city}, ${p.state}`,
+        condition: p.condition,
+        stock: p.stock,
+        status: p.condition === 'New' ? 'Ready' : p.condition === 'Good' ? 'Ready' : 'In Inspection'
+    }));
+    res.json(stockItems);
+});
+
+// @desc    Get assigned inventory (active rentals)
+// @route   GET /api/admin/inventory/assigned
+// @access  Private/Admin
+const getAssignedInventory = asyncHandler(async (req, res) => {
+    const rentals = await Rental.find({
+        status: { $in: ['Active', 'Delivered', 'Shipped', 'Approved'] }
+    })
+        .populate('user', 'name email')
+        .populate('orderItems.product', 'name')
+        .sort({ createdAt: -1 });
+
+    const assigned = [];
+    rentals.forEach(rental => {
+        rental.orderItems.forEach(item => {
+            const endDate = rental.rentalPeriod?.endDate;
+            const daysLeft = endDate
+                ? Math.ceil((new Date(endDate) - new Date()) / (1000 * 60 * 60 * 24))
+                : null;
+            assigned.push({
+                _id: `${rental._id}-${item._id}`,
+                item: item.name,
+                user: rental.user?.name || 'Unknown',
+                email: rental.user?.email || '',
+                order: `ORD-${rental._id.toString().slice(-6).toUpperCase()}`,
+                returnDate: endDate ? new Date(endDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : 'N/A',
+                daysLeft,
+                status: rental.status
+            });
+        });
+    });
+    res.json(assigned);
+});
+
+// @desc    Get returned inventory
+// @route   GET /api/admin/inventory/returned
+// @access  Private/Admin
+const getReturnedInventory = asyncHandler(async (req, res) => {
+    const rentals = await Rental.find({ status: 'Returned' })
+        .populate('user', 'name email')
+        .sort({ returnedAt: -1 });
+
+    const returned = [];
+    rentals.forEach(rental => {
+        rental.orderItems.forEach(item => {
+            returned.push({
+                _id: `${rental._id}-${item._id}`,
+                item: item.name,
+                returnedBy: rental.user?.name || 'Unknown',
+                condition: 'Pending Inspection',
+                processed: false,
+                date: rental.returnedAt
+                    ? new Date(rental.returnedAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })
+                    : new Date(rental.updatedAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })
+            });
+        });
+    });
+    res.json(returned);
+});
+
+// @desc    Get damaged inventory (products with condition Fair or manually flagged)
+// @route   GET /api/admin/inventory/damaged
+// @access  Private/Admin
+const getDamagedInventory = asyncHandler(async (req, res) => {
+    const products = await Product.find({ condition: 'Fair' }).sort({ updatedAt: -1 });
+    const damaged = products.map(p => ({
+        _id: p._id,
+        item: p.name,
+        issue: 'Wear & Tear – Condition Marked Fair',
+        severity: 'Low',
+        estimate: 'Under Assessment',
+        status: 'Pending Quote'
+    }));
+    res.json(damaged);
+});
+
+// @desc    Get stock alerts (low stock products < 5)
+// @route   GET /api/admin/inventory/alerts
+// @access  Private/Admin
+const getStockAlerts = asyncHandler(async (req, res) => {
+    const lowStock = await Product.find({ stock: { $gt: 0, $lt: 5 }, isActive: true }).sort({ stock: 1 });
+    const outOfStock = await Product.find({ stock: 0, isActive: true }).sort({ updatedAt: -1 });
+
+    const alerts = [
+        ...outOfStock.map(p => ({
+            _id: p._id,
+            item: p.name,
+            type: 'Out of Stock',
+            message: `${p.name} is currently out of stock.`,
+            priority: 'High',
+            stock: p.stock
+        })),
+        ...lowStock.map(p => ({
+            _id: p._id,
+            item: p.name,
+            type: 'Low Stock',
+            message: `Only ${p.stock} unit${p.stock !== 1 ? 's' : ''} remaining in ${p.city}.`,
+            priority: p.stock <= 2 ? 'High' : 'Medium',
+            stock: p.stock
+        }))
+    ];
+    res.json(alerts);
+});
+
+// @desc    Log a stock adjustment
+// @route   POST /api/admin/inventory/adjustment
+// @access  Private/Admin
+const adjustStock = asyncHandler(async (req, res) => {
+    const { productId, change, reason } = req.body;
+    const product = await Product.findById(productId);
+    if (!product) {
+        res.status(404);
+        throw new Error('Product not found');
+    }
+    product.stock = Math.max(0, product.stock + Number(change));
+    await product.save();
+    res.json({
+        message: 'Stock adjusted successfully',
+        product: { _id: product._id, name: product.name, stock: product.stock },
+        change,
+        reason
+    });
+});
+
 module.exports = {
     getDashboardStats,
     // Products
@@ -384,5 +527,12 @@ module.exports = {
     // Payments
     getAllPayments,
     // Calendar
-    getCalendarEvents
+    getCalendarEvents,
+    // Inventory
+    getAvailableStock,
+    getAssignedInventory,
+    getReturnedInventory,
+    getDamagedInventory,
+    getStockAlerts,
+    adjustStock,
 };

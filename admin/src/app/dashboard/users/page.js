@@ -8,6 +8,8 @@ import {
     UserPlus, ShieldCheck, User
 } from '@phosphor-icons/react';
 import {
+    Card,
+    CardBody,
     Input,
     Select,
     SelectItem,
