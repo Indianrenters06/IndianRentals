@@ -95,12 +95,13 @@ export default function PushNotifications() {
                     <p className="text-slate-600 dark:text-slate-400">Broadcast messages, alerts, and updates to your customers.</p>
                 </motion.div>
                 <div className="flex items-center gap-3">
-                    <Chip size="lg" variant="flat" className="font-bold text-sm px-3 bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600">
+                    <div className="inline-flex items-center gap-2 bg-indigo-50 dark:bg-indigo-500/10 text-indigo-700 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-500/20 rounded-full px-3 py-1.5 font-bold text-sm">
                         {notifications.filter(n => !n.isRead).length} Unread
-                    </Chip>
-                    <Button color="primary" variant="shadow" className="font-bold bg-indigo-600 shadow-indigo-500/20 px-6" startContent={<Plus weight="bold" />} onPress={onOpen}>
+                    </div>
+                    <button type="button" onClick={onOpen} className="inline-flex items-center gap-2 h-10 px-5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-sm shadow-lg shadow-indigo-500/25 transition-all">
+                        <Plus weight="bold" size={15} />
                         New Notification
-                    </Button>
+                    </button>
                 </div>
             </div>
 
@@ -149,9 +150,13 @@ export default function PushNotifications() {
                                         <TableCell className="font-semibold text-slate-900 dark:text-slate-100">{item.title}</TableCell>
                                         <TableCell className="text-sm text-slate-500 max-w-xs truncate">{item.message}</TableCell>
                                         <TableCell>
-                                            <Chip size="sm" color={getTypeColor(item.type)} variant="flat" className="font-bold" startContent={getTypeIcon(item.type)}>
+                                            <div className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 font-bold text-xs ${item.type === "order" ? "bg-blue-50 dark:bg-blue-500/10 text-blue-700 dark:text-blue-400" :
+                                                    item.type === "kyc" ? "bg-amber-50 dark:bg-amber-500/10 text-amber-700 dark:text-amber-400" :
+                                                        "bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400"
+                                                }`}>
+                                                {getTypeIcon(item.type)}
                                                 {item.type || "general"}
-                                            </Chip>
+                                            </div>
                                         </TableCell>
                                         <TableCell className="text-xs text-slate-500">
                                             {new Date(item.createdAt).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })}
@@ -197,7 +202,14 @@ export default function PushNotifications() {
                             </ModalBody>
                             <ModalFooter>
                                 <Button variant="flat" onPress={onClose}>Cancel</Button>
-                                <Button color="primary" isLoading={sending} onPress={handleSend} className="bg-indigo-600 font-bold" startContent={<PaperPlaneTilt weight="bold" />}>Send Now</Button>
+                                <button type="button" disabled={sending} onClick={handleSend} className="inline-flex items-center gap-2 h-10 px-5 rounded-xl bg-indigo-600 hover:bg-indigo-700 disabled:opacity-60 text-white font-bold text-sm transition-all">
+                                    {sending ? (
+                                        <svg className="animate-spin w-4 h-4" viewBox="0 0 24 24" fill="none"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" /></svg>
+                                    ) : (
+                                        <PaperPlaneTilt weight="bold" size={15} />
+                                    )}
+                                    Send Now
+                                </button>
                             </ModalFooter>
                         </>
                     )}

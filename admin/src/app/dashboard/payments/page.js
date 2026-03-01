@@ -58,8 +58,11 @@ export default function AllTransactions() {
                     <p className="text-slate-600 dark:text-slate-400">Complete financial audit log across all payment methods.</p>
                 </motion.div>
                 <div className="flex items-center gap-3">
-                    {!loading && <Chip size="lg" color="success" variant="flat" className="font-bold text-sm px-3">₹{total.toLocaleString("en-IN")} Collected</Chip>}
-                    <Button variant="flat" className="font-bold border border-indigo-500 text-indigo-600" startContent={<DownloadSimple />} onPress={exportCSV}>Export CSV</Button>
+                    {!loading && <div className="inline-flex items-center gap-2 bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-500/20 rounded-full px-3 py-1.5 font-bold text-sm">₹{total.toLocaleString("en-IN")} Collected</div>}
+                    <button type="button" onClick={exportCSV} className="inline-flex items-center gap-2 h-10 px-4 rounded-xl border border-indigo-500 text-indigo-600 dark:text-indigo-400 font-bold text-sm hover:bg-indigo-50 dark:hover:bg-indigo-500/10 transition-colors">
+                        <DownloadSimple size={15} />
+                        Export CSV
+                    </button>
                 </div>
             </div>
 
@@ -117,10 +120,13 @@ export default function AllTransactions() {
                                         <TableCell className="text-sm text-slate-500">{item.date}</TableCell>
                                         <TableCell>
                                             <div className="flex justify-center">
-                                                <Chip size="sm" color={item.status === "Success" ? "success" : "warning"} variant="flat" className="font-bold"
-                                                    startContent={item.status === "Success" ? <CheckCircle weight="bold" /> : <Clock weight="bold" />}>
+                                                <div className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 font-bold text-xs ${item.status === "Success"
+                                                        ? "bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-200"
+                                                        : "bg-amber-50 dark:bg-amber-500/10 text-amber-700 dark:text-amber-400 border border-amber-200"
+                                                    }`}>
+                                                    {item.status === "Success" ? <CheckCircle weight="bold" size={12} /> : <Clock weight="bold" size={12} />}
                                                     {item.status}
-                                                </Chip>
+                                                </div>
                                             </div>
                                         </TableCell>
                                     </TableRow>

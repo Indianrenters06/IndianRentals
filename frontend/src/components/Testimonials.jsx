@@ -1,8 +1,8 @@
-"use client";
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { FaStar } from 'react-icons/fa';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { getTestimonials } from '../services/testimonialService';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -69,11 +69,33 @@ const reviews = [
 ];
 
 const Testimonials = () => {
+    const [reviewsData, setReviewsData] = useState([]);
+    const [loading, setLoading] = useState(true);
     const wrapperRef = useRef(null);
     const row1Ref = useRef(null);
     const row2Ref = useRef(null);
 
     useEffect(() => {
+        const fetchTestimonials = async () => {
+            try {
+                const data = await getTestimonials();
+                if (data && data.length > 0) {
+                    setReviewsData(data);
+                } else {
+                    setReviewsData(reviews); // fallback to static
+                }
+            } catch (error) {
+                console.error("Failed to fetch testimonials", error);
+                setReviewsData(reviews);
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchTestimonials();
+    }, []);
+
+    useEffect(() => {
+        if (loading || reviewsData.length === 0) return;
         let ctx = gsap.context(() => {
             const rows = [
                 { ref: row1Ref.current, dir: -1 },
@@ -122,16 +144,16 @@ const Testimonials = () => {
         }, wrapperRef);
 
         return () => ctx.revert();
-    }, []);
+    }, [loading, reviewsData]);
 
-    const topReviews = reviews.slice(0, 3);
-    const bottomReviews = reviews.slice(3, 6);
+    const topReviews = reviewsData.slice(0, Math.ceil(reviewsData.length / 2));
+    const bottomReviews = reviewsData.slice(Math.ceil(reviewsData.length / 2));
     const row1Items = [...topReviews, ...topReviews, ...topReviews, ...topReviews];
     const row2Items = [...bottomReviews, ...bottomReviews, ...bottomReviews, ...bottomReviews];
 
     const ReviewCard = ({ review }) => (
         <div
-            className={`${review.bg} w-[250px] md:w-[400px] shrink-0 rounded-[2rem] p-6 lg:p-7 flex flex-col h-[230px] transition-all hover:-translate-y-1 hover:shadow-lg duration-300 select-none mr-6`}
+            className={`${review.bg || "bg-slate-50"} w-[250px] md:w-[400px] shrink-0 rounded-[2rem] p-6 lg:p-7 flex flex-col h-[230px] transition-all hover:-translate-y-1 hover:shadow-lg duration-300 select-none mr-6`}
         >
             <div className="mb-4">
                 <h3 className="text-lg font-bold text-gray-900 leading-none mb-1">{review.name}</h3>
@@ -139,7 +161,7 @@ const Testimonials = () => {
             </div>
 
             <p className="text-[#333] text-[15px] leading-[1.6] mb-4 grow font-medium line-clamp-4">
-                {review.text}
+                {review.message || review.text}
             </p>
 
             <div className="flex items-end justify-between mt-auto">
@@ -148,12 +170,14 @@ const Testimonials = () => {
                 </div>
                 <div className="flex text-[#F4B400] gap-0.5 text-lg">
                     {[...Array(5)].map((_, j) => (
-                        <FaStar key={j} className={j < review.stars ? "text-[#FAB005]" : "text-gray-300"} />
+                        <FaStar key={j} className={j < (review.rating || review.stars) ? "text-[#FAB005]" : "text-gray-300"} />
                     ))}
                 </div>
             </div>
         </div>
     );
+
+    if (loading) return <div className="h-96 w-full animate-pulse bg-slate-50 flex items-center justify-center">Loading reviews...</div>;
 
     return (
         <section ref={wrapperRef} className="py-10 md:py-20 bg-white relative overflow-hidden">
@@ -210,10 +234,10 @@ const Testimonials = () => {
             {/* Mobile: Horizontal scroll snap carousel - shows 1.5 cards */}
             <div className="lg:hidden px-4 mb-6">
                 <div className="flex gap-3 overflow-x-auto snap-x snap-mandatory pb-3 scrollbar-hide" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
-                    {reviews.map((review) => (
+                    {reviewsData.map((review, i) => (
                         <div
-                            key={review.id}
-                            className={`${review.bg} min-w-[75vw] max-w-[75vw] snap-start rounded-3xl p-5 flex flex-col min-h-[200px] shadow-sm shrink-0`}
+                            key={review._id || i}
+                            className={`${review.bg || "bg-slate-50"} min-w-[75vw] max-w-[75vw] snap-start rounded-3xl p-5 flex flex-col min-h-[200px] shadow-sm shrink-0`}
                         >
                             <div className="mb-3">
                                 <h3 className="text-base font-bold text-gray-900 leading-none mb-0.5">{review.name}</h3>
@@ -221,14 +245,14 @@ const Testimonials = () => {
                             </div>
 
                             <p className="text-[#333] text-xs leading-[1.6] mb-4 grow font-medium line-clamp-5">
-                                {review.text}
+                                {review.message || review.text}
                             </p>
 
                             <div className="flex items-end justify-between mt-auto">
                                 <GoogleLogo />
                                 <div className="flex text-[#FAB005] gap-0.5 text-base">
                                     {[...Array(5)].map((_, j) => (
-                                        <FaStar key={j} className={j < review.stars ? "text-[#FAB005]" : "text-gray-300"} />
+                                        <FaStar key={j} className={j < (review.rating || review.stars) ? "text-[#FAB005]" : "text-gray-300"} />
                                     ))}
                                 </div>
                             </div>

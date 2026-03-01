@@ -4,7 +4,7 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Lock, EnvelopeSimple, ShieldCheck, ArrowRight, ChartLineUp, Database, HardDrive } from "@phosphor-icons/react";
 import { useRouter } from "next/navigation";
-import { Card, CardBody, Input, Button } from "@heroui/react";
+import { Card, CardBody, Button } from "@heroui/react";
 import { ThemeToggle } from "../components/ThemeToggle";
 
 export default function AdminLogin() {
@@ -162,56 +162,42 @@ export default function AdminLogin() {
                   )}
                   <div className="space-y-1.5">
                     <label className="text-sm font-medium text-slate-700 dark:text-slate-300 ml-1">Email Address</label>
-                    <Input
-                      type="text"
-                      placeholder="admin@indianrentals.com"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      autoComplete="off"
-                      inputProps={{ autoComplete: "off", name: "admin-email-nofill" }}
-                      startContent={<EnvelopeSimple className="w-5 h-5 text-slate-400 dark:text-slate-500 mr-2" weight="bold" />}
-                      classNames={{
-                        input: "bg-transparent text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-600 font-medium",
-                        innerWrapper: "bg-transparent",
-                        inputWrapper: [
-                          "bg-slate-50 dark:bg-slate-950/50",
-                          "border-2 border-slate-200 dark:border-white/5",
-                          "hover:bg-slate-100 dark:hover:bg-slate-900/50",
-                          "hover:border-slate-300 dark:hover:border-white/10",
-                          "focus-within:!bg-white dark:focus-within:!bg-slate-900/50",
-                          "focus-within:!border-indigo-500",
-                          "rounded-xl h-14 transition-colors",
-                        ].join(" "),
-                      }}
-                      required
-                    />
+                    <div className="relative group/email">
+                      <EnvelopeSimple
+                        className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 dark:text-slate-500 group-focus-within/email:text-indigo-500 transition-colors pointer-events-none"
+                        weight="bold"
+                      />
+                      <input
+                        type="email"
+                        placeholder="admin@indianrentals.com"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        autoComplete="off"
+                        name="admin-email-nofill"
+                        required
+                        className="w-full h-14 pl-11 pr-4 rounded-xl bg-slate-50 dark:bg-slate-950/50 border-2 border-slate-200 dark:border-white/5 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-600 font-medium text-sm focus:outline-none focus:bg-white dark:focus:bg-slate-900/50 focus:border-indigo-500 hover:border-slate-300 dark:hover:border-white/10 transition-colors"
+                      />
+                    </div>
                   </div>
 
                   <div className="space-y-1.5">
                     <label className="text-sm font-medium text-slate-700 dark:text-slate-300 ml-1">Password</label>
-                    <Input
-                      type="password"
-                      placeholder="••••••••"
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      autoComplete="new-password"
-                      inputProps={{ autoComplete: "new-password", name: "admin-pass-nofill" }}
-                      startContent={<Lock className="w-5 h-5 text-slate-400 dark:text-slate-500 mr-2" weight="bold" />}
-                      classNames={{
-                        input: "bg-transparent text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-600 font-medium tracking-widest",
-                        innerWrapper: "bg-transparent",
-                        inputWrapper: [
-                          "bg-slate-50 dark:bg-slate-950/50",
-                          "border-2 border-slate-200 dark:border-white/5",
-                          "hover:bg-slate-100 dark:hover:bg-slate-900/50",
-                          "hover:border-slate-300 dark:hover:border-white/10",
-                          "focus-within:!bg-white dark:focus-within:!bg-slate-900/50",
-                          "focus-within:!border-indigo-500",
-                          "rounded-xl h-14 transition-colors",
-                        ].join(" "),
-                      }}
-                      required
-                    />
+                    <div className="relative group/pass">
+                      <Lock
+                        className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 dark:text-slate-500 group-focus-within/pass:text-indigo-500 transition-colors pointer-events-none"
+                        weight="bold"
+                      />
+                      <input
+                        type="password"
+                        placeholder="••••••••"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        autoComplete="new-password"
+                        name="admin-pass-nofill"
+                        required
+                        className="w-full h-14 pl-11 pr-4 rounded-xl bg-slate-50 dark:bg-slate-950/50 border-2 border-slate-200 dark:border-white/5 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-600 font-medium tracking-widest text-sm focus:outline-none focus:bg-white dark:focus:bg-slate-900/50 focus:border-indigo-500 hover:border-slate-300 dark:hover:border-white/10 transition-colors"
+                      />
+                    </div>
                   </div>
 
                   <div className="flex items-center justify-between pt-2">

@@ -36,7 +36,10 @@ export default function RevenueReport() {
                     </h1>
                     <p className="text-slate-600 dark:text-slate-400">Revenue trends, order volume, and financial performance overview.</p>
                 </motion.div>
-                <Chip size="lg" color="success" variant="flat" startContent={<TrendUp weight="bold" />} className="font-bold text-sm px-3">Live Data</Chip>
+                <div className="inline-flex items-center gap-2 bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-500/20 rounded-full px-3 py-1.5 font-bold text-sm">
+                    <TrendUp weight="bold" size={14} />
+                    Live Data
+                </div>
             </div>
 
             {/* KPI Cards */}

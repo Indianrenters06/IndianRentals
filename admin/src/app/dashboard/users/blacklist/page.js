@@ -67,13 +67,15 @@ export default function BlacklistManagement() {
                 </motion.div>
                 <div className="flex items-center gap-3">
                     {!loading && blacklist.length > 0 && (
-                        <Chip size="lg" color="danger" variant="flat" startContent={<ShieldSlash weight="bold" className="mr-1" />} className="font-bold text-sm px-3">
+                        <div className="inline-flex items-center gap-2 bg-rose-50 dark:bg-rose-500/10 text-rose-700 dark:text-rose-400 border border-rose-200 dark:border-rose-500/20 rounded-full px-3 py-1.5 font-bold text-sm">
+                            <ShieldSlash weight="bold" size={14} />
                             {blacklist.length} Blacklisted
-                        </Chip>
+                        </div>
                     )}
-                    <Button color="danger" variant="shadow" className="font-bold bg-rose-600 shadow-rose-500/20 px-6" startContent={<ShieldSlash weight="bold" />} onPress={onOpen}>
+                    <button type="button" onClick={onOpen} className="inline-flex items-center gap-2 h-10 px-5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-semibold text-sm shadow-lg shadow-rose-500/25 transition-all">
+                        <ShieldSlash weight="bold" size={15} />
                         Add to Blacklist
-                    </Button>
+                    </button>
                 </div>
             </div>
 
@@ -115,16 +117,10 @@ export default function BlacklistManagement() {
                                         <TableCell className="text-xs text-slate-400 font-bold">{item.date}</TableCell>
                                         <TableCell>
                                             <div className="flex justify-center">
-                                                <Button
-                                                    size="sm"
-                                                    color="danger"
-                                                    variant="light"
-                                                    className="font-bold h-7"
-                                                    startContent={<Trash weight="bold" />}
-                                                    onPress={() => handleRemove(item.id)}
-                                                >
+                                                <button type="button" onClick={() => handleRemove(item.id)} className="inline-flex items-center gap-1.5 h-7 px-3 rounded-lg text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-500/10 font-bold text-xs border border-transparent hover:border-rose-200 transition-colors">
+                                                    <Trash weight="bold" size={13} />
                                                     Remove
-                                                </Button>
+                                                </button>
                                             </div>
                                         </TableCell>
                                     </TableRow>
@@ -178,9 +174,10 @@ export default function BlacklistManagement() {
                             </ModalBody>
                             <ModalFooter>
                                 <Button variant="flat" onPress={onClose}>Cancel</Button>
-                                <Button color="danger" className="bg-rose-600 font-bold" startContent={<ShieldSlash weight="bold" />} onPress={handleAdd}>
+                                <button type="button" onClick={handleAdd} className="inline-flex items-center gap-2 h-10 px-5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-bold text-sm transition-all">
+                                    <ShieldSlash weight="bold" size={15} />
                                     Blacklist
-                                </Button>
+                                </button>
                             </ModalFooter>
                         </>
                     )}

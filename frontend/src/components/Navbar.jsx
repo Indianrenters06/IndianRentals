@@ -8,6 +8,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import AuthModal from "./AuthModal";
 import { useSelector } from "react-redux";
 import { selectCartTotalQuantity } from "../redux/features/cartSlice";
+import { useSettings } from "../context/SettingsContext";
 
 const Navbar = () => {
     const router = useRouter();
@@ -22,6 +23,9 @@ const Navbar = () => {
 
     // Redux Cart Selector
     const totalQuantity = useSelector(selectCartTotalQuantity);
+    const { settings } = useSettings();
+    const siteLogo = settings?.siteLogo || "https://res.cloudinary.com/dpu9ikeqe/image/upload/v1771271177/1d1f7c4e3c0490bcddb69ceb328c67be2f7cf361_cf3y9m.png";
+    const siteName = settings?.siteName || "Indian Renters";
 
     // Removed fixed cities array
     // Handle scroll effect
@@ -151,8 +155,8 @@ const Navbar = () => {
                         {/* Logo */}
                         <Link href="/" className="shrink-0">
                             <Image
-                                src="https://res.cloudinary.com/dpu9ikeqe/image/upload/v1771271177/1d1f7c4e3c0490bcddb69ceb328c67be2f7cf361_cf3y9m.png"
-                                alt="Indian Renters - You Name it We Rent it"
+                                src={siteLogo}
+                                alt={`${siteName} - You Name it We Rent it`}
                                 width={150}
                                 height={40}
                                 className="h-10 w-auto object-contain"

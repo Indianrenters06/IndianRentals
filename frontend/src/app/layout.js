@@ -21,6 +21,7 @@ export const metadata = {
 };
 
 import { ReduxProvider } from "@/redux/provider";
+import { SettingsProvider } from "@/context/SettingsContext";
 import ClientLayout from "@/components/ClientLayout";
 
 export default function RootLayout({ children }) {
@@ -28,9 +29,11 @@ export default function RootLayout({ children }) {
     <html lang="en">
       <body className={`${manrope.variable} ${poppins.variable} font-sans bg-gray-50 antialiased overflow-x-hidden max-w-full`}>
         <ReduxProvider>
-          <ClientLayout>
-            {children}
-          </ClientLayout>
+          <SettingsProvider>
+            <ClientLayout>
+              {children}
+            </ClientLayout>
+          </SettingsProvider>
         </ReduxProvider>
       </body>
     </html>

@@ -235,15 +235,14 @@ export default function CategoriesCMS() {
                     </p>
                 </motion.div>
 
-                <Button
-                    color="primary"
-                    variant="shadow"
-                    className="shadow-indigo-500/20 font-bold bg-indigo-600"
-                    startContent={<FolderPlus size={18} />}
-                    onPress={newCatModal.onOpen}
+                <button
+                    type="button"
+                    onClick={newCatModal.onOpen}
+                    className="inline-flex items-center gap-2 h-10 px-5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-sm shadow-lg shadow-indigo-500/25 transition-all"
                 >
+                    <FolderPlus size={16} />
                     Add Category
-                </Button>
+                </button>
             </div>
 
             {/* Stats strip */}
@@ -346,15 +345,13 @@ export default function CategoriesCMS() {
                                             </span>
 
                                             {/* Subcategory count badge */}
-                                            <Chip
-                                                size="sm"
-                                                variant="flat"
-                                                className="bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-300 font-semibold cursor-pointer"
-                                                startContent={<TreeStructure size={11} />}
+                                            <div
+                                                className="inline-flex items-center gap-1 bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-300 font-semibold cursor-pointer rounded-full px-2 py-0.5 text-xs"
                                                 onClick={() => toggleExpand(cat._id)}
                                             >
+                                                <TreeStructure size={11} />
                                                 {subCount} sub{subCount !== 1 ? "s" : ""}
-                                            </Chip>
+                                            </div>
 
                                             {/* Status */}
                                             <Chip
@@ -427,15 +424,14 @@ export default function CategoriesCMS() {
                                                                     {cat.name}
                                                                 </span>
                                                             </span>
-                                                            <Button
-                                                                size="sm"
-                                                                variant="flat"
-                                                                className="ml-auto h-6 px-2.5 text-xs text-indigo-600 bg-indigo-50 dark:bg-indigo-500/10 font-semibold"
-                                                                startContent={<Plus size={11} weight="bold" />}
-                                                                onPress={() => openSubModal(cat)}
+                                                            <button
+                                                                type="button"
+                                                                onClick={() => openSubModal(cat)}
+                                                                className="ml-auto inline-flex items-center gap-1 h-6 px-2.5 text-xs text-indigo-600 bg-indigo-50 dark:bg-indigo-500/10 font-semibold rounded-lg hover:bg-indigo-100 transition-colors"
                                                             >
+                                                                <Plus size={11} weight="bold" />
                                                                 Add Subcategory
-                                                            </Button>
+                                                            </button>
                                                         </div>
 
                                                         {/* Subcategory rows */}
@@ -505,16 +501,19 @@ export default function CategoriesCMS() {
                                     labelPlacement="outside"
                                     classNames={{ label: "text-slate-700 dark:text-slate-300 font-medium" }}
                                 />
-                                <Input
-                                    label="Cover Image URL"
-                                    value={catForm.image}
-                                    onChange={(e) => setCatForm((p) => ({ ...p, image: e.target.value }))}
-                                    placeholder="https://res.cloudinary.com/..."
-                                    variant="bordered"
-                                    labelPlacement="outside"
-                                    startContent={<Image size={15} className="text-slate-400" />}
-                                    classNames={{ label: "text-slate-700 dark:text-slate-300 font-medium" }}
-                                />
+                                <div>
+                                    <label className="text-sm text-slate-700 dark:text-slate-300 font-medium block mb-1.5">Cover Image URL</label>
+                                    <div className="relative">
+                                        <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"><Image size={15} /></span>
+                                        <input
+                                            type="url"
+                                            value={catForm.image}
+                                            onChange={(e) => setCatForm((p) => ({ ...p, image: e.target.value }))}
+                                            placeholder="https://res.cloudinary.com/..."
+                                            className="w-full h-10 pl-8 pr-3 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 transition-all"
+                                        />
+                                    </div>
+                                </div>
                             </ModalBody>
                             <ModalFooter>
                                 <Button color="danger" variant="flat" onPress={onClose}>Cancel</Button>
@@ -575,16 +574,19 @@ export default function CategoriesCMS() {
                                     labelPlacement="outside"
                                     classNames={{ label: "text-slate-700 dark:text-slate-300 font-medium" }}
                                 />
-                                <Input
-                                    label="Cover Image URL"
-                                    value={subForm.image}
-                                    onChange={(e) => setSubForm((p) => ({ ...p, image: e.target.value }))}
-                                    placeholder="https://res.cloudinary.com/..."
-                                    variant="bordered"
-                                    labelPlacement="outside"
-                                    startContent={<Image size={15} className="text-slate-400" />}
-                                    classNames={{ label: "text-slate-700 dark:text-slate-300 font-medium" }}
-                                />
+                                <div>
+                                    <label className="text-sm text-slate-700 dark:text-slate-300 font-medium block mb-1.5">Cover Image URL</label>
+                                    <div className="relative">
+                                        <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"><Image size={15} /></span>
+                                        <input
+                                            type="url"
+                                            value={subForm.image}
+                                            onChange={(e) => setSubForm((p) => ({ ...p, image: e.target.value }))}
+                                            placeholder="https://res.cloudinary.com/..."
+                                            className="w-full h-10 pl-8 pr-3 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 transition-all"
+                                        />
+                                    </div>
+                                </div>
                             </ModalBody>
                             <ModalFooter>
                                 <Button color="danger" variant="flat" onPress={onClose}>Cancel</Button>

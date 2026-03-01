@@ -25,7 +25,8 @@ const updateSettings = asyncHandler(async (req, res) => {
     }
 
     const {
-        siteName, siteLogo, contactEmail, contactPhone,
+        siteName, siteLogo, contactEmail, contactPhone, address,
+        maintenanceMode, allowRegistrations, requireKYC,
         paymentGatewaySecret, gstConfig, deliveryCharges, lateFeeRules
     } = req.body;
 
@@ -33,6 +34,10 @@ const updateSettings = asyncHandler(async (req, res) => {
     if (siteLogo !== undefined) settings.siteLogo = siteLogo;
     if (contactEmail !== undefined) settings.contactEmail = contactEmail;
     if (contactPhone !== undefined) settings.contactPhone = contactPhone;
+    if (address !== undefined) settings.address = address;
+    if (maintenanceMode !== undefined) settings.maintenanceMode = maintenanceMode;
+    if (allowRegistrations !== undefined) settings.allowRegistrations = allowRegistrations;
+    if (requireKYC !== undefined) settings.requireKYC = requireKYC;
     if (paymentGatewaySecret !== undefined) settings.paymentGatewaySecret = paymentGatewaySecret;
     if (gstConfig !== undefined) settings.gstConfig = { ...settings.gstConfig, ...gstConfig };
     if (deliveryCharges !== undefined) settings.deliveryCharges = { ...settings.deliveryCharges, ...deliveryCharges };

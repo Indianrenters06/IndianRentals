@@ -52,6 +52,8 @@ const updatePage = asyncHandler(async (req, res) => {
 
     const fields = [
         'heroEnabled', 'heroTitle', 'heroSubtitle', 'heroImage', 'overlayColor',
+        'whyChooseUsTitle', 'whyChooseUsSubtitle', 'whyChooseUsImage',
+        'statsDevices', 'statsCustomers', 'statsCities',
         'pageContent', 'bannerImage', 'bannerTitle',
         'metaTitle', 'metaDescription',
         'publishStatus', 'scheduledPublishTime',

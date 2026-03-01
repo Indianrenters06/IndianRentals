@@ -3,6 +3,7 @@ import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { FaFacebookF, FaInstagram, FaLinkedinIn, FaWhatsapp } from 'react-icons/fa';
+import { useSettings } from '../context/SettingsContext';
 
 // Inline SVG payment logo components — no external URL dependencies
 const PaymentUPI = () => (
@@ -36,6 +37,13 @@ const PaymentMastercard = () => (
 
 
 const Footer = () => {
+    const { settings } = useSettings();
+    const siteLogo = settings?.siteLogo || "https://res.cloudinary.com/dpu9ikeqe/image/upload/v1771271177/1d1f7c4e3c0490bcddb69ceb328c67be2f7cf361_cf3y9m.png";
+    const siteName = settings?.siteName || "Indian Renters";
+    const sitePhone = settings?.contactPhone || "+91 9999999999";
+    const currentYear = new Date().getFullYear();
+    const copyrightName = settings?.siteName || "AAA Rental LLP";
+
     return (
         <footer className="bg-white text-gray-700 pt-8 pb-4 border-t border-gray-100">
 
@@ -45,8 +53,8 @@ const Footer = () => {
                 <div className="mb-3">
                     <Link href="/" className="inline-block">
                         <Image
-                            src="https://res.cloudinary.com/dpu9ikeqe/image/upload/v1771271177/1d1f7c4e3c0490bcddb69ceb328c67be2f7cf361_cf3y9m.png"
-                            alt="Indian Renters"
+                            src={siteLogo}
+                            alt={siteName}
                             width={200}
                             height={54}
                             className="h-[54px] w-auto object-contain"
@@ -83,7 +91,7 @@ const Footer = () => {
 
                 {/* Social Icons */}
                 <div className="flex items-center gap-5 mb-6">
-                    <a href="#" className="transition-opacity hover:opacity-70">
+                    <a href={`https://wa.me/${sitePhone.replace(/[^\d]/g, '')}`} className="transition-opacity hover:opacity-70" target="_blank" rel="noopener noreferrer">
                         <FaWhatsapp size={22} className="text-[#25D366]" />
                     </a>
                     <a href="#" className="transition-opacity hover:opacity-70">
@@ -101,7 +109,7 @@ const Footer = () => {
                 <div className="border-t border-gray-200 pt-4">
                     {/* Copyright */}
                     <p className="text-gray-500 text-[11px] text-center mb-3">
-                        © 2025 AAA Rental LLP. All Rights Reserved
+                        © {currentYear} {copyrightName}. All Rights Reserved
                     </p>
 
                     {/* Payment Methods */}
@@ -131,8 +139,8 @@ const Footer = () => {
                     <div className="flex flex-col gap-4">
                         <Link href="/" className="inline-block">
                             <Image
-                                src="https://res.cloudinary.com/dpu9ikeqe/image/upload/v1771271177/1d1f7c4e3c0490bcddb69ceb328c67be2f7cf361_cf3y9m.png"
-                                alt="Indian Renters"
+                                src={siteLogo}
+                                alt={siteName}
                                 width={270}
                                 height={72}
                                 className="h-[72px] w-auto object-contain"
@@ -142,7 +150,7 @@ const Footer = () => {
                             Rent Anything, Anytime, Anywhere
                         </p>
                         <div className="flex items-center gap-3">
-                            <a href="#" className="transition-opacity hover:opacity-70">
+                            <a href={`https://wa.me/${sitePhone.replace(/[^\d]/g, '')}`} className="transition-opacity hover:opacity-70" target="_blank" rel="noopener noreferrer">
                                 <FaWhatsapp size={22} className="text-[#25D366]" />
                             </a>
                             <a href="#" className="transition-opacity hover:opacity-70">
@@ -190,7 +198,7 @@ const Footer = () => {
                 {/* Copyright Section */}
                 <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-16 border-t border-gray-200 mt-8 pt-5 pb-4 flex flex-col md:flex-row items-center justify-between gap-4">
                     <p className="text-gray-500 text-[11px] text-center md:text-left">
-                        © 2025 AAA Rental LLP. All Rights Reserved
+                        © {currentYear} {copyrightName}. All Rights Reserved
                     </p>
                     <div className="flex items-center gap-2">
                         <div className="h-7 px-2.5 bg-white border border-gray-200 rounded flex items-center justify-center">

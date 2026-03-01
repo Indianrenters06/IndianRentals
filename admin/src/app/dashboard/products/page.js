@@ -119,14 +119,14 @@ export default function AllProducts() {
                     >
                         <ArrowClockwise size={16} />
                     </Button>
-                    <Button
-                        color="primary" variant="shadow"
-                        className="shadow-indigo-500/30 font-bold bg-indigo-600"
-                        startContent={<Plus weight="bold" size={16} />}
-                        onPress={() => router.push("/dashboard/products/add")}
+                    <button
+                        type="button"
+                        onClick={() => router.push("/dashboard/products/add")}
+                        className="inline-flex items-center gap-2 h-10 px-5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-sm shadow-lg shadow-indigo-500/25 transition-all"
                     >
+                        <Plus weight="bold" size={15} />
                         Add New Product
-                    </Button>
+                    </button>
                 </motion.div>
             </div>
 
@@ -269,41 +269,33 @@ export default function AllProducts() {
                                         color="success"
                                     />
 
-                                    {/* Actions dropdown */}
-                                    <div className="flex justify-center">
-                                        <Dropdown>
-                                            <DropdownTrigger>
-                                                <Button isIconOnly size="sm" variant="light" className="text-slate-400 hover:text-indigo-500">
-                                                    <DotsThreeVertical weight="bold" size={18} />
-                                                </Button>
-                                            </DropdownTrigger>
-                                            <DropdownMenu aria-label="Product Actions">
-                                                <DropdownItem
-                                                    key="view"
-                                                    startContent={<Eye className="text-slate-400" size={15} />}
-                                                    onPress={() => window.open(`${process.env.NEXT_PUBLIC_FRONTEND_URL || "http://localhost:3000"}/products/${product._id}`, "_blank")}
-                                                >
-                                                    View on Site
-                                                </DropdownItem>
-                                                <DropdownItem
-                                                    key="edit"
-                                                    startContent={<PencilSimple className="text-indigo-400" size={15} />}
-                                                    onPress={() => router.push(`/dashboard/products/edit/${product._id}`)}
-                                                >
-                                                    Edit Product
-                                                </DropdownItem>
-                                                <DropdownItem
-                                                    key="delete"
-                                                    className="text-danger"
-                                                    color="danger"
-                                                    startContent={deleting === product._id ? <Spinner size="sm" /> : <Trash size={15} />}
-                                                    onPress={() => handleDelete(product._id)}
-                                                    isDisabled={deleting === product._id}
-                                                >
-                                                    Delete Product
-                                                </DropdownItem>
-                                            </DropdownMenu>
-                                        </Dropdown>
+                                    {/* Actions */}
+                                    <div className="flex justify-center items-center gap-1">
+                                        <button
+                                            type="button"
+                                            title="View on Site"
+                                            onClick={() => window.open(`${process.env.NEXT_PUBLIC_FRONTEND_URL || "http://localhost:3000"}/products/${product._id}`, "_blank")}
+                                            className="inline-flex items-center justify-center w-8 h-8 rounded-lg text-slate-400 hover:text-indigo-500 hover:bg-indigo-50 dark:hover:bg-indigo-500/10 transition-colors"
+                                        >
+                                            <Eye size={15} />
+                                        </button>
+                                        <button
+                                            type="button"
+                                            title="Edit Product"
+                                            onClick={() => router.push(`/dashboard/products/edit/${product._id}`)}
+                                            className="inline-flex items-center justify-center w-8 h-8 rounded-lg text-slate-400 hover:text-indigo-500 hover:bg-indigo-50 dark:hover:bg-indigo-500/10 transition-colors"
+                                        >
+                                            <PencilSimple size={15} />
+                                        </button>
+                                        <button
+                                            type="button"
+                                            title="Delete Product"
+                                            disabled={deleting === product._id}
+                                            onClick={() => handleDelete(product._id)}
+                                            className="inline-flex items-center justify-center w-8 h-8 rounded-lg text-slate-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 disabled:opacity-40 transition-colors"
+                                        >
+                                            {deleting === product._id ? <Spinner size="sm" /> : <Trash size={15} />}
+                                        </button>
                                     </div>
                                 </motion.div>
                             ))}

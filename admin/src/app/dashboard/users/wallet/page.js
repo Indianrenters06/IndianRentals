@@ -72,13 +72,15 @@ export default function UserWallet() {
                 </motion.div>
                 <div className="flex items-center gap-3">
                     {!loading && (
-                        <Chip size="lg" color="secondary" variant="flat" startContent={<CurrencyInr weight="bold" />} className="font-bold text-sm px-3">
+                        <div className="inline-flex items-center gap-2 bg-indigo-50 dark:bg-indigo-500/10 text-indigo-700 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-500/20 rounded-full px-3 py-1.5 font-bold text-sm">
+                            <CurrencyInr weight="bold" size={14} />
                             ₹{totalBalance.toLocaleString("en-IN")} Total
-                        </Chip>
+                        </div>
                     )}
-                    <Button color="primary" variant="shadow" className="font-bold bg-indigo-600 shadow-indigo-500/20 px-6" startContent={<Plus weight="bold" />} onPress={() => users.length > 0 && openAddCredit(users[0])}>
+                    <button type="button" onClick={() => users.length > 0 && openAddCredit(users[0])} className="inline-flex items-center gap-2 h-10 px-5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-sm shadow-lg shadow-indigo-500/25 transition-all">
+                        <Plus weight="bold" size={15} />
                         Add Credit
-                    </Button>
+                    </button>
                 </div>
             </div>
 
@@ -161,17 +163,21 @@ export default function UserWallet() {
                             <ModalHeader className="font-bold text-slate-900 dark:text-slate-100">
                                 Add Credit — {selectedUser?.name}
                             </ModalHeader>
-                            <ModalBody>
-                                <Input
-                                    label="Amount (₹)"
-                                    placeholder="Enter credit amount"
-                                    type="number"
-                                    min="1"
-                                    value={creditAmount}
-                                    onValueChange={setCreditAmount}
-                                    startContent={<CurrencyInr className="text-slate-400" />}
-                                    classNames={{ inputWrapper: "bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700" }}
-                                />
+                            <ModalBody className="pb-4">
+                                <div className="flex flex-col gap-1.5">
+                                    <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Amount (₹)</label>
+                                    <div className="relative">
+                                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"><CurrencyInr size={16} /></span>
+                                        <input
+                                            type="number"
+                                            min="1"
+                                            value={creditAmount}
+                                            onChange={e => setCreditAmount(e.target.value)}
+                                            placeholder="Enter credit amount"
+                                            className="w-full h-11 pl-9 pr-3 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 text-sm text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 transition-all"
+                                        />
+                                    </div>
+                                </div>
                             </ModalBody>
                             <ModalFooter>
                                 <Button variant="flat" onPress={onClose}>Cancel</Button>

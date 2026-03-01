@@ -3,12 +3,12 @@
 import { useState, useEffect, useCallback } from 'react';
 import { motion } from "framer-motion";
 import {
-    Card, CardBody, Button, Divider, Input,
-    Textarea, Tabs, Tab, Switch, Spinner, Chip
+    Card, CardBody, Divider, Input,
+    Textarea, Tabs, Tab, Switch, Spinner
 } from "@heroui/react";
 import {
     Layout, Image as PhosphorImage, FloppyDisk,
-    CheckCircle, Warning, Globe
+    CheckCircle, Warning, Globe, ShieldCheck, ChartLineUp
 } from "@phosphor-icons/react";
 import ImageUploader from "@/components/ImageUploader";
 
@@ -27,6 +27,12 @@ const DEFAULTS = {
     metaTitle: "",
     metaDescription: "",
     publishStatus: "published",
+    whyChooseUsTitle: "Why Choose Us?",
+    whyChooseUsSubtitle: "",
+    whyChooseUsImage: "",
+    statsDevices: "90k+",
+    statsCustomers: "30k+",
+    statsCities: "401+",
 };
 
 export default function CMSHomepage() {
@@ -96,28 +102,37 @@ export default function CMSHomepage() {
 
                 <div className="flex items-center gap-3">
                     {saved && (
-                        <Chip color="success" variant="flat" startContent={<CheckCircle size={14} weight="fill" />}>
+                        <div className="flex items-center gap-1.5 text-emerald-600 dark:text-emerald-400 text-sm font-semibold bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/20 rounded-full px-3 py-1.5">
+                            <CheckCircle size={14} weight="fill" />
                             Saved!
-                        </Chip>
+                        </div>
                     )}
-                    <Chip
-                        size="sm"
-                        color={data.publishStatus === "published" ? "success" : "warning"}
-                        variant="flat"
-                        startContent={data.publishStatus === "published" ? <Globe size={12} /> : <Warning size={12} />}
-                    >
+                    {/* Status badge */}
+                    <div className={`flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider rounded-full px-3 py-1.5 border ${data.publishStatus === "published"
+                        ? "bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border-emerald-200 dark:border-emerald-500/20"
+                        : "bg-amber-50 dark:bg-amber-500/10 text-amber-700 dark:text-amber-400 border-amber-200 dark:border-amber-500/20"
+                        }`}>
+                        {data.publishStatus === "published"
+                            ? <Globe size={12} weight="bold" />
+                            : <Warning size={12} weight="bold" />}
                         {data.publishStatus === "published" ? "Live" : "Draft"}
-                    </Chip>
-                    <Button
-                        color="primary"
-                        variant="shadow"
-                        startContent={<FloppyDisk size={18} />}
-                        isLoading={saving}
-                        onPress={handleSave}
-                        className="font-bold shadow-indigo-500/20 px-8 bg-indigo-600"
+                    </div>
+                    {/* Save button — icon inline with text using flex */}
+                    <button
+                        onClick={handleSave}
+                        disabled={saving}
+                        className="flex items-center gap-2 h-10 px-5 rounded-xl bg-indigo-600 hover:bg-indigo-700 disabled:opacity-60 text-white font-semibold text-sm shadow-lg shadow-indigo-500/25 transition-all"
                     >
-                        Save Changes
-                    </Button>
+                        {saving ? (
+                            <svg className="animate-spin w-4 h-4" viewBox="0 0 24 24" fill="none">
+                                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
+                            </svg>
+                        ) : (
+                            <FloppyDisk size={16} weight="bold" />
+                        )}
+                        {saving ? "Saving…" : "Save Changes"}
+                    </button>
                 </div>
             </div>
 
@@ -222,6 +237,79 @@ export default function CMSHomepage() {
                     </Card>
                 </Tab>
 
+                {/* ── Why Choose Us Tab ── */}
+                <Tab key="why-us" title={<div className="flex items-center gap-2"><ShieldCheck size={15} /><span>Why Choose Us</span></div>}>
+                    <Card className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 mt-4">
+                        <CardBody className="p-8 space-y-8">
+                            <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
+                                <div className="space-y-6">
+                                    <div className="space-y-2">
+                                        <label className="text-xs font-bold text-slate-600 dark:text-slate-300 uppercase tracking-wider">Heading</label>
+                                        <Input
+                                            value={data.whyChooseUsTitle}
+                                            onValueChange={(v) => set("whyChooseUsTitle", v)}
+                                            placeholder="Why Choose Us?"
+                                            variant="bordered"
+                                        />
+                                    </div>
+                                    <div className="space-y-2">
+                                        <label className="text-xs font-bold text-slate-600 dark:text-slate-300 uppercase tracking-wider">Description</label>
+                                        <Textarea
+                                            value={data.whyChooseUsSubtitle}
+                                            onValueChange={(v) => set("whyChooseUsSubtitle", v)}
+                                            placeholder="Tell your story or value proposition…"
+                                            variant="bordered"
+                                            minRows={4}
+                                        />
+                                    </div>
+
+                                    <div className="pt-4 space-y-4">
+                                        <p className="text-xs font-bold text-slate-600 dark:text-slate-300 uppercase tracking-wider flex items-center gap-2">
+                                            <ChartLineUp size={14} /> Platform Metrics
+                                        </p>
+                                        <div className="grid grid-cols-3 gap-4">
+                                            <Input
+                                                label="Devices"
+                                                value={data.statsDevices}
+                                                onValueChange={v => set("statsDevices", v)}
+                                                variant="bordered"
+                                                size="sm"
+                                            />
+                                            <Input
+                                                label="Customers"
+                                                value={data.statsCustomers}
+                                                onValueChange={v => set("statsCustomers", v)}
+                                                variant="bordered"
+                                                size="sm"
+                                            />
+                                            <Input
+                                                label="Cities"
+                                                value={data.statsCities}
+                                                onValueChange={v => set("statsCities", v)}
+                                                variant="bordered"
+                                                size="sm"
+                                            />
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="space-y-4">
+                                    <ImageUploader
+                                        label="Sidebar Image"
+                                        existingUrl={data.whyChooseUsImage}
+                                        onUpload={url => set("whyChooseUsImage", url)}
+                                    />
+                                    {data.whyChooseUsImage && (
+                                        <div className="aspect-[4/3] rounded-2xl overflow-hidden shadow-md">
+                                            <img src={data.whyChooseUsImage} className="w-full h-full object-cover" alt="Why Choose Us Preview" />
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                        </CardBody>
+                    </Card>
+                </Tab>
+
                 {/* ── Publish Status Tab ── */}
                 <Tab key="publish" title={<div className="flex items-center gap-2"><Globe size={15} /><span>Publish Status</span></div>}>
                     <Card className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 mt-4">
@@ -237,14 +325,15 @@ export default function CMSHomepage() {
                                     color="success"
                                 />
                             </div>
-                            <Chip
-                                color={data.publishStatus === "published" ? "success" : "warning"}
-                                variant="flat"
-                                size="lg"
-                                startContent={data.publishStatus === "published" ? <CheckCircle size={16} weight="fill" /> : <Warning size={16} weight="fill" />}
-                            >
+                            <div className={`inline-flex items-center gap-2 px-4 py-2 rounded-xl font-semibold text-sm border ${data.publishStatus === "published"
+                                ? "bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border-emerald-200 dark:border-emerald-500/20"
+                                : "bg-amber-50 dark:bg-amber-500/10 text-amber-700 dark:text-amber-400 border-amber-200 dark:border-amber-500/20"
+                                }`}>
+                                {data.publishStatus === "published"
+                                    ? <CheckCircle size={16} weight="fill" />
+                                    : <Warning size={16} weight="fill" />}
                                 {data.publishStatus === "published" ? "Page is LIVE" : "Page is a DRAFT (hidden from public)"}
-                            </Chip>
+                            </div>
                         </CardBody>
                     </Card>
                 </Tab>

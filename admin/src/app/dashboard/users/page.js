@@ -131,15 +131,13 @@ export default function UsersManagement() {
                 );
             case "role":
                 return (
-                    <Chip
-                        size="sm"
-                        variant="flat"
-                        color={user.isAdmin ? "secondary" : "default"}
-                        startContent={user.isAdmin ? <ShieldCheck className="w-3 h-3 ml-1" /> : <User className="w-3 h-3 ml-1" />}
-                        className="font-medium"
-                    >
+                    <div className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 font-medium text-xs ${user.isAdmin
+                            ? "bg-indigo-50 dark:bg-indigo-500/10 text-indigo-700 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-500/20"
+                            : "bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700"
+                        }`}>
+                        {user.isAdmin ? <ShieldCheck className="w-3 h-3" /> : <User className="w-3 h-3" />}
                         {user.isAdmin ? 'Admin' : 'Customer'}
-                    </Chip>
+                    </div>
                 );
             case "contact":
                 return (
@@ -221,18 +219,14 @@ export default function UsersManagement() {
                     <p className="text-slate-600 dark:text-slate-400">Complete directory of all registered customers and administrators.</p>
                 </motion.div>
                 <div className="flex flex-wrap items-center gap-3">
-                    <Button
-                        color="secondary"
-                        variant="flat"
-                        startContent={<DownloadSimple className="w-4 h-4" />}
-                        className="font-semibold bg-indigo-500/10 text-indigo-600 dark:text-indigo-400"
-                        onPress={exportCSV}
-                    >
+                    <button type="button" onClick={exportCSV} className="inline-flex items-center gap-2 h-10 px-4 rounded-xl border border-slate-300 dark:border-slate-700 text-indigo-600 dark:text-indigo-400 font-semibold text-sm bg-indigo-50 dark:bg-indigo-500/10 hover:border-indigo-400 transition-colors">
+                        <DownloadSimple className="w-4 h-4" />
                         Export CSV
-                    </Button>
-                    <Button color="primary" variant="shadow" startContent={<UserPlus className="w-4 h-4" />} className="font-semibold shadow-indigo-500/30">
+                    </button>
+                    <button type="button" className="inline-flex items-center gap-2 h-10 px-5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-sm shadow-lg shadow-indigo-500/25 transition-all">
+                        <UserPlus className="w-4 h-4" />
                         Add New User
-                    </Button>
+                    </button>
                 </div>
             </div>
 

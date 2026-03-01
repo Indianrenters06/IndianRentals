@@ -4,11 +4,15 @@ import React from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { FaShoppingCart, FaRegAddressCard, FaUserCheck, FaTruck } from 'react-icons/fa';
+import { useSettings } from '../context/SettingsContext';
 
 import { usePathname } from 'next/navigation';
 
 const CartHeader = () => {
     const pathname = usePathname();
+    const { settings } = useSettings();
+    const siteLogo = settings?.siteLogo || "/logo-v2.png";
+    const siteName = settings?.siteName || "Indian Renters";
 
     const steps = [
         { name: "Checkout", icon: FaShoppingCart, path: "/cart" },
@@ -28,8 +32,8 @@ const CartHeader = () => {
                 {/* Logo */}
                 <Link href="/" className="shrink-0">
                     <Image
-                        src="/logo-v2.png"
-                        alt="Indian Renters - You Name it We Rent it"
+                        src={siteLogo}
+                        alt={`${siteName} - You Name it We Rent it`}
                         width={200}
                         height={54}
                         className="h-12 w-auto object-contain"

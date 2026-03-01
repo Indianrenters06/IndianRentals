@@ -5,6 +5,12 @@ const settingsSchema = new mongoose.Schema({
     siteLogo: { type: String, default: '' },
     contactEmail: { type: String, default: 'support@indianrentals.com' },
     contactPhone: { type: String, default: '+91 1234567890' },
+    address: { type: String, default: '' },
+
+    // Platform behaviour flags
+    maintenanceMode: { type: Boolean, default: false },
+    allowRegistrations: { type: Boolean, default: true },
+    requireKYC: { type: Boolean, default: true },
 
     // Gateway Keys (Mock)
     paymentGatewaySecret: { type: String, default: '' },

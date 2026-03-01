@@ -82,16 +82,24 @@ function PostEditor({ post, onBack, onSaved }) {
                     </h2>
                 </div>
                 <div className="flex items-center gap-3">
-                    {saved && <Chip color="success" variant="flat" size="sm" startContent={<CheckCircle size={12} weight="fill" />}>Saved!</Chip>}
+                    {saved && (
+                        <div className="inline-flex items-center gap-1.5 text-emerald-600 dark:text-emerald-400 text-sm font-semibold bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/20 rounded-full px-3 py-1">
+                            <CheckCircle size={12} weight="fill" /> Saved!
+                        </div>
+                    )}
                     <Button variant="flat" size="sm" className="font-semibold"
                         onPress={() => set("status", form.status === "published" ? "draft" : "published")}>
                         {form.status === "published" ? "Switch to Draft" : "Publish"}
                     </Button>
-                    <Button color="primary" className="bg-indigo-600 font-bold shadow-indigo-500/20"
-                        startContent={<FloppyDisk size={16} />}
-                        isLoading={saving} onPress={handleSave}>
+                    <button type="button" disabled={saving} onClick={handleSave}
+                        className="inline-flex items-center gap-1.5 h-9 px-4 rounded-xl bg-indigo-600 hover:bg-indigo-700 disabled:opacity-60 text-white font-bold text-sm shadow-lg shadow-indigo-500/20 transition-all">
+                        {saving ? (
+                            <svg className="animate-spin w-3.5 h-3.5" viewBox="0 0 24 24" fill="none"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" /></svg>
+                        ) : (
+                            <FloppyDisk size={14} weight="bold" />
+                        )}
                         Save
-                    </Button>
+                    </button>
                 </div>
             </div>
 
@@ -169,14 +177,16 @@ function PostEditor({ post, onBack, onSaved }) {
                     <Card className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800">
                         <CardBody className="p-5 space-y-3">
                             <h4 className="text-xs font-bold uppercase tracking-wider text-slate-500">Cover Image</h4>
-                            <Input
-                                value={form.coverImage}
-                                onValueChange={v => set("coverImage", v)}
-                                placeholder="https://res.cloudinary.com/..."
-                                variant="bordered"
-                                size="sm"
-                                startContent={<PhosphorImage size={14} className="text-slate-400" />}
-                            />
+                            <div className="relative">
+                                <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"><PhosphorImage size={14} /></span>
+                                <input
+                                    type="url"
+                                    value={form.coverImage}
+                                    onChange={e => set("coverImage", e.target.value)}
+                                    placeholder="https://res.cloudinary.com/..."
+                                    className="w-full h-9 pl-8 pr-3 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 transition-all"
+                                />
+                            </div>
                             {form.coverImage && (
                                 <div className="aspect-video rounded-xl overflow-hidden bg-slate-100 dark:bg-slate-800">
                                     <img src={form.coverImage} alt="Cover preview" className="w-full h-full object-cover" />
@@ -189,26 +199,29 @@ function PostEditor({ post, onBack, onSaved }) {
                     <Card className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800">
                         <CardBody className="p-5 space-y-4">
                             <h4 className="text-xs font-bold uppercase tracking-wider text-slate-500">Details</h4>
-                            <Input
-                                label="Author"
-                                value={form.author}
-                                onValueChange={v => set("author", v)}
-                                variant="bordered"
-                                size="sm"
-                                labelPlacement="outside"
-                                classNames={{ label: "text-xs text-slate-500" }}
-                            />
-                            <Input
-                                label="Tags (comma separated)"
-                                value={form.tags}
-                                onValueChange={v => set("tags", v)}
-                                placeholder="rental, cameras, guide"
-                                variant="bordered"
-                                size="sm"
-                                labelPlacement="outside"
-                                startContent={<Tag size={13} className="text-slate-400" />}
-                                classNames={{ label: "text-xs text-slate-500" }}
-                            />
+                            <div>
+                                <label className="text-xs text-slate-500 block mb-1.5">Author</label>
+                                <input
+                                    type="text"
+                                    value={form.author}
+                                    onChange={e => set("author", e.target.value)}
+                                    placeholder="Admin"
+                                    className="w-full h-9 px-3 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 transition-all"
+                                />
+                            </div>
+                            <div>
+                                <label className="text-xs text-slate-500 block mb-1.5">Tags (comma separated)</label>
+                                <div className="relative">
+                                    <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"><Tag size={13} /></span>
+                                    <input
+                                        type="text"
+                                        value={form.tags}
+                                        onChange={e => set("tags", e.target.value)}
+                                        placeholder="rental, cameras, guide"
+                                        className="w-full h-9 pl-8 pr-3 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 transition-all"
+                                    />
+                                </div>
+                            </div>
                         </CardBody>
                     </Card>
                 </div>
@@ -274,15 +287,14 @@ export default function BlogManagement() {
                                 </h1>
                                 <p className="text-slate-600 dark:text-slate-400">Create, edit, and publish blog posts and industry news.</p>
                             </motion.div>
-                            <Button
-                                color="primary"
-                                variant="shadow"
-                                className="font-bold bg-indigo-600 shadow-indigo-500/20 px-6"
-                                startContent={<Plus weight="bold" size={16} />}
-                                onPress={() => setEditing("new")}
+                            <button
+                                type="button"
+                                onClick={() => setEditing("new")}
+                                className="inline-flex items-center gap-2 h-10 px-5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-sm shadow-lg shadow-indigo-500/20 transition-all"
                             >
+                                <Plus weight="bold" size={15} />
                                 Create Post
-                            </Button>
+                            </button>
                         </div>
 
                         {/* Stats */}

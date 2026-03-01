@@ -55,9 +55,10 @@ export default function ActiveUsers() {
                     <p className="text-slate-600 dark:text-slate-400">Users who logged in within the last 24 hours.</p>
                 </motion.div>
                 <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }}>
-                    <Chip size="lg" color="success" variant="flat" startContent={<Users weight="bold" className="mr-1" />} className="font-bold text-sm px-3">
+                    <div className="inline-flex items-center gap-2 bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-500/20 rounded-full px-3 py-1.5 font-bold text-sm">
+                        <Users weight="bold" size={14} />
                         {loading ? "..." : `${users.length} Active`}
-                    </Chip>
+                    </div>
                 </motion.div>
             </div>
 

@@ -1,79 +1,136 @@
 'use client';
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { motion } from "framer-motion";
 import {
     Card, CardBody, Button, Table, TableHeader, TableColumn, TableBody,
     TableRow, TableCell, Chip, Input, Modal, ModalContent, ModalHeader,
-    ModalBody, ModalFooter, Select, SelectItem, useDisclosure, Skeleton
+    ModalBody, ModalFooter, Select, SelectItem, useDisclosure, Skeleton, Spinner
 } from "@heroui/react";
-import { Tag, Plus, Trash, WarningCircle, CheckCircle, Clock, MagnifyingGlass } from "@phosphor-icons/react";
+import { Tag, Plus, Trash, WarningCircle, CheckCircle, Clock, MagnifyingGlass, ArrowClockwise } from "@phosphor-icons/react";
 
 const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
-const LOCAL_KEY = "admin_coupons";
-
-const loadCoupons = () => { try { return JSON.parse(localStorage.getItem(LOCAL_KEY) || "[]"); } catch { return []; } };
-const saveCoupons = (list) => localStorage.setItem(LOCAL_KEY, JSON.stringify(list));
+const getToken = () => localStorage.getItem("adminToken");
 
 export default function ActiveCoupons() {
     const [coupons, setCoupons] = useState([]);
     const [loading, setLoading] = useState(true);
     const [search, setSearch] = useState("");
     const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure();
-    const [form, setForm] = useState({ code: "", discount: "", type: "percentage", minOrder: "", expires: "", description: "" });
+    const [form, setForm] = useState({
+        code: "", discountAmount: "", discountType: "percentage",
+        minOrderAmount: "", expiryDate: "", usageLimit: "", description: ""
+    });
     const [formError, setFormError] = useState("");
     const [saving, setSaving] = useState(false);
+    const [deleting, setDeleting] = useState(null);
+    const [toggling, setToggling] = useState(null);
 
-    useEffect(() => {
-        setCoupons(loadCoupons());
-        setLoading(false);
+    // ── Fetch ──────────────────────────────────────────────────────────────────
+    const fetchCoupons = useCallback(async () => {
+        try {
+            setLoading(true);
+            const res = await fetch(`${API}/api/coupons`, {
+                headers: { Authorization: `Bearer ${getToken()}` }
+            });
+            if (res.ok) {
+                const data = await res.json();
+                setCoupons(Array.isArray(data) ? data : []);
+            }
+        } catch (err) {
+            console.error(err);
+        } finally {
+            setLoading(false);
+        }
     }, []);
 
+    useEffect(() => { fetchCoupons(); }, [fetchCoupons]);
+
     const filtered = coupons.filter(c =>
-        c.code.toLowerCase().includes(search.toLowerCase()) ||
+        c.code?.toLowerCase().includes(search.toLowerCase()) ||
         c.description?.toLowerCase().includes(search.toLowerCase())
     );
 
+    // ── Create ─────────────────────────────────────────────────────────────────
     const handleCreate = async () => {
         if (!form.code.trim()) return setFormError("Coupon code is required.");
-        if (!form.discount || isNaN(form.discount)) return setFormError("Enter a valid discount value.");
+        if (!form.discountAmount || isNaN(form.discountAmount)) return setFormError("Enter a valid discount value.");
         setFormError("");
         setSaving(true);
-        await new Promise(r => setTimeout(r, 400));
-        const newCoupon = {
-            id: Date.now().toString(),
-            code: form.code.toUpperCase().trim(),
-            discount: Number(form.discount),
-            type: form.type,
-            minOrder: form.minOrder ? Number(form.minOrder) : 0,
-            expires: form.expires || null,
-            description: form.description,
-            usageCount: 0,
-            status: "Active",
-            createdAt: new Date().toISOString(),
-        };
-        const updated = [newCoupon, ...coupons];
-        setCoupons(updated);
-        saveCoupons(updated);
-        setForm({ code: "", discount: "", type: "percentage", minOrder: "", expires: "", description: "" });
-        setSaving(false);
-        onClose();
+        try {
+            const payload = {
+                code: form.code.toUpperCase().trim(),
+                discountType: form.discountType,
+                discountAmount: Number(form.discountAmount),
+                minOrderAmount: form.minOrderAmount ? Number(form.minOrderAmount) : 0,
+                expiryDate: form.expiryDate || null,
+                usageLimit: form.usageLimit ? Number(form.usageLimit) : null,
+                isActive: true,
+            };
+            const res = await fetch(`${API}/api/coupons`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json", Authorization: `Bearer ${getToken()}` },
+                body: JSON.stringify(payload),
+            });
+            if (!res.ok) {
+                const err = await res.json();
+                throw new Error(err.message || "Failed to create coupon");
+            }
+            setForm({ code: "", discountAmount: "", discountType: "percentage", minOrderAmount: "", expiryDate: "", usageLimit: "", description: "" });
+            onClose();
+            fetchCoupons();
+        } catch (err) {
+            setFormError(err.message);
+        } finally {
+            setSaving(false);
+        }
     };
 
-    const handleDelete = (id) => {
-        const updated = coupons.filter(c => c.id !== id);
-        setCoupons(updated);
-        saveCoupons(updated);
+    // ── Delete ─────────────────────────────────────────────────────────────────
+    const handleDelete = async (id) => {
+        if (!confirm("Delete this coupon permanently?")) return;
+        try {
+            setDeleting(id);
+            const res = await fetch(`${API}/api/coupons/${id}`, {
+                method: "DELETE",
+                headers: { Authorization: `Bearer ${getToken()}` }
+            });
+            if (res.ok) {
+                setCoupons(prev => prev.filter(c => c._id !== id));
+            } else {
+                const err = await res.json();
+                alert(err.message || "Failed to delete");
+            }
+        } catch (err) {
+            alert(err.message);
+        } finally {
+            setDeleting(null);
+        }
     };
 
-    const toggleStatus = (id) => {
-        const updated = coupons.map(c => c.id === id ? { ...c, status: c.status === "Active" ? "Paused" : "Active" } : c);
-        setCoupons(updated);
-        saveCoupons(updated);
+    // ── Toggle Active / Paused ──────────────────────────────────────────────────
+    const toggleStatus = async (coupon) => {
+        try {
+            setToggling(coupon._id);
+            const res = await fetch(`${API}/api/coupons/${coupon._id}`, {
+                method: "PUT",
+                headers: { "Content-Type": "application/json", Authorization: `Bearer ${getToken()}` },
+                body: JSON.stringify({ isActive: !coupon.isActive }),
+            });
+            if (res.ok) {
+                const updated = await res.json();
+                setCoupons(prev => prev.map(c => c._id === coupon._id ? updated : c));
+            }
+        } catch (err) {
+            console.error(err);
+        } finally {
+            setToggling(null);
+        }
     };
 
     const isExpired = (expires) => expires && new Date(expires) < new Date();
 
+    // ── Render ─────────────────────────────────────────────────────────────────
     return (
         <div className="w-full space-y-6 pb-12">
             <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
@@ -84,12 +141,16 @@ export default function ActiveCoupons() {
                     <p className="text-slate-600 dark:text-slate-400">Create, manage, and monitor discount coupons for your customers.</p>
                 </motion.div>
                 <div className="flex items-center gap-3">
-                    <Chip size="lg" color="success" variant="flat" className="font-bold text-sm px-3">
-                        {coupons.filter(c => c.status === "Active" && !isExpired(c.expires)).length} Active
-                    </Chip>
-                    <Button color="primary" variant="shadow" className="font-bold bg-indigo-600 shadow-indigo-500/20 px-6" startContent={<Plus weight="bold" />} onPress={onOpen}>
+                    <button type="button" onClick={fetchCoupons} className="inline-flex items-center justify-center w-9 h-9 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-500 hover:text-indigo-500 transition-colors">
+                        <ArrowClockwise size={16} />
+                    </button>
+                    <div className="inline-flex items-center gap-2 bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-500/20 rounded-full px-3 py-1.5 font-bold text-sm">
+                        {coupons.filter(c => c.isActive && !isExpired(c.expiryDate)).length} Active
+                    </div>
+                    <button type="button" onClick={onOpen} className="inline-flex items-center gap-2 h-10 px-5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-sm shadow-lg shadow-indigo-500/25 transition-all">
+                        <Plus weight="bold" size={15} />
                         Create Coupon
-                    </Button>
+                    </button>
                 </div>
             </div>
 
@@ -122,46 +183,62 @@ export default function ActiveCoupons() {
                             </TableHeader>
                             <TableBody items={filtered} emptyContent="No coupons yet. Click 'Create Coupon' to add one.">
                                 {(item) => (
-                                    <TableRow key={item.id}>
+                                    <TableRow key={item._id}>
                                         <TableCell>
                                             <span className="font-mono font-bold text-sm text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-500/10 px-2.5 py-1 rounded-lg tracking-widest">
                                                 {item.code}
                                             </span>
                                         </TableCell>
                                         <TableCell className="font-bold text-slate-900 dark:text-slate-100">
-                                            {item.type === "percentage" ? `${item.discount}%` : `₹${item.discount}`}
+                                            {item.discountType === "percentage" ? `${item.discountAmount}%` : `₹${item.discountAmount}`}
                                         </TableCell>
-                                        <TableCell className="text-sm text-slate-500">{item.minOrder > 0 ? `₹${item.minOrder}` : "No minimum"}</TableCell>
+                                        <TableCell className="text-sm text-slate-500">{item.minOrderAmount > 0 ? `₹${item.minOrderAmount}` : "No minimum"}</TableCell>
                                         <TableCell>
-                                            {item.expires ? (
+                                            {item.expiryDate ? (
                                                 <div className="flex items-center gap-1.5">
-                                                    <Clock size={12} className={isExpired(item.expires) ? "text-rose-500" : "text-slate-400"} />
-                                                    <span className={`text-xs font-medium ${isExpired(item.expires) ? "text-rose-500" : "text-slate-500"}`}>
-                                                        {new Date(item.expires).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })}
-                                                        {isExpired(item.expires) && " (Expired)"}
+                                                    <Clock size={12} className={isExpired(item.expiryDate) ? "text-rose-500" : "text-slate-400"} />
+                                                    <span className={`text-xs font-medium ${isExpired(item.expiryDate) ? "text-rose-500" : "text-slate-500"}`}>
+                                                        {new Date(item.expiryDate).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })}
+                                                        {isExpired(item.expiryDate) && " (Expired)"}
                                                     </span>
                                                 </div>
                                             ) : <span className="text-xs text-slate-400">No expiry</span>}
                                         </TableCell>
-                                        <TableCell><span className="font-bold text-slate-700 dark:text-slate-300">{item.usageCount}</span></TableCell>
+                                        <TableCell>
+                                            <span className="font-bold text-slate-700 dark:text-slate-300">{item.usageCount || 0}</span>
+                                            {item.usageLimit && <span className="text-xs text-slate-400 ml-1">/ {item.usageLimit}</span>}
+                                        </TableCell>
                                         <TableCell>
                                             <div className="flex justify-center">
-                                                <Chip
-                                                    size="sm"
-                                                    color={isExpired(item.expires) ? "danger" : item.status === "Active" ? "success" : "warning"}
-                                                    variant="flat"
-                                                    className="font-bold cursor-pointer"
-                                                    onClick={() => toggleStatus(item.id)}
+                                                <button
+                                                    onClick={() => !isExpired(item.expiryDate) && toggleStatus(item)}
+                                                    disabled={toggling === item._id || isExpired(item.expiryDate)}
+                                                    className="inline-flex items-center gap-1 disabled:cursor-not-allowed"
                                                 >
-                                                    {isExpired(item.expires) ? "Expired" : item.status}
-                                                </Chip>
+                                                    {toggling === item._id ? (
+                                                        <Spinner size="sm" />
+                                                    ) : (
+                                                        <span className={`text-xs font-bold px-2.5 py-1 rounded-full ${isExpired(item.expiryDate)
+                                                                ? "bg-rose-100 dark:bg-rose-500/10 text-rose-600"
+                                                                : item.isActive
+                                                                    ? "bg-emerald-100 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 cursor-pointer hover:bg-emerald-200"
+                                                                    : "bg-amber-100 dark:bg-amber-500/10 text-amber-700 dark:text-amber-400 cursor-pointer hover:bg-amber-200"
+                                                            }`}>
+                                                            {isExpired(item.expiryDate) ? "Expired" : item.isActive ? "Active" : "Paused"}
+                                                        </span>
+                                                    )}
+                                                </button>
                                             </div>
                                         </TableCell>
                                         <TableCell>
                                             <div className="flex justify-center">
-                                                <Button size="sm" color="danger" variant="light" isIconOnly onPress={() => handleDelete(item.id)}>
-                                                    <Trash weight="bold" size={14} />
-                                                </Button>
+                                                <button
+                                                    disabled={deleting === item._id}
+                                                    onClick={() => handleDelete(item._id)}
+                                                    className="inline-flex items-center justify-center w-8 h-8 rounded-lg text-slate-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 disabled:opacity-40 transition-colors"
+                                                >
+                                                    {deleting === item._id ? <Spinner size="sm" /> : <Trash weight="bold" size={14} />}
+                                                </button>
                                             </div>
                                         </TableCell>
                                     </TableRow>
@@ -181,20 +258,32 @@ export default function ActiveCoupons() {
                             <ModalBody className="flex flex-col gap-4 py-4">
                                 <div className="grid grid-cols-2 gap-3">
                                     <Input label="Coupon Code" placeholder="e.g. SAVE20" value={form.code} onValueChange={v => setForm(f => ({ ...f, code: v.toUpperCase() }))} description="Will be auto-uppercased" classNames={{ inputWrapper: "bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700" }} />
-                                    <Select label="Discount Type" selectedKeys={[form.type]} onSelectionChange={keys => setForm(f => ({ ...f, type: [...keys][0] || "percentage" }))} classNames={{ trigger: "bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700" }}>
-                                        <SelectItem key="percentage">Percentage (%)</SelectItem>
-                                        <SelectItem key="flat">Flat Amount (₹)</SelectItem>
-                                    </Select>
-                                    <Input label={form.type === "percentage" ? "Discount %" : "Discount ₹"} placeholder={form.type === "percentage" ? "e.g. 20" : "e.g. 100"} type="number" value={form.discount} onValueChange={v => setForm(f => ({ ...f, discount: v }))} classNames={{ inputWrapper: "bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700" }} />
-                                    <Input label="Minimum Order (₹)" placeholder="e.g. 500 (optional)" type="number" value={form.minOrder} onValueChange={v => setForm(f => ({ ...f, minOrder: v }))} classNames={{ inputWrapper: "bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700" }} />
+                                    <div className="flex flex-col gap-1.5">
+                                        <label className="text-sm text-slate-700 dark:text-slate-300 font-medium">Discount Type</label>
+                                        <select value={form.discountType} onChange={e => setForm(f => ({ ...f, discountType: e.target.value }))} className="h-12 px-3 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/30 appearance-none cursor-pointer">
+                                            <option value="percentage">Percentage (%)</option>
+                                            <option value="flat">Flat Amount (₹)</option>
+                                        </select>
+                                    </div>
+                                    <Input label={form.discountType === "percentage" ? "Discount %" : "Discount ₹"} placeholder={form.discountType === "percentage" ? "e.g. 20" : "e.g. 100"} type="number" value={form.discountAmount} onValueChange={v => setForm(f => ({ ...f, discountAmount: v }))} classNames={{ inputWrapper: "bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700" }} />
+                                    <Input label="Minimum Order (₹)" placeholder="e.g. 500 (optional)" type="number" value={form.minOrderAmount} onValueChange={v => setForm(f => ({ ...f, minOrderAmount: v }))} classNames={{ inputWrapper: "bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700" }} />
                                 </div>
-                                <Input label="Expiry Date" type="date" value={form.expires} onValueChange={v => setForm(f => ({ ...f, expires: v }))} classNames={{ inputWrapper: "bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700" }} />
-                                <Input label="Description (optional)" placeholder="Internal note about this coupon" value={form.description} onValueChange={v => setForm(f => ({ ...f, description: v }))} classNames={{ inputWrapper: "bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700" }} />
+                                <div className="grid grid-cols-2 gap-3">
+                                    <Input label="Expiry Date" type="date" value={form.expiryDate} onValueChange={v => setForm(f => ({ ...f, expiryDate: v }))} classNames={{ inputWrapper: "bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700" }} />
+                                    <Input label="Usage Limit (optional)" placeholder="e.g. 100" type="number" value={form.usageLimit} onValueChange={v => setForm(f => ({ ...f, usageLimit: v }))} classNames={{ inputWrapper: "bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700" }} />
+                                </div>
                                 {formError && <p className="text-sm text-rose-500 flex items-center gap-2"><WarningCircle weight="bold" />{formError}</p>}
                             </ModalBody>
                             <ModalFooter>
                                 <Button variant="flat" onPress={onClose}>Cancel</Button>
-                                <Button color="primary" isLoading={saving} onPress={handleCreate} className="bg-indigo-600 font-bold" startContent={<Tag weight="bold" />}>Create Coupon</Button>
+                                <button type="button" disabled={saving} onClick={handleCreate} className="inline-flex items-center gap-2 h-10 px-5 rounded-xl bg-indigo-600 hover:bg-indigo-700 disabled:opacity-60 text-white font-bold text-sm transition-all">
+                                    {saving ? (
+                                        <svg className="animate-spin w-4 h-4" viewBox="0 0 24 24" fill="none"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" /></svg>
+                                    ) : (
+                                        <Tag weight="bold" size={15} />
+                                    )}
+                                    Create Coupon
+                                </button>
                             </ModalFooter>
                         </>
                     )}

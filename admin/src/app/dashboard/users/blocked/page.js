@@ -61,9 +61,10 @@ export default function BlockedUsers() {
                     <p className="text-slate-600 dark:text-slate-400">Manage users who have been temporarily or permanently restricted.</p>
                 </motion.div>
                 {!loading && (
-                    <Chip size="lg" color="danger" variant="flat" startContent={<Prohibit weight="bold" className="mr-1" />} className="font-bold text-sm px-3">
+                    <div className="inline-flex items-center gap-2 bg-rose-50 dark:bg-rose-500/10 text-rose-700 dark:text-rose-400 border border-rose-200 dark:border-rose-500/20 rounded-full px-3 py-1.5 font-bold text-sm">
+                        <Prohibit weight="bold" size={14} />
                         {blocked.length} Blocked
-                    </Chip>
+                    </div>
                 )}
             </div>
 
@@ -119,17 +120,19 @@ export default function BlockedUsers() {
                                         </TableCell>
                                         <TableCell>
                                             <div className="flex justify-center">
-                                                <Button
-                                                    size="sm"
-                                                    color="success"
-                                                    variant="flat"
-                                                    className="font-bold h-7"
-                                                    startContent={<ArrowCounterClockwise />}
-                                                    isLoading={restoring[user._id]}
-                                                    onPress={() => handleRestore(user._id)}
+                                                <button
+                                                    type="button"
+                                                    disabled={restoring[user._id]}
+                                                    onClick={() => handleRestore(user._id)}
+                                                    className="inline-flex items-center gap-1.5 h-7 px-3 rounded-lg bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-500/20 font-bold text-xs disabled:opacity-50 hover:bg-emerald-100 transition-colors"
                                                 >
+                                                    {restoring[user._id] ? (
+                                                        <svg className="animate-spin w-3 h-3" viewBox="0 0 24 24" fill="none"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" /></svg>
+                                                    ) : (
+                                                        <ArrowCounterClockwise size={13} />
+                                                    )}
                                                     Restore Access
-                                                </Button>
+                                                </button>
                                             </div>
                                         </TableCell>
                                     </TableRow>
