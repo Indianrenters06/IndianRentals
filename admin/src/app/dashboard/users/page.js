@@ -42,6 +42,7 @@ export default function UsersManagement() {
     const { isOpen, onOpen, onOpenChange } = useDisclosure();
     const [selectedUser, setSelectedUser] = useState(null);
     const [modalType, setModalType] = useState('profile');
+    const [fetchError, setFetchError] = useState(null);
 
     const handleView = (user, type) => {
         setSelectedUser(user);
@@ -67,19 +68,14 @@ export default function UsersManagement() {
             if (response.ok) {
                 const data = await response.json();
                 setUsers(data);
+                setFetchError(null);
             } else {
-                throw new Error("API failed");
+                setFetchError(`API Error: ${response.status}`);
             }
         } catch (error) {
-            console.error('Error fetching users:', error);
-            // Mock data fallback
-            setUsers([
-                { _id: "1", name: "Rahul Sharma", email: "rahul.s@example.com", phone: "+91 9876543210", city: "Mumbai", state: "Maharashtra", isAdmin: true, createdAt: "2023-01-15T10:00:00Z" },
-                { _id: "2", name: "Sneha Menon", email: "sneha.m@example.com", phone: "+91 9876543211", city: "Bangalore", state: "Karnataka", isAdmin: false, createdAt: "2023-03-22T14:30:00Z" },
-                { _id: "3", name: "Amit Kumar", email: "amit.k@example.com", phone: "+91 9876543212", city: "Delhi", state: "Delhi", isAdmin: false, createdAt: "2023-05-10T09:15:00Z" },
-                { _id: "4", name: "Priya Desai", email: "priya.d@example.com", phone: "+91 9876543213", city: "Pune", state: "Maharashtra", isAdmin: false, createdAt: "2023-07-05T16:45:00Z" },
-                { _id: "5", name: "Vikram Singh", email: "vikram.s@example.com", phone: "+91 9876543214", city: "Jaipur", state: "Rajasthan", isAdmin: false, createdAt: "2023-08-11T11:20:00Z" }
-            ]);
+            console.warn('Error fetching users from API:', error);
+            setFetchError("Network or server error. Make sure the backend is running.");
+            setUsers([]);
         } finally {
             setLoading(false);
         }
@@ -93,7 +89,7 @@ export default function UsersManagement() {
     const exportCSV = () => {
         const headers = ["Name,Email,Phone,City,State,Role,Joined\n"];
         const rows = users.map(u =>
-            `${u.name},${u.email},${u.phone || ""},${u.city || ""},${u.state || ""},${u.isAdmin ? "Admin" : "Customer"},${new Date(u.createdAt).toLocaleDateString()}`
+            `${u.name},${u.email},${u.phone || ""},${u.city || ""},${u.state || ""},${u.role === 'admin' ? "Admin" : "Customer"},${new Date(u.createdAt).toLocaleDateString()}`
         ).join("\n");
         const blob = new Blob([headers, rows], { type: 'text/csv' });
         const url = window.URL.createObjectURL(blob);
@@ -111,8 +107,8 @@ export default function UsersManagement() {
             const matchesSearch = user.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
                 user.email?.toLowerCase().includes(searchTerm.toLowerCase());
             const matchesRole = filterRole === 'all' ||
-                (filterRole === 'admin' && user.isAdmin) ||
-                (filterRole === 'user' && !user.isAdmin);
+                (filterRole === 'admin' && (user?.role === 'admin' || user?.role === 'Admin' || user?.isAdmin)) ||
+                (filterRole === 'user' && user?.role !== 'admin' && user?.role !== 'Admin' && !user?.isAdmin);
             return matchesSearch && matchesRole;
         });
     }, [users, searchTerm, filterRole]);
@@ -140,13 +136,14 @@ export default function UsersManagement() {
                     </div>
                 );
             case "role":
+                const isAdmin = user?.role === 'admin' || user?.role === 'Admin' || user?.isAdmin;
                 return (
-                    <div className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 font-medium text-xs ${user.isAdmin
+                    <div className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 font-medium text-xs ${isAdmin
                         ? "bg-indigo-50 dark:bg-indigo-500/10 text-indigo-700 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-500/20"
                         : "bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700"
                         }`}>
-                        {user.isAdmin ? <ShieldCheck className="w-3 h-3" /> : <User className="w-3 h-3" />}
-                        {user.isAdmin ? 'Admin' : 'Customer'}
+                        {isAdmin ? <ShieldCheck className="w-3 h-3" /> : <User className="w-3 h-3" />}
+                        {isAdmin ? 'Admin' : 'Customer'}
                     </div>
                 );
             case "contact":
@@ -240,6 +237,16 @@ export default function UsersManagement() {
                 </div>
             </div>
 
+            {fetchError && (
+                <div className="w-full bg-rose-50 border-l-4 border-rose-500 text-rose-700 p-4 rounded-xl shadow-sm text-sm flex justify-between items-center">
+                    <div>
+                        <strong>Connection Issue: </strong>
+                        Failed to load real users from the database. ({fetchError})
+                    </div>
+                    <Button size="sm" color="danger" variant="flat" onPress={fetchUsers}>Retry</Button>
+                </div>
+            )}
+
             <Card className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
                 <CardBody className="p-0">
                     <div className="px-6 py-5 bg-slate-50 dark:bg-slate-900/50 border-b border-slate-200 dark:border-slate-800 flex flex-col sm:flex-row gap-4">
@@ -253,23 +260,20 @@ export default function UsersManagement() {
                                 className="w-full bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 rounded-xl pl-10 pr-4 py-2 text-sm text-slate-900 dark:text-slate-200 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all h-11"
                             />
                         </div>
-                        <div className="w-full sm:w-48">
-                            <Select
-                                selectedKeys={[filterRole]}
-                                onSelectionChange={(keys) => setFilterRole(Array.from(keys)[0])}
-                                variant="bordered"
-                                placeholder="All Roles"
-                                startContent={<Funnel className="text-slate-400" />}
-                                aria-label="Filter Roles"
-                                classNames={{
-                                    trigger: "border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-950/50 text-slate-900 dark:text-slate-200 h-11 border-1",
-                                    popoverContent: "z-[100] bg-white dark:bg-slate-900"
-                                }}
+                        <div className="w-full sm:w-48 relative">
+                            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none z-10">
+                                <Funnel size={16} />
+                            </span>
+                            <select
+                                value={filterRole}
+                                onChange={(e) => setFilterRole(e.target.value)}
+                                className="w-full bg-white dark:bg-slate-950/50 border border-slate-200 dark:border-slate-700 rounded-xl pl-9 pr-8 py-2 text-sm text-slate-900 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 h-11 appearance-none cursor-pointer transition-all shadow-sm"
                             >
-                                <SelectItem key="all" value="all">All Roles</SelectItem>
-                                <SelectItem key="admin" value="admin">Administrators</SelectItem>
-                                <SelectItem key="user" value="user">Customers</SelectItem>
-                            </Select>
+                                <option value="all">All Roles</option>
+                                <option value="admin">Administrators</option>
+                                <option value="user">Customers</option>
+                            </select>
+                            <span className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none">▾</span>
                         </div>
                     </div>
 
@@ -319,7 +323,7 @@ export default function UsersManagement() {
                                         <MagnifyingGlass className="w-6 h-6" />
                                     </div>
                                     <h3 className="text-lg font-medium text-slate-900 dark:text-slate-200 mb-1">No users found</h3>
-                                    <p className="text-slate-500 text-sm text-center">We couldn't find any users matching your filters.</p>
+                                    <p className="text-slate-500 text-sm text-center">We couldn't find any real users matching your filters or failed to load them.</p>
                                 </div>
                             }
                         >
@@ -353,7 +357,7 @@ export default function UsersManagement() {
                                             <div className="flex-1 min-w-0">
                                                 <h3 className="text-2xl font-bold text-slate-900 dark:text-slate-100 tracking-tight truncate flex items-center gap-2">
                                                     {selectedUser.name || 'Unnamed User'}
-                                                    {selectedUser.isAdmin && (
+                                                    {(selectedUser.role === 'admin' || selectedUser.role === 'Admin' || selectedUser.isAdmin) && (
                                                         <Tooltip content="Administrator" size="sm" color="primary">
                                                             <ShieldCheck className="text-indigo-500" weight="fill" size={20} />
                                                         </Tooltip>

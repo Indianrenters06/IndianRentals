@@ -14,8 +14,9 @@ import {
     ArrowClockwise, FunnelSimple
 } from "@phosphor-icons/react";
 
-const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
-const FRONTEND = process.env.NEXT_PUBLIC_FRONTEND_URL || "http://localhost:3000";
+const ENV_API = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:5000";
+const API = ENV_API.replace('localhost', '127.0.0.1');
+const FRONTEND = process.env.NEXT_PUBLIC_FRONTEND_URL || "http://127.0.0.1:3001";
 const getToken = () => localStorage.getItem("adminToken");
 
 const getImageUrl = (path) => {
@@ -41,8 +42,14 @@ export default function AllProducts() {
             if (res.ok) {
                 const data = await res.json();
                 setProducts(Array.isArray(data.products) ? data.products : []);
+            } else {
+                console.error(`API returned ${res.status}`);
             }
-        } catch (err) { console.error(err); }
+        } catch (err) {
+            console.error("Network Fetch Error:", err);
+            // Fallback or empty state
+            setProducts([]);
+        }
         finally { setLoading(false); }
     }, []);
 
