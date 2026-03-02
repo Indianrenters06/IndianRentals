@@ -249,7 +249,7 @@ export default function AdminDashboard() {
         <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.5 }} className="flex items-center gap-3">
           <Button
             variant="bordered"
-            className="font-semibold border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:border-indigo-400 hover:text-indigo-600 dark:hover:border-indigo-500 dark:hover:text-indigo-400 transition-colors h-10 px-4"
+            className="rounded-xl font-semibold border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:border-indigo-400 hover:text-indigo-600 dark:hover:border-indigo-500 dark:hover:text-indigo-400 transition-colors h-10 px-4"
             startContent={<DownloadSimple className="w-4 h-4" />}
             onPress={() => window.location.href = '/dashboard/reports/revenue'}
           >
@@ -257,7 +257,7 @@ export default function AdminDashboard() {
           </Button>
           <Button
             color="primary"
-            className="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold shadow-lg shadow-indigo-500/25 h-10 px-5"
+            className="rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-semibold shadow-lg shadow-indigo-500/25 h-10 px-5 transition-all"
             onPress={() => window.location.href = '/dashboard/orders'}
           >
             + New Order

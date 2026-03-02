@@ -187,7 +187,7 @@ export default function ImageUploader({
                     <img
                         src={preview}
                         alt="Uploaded preview"
-                        className="w-full max-h-64 object-contain p-2"
+                        className="w-full max-h-36 object-contain p-2"
                     />
                     <button
                         onClick={(e) => { e.stopPropagation(); removeSingle(); }}

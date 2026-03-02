@@ -32,6 +32,7 @@ import {
     TreeStructure,
     Tag,
 } from "@phosphor-icons/react";
+import ImageUploader from "@/components/ImageUploader";
 
 const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
 
@@ -472,6 +473,8 @@ export default function CategoriesCMS() {
                 isOpen={newCatModal.isOpen}
                 onOpenChange={newCatModal.onOpenChange}
                 placement="top-center"
+                scrollBehavior="inside"
+                size="3xl"
                 classNames={{ base: "bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800" }}
             >
                 <ModalContent>
@@ -480,49 +483,46 @@ export default function CategoriesCMS() {
                             <ModalHeader className="flex items-center gap-2 text-slate-900 dark:text-white">
                                 <Folder className="text-indigo-500" size={20} /> Add Root Category
                             </ModalHeader>
-                            <ModalBody className="gap-4">
-                                <div>
-                                    <label className="text-sm text-slate-700 dark:text-slate-300 font-medium block mb-1.5">Category Name <span className="text-red-500">*</span></label>
-                                    <Input
-                                        autoFocus
-                                        isRequired
-                                        value={catForm.name}
-                                        onChange={(e) => setCatForm((p) => ({ ...p, name: e.target.value }))}
-                                        placeholder="e.g. Photography"
-                                        variant="bordered"
-                                    />
-                                </div>
-                                <div>
-                                    <label className="text-sm text-slate-700 dark:text-slate-300 font-medium block mb-1.5">Description</label>
-                                    <Textarea
-                                        value={catForm.description}
-                                        onChange={(e) => setCatForm((p) => ({ ...p, description: e.target.value }))}
-                                        placeholder="Short description of this category..."
-                                        variant="bordered"
-                                        disableAutosize
-                                        rows={3}
-                                        classNames={{ input: "resize-y" }}
-                                    />
-                                </div>
-                                <div>
-                                    <label className="text-sm text-slate-700 dark:text-slate-300 font-medium block mb-1.5">Cover Image URL</label>
-                                    <div className="relative">
-                                        <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"><Image size={15} /></span>
-                                        <input
-                                            type="url"
-                                            value={catForm.image}
-                                            onChange={(e) => setCatForm((p) => ({ ...p, image: e.target.value }))}
-                                            placeholder="https://res.cloudinary.com/..."
-                                            className="w-full h-10 pl-8 pr-3 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 transition-all"
+                            <ModalBody className="p-6">
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <div className="space-y-4">
+                                        <div>
+                                            <label className="text-sm text-slate-700 dark:text-slate-300 font-medium block mb-1.5">Category Name <span className="text-red-500">*</span></label>
+                                            <input
+                                                autoFocus
+                                                required
+                                                value={catForm.name}
+                                                onChange={(e) => setCatForm((p) => ({ ...p, name: e.target.value }))}
+                                                placeholder="e.g. Photography"
+                                                className="w-full h-10 px-3 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 transition-all shadow-sm"
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className="text-sm text-slate-700 dark:text-slate-300 font-medium block mb-1.5">Description</label>
+                                            <textarea
+                                                value={catForm.description}
+                                                onChange={(e) => setCatForm((p) => ({ ...p, description: e.target.value }))}
+                                                placeholder="Short description of this category..."
+                                                rows={5}
+                                                className="w-full p-3 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 transition-all shadow-sm resize-y"
+                                            />
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <label className="text-sm text-slate-700 dark:text-slate-300 font-medium block mb-1.5">Cover Image (Optional)</label>
+                                        <ImageUploader
+                                            key={`cat-${newCatModal.isOpen}`}
+                                            existingUrl={catForm.image}
+                                            onUpload={(url) => setCatForm((p) => ({ ...p, image: url }))}
+                                            label="Click or drag to upload category banner"
                                         />
                                     </div>
                                 </div>
                             </ModalBody>
-                            <ModalFooter>
-                                <Button color="danger" variant="flat" onPress={onClose}>Cancel</Button>
+                            <ModalFooter className="border-t border-slate-100 dark:border-slate-800/60 p-4">
+                                <Button variant="flat" onPress={onClose} className="rounded-xl font-semibold bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 transition-colors">Cancel</Button>
                                 <Button
-                                    color="primary"
-                                    className="bg-indigo-600"
+                                    className="rounded-xl font-semibold bg-indigo-600 hover:bg-indigo-700 text-white shadow-lg shadow-indigo-500/30 transition-all font-medium"
                                     isLoading={catSaving}
                                     onPress={() => handleCreateCategory(onClose)}
                                 >
@@ -539,6 +539,8 @@ export default function CategoriesCMS() {
                 isOpen={newSubModal.isOpen}
                 onOpenChange={newSubModal.onOpenChange}
                 placement="top-center"
+                scrollBehavior="inside"
+                size="3xl"
                 classNames={{ base: "bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800" }}
             >
                 <ModalContent>
@@ -556,49 +558,46 @@ export default function CategoriesCMS() {
                                     </p>
                                 )}
                             </ModalHeader>
-                            <ModalBody className="gap-4">
-                                <div>
-                                    <label className="text-sm text-slate-700 dark:text-slate-300 font-medium block mb-1.5">Subcategory Name <span className="text-red-500">*</span></label>
-                                    <Input
-                                        autoFocus
-                                        isRequired
-                                        value={subForm.name}
-                                        onChange={(e) => setSubForm((p) => ({ ...p, name: e.target.value }))}
-                                        placeholder="e.g. MacBook Air"
-                                        variant="bordered"
-                                    />
-                                </div>
-                                <div>
-                                    <label className="text-sm text-slate-700 dark:text-slate-300 font-medium block mb-1.5">Description</label>
-                                    <Textarea
-                                        value={subForm.description}
-                                        onChange={(e) => setSubForm((p) => ({ ...p, description: e.target.value }))}
-                                        placeholder="Short description..."
-                                        variant="bordered"
-                                        disableAutosize
-                                        rows={3}
-                                        classNames={{ input: "resize-y" }}
-                                    />
-                                </div>
-                                <div>
-                                    <label className="text-sm text-slate-700 dark:text-slate-300 font-medium block mb-1.5">Cover Image URL</label>
-                                    <div className="relative">
-                                        <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"><Image size={15} /></span>
-                                        <input
-                                            type="url"
-                                            value={subForm.image}
-                                            onChange={(e) => setSubForm((p) => ({ ...p, image: e.target.value }))}
-                                            placeholder="https://res.cloudinary.com/..."
-                                            className="w-full h-10 pl-8 pr-3 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 transition-all"
+                            <ModalBody className="p-6">
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <div className="space-y-4">
+                                        <div>
+                                            <label className="text-sm text-slate-700 dark:text-slate-300 font-medium block mb-1.5">Subcategory Name <span className="text-red-500">*</span></label>
+                                            <input
+                                                autoFocus
+                                                required
+                                                value={subForm.name}
+                                                onChange={(e) => setSubForm((p) => ({ ...p, name: e.target.value }))}
+                                                placeholder="e.g. MacBook Air"
+                                                className="w-full h-10 px-3 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 transition-all shadow-sm"
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className="text-sm text-slate-700 dark:text-slate-300 font-medium block mb-1.5">Description</label>
+                                            <textarea
+                                                value={subForm.description}
+                                                onChange={(e) => setSubForm((p) => ({ ...p, description: e.target.value }))}
+                                                placeholder="Short description..."
+                                                rows={5}
+                                                className="w-full p-3 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 transition-all shadow-sm resize-y"
+                                            />
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <label className="text-sm text-slate-700 dark:text-slate-300 font-medium block mb-1.5">Cover Image (Optional)</label>
+                                        <ImageUploader
+                                            key={`sub-${newSubModal.isOpen}`}
+                                            existingUrl={subForm.image}
+                                            onUpload={(url) => setSubForm((p) => ({ ...p, image: url }))}
+                                            label="Click or drag to upload subcategory banner"
                                         />
                                     </div>
                                 </div>
                             </ModalBody>
-                            <ModalFooter>
-                                <Button color="danger" variant="flat" onPress={onClose}>Cancel</Button>
+                            <ModalFooter className="border-t border-slate-100 dark:border-slate-800/60 p-4">
+                                <Button variant="flat" onPress={onClose} className="rounded-xl font-semibold bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 transition-colors">Cancel</Button>
                                 <Button
-                                    color="primary"
-                                    className="bg-purple-600"
+                                    className="rounded-xl font-semibold bg-indigo-600 hover:bg-indigo-700 text-white shadow-lg shadow-indigo-500/30 transition-all font-medium"
                                     isLoading={subSaving}
                                     onPress={() => handleCreateSubcategory(onClose)}
                                 >

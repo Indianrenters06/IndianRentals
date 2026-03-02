@@ -304,7 +304,7 @@ export default function CMSHomepage() {
                                         onUpload={url => set("whyChooseUsImage", url)}
                                     />
                                     {data.whyChooseUsImage && (
-                                        <div className="aspect-[4/3] rounded-2xl overflow-hidden shadow-md">
+                                        <div className="aspect-4/3 rounded-2xl overflow-hidden shadow-md">
                                             <img src={data.whyChooseUsImage} className="w-full h-full object-cover" alt="Why Choose Us Preview" />
                                         </div>
                                     )}

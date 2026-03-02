@@ -87,7 +87,7 @@ const couponRoutes = require('./routes/couponRoutes');
 app.use('/api/coupons', couponRoutes);
 
 const notificationRoutes = require('./routes/notificationRoutes');
-app.use('/api/notifications', notificationRoutes);
+app.use('/api/alerts', notificationRoutes);
 
 app.get('/', (req, res) => {
   res.send('API is running...');

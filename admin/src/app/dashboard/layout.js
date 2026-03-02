@@ -16,8 +16,8 @@ import {
 } from "@heroui/react";
 import {
   House, Users, Package, ShoppingCart, FileText,
-  CreditCard, Calendar, Gear, CaretRight, CaretDown,
-  MagnifyingGlass, Bell, Sun, Moon, List, X, SignOut, ShieldCheck,
+  CreditCard, Calendar, Gear, CaretRight, CaretDown, CaretLeft,
+  MagnifyingGlass, Bell, Sun, Moon, List, SignOut, ShieldCheck,
   Layout, Cube, Tag, ChartBar, ChatCenteredText
 } from '@phosphor-icons/react';
 
@@ -40,7 +40,7 @@ export default function DashboardLayout({ children }) {
       const token = localStorage.getItem("adminToken");
       if (!token) return;
 
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000"}/api/notifications`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000"}/api/alerts`, {
         headers: { "Authorization": `Bearer ${token}` }
       });
       if (res.ok) {
@@ -48,7 +48,7 @@ export default function DashboardLayout({ children }) {
         setNotifications(data);
       }
 
-      const countRes = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000"}/api/notifications/unread-count`, {
+      const countRes = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000"}/api/alerts/unread-count`, {
         headers: { "Authorization": `Bearer ${token}` }
       });
       if (countRes.ok) {
@@ -56,33 +56,34 @@ export default function DashboardLayout({ children }) {
         setUnreadCount(countData.count);
       }
     } catch (error) {
-      console.error("Failed to load notifications", error);
+      // Intentionally omitting console.error to prevent Turbopack dev-overlay popups for generic disconnects
+      console.log("Failed to load notifications", error.message);
     }
   };
 
   const markAllAsRead = async () => {
     try {
       const token = localStorage.getItem("adminToken");
-      await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000"}/api/notifications/read-all`, {
+      await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000"}/api/alerts/read-all`, {
         method: 'PUT',
         headers: { "Authorization": `Bearer ${token}` }
       });
       fetchNotifications();
     } catch (error) {
-      console.error("Failed to mark all as read", error);
+      console.log("Failed to mark all as read", error.message);
     }
   };
 
   const markAsRead = async (id) => {
     try {
       const token = localStorage.getItem("adminToken");
-      await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000"}/api/notifications/${id}/read`, {
+      await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000"}/api/alerts/${id}/read`, {
         method: 'PUT',
         headers: { "Authorization": `Bearer ${token}` }
       });
       fetchNotifications();
     } catch (error) {
-      console.error("Failed to mark as read", error);
+      console.log("Failed to mark as read", error.message);
     }
   };
 
@@ -352,7 +353,7 @@ export default function DashboardLayout({ children }) {
               onClick={() => setIsSidebarOpen(!isSidebarOpen)}
               className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800/80 rounded-xl transition-colors text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200"
             >
-              {isSidebarOpen ? <X className="w-5 h-5" /> : <List className="w-5 h-5" />}
+              {isSidebarOpen ? <CaretRight className="w-5 h-5" /> : <List className="w-5 h-5" />}
             </button>
 
             <div className="hidden md:flex relative group">
