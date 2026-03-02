@@ -481,26 +481,29 @@ export default function CategoriesCMS() {
                                 <Folder className="text-indigo-500" size={20} /> Add Root Category
                             </ModalHeader>
                             <ModalBody className="gap-4">
-                                <Input
-                                    autoFocus
-                                    isRequired
-                                    label="Category Name"
-                                    value={catForm.name}
-                                    onChange={(e) => setCatForm((p) => ({ ...p, name: e.target.value }))}
-                                    placeholder="e.g. Photography"
-                                    variant="bordered"
-                                    labelPlacement="outside"
-                                    classNames={{ label: "text-slate-700 dark:text-slate-300 font-medium" }}
-                                />
-                                <Textarea
-                                    label="Description"
-                                    value={catForm.description}
-                                    onChange={(e) => setCatForm((p) => ({ ...p, description: e.target.value }))}
-                                    placeholder="Short description of this category..."
-                                    variant="bordered"
-                                    labelPlacement="outside"
-                                    classNames={{ label: "text-slate-700 dark:text-slate-300 font-medium" }}
-                                />
+                                <div>
+                                    <label className="text-sm text-slate-700 dark:text-slate-300 font-medium block mb-1.5">Category Name <span className="text-red-500">*</span></label>
+                                    <Input
+                                        autoFocus
+                                        isRequired
+                                        value={catForm.name}
+                                        onChange={(e) => setCatForm((p) => ({ ...p, name: e.target.value }))}
+                                        placeholder="e.g. Photography"
+                                        variant="bordered"
+                                    />
+                                </div>
+                                <div>
+                                    <label className="text-sm text-slate-700 dark:text-slate-300 font-medium block mb-1.5">Description</label>
+                                    <Textarea
+                                        value={catForm.description}
+                                        onChange={(e) => setCatForm((p) => ({ ...p, description: e.target.value }))}
+                                        placeholder="Short description of this category..."
+                                        variant="bordered"
+                                        disableAutosize
+                                        rows={3}
+                                        classNames={{ input: "resize-y" }}
+                                    />
+                                </div>
                                 <div>
                                     <label className="text-sm text-slate-700 dark:text-slate-300 font-medium block mb-1.5">Cover Image URL</label>
                                     <div className="relative">
@@ -554,26 +557,29 @@ export default function CategoriesCMS() {
                                 )}
                             </ModalHeader>
                             <ModalBody className="gap-4">
-                                <Input
-                                    autoFocus
-                                    isRequired
-                                    label="Subcategory Name"
-                                    value={subForm.name}
-                                    onChange={(e) => setSubForm((p) => ({ ...p, name: e.target.value }))}
-                                    placeholder="e.g. MacBook Air"
-                                    variant="bordered"
-                                    labelPlacement="outside"
-                                    classNames={{ label: "text-slate-700 dark:text-slate-300 font-medium" }}
-                                />
-                                <Textarea
-                                    label="Description"
-                                    value={subForm.description}
-                                    onChange={(e) => setSubForm((p) => ({ ...p, description: e.target.value }))}
-                                    placeholder="Short description..."
-                                    variant="bordered"
-                                    labelPlacement="outside"
-                                    classNames={{ label: "text-slate-700 dark:text-slate-300 font-medium" }}
-                                />
+                                <div>
+                                    <label className="text-sm text-slate-700 dark:text-slate-300 font-medium block mb-1.5">Subcategory Name <span className="text-red-500">*</span></label>
+                                    <Input
+                                        autoFocus
+                                        isRequired
+                                        value={subForm.name}
+                                        onChange={(e) => setSubForm((p) => ({ ...p, name: e.target.value }))}
+                                        placeholder="e.g. MacBook Air"
+                                        variant="bordered"
+                                    />
+                                </div>
+                                <div>
+                                    <label className="text-sm text-slate-700 dark:text-slate-300 font-medium block mb-1.5">Description</label>
+                                    <Textarea
+                                        value={subForm.description}
+                                        onChange={(e) => setSubForm((p) => ({ ...p, description: e.target.value }))}
+                                        placeholder="Short description..."
+                                        variant="bordered"
+                                        disableAutosize
+                                        rows={3}
+                                        classNames={{ input: "resize-y" }}
+                                    />
+                                </div>
                                 <div>
                                     <label className="text-sm text-slate-700 dark:text-slate-300 font-medium block mb-1.5">Cover Image URL</label>
                                     <div className="relative">

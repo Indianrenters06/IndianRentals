@@ -75,7 +75,8 @@ export default function ImageUploader({
             } else {
                 setPreviews(prev => {
                     const merged = [...prev, ...urls];
-                    onUploadMany?.(merged);
+                    // We call onUploadMany outside of the state updater to avoid React render phase errors
+                    setTimeout(() => onUploadMany?.(merged), 0);
                     return merged;
                 });
             }
@@ -105,7 +106,7 @@ export default function ImageUploader({
     const removeMulti = (idx) => {
         setPreviews(prev => {
             const next = prev.filter((_, i) => i !== idx);
-            onUploadMany?.(next);
+            setTimeout(() => onUploadMany?.(next), 0);
             return next;
         });
     };

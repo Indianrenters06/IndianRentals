@@ -181,7 +181,9 @@ export default function CMSHomepage() {
                                             onValueChange={(v) => set("heroSubtitle", v)}
                                             placeholder="Premium rentals at your fingertips. Why buy when you can rent?"
                                             variant="bordered"
-                                            minRows={3}
+                                            disableAutosize
+                                            rows={3}
+                                            classNames={{ input: "resize-y" }}
                                         />
                                     </div>
                                     <div className="space-y-2">
@@ -259,7 +261,9 @@ export default function CMSHomepage() {
                                             onValueChange={(v) => set("whyChooseUsSubtitle", v)}
                                             placeholder="Tell your story or value proposition…"
                                             variant="bordered"
-                                            minRows={4}
+                                            disableAutosize
+                                            rows={5}
+                                            classNames={{ input: "resize-y min-h-[120px]" }}
                                         />
                                     </div>
 
@@ -360,7 +364,9 @@ export default function CMSHomepage() {
                                     onValueChange={(v) => set("metaDescription", v)}
                                     placeholder="Find and rent premium gadgets, cameras, furniture & more across India."
                                     variant="bordered"
-                                    minRows={3}
+                                    disableAutosize
+                                    rows={3}
+                                    classNames={{ input: "resize-y" }}
                                 />
                                 <p className="text-xs text-slate-400">{data.metaDescription.length} / 160 characters</p>
                             </div>

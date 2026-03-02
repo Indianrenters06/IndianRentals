@@ -19,6 +19,9 @@ const PAGES = [
     { key: "terms", label: "Terms & Conditions", slug: "/terms" },
     { key: "privacy", label: "Privacy Policy", slug: "/privacy" },
     { key: "contact", label: "Contact Us", slug: "/contact" },
+    { key: "shipping", label: "Shipping & Delivery", slug: "/shipping" },
+    { key: "refund", label: "Cancellation & Refund Policy", slug: "/refund-policy" },
+    { key: "faq", label: "FAQ / Help Center", slug: "/faq" },
 ];
 
 const DEFAULTS = {
@@ -123,26 +126,28 @@ function PageEditor({ page, onBack }) {
                     <div>
                         <h4 className="text-sm font-bold text-slate-700 dark:text-slate-200 uppercase tracking-wider mb-4">Page Banner</h4>
                         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                            <div className="space-y-3">
-                                <Input
-                                    label="Banner Title"
-                                    value={data.bannerTitle}
-                                    onValueChange={v => set("bannerTitle", v)}
-                                    placeholder={`${page.label}`}
-                                    variant="bordered"
-                                    labelPlacement="outside"
-                                    classNames={{ label: "text-slate-600 dark:text-slate-400 font-medium text-xs" }}
-                                />
-                                <Input
-                                    label="Banner Image URL"
-                                    value={data.bannerImage}
-                                    onValueChange={v => set("bannerImage", v)}
-                                    placeholder="https://res.cloudinary.com/..."
-                                    variant="bordered"
-                                    labelPlacement="outside"
-                                    startContent={<PhosphorImage size={14} className="text-slate-400" />}
-                                    classNames={{ label: "text-slate-600 dark:text-slate-400 font-medium text-xs" }}
-                                />
+                            <div className="space-y-4">
+                                <div className="space-y-2">
+                                    <label className="text-xs font-bold text-slate-600 dark:text-slate-300 uppercase tracking-wider">Banner Title</label>
+                                    <Input
+                                        value={data.bannerTitle}
+                                        onValueChange={v => set("bannerTitle", v)}
+                                        placeholder={`${page.label}`}
+                                        variant="bordered"
+                                        classNames={{ inputWrapper: "h-11" }}
+                                    />
+                                </div>
+                                <div className="space-y-2">
+                                    <label className="text-xs font-bold text-slate-600 dark:text-slate-300 uppercase tracking-wider">Banner Image URL</label>
+                                    <Input
+                                        value={data.bannerImage}
+                                        onValueChange={v => set("bannerImage", v)}
+                                        placeholder="https://res.cloudinary.com/..."
+                                        variant="bordered"
+                                        startContent={<PhosphorImage size={14} className="text-slate-400" />}
+                                        classNames={{ inputWrapper: "h-11" }}
+                                    />
+                                </div>
                             </div>
                             {/* Banner preview */}
                             <div
@@ -171,8 +176,9 @@ function PageEditor({ page, onBack }) {
                             onValueChange={v => set("pageContent", v)}
                             placeholder="Enter full page content here…"
                             variant="bordered"
-                            minRows={12}
-                            classNames={{ input: "font-mono text-sm" }}
+                            disableAutosize
+                            rows={12}
+                            classNames={{ input: "font-mono text-sm resize-y min-h-[250px]" }}
                         />
                         <p className="text-xs text-slate-400 mt-2">{data.pageContent.length.toLocaleString()} characters</p>
                     </div>
@@ -184,27 +190,26 @@ function PageEditor({ page, onBack }) {
                         <h4 className="text-sm font-bold text-slate-700 dark:text-slate-200 uppercase tracking-wider mb-4">SEO</h4>
                         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                             <div className="space-y-2">
+                                <label className="text-xs font-bold text-slate-600 dark:text-slate-300 uppercase tracking-wider">Meta Title</label>
                                 <Input
-                                    label="Meta Title"
                                     value={data.metaTitle}
                                     onValueChange={v => set("metaTitle", v)}
                                     placeholder={`${page.label} – IndianRentals`}
                                     variant="bordered"
-                                    labelPlacement="outside"
-                                    classNames={{ label: "text-slate-600 dark:text-slate-400 font-medium text-xs", inputWrapper: "h-11" }}
+                                    classNames={{ inputWrapper: "h-11" }}
                                 />
                                 <p className="text-xs text-slate-400">{data.metaTitle.length}/60</p>
                             </div>
                             <div className="space-y-2">
+                                <label className="text-xs font-bold text-slate-600 dark:text-slate-300 uppercase tracking-wider">Meta Description</label>
                                 <Textarea
-                                    label="Meta Description"
                                     value={data.metaDescription}
                                     onValueChange={v => set("metaDescription", v)}
                                     placeholder="A short description for search engines."
                                     variant="bordered"
-                                    labelPlacement="outside"
-                                    minRows={2}
-                                    classNames={{ label: "text-slate-600 dark:text-slate-400 font-medium text-xs" }}
+                                    disableAutosize
+                                    rows={3}
+                                    classNames={{ input: "resize-y min-h-[80px]" }}
                                 />
                                 <p className="text-xs text-slate-400">{data.metaDescription.length}/160</p>
                             </div>

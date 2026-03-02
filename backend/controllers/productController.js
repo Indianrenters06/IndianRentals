@@ -8,6 +8,7 @@ const { PAGE_SIZE } = require('../config/constants');
 // @access  Public
 const getProducts = asyncHandler(async (req, res) => {
     const page = Number(req.query.pageNumber) || 1;
+    const limit = Number(req.query.limit) || PAGE_SIZE;
 
     // Base query object
     const query = {};
@@ -62,10 +63,11 @@ const getProducts = asyncHandler(async (req, res) => {
     const count = await Product.countDocuments(query);
     const products = await Product.find(query)
         .populate('subcategory', 'name slug')
-        .limit(PAGE_SIZE)
-        .skip(PAGE_SIZE * (page - 1));
+        .sort({ createdAt: -1 })
+        .limit(limit)
+        .skip(limit * (page - 1));
 
-    res.json({ products, page, pages: Math.ceil(count / PAGE_SIZE) });
+    res.json({ products, page, pages: Math.ceil(count / limit) });
 });
 
 // @desc    Fetch single product

@@ -28,7 +28,8 @@ import {
     DropdownMenu,
     DropdownItem,
     Pagination,
-    Spinner
+    Spinner,
+    Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, useDisclosure, Divider
 } from "@heroui/react";
 
 export default function UsersManagement() {
@@ -38,6 +39,15 @@ export default function UsersManagement() {
     const [filterRole, setFilterRole] = useState('all');
     const [page, setPage] = useState(1);
     const rowsPerPage = 10;
+    const { isOpen, onOpen, onOpenChange } = useDisclosure();
+    const [selectedUser, setSelectedUser] = useState(null);
+    const [modalType, setModalType] = useState('profile');
+
+    const handleView = (user, type) => {
+        setSelectedUser(user);
+        setModalType(type);
+        onOpen();
+    };
 
     useEffect(() => {
         fetchUsers();
@@ -132,8 +142,8 @@ export default function UsersManagement() {
             case "role":
                 return (
                     <div className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 font-medium text-xs ${user.isAdmin
-                            ? "bg-indigo-50 dark:bg-indigo-500/10 text-indigo-700 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-500/20"
-                            : "bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700"
+                        ? "bg-indigo-50 dark:bg-indigo-500/10 text-indigo-700 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-500/20"
+                        : "bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700"
                         }`}>
                         {user.isAdmin ? <ShieldCheck className="w-3 h-3" /> : <User className="w-3 h-3" />}
                         {user.isAdmin ? 'Admin' : 'Customer'}
@@ -168,21 +178,21 @@ export default function UsersManagement() {
                 );
             case "actions":
                 return (
-                    <div className="relative flex justify-end items-center gap-2 pr-4">
+                    <div className="flex justify-end items-center gap-2 pr-4">
                         <Tooltip content="Edit user" color="primary" delay={0}>
                             <Button isIconOnly size="sm" variant="light" color="primary" className="text-slate-400 hover:text-indigo-400">
                                 <PencilSimple className="w-4 h-4" />
                             </Button>
                         </Tooltip>
-                        <Dropdown>
+                        <Dropdown classNames={{ content: "bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 z-50 shadow-xl" }}>
                             <DropdownTrigger>
                                 <Button isIconOnly size="sm" variant="light" className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-300">
                                     <DotsThreeVertical className="w-4 h-4" />
                                 </Button>
                             </DropdownTrigger>
                             <DropdownMenu aria-label="User Actions" variant="flat">
-                                <DropdownItem key="view" startContent={<User />}>View Profile</DropdownItem>
-                                <DropdownItem key="orders" startContent={<MapPin />}>View Orders</DropdownItem>
+                                <DropdownItem key="view" startContent={<User />} onPress={() => handleView(user, 'profile')}>View Profile</DropdownItem>
+                                <DropdownItem key="orders" startContent={<MapPin />} onPress={() => handleView(user, 'orders')}>View Orders</DropdownItem>
                                 <DropdownItem
                                     key="delete"
                                     className="text-danger"
@@ -252,7 +262,8 @@ export default function UsersManagement() {
                                 startContent={<Funnel className="text-slate-400" />}
                                 aria-label="Filter Roles"
                                 classNames={{
-                                    trigger: "border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-950/50 text-slate-900 dark:text-slate-200 h-11 border-1"
+                                    trigger: "border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-950/50 text-slate-900 dark:text-slate-200 h-11 border-1",
+                                    popoverContent: "z-[100] bg-white dark:bg-slate-900"
                                 }}
                             >
                                 <SelectItem key="all" value="all">All Roles</SelectItem>
@@ -321,6 +332,95 @@ export default function UsersManagement() {
                     </Table>
                 </CardBody>
             </Card>
+
+            <Modal isOpen={isOpen} onOpenChange={onOpenChange} size="2xl" scrollBehavior="inside" classNames={{ backdrop: "bg-slate-900/50 backdrop-blur-sm" }}>
+                <ModalContent className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-2xl">
+                    {(onClose) => (
+                        <>
+                            <ModalHeader className="flex flex-col gap-1 border-b border-slate-100 dark:border-slate-800/60 pb-4 pt-5 px-6">
+                                <h2 className="text-xl font-bold tracking-tight text-slate-900 dark:text-slate-100">
+                                    {modalType === 'profile' ? 'User Profile' : 'User Orders'}
+                                </h2>
+                            </ModalHeader>
+                            <ModalBody className="py-6 px-6">
+                                {selectedUser && modalType === 'profile' && (
+                                    <div className="space-y-8">
+                                        <div className="flex items-start md:items-center gap-5 border-b border-slate-100 dark:border-slate-800/60 pb-6">
+                                            <Avatar
+                                                name={selectedUser.name?.charAt(0).toUpperCase() || 'U'}
+                                                className="bg-linear-to-br from-indigo-500 to-purple-500 text-white w-20 h-20 text-2xl shadow-lg shrink-0"
+                                            />
+                                            <div className="flex-1 min-w-0">
+                                                <h3 className="text-2xl font-bold text-slate-900 dark:text-slate-100 tracking-tight truncate flex items-center gap-2">
+                                                    {selectedUser.name || 'Unnamed User'}
+                                                    {selectedUser.isAdmin && (
+                                                        <Tooltip content="Administrator" size="sm" color="primary">
+                                                            <ShieldCheck className="text-indigo-500" weight="fill" size={20} />
+                                                        </Tooltip>
+                                                    )}
+                                                </h3>
+                                                <p className="text-slate-500 font-medium truncate">{selectedUser.email}</p>
+                                                <div className="mt-2 text-xs font-mono px-2 py-1 bg-slate-100 dark:bg-slate-800 rounded-lg inline-flex items-center text-slate-500">
+                                                    ID: {selectedUser._id}
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div>
+                                            <h4 className="text-sm font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-4 flex items-center gap-2">
+                                                <User size={16} /> Personal Information
+                                            </h4>
+                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-y-6 gap-x-8">
+                                                <div>
+                                                    <span className="text-xs font-bold text-slate-400 tracking-wider mb-1.5 flex items-center gap-1.5"><Phone size={14} /> Phone Number</span>
+                                                    <span className="text-slate-800 dark:text-slate-200 font-medium">{selectedUser.phone || 'Not provided'}</span>
+                                                </div>
+                                                <div>
+                                                    <span className="text-xs font-bold text-slate-400 tracking-wider mb-1.5 flex items-center gap-1.5"><MapPin size={14} /> Location</span>
+                                                    <span className="text-slate-800 dark:text-slate-200 font-medium">
+                                                        {selectedUser.city ? `${selectedUser.city}, ${selectedUser.state}` : 'Not provided'}
+                                                    </span>
+                                                </div>
+                                                <div>
+                                                    <span className="text-xs font-bold text-slate-400 tracking-wider mb-1.5 flex items-center gap-1.5"><ShieldCheck size={14} /> Account Role</span>
+                                                    <div className="inline-block mt-0.5">
+                                                        <Chip size="sm" color={selectedUser.isAdmin ? "primary" : "default"} variant="flat" className="font-semibold">
+                                                            {selectedUser.isAdmin ? 'Administrator' : 'Customer'}
+                                                        </Chip>
+                                                    </div>
+                                                </div>
+                                                <div>
+                                                    <span className="text-xs font-bold text-slate-400 tracking-wider mb-1.5 flex items-center gap-1.5"><UserPlus size={14} /> Member Since</span>
+                                                    <span className="text-slate-800 dark:text-slate-200 font-medium">
+                                                        {new Date(selectedUser.createdAt).toLocaleDateString('en-US', { day: 'numeric', month: 'long', year: 'numeric' })}
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                )}
+
+                                {selectedUser && modalType === 'orders' && (
+                                    <div className="flex flex-col items-center justify-center text-center py-12 px-4 border border-dashed border-slate-200 dark:border-slate-800 rounded-2xl bg-slate-50 dark:bg-slate-900/50">
+                                        <div className="w-16 h-16 bg-white dark:bg-slate-800 shadow-sm rounded-full flex items-center justify-center mb-4">
+                                            <MapPin className="w-8 h-8 text-indigo-400" weight="duotone" />
+                                        </div>
+                                        <h3 className="text-lg font-bold text-slate-900 dark:text-slate-100 mb-2">Order History for {selectedUser.name}</h3>
+                                        <p className="text-slate-500 text-sm max-w-sm">
+                                            We are currently developing the specific orders timeline view for each user. It will be available here soon.
+                                        </p>
+                                    </div>
+                                )}
+                            </ModalBody>
+                            <ModalFooter className="border-t border-slate-100 dark:border-slate-800/60 pb-5 px-6">
+                                <Button color="primary" variant="flat" onPress={onClose} className="font-semibold">
+                                    Close Window
+                                </Button>
+                            </ModalFooter>
+                        </>
+                    )}
+                </ModalContent>
+            </Modal>
         </div>
     );
 }

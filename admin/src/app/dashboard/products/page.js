@@ -6,7 +6,7 @@ import { motion } from "framer-motion";
 import {
     Card, CardBody, Button, Chip, Avatar,
     Dropdown, DropdownTrigger, DropdownMenu, DropdownItem,
-    Spinner, Switch,
+    Spinner,
 } from "@heroui/react";
 import {
     Plus, MagnifyingGlass, DotsThreeVertical,
@@ -15,7 +15,14 @@ import {
 } from "@phosphor-icons/react";
 
 const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+const FRONTEND = process.env.NEXT_PUBLIC_FRONTEND_URL || "http://localhost:3000";
 const getToken = () => localStorage.getItem("adminToken");
+
+const getImageUrl = (path) => {
+    if (!path) return undefined;
+    if (path.startsWith('http') || path.startsWith('data:')) return path;
+    return `${FRONTEND}${path.startsWith('/') ? '' : '/'}${path}`;
+};
 
 export default function AllProducts() {
     const router = useRouter();
@@ -97,6 +104,8 @@ export default function AllProducts() {
         } catch (err) { alert(err.message); }
         finally { setToggling(null); }
     };
+
+    const gridClass = "grid grid-cols-[minmax(250px,2fr)_minmax(120px,1fr)_minmax(130px,1fr)_minmax(100px,1fr)_80px_100px] gap-4 items-center";
 
     return (
         <div className="w-full space-y-6 pb-12">
@@ -185,12 +194,12 @@ export default function AllProducts() {
                     </div>
 
                     {/* Column headers */}
-                    <div className="grid grid-cols-[2fr_1fr_1fr_1fr_auto_auto] gap-4 items-center px-5 py-3 bg-slate-50 dark:bg-slate-950/80 border-b border-slate-200 dark:border-slate-800 text-[11px] font-bold uppercase tracking-wider text-slate-400">
+                    <div className={`${gridClass} px-6 py-3 bg-slate-50 dark:bg-slate-950/80 border-b border-slate-200 dark:border-slate-800 text-[11px] font-bold uppercase tracking-wider text-slate-400`}>
                         <span>Product</span>
                         <span>Category</span>
                         <span>Price / Deposit</span>
                         <span>Stock</span>
-                        <span>Active</span>
+                        <span className="text-center">Status</span>
                         <span className="text-center">Actions</span>
                     </div>
 
@@ -219,17 +228,21 @@ export default function AllProducts() {
                                     initial={{ opacity: 0, y: 6 }}
                                     animate={{ opacity: 1, y: 0 }}
                                     transition={{ delay: i * 0.025 }}
-                                    className="grid grid-cols-[2fr_1fr_1fr_1fr_auto_auto] gap-4 items-center px-5 py-3.5 hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors group"
+                                    className={`${gridClass} px-6 py-3.5 hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors group`}
                                 >
                                     {/* Product */}
-                                    <div className="flex items-center gap-3 min-w-0">
-                                        <Avatar
-                                            src={product.images?.[0] || undefined}
-                                            name={product.name}
-                                            size="md"
-                                            radius="md"
-                                            className="ring-1 ring-slate-200 dark:ring-slate-700 bg-white dark:bg-slate-800 shrink-0"
-                                        />
+                                    <div className="flex items-center gap-3 min-w-0 pr-4">
+                                        <div className="w-12 h-12 rounded-md ring-1 ring-slate-200 dark:ring-slate-700 bg-white dark:bg-slate-800 shrink-0 overflow-hidden flex items-center justify-center p-1">
+                                            {getImageUrl(product.images?.[0]) ? (
+                                                <img
+                                                    src={getImageUrl(product.images?.[0])}
+                                                    alt={product.name}
+                                                    className="w-full h-full object-contain"
+                                                />
+                                            ) : (
+                                                <Package className="text-slate-300 w-6 h-6" />
+                                            )}
+                                        </div>
                                         <div className="min-w-0">
                                             <p className="text-sm font-semibold text-slate-900 dark:text-slate-200 group-hover:text-indigo-500 transition-colors truncate">
                                                 {product.name}
@@ -261,13 +274,16 @@ export default function AllProducts() {
                                     </div>
 
                                     {/* Active toggle */}
-                                    <Switch
-                                        size="sm"
-                                        isSelected={product.isActive}
-                                        onValueChange={() => handleToggleActive(product)}
-                                        isDisabled={toggling === product._id}
-                                        color="success"
-                                    />
+                                    <div className="flex justify-center items-center">
+                                        <button
+                                            type="button"
+                                            onClick={() => handleToggleActive(product)}
+                                            disabled={toggling === product._id}
+                                            className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer items-center rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed ${product.isActive ? 'bg-indigo-500' : 'bg-slate-200 dark:bg-slate-700'}`}
+                                        >
+                                            <span className={`pointer-events-none inline-block h-4 w-4 transform rounded-full bg-white shadow-sm ring-0 transition duration-200 ease-in-out ${product.isActive ? 'translate-x-5' : 'translate-x-1'}`} />
+                                        </button>
+                                    </div>
 
                                     {/* Actions */}
                                     <div className="flex justify-center items-center gap-1">

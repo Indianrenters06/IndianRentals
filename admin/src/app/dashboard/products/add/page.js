@@ -9,6 +9,7 @@ import ImageUploader from "@/components/ImageUploader";
 
 const inputCls = "w-full h-12 px-3 rounded-xl bg-white dark:bg-slate-950/60 border border-slate-200 dark:border-slate-800 text-sm text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 transition-all shadow-sm";
 const prefixInputCls = "w-full h-12 pl-9 pr-3 rounded-xl bg-white dark:bg-slate-950/60 border border-slate-200 dark:border-slate-800 text-sm text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 transition-all shadow-sm";
+const textareaCls = "w-full min-h-[120px] p-3 rounded-xl bg-white dark:bg-slate-950/60 border border-slate-200 dark:border-slate-800 text-sm text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 transition-all shadow-sm resize-y";
 const selectCls = "w-full h-12 px-3 rounded-xl bg-white dark:bg-slate-950/60 border border-slate-200 dark:border-slate-800 text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/30 transition-all shadow-sm appearance-none cursor-pointer";
 const labelCls = "text-sm font-bold text-slate-700 dark:text-slate-200 block mb-1.5";
 
@@ -163,17 +164,13 @@ export default function AddProduct() {
 
                             <div>
                                 <label className={labelCls}>Product Description <span className="text-rose-500">*</span></label>
-                                <Textarea
-                                    isRequired
+                                <textarea
+                                    required
                                     name="description"
                                     value={formData.description}
-                                    onValueChange={v => set("description", v)}
+                                    onChange={e => set("description", e.target.value)}
                                     placeholder="Describe features, colors, condition etc."
-                                    variant="bordered"
-                                    minRows={4}
-                                    classNames={{
-                                        inputWrapper: "border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950/60 shadow-sm focus-within:ring-2 focus-within:ring-indigo-500/20"
-                                    }}
+                                    className={textareaCls}
                                 />
                             </div>
 
