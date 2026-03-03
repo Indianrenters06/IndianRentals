@@ -6,16 +6,15 @@ import BestRentedProducts from "@/components/BestRentedProducts";
 import FeatureSection from "@/components/FeatureSection";
 import RentalProcess from "@/components/RentalProcess";
 import Testimonials from "@/components/Testimonials";
-import Footer from "@/components/Footer";
 
 export default function Home() {
   return (
     <main className="min-h-screen bg-gray-50 w-full max-w-full overflow-x-hidden">
       <Hero />
       <RentByCategory />
-      <BestRentedProducts title="Best Rented Products" />
+      <BestRentedProducts type="bestRented" defaultTitle="Best Rented Products" />
       <FeatureSection />
-      <BestRentedProducts title="New Launches This Week" />
+      <BestRentedProducts type="newLaunches" defaultTitle="New Launches This Week" />
       <RentalProcess />
       <WhyChooseUs />
       <Testimonials />

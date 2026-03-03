@@ -16,7 +16,23 @@ const PORT = process.env.PORT || 5000;
 // Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(cors());
+// CORS — allow local dev + deployed frontends
+const allowedOrigins = [
+  'http://localhost:3000',
+  'http://localhost:3001',
+  process.env.FRONTEND_URL,  // e.g. https://indian-rentals.vercel.app
+  process.env.ADMIN_URL,     // e.g. https://indian-rentals-admin.vercel.app
+].filter(Boolean); // remove undefined entries
+
+app.use(cors({
+  origin: (origin, callback) => {
+    // Allow requests with no origin (mobile apps, curl, Postman)
+    if (!origin) return callback(null, true);
+    if (allowedOrigins.includes(origin)) return callback(null, true);
+    callback(new Error(`CORS: Origin ${origin} not allowed`));
+  },
+  credentials: true,
+}));
 app.use(cookieParser());
 app.use(morgan('combined'));
 

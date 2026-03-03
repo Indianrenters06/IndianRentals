@@ -51,12 +51,34 @@ const updatePage = asyncHandler(async (req, res) => {
     }
 
     const fields = [
-        'heroEnabled', 'heroTitle', 'heroSubtitle', 'heroImage', 'overlayColor',
+        // Hero
+        'heroEnabled', 'heroSlides',
+        // Legacy Hero (fallback)
+        'heroTitle', 'heroSubtitle', 'heroImage', 'overlayColor', 'heroBgColor',
+
+        // Best Rented
+        'bestRentedEnabled', 'bestRentedTitle', 'bestRentedProductIds',
+
+        // New Launch
+        'newLaunchEnabled', 'newLaunchTitle', 'newLaunchProductIds',
+
+        // Rental Process / KYC
+        'rentalProcessEnabled', 'rentalProcessTitle', 'rentalProcessSubtitle', 'rentalProcessSteps',
+
+        // Testimonials
+        'testimonialsEnabled', 'testimonialSectionTitle', 'testimonialSectionSubtitle', 'testimonialGoogleReviewCount', 'testimonialGoogleRating',
+
+        // Why Choose Us
         'whyChooseUsTitle', 'whyChooseUsSubtitle', 'whyChooseUsImage',
+
+        // Stats
         'statsDevices', 'statsCustomers', 'statsCities',
+
+        // Generic Info
         'pageContent', 'bannerImage', 'bannerTitle',
-        'metaTitle', 'metaDescription',
-        'publishStatus', 'scheduledPublishTime',
+
+        // SEO
+        'metaTitle', 'metaDescription', 'publishStatus', 'scheduledPublishTime',
     ];
 
     fields.forEach((field) => {

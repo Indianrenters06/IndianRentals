@@ -7,19 +7,22 @@ import { useState, useEffect } from "react";
 
 const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
 
-// Static fallback slide (shown until CMS loads or if CMS is empty)
 const FALLBACK_SLIDES = [
     {
         title: "The Tech That Powers Your Ambition. On Demand.",
         subtitle: "Get the latest MacBooks, Workstations, Cameras, and more. Delivered to your door with flexible monthly plans. Upgrade your toolkit, not your expenses.",
         image: "https://res.cloudinary.com/dgkckcdk8/image/upload/v1769946716/indian-rentals/fj8ptqbhppbstdd0hs4i.png",
-        bg: "#00A8FF",
+        bgColor: "#00A8FF",
+        ctaText: "Rent Now",
+        ctaLink: "/store",
     },
     {
-        title: "The Tech That Powers Your Ambition. On Demand.",
-        subtitle: "Get the latest MacBooks, Workstations, Cameras and more. Delivered to your door with flexible monthly plans. Upgrade your toolkit, not your experience.",
+        title: "Work Seamlessly From Anywhere.",
+        subtitle: "Rent enterprise-grade laptops and accessories without upfront capital. Zero maintenance cost.",
         image: "https://res.cloudinary.com/dgkckcdk8/image/upload/v1769946716/indian-rentals/fj8ptqbhppbstdd0hs4i.png",
-        bg: "#0077CC",
+        bgColor: "#0077CC",
+        ctaText: "Explore Laptops",
+        ctaLink: "/store",
     },
 ];
 
@@ -29,29 +32,35 @@ const Hero = () => {
     const [heroVisible, setHeroVisible] = useState(true);
 
     useEffect(() => {
-        fetch(`${API}/api/cms/homepage`)
-            .then(r => r.ok ? r.json() : null)
-            .then(cms => {
-                if (!cms) return;
+        const loadCMS = async () => {
+            try {
+                const r = await fetch(`${API}/api/cms/homepage`);
+                if (!r.ok) return;
+                const cms = await r.json();
 
-                // If admin hid the hero, skip it
                 if (cms.heroEnabled === false) {
                     setHeroVisible(false);
                     return;
                 }
 
-                // Merge CMS data into slide[0]; keep slide[1] as static second slide
-                const merged = [...FALLBACK_SLIDES];
-                merged[0] = {
-                    ...FALLBACK_SLIDES[0],
-                    ...(cms.heroTitle && { title: cms.heroTitle }),
-                    ...(cms.heroSubtitle && { subtitle: cms.heroSubtitle }),
-                    ...(cms.heroImage && { image: cms.heroImage }),
-                    ...(cms.heroBgColor && { bg: cms.heroBgColor }),
-                };
-                setSlides(merged);
-            })
-            .catch(() => {/* silently use fallback */ });
+                if (cms.heroSlides && cms.heroSlides.length > 0) {
+                    setSlides(cms.heroSlides);
+                } else if (cms.heroTitle) {
+                    // Fallback for legacy single-hero
+                    setSlides([{
+                        title: cms.heroTitle,
+                        subtitle: cms.heroSubtitle,
+                        image: cms.heroImage,
+                        bgColor: cms.heroBgColor || "#00A8FF",
+                        ctaText: "Rent Now",
+                        ctaLink: "/store"
+                    }]);
+                }
+            } catch (err) {
+                console.error("Failed to fetch hero CMS data", err);
+            }
+        };
+        loadCMS();
     }, []);
 
     const prev = () => setActiveSlide(i => (i - 1 + slides.length) % slides.length);
@@ -75,17 +84,17 @@ const Hero = () => {
                             <div key={index} className="min-w-full">
                                 <div
                                     className="relative rounded-2xl overflow-hidden"
-                                    style={{ backgroundColor: s.bg }}
+                                    style={{ backgroundColor: s.bgColor }}
                                 >
                                     {/* Text */}
                                     <div className="px-5 pt-5 pb-0 space-y-3 text-white relative z-10">
                                         <h1 className="text-xl font-bold leading-snug">{s.title}</h1>
                                         <p className="text-xs leading-relaxed text-white/90">{s.subtitle}</p>
                                         <Link
-                                            href="/store"
+                                            href={s.ctaLink || "/store"}
                                             className="inline-flex items-center gap-2 bg-[#FFC107] text-gray-900 px-5 py-2 rounded-full font-bold text-sm hover:bg-[#FFD54F] transition-all shadow-md"
                                         >
-                                            Rent Now <FaArrowRight size={11} />
+                                            {s.ctaText || "Rent Now"} <FaArrowRight size={11} />
                                         </Link>
                                     </div>
                                     {/* Hero image */}
@@ -120,7 +129,7 @@ const Hero = () => {
                 <div className="hidden md:block relative">
                     <div
                         className="absolute inset-0 rounded-3xl md:rounded-[2.5rem] transition-colors duration-700"
-                        style={{ backgroundColor: slide.bg }}
+                        style={{ backgroundColor: slide.bgColor }}
                     />
                     <div className="absolute inset-0 bg-linear-to-r from-transparent to-white/10 rounded-3xl md:rounded-[2.5rem]" />
 
@@ -173,10 +182,10 @@ const Hero = () => {
                                     className="pt-2"
                                 >
                                     <Link
-                                        href="/store"
+                                        href={slide.ctaLink || "/store"}
                                         className="inline-flex items-center gap-2 bg-[#FFC107] text-gray-900 px-7 py-3 rounded-full font-bold text-[15px] hover:bg-[#FFD54F] transition-all transform hover:scale-105 shadow-lg"
                                     >
-                                        Rent Now <FaArrowRight size={13} className="ml-1" />
+                                        {slide.ctaText || "Rent Now"} <FaArrowRight size={13} className="ml-1" />
                                     </Link>
                                 </motion.div>
 

@@ -1,21 +1,68 @@
 "use client";
-import React from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { FaHeart, FaStar, FaBolt } from "react-icons/fa";
 import { motion } from "framer-motion";
 
-import { getProducts } from "../services/productService";
-import { useState, useEffect } from "react";
+const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
 
-const BestRentedProducts = ({ title = "Best Rented Products" }) => {
+// Optional: you can still use the service, but since we need multiple products by ID we'll implement it manually or use a simple fetch call.
+const BestRentedProducts = ({ type = "bestRented", defaultTitle = "Curated Products" }) => {
     const [products, setProducts] = useState([]);
+    const [cmsConfig, setCmsConfig] = useState({
+        enabled: true,
+        title: defaultTitle,
+        productIds: []
+    });
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        const fetchProducts = async () => {
+        const fetchCMSAndProducts = async () => {
             try {
-                const { products: apiProducts } = await getProducts();
-                // Map API data to component structure
-                const mappedProducts = (apiProducts || []).slice(0, 4).map(p => ({
+                // 1. Fetch CMS configs
+                const cmsRes = await fetch(`${API}/api/cms/homepage`);
+                let isEnabled = true;
+                let finalTitle = defaultTitle;
+                let targetIds = [];
+
+                if (cmsRes.ok) {
+                    const cmsData = await cmsRes.json();
+                    if (type === "bestRented") {
+                        isEnabled = cmsData.bestRentedEnabled !== false;
+                        finalTitle = cmsData.bestRentedTitle || "Best Rented Products";
+                        targetIds = cmsData.bestRentedProductIds || [];
+                    } else if (type === "newLaunches") {
+                        isEnabled = cmsData.newLaunchEnabled !== false;
+                        finalTitle = cmsData.newLaunchTitle || "New Launches This Week";
+                        targetIds = cmsData.newLaunchProductIds || [];
+                    }
+                }
+
+                setCmsConfig({ enabled: isEnabled, title: finalTitle, productIds: targetIds });
+
+                if (!isEnabled) {
+                    setLoading(false);
+                    return;
+                }
+
+                // 2. Fetch products
+                let fetchedProducts = [];
+                if (targetIds.length > 0) {
+                    // Fetch specific products concurrently
+                    const prodPromises = targetIds.map(id => fetch(`${API}/api/products/${id}`).then(r => r.ok ? r.json() : null));
+                    const responses = await Promise.all(prodPromises);
+                    fetchedProducts = responses.filter(p => p !== null);
+                } else {
+                    // Fallback to recent generic products
+                    const fallBackRes = await fetch(`${API}/api/products?limit=4`);
+                    if (fallBackRes.ok) {
+                        const fallbackData = await fallBackRes.json();
+                        fetchedProducts = fallbackData.products || [];
+                    }
+                }
+
+                // 3. Map to UI
+                const mappedProducts = fetchedProducts.map(p => ({
                     id: p._id,
                     name: p.name,
                     category: p.category,
@@ -29,14 +76,19 @@ const BestRentedProducts = ({ title = "Best Rented Products" }) => {
                     tags: ["Quality tested", "Deep Cleaned"],
                     statusTags: ["Like New", "In Stock"],
                 }));
-
-                setProducts(mappedProducts);
+                // Only take first 4 to avoid layout breaking
+                setProducts(mappedProducts.slice(0, 4));
+                setLoading(false);
             } catch (error) {
-                console.error("Failed to fetch products", error);
+                console.error("Failed to fetch products or cms", error);
+                setLoading(false);
             }
         };
-        fetchProducts();
-    }, []);
+        fetchCMSAndProducts();
+    }, [type, defaultTitle]);
+
+    if (loading) return <div className="h-48 w-full bg-slate-50 animate-pulse my-4" />;
+    if (!cmsConfig.enabled) return null;
 
     return (
         <section className="py-8 md:py-12 bg-white">
@@ -45,7 +97,7 @@ const BestRentedProducts = ({ title = "Best Rented Products" }) => {
                 {/* Header */}
                 <div className="flex items-center justify-between mb-6 md:mb-12">
                     <h2 className="text-4xl font-semibold font-manrope text-gray-900 tracking-tight">
-                        {title}
+                        {cmsConfig.title}
                     </h2>
                     <Link
                         href="/products"

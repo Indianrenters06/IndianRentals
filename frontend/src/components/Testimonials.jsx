@@ -6,6 +6,8 @@ import { getTestimonials } from '../services/testimonialService';
 
 gsap.registerPlugin(ScrollTrigger);
 
+const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+
 const GoogleLogo = () => (
     <span className="flex items-center font-bold text-xl leading-none tracking-tight">
         <span className="text-[#4285F4]">G</span>
@@ -17,7 +19,7 @@ const GoogleLogo = () => (
     </span>
 );
 
-const reviews = [
+const staticReviews = [
     {
         id: 1,
         name: "John Doe",
@@ -71,31 +73,53 @@ const reviews = [
 const Testimonials = () => {
     const [reviewsData, setReviewsData] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [cms, setCms] = useState({
+        enabled: true,
+        title: "What Our Customers Say",
+        subtitle: "Real experiences from innovators, businesses, and creators powering their ambitions with IndianRenters.",
+        reviewCount: "5000+",
+        rating: 4.9
+    });
+
     const wrapperRef = useRef(null);
     const row1Ref = useRef(null);
     const row2Ref = useRef(null);
 
     useEffect(() => {
-        const fetchTestimonials = async () => {
+        const fetchAll = async () => {
             try {
-                const data = await getTestimonials();
-                if (data && data.length > 0) {
-                    setReviewsData(data);
+                // Fetch CMS
+                fetch(`${API}/api/cms/homepage`).then(r => r.ok ? r.json() : null).then(data => {
+                    if (data) {
+                        setCms({
+                            enabled: data.testimonialsEnabled !== false,
+                            title: data.testimonialSectionTitle || "What Our Customers Say",
+                            subtitle: data.testimonialSectionSubtitle || "Real experiences from innovators, businesses, and creators powering their ambitions with IndianRenters.",
+                            reviewCount: data.testimonialGoogleReviewCount || "5000+",
+                            rating: data.testimonialGoogleRating || 4.9
+                        });
+                    }
+                }).catch(console.error);
+
+                // Fetch real testimonials
+                const tData = await getTestimonials();
+                if (tData && tData.length > 0) {
+                    setReviewsData(tData);
                 } else {
-                    setReviewsData(reviews); // fallback to static
+                    setReviewsData(staticReviews);
                 }
             } catch (error) {
                 console.error("Failed to fetch testimonials", error);
-                setReviewsData(reviews);
+                setReviewsData(staticReviews);
             } finally {
                 setLoading(false);
             }
         };
-        fetchTestimonials();
+        fetchAll();
     }, []);
 
     useEffect(() => {
-        if (loading || reviewsData.length === 0) return;
+        if (loading || reviewsData.length === 0 || !cms.enabled) return;
         let ctx = gsap.context(() => {
             const rows = [
                 { ref: row1Ref.current, dir: -1 },
@@ -144,7 +168,9 @@ const Testimonials = () => {
         }, wrapperRef);
 
         return () => ctx.revert();
-    }, [loading, reviewsData]);
+    }, [loading, reviewsData, cms.enabled]);
+
+    if (!cms.enabled) return null;
 
     const topReviews = reviewsData.slice(0, Math.ceil(reviewsData.length / 2));
     const bottomReviews = reviewsData.slice(Math.ceil(reviewsData.length / 2));
@@ -179,6 +205,16 @@ const Testimonials = () => {
 
     if (loading) return <div className="h-96 w-full animate-pulse bg-slate-50 flex items-center justify-center">Loading reviews...</div>;
 
+    const parseTitle = (text) => {
+        // Attempt to style the target word dynamically if it exists (e.g. Customers)
+        // For simplicity, just rendering it exactly as entered, but we can highlight keywords
+        if (text.includes('Customers')) {
+            const parts = text.split('Customers');
+            return <>{parts[0]}<span className="text-[#0A99FF]">Customers</span>{parts[1]}</>;
+        }
+        return text;
+    }
+
     return (
         <section ref={wrapperRef} className="py-10 md:py-20 bg-white relative overflow-hidden">
             <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 relative z-10 mb-8">
@@ -186,10 +222,10 @@ const Testimonials = () => {
                 <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
                     <div className="space-y-2 md:space-y-4 max-w-2xl">
                         <h2 className="text-4xl font-semibold font-manrope text-gray-900 tracking-tight">
-                            What Our <span className="text-[#0A99FF]">Customers</span> Say
+                            {parseTitle(cms.title)}
                         </h2>
                         <p className="text-gray-600 text-sm md:text-lg">
-                            Real experiences from innovators, businesses, and creators powering their ambitions with IndianRenters.
+                            {cms.subtitle}
                         </p>
                     </div>
 
@@ -197,12 +233,12 @@ const Testimonials = () => {
                     <div className="hidden md:flex items-center gap-4 bg-white border border-gray-100 px-6 py-3 rounded-2xl shadow-sm hover:shadow-md transition-shadow cursor-pointer">
                         <GoogleLogo />
                         <div className="flex flex-col border-l border-gray-200 pl-4">
-                            <span className="text-xs text-gray-500 font-bold uppercase tracking-wider">5000+ reviews</span>
+                            <span className="text-xs text-gray-500 font-bold uppercase tracking-wider">{cms.reviewCount} reviews</span>
                             <div className="flex items-center gap-2">
                                 <div className="flex text-[#F4B400] text-sm">
                                     <FaStar /><FaStar /><FaStar /><FaStar /><FaStar />
                                 </div>
-                                <span className="text-gray-900 font-bold text-sm">4.9</span>
+                                <span className="text-gray-900 font-bold text-sm">{cms.rating}</span>
                             </div>
                         </div>
                     </div>

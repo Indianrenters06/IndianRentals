@@ -1,19 +1,60 @@
 const mongoose = require('mongoose');
 
+const rentalProcessStepSchema = new mongoose.Schema({
+    title: { type: String, default: '' },
+    description: { type: String, default: '' },
+    icon: { type: String, default: 'FaLaptopCode' }, // icon name string
+    highlight: { type: Boolean, default: false }, // yellow highlight card
+}, { _id: false });
+
+const heroSlideSchema = new mongoose.Schema({
+    title: { type: String, default: '' },
+    subtitle: { type: String, default: '' },
+    image: { type: String, default: '' },
+    bgColor: { type: String, default: '#00A8FF' },
+    ctaText: { type: String, default: 'Rent Now' },
+    ctaLink: { type: String, default: '/products' },
+}, { _id: false });
+
 const cmsSchema = new mongoose.Schema({
     pageName: {
         type: String,
         required: true,
         unique: true,
-        // e.g. 'homepage', 'about', 'terms', 'privacy', 'contact'
     },
-    // ── Hero (homepage) ──────────────────────────────────────────────────────
+
+    // ── Hero Slides (homepage) ────────────────────────────────────────────────
     heroEnabled: { type: Boolean, default: true },
+    heroSlides: { type: [heroSlideSchema], default: [] },
+    // Legacy single-hero fields (kept for backward compat)
     heroTitle: { type: String, default: '' },
     heroSubtitle: { type: String, default: '' },
     heroImage: { type: String, default: '' },
     overlayColor: { type: String, default: 'rgba(0,0,0,0.5)' },
-    heroBgColor: { type: String, default: '' },  // e.g. '#00A8FF'
+    heroBgColor: { type: String, default: '' },
+
+    // ── Best Rented Products (homepage) ───────────────────────────────────────
+    bestRentedEnabled: { type: Boolean, default: true },
+    bestRentedTitle: { type: String, default: 'Best Rented Products' },
+    bestRentedProductIds: { type: [String], default: [] }, // pinned product _ids
+
+    // ── New Launch Products (homepage) ────────────────────────────────────────
+    newLaunchEnabled: { type: Boolean, default: true },
+    newLaunchTitle: { type: String, default: 'New Launches This Week' },
+    newLaunchProductIds: { type: [String], default: [] }, // pinned product _ids
+
+    // ── Rental Process / KYC Steps (homepage) ─────────────────────────────────
+    rentalProcessEnabled: { type: Boolean, default: true },
+    rentalProcessTitle: { type: String, default: 'Rental Process' },
+    rentalProcessSubtitle: { type: String, default: 'Choose, secure, receive, and create with zero hassle. No installation, no configuration, no delay.' },
+    rentalProcessSteps: { type: [rentalProcessStepSchema], default: [] },
+
+    // ── Testimonials Section (homepage) ───────────────────────────────────────
+    testimonialsEnabled: { type: Boolean, default: true },
+    testimonialSectionTitle: { type: String, default: 'What Our Customers Say' },
+    testimonialSectionSubtitle: { type: String, default: 'Real experiences from innovators, businesses, and creators powering their ambitions with IndianRenters.' },
+    testimonialGoogleReviewCount: { type: String, default: '5000+' },
+    testimonialGoogleRating: { type: String, default: '4.9' },
 
     // ── Why Choose Us (homepage) ──────────────────────────────────────────────
     whyChooseUsTitle: { type: String, default: 'Why Choose Us?' },
@@ -25,11 +66,8 @@ const cmsSchema = new mongoose.Schema({
     statsCustomers: { type: String, default: '30k+' },
     statsCities: { type: String, default: '401+' },
 
-    // ── Generic rich page content (markdown / HTML) ──────────────────────────
-    // Used for Terms, Privacy, About, Contact static content
+    // ── Generic rich page content ─────────────────────────────────────────────
     pageContent: { type: String, default: '' },
-
-    // ── Banner image shown at the top of the page ────────────────────────────
     bannerImage: { type: String, default: '' },
     bannerTitle: { type: String, default: '' },
 
