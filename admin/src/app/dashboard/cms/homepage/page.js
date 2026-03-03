@@ -376,23 +376,23 @@ export default function CMSHomepage() {
                                                 {/* Text side */}
                                                 <div className="space-y-4">
                                                     <Input
-                                                        label="Headline" labelPlacement="outside"
+                                                        label="Headline"
                                                         value={slide.title} onValueChange={(v) => { const n = [...data.heroSlides]; n[index].title = v; set("heroSlides", n); }}
                                                         placeholder="The Tech That Powers Your Ambition." variant="bordered"
                                                     />
                                                     <Textarea
-                                                        label="Sub-headline" labelPlacement="outside"
+                                                        label="Sub-headline"
                                                         value={slide.subtitle} onValueChange={(v) => { const n = [...data.heroSlides]; n[index].subtitle = v; set("heroSlides", n); }}
                                                         placeholder="Get the latest MacBooks right now..." variant="bordered" rows={2}
                                                     />
                                                     <div className="grid grid-cols-2 gap-4">
                                                         <Input
-                                                            label="CTA Button Text" labelPlacement="outside"
+                                                            label="CTA Button Text"
                                                             value={slide.ctaText} onValueChange={(v) => { const n = [...data.heroSlides]; n[index].ctaText = v; set("heroSlides", n); }}
                                                             variant="bordered"
                                                         />
                                                         <Input
-                                                            label="CTA Button Link" labelPlacement="outside"
+                                                            label="CTA Button Link"
                                                             value={slide.ctaLink} onValueChange={(v) => { const n = [...data.heroSlides]; n[index].ctaLink = v; set("heroSlides", n); }}
                                                             variant="bordered"
                                                         />
@@ -448,7 +448,7 @@ export default function CMSHomepage() {
 
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                     <Input
-                                        label="Section Title" labelPlacement="outside"
+                                        label="Section Title"
                                         value={data.bestRentedTitle} onValueChange={(v) => set("bestRentedTitle", v)}
                                         variant="bordered" placeholder="e.g. Best Rented Products"
                                     />
@@ -477,7 +477,7 @@ export default function CMSHomepage() {
 
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                     <Input
-                                        label="Section Title" labelPlacement="outside"
+                                        label="Section Title"
                                         value={data.newLaunchTitle} onValueChange={(v) => set("newLaunchTitle", v)}
                                         variant="bordered" placeholder="e.g. New Launches This Week"
                                     />
@@ -507,12 +507,12 @@ export default function CMSHomepage() {
                                         <Switch isSelected={data.rentalProcessEnabled} onValueChange={(v) => set("rentalProcessEnabled", v)} color="success" size="sm" />
                                     </div>
                                     <Input
-                                        label="Section Title" labelPlacement="outside"
+                                        label="Section Title"
                                         value={data.rentalProcessTitle} onValueChange={(v) => set("rentalProcessTitle", v)}
                                         variant="bordered"
                                     />
                                     <Textarea
-                                        label="Section Subtitle" labelPlacement="outside"
+                                        label="Section Subtitle"
                                         value={data.rentalProcessSubtitle} onValueChange={(v) => set("rentalProcessSubtitle", v)}
                                         variant="bordered" rows={2}
                                     />
@@ -546,19 +546,19 @@ export default function CMSHomepage() {
                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                             <div className="space-y-4">
                                                 <Input
-                                                    label="Title" labelPlacement="outside" size="sm"
+                                                    label="Title" size="sm"
                                                     value={step.title} onValueChange={(v) => { const n = [...data.rentalProcessSteps]; n[idx].title = v; set("rentalProcessSteps", n); }}
                                                     variant="bordered"
                                                 />
                                                 <Input
-                                                    label="React Icon Name (e.g. FaUserCheck)" labelPlacement="outside" size="sm"
+                                                    label="React Icon Name (e.g. FaUserCheck)" size="sm"
                                                     value={step.icon} onValueChange={(v) => { const n = [...data.rentalProcessSteps]; n[idx].icon = v; set("rentalProcessSteps", n); }}
                                                     variant="bordered"
                                                 />
                                             </div>
                                             <div>
                                                 <Textarea
-                                                    label="Body Description" labelPlacement="outside"
+                                                    label="Body Description"
                                                     value={step.description} onValueChange={(v) => { const n = [...data.rentalProcessSteps]; n[idx].description = v; set("rentalProcessSteps", n); }}
                                                     variant="bordered" rows={3}
                                                 />
@@ -592,18 +592,18 @@ export default function CMSHomepage() {
 
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                     <Input
-                                        label="Section Title" labelPlacement="outside"
+                                        label="Section Title"
                                         value={data.testimonialSectionTitle} onValueChange={(v) => set("testimonialSectionTitle", v)}
                                         variant="bordered"
                                     />
                                     <Input
-                                        label="Google Review Count Badge" labelPlacement="outside"
+                                        label="Google Review Count Badge"
                                         value={data.testimonialGoogleReviewCount} onValueChange={(v) => set("testimonialGoogleReviewCount", v)}
                                         variant="bordered" placeholder="e.g. 5000+"
                                     />
                                     <div className="md:col-span-2">
                                         <Textarea
-                                            label="Section Subtitle" labelPlacement="outside"
+                                            label="Section Subtitle"
                                             value={data.testimonialSectionSubtitle} onValueChange={(v) => set("testimonialSectionSubtitle", v)}
                                             variant="bordered" rows={2}
                                         />
@@ -623,12 +623,12 @@ export default function CMSHomepage() {
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                                     <div className="space-y-4">
                                         <Input
-                                            label="Headline" labelPlacement="outside"
+                                            label="Headline"
                                             value={data.whyChooseUsTitle} onValueChange={(v) => set("whyChooseUsTitle", v)}
                                             variant="bordered"
                                         />
                                         <Textarea
-                                            label="Description text" labelPlacement="outside"
+                                            label="Description text"
                                             value={data.whyChooseUsSubtitle} onValueChange={(v) => set("whyChooseUsSubtitle", v)}
                                             variant="bordered" rows={5}
                                         />
