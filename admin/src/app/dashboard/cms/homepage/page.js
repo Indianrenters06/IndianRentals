@@ -71,6 +71,7 @@ const ProductSelector = ({ label, selectedIds, onChange }) => {
     const [results, setResults] = useState([]);
     const [searching, setSearching] = useState(false);
     const [selectedProducts, setSelectedProducts] = useState([]);
+    const [allProducts, setAllProducts] = useState([]);
     const inputRef = useRef(null);
 
     useEffect(() => {
@@ -94,6 +95,20 @@ const ProductSelector = ({ label, selectedIds, onChange }) => {
         fetchSelected();
     }, [selectedIds]);
 
+    // Fetch all products for easy dropdown selection
+    useEffect(() => {
+        const fetchAll = async () => {
+            try {
+                const res = await fetch(`${API}/api/products?limit=500`);
+                if (res.ok) {
+                    const data = await res.json();
+                    setAllProducts(data.products || []);
+                }
+            } catch (err) { console.error(err); }
+        };
+        fetchAll();
+    }, []);
+
     const handleSearch = async (val) => {
         setQuery(val);
         if (val.length < 2) { setResults([]); return; }
@@ -112,6 +127,14 @@ const ProductSelector = ({ label, selectedIds, onChange }) => {
         setQuery(""); setResults([]);
     };
 
+    const handleSelectDropdown = (e) => {
+        const id = e.target.value;
+        if (!id) return;
+        const prod = allProducts.find(p => p._id === id);
+        if (prod) addProduct(prod);
+        e.target.value = ""; // Reset value for next selection
+    };
+
     const removeProduct = (id) => {
         setSelectedProducts(selectedProducts.filter(p => p._id !== id));
         onChange(selectedIds.filter(i => i !== id));
@@ -128,39 +151,65 @@ const ProductSelector = ({ label, selectedIds, onChange }) => {
                         <button onClick={() => removeProduct(p._id)} className="ml-0.5 text-indigo-400 hover:text-red-500 leading-none">×</button>
                     </span>
                 ))}
-                {selectedProducts.length === 0 && <span className="text-xs text-slate-400 italic">No products selected yet. Search below to add.</span>}
+                {selectedProducts.length === 0 && <span className="text-xs text-slate-400 italic">No products selected yet. Search or select below to add.</span>}
             </div>
 
-            <div className="relative">
-                <div className="relative flex items-center">
-                    <PhosphorImage className="absolute left-3 text-slate-400 pointer-events-none" size={16} />
-                    <input
-                        ref={inputRef}
-                        type="text"
-                        value={query}
-                        onChange={e => handleSearch(e.target.value)}
-                        placeholder="Search by product name..."
-                        className="w-full h-10 pl-9 pr-9 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/40 focus:border-indigo-400 transition-all"
-                    />
-                    {searching && <Spinner size="sm" className="absolute right-3" />}
-                </div>
-                {results.length > 0 && query.length >= 2 && (
-                    <div className="absolute z-50 top-full left-0 w-full mt-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl shadow-xl overflow-hidden max-h-[300px] overflow-y-auto">
-                        {results.map(r => (
-                            <button key={r._id} onClick={() => addProduct(r)}
-                                className="w-full flex items-center gap-3 p-3 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors text-left border-b border-slate-100 dark:border-slate-800/50 last:border-0">
-                                <div className="w-10 h-10 rounded-lg bg-slate-100 flex items-center justify-center overflow-hidden shrink-0">
-                                    {r.images?.[0] ? <img src={r.images[0]} className="w-full h-full object-cover" alt="" /> : <Package size={20} />}
-                                </div>
-                                <div className="flex flex-col flex-1 truncate">
-                                    <span className="text-sm font-semibold truncate text-slate-900 dark:text-white">{r.name}</span>
-                                    <span className="text-xs text-slate-500">{r.category} • ₹{r.rentalPrice}/mo</span>
-                                </div>
-                                {selectedIds.includes(r._id) && <CheckCircle size={18} weight="fill" className="text-emerald-500 shrink-0" />}
-                            </button>
+            <div className="flex flex-col gap-3">
+                <div className="relative">
+                    <select
+                        onChange={handleSelectDropdown}
+                        defaultValue=""
+                        className="w-full h-10 px-3 appearance-none rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/40 focus:border-indigo-400 transition-all cursor-pointer"
+                    >
+                        <option value="" disabled>Browse & Select a product...</option>
+                        {allProducts.map(p => (
+                            <option key={p._id} value={p._id} disabled={selectedIds.includes(p._id)}>
+                                {p.name} {selectedIds.includes(p._id) ? '(Added)' : ''}
+                            </option>
                         ))}
+                    </select>
+                    <div className="absolute right-3 top-[10px] pointer-events-none text-slate-400">
+                        <svg width="16" height="16" fill="currentColor" viewBox="0 0 256 256"><path d="M213.66,101.66l-80,80a8,8,0,0,1-11.32,0l-80-80A8,8,0,0,1,53.66,90.34L128,164.69l74.34-74.35a8,8,0,0,1,11.32,11.32Z"></path></svg>
                     </div>
-                )}
+                </div>
+
+                <div className="flex items-center gap-2">
+                    <div className="flex-1 h-[1px] bg-slate-200 dark:bg-slate-700"></div>
+                    <span className="text-xs text-slate-400 font-semibold uppercase tracking-wider">Or Search</span>
+                    <div className="flex-1 h-[1px] bg-slate-200 dark:bg-slate-700"></div>
+                </div>
+
+                <div className="relative">
+                    <div className="relative flex items-center">
+                        <PhosphorImage className="absolute left-3 text-slate-400 pointer-events-none" size={16} />
+                        <input
+                            ref={inputRef}
+                            type="text"
+                            value={query}
+                            onChange={e => handleSearch(e.target.value)}
+                            placeholder="Search by product name..."
+                            className="w-full h-10 pl-9 pr-9 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/40 focus:border-indigo-400 transition-all"
+                        />
+                        {searching && <Spinner size="sm" className="absolute right-3" />}
+                    </div>
+                    {results.length > 0 && query.length >= 2 && (
+                        <div className="absolute z-50 top-full left-0 w-full mt-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl shadow-xl overflow-hidden max-h-[300px] overflow-y-auto">
+                            {results.map(r => (
+                                <button key={r._id} onClick={() => addProduct(r)}
+                                    className="w-full flex items-center gap-3 p-3 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors text-left border-b border-slate-100 dark:border-slate-800/50 last:border-0">
+                                    <div className="w-10 h-10 rounded-lg bg-slate-100 flex items-center justify-center overflow-hidden shrink-0">
+                                        {r.images?.[0] ? <img src={r.images[0]} className="w-full h-full object-cover" alt="" /> : <Package size={20} />}
+                                    </div>
+                                    <div className="flex flex-col flex-1 truncate">
+                                        <span className="text-sm font-semibold truncate text-slate-900 dark:text-white">{r.name}</span>
+                                        <span className="text-xs text-slate-500">{r.category} • ₹{r.rentalPrice}/mo</span>
+                                    </div>
+                                    {selectedIds.includes(r._id) && <CheckCircle size={18} weight="fill" className="text-emerald-500 shrink-0" />}
+                                </button>
+                            ))}
+                        </div>
+                    )}
+                </div>
             </div>
         </div>
     );
