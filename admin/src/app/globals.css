@@ -46,3 +46,69 @@ body {
   --heroui-colors-primary: #6366f1;
   --heroui-colors-secondary: #a855f7;
 }
+
+/* ── HeroUI + Tailwind v4 Compatibility Fix ──────────────────────────────────
+   Tailwind v4 changed CSS layer cascading which breaks HeroUI v2's floating
+   label system. The label gets stuck on top of the input value text.
+   These targeted rules restore correct label positioning.
+   ─────────────────────────────────────────────────────────────────────────── */
+
+/* Ensure the input wrapper is positioned so the label can float correctly */
+[data-slot="input-wrapper"],
+[data-slot="inner-wrapper"] {
+  position: relative !important;
+}
+
+/* The floating label: start it inside the input field */
+[data-slot="label"] {
+  position: absolute !important;
+  pointer-events: none !important;
+  transform-origin: top left !important;
+  transition: transform 0.15s ease, font-size 0.15s ease, color 0.15s ease !important;
+
+  /* Default (unfocused, empty) state — sits in the middle of the input */
+  top: 50% !important;
+  left: 12px !important;
+  transform: translateY(-50%) !important;
+  font-size: 0.875rem !important;
+  color: #94a3b8 !important;
+  z-index: 10 !important;
+  line-height: 1 !important;
+}
+
+/* When the input has a value OR is focused — label floats to the top */
+[data-filled="true"] [data-slot="label"],
+[data-filled-within="true"] [data-slot="label"],
+[data-focus="true"] [data-slot="label"],
+:focus-within>[data-slot="label"],
+[data-has-value="true"] [data-slot="label"] {
+  top: 8px !important;
+  transform: translateY(0) scale(0.8) !important;
+  font-size: 0.75rem !important;
+  color: #6366f1 !important;
+}
+
+/* Textarea label fix — full height wrappers need top-aligned label by default */
+[data-slot="input-wrapper"]:has(textarea) [data-slot="label"] {
+  top: 14px !important;
+  transform: none !important;
+}
+
+[data-filled="true"] [data-slot="input-wrapper"]:has(textarea) [data-slot="label"],
+[data-filled-within="true"] [data-slot="input-wrapper"]:has(textarea) [data-slot="label"],
+[data-focus="true"] [data-slot="input-wrapper"]:has(textarea) [data-slot="label"],
+[data-slot="input-wrapper"]:has(textarea:focus) [data-slot="label"],
+[data-has-value="true"] [data-slot="input-wrapper"]:has(textarea) [data-slot="label"] {
+  top: 6px !important;
+  transform: scale(0.8) !important;
+  transform-origin: top left !important;
+  font-size: 0.75rem !important;
+  color: #6366f1 !important;
+}
+
+/* Push the actual input text down so it doesn't overlap the floated label */
+[data-slot="input"],
+[data-slot="textarea"] {
+  padding-top: 1.25rem !important;
+  padding-bottom: 0.25rem !important;
+}
