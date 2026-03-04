@@ -4,12 +4,13 @@ import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from "framer-motion";
 import {
     Card, CardBody, Button, Input, Textarea,
-    Chip, Spinner, Divider, Switch
+    Chip, Spinner, Divider
 } from "@heroui/react";
 import {
     FileText, LinkSimple, FloppyDisk, PencilSimple,
     ArrowLeft, CheckCircle, Globe, Warning, Image as PhosphorImage
 } from "@phosphor-icons/react";
+import Toggle from "@/components/Toggle";
 
 const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
 const getToken = () => typeof window !== "undefined" ? localStorage.getItem("adminToken") : null;
@@ -224,10 +225,9 @@ function PageEditor({ page, onBack }) {
                             <p className="font-semibold text-slate-800 dark:text-slate-100">Publish Status</p>
                             <p className="text-xs text-slate-500">When disabled the page returns a draft notice.</p>
                         </div>
-                        <Switch
+                        <Toggle
                             isSelected={data.publishStatus === "published"}
                             onValueChange={v => set("publishStatus", v ? "published" : "draft")}
-                            color="success"
                         />
                     </div>
                 </CardBody>

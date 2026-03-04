@@ -4,13 +4,14 @@ import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from "framer-motion";
 import {
     Card, CardBody, Button, Input, Textarea,
-    Chip, Spinner, Divider, Switch, Avatar
+    Chip, Spinner, Divider, Avatar
 } from "@heroui/react";
 import {
     Plus, PencilSimple, Trash, FileText,
     Eye, Clock, ArrowLeft, Image as PhosphorImage,
     FloppyDisk, CheckCircle, Tag, Globe
 } from "@phosphor-icons/react";
+import Toggle from "@/components/Toggle";
 
 const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
 const getToken = () => typeof window !== "undefined" ? localStorage.getItem("adminToken") : null;
@@ -162,14 +163,13 @@ function PostEditor({ post, onBack, onSaved }) {
                                     {form.status === "published" ? "Published" : "Draft"}
                                 </Chip>
                             </div>
-                            <Switch
+                            <Toggle
                                 isSelected={form.status === "published"}
                                 onValueChange={v => set("status", v ? "published" : "draft")}
-                                color="success"
                                 size="sm"
                             >
-                                <span className="text-sm text-slate-600 dark:text-slate-400">Publish publicly</span>
-                            </Switch>
+                                Publish publicly
+                            </Toggle>
                         </CardBody>
                     </Card>
 

@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from "framer-motion";
 import {
     Card, CardBody, Divider, Input,
-    Textarea, Tabs, Tab, Switch, Spinner,
+    Textarea, Tabs, Tab, Spinner,
     Button, Badge, Chip,
 } from "@heroui/react";
 import {
@@ -13,6 +13,7 @@ import {
     Plus, Trash, ArrowsLeftRight, Tag, Star, Package, CaretRight, ChatText
 } from "@phosphor-icons/react";
 import ImageUploader from "@/components/ImageUploader";
+import Toggle from "@/components/Toggle";
 
 const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
 const getToken = () => typeof window !== "undefined" ? localStorage.getItem("adminToken") : null;
@@ -332,7 +333,7 @@ export default function CMSHomepage() {
                                     <h4 className="text-base font-bold text-slate-900 dark:text-white">Hero Visibility</h4>
                                     <p className="text-sm text-slate-500">Show or hide the main slider at the top of the homepage.</p>
                                 </div>
-                                <Switch isSelected={data.heroEnabled} onValueChange={(v) => set("heroEnabled", v)} color="success" />
+                                <Toggle isSelected={data.heroEnabled} onValueChange={(v) => set("heroEnabled", v)} />
                             </div>
 
                             <Divider />
@@ -443,7 +444,7 @@ export default function CMSHomepage() {
                                             <p className="text-sm text-slate-500">Pick exactly which products to display on the homepage.</p>
                                         </div>
                                     </div>
-                                    <Switch isSelected={data.bestRentedEnabled} onValueChange={(v) => set("bestRentedEnabled", v)} color="success" />
+                                    <Toggle isSelected={data.bestRentedEnabled} onValueChange={(v) => set("bestRentedEnabled", v)} />
                                 </div>
 
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -472,7 +473,7 @@ export default function CMSHomepage() {
                                             <p className="text-sm text-slate-500">Feature the latest equipment added to your inventory.</p>
                                         </div>
                                     </div>
-                                    <Switch isSelected={data.newLaunchEnabled} onValueChange={(v) => set("newLaunchEnabled", v)} color="success" />
+                                    <Toggle isSelected={data.newLaunchEnabled} onValueChange={(v) => set("newLaunchEnabled", v)} />
                                 </div>
 
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -504,7 +505,7 @@ export default function CMSHomepage() {
                                 <div className="flex-1 space-y-4">
                                     <div className="flex justify-between items-center mb-2">
                                         <h3 className="text-lg font-bold">Process Settings</h3>
-                                        <Switch isSelected={data.rentalProcessEnabled} onValueChange={(v) => set("rentalProcessEnabled", v)} color="success" size="sm" />
+                                        <Toggle isSelected={data.rentalProcessEnabled} onValueChange={(v) => set("rentalProcessEnabled", v)} size="sm" />
                                     </div>
                                     <Input
                                         label="Section Title"
@@ -534,9 +535,9 @@ export default function CMSHomepage() {
                                         <div className="flex justify-between mb-4">
                                             <span className="font-bold text-slate-400">Step {idx + 1}</span>
                                             <div className="flex items-center gap-4">
-                                                <Switch size="sm" isSelected={step.highlight} onValueChange={(v) => { const n = [...data.rentalProcessSteps]; n[idx].highlight = v; set("rentalProcessSteps", n); }}>
-                                                    <span className="text-xs text-slate-500">Yellow Highlight Container</span>
-                                                </Switch>
+                                                <Toggle size="sm" isSelected={step.highlight} onValueChange={(v) => { const n = [...data.rentalProcessSteps]; n[idx].highlight = v; set("rentalProcessSteps", n); }}>
+                                                    Yellow Highlight Container
+                                                </Toggle>
                                                 <button onClick={() => { const n = [...data.rentalProcessSteps]; n.splice(idx, 1); set("rentalProcessSteps", n); }} className="text-red-500 hover:text-red-700">
                                                     <Trash size={16} />
                                                 </button>
@@ -587,7 +588,7 @@ export default function CMSHomepage() {
                                             <p className="text-sm text-slate-500">Review content is managed in the Testimonials tab. Configure UI here.</p>
                                         </div>
                                     </div>
-                                    <Switch isSelected={data.testimonialsEnabled} onValueChange={(v) => set("testimonialsEnabled", v)} color="success" />
+                                    <Toggle isSelected={data.testimonialsEnabled} onValueChange={(v) => set("testimonialsEnabled", v)} />
                                 </div>
 
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
