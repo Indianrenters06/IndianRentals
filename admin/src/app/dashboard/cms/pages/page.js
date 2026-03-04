@@ -2,10 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from "framer-motion";
-import {
-    Card, CardBody, Button, Input, Textarea,
-    Chip, Spinner, Divider
-} from "@heroui/react";
+import { Chip, Spinner } from "@heroui/react";
 import {
     FileText, LinkSimple, FloppyDisk, PencilSimple,
     ArrowLeft, CheckCircle, Globe, Warning, Image as PhosphorImage
@@ -25,14 +22,25 @@ const PAGES = [
     { key: "faq", label: "FAQ / Help Center", slug: "/faq" },
 ];
 
-const DEFAULTS = {
-    bannerImage: "",
-    bannerTitle: "",
-    pageContent: "",
-    metaTitle: "",
-    metaDescription: "",
-    publishStatus: "published",
-};
+const DEFAULTS = { bannerImage: "", bannerTitle: "", pageContent: "", metaTitle: "", metaDescription: "", publishStatus: "published" };
+
+// ── Shared Field Component ─────────────────────────────────────────────────
+const Field = ({ label, value, onChange, placeholder, rows, min, max }) => (
+    <div className="flex flex-col gap-1.5">
+        {label && <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">{label}</label>}
+        {rows ? (
+            <textarea
+                value={value} onChange={e => onChange(e.target.value)} placeholder={placeholder} rows={rows}
+                className="w-full px-3 py-2.5 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-400 transition-all resize-none"
+            />
+        ) : (
+            <input
+                type="text" value={value} onChange={e => onChange(e.target.value)} placeholder={placeholder}
+                className="w-full h-10 px-3 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-400 transition-all"
+            />
+        )}
+    </div>
+);
 
 // ── Editor for a single page ──────────────────────────────────────────────────
 function PageEditor({ page, onBack }) {
@@ -40,7 +48,6 @@ function PageEditor({ page, onBack }) {
     const [saving, setSaving] = useState(false);
     const [saved, setSaved] = useState(false);
     const [data, setData] = useState(DEFAULTS);
-
     const set = (k, v) => setData(p => ({ ...p, [k]: v }));
 
     const fetch_ = useCallback(async () => {
@@ -69,186 +76,129 @@ function PageEditor({ page, onBack }) {
         finally { setSaving(false); }
     };
 
-    if (loading) {
-        return (
-            <div className="flex items-center justify-center gap-3 py-24 text-slate-400">
-                <Spinner size="sm" color="secondary" />
-                Loading {page.label}…
-            </div>
-        );
-    }
+    if (loading) return (
+        <div className="flex items-center justify-center gap-3 py-24 text-slate-400">
+            <Spinner size="sm" color="secondary" /> Loading {page.label}…
+        </div>
+    );
 
     return (
-        <motion.div
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -20 }}
-            className="space-y-6"
-        >
+        <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-6">
             {/* Sub-header */}
             <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                    <Button isIconOnly size="sm" variant="light" onPress={onBack} className="text-slate-500">
+                    <button onClick={onBack} className="w-9 h-9 rounded-xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-500 hover:bg-slate-200 dark:hover:bg-slate-700 transition-all">
                         <ArrowLeft size={18} />
-                    </Button>
+                    </button>
                     <div>
                         <h2 className="text-xl font-bold text-slate-900 dark:text-slate-100">{page.label}</h2>
-                        <div className="flex items-center gap-1 text-xs text-slate-400 font-mono">
+                        <div className="flex items-center gap-1 text-xs text-slate-400 font-mono mt-0.5">
                             <LinkSimple size={11} />{page.slug}
                         </div>
                     </div>
                 </div>
                 <div className="flex items-center gap-3">
-                    {saved && <Chip color="success" variant="flat" size="sm" startContent={<CheckCircle size={12} weight="fill" />}>Saved!</Chip>}
-                    <Chip
-                        size="sm"
-                        color={data.publishStatus === "published" ? "success" : "warning"}
-                        variant="flat"
-                        startContent={data.publishStatus === "published" ? <Globe size={11} /> : <Warning size={11} />}
-                    >
+                    {saved && (
+                        <span className="flex items-center gap-1.5 text-emerald-600 text-xs font-semibold bg-emerald-50 border border-emerald-200 rounded-full px-3 py-1.5">
+                            <CheckCircle size={12} weight="fill" /> Saved!
+                        </span>
+                    )}
+                    <Chip size="sm" color={data.publishStatus === "published" ? "success" : "warning"} variant="flat"
+                        startContent={data.publishStatus === "published" ? <Globe size={11} /> : <Warning size={11} />}>
                         {data.publishStatus === "published" ? "Live" : "Draft"}
                     </Chip>
-                    <Button
-                        color="primary"
-                        variant="shadow"
-                        startContent={<FloppyDisk size={16} />}
-                        isLoading={saving}
-                        onPress={save}
-                        className="bg-indigo-600 font-bold shadow-indigo-500/20"
-                    >
-                        Save
-                    </Button>
+                    <button onClick={save} disabled={saving}
+                        className="flex items-center gap-2 h-9 px-4 rounded-xl bg-indigo-600 hover:bg-indigo-700 disabled:opacity-60 text-white font-semibold text-sm shadow-lg shadow-indigo-500/20 transition-all">
+                        {saving ? <Spinner size="sm" color="white" /> : <FloppyDisk size={15} weight="bold" />} Save
+                    </button>
                 </div>
             </div>
 
-            <Card className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800">
-                <CardBody className="p-8 space-y-8">
-                    {/* Banner section */}
-                    <div>
-                        <h4 className="text-sm font-bold text-slate-700 dark:text-slate-200 uppercase tracking-wider mb-4">Page Banner</h4>
-                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                            <div className="space-y-4">
-                                <div className="space-y-2">
-                                    <label className="text-xs font-bold text-slate-600 dark:text-slate-300 uppercase tracking-wider">Banner Title</label>
-                                    <Input
-                                        value={data.bannerTitle}
-                                        onValueChange={v => set("bannerTitle", v)}
-                                        placeholder={`${page.label}`}
-                                        variant="bordered"
-                                        classNames={{ inputWrapper: "h-11" }}
-                                    />
-                                </div>
-                                <div className="space-y-2">
-                                    <label className="text-xs font-bold text-slate-600 dark:text-slate-300 uppercase tracking-wider">Banner Image URL</label>
-                                    <Input
-                                        value={data.bannerImage}
-                                        onValueChange={v => set("bannerImage", v)}
+            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 md:p-8 space-y-8 shadow-sm">
+                {/* Banner */}
+                <div>
+                    <h4 className="text-sm font-bold text-slate-700 dark:text-slate-200 uppercase tracking-wider mb-4">Page Banner</h4>
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <div className="space-y-4">
+                            <Field label="Banner Title" value={data.bannerTitle} onChange={v => set("bannerTitle", v)} placeholder={page.label} />
+                            <div className="flex flex-col gap-1.5">
+                                <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Banner Image URL</label>
+                                <div className="relative">
+                                    <PhosphorImage size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
+                                    <input type="url" value={data.bannerImage} onChange={e => set("bannerImage", e.target.value)}
                                         placeholder="https://res.cloudinary.com/..."
-                                        variant="bordered"
-                                        startContent={<PhosphorImage size={14} className="text-slate-400" />}
-                                        classNames={{ inputWrapper: "h-11" }}
-                                    />
+                                        className="w-full h-10 pl-9 pr-3 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-400 transition-all" />
                                 </div>
                             </div>
-                            {/* Banner preview */}
-                            <div
-                                className="h-32 rounded-2xl relative overflow-hidden border-2 border-dashed border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 flex items-center justify-center"
-                                style={data.bannerImage ? { backgroundImage: `url(${data.bannerImage})`, backgroundSize: "cover", backgroundPosition: "center" } : {}}
-                            >
-                                {data.bannerImage ? (
-                                    <div className="absolute inset-0 flex items-center justify-center bg-black/50">
-                                        <p className="text-white font-bold text-lg">{data.bannerTitle || page.label}</p>
-                                    </div>
-                                ) : (
-                                    <span className="text-xs text-slate-400">Banner preview</span>
-                                )}
-                            </div>
+                        </div>
+                        <div className="h-32 rounded-2xl relative overflow-hidden border-2 border-dashed border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 flex items-center justify-center"
+                            style={data.bannerImage ? { backgroundImage: `url(${data.bannerImage})`, backgroundSize: "cover", backgroundPosition: "center" } : {}}>
+                            {data.bannerImage ? (
+                                <div className="absolute inset-0 flex items-center justify-center bg-black/50">
+                                    <p className="text-white font-bold text-lg">{data.bannerTitle || page.label}</p>
+                                </div>
+                            ) : (
+                                <span className="text-xs text-slate-400">Banner preview</span>
+                            )}
                         </div>
                     </div>
+                </div>
 
-                    <Divider />
+                <hr className="border-slate-100 dark:border-slate-800" />
 
-                    {/* Page content */}
+                {/* Content */}
+                <div>
+                    <h4 className="text-sm font-bold text-slate-700 dark:text-slate-200 uppercase tracking-wider mb-2">Page Content</h4>
+                    <p className="text-xs text-slate-400 mb-3">You can use HTML or plain paragraphs. This content is rendered on the public page.</p>
+                    <Field label="" value={data.pageContent} onChange={v => set("pageContent", v)} placeholder="Enter full page content here…" rows={12} />
+                    <p className="text-xs text-slate-400 mt-2">{data.pageContent.length.toLocaleString()} characters</p>
+                </div>
+
+                <hr className="border-slate-100 dark:border-slate-800" />
+
+                {/* SEO */}
+                <div>
+                    <h4 className="text-sm font-bold text-slate-700 dark:text-slate-200 uppercase tracking-wider mb-4">SEO</h4>
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <div className="space-y-1">
+                            <Field label="Meta Title" value={data.metaTitle} onChange={v => set("metaTitle", v)} placeholder={`${page.label} – IndianRentals`} />
+                            <p className="text-xs text-slate-400">{data.metaTitle.length}/60</p>
+                        </div>
+                        <div className="space-y-1">
+                            <Field label="Meta Description" value={data.metaDescription} onChange={v => set("metaDescription", v)} placeholder="A short description for search engines." rows={3} />
+                            <p className="text-xs text-slate-400">{data.metaDescription.length}/160</p>
+                        </div>
+                    </div>
+                </div>
+
+                <hr className="border-slate-100 dark:border-slate-800" />
+
+                {/* Publish toggle */}
+                <div className="flex items-center justify-between">
                     <div>
-                        <h4 className="text-sm font-bold text-slate-700 dark:text-slate-200 uppercase tracking-wider mb-4">Page Content</h4>
-                        <p className="text-xs text-slate-400 mb-3">You can use HTML or plain paragraphs. This content is rendered on the public page.</p>
-                        <Textarea
-                            value={data.pageContent}
-                            onValueChange={v => set("pageContent", v)}
-                            placeholder="Enter full page content here…"
-                            variant="bordered"
-                            disableAutosize
-                            rows={12}
-                            classNames={{ input: "font-mono text-sm resize-y min-h-[250px]" }}
-                        />
-                        <p className="text-xs text-slate-400 mt-2">{data.pageContent.length.toLocaleString()} characters</p>
+                        <p className="font-semibold text-slate-800 dark:text-slate-100">Publish Status</p>
+                        <p className="text-xs text-slate-500">When disabled the page returns a draft notice.</p>
                     </div>
-
-                    <Divider />
-
-                    {/* SEO */}
-                    <div>
-                        <h4 className="text-sm font-bold text-slate-700 dark:text-slate-200 uppercase tracking-wider mb-4">SEO</h4>
-                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                            <div className="space-y-2">
-                                <label className="text-xs font-bold text-slate-600 dark:text-slate-300 uppercase tracking-wider">Meta Title</label>
-                                <Input
-                                    value={data.metaTitle}
-                                    onValueChange={v => set("metaTitle", v)}
-                                    placeholder={`${page.label} – IndianRentals`}
-                                    variant="bordered"
-                                    classNames={{ inputWrapper: "h-11" }}
-                                />
-                                <p className="text-xs text-slate-400">{data.metaTitle.length}/60</p>
-                            </div>
-                            <div className="space-y-2">
-                                <label className="text-xs font-bold text-slate-600 dark:text-slate-300 uppercase tracking-wider">Meta Description</label>
-                                <Textarea
-                                    value={data.metaDescription}
-                                    onValueChange={v => set("metaDescription", v)}
-                                    placeholder="A short description for search engines."
-                                    variant="bordered"
-                                    disableAutosize
-                                    rows={3}
-                                    classNames={{ input: "resize-y min-h-[80px]" }}
-                                />
-                                <p className="text-xs text-slate-400">{data.metaDescription.length}/160</p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <Divider />
-
-                    {/* Publish toggle */}
-                    <div className="flex items-center justify-between">
-                        <div>
-                            <p className="font-semibold text-slate-800 dark:text-slate-100">Publish Status</p>
-                            <p className="text-xs text-slate-500">When disabled the page returns a draft notice.</p>
-                        </div>
-                        <Toggle
-                            isSelected={data.publishStatus === "published"}
-                            onValueChange={v => set("publishStatus", v ? "published" : "draft")}
-                        />
-                    </div>
-                </CardBody>
-            </Card>
+                    <Toggle
+                        isSelected={data.publishStatus === "published"}
+                        onValueChange={v => set("publishStatus", v ? "published" : "draft")}
+                    />
+                </div>
+            </div>
         </motion.div>
     );
 }
 
 // ── Pages list ────────────────────────────────────────────────────────────────
 export default function StaticPages() {
-    const [selected, setSelected] = useState(null); // page key being edited
+    const [selected, setSelected] = useState(null);
     const [statuses, setStatuses] = useState({});
     const [loading, setLoading] = useState(true);
 
     const fetchStatuses = useCallback(async () => {
         try {
             setLoading(true);
-            const token = getToken();
-            const res = await fetch(`${API}/api/cms`, {
-                headers: { Authorization: `Bearer ${token}` },
-            });
+            const res = await fetch(`${API}/api/cms`, { headers: { Authorization: `Bearer ${getToken()}` } });
             if (res.ok) {
                 const list = await res.json();
                 const map = {};
@@ -265,25 +215,18 @@ export default function StaticPages() {
 
     return (
         <div className="w-full space-y-6 pb-12">
-            {/* Header */}
             {!selected && (
                 <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }}>
                     <h1 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-slate-100 mb-1">
                         Static <span className="text-transparent bg-clip-text bg-linear-to-r from-indigo-500 to-purple-500">Pages</span>
                     </h1>
-                    <p className="text-slate-600 dark:text-slate-400">
-                        Manage legal and informational pages. Click a page to edit its content.
-                    </p>
+                    <p className="text-slate-600 dark:text-slate-400">Manage legal and informational pages. Click a page to edit its content.</p>
                 </motion.div>
             )}
 
             <AnimatePresence mode="wait">
                 {selected && editingPage ? (
-                    <PageEditor
-                        key={selected}
-                        page={editingPage}
-                        onBack={() => { setSelected(null); fetchStatuses(); }}
-                    />
+                    <PageEditor key={selected} page={editingPage} onBack={() => { setSelected(null); fetchStatuses(); }} />
                 ) : (
                     <motion.div key="list" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
                         {loading ? (
@@ -291,7 +234,7 @@ export default function StaticPages() {
                                 <Spinner size="sm" color="secondary" /> Loading…
                             </div>
                         ) : (
-                            <div className="grid grid-cols-1 gap-4">
+                            <div className="grid grid-cols-1 gap-3">
                                 {PAGES.map((page, i) => {
                                     const info = statuses[page.key];
                                     const status = info?.publishStatus || "published";
@@ -299,17 +242,10 @@ export default function StaticPages() {
                                         ? new Date(info.updatedAt).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })
                                         : "Never edited";
                                     return (
-                                        <motion.div
-                                            key={page.key}
-                                            initial={{ opacity: 0, y: 10 }}
-                                            animate={{ opacity: 1, y: 0 }}
-                                            transition={{ delay: i * 0.06 }}
-                                        >
-                                            <Card className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:border-indigo-400/50 transition-all duration-200 shadow-sm group cursor-pointer">
-                                                <CardBody
-                                                    className="p-5 flex flex-row items-center gap-4"
-                                                    onClick={() => setSelected(page.key)}
-                                                >
+                                        <motion.div key={page.key} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.06 }}>
+                                            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:border-indigo-400/50 rounded-2xl transition-all duration-200 shadow-sm group cursor-pointer"
+                                                onClick={() => setSelected(page.key)}>
+                                                <div className="p-5 flex flex-row items-center gap-4">
                                                     <div className="p-3 rounded-xl bg-indigo-50 dark:bg-indigo-500/10 text-indigo-500 shrink-0">
                                                         <FileText size={22} weight="duotone" />
                                                     </div>
@@ -320,24 +256,14 @@ export default function StaticPages() {
                                                         </div>
                                                     </div>
                                                     <div className="text-xs text-slate-400 hidden md:block">{updated}</div>
-                                                    <Chip
-                                                        size="sm"
-                                                        color={status === "published" ? "success" : "warning"}
-                                                        variant="flat"
-                                                    >
+                                                    <Chip size="sm" color={status === "published" ? "success" : "warning"} variant="flat">
                                                         {status === "published" ? "Live" : "Draft"}
                                                     </Chip>
-                                                    <Button
-                                                        isIconOnly
-                                                        size="sm"
-                                                        variant="light"
-                                                        className="text-slate-400 group-hover:text-indigo-500"
-                                                        onPress={() => setSelected(page.key)}
-                                                    >
+                                                    <div className="w-8 h-8 rounded-lg flex items-center justify-center text-slate-400 group-hover:text-indigo-500 group-hover:bg-indigo-50 dark:group-hover:bg-indigo-500/10 transition-all">
                                                         <PencilSimple size={16} />
-                                                    </Button>
-                                                </CardBody>
-                                            </Card>
+                                                    </div>
+                                                </div>
+                                            </div>
                                         </motion.div>
                                     );
                                 })}

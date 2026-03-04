@@ -57,8 +57,8 @@ const TabBtn = ({ icon, label, active, onClick }) => (
     <button
         onClick={onClick}
         className={`flex items-center gap-2 px-4 py-2.5 text-sm font-semibold rounded-xl transition-all whitespace-nowrap ${active
-                ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-500/25'
-                : 'text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
+            ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-500/25'
+            : 'text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
             }`}
     >
         {icon} {label}
@@ -262,7 +262,7 @@ export default function CMSHomepage() {
             <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
                 <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }}>
                     <h1 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-slate-100 mb-1">
-                        Homepage <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-500 to-purple-500">Editor</span>
+                        Homepage <span className="text-transparent bg-clip-text bg-linear-to-r from-indigo-500 to-purple-500">Editor</span>
                     </h1>
                     <p className="text-slate-500 dark:text-slate-400 text-sm">Manage all homepage sections natively inside the platform.</p>
                 </motion.div>
@@ -481,11 +481,6 @@ export default function CMSHomepage() {
                             </div>
                             <div>
                                 <ImageUploader label="Corporate Image" existingUrl={data.whyChooseUsImage} onUpload={url => set("whyChooseUsImage", url)} />
-                                {data.whyChooseUsImage && (
-                                    <div className="aspect-[4/3] w-full mt-4 rounded-xl overflow-hidden shadow-md">
-                                        <img src={data.whyChooseUsImage} className="w-full h-full object-cover" alt="Preview" />
-                                    </div>
-                                )}
                             </div>
                         </div>
                     </div>

@@ -39,12 +39,14 @@ body {
   @apply bg-slate-600;
 }
 
-/* HeroUI custom theme */
+/* HeroUI theme — use light defaults so inputs look white in light mode */
 :root {
-  --heroui-colors-background: #0f172a;
-  --heroui-colors-foreground: #f1f5f9;
   --heroui-colors-primary: #6366f1;
   --heroui-colors-secondary: #a855f7;
+  --heroui-colors-background: #ffffff;
+  --heroui-colors-foreground: #0f172a;
+  --heroui-colors-content1: #ffffff;
+  --heroui-colors-content2: #f8fafc;
 }
 
 /* ── HeroUI + Tailwind v4 Compatibility Fix ──────────────────────────────────
