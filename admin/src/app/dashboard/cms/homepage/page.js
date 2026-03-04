@@ -1,16 +1,12 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
-import { motion, AnimatePresence } from "framer-motion";
-import {
-    Card, CardBody, Divider, Input,
-    Textarea, Tabs, Tab, Spinner,
-    Button, Badge, Chip,
-} from "@heroui/react";
+import { useState, useEffect, useCallback, useRef } from 'react';
+import { motion } from "framer-motion";
+import { Spinner, Chip } from "@heroui/react";
 import {
     Layout, Image as PhosphorImage, FloppyDisk,
-    CheckCircle, Warning, Globe, ShieldCheck, ChartLineUp,
-    Plus, Trash, ArrowsLeftRight, Tag, Star, Package, CaretRight, ChatText
+    CheckCircle, Globe, ShieldCheck,
+    Plus, Trash, ArrowsLeftRight, Tag, Star, Package, ChatText
 } from "@phosphor-icons/react";
 import ImageUploader from "@/components/ImageUploader";
 import Toggle from "@/components/Toggle";
@@ -18,194 +14,149 @@ import Toggle from "@/components/Toggle";
 const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
 const getToken = () => typeof window !== "undefined" ? localStorage.getItem("adminToken") : null;
 
-// The default empty state mirroring our backend schema
-const DEFAULTS = {
-    publishStatus: "published",
+// ── Reusable Native Input/Textarea ──────────────────────────────────────────
+const Field = ({ label, value, onChange, placeholder, type = "text", rows, className = "" }) => (
+    <div className={`flex flex-col gap-1 ${className}`}>
+        {label && <label className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">{label}</label>}
+        {rows ? (
+            <textarea
+                value={value}
+                onChange={e => onChange(e.target.value)}
+                placeholder={placeholder}
+                rows={rows}
+                className="w-full px-3 py-2.5 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/40 focus:border-indigo-400 transition-all resize-none"
+            />
+        ) : (
+            <input
+                type={type}
+                value={value}
+                onChange={e => onChange(e.target.value)}
+                placeholder={placeholder}
+                className="w-full h-10 px-3 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/40 focus:border-indigo-400 transition-all"
+            />
+        )}
+    </div>
+);
 
-    heroEnabled: true,
-    heroSlides: [{
-        title: "The Tech That Powers Your Ambition. On Demand.",
-        subtitle: "Get the latest MacBooks, Workstations, Cameras, and more.",
-        image: "",
-        bgColor: "#00A8FF",
-        ctaText: "Rent Now",
-        ctaLink: "/products"
-    }],
+// ── Section Header ───────────────────────────────────────────────────────────
+const SectionRow = ({ icon, title, desc, toggle, onToggle }) => (
+    <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-4">
+        <div className="flex items-center gap-3">
+            {icon && <div className="p-2 rounded-lg">{icon}</div>}
+            <div>
+                <h3 className="text-base font-bold text-slate-800 dark:text-slate-100">{title}</h3>
+                {desc && <p className="text-xs text-slate-500 mt-0.5">{desc}</p>}
+            </div>
+        </div>
+        {toggle !== undefined && <Toggle isSelected={toggle} onValueChange={onToggle} />}
+    </div>
+);
 
-    bestRentedEnabled: true,
-    bestRentedTitle: "Best Rented Products",
-    bestRentedProductIds: [],
+// ── Tab Button ───────────────────────────────────────────────────────────────
+const TabBtn = ({ icon, label, active, onClick }) => (
+    <button
+        onClick={onClick}
+        className={`flex items-center gap-2 px-4 py-2.5 text-sm font-semibold rounded-xl transition-all whitespace-nowrap ${active
+                ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-500/25'
+                : 'text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
+            }`}
+    >
+        {icon} {label}
+    </button>
+);
 
-    newLaunchEnabled: true,
-    newLaunchTitle: "New Launches This Week",
-    newLaunchProductIds: [],
-
-    rentalProcessEnabled: true,
-    rentalProcessTitle: "Rental Process",
-    rentalProcessSubtitle: "Choose, secure, receive, and create with zero hassle. No installation, no configuration, no delay.",
-    rentalProcessSteps: [
-        { title: "Choose Your Tech", description: "Browse our curated selection...", icon: "FaLaptopCode", highlight: true },
-        { title: "Complete KYC", description: "Pick a flexible rental tenure...", icon: "FaUserCheck", highlight: false },
-        { title: "Secure Your Order", description: "Confirm your rental...", icon: "FaShieldAlt", highlight: false },
-        { title: "Receive & Create", description: "We deliver your tech...", icon: "FaBoxOpen", highlight: false }
-    ],
-
-    testimonialsEnabled: true,
-    testimonialSectionTitle: "What Our Customers Say",
-    testimonialSectionSubtitle: "Real experiences from innovators...",
-    testimonialGoogleReviewCount: "5000+",
-    testimonialGoogleRating: "4.9",
-
-    whyChooseUsTitle: "Why Choose Us?",
-    whyChooseUsSubtitle: "",
-    whyChooseUsImage: "",
-    statsDevices: "90k+",
-    statsCustomers: "30k+",
-    statsCities: "401+",
-
-    metaTitle: "",
-    metaDescription: "",
-};
-
-
-// ── Helper Component for Product Search/Selection ──────────────────────────
+// ── Product Search/Selector ──────────────────────────────────────────────────
 const ProductSelector = ({ label, selectedIds, onChange }) => {
     const [query, setQuery] = useState("");
     const [results, setResults] = useState([]);
     const [searching, setSearching] = useState(false);
     const [selectedProducts, setSelectedProducts] = useState([]);
+    const inputRef = useRef(null);
 
-    // Fetch initial selected products info
     useEffect(() => {
-        if (!selectedIds || selectedIds.length === 0) {
-            setSelectedProducts([]);
-            return;
-        }
-
+        if (!selectedIds || selectedIds.length === 0) { setSelectedProducts([]); return; }
         const fetchSelected = async () => {
             try {
-                // If the IDs haven't changed, don't re-fetch
-                if (selectedProducts.length === selectedIds.length &&
-                    selectedProducts.every(p => selectedIds.includes(p._id))) {
-                    return;
-                }
-
-                // Since we don't have a /api/products/batch route, we fetch them via general query or individually
-                // To save requests, we'll just fetch all products and filter for now (or let the user pick again)
-                // For a true enterprise app we'd add `?ids=id1,id2` to the backend.
-
-                // Temporary workaround: Fetch page 1 (since usually featured products are recent) 
-                // and just cache anything they search. If they reload, they just see IDs unless we fetch.
                 const res = await fetch(`${API}/api/products`);
                 if (res.ok) {
                     const data = await res.json();
                     const matched = data.products.filter(p => selectedIds.includes(p._id));
-                    // we'll at least show the matched ones.
-                    // To be safe and show *all* selected, we should ideally fetch by ID individually.
                     const finalProducts = [...matched];
-
-                    // Fetch any missing ones directly
                     const missingIds = selectedIds.filter(id => !matched.some(m => m._id === id));
                     for (const id of missingIds) {
-                        const singleRes = await fetch(`${API}/api/products/${id}`);
-                        if (singleRes.ok) finalProducts.push(await singleRes.json());
+                        const r = await fetch(`${API}/api/products/${id}`);
+                        if (r.ok) finalProducts.push(await r.json());
                     }
                     setSelectedProducts(finalProducts);
                 }
-            } catch (err) {
-                console.error(err);
-            }
+            } catch (err) { console.error(err); }
         };
         fetchSelected();
     }, [selectedIds]);
 
     const handleSearch = async (val) => {
         setQuery(val);
-        if (val.length < 2) {
-            setResults([]);
-            return;
-        }
+        if (val.length < 2) { setResults([]); return; }
         setSearching(true);
         try {
             const res = await fetch(`${API}/api/products?keyword=${val}&limit=5`);
-            if (res.ok) {
-                const data = await res.json();
-                setResults(data.products || []);
-            }
-        } catch (err) {
-            console.error(err);
-        } finally {
-            setSearching(false);
-        }
+            if (res.ok) { const data = await res.json(); setResults(data.products || []); }
+        } catch (err) { console.error(err); }
+        finally { setSearching(false); }
     };
 
     const addProduct = (prod) => {
         if (selectedIds.includes(prod._id)) return;
-        const newIds = [...selectedIds, prod._id];
         setSelectedProducts([...selectedProducts, prod]);
-        onChange(newIds);
-        setQuery("");
-        setResults([]);
+        onChange([...selectedIds, prod._id]);
+        setQuery(""); setResults([]);
     };
 
     const removeProduct = (id) => {
-        const newIds = selectedIds.filter(i => i !== id);
         setSelectedProducts(selectedProducts.filter(p => p._id !== id));
-        onChange(newIds);
+        onChange(selectedIds.filter(i => i !== id));
     };
 
     return (
         <div className="space-y-4 bg-slate-50 dark:bg-slate-900/40 p-5 rounded-2xl border border-slate-200 dark:border-slate-800">
             <h4 className="text-sm font-bold text-slate-800 dark:text-slate-200">{label}</h4>
-
-            {/* Selected Pills */}
-            <div className="flex flex-wrap gap-2">
-                {selectedProducts.map((p) => (
-                    <Chip
-                        key={p._id}
-                        onClose={() => removeProduct(p._id)}
-                        variant="flat"
-                        color="secondary"
-                        avatar={p.images?.[0] ? <img src={p.images[0]} alt="" className="object-cover" /> : null}
-                    >
+            <div className="flex flex-wrap gap-2 min-h-[28px]">
+                {selectedProducts.map(p => (
+                    <span key={p._id} className="inline-flex items-center gap-1.5 px-3 py-1 bg-indigo-50 dark:bg-indigo-500/10 border border-indigo-200 dark:border-indigo-500/20 text-indigo-700 dark:text-indigo-300 rounded-full text-xs font-semibold">
+                        {p.images?.[0] && <img src={p.images[0]} alt="" className="w-4 h-4 rounded-full object-cover" />}
                         {p.name}
-                    </Chip>
+                        <button onClick={() => removeProduct(p._id)} className="ml-0.5 text-indigo-400 hover:text-red-500 leading-none">×</button>
+                    </span>
                 ))}
-                {selectedProducts.length === 0 && (
-                    <span className="text-xs text-slate-400 italic">No products selected yet. Search below to add.</span>
-                )}
+                {selectedProducts.length === 0 && <span className="text-xs text-slate-400 italic">No products selected yet. Search below to add.</span>}
             </div>
 
-            {/* Search Input */}
             <div className="relative">
-                <Input
-                    value={query}
-                    onValueChange={handleSearch}
-                    placeholder="Search by product name..."
-                    variant="bordered"
-                    startContent={<PhosphorImage className="text-slate-400" />}
-                    endContent={searching ? <Spinner size="sm" /> : null}
-                />
-
-                {/* Search Results Dropdown */}
+                <div className="relative flex items-center">
+                    <PhosphorImage className="absolute left-3 text-slate-400 pointer-events-none" size={16} />
+                    <input
+                        ref={inputRef}
+                        type="text"
+                        value={query}
+                        onChange={e => handleSearch(e.target.value)}
+                        placeholder="Search by product name..."
+                        className="w-full h-10 pl-9 pr-9 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/40 focus:border-indigo-400 transition-all"
+                    />
+                    {searching && <Spinner size="sm" className="absolute right-3" />}
+                </div>
                 {results.length > 0 && query.length >= 2 && (
                     <div className="absolute z-50 top-full left-0 w-full mt-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl shadow-xl overflow-hidden max-h-[300px] overflow-y-auto">
-                        {results.map((r) => (
-                            <button
-                                key={r._id}
-                                onClick={() => addProduct(r)}
-                                className="w-full flex items-center gap-3 p-3 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors text-left border-b border-slate-50 dark:border-slate-800/50 last:border-0"
-                            >
+                        {results.map(r => (
+                            <button key={r._id} onClick={() => addProduct(r)}
+                                className="w-full flex items-center gap-3 p-3 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors text-left border-b border-slate-100 dark:border-slate-800/50 last:border-0">
                                 <div className="w-10 h-10 rounded-lg bg-slate-100 flex items-center justify-center overflow-hidden shrink-0">
-                                    {r.images?.[0] ? <img src={r.images[0]} className="w-full h-full object-cover" /> : <Package size={20} />}
+                                    {r.images?.[0] ? <img src={r.images[0]} className="w-full h-full object-cover" alt="" /> : <Package size={20} />}
                                 </div>
                                 <div className="flex flex-col flex-1 truncate">
                                     <span className="text-sm font-semibold truncate text-slate-900 dark:text-white">{r.name}</span>
                                     <span className="text-xs text-slate-500">{r.category} • ₹{r.rentalPrice}/mo</span>
                                 </div>
-                                {selectedIds.includes(r._id) && (
-                                    <CheckCircle size={18} weight="fill" className="text-emerald-500" />
-                                )}
+                                {selectedIds.includes(r._id) && <CheckCircle size={18} weight="fill" className="text-emerald-500 shrink-0" />}
                             </button>
                         ))}
                     </div>
@@ -215,10 +166,45 @@ const ProductSelector = ({ label, selectedIds, onChange }) => {
     );
 };
 
+// ── Default CMS State ────────────────────────────────────────────────────────
+const DEFAULTS = {
+    publishStatus: "published",
+    heroEnabled: true,
+    heroSlides: [{ title: "The Tech That Powers Your Ambition. On Demand.", subtitle: "Get the latest MacBooks, Workstations, Cameras, and more.", image: "", bgColor: "#00A8FF", ctaText: "Rent Now", ctaLink: "/products" }],
+    bestRentedEnabled: true, bestRentedTitle: "Best Rented Products", bestRentedProductIds: [],
+    newLaunchEnabled: true, newLaunchTitle: "New Launches This Week", newLaunchProductIds: [],
+    rentalProcessEnabled: true,
+    rentalProcessTitle: "Rental Process",
+    rentalProcessSubtitle: "Choose, secure, receive, and create with zero hassle. No installation, no configuration, no delay.",
+    rentalProcessSteps: [
+        { title: "Choose Your Tech", description: "Browse our curated selection...", icon: "FaLaptopCode", highlight: true },
+        { title: "Complete KYC", description: "Pick a flexible rental tenure...", icon: "FaUserCheck", highlight: false },
+        { title: "Secure Your Order", description: "Confirm your rental...", icon: "FaShieldAlt", highlight: false },
+        { title: "Receive & Create", description: "We deliver your tech...", icon: "FaBoxOpen", highlight: false },
+    ],
+    testimonialsEnabled: true,
+    testimonialSectionTitle: "What Our Customers Say",
+    testimonialSectionSubtitle: "Real experiences from innovators, businesses, and creators powering their ambitions with IndianRentals.",
+    testimonialGoogleReviewCount: "5000+",
+    testimonialGoogleRating: "4.9",
+    whyChooseUsTitle: "Why Choose Us?",
+    whyChooseUsSubtitle: "",
+    whyChooseUsImage: "",
+    statsDevices: "90k+", statsCustomers: "30k+", statsCities: "401+",
+    metaTitle: "", metaDescription: "",
+};
 
+const TABS = [
+    { key: "hero", label: "Hero Slides", icon: <Layout size={15} /> },
+    { key: "products", label: "Curated Grids", icon: <Package size={15} /> },
+    { key: "process", label: "Rental Process", icon: <ArrowsLeftRight size={15} /> },
+    { key: "trust", label: "Trust Factors", icon: <ChatText size={15} /> },
+    { key: "seo", label: "SEO Settings", icon: <Globe size={15} /> },
+];
 
-// ── Main Page Component ───────────────────────────────────────────────────────
+// ── Main Page ────────────────────────────────────────────────────────────────
 export default function CMSHomepage() {
+    const [activeTab, setActiveTab] = useState("hero");
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
     const [saved, setSaved] = useState(false);
@@ -232,32 +218,18 @@ export default function CMSHomepage() {
             const res = await fetch(`${API}/api/cms/homepage`);
             if (res.ok) {
                 const d = await res.json();
-
-                // Handle backwards compatibility for single-hero CMS structure
                 if (d.heroSlides?.length === 0 && d.heroTitle) {
-                    d.heroSlides = [{
-                        title: d.heroTitle,
-                        subtitle: d.heroSubtitle,
-                        image: d.heroImage,
-                        bgColor: d.heroBgColor || "#00A8FF",
-                        ctaText: "Rent Now",
-                        ctaLink: "/products"
-                    }];
+                    d.heroSlides = [{ title: d.heroTitle, subtitle: d.heroSubtitle, image: d.heroImage, bgColor: d.heroBgColor || "#00A8FF", ctaText: "Rent Now", ctaLink: "/products" }];
                 } else if (!d.heroSlides || d.heroSlides.length === 0) {
                     d.heroSlides = DEFAULTS.heroSlides;
                 }
-
                 if (!d.rentalProcessSteps || d.rentalProcessSteps.length === 0) {
                     d.rentalProcessSteps = DEFAULTS.rentalProcessSteps;
                 }
-
                 setData({ ...DEFAULTS, ...d });
             }
-        } catch (err) {
-            console.error(err);
-        } finally {
-            setLoading(false);
-        }
+        } catch (err) { console.error(err); }
+        finally { setLoading(false); }
     }, []);
 
     useEffect(() => { fetchCMS(); }, [fetchCMS]);
@@ -273,428 +245,273 @@ export default function CMSHomepage() {
             if (!res.ok) throw new Error((await res.json()).message || "Failed to save");
             setSaved(true);
             setTimeout(() => setSaved(false), 3000);
-        } catch (err) {
-            alert(err.message);
-        } finally {
-            setSaving(false);
-        }
+        } catch (err) { alert(err.message); }
+        finally { setSaving(false); }
     };
 
-    if (loading) {
-        return (
-            <div className="h-[60vh] flex flex-col items-center justify-center space-y-4">
-                <Spinner size="lg" color="secondary" />
-                <p className="text-slate-500 font-medium">Loading Homepage CMS…</p>
-            </div>
-        );
-    }
+    if (loading) return (
+        <div className="h-[60vh] flex flex-col items-center justify-center gap-4">
+            <Spinner size="lg" color="secondary" />
+            <p className="text-slate-500 font-medium">Loading Homepage CMS…</p>
+        </div>
+    );
 
     return (
-        <div className="w-full space-y-6 pb-12">
-            {/* Header */}
+        <div className="w-full space-y-6 pb-16">
+            {/* ── Page Header ── */}
             <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
                 <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }}>
                     <h1 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-slate-100 mb-1">
-                        Homepage <span className="text-transparent bg-clip-text bg-linear-to-r from-indigo-500 to-purple-500">Editor</span>
+                        Homepage <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-500 to-purple-500">Editor</span>
                     </h1>
-                    <p className="text-slate-600 dark:text-slate-400">
-                        Manage all homepage sections natively inside the platform.
-                    </p>
+                    <p className="text-slate-500 dark:text-slate-400 text-sm">Manage all homepage sections natively inside the platform.</p>
                 </motion.div>
-
                 <div className="flex items-center gap-3">
                     {saved && (
-                        <div className="flex items-center gap-1.5 text-emerald-600 dark:text-emerald-400 text-sm font-semibold bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/20 rounded-full px-3 py-1.5 animate-pulse">
-                            <CheckCircle size={14} weight="fill" />
-                            Saved Successfully!
-                        </div>
+                        <span className="flex items-center gap-1.5 text-emerald-600 dark:text-emerald-400 text-sm font-semibold bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/20 rounded-full px-3 py-1.5 animate-pulse">
+                            <CheckCircle size={14} weight="fill" /> Saved Successfully!
+                        </span>
                     )}
-                    <button
-                        onClick={handleSave}
-                        disabled={saving}
-                        className="flex items-center gap-2 h-10 px-6 rounded-xl bg-indigo-600 hover:bg-indigo-700 disabled:opacity-60 text-white font-semibold text-sm shadow-lg shadow-indigo-500/25 transition-all"
-                    >
+                    <button onClick={handleSave} disabled={saving}
+                        className="flex items-center gap-2 h-10 px-6 rounded-xl bg-indigo-600 hover:bg-indigo-700 disabled:opacity-60 text-white font-semibold text-sm shadow-lg shadow-indigo-500/25 transition-all">
                         {saving ? <Spinner size="sm" color="white" /> : <FloppyDisk size={18} weight="bold" />}
                         {saving ? "Publishing…" : "Publish Changes"}
                     </button>
                 </div>
             </div>
 
-            {/* TAB SYSTEM */}
-            <Tabs aria-label="Homepage Sections" color="primary" variant="underlined"
-                classNames={{ tabList: "gap-6 border-b border-slate-200 dark:border-slate-800 w-full overflow-x-auto", cursor: "w-full bg-indigo-500", tab: "max-w-fit px-0 h-12" }}>
+            {/* ── Custom Tab Bar ── */}
+            <div className="flex items-center gap-2 flex-wrap">
+                {TABS.map(t => (
+                    <TabBtn key={t.key} icon={t.icon} label={t.label} active={activeTab === t.key} onClick={() => setActiveTab(t.key)} />
+                ))}
+            </div>
 
-                {/* ── HERO TAB ── */}
-                <Tab key="hero" title={<div className="flex items-center gap-2"><Layout size={15} /><span>Hero Highlights</span></div>}>
-                    <Card className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 mt-4 shadow-sm">
-                        <CardBody className="p-6 md:p-8 space-y-8">
-                            <div className="flex items-center justify-between bg-slate-50 dark:bg-slate-800/50 p-4 rounded-xl">
-                                <div>
-                                    <h4 className="text-base font-bold text-slate-900 dark:text-white">Hero Visibility</h4>
-                                    <p className="text-sm text-slate-500">Show or hide the main slider at the top of the homepage.</p>
-                                </div>
-                                <Toggle isSelected={data.heroEnabled} onValueChange={(v) => set("heroEnabled", v)} />
-                            </div>
+            {/* ── TAB: HERO ── */}
+            {activeTab === "hero" && (
+                <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="space-y-6">
+                    <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 shadow-sm">
+                        <SectionRow
+                            title="Hero Visibility"
+                            desc="Show or hide the main hero slider at the top of the homepage."
+                            toggle={data.heroEnabled}
+                            onToggle={v => set("heroEnabled", v)}
+                        />
+                    </div>
 
-                            <Divider />
+                    <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 shadow-sm space-y-6">
+                        <div className="flex justify-between items-center">
+                            <h3 className="text-lg font-bold flex items-center gap-2 text-slate-800 dark:text-slate-100"><PhosphorImage /> Carousel Slides</h3>
+                            <button onClick={() => set("heroSlides", [...data.heroSlides, { title: "New Slide", subtitle: "", image: "", bgColor: "#333333", ctaText: "Rent Now", ctaLink: "/products" }])}
+                                className="flex items-center gap-1.5 h-8 px-4 rounded-lg bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 text-sm font-semibold hover:bg-indigo-100 dark:hover:bg-indigo-500/20 transition-all border border-indigo-200 dark:border-indigo-500/20">
+                                <Plus size={14} /> Add Slide
+                            </button>
+                        </div>
 
-                            <div className="space-y-6">
-                                <div className="flex justify-between items-center">
-                                    <h3 className="text-xl font-bold flex items-center gap-2"><PhosphorImage /> Carousel Slides</h3>
-                                    <Button
-                                        size="sm" color="primary" variant="flat" startContent={<Plus />}
-                                        onClick={() => {
-                                            set("heroSlides", [...data.heroSlides, { title: "New Slide", subtitle: "", image: "", bgColor: "#333333", ctaText: "Rent Now", ctaLink: "/products" }]);
-                                        }}
-                                    >
-                                        Add Slide
-                                    </Button>
-                                </div>
+                        <div className="space-y-5">
+                            {data.heroSlides.map((slide, index) => (
+                                <div key={index} className="p-5 border border-slate-200 dark:border-slate-700 rounded-2xl relative bg-slate-50 dark:bg-slate-950">
+                                    <div className="flex items-center justify-between mb-5">
+                                        <div className="flex items-center gap-2">
+                                            <span className="w-7 h-7 bg-indigo-100 text-indigo-700 rounded-full flex items-center justify-center font-bold text-xs">#{index + 1}</span>
+                                            <h4 className="font-semibold text-slate-800 dark:text-slate-200">Slide Configuration</h4>
+                                        </div>
+                                        {data.heroSlides.length > 1 && (
+                                            <button onClick={() => { const n = [...data.heroSlides]; n.splice(index, 1); set("heroSlides", n); }}
+                                                className="text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 p-2 rounded-lg transition-colors">
+                                                <Trash size={16} />
+                                            </button>
+                                        )}
+                                    </div>
 
-                                <div className="space-y-4">
-                                    {data.heroSlides.map((slide, index) => (
-                                        <div key={index} className="p-5 border border-slate-200 dark:border-slate-700 rounded-2xl relative bg-white dark:bg-slate-950 shadow-xs">
-                                            {/* Delete Btn */}
-                                            {data.heroSlides.length > 1 && (
-                                                <button
-                                                    onClick={() => {
-                                                        const newSlides = [...data.heroSlides];
-                                                        newSlides.splice(index, 1);
-                                                        set("heroSlides", newSlides);
-                                                    }}
-                                                    className="absolute top-4 right-4 text-red-500 hover:bg-red-50 p-2 rounded-lg transition-colors"
-                                                >
-                                                    <Trash size={18} />
-                                                </button>
+                                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                                        <div className="space-y-4">
+                                            <Field label="Headline" value={slide.title} onChange={v => { const n = [...data.heroSlides]; n[index].title = v; set("heroSlides", n); }} placeholder="The Tech That Powers Your Ambition." />
+                                            <Field label="Sub-headline" value={slide.subtitle} onChange={v => { const n = [...data.heroSlides]; n[index].subtitle = v; set("heroSlides", n); }} placeholder="Get the latest MacBooks right now..." rows={2} />
+                                            <div className="grid grid-cols-2 gap-4">
+                                                <Field label="CTA Button Text" value={slide.ctaText} onChange={v => { const n = [...data.heroSlides]; n[index].ctaText = v; set("heroSlides", n); }} placeholder="Rent Now" />
+                                                <Field label="CTA Button Link" value={slide.ctaLink} onChange={v => { const n = [...data.heroSlides]; n[index].ctaLink = v; set("heroSlides", n); }} placeholder="/products" />
+                                            </div>
+                                            <div>
+                                                <label className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider block mb-2">Background Color (Hex)</label>
+                                                <div className="flex items-center gap-3">
+                                                    <input type="color" value={slide.bgColor} onChange={e => { const n = [...data.heroSlides]; n[index].bgColor = e.target.value; set("heroSlides", n); }} className="w-10 h-10 rounded-lg cursor-pointer border border-slate-200 dark:border-slate-700" />
+                                                    <input type="text" value={slide.bgColor} onChange={e => { const n = [...data.heroSlides]; n[index].bgColor = e.target.value; set("heroSlides", n); }}
+                                                        className="flex-1 h-10 px-3 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/40 transition-all font-mono" />
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div className="space-y-4">
+                                            <ImageUploader label="Foreground Image (Transparent PNG Recommended)" existingUrl={slide.image}
+                                                onUpload={url => { const n = [...data.heroSlides]; n[index].image = url; set("heroSlides", n); }} />
+                                            {slide.image && (
+                                                <div className="h-32 rounded-xl flex items-center justify-center p-2 border border-slate-200 dark:border-slate-700" style={{ backgroundColor: slide.bgColor }}>
+                                                    <img src={slide.image} className="max-h-full max-w-full object-contain drop-shadow-xl" alt="Preview" />
+                                                </div>
                                             )}
-
-                                            <div className="flex items-center gap-3 mb-4">
-                                                <span className="w-7 h-7 bg-indigo-100 text-indigo-700 rounded-full flex items-center justify-center font-bold text-xs">#{index + 1}</span>
-                                                <h4 className="font-semibold text-slate-800 dark:text-slate-200">Slide Configuration</h4>
-                                            </div>
-
-                                            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                                                {/* Text side */}
-                                                <div className="space-y-4">
-                                                    <Input
-                                                        label="Headline"
-                                                        value={slide.title} onValueChange={(v) => { const n = [...data.heroSlides]; n[index].title = v; set("heroSlides", n); }}
-                                                        placeholder="The Tech That Powers Your Ambition." variant="bordered"
-                                                    />
-                                                    <Textarea
-                                                        label="Sub-headline"
-                                                        value={slide.subtitle} onValueChange={(v) => { const n = [...data.heroSlides]; n[index].subtitle = v; set("heroSlides", n); }}
-                                                        placeholder="Get the latest MacBooks right now..." variant="bordered" rows={2}
-                                                    />
-                                                    <div className="grid grid-cols-2 gap-4">
-                                                        <Input
-                                                            label="CTA Button Text"
-                                                            value={slide.ctaText} onValueChange={(v) => { const n = [...data.heroSlides]; n[index].ctaText = v; set("heroSlides", n); }}
-                                                            variant="bordered"
-                                                        />
-                                                        <Input
-                                                            label="CTA Button Link"
-                                                            value={slide.ctaLink} onValueChange={(v) => { const n = [...data.heroSlides]; n[index].ctaLink = v; set("heroSlides", n); }}
-                                                            variant="bordered"
-                                                        />
-                                                    </div>
-                                                    <div>
-                                                        <label className="text-xs font-bold text-slate-600 block mb-2">Background Color (Hex)</label>
-                                                        <div className="flex items-center gap-3">
-                                                            <input type="color" value={slide.bgColor} onChange={(e) => { const n = [...data.heroSlides]; n[index].bgColor = e.target.value; set("heroSlides", n); }} className="w-10 h-10 rounded cursor-pointer" />
-                                                            <Input value={slide.bgColor} onValueChange={(v) => { const n = [...data.heroSlides]; n[index].bgColor = v; set("heroSlides", n); }} variant="bordered" className="flex-1" />
-                                                        </div>
-                                                    </div>
-                                                </div>
-
-                                                {/* Image Side */}
-                                                <div className="space-y-4">
-                                                    <ImageUploader
-                                                        label="Foreground Image (Transparent PNG Recommended)"
-                                                        existingUrl={slide.image}
-                                                        onUpload={url => { const n = [...data.heroSlides]; n[index].image = url; set("heroSlides", n); }}
-                                                    />
-                                                    {slide.image && (
-                                                        <div className="h-32 rounded-xl bg-slate-100 flex items-center justify-center p-2 border border-slate-200" style={{ backgroundColor: slide.bgColor }}>
-                                                            <img src={slide.image} className="max-h-full max-w-full object-contain mix-blend-normal drop-shadow-xl" alt="Preview" />
-                                                        </div>
-                                                    )}
-                                                </div>
-                                            </div>
-                                        </div>
-                                    ))}
-                                </div>
-                            </div>
-                        </CardBody>
-                    </Card>
-                </Tab>
-
-                {/* ── PRODUCTS GRID TAB ── */}
-                <Tab key="products" title={<div className="flex items-center gap-2"><Package size={15} /><span>Curated Grids</span></div>}>
-                    <Card className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 mt-4 shadow-sm">
-                        <CardBody className="p-6 md:p-8 space-y-10">
-
-                            {/* Best Rented */}
-                            <div className="space-y-6">
-                                <div className="flex items-center justify-between border-b border-slate-100 pb-4">
-                                    <div className="flex items-center gap-3">
-                                        <div className="p-2 bg-amber-100 text-amber-600 rounded-lg"><Star weight="fill" /></div>
-                                        <div>
-                                            <h3 className="text-lg font-bold">Best Rented Products</h3>
-                                            <p className="text-sm text-slate-500">Pick exactly which products to display on the homepage.</p>
                                         </div>
                                     </div>
-                                    <Toggle isSelected={data.bestRentedEnabled} onValueChange={(v) => set("bestRentedEnabled", v)} />
                                 </div>
+                            ))}
+                        </div>
+                    </div>
+                </motion.div>
+            )}
 
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                    <Input
-                                        label="Section Title"
-                                        value={data.bestRentedTitle} onValueChange={(v) => set("bestRentedTitle", v)}
-                                        variant="bordered" placeholder="e.g. Best Rented Products"
-                                    />
-                                    <div className="md:col-span-2">
-                                        <ProductSelector
-                                            label="Select Products to Feature (Recommend exactly 4 or 8)"
-                                            selectedIds={data.bestRentedProductIds}
-                                            onChange={(ids) => set("bestRentedProductIds", ids)}
-                                        />
-                                    </div>
-                                </div>
+            {/* ── TAB: CURATED GRIDS ── */}
+            {activeTab === "products" && (
+                <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="space-y-6">
+                    {/* Best Rented */}
+                    <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 shadow-sm space-y-6">
+                        <SectionRow
+                            icon={<Star weight="fill" className="text-amber-500" />}
+                            title="Best Rented Products"
+                            desc="Pick exactly which products to display on the homepage."
+                            toggle={data.bestRentedEnabled}
+                            onToggle={v => set("bestRentedEnabled", v)}
+                        />
+                        <Field label="Section Title" value={data.bestRentedTitle} onChange={v => set("bestRentedTitle", v)} placeholder="e.g. Best Rented Products" />
+                        <ProductSelector label="Select Products to Feature (Recommend exactly 4 or 8)" selectedIds={data.bestRentedProductIds} onChange={ids => set("bestRentedProductIds", ids)} />
+                    </div>
+
+                    {/* New Launches */}
+                    <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 shadow-sm space-y-6">
+                        <SectionRow
+                            icon={<Tag weight="bold" className="text-indigo-500" />}
+                            title="New Launches Grid"
+                            desc="Feature the latest equipment added to your inventory."
+                            toggle={data.newLaunchEnabled}
+                            onToggle={v => set("newLaunchEnabled", v)}
+                        />
+                        <Field label="Section Title" value={data.newLaunchTitle} onChange={v => set("newLaunchTitle", v)} placeholder="e.g. New Launches This Week" />
+                        <ProductSelector label="Select Products to Feature (Recommend exactly 4 or 8)" selectedIds={data.newLaunchProductIds} onChange={ids => set("newLaunchProductIds", ids)} />
+                    </div>
+                </motion.div>
+            )}
+
+            {/* ── TAB: RENTAL PROCESS ── */}
+            {activeTab === "process" && (
+                <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}>
+                    <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 shadow-sm space-y-6">
+                        {/* Settings block */}
+                        <div className="bg-slate-50 dark:bg-slate-800/50 rounded-2xl p-5 space-y-4">
+                            <div className="flex justify-between items-center">
+                                <h3 className="text-base font-bold text-slate-800 dark:text-slate-100">Process Settings</h3>
+                                <Toggle isSelected={data.rentalProcessEnabled} onValueChange={v => set("rentalProcessEnabled", v)} size="sm" />
                             </div>
+                            <Field label="Section Title" value={data.rentalProcessTitle} onChange={v => set("rentalProcessTitle", v)} />
+                            <Field label="Section Subtitle" value={data.rentalProcessSubtitle} onChange={v => set("rentalProcessSubtitle", v)} rows={2} />
+                        </div>
 
-                            {/* New Launches */}
-                            <div className="space-y-6 pt-6 border-t border-slate-100 dark:border-slate-800">
-                                <div className="flex items-center justify-between border-b border-slate-100 pb-4">
-                                    <div className="flex items-center gap-3">
-                                        <div className="p-2 bg-indigo-100 text-indigo-600 rounded-lg"><Tag weight="bold" /></div>
-                                        <div>
-                                            <h3 className="text-lg font-bold">New Launches Grid</h3>
-                                            <p className="text-sm text-slate-500">Feature the latest equipment added to your inventory.</p>
-                                        </div>
-                                    </div>
-                                    <Toggle isSelected={data.newLaunchEnabled} onValueChange={(v) => set("newLaunchEnabled", v)} />
-                                </div>
-
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                    <Input
-                                        label="Section Title"
-                                        value={data.newLaunchTitle} onValueChange={(v) => set("newLaunchTitle", v)}
-                                        variant="bordered" placeholder="e.g. New Launches This Week"
-                                    />
-                                    <div className="md:col-span-2">
-                                        <ProductSelector
-                                            label="Select Products to Feature (Recommend exactly 4 or 8)"
-                                            selectedIds={data.newLaunchProductIds}
-                                            onChange={(ids) => set("newLaunchProductIds", ids)}
-                                        />
-                                    </div>
-                                </div>
-                            </div>
-
-                        </CardBody>
-                    </Card>
-                </Tab>
-
-                {/* ── ONBOARDING / KYC TAB ── */}
-                <Tab key="process" title={<div className="flex items-center gap-2"><ArrowsLeftRight size={15} /><span>Rental Process</span></div>}>
-                    <Card className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 mt-4 shadow-sm">
-                        <CardBody className="p-6 md:p-8 space-y-8">
-
-                            <div className="flex flex-col md:flex-row gap-6 mb-8 bg-slate-50 dark:bg-slate-800/50 p-6 rounded-2xl">
-                                <div className="flex-1 space-y-4">
-                                    <div className="flex justify-between items-center mb-2">
-                                        <h3 className="text-lg font-bold">Process Settings</h3>
-                                        <Toggle isSelected={data.rentalProcessEnabled} onValueChange={(v) => set("rentalProcessEnabled", v)} size="sm" />
-                                    </div>
-                                    <Input
-                                        label="Section Title"
-                                        value={data.rentalProcessTitle} onValueChange={(v) => set("rentalProcessTitle", v)}
-                                        variant="bordered"
-                                    />
-                                    <Textarea
-                                        label="Section Subtitle"
-                                        value={data.rentalProcessSubtitle} onValueChange={(v) => set("rentalProcessSubtitle", v)}
-                                        variant="bordered" rows={2}
-                                    />
-                                </div>
-                            </div>
-
+                        {/* Steps */}
+                        <div>
                             <div className="flex justify-between items-center bg-slate-900 text-white px-5 py-3 rounded-t-xl">
                                 <h4 className="font-semibold text-sm">Flow Steps Configuration</h4>
-                                <Button size="sm" variant="flat" className="bg-white/20 text-white"
-                                    onClick={() => set("rentalProcessSteps", [...data.rentalProcessSteps, { title: "New Step", description: "Write description...", icon: "FaSearch", highlight: false }])}>
-                                    + Add Step
-                                </Button>
+                                <button onClick={() => set("rentalProcessSteps", [...data.rentalProcessSteps, { title: "New Step", description: "Write description...", icon: "FaSearch", highlight: false }])}
+                                    className="flex items-center gap-1.5 text-xs font-semibold bg-white/20 hover:bg-white/30 px-3 py-1.5 rounded-lg transition-all">
+                                    <Plus size={12} /> Add Step
+                                </button>
                             </div>
 
                             <div className="space-y-4 border border-slate-200 dark:border-slate-800 rounded-b-xl p-4 md:p-6 bg-slate-50/50 dark:bg-slate-900/50">
                                 {data.rentalProcessSteps.map((step, idx) => (
-                                    <div key={idx} className={`p-5 rounded-xl border relative shadow-xs transition-colors ${step.highlight ? 'bg-amber-50 border-amber-200' : 'bg-white border-slate-200 dark:bg-slate-950 dark:border-slate-800'}`}>
-
-                                        <div className="flex justify-between mb-4">
-                                            <span className="font-bold text-slate-400">Step {idx + 1}</span>
+                                    <div key={idx} className={`p-5 rounded-xl border relative transition-colors ${step.highlight ? 'bg-amber-50 border-amber-200 dark:bg-amber-500/5 dark:border-amber-500/20' : 'bg-white border-slate-200 dark:bg-slate-950 dark:border-slate-800'}`}>
+                                        <div className="flex justify-between items-center mb-4">
+                                            <span className="font-bold text-slate-400 text-sm">Step {idx + 1}</span>
                                             <div className="flex items-center gap-4">
-                                                <Toggle size="sm" isSelected={step.highlight} onValueChange={(v) => { const n = [...data.rentalProcessSteps]; n[idx].highlight = v; set("rentalProcessSteps", n); }}>
-                                                    Yellow Highlight Container
+                                                <Toggle size="sm" isSelected={step.highlight} onValueChange={v => { const n = [...data.rentalProcessSteps]; n[idx].highlight = v; set("rentalProcessSteps", n); }}>
+                                                    Yellow Highlight
                                                 </Toggle>
-                                                <button onClick={() => { const n = [...data.rentalProcessSteps]; n.splice(idx, 1); set("rentalProcessSteps", n); }} className="text-red-500 hover:text-red-700">
-                                                    <Trash size={16} />
+                                                <button onClick={() => { const n = [...data.rentalProcessSteps]; n.splice(idx, 1); set("rentalProcessSteps", n); }} className="text-red-500 hover:text-red-700 p-1">
+                                                    <Trash size={15} />
                                                 </button>
                                             </div>
                                         </div>
-
                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                            <div className="space-y-4">
-                                                <Input
-                                                    label="Title" size="sm"
-                                                    value={step.title} onValueChange={(v) => { const n = [...data.rentalProcessSteps]; n[idx].title = v; set("rentalProcessSteps", n); }}
-                                                    variant="bordered"
-                                                />
-                                                <Input
-                                                    label="React Icon Name (e.g. FaUserCheck)" size="sm"
-                                                    value={step.icon} onValueChange={(v) => { const n = [...data.rentalProcessSteps]; n[idx].icon = v; set("rentalProcessSteps", n); }}
-                                                    variant="bordered"
-                                                />
+                                            <div className="space-y-3">
+                                                <Field label="Title" value={step.title} onChange={v => { const n = [...data.rentalProcessSteps]; n[idx].title = v; set("rentalProcessSteps", n); }} />
+                                                <Field label="Icon Name (e.g. FaUserCheck)" value={step.icon} onChange={v => { const n = [...data.rentalProcessSteps]; n[idx].icon = v; set("rentalProcessSteps", n); }} placeholder="FaUserCheck" />
                                             </div>
-                                            <div>
-                                                <Textarea
-                                                    label="Body Description"
-                                                    value={step.description} onValueChange={(v) => { const n = [...data.rentalProcessSteps]; n[idx].description = v; set("rentalProcessSteps", n); }}
-                                                    variant="bordered" rows={3}
-                                                />
-                                            </div>
+                                            <Field label="Body Description" value={step.description} onChange={v => { const n = [...data.rentalProcessSteps]; n[idx].description = v; set("rentalProcessSteps", n); }} rows={3} />
                                         </div>
                                     </div>
                                 ))}
                             </div>
+                        </div>
+                    </div>
+                </motion.div>
+            )}
 
-                        </CardBody>
-                    </Card>
-                </Tab>
-
-                {/* ── TESTIMONIALS & WHY CHOOSE US TAB ── */}
-                <Tab key="trust" title={<div className="flex items-center gap-2"><ChatText size={15} /><span>Trust Factors</span></div>}>
-                    <Card className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 mt-4 shadow-sm">
-                        <CardBody className="p-6 md:p-8 space-y-12">
-
-                            {/* Testimonials */}
-                            <div className="space-y-6">
-                                <div className="flex items-center justify-between border-b border-slate-100 pb-4">
-                                    <div className="flex items-center gap-3">
-                                        <div className="p-2 bg-emerald-100 text-emerald-600 rounded-lg"><Star weight="fill" /></div>
-                                        <div>
-                                            <h3 className="text-lg font-bold">Testimonials Section header</h3>
-                                            <p className="text-sm text-slate-500">Review content is managed in the Testimonials tab. Configure UI here.</p>
-                                        </div>
-                                    </div>
-                                    <Toggle isSelected={data.testimonialsEnabled} onValueChange={(v) => set("testimonialsEnabled", v)} />
-                                </div>
-
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                    <Input
-                                        label="Section Title"
-                                        value={data.testimonialSectionTitle} onValueChange={(v) => set("testimonialSectionTitle", v)}
-                                        variant="bordered"
-                                    />
-                                    <Input
-                                        label="Google Review Count Badge"
-                                        value={data.testimonialGoogleReviewCount} onValueChange={(v) => set("testimonialGoogleReviewCount", v)}
-                                        variant="bordered" placeholder="e.g. 5000+"
-                                    />
-                                    <div className="md:col-span-2">
-                                        <Textarea
-                                            label="Section Subtitle"
-                                            value={data.testimonialSectionSubtitle} onValueChange={(v) => set("testimonialSectionSubtitle", v)}
-                                            variant="bordered" rows={2}
-                                        />
-                                    </div>
-                                </div>
+            {/* ── TAB: TRUST FACTORS ── */}
+            {activeTab === "trust" && (
+                <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="space-y-6">
+                    {/* Testimonials */}
+                    <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 shadow-sm space-y-6">
+                        <SectionRow
+                            icon={<Star weight="fill" className="text-emerald-500" />}
+                            title="Testimonials Section"
+                            desc="Review content is managed in the Testimonials tab. Configure UI here."
+                            toggle={data.testimonialsEnabled}
+                            onToggle={v => set("testimonialsEnabled", v)}
+                        />
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <Field label="Section Title" value={data.testimonialSectionTitle} onChange={v => set("testimonialSectionTitle", v)} />
+                            <Field label="Google Review Count Badge" value={data.testimonialGoogleReviewCount} onChange={v => set("testimonialGoogleReviewCount", v)} placeholder="e.g. 5000+" />
+                            <div className="md:col-span-2">
+                                <Field label="Section Subtitle" value={data.testimonialSectionSubtitle} onChange={v => set("testimonialSectionSubtitle", v)} rows={2} />
                             </div>
+                        </div>
+                    </div>
 
-                            {/* Why Choose Us */}
-                            <div className="space-y-6 pt-6 border-t border-slate-100 dark:border-slate-800">
-                                <div className="flex items-center gap-3 border-b border-slate-100 pb-4">
-                                    <div className="p-2 bg-blue-100 text-blue-600 rounded-lg"><ShieldCheck weight="fill" /></div>
-                                    <div>
-                                        <h3 className="text-lg font-bold">Why Choose Us Block</h3>
-                                    </div>
-                                </div>
-
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                                    <div className="space-y-4">
-                                        <Input
-                                            label="Headline"
-                                            value={data.whyChooseUsTitle} onValueChange={(v) => set("whyChooseUsTitle", v)}
-                                            variant="bordered"
-                                        />
-                                        <Textarea
-                                            label="Description text"
-                                            value={data.whyChooseUsSubtitle} onValueChange={(v) => set("whyChooseUsSubtitle", v)}
-                                            variant="bordered" rows={5}
-                                        />
-
-                                        <div className="grid grid-cols-3 gap-3 pt-2">
-                                            <Input label="Devices Stat" size="sm" value={data.statsDevices} onValueChange={v => set("statsDevices", v)} variant="bordered" />
-                                            <Input label="Customers Stat" size="sm" value={data.statsCustomers} onValueChange={v => set("statsCustomers", v)} variant="bordered" />
-                                            <Input label="Cities Stat" size="sm" value={data.statsCities} onValueChange={v => set("statsCities", v)} variant="bordered" />
-                                        </div>
-                                    </div>
-                                    <div>
-                                        <ImageUploader
-                                            label="Corporate Image"
-                                            existingUrl={data.whyChooseUsImage}
-                                            onUpload={url => set("whyChooseUsImage", url)}
-                                        />
-                                        {data.whyChooseUsImage && (
-                                            <div className="aspect-[4/3] w-full mt-4 rounded-xl overflow-hidden shadow-md">
-                                                <img src={data.whyChooseUsImage} className="w-full h-full object-cover" alt="Preview" />
-                                            </div>
-                                        )}
-                                    </div>
+                    {/* Why Choose Us */}
+                    <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 shadow-sm space-y-6">
+                        <SectionRow
+                            icon={<ShieldCheck weight="fill" className="text-blue-500" />}
+                            title="Why Choose Us Block"
+                        />
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                            <div className="space-y-4">
+                                <Field label="Headline" value={data.whyChooseUsTitle} onChange={v => set("whyChooseUsTitle", v)} />
+                                <Field label="Description" value={data.whyChooseUsSubtitle} onChange={v => set("whyChooseUsSubtitle", v)} rows={5} placeholder="Join thousands who've switched to IndianRentals..." />
+                                <div className="grid grid-cols-3 gap-3">
+                                    <Field label="Devices Stat" value={data.statsDevices} onChange={v => set("statsDevices", v)} placeholder="90k+" />
+                                    <Field label="Customers Stat" value={data.statsCustomers} onChange={v => set("statsCustomers", v)} placeholder="30k+" />
+                                    <Field label="Cities Stat" value={data.statsCities} onChange={v => set("statsCities", v)} placeholder="401+" />
                                 </div>
                             </div>
-
-                        </CardBody>
-                    </Card>
-                </Tab>
-
-                {/* ── SEO INFO TAB ── */}
-                <Tab key="seo" title={<div className="flex items-center gap-2"><Globe size={15} /><span>SEO Meta Settings</span></div>}>
-                    <Card className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 mt-4">
-                        <CardBody className="p-8 space-y-6">
-                            <div className="space-y-2">
-                                <label className="text-xs font-bold text-slate-600 dark:text-slate-300 uppercase tracking-wider">Meta Title</label>
-                                <Input
-                                    value={data.metaTitle}
-                                    onValueChange={(v) => set("metaTitle", v)}
-                                    placeholder="IndianRentals – Rent Everything You Need"
-                                    variant="bordered"
-                                    classNames={{ inputWrapper: "h-12" }}
-                                />
+                            <div>
+                                <ImageUploader label="Corporate Image" existingUrl={data.whyChooseUsImage} onUpload={url => set("whyChooseUsImage", url)} />
+                                {data.whyChooseUsImage && (
+                                    <div className="aspect-[4/3] w-full mt-4 rounded-xl overflow-hidden shadow-md">
+                                        <img src={data.whyChooseUsImage} className="w-full h-full object-cover" alt="Preview" />
+                                    </div>
+                                )}
                             </div>
-                            <div className="space-y-2">
-                                <label className="text-xs font-bold text-slate-600 dark:text-slate-300 uppercase tracking-wider">Meta Description</label>
-                                <Textarea
-                                    value={data.metaDescription}
-                                    onValueChange={(v) => set("metaDescription", v)}
-                                    placeholder="Find and rent premium gadgets..."
-                                    variant="bordered"
-                                    rows={3}
-                                />
-                            </div>
+                        </div>
+                    </div>
+                </motion.div>
+            )}
 
-                            <div className="p-5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 space-y-1">
-                                <p className="text-xs text-slate-400 uppercase font-semibold tracking-wider mb-2">Google Custom Snippet Preview</p>
-                                <p className="text-[#1a0dab] text-lg hover:underline cursor-pointer">{data.metaTitle || "IndianRentals – Get Tech on Demand"}</p>
-                                <p className="text-[#006621] text-sm">https://indianrentals.com</p>
-                                <p className="text-[#545454] text-sm">{data.metaDescription || "Default website description goes here to entice users..."}</p>
-                            </div>
-                        </CardBody>
-                    </Card>
-                </Tab>
+            {/* ── TAB: SEO ── */}
+            {activeTab === "seo" && (
+                <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}>
+                    <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 shadow-sm space-y-6">
+                        <SectionRow icon={<Globe className="text-indigo-500" />} title="SEO Meta Settings" desc="These appear in Google search results and social media previews." />
+                        <Field label="Meta Title" value={data.metaTitle} onChange={v => set("metaTitle", v)} placeholder="IndianRentals – Rent Everything You Need" />
+                        <p className="text-xs text-slate-400 -mt-4">{data.metaTitle.length}/60 characters</p>
+                        <Field label="Meta Description" value={data.metaDescription} onChange={v => set("metaDescription", v)} placeholder="Find and rent premium gadgets, laptops, cameras and more..." rows={3} />
+                        <p className="text-xs text-slate-400 -mt-4">{data.metaDescription.length}/160 characters</p>
 
-            </Tabs>
+                        {/* Google Preview */}
+                        <div className="p-5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 space-y-1">
+                            <p className="text-xs text-slate-400 uppercase font-semibold tracking-wider mb-3">Google Snippet Preview</p>
+                            <p className="text-[#1a0dab] dark:text-[#8ab4f8] text-lg hover:underline cursor-pointer font-medium leading-snug">{data.metaTitle || "IndianRentals – Get Tech on Demand"}</p>
+                            <p className="text-[#006621] dark:text-[#4caf50] text-sm">https://indianrentals.com</p>
+                            <p className="text-[#545454] dark:text-slate-400 text-sm leading-snug">{data.metaDescription || "Default website description goes here to entice users..."}</p>
+                        </div>
+                    </div>
+                </motion.div>
+            )}
         </div>
     );
 }
