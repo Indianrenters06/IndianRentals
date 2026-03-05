@@ -15,7 +15,13 @@ const getAllPosts = asyncHandler(async (req, res) => {
 // ── @route  GET /api/blog/:id
 // ── @access Public
 const getPostById = asyncHandler(async (req, res) => {
-    const post = await BlogPost.findById(req.params.id);
+    let post;
+    if (req.params.id.match(/^[0-9a-fA-F]{24}$/)) {
+        post = await BlogPost.findById(req.params.id);
+    } else {
+        post = await BlogPost.findOne({ slug: req.params.id });
+    }
+
     if (!post) {
         res.status(404);
         throw new Error('Blog post not found');
