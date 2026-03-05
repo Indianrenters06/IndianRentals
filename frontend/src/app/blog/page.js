@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Spinner } from "@heroui/react";
-import { ArrowUpRight } from "@phosphor-icons/react";
+import { FiArrowUpRight } from "react-icons/fi";
 
 const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
 
@@ -142,7 +142,7 @@ export default function BlogPage() {
                                             <h3 className="text-xl font-bold text-slate-900 group-hover:text-blue-600 transition-colors line-clamp-2">
                                                 {post.title}
                                             </h3>
-                                            <ArrowUpRight size={22} className="text-slate-400 group-hover:text-blue-600 transition-colors shrink-0 mt-1" weight="bold" />
+                                            <FiArrowUpRight size={22} className="text-slate-400 group-hover:text-blue-600 transition-colors shrink-0 mt-1" />
                                         </div>
 
                                         {post.excerpt && (

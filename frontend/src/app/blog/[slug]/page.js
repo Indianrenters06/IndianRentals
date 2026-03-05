@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Spinner } from "@heroui/react";
-import { ArrowLeft, Clock, User, Tag } from "@phosphor-icons/react";
+import { FiArrowLeft, FiClock, FiUser, FiTag } from "react-icons/fi";
 
 const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
 
@@ -59,7 +59,7 @@ export default function BlogPostPage() {
                     onClick={() => router.push('/blog')}
                     className="flex items-center gap-2 px-6 py-3 bg-indigo-600 text-white font-semibold rounded-xl hover:bg-indigo-700 transition-colors"
                 >
-                    <ArrowLeft size={18} weight="bold" /> Back to Blog
+                    <FiArrowLeft size={18} /> Back to Blog
                 </button>
             </div>
         );
@@ -70,14 +70,14 @@ export default function BlogPostPage() {
             <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pt-12 md:pt-20">
 
                 <Link href="/blog" className="inline-flex items-center gap-2 text-indigo-600 hover:text-indigo-800 font-semibold mb-8 text-sm transition-colors">
-                    <ArrowLeft size={16} weight="bold" /> Back to all posts
+                    <FiArrowLeft size={16} /> Back to all posts
                 </Link>
 
                 <header className="mb-10">
                     <div className="flex flex-wrap items-center gap-2 mb-6">
                         {post.tags && post.tags.map((tag, i) => (
                             <span key={i} className="px-3 py-1 bg-blue-50 border border-blue-200 text-blue-600 text-xs font-semibold rounded-full flex items-center gap-1.5">
-                                <Tag size={12} weight="fill" /> {tag}
+                                <FiTag size={12} /> {tag}
                             </span>
                         ))}
                     </div>
@@ -101,10 +101,10 @@ export default function BlogPostPage() {
                         </div>
                         <div>
                             <div className="font-bold text-slate-900 flex items-center gap-1.5 text-base">
-                                <User size={16} weight="fill" className="text-slate-400" /> {post.author || "Admin"}
+                                <FiUser size={16} className="text-slate-400" /> {post.author || "Admin"}
                             </div>
                             <div className="text-sm text-slate-500 flex items-center gap-1.5 mt-0.5">
-                                <Clock size={16} weight="fill" className="text-slate-400" /> {formatDate(post.createdAt)}
+                                <FiClock size={16} className="text-slate-400" /> {formatDate(post.createdAt)}
                             </div>
                         </div>
                     </div>
