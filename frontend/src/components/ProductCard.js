@@ -11,7 +11,7 @@ const ProductCard = ({ product }) => (
         <Link href={`/products/${product.id}`} className="contents">
             <div className="relative w-full aspect-[7/8] mb-3 flex items-center justify-center rounded-[32px] overflow-hidden cursor-pointer">
                 <div className="absolute inset-0 pointer-events-none" />
-                <Image src={product.image} alt={product.name} fill className="object-contain p-6 pb-14 group-hover:scale-105 transition-transform duration-500 drop-shadow-xl" />
+                <Image src={product.image} alt={product.name} fill className="object-contain p-6 pb-14 group-hover:scale-105 transition-transform duration-500 drop-shadow-xl mix-blend-multiply" />
                 <button className=" absolute bottom-2 left-4 right-4 bg-[#1D1D1F] text-white text-[14px] font-medium py-2 rounded-full hover:bg-white hover:text-black hover:scale-[1.02] active:scale-[0.98] transition-all duration-500 ease-out shadow-lg translate-y-[130%] group-hover:translate-y-0 z-20">Rent Now</button>
             </div>
             <div className="flex flex-col flex-1 px-1 cursor-pointer">

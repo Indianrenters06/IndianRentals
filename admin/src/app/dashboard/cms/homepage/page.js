@@ -220,16 +220,29 @@ const DEFAULTS = {
     publishStatus: "published",
     heroEnabled: true,
     heroSlides: [{ title: "The Tech That Powers Your Ambition. On Demand.", subtitle: "Get the latest MacBooks, Workstations, Cameras, and more.", image: "", bgColor: "#00A8FF", ctaText: "Rent Now", ctaLink: "/products" }],
+    categorySectionEnabled: true,
+    categorySectionTitle: "Rent by Category",
     bestRentedEnabled: true, bestRentedTitle: "Best Rented Products", bestRentedProductIds: [],
     newLaunchEnabled: true, newLaunchTitle: "New Launches This Week", newLaunchProductIds: [],
+    featureSectionEnabled: true,
+    featureSectionTitle: "MacBook Air",
+    featureSectionSubtitle: "Skip the setup hassle. Get high-performance workstations pre-configured with Ollama for instant AI development. Run large language models locally.",
+    featureSectionImage: "https://res.cloudinary.com/dgkckcdk8/image/upload/v1769961205/indian-rentals/gfjrzgp5llzcjap30wkt.png",
+    featureSectionCtaText: "Rent Now",
+    featureSectionCtaLink: "/store",
+    featureSectionStats: [
+        { value: '23x', label: 'Up to', sublabel: 'faster than the fastest Intel-based MacBook Air' },
+        { value: '2x', label: 'Up to', sublabel: 'faster than MacBook Air(M1)' },
+        { value: '18 hr', label: 'Up to', sublabel: 'battery life' }
+    ],
     rentalProcessEnabled: true,
     rentalProcessTitle: "Rental Process",
     rentalProcessSubtitle: "Choose, secure, receive, and create with zero hassle. No installation, no configuration, no delay.",
     rentalProcessSteps: [
-        { title: "Choose Your Tech", description: "Browse our curated selection...", icon: "FaLaptopCode", highlight: true },
-        { title: "Complete KYC", description: "Pick a flexible rental tenure...", icon: "FaUserCheck", highlight: false },
-        { title: "Secure Your Order", description: "Confirm your rental...", icon: "FaShieldAlt", highlight: false },
-        { title: "Receive & Create", description: "We deliver your tech...", icon: "FaBoxOpen", highlight: false },
+        { title: "Choose Your Tech", description: "Browse our curated selection...", icon: "Laptop", highlight: true },
+        { title: "Complete KYC", description: "Pick a flexible rental tenure...", icon: "IdentificationCard", highlight: false },
+        { title: "Secure Your Order", description: "Confirm your rental...", icon: "ShoppingCart", highlight: false },
+        { title: "Receive & Create", description: "We deliver your tech...", icon: "Package", highlight: false },
     ],
     testimonialsEnabled: true,
     testimonialSectionTitle: "What Our Customers Say",
@@ -246,6 +259,7 @@ const DEFAULTS = {
 const TABS = [
     { key: "hero", label: "Hero Slides", icon: <Layout size={15} /> },
     { key: "products", label: "Curated Grids", icon: <Package size={15} /> },
+    { key: "feature", label: "Feature Section", icon: <Star size={15} /> },
     { key: "process", label: "Rental Process", icon: <ArrowsLeftRight size={15} /> },
     { key: "trust", label: "Trust Factors", icon: <ChatText size={15} /> },
     { key: "seo", label: "SEO Settings", icon: <Globe size={15} /> },
@@ -410,6 +424,18 @@ export default function CMSHomepage() {
             {/* ── TAB: CURATED GRIDS ── */}
             {activeTab === "products" && (
                 <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="space-y-6">
+                    {/* Category Section */}
+                    <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 shadow-sm space-y-6">
+                        <SectionRow
+                            icon={<Layout weight="bold" className="text-emerald-500" />}
+                            title="Rent by Category"
+                            desc="Configure the category swiper title and visibility."
+                            toggle={data.categorySectionEnabled}
+                            onToggle={v => set("categorySectionEnabled", v)}
+                        />
+                        <Field label="Section Title" value={data.categorySectionTitle} onChange={v => set("categorySectionTitle", v)} placeholder="e.g. Rent by Category" />
+                    </div>
+
                     {/* Best Rented */}
                     <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 shadow-sm space-y-6">
                         <SectionRow
@@ -434,6 +460,64 @@ export default function CMSHomepage() {
                         />
                         <Field label="Section Title" value={data.newLaunchTitle} onChange={v => set("newLaunchTitle", v)} placeholder="e.g. New Launches This Week" />
                         <ProductSelector label="Select Products to Feature (Recommend exactly 4 or 8)" selectedIds={data.newLaunchProductIds} onChange={ids => set("newLaunchProductIds", ids)} />
+                    </div>
+                </motion.div>
+            )}
+
+            {/* ── TAB: FEATURE SECTION ── */}
+            {activeTab === "feature" && (
+                <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="space-y-6">
+                    <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 shadow-sm space-y-8">
+                        <SectionRow
+                            icon={<Star weight="fill" className="text-pink-500" />}
+                            title="Promotional Feature Section"
+                            desc="Customize the high-impact promotional section (e.g. MacBook Air highlight)."
+                            toggle={data.featureSectionEnabled}
+                            onToggle={v => set("featureSectionEnabled", v)}
+                        />
+
+                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                            <div className="space-y-4">
+                                <Field label="Headline" value={data.featureSectionTitle} onChange={v => set("featureSectionTitle", v)} placeholder="e.g. MacBook Air" />
+                                <Field label="Description" value={data.featureSectionSubtitle} onChange={v => set("featureSectionSubtitle", v)} rows={3} placeholder="Write something compelling..." />
+                                <div className="grid grid-cols-2 gap-4">
+                                    <Field label="CTA Text" value={data.featureSectionCtaText} onChange={v => set("featureSectionCtaText", v)} placeholder="Rent Now" />
+                                    <Field label="CTA Link" value={data.featureSectionCtaLink} onChange={v => set("featureSectionCtaLink", v)} placeholder="/store" />
+                                </div>
+                            </div>
+                            <div>
+                                <ImageUploader label="Feature Image" existingUrl={data.featureSectionImage} onUpload={url => set("featureSectionImage", url)} />
+                                {data.featureSectionImage && (
+                                    <div className="mt-4 h-40 rounded-xl bg-slate-50 dark:bg-slate-950 flex items-center justify-center p-4 border border-slate-200 dark:border-slate-800">
+                                        <img src={data.featureSectionImage} className="max-h-full max-w-full object-contain drop-shadow-lg" alt="Preview" />
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+
+                        {/* Stats Rows */}
+                        <div className="space-y-4">
+                            <div className="flex justify-between items-center border-t border-slate-100 dark:border-slate-800 pt-6">
+                                <h4 className="text-sm font-bold text-slate-800 dark:text-slate-200 uppercase tracking-tighter">Performance Statistics</h4>
+                                <button onClick={() => set("featureSectionStats", [...(data.featureSectionStats || []), { value: "10x", label: "Up to", sublabel: "Performance" }])}
+                                    className="flex items-center gap-1 text-xs font-semibold text-indigo-600 hover:text-indigo-700">
+                                    <Plus size={14} /> Add Stat
+                                </button>
+                            </div>
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                {(data.featureSectionStats || []).map((stat, idx) => (
+                                    <div key={idx} className="p-4 bg-slate-50 dark:bg-slate-950 rounded-xl border border-slate-200 dark:border-slate-800 relative group">
+                                        <button onClick={() => { const n = [...data.featureSectionStats]; n.splice(idx, 1); set("featureSectionStats", n) }}
+                                            className="absolute -top-2 -right-2 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center text-xs opacity-0 group-hover:opacity-100 transition-opacity">×</button>
+                                        <div className="space-y-3">
+                                            <Field label="Label (e.g. Up to)" value={stat.label} onChange={v => { const n = [...data.featureSectionStats]; n[idx].label = v; set("featureSectionStats", n); }} />
+                                            <Field label="Value (e.g. 23x)" value={stat.value} onChange={v => { const n = [...data.featureSectionStats]; n[idx].value = v; set("featureSectionStats", n); }} />
+                                            <Field label="Subtext" value={stat.sublabel} onChange={v => { const n = [...data.featureSectionStats]; n[idx].sublabel = v; set("featureSectionStats", n); }} />
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
                     </div>
                 </motion.div>
             )}
@@ -479,9 +563,10 @@ export default function CMSHomepage() {
                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                             <div className="space-y-3">
                                                 <Field label="Title" value={step.title} onChange={v => { const n = [...data.rentalProcessSteps]; n[idx].title = v; set("rentalProcessSteps", n); }} />
-                                                <Field label="Icon Name (e.g. FaUserCheck)" value={step.icon} onChange={v => { const n = [...data.rentalProcessSteps]; n[idx].icon = v; set("rentalProcessSteps", n); }} placeholder="FaUserCheck" />
+                                                <Field label="Icon Name (e.g. Laptop)" value={step.icon} onChange={v => { const n = [...data.rentalProcessSteps]; n[idx].icon = v; set("rentalProcessSteps", n); }} placeholder="Laptop" />
+                                                <ImageUploader label="Step Illustration" existingUrl={step.image} onUpload={url => { const n = [...data.rentalProcessSteps]; n[idx].image = url; set("rentalProcessSteps", n); }} />
                                             </div>
-                                            <Field label="Body Description" value={step.description} onChange={v => { const n = [...data.rentalProcessSteps]; n[idx].description = v; set("rentalProcessSteps", n); }} rows={3} />
+                                            <Field label="Body Description" value={step.description} onChange={v => { const n = [...data.rentalProcessSteps]; n[idx].description = v; set("rentalProcessSteps", n); }} rows={5} />
                                         </div>
                                     </div>
                                 ))}

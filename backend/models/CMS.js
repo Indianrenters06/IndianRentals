@@ -5,6 +5,7 @@ const rentalProcessStepSchema = new mongoose.Schema({
     description: { type: String, default: '' },
     icon: { type: String, default: 'FaLaptopCode' }, // icon name string
     highlight: { type: Boolean, default: false }, // yellow highlight card
+    image: { type: String, default: '' },
 }, { _id: false });
 
 const heroSlideSchema = new mongoose.Schema({
@@ -32,6 +33,10 @@ const cmsSchema = new mongoose.Schema({
     heroImage: { type: String, default: '' },
     overlayColor: { type: String, default: 'rgba(0,0,0,0.5)' },
     heroBgColor: { type: String, default: '' },
+    
+    // ── Rent By Category (homepage) ──────────────────────────────────────────
+    categorySectionEnabled: { type: Boolean, default: true },
+    categorySectionTitle: { type: String, default: 'Rent by Category' },
 
     // ── Best Rented Products (homepage) ───────────────────────────────────────
     bestRentedEnabled: { type: Boolean, default: true },
@@ -65,6 +70,26 @@ const cmsSchema = new mongoose.Schema({
     statsDevices: { type: String, default: '90k+' },
     statsCustomers: { type: String, default: '30k+' },
     statsCities: { type: String, default: '401+' },
+
+    // ── Feature Section (homepage) ────────────────────────────────────────────
+    featureSectionEnabled: { type: Boolean, default: true },
+    featureSectionTitle: { type: String, default: 'MacBook Air' },
+    featureSectionSubtitle: { type: String, default: 'Skip the setup hassle. Get high-performance workstations pre-configured with Ollama for instant AI development. Run large language models locally.' },
+    featureSectionImage: { type: String, default: 'https://res.cloudinary.com/dgkckcdk8/image/upload/v1769961205/indian-rentals/gfjrzgp5llzcjap30wkt.png' },
+    featureSectionCtaText: { type: String, default: 'Rent Now' },
+    featureSectionCtaLink: { type: String, default: '/store' },
+    featureSectionStats: {
+        type: [{
+            value: String,
+            label: String,
+            sublabel: String
+        }],
+        default: [
+            { value: '23x', label: 'Up to', sublabel: 'faster than the fastest Intel-based MacBook Air' },
+            { value: '2x', label: 'Up to', sublabel: 'faster than MacBook Air(M1)' },
+            { value: '18 hr', label: 'Up to', sublabel: 'battery life' }
+        ]
+    },
 
     // ── Generic rich page content ─────────────────────────────────────────────
     pageContent: { type: String, default: '' },

@@ -4,6 +4,7 @@ import "./globals.css";
 
 const manrope = Manrope({
   subsets: ["latin"],
+  weight: ["400", "500", "600", "700", "800"],
   variable: "--font-manrope",
   display: "swap",
 });
@@ -27,7 +28,7 @@ import ClientLayout from "@/components/ClientLayout";
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
-      <body className={`${manrope.variable} ${poppins.variable} font-sans bg-gray-50 antialiased overflow-x-hidden max-w-full`}>
+      <body className={`${manrope.variable} font-manrope bg-gray-50 antialiased overflow-x-hidden max-w-full`}>
         <ReduxProvider>
           <SettingsProvider>
             <ClientLayout>

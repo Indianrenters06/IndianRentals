@@ -10,7 +10,7 @@ const initialCategories = [
     {
         id: 1,
         title: "Apple Products",
-        defaultImage: "https://images.unsplash.com/photo-1611186871348-b1ce696e52c9?q=80&w=800&auto=format&fit=crop",
+        defaultImage: "/macbook-pro-new.jpg",
         href: "/category/apple"
     },
     {
@@ -22,7 +22,7 @@ const initialCategories = [
     {
         id: 3,
         title: "AV Products",
-        defaultImage: "https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?q=80&w=800&auto=format&fit=crop",
+        defaultImage: "/it-products-new.jpg",
         href: "/category/av-products"
     },
     {

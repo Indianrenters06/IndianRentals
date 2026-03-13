@@ -88,7 +88,7 @@ export default function DynamicCategoryPage({
         : subcategories;
 
     return (
-        <div className="min-h-screen bg-white">
+        <div className="min-h-screen bg-white font-manrope">
             <main className="px-4 pt-5 pb-10 max-w-7xl mx-auto sm:px-6 lg:px-8">
 
                 {/* Filter Grid */}
@@ -131,7 +131,7 @@ export default function DynamicCategoryPage({
                     <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-6">
                         {[1, 2, 3, 4, 5, 6].map((n) => (
                             <div key={n} className="animate-pulse">
-                                <div className="bg-gray-100 rounded-2xl aspect-[4/3] mb-2" />
+                                <div className="bg-gray-100 rounded-2xl aspect-4/3 mb-2" />
                                 <div className="h-3 bg-gray-100 rounded w-3/4 mx-auto" />
                             </div>
                         ))}
@@ -144,14 +144,14 @@ export default function DynamicCategoryPage({
                         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-6">
                             {filtered.map((sub) => (
                                 <Link key={sub.href} href={sub.href} className="group block">
-                                    <div className="bg-gray-50 border border-gray-100 rounded-2xl overflow-hidden aspect-[4/3] relative group-hover:shadow-md transition-shadow duration-200">
+                                    <div className="bg-gray-50 border border-gray-100 rounded-2xl overflow-hidden aspect-4/3 relative group-hover:shadow-md transition-shadow duration-200">
                                         <div className="relative w-full h-full transform group-hover:scale-105 transition-transform duration-300">
                                             {sub.image ? (
                                                 <Image
                                                     src={sub.image}
                                                     alt={sub.name}
                                                     fill
-                                                    className="object-contain p-3"
+                                                    className="object-contain p-3 mix-blend-multiply"
                                                     sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
                                                 />
                                             ) : (

@@ -1,7 +1,7 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
-import { FaHeart, FaStar, FaBolt } from "react-icons/fa";
+import { FaRegHeart, FaStar, FaBolt, FaTruck, FaInfoCircle } from "react-icons/fa";
 import { motion } from "framer-motion";
 
 const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
@@ -120,69 +120,88 @@ const BestRentedProducts = ({ type = "bestRented", defaultTitle = "Curated Produ
                                     whileInView={{ opacity: 1, y: 0 }}
                                     viewport={{ once: true }}
                                     transition={{ duration: 0.5, delay: index * 0.1 }}
-                                    className="group bg-white rounded-2xl md:rounded-3xl p-3 md:p-4 shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 h-full flex flex-col hover:-translate-y-1"
+                                    className="group bg-white rounded-2xl p-4 shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 flex flex-col hover:-translate-y-1 md:w-[285px] md:h-[391px] mx-auto overflow-hidden"
                                 >
                                     {/* Image Container */}
-                                    <div className="relative aspect-square rounded-xl md:rounded-2xl bg-gray-50 overflow-hidden mb-3 md:mb-4 group-hover:bg-gray-100 transition-colors">
+                                    <div className="relative aspect-[254/220] rounded-xl bg-gray-50/50 overflow-hidden mb-4 group-hover:bg-gray-100/50 transition-colors flex items-center justify-center">
 
                                         {/* Badges */}
-                                        <div className="absolute top-2 left-2 z-10">
-                                            <span className="bg-[#FF4757] text-white text-[10px] md:text-xs font-bold px-2 py-0.5 rounded-full shadow-sm">
+                                        <div className="absolute top-2 left-2 z-10 flex gap-1">
+                                            <span className="bg-[#FF3B30] text-white text-[10px] font-bold px-2 py-0.5 rounded-md shadow-sm">
                                                 -20% off
                                             </span>
+                                            {product.isNew && (
+                                                <span className="bg-[#34C759] text-white text-[10px] font-bold px-2 py-0.5 rounded-md shadow-sm">
+                                                    New
+                                                </span>
+                                            )}
                                         </div>
 
                                         {/* Favorite Button */}
-                                        <button className="absolute top-2 right-2 z-10 p-1.5 md:p-2 bg-white/80 backdrop-blur-sm hover:bg-white text-gray-900 rounded-full shadow-sm transition-all">
-                                            <FaHeart size={12} className="text-gray-900 md:text-base" />
+                                        <button className="absolute top-2 right-2 z-10 w-8 h-8 flex items-center justify-center bg-white border border-gray-100 text-[#1D1D1F] rounded-full shadow-sm hover:text-[#FF3B30] transition-all">
+                                            <FaRegHeart size={16} />
                                         </button>
 
-                                        {/* Image */}
-                                        <Link href={`/products/${product.id}`} className="w-full h-full flex items-center justify-center relative p-4 md:p-6">
-                                            {product.image && product.image !== "/images/placeholder.png" ? (
-                                                <img src={product.image} alt={product.name} className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-500" />
-                                            ) : (
-                                                <div className="text-center text-gray-300">
-                                                    <FaBolt className="mx-auto mb-2 text-2xl md:text-4xl opacity-20" />
-                                                    <span className="text-[10px] md:text-sm font-medium opacity-50">{product.category}</span>
-                                                </div>
-                                            )}
-                                        </Link>
+                                        {/* Image Container with precise specs */}
+                                        <div className="relative w-full h-[286px] overflow-hidden">
+                                            {/* Precise Image Link/Wrapper */}
+                                            <Link
+                                                href={`/products/${product.id}`}
+                                                className="absolute z-0 flex items-center justify-center transition-transform duration-500 group-hover:scale-105"
+                                                style={{
+                                                    width: '255.59px',
+                                                    height: '196.42px',
+                                                    top: '43.29px',
+                                                    left: '15.71px'
+                                                }}
+                                            >
+                                                {product.image && product.image !== "/images/placeholder.png" ? (
+                                                    <img
+                                                        src={product.image}
+                                                        alt={product.name}
+                                                        className="w-full h-full object-contain mix-blend-multiply"
+                                                    />
+                                                ) : (
+                                                    <div className="text-center text-gray-300">
+                                                        <FaBolt className="mx-auto mb-2 text-4xl opacity-20" />
+                                                        <span className="text-sm font-medium opacity-50">{product.category}</span>
+                                                    </div>
+                                                )}
+                                            </Link>
+                                        </div>
                                     </div>
 
                                     {/* Content */}
-                                    <div className="flex flex-col flex-grow space-y-1.5 md:space-y-2">
-                                        <h3 className="text-xs md:text-lg font-bold text-gray-900 leading-snug line-clamp-2">
+                                    <div className="flex flex-col gap-[8px] pt-[8px] pr-[12px] pb-[12px] pl-[12px] h-[105px] w-full">
+                                        <h3 className="text-[16px] font-semibold font-manrope text-[#1D1D1F] leading-[24px] tracking-tight line-clamp-1">
                                             {product.name}
                                         </h3>
 
-                                        {/* Star Rating */}
-                                        <div className="flex items-center gap-1">
-                                            <FaStar size={12} className="text-[#FFC107]" />
-                                            <span className="text-xs font-semibold text-gray-700">{product.rating}</span>
-                                            <span className="text-[10px] text-gray-400">({product.reviews})</span>
+                                        {/* Row: Rating + Delivery */}
+                                        <div className="flex items-center justify-between">
+                                            <div className="flex items-center gap-0.5">
+                                                <div className="flex gap-0.5">
+                                                    {[...Array(5)].map((_, i) => (
+                                                        <FaStar key={i} size={14} className={i < 4 ? "text-[#FF9F0A]" : "text-[#FF9F0A] opacity-50"} />
+                                                    ))}
+                                                </div>
+                                                <span className="text-[11px] font-semibold text-[#86868B] ml-1">
+                                                    {product.rating}({product.reviews})
+                                                </span>
+                                            </div>
+                                            <div className="flex items-center gap-1 text-[#86868B]">
+                                                <FaTruck size={14} />
+                                                <span className="text-[11px]">2-4 days</span>
+                                                <FaInfoCircle size={10} className="opacity-50" />
+                                            </div>
                                         </div>
 
-                                        {/* Price */}
-                                        <div className="flex flex-wrap items-baseline gap-1">
-                                            <span className="text-[10px] text-gray-500">from</span>
-                                            <span className="text-[10px] text-gray-400 line-through">₹{product.originalPrice}</span>
-                                            <span className="text-xs md:text-sm font-bold text-[#FF4757]">₹{product.rentPrice}</span>
-                                            <span className="text-[10px] text-gray-500">/month</span>
-                                        </div>
-
-                                        {/* Tags */}
-                                        <div className="flex flex-wrap gap-1 mt-1">
-                                            {product.tags && product.tags.map(tag => (
-                                                <span key={tag} className="text-[9px] md:text-[10px] px-1.5 py-0.5 rounded-full border border-gray-200 text-gray-500 font-medium">
-                                                    {tag}
-                                                </span>
-                                            ))}
-                                            {product.statusTags && product.statusTags.map(tag => (
-                                                <span key={tag} className="text-[9px] md:text-[10px] px-1.5 py-0.5 rounded-full border border-gray-200 text-gray-500 font-medium">
-                                                    {tag}
-                                                </span>
-                                            ))}
+                                        {/* Price Section */}
+                                        <div className="flex items-baseline gap-1.5 flex-wrap">
+                                            <span className="text-[12px] text-[#86868B] font-medium">from</span>
+                                            <span className="text-[16px] text-[#86868B] line-through font-medium opacity-50">₹{product.originalPrice}</span>
+                                            <span className="text-[22px] font-bold text-[#FF3B30] leading-none">₹{product.rentPrice}</span>
+                                            <span className="text-[13px] text-[#86868B] font-medium">/month</span>
                                         </div>
                                     </div>
                                 </motion.div>

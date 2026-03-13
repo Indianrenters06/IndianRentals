@@ -5,7 +5,34 @@ import Image from 'next/image';
 import { motion } from 'framer-motion';
 import { FaArrowRight } from 'react-icons/fa';
 
+const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+
 const FeatureSection = () => {
+    const [cms, setCms] = React.useState(null);
+    const [loading, setLoading] = React.useState(true);
+
+    React.useEffect(() => {
+        const fetchCMS = async () => {
+            try {
+                const res = await fetch(`${API}/api/cms/homepage`, { cache: 'no-store' });
+                if (res.ok) {
+                    const data = await res.json();
+                    setCms(data);
+                }
+            } catch (err) {
+                console.error("Failed to fetch feature section CMS:", err);
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchCMS();
+    }, []);
+
+    if (loading) return <div className="h-96 w-full animate-pulse bg-gray-50 rounded-3xl max-w-[1440px] mx-auto my-12" />;
+    if (!cms || cms.featureSectionEnabled === false) return null;
+
+    const stats = cms.featureSectionStats || [];
+
     return (
         <section className="py-12 md:py-20 bg-white overflow-hidden relative">
             <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
@@ -28,7 +55,7 @@ const FeatureSection = () => {
                             viewport={{ once: true }}
                             className="text-4xl md:text-5xl lg:text-[52px] font-normal tracking-tight text-[#1a2b4c] leading-tight mb-5"
                         >
-                            MacBook Air
+                            {cms.featureSectionTitle || "MacBook Air"}
                         </motion.h1>
 
                         <motion.p
@@ -38,7 +65,7 @@ const FeatureSection = () => {
                             transition={{ delay: 0.1 }}
                             className="text-[#4a5568] text-[14px] md:text-[15px] leading-relaxed mb-8 max-w-[280px] font-medium"
                         >
-                            Skip the setup hassle. Get high-performance workstations pre-configured with Ollama for instant AI development. Run large language models locally.
+                            {cms.featureSectionSubtitle}
                         </motion.p>
 
                         <motion.div
@@ -48,10 +75,10 @@ const FeatureSection = () => {
                             transition={{ delay: 0.2 }}
                         >
                             <Link
-                                href="/store"
+                                href={cms.featureSectionCtaLink || "/store"}
                                 className="inline-flex items-center gap-2 bg-[#ffc53d] text-[#1a2b4c] px-6 py-2.5 rounded-full font-medium transition-all hover:bg-[#ffb50f] hover:scale-105 shadow-sm text-sm"
                             >
-                                Rent Now
+                                {cms.featureSectionCtaText || "Rent Now"}
                                 <FaArrowRight size={12} />
                             </Link>
                         </motion.div>
@@ -67,8 +94,8 @@ const FeatureSection = () => {
                             className="relative w-full max-w-[600px] aspect-[16/10] flex items-center justify-center drop-shadow-2xl"
                         >
                             <Image
-                                src="https://res.cloudinary.com/dgkckcdk8/image/upload/v1769961205/indian-rentals/gfjrzgp5llzcjap30wkt.png"
-                                alt="MacBook Air"
+                                src={cms.featureSectionImage || "https://res.cloudinary.com/dgkckcdk8/image/upload/v1769961205/indian-rentals/gfjrzgp5llzcjap30wkt.png"}
+                                alt={cms.featureSectionTitle}
                                 fill
                                 className="object-contain hover:scale-105 transition-transform duration-500 scale-110"
                                 priority
@@ -94,47 +121,21 @@ const FeatureSection = () => {
 
                     {/* Right Content (Stats) */}
                     <div className="lg:w-[16%] w-full flex flex-row lg:flex-col justify-between gap-6 lg:gap-10 z-10 mt-10 lg:mt-0">
-                        {/* Stat 1 */}
-                        <motion.div
-                            initial={{ opacity: 0, x: 20 }}
-                            whileInView={{ opacity: 1, x: 0 }}
-                            viewport={{ once: true }}
-                            transition={{ delay: 0.3 }}
-                        >
-                            <p className="text-xs text-[#718096] font-medium mb-1">Up to</p>
-                            <h4 className="text-3xl md:text-4xl lg:text-[42px] font-normal tracking-tight text-[#1a2b4c] leading-none mb-2">23x</h4>
-                            <p className="text-[11px] text-[#718096] leading-snug">
-                                faster than the fastest<br />Intel-based<br />MacBook Air
-                            </p>
-                        </motion.div>
-
-                        {/* Stat 2 */}
-                        <motion.div
-                            initial={{ opacity: 0, x: 20 }}
-                            whileInView={{ opacity: 1, x: 0 }}
-                            viewport={{ once: true }}
-                            transition={{ delay: 0.4 }}
-                        >
-                            <p className="text-xs text-[#718096] font-medium mb-1">Up to</p>
-                            <h4 className="text-3xl md:text-4xl lg:text-[42px] font-normal tracking-tight text-[#1a2b4c] leading-none mb-2">2x</h4>
-                            <p className="text-[11px] text-[#718096] leading-snug">
-                                faster than<br />MacBook<br />Air(M1)
-                            </p>
-                        </motion.div>
-
-                        {/* Stat 3 */}
-                        <motion.div
-                            initial={{ opacity: 0, x: 20 }}
-                            whileInView={{ opacity: 1, x: 0 }}
-                            viewport={{ once: true }}
-                            transition={{ delay: 0.5 }}
-                        >
-                            <p className="text-xs text-[#718096] font-medium mb-1">Up to</p>
-                            <h4 className="text-3xl md:text-4xl lg:text-[42px] font-normal tracking-tight text-[#15803d] leading-none mb-2">18 hr</h4>
-                            <p className="text-[11px] text-[#718096] leading-snug">
-                                battery life
-                            </p>
-                        </motion.div>
+                        {stats.map((stat, idx) => (
+                            <motion.div
+                                key={idx}
+                                initial={{ opacity: 0, x: 20 }}
+                                whileInView={{ opacity: 1, x: 0 }}
+                                viewport={{ once: true }}
+                                transition={{ delay: 0.3 + (idx * 0.1) }}
+                            >
+                                <p className="text-xs text-[#718096] font-medium mb-1">{stat.label}</p>
+                                <h4 className="text-3xl md:text-4xl lg:text-[42px] font-normal tracking-tight text-[#1a2b4c] leading-none mb-2">{stat.value}</h4>
+                                <p className="text-[11px] text-[#718096] leading-snug">
+                                    {stat.sublabel}
+                                </p>
+                            </motion.div>
+                        ))}
                     </div>
 
                 </div>

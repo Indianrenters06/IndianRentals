@@ -98,7 +98,7 @@ export default function SubcategoryProductsPage({ subcategoryId, subcategoryName
                     <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                         {[1, 2, 3, 4, 5, 6].map((n) => (
                             <div key={n} className="animate-pulse">
-                                <div className="bg-gray-100 rounded-2xl aspect-[4/3] mb-2" />
+                                <div className="bg-gray-100 rounded-2xl aspect-4/3 mb-2" />
                                 <div className="h-4 bg-gray-100 rounded w-3/4 mx-auto" />
                                 <div className="h-3 bg-gray-100 rounded w-1/2 mx-auto mt-1" />
                             </div>
@@ -144,14 +144,14 @@ export default function SubcategoryProductsPage({ subcategoryId, subcategoryName
                             {sortedProducts.map((product) => (
                                 <Link key={product._id} href={`/products/${product._id}`} className="group block">
                                     {/* Image tile */}
-                                    <div className="bg-gray-50 border border-gray-100 rounded-2xl overflow-hidden aspect-[4/3] relative group-hover:shadow-md transition-shadow duration-200">
+                                    <div className="bg-gray-50 border border-gray-100 rounded-2xl overflow-hidden aspect-4/3 relative group-hover:shadow-md transition-shadow duration-200">
                                         <div className="relative w-full h-full transform group-hover:scale-105 transition-transform duration-300">
                                             {product.images?.[0] ? (
                                                 <Image
                                                     src={product.images[0]}
                                                     alt={product.name}
                                                     fill
-                                                    className="object-contain p-3"
+                                                    className="object-contain p-3 mix-blend-multiply"
                                                     sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
                                                 />
                                             ) : (

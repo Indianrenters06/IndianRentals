@@ -1,27 +1,21 @@
-require('dotenv').config();
 const mongoose = require('mongoose');
-const Category = require('../models/Category');
+const dotenv = require('dotenv');
+const path = require('path');
+const fs = require('fs');
 
-const check = async () => {
+dotenv.config({ path: path.join(__dirname, '../.env') });
+
+const checkCategories = async () => {
     try {
-        await mongoose.connect(process.env.MONGO_URI);
-        const allInOne = await Category.find({ name: { $regex: /all in one/i } });
-        console.log("\n--- Searching for 'All in One' ---");
-        if (allInOne.length > 0) {
-            allInOne.forEach(c => {
-                console.log(`Found: "${c.name}"`);
-                console.log(`ID: ${c._id}`);
-            });
-        } else {
-            console.log("NOT FOUND in database.");
-        }
-        console.log("----------------------------------\n");
-
+        await mongoose.connect(process.env.MONGO_URI || 'mongodb://localhost:27017/indian_rentals');
+        const db = mongoose.connection.db;
+        const categories = await db.collection('categories').find({}).toArray();
+        fs.writeFileSync(path.join(__dirname, 'cat_output.json'), JSON.stringify(categories, null, 2));
+        console.log('Categories written to cat_output.json');
         process.exit(0);
-    } catch (error) {
-        console.error(error);
+    } catch (err) {
+        console.error(err);
         process.exit(1);
     }
 };
-
-check();
+checkCategories();

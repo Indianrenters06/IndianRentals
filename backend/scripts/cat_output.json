@@ -1,0 +1,541 @@
+[
+  {
+    "_id": "697c460841a1011ebbdfafa9",
+    "name": "MacBook",
+    "description": "MacBook category",
+    "isActive": true,
+    "createdAt": "2026-01-30T05:47:52.348Z",
+    "updatedAt": "2026-03-12T08:40:09.740Z",
+    "__v": 0,
+    "image": "https://res.cloudinary.com/dpu9ikeqe/image/upload/v1769200258/WhatsApp_Image_2026-01-23_at_23.58._j7jcoq.jpg"
+  },
+  {
+    "_id": "697c460841a1011ebbdfafac",
+    "name": "Camera",
+    "description": "Camera category",
+    "isActive": true,
+    "createdAt": "2026-01-30T05:47:52.432Z",
+    "updatedAt": "2026-02-01T12:44:51.632Z",
+    "__v": 0,
+    "image": ""
+  },
+  {
+    "_id": "697c460841a1011ebbdfafaf",
+    "name": "Laptop",
+    "description": "Laptop category",
+    "isActive": true,
+    "createdAt": "2026-01-30T05:47:52.512Z",
+    "updatedAt": "2026-02-01T17:56:14.126Z",
+    "__v": 0,
+    "image": ""
+  },
+  {
+    "_id": "697c460841a1011ebbdfafb2",
+    "name": "Desktop",
+    "description": "Desktop category",
+    "isActive": true,
+    "createdAt": "2026-01-30T05:47:52.593Z",
+    "updatedAt": "2026-02-01T17:56:14.082Z",
+    "__v": 0,
+    "image": "https://res.cloudinary.com/dgkckcdk8/image/upload/v1769955986/indian-rentals/ef8z4wjvwbfg5ms3zag7.jpg"
+  },
+  {
+    "_id": "697c460841a1011ebbdfafb5",
+    "name": "Gaming",
+    "description": "Gaming category",
+    "isActive": true,
+    "createdAt": "2026-01-30T05:47:52.673Z",
+    "updatedAt": "2026-02-01T17:56:13.716Z",
+    "__v": 0,
+    "image": ""
+  },
+  {
+    "_id": "697ccab4b3154f5d98990371",
+    "name": "Apple Products",
+    "description": "Apple Products category",
+    "isActive": true,
+    "createdAt": "2026-01-30T15:13:56.408Z",
+    "updatedAt": "2026-02-01T17:56:13.765Z",
+    "__v": 0,
+    "image": "https://res.cloudinary.com/dgkckcdk8/image/upload/v1769946716/indian-rentals/fj8ptqbhppbstdd0hs4i.png"
+  },
+  {
+    "_id": "697ccab4b3154f5d98990374",
+    "name": "IT Products",
+    "description": "IT Products category",
+    "isActive": true,
+    "createdAt": "2026-01-30T15:13:56.516Z",
+    "updatedAt": "2026-02-01T17:56:13.812Z",
+    "__v": 0,
+    "image": ""
+  },
+  {
+    "_id": "697ccab4b3154f5d98990377",
+    "name": "AV Products",
+    "description": "AV Products category",
+    "isActive": true,
+    "createdAt": "2026-01-30T15:13:56.634Z",
+    "updatedAt": "2026-02-01T17:56:13.859Z",
+    "__v": 0,
+    "image": "https://res.cloudinary.com/dgkckcdk8/image/upload/v1769967671/indian-rentals/ecmi4pwvqgqs0owaw4xi.jpg"
+  },
+  {
+    "_id": "697ccab4b3154f5d9899037a",
+    "name": "Office Equipment",
+    "description": "Office Equipment category",
+    "isActive": true,
+    "createdAt": "2026-01-30T15:13:56.755Z",
+    "updatedAt": "2026-02-01T17:56:13.902Z",
+    "__v": 0,
+    "image": "https://res.cloudinary.com/dgkckcdk8/image/upload/v1769967742/indian-rentals/bg4ktprnuvw0jf33m6wv.jpg"
+  },
+  {
+    "_id": "697ccab4b3154f5d9899037d",
+    "name": "DSLR Cameras",
+    "description": "DSLR Cameras category",
+    "isActive": true,
+    "createdAt": "2026-01-30T15:13:56.859Z",
+    "updatedAt": "2026-02-01T17:56:13.947Z",
+    "__v": 0,
+    "image": "https://res.cloudinary.com/dgkckcdk8/image/upload/v1769967871/indian-rentals/ea5ryxbvie8spmdb9slz.jpg"
+  },
+  {
+    "_id": "697ccffc0f987b08518468d9",
+    "name": "MacBook Pro",
+    "description": "MacBook Pro subcategory",
+    "isActive": true,
+    "createdAt": "2026-01-30T15:36:28.409Z",
+    "updatedAt": "2026-03-12T08:40:09.740Z",
+    "__v": 0,
+    "image": "https://res.cloudinary.com/dpu9ikeqe/image/upload/v1769200258/WhatsApp_Image_2026-01-23_at_23.58._j7jcoq.jpg"
+  },
+  {
+    "_id": "697ccffc0f987b08518468dc",
+    "name": "iPhone",
+    "description": "iPhone subcategory",
+    "isActive": true,
+    "createdAt": "2026-01-30T15:36:28.505Z",
+    "updatedAt": "2026-01-30T15:36:28.505Z",
+    "__v": 0
+  },
+  {
+    "_id": "697ccffc0f987b08518468df",
+    "name": "Mac Mini",
+    "description": "Mac Mini subcategory",
+    "isActive": true,
+    "createdAt": "2026-01-30T15:36:28.591Z",
+    "updatedAt": "2026-01-30T15:36:28.591Z",
+    "__v": 0
+  },
+  {
+    "_id": "697ccffc0f987b08518468e2",
+    "name": "Mac Studio",
+    "description": "Mac Studio subcategory",
+    "isActive": true,
+    "createdAt": "2026-01-30T15:36:28.679Z",
+    "updatedAt": "2026-01-30T15:36:28.679Z",
+    "__v": 0
+  },
+  {
+    "_id": "697ccffc0f987b08518468e5",
+    "name": "MacBook Air",
+    "description": "MacBook Air subcategory",
+    "isActive": true,
+    "createdAt": "2026-01-30T15:36:28.766Z",
+    "updatedAt": "2026-03-12T08:40:09.740Z",
+    "__v": 0,
+    "image": "https://res.cloudinary.com/dpu9ikeqe/image/upload/v1769200258/WhatsApp_Image_2026-01-23_at_23.58._j7jcoq.jpg"
+  },
+  {
+    "_id": "697ccffc0f987b08518468e8",
+    "name": "Apple Studio Display",
+    "description": "Apple Studio Display subcategory",
+    "isActive": true,
+    "createdAt": "2026-01-30T15:36:28.854Z",
+    "updatedAt": "2026-01-30T15:36:28.854Z",
+    "__v": 0
+  },
+  {
+    "_id": "697ccffc0f987b08518468eb",
+    "name": "Apple XDR Display",
+    "description": "Apple XDR Display subcategory",
+    "isActive": true,
+    "createdAt": "2026-01-30T15:36:28.939Z",
+    "updatedAt": "2026-01-30T15:36:28.939Z",
+    "__v": 0
+  },
+  {
+    "_id": "697ccffd0f987b08518468ee",
+    "name": "Mac Pro",
+    "description": "Mac Pro subcategory",
+    "isActive": true,
+    "createdAt": "2026-01-30T15:36:29.027Z",
+    "updatedAt": "2026-01-30T15:36:29.027Z",
+    "__v": 0
+  },
+  {
+    "_id": "697ccffd0f987b08518468f1",
+    "name": "iMac",
+    "description": "iMac subcategory",
+    "isActive": true,
+    "createdAt": "2026-01-30T15:36:29.122Z",
+    "updatedAt": "2026-01-30T15:36:29.122Z",
+    "__v": 0
+  },
+  {
+    "_id": "697ccffd0f987b08518468f4",
+    "name": "iPad",
+    "description": "iPad category",
+    "isActive": true,
+    "createdAt": "2026-01-30T15:36:29.231Z",
+    "updatedAt": "2026-02-01T17:56:14.037Z",
+    "__v": 0,
+    "image": "https://res.cloudinary.com/dgkckcdk8/image/upload/v1769956120/indian-rentals/ozvtewzsr5kjyuqppkmr.jpg"
+  },
+  {
+    "_id": "697cd195b9356451508054a6",
+    "name": "Computer",
+    "description": "Computer category",
+    "isActive": true,
+    "createdAt": "2026-01-30T15:43:17.868Z",
+    "updatedAt": "2026-02-01T17:56:14.172Z",
+    "__v": 0
+  },
+  {
+    "_id": "697cd195b9356451508054a9",
+    "name": "Server",
+    "description": "Server category",
+    "isActive": true,
+    "createdAt": "2026-01-30T15:43:17.951Z",
+    "updatedAt": "2026-02-01T17:56:14.215Z",
+    "__v": 0
+  },
+  {
+    "_id": "697cd196b9356451508054ac",
+    "name": "Workstation",
+    "description": "Workstation category",
+    "isActive": true,
+    "createdAt": "2026-01-30T15:43:18.051Z",
+    "updatedAt": "2026-02-01T17:56:14.260Z",
+    "__v": 0
+  },
+  {
+    "_id": "697cd196b9356451508054af",
+    "name": "Storage",
+    "description": "Storage category",
+    "isActive": true,
+    "createdAt": "2026-01-30T15:43:18.141Z",
+    "updatedAt": "2026-02-01T17:56:14.306Z",
+    "__v": 0
+  },
+  {
+    "_id": "697cd196b9356451508054b2",
+    "name": "Monitor / TFT",
+    "description": "Monitor / TFT category",
+    "isActive": true,
+    "createdAt": "2026-01-30T15:43:18.254Z",
+    "updatedAt": "2026-02-01T17:56:14.349Z",
+    "__v": 0
+  },
+  {
+    "_id": "697cd196b9356451508054b5",
+    "name": "UPS",
+    "description": "UPS category",
+    "isActive": true,
+    "createdAt": "2026-01-30T15:43:18.329Z",
+    "updatedAt": "2026-02-01T17:56:14.392Z",
+    "__v": 0
+  },
+  {
+    "_id": "697cd196b9356451508054b8",
+    "name": "Printer & Scanner",
+    "description": "Printer & Scanner category",
+    "isActive": true,
+    "createdAt": "2026-01-30T15:43:18.406Z",
+    "updatedAt": "2026-02-01T17:56:14.435Z",
+    "__v": 0
+  },
+  {
+    "_id": "697cd196b9356451508054bb",
+    "name": "All In One",
+    "description": "All In One category",
+    "isActive": true,
+    "createdAt": "2026-01-30T15:43:18.489Z",
+    "updatedAt": "2026-02-01T17:56:14.479Z",
+    "__v": 0,
+    "image": "https://res.cloudinary.com/dgkckcdk8/image/upload/v1769954114/indian-rentals/mqttrf8w8p4dusfhhk0m.jpg"
+  },
+  {
+    "_id": "697cd196b9356451508054be",
+    "name": "Computer Accessories",
+    "description": "Computer Accessories category",
+    "isActive": true,
+    "createdAt": "2026-01-30T15:43:18.566Z",
+    "updatedAt": "2026-02-01T17:56:14.525Z",
+    "__v": 0
+  },
+  {
+    "_id": "697cd196b9356451508054c1",
+    "name": "Paper Shredder",
+    "description": "Paper Shredder category",
+    "isActive": true,
+    "createdAt": "2026-01-30T15:43:18.644Z",
+    "updatedAt": "2026-02-01T17:56:15.016Z",
+    "__v": 0
+  },
+  {
+    "_id": "697cd196b9356451508054c4",
+    "name": "Note Counting Machine",
+    "description": "Note Counting Machine category",
+    "isActive": true,
+    "createdAt": "2026-01-30T15:43:18.724Z",
+    "updatedAt": "2026-02-01T17:56:15.059Z",
+    "__v": 0
+  },
+  {
+    "_id": "697cd196b9356451508054c7",
+    "name": "Lamination Machine",
+    "description": "Lamination Machine category",
+    "isActive": true,
+    "createdAt": "2026-01-30T15:43:18.805Z",
+    "updatedAt": "2026-02-01T17:56:15.102Z",
+    "__v": 0
+  },
+  {
+    "_id": "697cd196b9356451508054ca",
+    "name": "FAX Machine",
+    "description": "FAX Machine category",
+    "isActive": true,
+    "createdAt": "2026-01-30T15:43:18.889Z",
+    "updatedAt": "2026-02-01T17:56:15.148Z",
+    "__v": 0
+  },
+  {
+    "_id": "697cd196b9356451508054cd",
+    "name": "Barcode Scanner",
+    "description": "Barcode Scanner category",
+    "isActive": true,
+    "createdAt": "2026-01-30T15:43:18.974Z",
+    "updatedAt": "2026-02-01T17:56:15.190Z",
+    "__v": 0
+  },
+  {
+    "_id": "697cd197b9356451508054d0",
+    "name": "Barcode Printer",
+    "description": "Barcode Printer category",
+    "isActive": true,
+    "createdAt": "2026-01-30T15:43:19.069Z",
+    "updatedAt": "2026-02-01T17:56:15.234Z",
+    "__v": 0
+  },
+  {
+    "_id": "697cd197b9356451508054d3",
+    "name": "PVC Card Printer",
+    "description": "PVC Card Printer category",
+    "isActive": true,
+    "createdAt": "2026-01-30T15:43:19.160Z",
+    "updatedAt": "2026-02-01T17:56:15.277Z",
+    "__v": 0
+  },
+  {
+    "_id": "697cd197b9356451508054d6",
+    "name": "POS Bill Printer",
+    "description": "POS Bill Printer category",
+    "isActive": true,
+    "createdAt": "2026-01-30T15:43:19.240Z",
+    "updatedAt": "2026-02-01T17:56:15.321Z",
+    "__v": 0
+  },
+  {
+    "_id": "697cd197b9356451508054da",
+    "name": "Projector",
+    "description": "Projector category",
+    "isActive": true,
+    "createdAt": "2026-01-30T15:43:19.357Z",
+    "updatedAt": "2026-02-01T17:56:14.567Z",
+    "__v": 0
+  },
+  {
+    "_id": "697cd197b9356451508054dd",
+    "name": "Television",
+    "description": "Television category",
+    "isActive": true,
+    "createdAt": "2026-01-30T15:43:19.434Z",
+    "updatedAt": "2026-02-01T17:56:14.612Z",
+    "__v": 0
+  },
+  {
+    "_id": "697cd197b9356451508054e0",
+    "name": "Sound System",
+    "description": "Sound System category",
+    "isActive": true,
+    "createdAt": "2026-01-30T15:43:19.513Z",
+    "updatedAt": "2026-02-01T17:56:14.656Z",
+    "__v": 0
+  },
+  {
+    "_id": "697cd197b9356451508054e3",
+    "name": "PA System",
+    "description": "PA System subcategory",
+    "isActive": true,
+    "createdAt": "2026-01-30T15:43:19.596Z",
+    "updatedAt": "2026-01-30T15:43:19.596Z",
+    "__v": 0
+  },
+  {
+    "_id": "697cd197b9356451508054e6",
+    "name": "Touch Screen",
+    "description": "Touch Screen category",
+    "isActive": true,
+    "createdAt": "2026-01-30T15:43:19.671Z",
+    "updatedAt": "2026-02-01T17:56:14.701Z",
+    "__v": 0
+  },
+  {
+    "_id": "697cd197b9356451508054e9",
+    "name": "Conferencing Device",
+    "description": "Conferencing Device category",
+    "isActive": true,
+    "createdAt": "2026-01-30T15:43:19.747Z",
+    "updatedAt": "2026-02-01T17:56:14.745Z",
+    "__v": 0
+  },
+  {
+    "_id": "697cd197b9356451508054ec",
+    "name": "KIOSK",
+    "description": "KIOSK category",
+    "isActive": true,
+    "createdAt": "2026-01-30T15:43:19.831Z",
+    "updatedAt": "2026-02-01T17:56:14.789Z",
+    "__v": 0
+  },
+  {
+    "_id": "697cd197b9356451508054ef",
+    "name": "Microphone",
+    "description": "Microphone category",
+    "isActive": true,
+    "createdAt": "2026-01-30T15:43:19.916Z",
+    "updatedAt": "2026-02-01T17:56:14.834Z",
+    "__v": 0
+  },
+  {
+    "_id": "697cd198b9356451508054f2",
+    "name": "Panaboard",
+    "description": "Panaboard category",
+    "isActive": true,
+    "createdAt": "2026-01-30T15:43:20.008Z",
+    "updatedAt": "2026-02-01T17:56:14.877Z",
+    "__v": 0
+  },
+  {
+    "_id": "697cd198b9356451508054f5",
+    "name": "DVD Player",
+    "description": "DVD Player category",
+    "isActive": true,
+    "createdAt": "2026-01-30T15:43:20.092Z",
+    "updatedAt": "2026-02-01T17:56:14.929Z",
+    "__v": 0
+  },
+  {
+    "_id": "697cd198b9356451508054f8",
+    "name": "LED Wall",
+    "description": "LED Wall category",
+    "isActive": true,
+    "createdAt": "2026-01-30T15:43:20.173Z",
+    "updatedAt": "2026-02-01T17:56:14.973Z",
+    "__v": 0
+  },
+  {
+    "_id": "697cd198b9356451508054fb",
+    "name": "DSLR Camera",
+    "description": "DSLR Camera subcategory",
+    "isActive": true,
+    "createdAt": "2026-01-30T15:43:20.253Z",
+    "updatedAt": "2026-01-30T15:43:20.253Z",
+    "__v": 0
+  },
+  {
+    "_id": "697cd198b9356451508054fe",
+    "name": "Video Camera",
+    "description": "Video Camera category",
+    "isActive": true,
+    "createdAt": "2026-01-30T15:43:20.345Z",
+    "updatedAt": "2026-02-01T17:56:15.365Z",
+    "__v": 0
+  },
+  {
+    "_id": "697cd198b935645150805501",
+    "name": "Instant Camera",
+    "description": "Instant Camera category",
+    "isActive": true,
+    "createdAt": "2026-01-30T15:43:20.422Z",
+    "updatedAt": "2026-02-01T17:56:15.408Z",
+    "__v": 0
+  },
+  {
+    "_id": "697cd198b935645150805504",
+    "name": "Go-Pro",
+    "description": "Go-Pro category",
+    "isActive": true,
+    "createdAt": "2026-01-30T15:43:20.501Z",
+    "updatedAt": "2026-02-01T17:56:15.451Z",
+    "__v": 0
+  },
+  {
+    "_id": "697cd198b935645150805507",
+    "name": "Camera Lenses",
+    "description": "Camera Lenses category",
+    "isActive": true,
+    "createdAt": "2026-01-30T15:43:20.587Z",
+    "updatedAt": "2026-02-01T17:56:15.494Z",
+    "__v": 0
+  },
+  {
+    "_id": "697cd198b93564515080550a",
+    "name": "Photo Printer",
+    "description": "Photo Printer category",
+    "isActive": true,
+    "createdAt": "2026-01-30T15:43:20.679Z",
+    "updatedAt": "2026-02-01T17:56:15.539Z",
+    "__v": 0
+  },
+  {
+    "_id": "697f48327c144a052e414c20",
+    "name": "DSLR",
+    "description": "DSLR category",
+    "image": "https://res.cloudinary.com/dgkckcdk8/image/upload/v1769955919/indian-rentals/dnleaqjxsbiwvvf1vkiu.jpg",
+    "isActive": true,
+    "createdAt": "2026-02-01T12:33:54.236Z",
+    "updatedAt": "2026-02-01T17:56:13.628Z",
+    "__v": 0
+  },
+  {
+    "_id": "697f48327c144a052e414c23",
+    "name": "All in One",
+    "description": "All in One category",
+    "image": "",
+    "isActive": true,
+    "createdAt": "2026-02-01T12:33:54.432Z",
+    "updatedAt": "2026-02-01T17:56:13.993Z",
+    "__v": 0
+  },
+  {
+    "_id": "697f48327c144a052e414c27",
+    "name": "SmartPhone",
+    "description": "SmartPhone category",
+    "image": "https://res.cloudinary.com/dgkckcdk8/image/upload/v1769956048/indian-rentals/nnpmzqr1w7giv7oid400.jpg",
+    "isActive": true,
+    "createdAt": "2026-02-01T12:33:54.552Z",
+    "updatedAt": "2026-02-01T17:56:13.673Z",
+    "__v": 0
+  },
+  {
+    "_id": "6990d359adfff46572a87493",
+    "name": "Apple",
+    "description": "Apple category",
+    "isActive": true,
+    "createdAt": "2026-02-14T19:56:09.914Z",
+    "updatedAt": "2026-02-14T19:56:09.914Z",
+    "__v": 0
+  }
+]

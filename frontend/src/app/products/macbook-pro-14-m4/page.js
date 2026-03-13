@@ -83,7 +83,7 @@ export default function ProductPage() {
     };
 
     return (
-        <div className="min-h-screen bg-white font-sans text-[#1D1D1F] tracking-tight antialiased">
+        <div className="min-h-screen bg-white font-manrope text-[#1D1D1F] tracking-tight antialiased">
             {/* Breadcrumb */}
             <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-4 text-sm text-gray-500">
                 <Link href="/" className="text-black hover:text-gray hover:underline">Shop all</Link>

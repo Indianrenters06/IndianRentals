@@ -9,7 +9,7 @@ import Testimonials from "@/components/Testimonials";
 
 export default function Home() {
   return (
-    <main className="min-h-screen bg-gray-50 w-full max-w-full overflow-x-hidden">
+    <main className="min-h-screen bg-gray-50 w-full max-w-full overflow-x-hidden font-manrope">
       <Hero />
       <RentByCategory />
       <BestRentedProducts type="bestRented" defaultTitle="Best Rented Products" />

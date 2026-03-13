@@ -1,21 +1,46 @@
-'use client';
+`'use client';
 
 import React from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import {
-    FaLaptop,
-    FaUserCheck,
-    FaShoppingCart,
-    FaBoxOpen,
-    FaClock,
-    FaCalendarAlt,
-    FaTruck,
-    FaRupeeSign
-} from 'react-icons/fa';
+    DeviceLaptop,
+    UserCheck,
+    ShoppingCartSimple,
+    BoxArrowUp,
+    Clock,
+    Calendar,
+    Truck,
+    CurrencyInr
+} from '@phosphor-icons/react';
 import Testimonials from '../../components/Testimonials';
 
 export default function RentalProcessPage() {
+    const [activeStep, setActiveStep] = React.useState(0);
+
+    const steps = [
+        {
+            title: "Choose Your Tech",
+            description: "Browse our curated selection of premium, performance tested devices. Use the search or categories to find the perfect tool for your needs.",
+            icon: DeviceLaptop,
+        },
+        {
+            title: "Complete KYC",
+            description: "Pick a flexible rental tenure from 1 to 12 months. Then, complete our KYC process online with your basic documents (PAN and Address Proof).",
+            icon: UserCheck,
+        },
+        {
+            title: "Secure Your Order",
+            description: "Confirm your rental and complete the payment online. This includes the first month's rent and a fully refundable security deposit.",
+            icon: ShoppingCartSimple,
+        },
+        {
+            title: "Receive & Create",
+            description: "We deliver your tech right to your doorstep, typically within 2-3 business days. It arrives fully charged, sanitized, and ready to use straight out of the box.",
+            icon: BoxArrowUp,
+        }
+    ];
+
     return (
         <div className="font-sans text-gray-800 pb-20">
             {/* 1. Header Hero Banner */}
@@ -34,13 +59,13 @@ export default function RentalProcessPage() {
             </div>
 
             {/* 2. Rental Process Steps Section */}
-            <div className="max-w-[1150px] mx-auto px-4 sm:px-6 lg:px-8 mb-24">
-                <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-6">
+            <div className="max-w-[1400px] mx-auto px-4 md:px-8 mb-24 font-manrope">
+                <div style={{ width: '1192px' }} className="mx-auto flex flex-col md:flex-row md:items-start justify-between mb-12 gap-6">
                     <div className="max-w-2xl">
-                        <div className="inline-block bg-gray-800 text-white text-xs font-bold px-3 py-1 rounded-full mb-4 uppercase tracking-wider">
+                        <div className="inline-block bg-[#333] font-manrope text-white text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-widest leading-none">
                             Rental Process
                         </div>
-                        <h2 className="text-4xl md:text-5xl font-bold text-gray-900 font-manrope mb-4">
+                        <h2 className="text-3xl md:text-[36px] font-semibold text-gray-900 font-manrope mb-4 tracking-tight leading-[1.1]">
                             Rental Process
                         </h2>
                         <p className="text-gray-600 font-manrope text-lg">
@@ -48,63 +73,88 @@ export default function RentalProcessPage() {
                             No installation, no configuration, no delay.
                         </p>
                     </div>
-                    <div>
+                    <div className="pt-24 md:pr-12">
                         <Link
                             href="/contact"
-                            className="inline-flex items-center justify-center px-8 py-3 bg-[#333] text-white font-bold rounded-full hover:bg-black transition-transform hover:-translate-y-1"
+                            className="inline-flex items-center justify-center px-8 py-3 bg-[#333] text-white font-bold rounded-full hover:bg-black transition-transform hover:-translate-y-1 font-manrope"
                         >
                             Contact
                         </Link>
                     </div>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                    {/* Step 1 */}
-                    <div className="bg-[#FFC107] p-8 rounded-[2rem] relative min-h-[320px] flex flex-col group transition-transform hover:-translate-y-1">
-                        <div className="w-10 h-10 mb-6 text-gray-900">
-                            <FaLaptop size={32} />
-                        </div>
-                        <h3 className="text-xl font-bold text-gray-900 mb-3 font-manrope">Choose Your Tech</h3>
-                        <p className="text-gray-800 text-sm leading-relaxed font-manrope">
-                            Browse our curated selection of premium, performance tested devices. Use the search or categories to find the perfect tool for your needs.
-                        </p>
-                        <span className="absolute bottom-4 right-8 text-8xl font-bold text-black/10 font-manrope select-none">1</span>
+                <div style={{ width: '1192px', height: '500px', gap: '12px' }} className="mx-auto flex flex-row items-stretch mb-24">
+
+                    {/* Left side: Steps */}
+                    <div className="w-[590px] flex flex-col gap-[5px] h-full">
+                        {steps.map((step, index) => {
+                            const isActive = activeStep === index;
+                            const idxNum = index + 1;
+                            const Icon = step.icon;
+
+                            return (
+                                <div
+                                    key={index}
+                                    onClick={() => setActiveStep(index)}
+                                    className="cursor-pointer"
+                                >
+                                    {isActive ? (
+                                        // Active Step Card
+                                        <div 
+                                            style={{ 
+                                                height: '184px',
+                                                background: 'linear-gradient(125.34deg, rgba(255, 207, 70, 0.5) 1.25%, rgba(255, 185, 27, 0.9) 98.94%)',
+                                                boxShadow: '-3px -3px 15px -2px #E26E0042 inset'
+                                            }}
+                                            className="px-7 py-5 flex flex-col justify-between rounded-2xl"
+                                        >
+                                            <div className="flex justify-between items-start">
+                                                <div className="text-[#6B4B18] scale-[1.3] origin-left pt-1">
+                                                    <Icon size={24} weight="fill" />
+                                                </div>
+                                                <div className="px-5 py-2 bg-white text-[13px] font-bold text-[#6B4B18] rounded-full tracking-tighter shadow-sm">
+                                                    Step {idxNum}
+                                                </div>
+                                            </div>
+                                            <div className="flex-1 flex flex-col justify-center gap-1.5 pt-2">
+                                                <h3 className="text-[28px] font-semibold text-[#6B4B18] tracking-[-0.04em] leading-none font-manrope mb-2">
+                                                    {step.title}
+                                                </h3>
+                                                <p className="text-[#846221] text-[16px] leading-[1.4] font-medium tracking-tight font-manrope opacity-95">
+                                                    {step.description}
+                                                </p>
+                                            </div>
+                                        </div>
+                                    ) : (
+                                        // Inactive Step Card
+                                        <div className="h-[100px] px-7 py-5 flex flex-col justify-center bg-white border border-gray-100 shadow-sm hover:border-gray-200 rounded-2xl">
+                                            <div className="flex justify-between items-start mb-1.5">
+                                                <div className="text-gray-900 scale-[1.2] origin-left pt-1">
+                                                    <Icon size={24} weight="bold" />
+                                                </div>
+                                                <div className="px-4 py-1.5 border border-gray-200 text-[12px] font-bold text-gray-400 rounded-full tracking-tighter bg-transparent">
+                                                    Step {idxNum}
+                                                </div>
+                                            </div>
+                                            <h3 className="text-[22px] font-semibold text-gray-900 tracking-[-0.04em] mt-1.5 leading-none font-manrope">
+                                                {step.title}
+                                            </h3>
+                                        </div>
+                                    )}
+                                </div>
+                            )
+                        })}
                     </div>
 
-                    {/* Step 2 */}
-                    <div className="bg-gray-50 p-8 rounded-[2rem] relative min-h-[320px] flex flex-col group transition-transform hover:-translate-y-1">
-                        <div className="w-10 h-10 mb-6 text-gray-900">
-                            <FaUserCheck size={32} />
-                        </div>
-                        <h3 className="text-xl font-bold text-gray-900 mb-3 font-manrope">Complete KYC</h3>
-                        <p className="text-gray-500 text-sm leading-relaxed font-manrope">
-                            Pick a flexible rental tenure from 1 to 12 months. Then, complete our KYC process online with your basic documents (PAN and Address Proof).
-                        </p>
-                        <span className="absolute bottom-4 right-8 text-8xl font-bold text-gray-200 font-manrope select-none">2</span>
-                    </div>
-
-                    {/* Step 3 */}
-                    <div className="bg-gray-50 p-8 rounded-[2rem] relative min-h-[320px] flex flex-col group transition-transform hover:-translate-y-1">
-                        <div className="w-10 h-10 mb-6 text-gray-900">
-                            <FaShoppingCart size={32} />
-                        </div>
-                        <h3 className="text-xl font-bold text-gray-900 mb-3 font-manrope">Secure Your Order</h3>
-                        <p className="text-gray-500 text-sm leading-relaxed font-manrope">
-                            Confirm your rental and complete the payment online. This includes the first month's rent and a fully refundable security deposit.
-                        </p>
-                        <span className="absolute bottom-4 right-8 text-8xl font-bold text-gray-200 font-manrope select-none">3</span>
-                    </div>
-
-                    {/* Step 4 */}
-                    <div className="bg-gray-50 p-8 rounded-[2rem] relative min-h-[320px] flex flex-col group transition-transform hover:-translate-y-1">
-                        <div className="w-10 h-10 mb-6 text-gray-900">
-                            <FaBoxOpen size={32} />
-                        </div>
-                        <h3 className="text-xl font-bold text-gray-900 mb-3 font-manrope">Receive & Create</h3>
-                        <p className="text-gray-500 text-sm leading-relaxed font-manrope">
-                            We deliver your tech right to your doorstep, typically within 2-3 business days. It arrives fully charged, sanitized, and ready to use straight out of the box.
-                        </p>
-                        <span className="absolute bottom-4 right-8 text-8xl font-bold text-gray-200 font-manrope select-none">4</span>
+                    {/* Right side: Image Container */}
+                    <div className="w-[590px] relative h-full rounded-[3rem] overflow-hidden shadow-xl">
+                        <Image
+                            src="https://res.cloudinary.com/dpu9ikeqe/image/upload/v1769200258/WhatsApp_Image_2026-01-23_at_ahuj83.jpg"
+                            alt="Modern Tech Setup"
+                            fill
+                            className="object-cover object-center rounded-[3rem]"
+                            priority
+                        />
                     </div>
                 </div>
             </div>
@@ -122,7 +172,7 @@ export default function RentalProcessPage() {
                     {/* Feature 1 */}
                     <div className="flex flex-col items-center text-center p-6">
                         <div className="w-16 h-16 rounded-full bg-white border-2 border-gray-900 flex items-center justify-center mb-6">
-                            <FaClock size={28} className="text-gray-900" />
+                            <Clock size={28} className="text-gray-900" />
                         </div>
                         <h3 className="text-xl font-bold text-gray-900 mb-2 font-manrope">Quick Support</h3>
                         <p className="text-gray-500 text-sm font-manrope">Get expert help fast</p>
@@ -131,7 +181,7 @@ export default function RentalProcessPage() {
                     {/* Feature 2 */}
                     <div className="flex flex-col items-center text-center p-6">
                         <div className="w-16 h-16 rounded-full bg-white border-2 border-gray-900 flex items-center justify-center mb-6">
-                            <FaCalendarAlt size={24} className="text-gray-900" />
+                            <Calendar size={24} className="text-gray-900" />
                         </div>
                         <h3 className="text-xl font-bold text-gray-900 mb-2 font-manrope">Rental Flexibility</h3>
                         <p className="text-gray-500 text-sm font-manrope">Choose your rental plan</p>
@@ -140,7 +190,7 @@ export default function RentalProcessPage() {
                     {/* Feature 3 */}
                     <div className="flex flex-col items-center text-center p-6">
                         <div className="w-16 h-16 rounded-full bg-white border-2 border-gray-900 flex items-center justify-center mb-6">
-                            <FaTruck size={28} className="text-gray-900" />
+                            <Truck size={28} className="text-gray-900" />
                         </div>
                         <h3 className="text-xl font-bold text-gray-900 mb-2 font-manrope">Fast Delivery</h3>
                         <p className="text-gray-500 text-sm font-manrope">We deliver quickly across India within 48-72 hour</p>
@@ -150,7 +200,7 @@ export default function RentalProcessPage() {
                     <div className="flex flex-col items-center text-center p-6">
                         <div className="w-16 h-16 rounded-full bg-white border-2 border-gray-900 flex items-center justify-center mb-6">
                             <div className="relative">
-                                <FaRupeeSign size={24} className="text-gray-900" />
+                                <CurrencyInr size={24} className="text-gray-900" />
                                 {/* Shield outline effect simulated with border if needed, but icon is clean */}
                             </div>
                         </div>

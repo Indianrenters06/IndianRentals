@@ -34,7 +34,7 @@ const Hero = () => {
     useEffect(() => {
         const loadCMS = async () => {
             try {
-                const r = await fetch(`${API}/api/cms/homepage`);
+                const r = await fetch(`${API}/api/cms/homepage`, { cache: 'no-store' });
                 if (!r.ok) return;
                 const cms = await r.json();
 
@@ -63,12 +63,18 @@ const Hero = () => {
         loadCMS();
     }, []);
 
+    useEffect(() => {
+        if (activeSlide >= slides.length && slides.length > 0) {
+            setActiveSlide(0);
+        }
+    }, [slides, activeSlide]);
+
     const prev = () => setActiveSlide(i => (i - 1 + slides.length) % slides.length);
     const next = () => setActiveSlide(i => (i + 1) % slides.length);
 
     if (!heroVisible) return null;
 
-    const slide = slides[activeSlide];
+    const slide = slides[activeSlide] || slides[0] || FALLBACK_SLIDES[0];
 
     return (
         <section className="bg-white py-4 md:py-6">
@@ -100,7 +106,7 @@ const Hero = () => {
                                     {/* Hero image */}
                                     <div className="relative w-full h-[160px] mt-2">
                                         <Image
-                                            src={s.image}
+                                            src={s.image || FALLBACK_SLIDES[0].image}
                                             alt="Hero Visual"
                                             fill
                                             className="object-contain object-bottom drop-shadow-2xl"
@@ -211,7 +217,7 @@ const Hero = () => {
                             >
                                 <div className="relative w-full max-w-[600px] aspect-16/10">
                                     <Image
-                                        src={slide.image}
+                                        src={slide.image || FALLBACK_SLIDES[0].image}
                                         alt="Hero Visual"
                                         fill
                                         className="object-contain drop-shadow-2xl hover:scale-105 transition-transform duration-500"

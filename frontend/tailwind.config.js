@@ -29,6 +29,13 @@ module.exports = {
                 ],
                 poppins: ["var(--font-poppins)", "Poppins", "sans-serif"],
             },
+            colors: {
+                'grey-white': 'hsla(0, 0%, 100%, 1)',
+            },
+            borderRadius: {
+                '4xl': '2rem',
+                '5xl': '3rem',
+            },
         },
     },
     plugins: [],

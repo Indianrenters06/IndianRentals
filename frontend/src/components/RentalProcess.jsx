@@ -3,44 +3,53 @@ import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 // Import a bunch of icons to support dynamic string resolution from CMS
-import * as FontAwesome from 'react-icons/fa';
+import * as PhosphorIcons from '@phosphor-icons/react';
+import { DeviceLaptop, UserCheck, ShoppingCartSimple, BoxArrowUp } from '@phosphor-icons/react';
 
 const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
 
 const FALLBACK_STEPS = [
     {
         title: "Choose Your Tech",
-        description: "Browse our curated selection of premium, performance tested devices.",
-        icon: "FaLaptopCode",
+        description: "Browse our curated selection of premium, performance tested devices. Use the search or categories to find the perfect tool for your needs.",
+        icon: "Laptop",
         highlight: true,
     },
     {
         title: "Complete KYC",
         description: "Pick a flexible rental tenure from 1 to 12 months. Then, complete our KYC process.",
-        icon: "FaUserCheck",
+        icon: "IdentificationCard",
         highlight: false,
     },
     {
         title: "Secure Your Order",
         description: "Confirm your rental and complete the payment online. This includes a fully refundable security deposit.",
-        icon: "FaShieldAlt",
+        icon: "ShoppingCart",
         highlight: false,
     },
     {
         title: "Receive & Create",
         description: "We deliver your tech right to your doorstep, typically within 2-3 business days.",
-        icon: "FaBoxOpen",
+        icon: "Package",
         highlight: false,
     }
 ];
 
-// Helper to safely render dynamic string icons from react-icons/fa
-const DynamicIcon = ({ name, size = 24, className = "" }) => {
-    // defaults to FaCheckCircle if not found
-    const IconComponent = FontAwesome[name] || FontAwesome.FaCheckCircle;
-    return <IconComponent size={size} className={className} />;
+// Helper to safely render dynamic string icons from @phosphor-icons/react
+const DynamicIcon = ({ name, size = 24, className = "", weight = "regular" }) => {
+    // defaults to CheckCircle if not found
+    const IconComponent = PhosphorIcons[name] || PhosphorIcons.CheckCircle;
+    return <IconComponent size={size} className={className} weight={weight} />;
 };
 
+
+// Image mapping for each step
+const STEP_IMAGES = [
+    "https://res.cloudinary.com/dpu9ikeqe/image/upload/v1769200258/WhatsApp_Image_2026-01-23_at_ahuj83.jpg", // Step 1: Browse
+    "https://res.cloudinary.com/dpu9ikeqe/image/upload/v1773311179/f5d05a49c7a9e513697df5b39fc826c8e9635182_bau9ky.png", // Step 2: KYC
+    "https://res.cloudinary.com/dpu9ikeqe/image/upload/v1773311180/c853e25515c331bf8956b228e04cd4b22e0b91d3_d7oqzx.png", // Step 3: Payment
+    "https://res.cloudinary.com/dpu9ikeqe/image/upload/v1773311190/7376ef09ee50f329f3115a2bdec517818465c5a3_fzsfya.png", // Step 4: Delivery
+];
 
 const RentalProcess = () => {
     const [cms, setCms] = useState({
@@ -50,15 +59,17 @@ const RentalProcess = () => {
         steps: FALLBACK_STEPS
     });
 
+    const [activeStep, setActiveStep] = useState(0);
+
     useEffect(() => {
-        fetch(`${API}/api/cms/homepage`)
+        fetch(`${API}/api/cms/homepage`, { cache: 'no-store' })
             .then(r => r.ok ? r.json() : null)
             .then(data => {
                 if (!data) return;
                 setCms({
                     enabled: data.rentalProcessEnabled !== false,
                     title: data.rentalProcessTitle || "Rental Process",
-                    subtitle: data.rentalProcessSubtitle || "Choose, secure, receive, and create with zero hassle.",
+                    subtitle: data.rentalProcessSubtitle || "Choose, secure, receive, and create with zero hassle. No installation, no configuration, no delay.",
                     steps: data.rentalProcessSteps?.length > 0 ? data.rentalProcessSteps : FALLBACK_STEPS
                 });
             })
@@ -68,106 +79,122 @@ const RentalProcess = () => {
     if (!cms.enabled) return null;
 
     return (
-        <section className="py-10 md:py-20 bg-gray-50">
-            <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
+        <section className="py-12 md:py-24 bg-white overflow-hidden">
+            <div className="max-w-[1400px] mx-auto px-4 md:px-8">
 
-                <div className="flex flex-col md:flex-row md:items-end justify-between mb-8 md:mb-12 gap-4">
-                    <div>
-                        <h2 className="text-4xl font-semibold font-manrope text-gray-900 mb-2">
+                {/* Header Section */}
+                <div style={{ width: '1192px' }} className="mx-auto flex flex-col md:flex-row md:items-start justify-between mb-10 gap-8 font-manrope">
+                    <div className="max-w-2xl">
+                        <div className="inline-block bg-[#222] text-white text-[11px] font-bold px-4 py-1.5 rounded-full mb-6 uppercase tracking-tight leading-none">
+                            Rental Process
+                        </div>
+                        <h2 className="text-3xl md:text-[36px] font-semibold text-gray-900 font-manrope mb-4 tracking-tight leading-[1.1]">
                             {cms.title}
                         </h2>
-                        <p className="text-gray-600 max-w-2xl text-sm md:text-lg">
+                        <p className="text-gray-600 text-base md:text-[18px] leading-[1.3] tracking-tight max-w-md pt-1">
                             {cms.subtitle}
                         </p>
                     </div>
 
-                    <div className="flex items-center gap-3">
-                        <Link href="/rental-process" className="px-5 py-2 bg-[#FFC107] text-black font-bold rounded-full hover:bg-[#FFD54F] transition-colors shadow-sm text-sm">
-                            Learn More
+                    <div className="flex items-center gap-2 pt-24 md:pr-12">
+                        <Link href="/rental-process" className="px-9 py-4 bg-[#FFC107] text-black font-extrabold rounded-full hover:bg-[#FFB300] transition-all hover:scale-105 shadow-sm text-[16px] tracking-tight font-manrope">
+                            Rental Process
                         </Link>
-                        <Link href="/contact" className="px-5 py-2 bg-gray-800 text-white font-bold rounded-full hover:bg-gray-700 transition-colors text-sm">
-                            Contact Support
+                        <Link href="/contact" className="px-9 py-4 bg-[#222] text-white font-extrabold rounded-full hover:bg-black transition-all hover:scale-105 text-[16px] tracking-tight font-manrope">
+                            Contact
                         </Link>
                     </div>
                 </div>
 
-                {/* Mobile: Single column stacked cards */}
-                <div className="md:hidden flex flex-col gap-3">
-                    {cms.steps.map((step, index) => {
-                        const isHighlighted = step.highlight;
-                        const idxNum = index + 1;
-                        return (
-                            <div
-                                key={index}
-                                className={`relative p-5 rounded-2xl border border-transparent shadow-sm flex flex-col justify-between transition-all duration-300 ${isHighlighted ? 'bg-[#FFC107] text-black' : 'bg-white text-gray-900 border-gray-100'}`}
-                            >
-                                <div className="flex items-start gap-4">
-                                    <div className={`text-xl mt-0.5 ${isHighlighted ? 'text-black' : 'text-gray-700'}`}>
-                                        <DynamicIcon name={step.icon} size={24} />
-                                    </div>
-                                    <div className="flex-1">
-                                        <h3 className={`text-base font-bold mb-1.5 ${isHighlighted ? 'text-black' : 'text-gray-900'}`}>
-                                            {step.title}
-                                        </h3>
-                                        <p className={`text-xs leading-relaxed ${isHighlighted ? 'text-gray-900/80 font-medium' : 'text-gray-500'}`}>
-                                            {step.description}
-                                        </p>
-                                    </div>
-                                    <span className={`text-5xl font-bold opacity-20 select-none mt-auto self-end ${isHighlighted ? 'text-black' : 'text-gray-300'}`}>
-                                        {idxNum}
-                                    </span>
+                {/* Content Section: Steps and Image */}
+                <div style={{ width: '1192px', height: '500px', gap: '12px' }} className="mx-auto flex flex-row items-stretch font-manrope">
+
+                    {/* Left side: Steps */}
+                    <div className="w-[590px] flex flex-col gap-[5px] h-full">
+                        {cms.steps.map((step, index) => {
+                            const isActive = activeStep === index;
+                            const idxNum = index + 1;
+
+                            return (
+                                <div
+                                    key={index}
+                                    onClick={() => setActiveStep(index)}
+                                    className="cursor-pointer"
+                                >
+                                    {isActive ? (
+                                        // Active Step Card
+                                        <div 
+                                            style={{ 
+                                                height: '184px',
+                                                background: 'linear-gradient(125.34deg, rgba(255, 207, 70, 0.5) 1.25%, rgba(255, 185, 27, 0.9) 98.94%)',
+                                                boxShadow: '-3px -3px 15px -2px #E26E0042 inset'
+                                            }}
+                                            className="px-7 py-5 flex flex-col justify-between rounded-2xl"
+                                        >
+                                            <div className="flex justify-between items-start">
+                                                <div className="text-[#6B4B18] scale-[1.3] origin-left pt-1">
+                                                    <DynamicIcon name={step.icon} size={28} weight="fill" />
+                                                </div>
+                                                <div className="px-5 py-2 bg-white text-[13px] font-bold text-[#6B4B18] rounded-full tracking-tighter shadow-sm">
+                                                    Step {idxNum}
+                                                </div>
+                                            </div>
+                                            <div className="flex-1 flex flex-col justify-center gap-1.5 pt-2">
+                                                <h3 className="text-[28px] font-semibold text-[#6B4B18] tracking-[-0.04em] leading-none font-manrope">
+                                                    {step.title}
+                                                </h3>
+                                                <p className="text-[#846221] text-[16px] leading-[1.4] font-medium tracking-tight font-manrope opacity-95">
+                                                    {step.description}
+                                                </p>
+                                            </div>
+                                        </div>
+                                    ) : (
+                                        // Inactive Step Card
+                                        <div className="h-[100px] px-7 py-5 flex flex-col justify-center bg-white border border-gray-100 shadow-sm hover:border-gray-200 rounded-2xl">
+                                            <div className="flex justify-between items-start mb-1.5">
+                                                <div className="text-gray-900 scale-[1.2] origin-left pt-1">
+                                                    <DynamicIcon name={step.icon} size={24} weight="bold" />
+                                                </div>
+                                                <div className="px-4 py-1.5 border border-gray-200 text-[12px] font-bold text-gray-400 rounded-full tracking-tighter bg-transparent">
+                                                    Step {idxNum}
+                                                </div>
+                                            </div>
+                                            <h3 className="text-[22px] font-semibold text-gray-900 tracking-[-0.04em] mt-1.5 leading-none font-manrope">
+                                                {step.title}
+                                            </h3>
+                                        </div>
+                                    )}
                                 </div>
-                            </div>
-                        )
-                    })}
-                </div>
+                            )
+                        })}
+                    </div>
 
-                {/* Desktop: Grid Layout */}
-                <div className="hidden md:grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
-                    {cms.steps.map((step, index) => {
-                        const isHighlighted = step.highlight;
-                        const idxNum = index + 1;
-                        return (
-                            <div
-                                key={index}
-                                className={`relative p-6 sm:p-8 rounded-[2rem] border border-transparent shadow-sm flex flex-col justify-between min-h-[320px] transition-all duration-300 ${isHighlighted ? 'bg-[#FFC107] text-black hover:-translate-y-1' : 'bg-white text-gray-900 border-gray-100 hover:shadow-xl hover:-translate-y-1'}`}
-                            >
-                                <div className="flex flex-col items-start gap-4">
-                                    <div className={`text-4xl mb-2 ${isHighlighted ? 'text-black' : 'text-gray-900'}`}>
-                                        <DynamicIcon name={step.icon} size={36} />
-                                    </div>
-
-                                    <div>
-                                        <h3 className={`text-xl font-bold mb-3 ${isHighlighted ? 'text-black' : 'text-gray-900'}`}>
-                                            {step.title}
-                                        </h3>
-                                        <p className={`text-sm leading-relaxed ${isHighlighted ? 'text-gray-900/80 font-medium' : 'text-gray-500'}`}>
-                                            {step.description}
-                                        </p>
-                                    </div>
-                                </div>
-
-                                {/* Big Number */}
-                                <div className={`absolute bottom-4 right-6 text-7xl font-bold opacity-20 ${isHighlighted ? 'text-black' : 'text-gray-300'}`}>
-                                    {idxNum}
-                                </div>
-                            </div>
-                        )
-                    })}
-                </div>
-
-                {/* Bottom Image Placeholder */}
-                <div className="hidden md:block mt-16 rounded-3xl overflow-hidden shadow-lg h-96 relative">
-                    <Image
-                        src="https://res.cloudinary.com/dgkckcdk8/image/upload/v1769959582/indian-rentals/zojf5e2uxucfqpju6qpa.jpg"
-                        alt="Rental Process Lifestyle"
-                        fill
-                        className="object-cover"
-                    />
-                    <div className="absolute top-0 right-0 w-full h-full bg-linear-to-b from-transparent to-black/50"></div>
+                    {/* Right side: Image Container */}
+                    <div className="w-[590px] relative h-full rounded-[3rem] overflow-hidden shadow-xl bg-gray-100">
+                        {cms.steps[activeStep] && (
+                            <Image
+                                key={activeStep}
+                                src={cms.steps[activeStep].image || STEP_IMAGES[activeStep] || STEP_IMAGES[0]}
+                                alt={cms.steps[activeStep].title}
+                                fill
+                                className="object-cover object-center rounded-[3rem] animate-fadeIn"
+                                priority
+                            />
+                        )}
+                    </div>
                 </div>
 
             </div>
+
+            <style jsx>{`
+                @keyframes fadeIn {
+                    from { opacity: 0; transform: translateY(4px); }
+                    to { opacity: 1; transform: translateY(0); }
+                }
+                .animate-fadeIn {
+                    animation: fadeIn 0.4s ease-out forwards;
+                }
+            `}</style>
         </section>
     );
 };

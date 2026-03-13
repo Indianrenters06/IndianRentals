@@ -74,6 +74,13 @@ const updatePage = asyncHandler(async (req, res) => {
         // Stats
         'statsDevices', 'statsCustomers', 'statsCities',
 
+        // Category section
+        'categorySectionEnabled', 'categorySectionTitle',
+
+        // Feature section
+        'featureSectionEnabled', 'featureSectionTitle', 'featureSectionSubtitle', 
+        'featureSectionImage', 'featureSectionCtaText', 'featureSectionCtaLink', 'featureSectionStats',
+
         // Generic Info
         'pageContent', 'bannerImage', 'bannerTitle',
 
