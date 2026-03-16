@@ -253,7 +253,7 @@ const Testimonials = () => {
                 <div className="w-full overflow-hidden">
                     <div ref={row1Ref} className="flex w-max pl-4">
                         {row1Items.map((review, i) => (
-                            <ReviewCard key={`r1-${i}`} review={review} />
+                            <ReviewCard key={`row1-${i}`} review={review} />
                         ))}
                     </div>
                 </div>
@@ -261,7 +261,7 @@ const Testimonials = () => {
                 <div className="w-full overflow-hidden">
                     <div ref={row2Ref} className="flex w-max pl-4">
                         {row2Items.map((review, i) => (
-                            <ReviewCard key={`r2-${i}`} review={review} />
+                            <ReviewCard key={`row2-${i}`} review={review} />
                         ))}
                     </div>
                 </div>
@@ -272,7 +272,7 @@ const Testimonials = () => {
                 <div className="flex gap-3 overflow-x-auto snap-x snap-mandatory pb-3 scrollbar-hide" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
                     {reviewsData.map((review, i) => (
                         <div
-                            key={review._id || i}
+                            key={`mobile-rev-${review._id || i}`}
                             className={`${review.bg || "bg-slate-50"} min-w-[75vw] max-w-[75vw] snap-start rounded-3xl p-5 flex flex-col min-h-[200px] shadow-sm shrink-0`}
                         >
                             <div className="mb-3">
@@ -288,7 +288,7 @@ const Testimonials = () => {
                                 <GoogleLogo />
                                 <div className="flex text-[#FAB005] gap-0.5 text-base">
                                     {[...Array(5)].map((_, j) => (
-                                        <FaStar key={j} className={j < (review.rating || review.stars) ? "text-[#FAB005]" : "text-gray-300"} />
+                                        <FaStar key={`r1-s-${i}-${j}`} className={j < (review.rating || review.stars) ? "text-[#FAB005]" : "text-gray-300"} />
                                     ))}
                                 </div>
                             </div>

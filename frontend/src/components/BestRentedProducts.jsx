@@ -143,7 +143,7 @@ const BestRentedProducts = ({ type = "bestRented", defaultTitle = "Curated Produ
                     {products.map((product, index) => {
                         return (
                             <div
-                                key={product.id}
+                                key={product.id || index}
                                 className="block h-full relative"
                             >
                                 <motion.div
