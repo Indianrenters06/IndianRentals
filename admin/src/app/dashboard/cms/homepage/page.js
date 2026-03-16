@@ -253,16 +253,24 @@ const DEFAULTS = {
     whyChooseUsSubtitle: "",
     whyChooseUsImage: "",
     statsDevices: "90k+", statsCustomers: "30k+", statsCities: "401+",
+    featuredShowcaseEnabled: true,
+    featuredShowcaseProductIds: [],
+    featuredShowcaseBanners: [
+        { title: 'Apple Products',   subtitle: 'MacBooks | iPads | iPhones | Mac Studio | Mac Mini', image: '', bg: 'linear-gradient(135deg, #2a1a5e 0%, #4c3099 40%, #7c5cbf 70%, #b08ad4 100%)', href: '/categories/apple' },
+        { title: 'Gaming Laptops',   subtitle: 'ASUS ROG | Lenovo Legion | MSI | HP Omen',          image: '', bg: 'linear-gradient(135deg, #0a1628 0%, #1a3a5c 40%, #1e5f8c 70%, #2a9fd6 100%)', href: '/categories/gaming' },
+        { title: 'Smart Devices',    subtitle: 'Tablets | Smartwatches | Earbuds | Accessories',    image: '', bg: 'linear-gradient(135deg, #1a2e1a 0%, #1e5c3a 40%, #25874f 70%, #3ac47d 100%)', href: '/categories/smart-devices' },
+    ],
     metaTitle: "", metaDescription: "",
 };
 
 const TABS = [
-    { key: "hero", label: "Hero Slides", icon: <Layout size={15} /> },
-    { key: "products", label: "Curated Grids", icon: <Package size={15} /> },
-    { key: "feature", label: "Feature Section", icon: <Star size={15} /> },
-    { key: "process", label: "Rental Process", icon: <ArrowsLeftRight size={15} /> },
-    { key: "trust", label: "Trust Factors", icon: <ChatText size={15} /> },
-    { key: "seo", label: "SEO Settings", icon: <Globe size={15} /> },
+    { key: "hero",     label: "Hero Slides",       icon: <Layout size={15} /> },
+    { key: "products", label: "Curated Grids",     icon: <Package size={15} /> },
+    { key: "showcase", label: "Featured Showcase", icon: <PhosphorImage size={15} /> },
+    { key: "feature",  label: "Feature Section",   icon: <Star size={15} /> },
+    { key: "process",  label: "Rental Process",    icon: <ArrowsLeftRight size={15} /> },
+    { key: "trust",    label: "Trust Factors",     icon: <ChatText size={15} /> },
+    { key: "seo",      label: "SEO Settings",      icon: <Globe size={15} /> },
 ];
 
 // ── Main Page ────────────────────────────────────────────────────────────────
@@ -460,6 +468,136 @@ export default function CMSHomepage() {
                         />
                         <Field label="Section Title" value={data.newLaunchTitle} onChange={v => set("newLaunchTitle", v)} placeholder="e.g. New Launches This Week" />
                         <ProductSelector label="Select Products to Feature (Recommend exactly 4 or 8)" selectedIds={data.newLaunchProductIds} onChange={ids => set("newLaunchProductIds", ids)} />
+                    </div>
+                </motion.div>
+            )}
+
+            {/* ── TAB: FEATURED SHOWCASE ── */}
+            {activeTab === "showcase" && (
+                <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="space-y-6">
+
+                    {/* Section toggle + product selector */}
+                    <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 shadow-sm space-y-6">
+                        <SectionRow
+                            icon={<PhosphorImage weight="bold" className="text-violet-500" />}
+                            title="Featured Showcase"
+                            desc="A 1200×391 panel with 2 product cards + a rotating banner carousel, shown above the Rental Process section."
+                            toggle={data.featuredShowcaseEnabled}
+                            onToggle={v => set("featuredShowcaseEnabled", v)}
+                        />
+
+                        <ProductSelector
+                            label="Pin 2 Products (left side cards — choose exactly 2)"
+                            selectedIds={data.featuredShowcaseProductIds}
+                            onChange={ids => set("featuredShowcaseProductIds", ids.slice(0, 2))}
+                        />
+                    </div>
+
+                    {/* Banner slides */}
+                    <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 shadow-sm space-y-6">
+                        <div className="flex justify-between items-center border-b border-slate-100 dark:border-slate-800 pb-4">
+                            <div>
+                                <h3 className="text-base font-bold text-slate-800 dark:text-slate-100">Banner Carousel Slides</h3>
+                                <p className="text-xs text-slate-500 mt-0.5">Right-side rotating banners. Each slide has a title, subtitle, background gradient and an image.</p>
+                            </div>
+                            <button
+                                onClick={() => set("featuredShowcaseBanners", [
+                                    ...(data.featuredShowcaseBanners || []),
+                                    { title: 'New Category', subtitle: 'Product 1 | Product 2 | Product 3', image: '', bg: 'linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%)', href: '/products' }
+                                ])}
+                                className="flex items-center gap-1.5 h-8 px-4 rounded-lg bg-violet-50 dark:bg-violet-500/10 text-violet-600 dark:text-violet-400 text-sm font-semibold hover:bg-violet-100 dark:hover:bg-violet-500/20 transition-all border border-violet-200 dark:border-violet-500/20"
+                            >
+                                <Plus size={14} /> Add Banner
+                            </button>
+                        </div>
+
+                        <div className="space-y-5">
+                            {(data.featuredShowcaseBanners || []).map((banner, idx) => (
+                                <div key={idx} className="p-5 border border-slate-200 dark:border-slate-700 rounded-2xl bg-slate-50 dark:bg-slate-950 relative">
+                                    {/* Slide header */}
+                                    <div className="flex items-center justify-between mb-5">
+                                        <div className="flex items-center gap-2">
+                                            <span className="w-7 h-7 bg-violet-100 text-violet-700 rounded-full flex items-center justify-center font-bold text-xs">#{idx + 1}</span>
+                                            <h4 className="font-semibold text-slate-800 dark:text-slate-200">Banner Slide</h4>
+                                        </div>
+                                        {(data.featuredShowcaseBanners || []).length > 1 && (
+                                            <button
+                                                onClick={() => { const n = [...data.featuredShowcaseBanners]; n.splice(idx, 1); set("featuredShowcaseBanners", n); }}
+                                                className="text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 p-2 rounded-lg transition-colors"
+                                            >
+                                                <Trash size={16} />
+                                            </button>
+                                        )}
+                                    </div>
+
+                                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                                        {/* Left: text fields */}
+                                        <div className="space-y-4">
+                                            <Field
+                                                label="Banner Title"
+                                                value={banner.title}
+                                                onChange={v => { const n = [...data.featuredShowcaseBanners]; n[idx].title = v; set("featuredShowcaseBanners", n); }}
+                                                placeholder="e.g. Apple Products"
+                                            />
+                                            <Field
+                                                label="Subtitle / Product List"
+                                                value={banner.subtitle}
+                                                onChange={v => { const n = [...data.featuredShowcaseBanners]; n[idx].subtitle = v; set("featuredShowcaseBanners", n); }}
+                                                placeholder="MacBooks | iPads | iPhones"
+                                            />
+                                            <Field
+                                                label="Link (href)"
+                                                value={banner.href}
+                                                onChange={v => { const n = [...data.featuredShowcaseBanners]; n[idx].href = v; set("featuredShowcaseBanners", n); }}
+                                                placeholder="/categories/apple"
+                                            />
+                                            {/* Gradient bg input */}
+                                            <div>
+                                                <label className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider block mb-2">Background Gradient (CSS)</label>
+                                                <input
+                                                    type="text"
+                                                    value={banner.bg}
+                                                    onChange={e => { const n = [...data.featuredShowcaseBanners]; n[idx].bg = e.target.value; set("featuredShowcaseBanners", n); }}
+                                                    className="w-full h-10 px-3 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-violet-500/40 focus:border-violet-400 transition-all font-mono text-xs"
+                                                    placeholder="linear-gradient(135deg, #2a1a5e 0%, #b08ad4 100%)"
+                                                />
+                                                {/* Gradient preview swatch */}
+                                                <div
+                                                    className="mt-2 h-6 w-full rounded-lg border border-slate-200 dark:border-slate-700"
+                                                    style={{ background: banner.bg }}
+                                                />
+                                            </div>
+                                        </div>
+
+                                        {/* Right: image upload + preview */}
+                                        <div className="space-y-4">
+                                            <ImageUploader
+                                                label="Banner Image (PNG with transparency recommended)"
+                                                existingUrl={banner.image}
+                                                onUpload={url => { const n = [...data.featuredShowcaseBanners]; n[idx].image = url; set("featuredShowcaseBanners", n); }}
+                                            />
+                                            {/* Live preview card */}
+                                            <div
+                                                className="relative h-40 rounded-xl overflow-hidden border border-slate-200 dark:border-slate-700 flex flex-col justify-end p-4"
+                                                style={{ background: banner.bg }}
+                                            >
+                                                {banner.image && (
+                                                    <img
+                                                        src={banner.image}
+                                                        alt="preview"
+                                                        className="absolute inset-0 w-full h-full object-contain object-center opacity-80"
+                                                    />
+                                                )}
+                                                <div className="relative z-10">
+                                                    <p className="text-white font-bold text-sm leading-tight">{banner.title || 'Banner Title'}</p>
+                                                    <p className="text-white/70 text-xs mt-0.5">{banner.subtitle || 'Subtitle goes here'}</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
                     </div>
                 </motion.div>
             )}

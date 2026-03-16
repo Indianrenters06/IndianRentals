@@ -7,14 +7,45 @@ import { motion } from "framer-motion";
 const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
 
 // Optional: you can still use the service, but since we need multiple products by ID we'll implement it manually or use a simple fetch call.
+import { useRouter } from "next/navigation";
+import { useDispatch } from "react-redux";
+import { addToCart } from "@/redux/features/cartSlice";
+
 const BestRentedProducts = ({ type = "bestRented", defaultTitle = "Curated Products" }) => {
+    const router = useRouter();
+    const dispatch = useDispatch();
     const [products, setProducts] = useState([]);
+    const [addedStatus, setAddedStatus] = useState({});
     const [cmsConfig, setCmsConfig] = useState({
         enabled: true,
         title: defaultTitle,
         productIds: []
     });
     const [loading, setLoading] = useState(true);
+    
+    const handleAddToCart = (e, product) => {
+        e.preventDefault();
+        e.stopPropagation();
+        dispatch(addToCart({
+            id: product.id,
+            name: product.name,
+            image: product.image,
+            price: product.rentPrice,
+            monthlyRent: product.rentPrice,
+            quantity: 1,
+            duration: 1,
+            refundableAmount: 0,
+            description: product.name
+        }));
+        setAddedStatus(prev => ({ ...prev, [product.id]: true }));
+        setTimeout(() => setAddedStatus(prev => ({ ...prev, [product.id]: false })), 2000);
+    };
+
+    const handleQuickView = (e, productId) => {
+        e.preventDefault();
+        e.stopPropagation();
+        router.push(`/products/${productId}`);
+    };
 
     useEffect(() => {
         const fetchCMSAndProducts = async () => {
@@ -172,13 +203,13 @@ const BestRentedProducts = ({ type = "bestRented", defaultTitle = "Curated Produ
                                     </div>
 
                                     {/* Content */}
-                                    <div className="flex flex-col gap-[8px] pt-[8px] pr-[12px] pb-[12px] pl-[12px] h-[105px] w-full">
-                                        <h3 className="text-[16px] font-semibold font-manrope text-[#1D1D1F] leading-[24px] tracking-tight line-clamp-1">
+                                    <div className="flex flex-col gap-[8px] pt-[8px] pr-[12px] pb-[12px] pl-[12px] h-[105px] w-full relative">
+                                        <h3 className="text-[16px] font-semibold font-manrope text-[#1D1D1F] leading-[24px] tracking-tight line-clamp-1 transition-colors duration-300 group-hover:text-[#FF3B30]">
                                             {product.name}
                                         </h3>
 
                                         {/* Row: Rating + Delivery */}
-                                        <div className="flex items-center justify-between">
+                                        <div className="flex items-center justify-between transition-all duration-300 group-hover:opacity-0 group-hover:-translate-y-1">
                                             <div className="flex items-center gap-0.5">
                                                 <div className="flex gap-0.5">
                                                     {[...Array(5)].map((_, i) => (
@@ -196,12 +227,31 @@ const BestRentedProducts = ({ type = "bestRented", defaultTitle = "Curated Produ
                                             </div>
                                         </div>
 
-                                        {/* Price Section */}
-                                        <div className="flex items-baseline gap-1.5 flex-wrap">
-                                            <span className="text-[12px] text-[#86868B] font-medium">from</span>
-                                            <span className="text-[16px] text-[#86868B] line-through font-medium opacity-50">₹{product.originalPrice}</span>
-                                            <span className="text-[22px] font-bold text-[#FF3B30] leading-none">₹{product.rentPrice}</span>
-                                            <span className="text-[13px] text-[#86868B] font-medium">/month</span>
+                                        {/* Price / Buttons Container */}
+                                        <div className="relative mt-auto h-[32px]">
+                                            {/* Price Section */}
+                                            <div className="flex items-baseline gap-1.5 flex-wrap transition-all duration-300 group-hover:opacity-0 group-hover:-translate-y-2">
+                                                <span className="text-[12px] text-[#86868B] font-medium">from</span>
+                                                <span className="text-[16px] text-[#86868B] line-through font-medium opacity-50">₹{product.originalPrice}</span>
+                                                <span className="text-[22px] font-bold text-[#FF3B30] leading-none">₹{product.rentPrice}</span>
+                                                <span className="text-[13px] text-[#86868B] font-medium">/month</span>
+                                            </div>
+
+                                            {/* Hover Action Buttons */}
+                                            <div className="absolute inset-0 flex gap-2 opacity-0 translate-y-4 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-500 ease-out z-20">
+                                                <button 
+                                                    className="flex-1 bg-white border border-gray-200 text-[#4A4A4A] py-1.5 rounded-xl text-[12px] font-semibold hover:bg-gray-50 transition-colors shadow-sm"
+                                                    onClick={(e) => handleQuickView(e, product.id)}
+                                                >
+                                                    Quick View
+                                                </button>
+                                                <button 
+                                                    className={`flex-1 ${addedStatus[product.id] ? 'bg-green-500' : 'bg-[#FF3B30]'} text-white py-1.5 rounded-xl text-[12px] font-semibold transition-all hover:bg-[#e0352b] hover:shadow-lg active:scale-95`}
+                                                    onClick={(e) => handleAddToCart(e, product)}
+                                                >
+                                                    {addedStatus[product.id] ? 'Added!' : 'Add to Cart'}
+                                                </button>
+                                            </div>
                                         </div>
                                     </div>
                                 </motion.div>

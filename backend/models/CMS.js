@@ -1,5 +1,13 @@
 const mongoose = require('mongoose');
 
+const featuredShowcaseBannerSchema = new mongoose.Schema({
+    title:    { type: String, default: '' },
+    subtitle: { type: String, default: '' },
+    image:    { type: String, default: '' },
+    bg:       { type: String, default: 'linear-gradient(135deg, #2a1a5e 0%, #4c3099 40%, #7c5cbf 70%, #b08ad4 100%)' },
+    href:     { type: String, default: '/products' },
+}, { _id: false });
+
 const rentalProcessStepSchema = new mongoose.Schema({
     title: { type: String, default: '' },
     description: { type: String, default: '' },
@@ -70,6 +78,18 @@ const cmsSchema = new mongoose.Schema({
     statsDevices: { type: String, default: '90k+' },
     statsCustomers: { type: String, default: '30k+' },
     statsCities: { type: String, default: '401+' },
+
+    // ── Featured Showcase Section (homepage) ──────────────────────────────────
+    featuredShowcaseEnabled:    { type: Boolean, default: true },
+    featuredShowcaseProductIds: { type: [String], default: [] }, // 2 pinned product _ids
+    featuredShowcaseBanners: {
+        type: [featuredShowcaseBannerSchema],
+        default: [
+            { title: 'Apple Products',   subtitle: 'MacBooks | iPads | iPhones | Mac Studio | Mac Mini', image: '', bg: 'linear-gradient(135deg, #2a1a5e 0%, #4c3099 40%, #7c5cbf 70%, #b08ad4 100%)', href: '/categories/apple' },
+            { title: 'Gaming Laptops',   subtitle: 'ASUS ROG | Lenovo Legion | MSI | HP Omen',          image: '', bg: 'linear-gradient(135deg, #0a1628 0%, #1a3a5c 40%, #1e5f8c 70%, #2a9fd6 100%)', href: '/categories/gaming' },
+            { title: 'Smart Devices',    subtitle: 'Tablets | Smartwatches | Earbuds | Accessories',    image: '', bg: 'linear-gradient(135deg, #1a2e1a 0%, #1e5c3a 40%, #25874f 70%, #3ac47d 100%)', href: '/categories/smart-devices' },
+        ]
+    },
 
     // ── Feature Section (homepage) ────────────────────────────────────────────
     featureSectionEnabled: { type: Boolean, default: true },

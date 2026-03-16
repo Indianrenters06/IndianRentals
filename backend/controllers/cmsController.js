@@ -77,6 +77,9 @@ const updatePage = asyncHandler(async (req, res) => {
         // Category section
         'categorySectionEnabled', 'categorySectionTitle',
 
+        // Featured Showcase section
+        'featuredShowcaseEnabled', 'featuredShowcaseProductIds', 'featuredShowcaseBanners',
+
         // Feature section
         'featureSectionEnabled', 'featureSectionTitle', 'featureSectionSubtitle', 
         'featureSectionImage', 'featureSectionCtaText', 'featureSectionCtaLink', 'featureSectionStats',

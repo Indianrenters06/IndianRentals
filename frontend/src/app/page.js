@@ -5,6 +5,7 @@ import WhyChooseUs from "@/components/WhyChooseUs";
 import BestRentedProducts from "@/components/BestRentedProducts";
 import FeatureSection from "@/components/FeatureSection";
 import RentalProcess from "@/components/RentalProcess";
+import FeaturedShowcase from "@/components/FeaturedShowcase";
 import Testimonials from "@/components/Testimonials";
 
 export default function Home() {
@@ -15,6 +16,7 @@ export default function Home() {
       <BestRentedProducts type="bestRented" defaultTitle="Best Rented Products" />
       <FeatureSection />
       <BestRentedProducts type="newLaunches" defaultTitle="New Launches This Week" />
+      <FeaturedShowcase />
       <RentalProcess />
       <WhyChooseUs />
       <Testimonials />
