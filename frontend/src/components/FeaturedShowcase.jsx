@@ -377,7 +377,7 @@ const FeaturedShowcase = () => {
                     <div className="flex flex-row" style={{ gap: "35px" }}>
                         {displayProducts.map((product, idx) => (
                             <ShowcaseProductCard 
-                                key={product.id} 
+                                key={product.id || idx} 
                                 product={product} 
                                 index={idx} 
                                 onAddToCart={handleAddToCart}

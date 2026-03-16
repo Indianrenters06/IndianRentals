@@ -149,8 +149,8 @@ const RentByCategory = () => {
 
                 {/* Mobile Grid: updated to match requested card style */}
                 <div className="md:hidden grid grid-cols-4 gap-3">
-                    {mobileCats.map((cat) => (
-                        <Link key={cat._id} href={getCategoryRoute(cat)} className="flex flex-col items-center">
+                    {mobileCats.map((cat, index) => (
+                        <Link key={cat._id || index} href={getCategoryRoute(cat)} className="flex flex-col items-center">
                             <div className="w-full aspect-square rounded-lg bg-white border border-gray-100 flex items-center justify-center overflow-hidden relative shadow-sm">
                                 {cat.image ? (
                                     <Image
@@ -193,8 +193,8 @@ const RentByCategory = () => {
                         }}
                         className="py-4"
                     >
-                        {displayCategories.map((cat) => (
-                            <SwiperSlide key={cat._id} style={{ width: '177.33px' }}>
+                        {displayCategories.map((cat, index) => (
+                            <SwiperSlide key={cat._id || index} style={{ width: '177.33px' }}>
                                 <Link href={getCategoryRoute(cat)} className="group flex flex-col items-center cursor-pointer">
                                     <div className="w-[177.33px] h-[173px] flex items-center justify-center mb-4 relative bg-white border border-gray-200 rounded-xl group-hover:border-[#FFC107]/20 group-hover:shadow-lg transition-all duration-300 overflow-hidden shadow-md">
                                         {cat.image ? (

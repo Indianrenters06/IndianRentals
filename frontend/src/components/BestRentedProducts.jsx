@@ -213,7 +213,7 @@ const BestRentedProducts = ({ type = "bestRented", defaultTitle = "Curated Produ
                                             <div className="flex items-center gap-0.5">
                                                 <div className="flex gap-0.5">
                                                     {[...Array(5)].map((_, i) => (
-                                                        <FaStar key={i} size={14} className={i < 4 ? "text-[#FF9F0A]" : "text-[#FF9F0A] opacity-50"} />
+                                                        <FaStar key={`pstar-${product.id}-${i}`} size={14} className={i < 4 ? "text-[#FF9F0A]" : "text-[#FF9F0A] opacity-50"} />
                                                     ))}
                                                 </div>
                                                 <span className="text-[11px] font-semibold text-[#86868B] ml-1">

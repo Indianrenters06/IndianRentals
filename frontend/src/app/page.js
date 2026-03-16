@@ -19,7 +19,7 @@ export default function Home() {
       <FeaturedShowcase />
       <RentalProcess />
       <WhyChooseUs />
-      <Testimonials />
+      {/* <Testimonials /> */}
     </main>
   );
 }

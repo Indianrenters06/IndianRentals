@@ -2,9 +2,14 @@
 import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-// Import a bunch of icons to support dynamic string resolution from CMS
-import * as PhosphorIcons from '@phosphor-icons/react';
-import { DeviceLaptop, UserCheck, ShoppingCartSimple, BoxArrowUp } from '@phosphor-icons/react';
+// Switch to react-icons/pi for better build compatibility
+import { 
+  PiLaptop as DeviceLaptop, 
+  PiUserCheck as UserCheck, 
+  PiShoppingCartSimple as ShoppingCartSimple, 
+  PiBoxArrowUp as BoxArrowUp,
+  PiCheckCircle
+} from 'react-icons/pi';
 
 const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
 
@@ -35,11 +40,18 @@ const FALLBACK_STEPS = [
     }
 ];
 
-// Helper to safely render dynamic string icons from @phosphor-icons/react
-const DynamicIcon = ({ name, size = 24, className = "", weight = "regular" }) => {
-    // defaults to CheckCircle if not found
-    const IconComponent = PhosphorIcons[name] || PhosphorIcons.CheckCircle;
-    return <IconComponent size={size} className={className} weight={weight} />;
+// Map CMS string names to actual Pi icons
+const ICON_MAP = {
+    "Laptop": DeviceLaptop,
+    "IdentificationCard": UserCheck,
+    "ShoppingCart": ShoppingCartSimple,
+    "Package": BoxArrowUp,
+};
+
+// Helper to safely render dynamic icons
+const DynamicIcon = ({ name, size = 24, className = "" }) => {
+    const IconComponent = ICON_MAP[name] || PiCheckCircle;
+    return <IconComponent size={size} className={className} />;
 };
 
 
@@ -117,7 +129,7 @@ const RentalProcess = () => {
 
                             return (
                                 <div
-                                    key={index}
+                                    key={`rp-step-${index}`}
                                     onClick={() => setActiveStep(index)}
                                     className="cursor-pointer"
                                 >
@@ -133,7 +145,7 @@ const RentalProcess = () => {
                                         >
                                             <div className="flex justify-between items-start">
                                                 <div className="text-[#6B4B18] scale-[1.3] origin-left pt-1">
-                                                    <DynamicIcon name={step.icon} size={28} weight="fill" />
+                                                    <DynamicIcon name={step.icon} size={28} />
                                                 </div>
                                                 <div className="px-5 py-2 bg-white text-[13px] font-bold text-[#6B4B18] rounded-full tracking-tighter shadow-sm">
                                                     Step {idxNum}
@@ -153,7 +165,7 @@ const RentalProcess = () => {
                                         <div className="h-[100px] px-7 py-5 flex flex-col justify-center bg-white border border-gray-100 shadow-sm hover:border-gray-200 rounded-2xl">
                                             <div className="flex justify-between items-start mb-1.5">
                                                 <div className="text-gray-900 scale-[1.2] origin-left pt-1">
-                                                    <DynamicIcon name={step.icon} size={24} weight="bold" />
+                                                    <DynamicIcon name={step.icon} size={24} />
                                                 </div>
                                                 <div className="px-4 py-1.5 border border-gray-200 text-[12px] font-bold text-gray-400 rounded-full tracking-tighter bg-transparent">
                                                     Step {idxNum}
@@ -173,7 +185,7 @@ const RentalProcess = () => {
                     <div className="w-[590px] relative h-full rounded-[3rem] overflow-hidden shadow-xl bg-gray-100">
                         {cms.steps[activeStep] && (
                             <Image
-                                key={activeStep}
+                                key={`rp-img-${activeStep}`}
                                 src={cms.steps[activeStep].image || STEP_IMAGES[activeStep] || STEP_IMAGES[0]}
                                 alt={cms.steps[activeStep].title}
                                 fill

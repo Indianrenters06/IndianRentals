@@ -196,7 +196,7 @@ const Testimonials = () => {
                 </div>
                 <div className="flex text-[#F4B400] gap-0.5 text-lg">
                     {[...Array(5)].map((_, j) => (
-                        <FaStar key={j} className={j < (review.rating || review.stars) ? "text-[#FAB005]" : "text-gray-300"} />
+                        <FaStar key={`star-${review._id || review.id || 'r'}-${j}`} className={j < (review.rating || review.stars) ? "text-[#FAB005]" : "text-gray-300"} />
                     ))}
                 </div>
             </div>
