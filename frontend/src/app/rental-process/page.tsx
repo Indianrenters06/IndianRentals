@@ -210,7 +210,7 @@ export default function RentalProcessPage() {
                         <div>
                             <h2 className="text-4xl md:text-5xl font-bold mb-6 font-manrope text-gray-900">Why Choose Us?</h2>
                             <p className="text-gray-600 mb-10 leading-relaxed font-manrope max-w-lg text-lg">
-                                Join thousands who've switched to the flexible, affordable way to access
+                                Join thousands who&apos;ve switched to the flexible, affordable way to access
                                 high-end tech. IndianRenters delivers AI-ready workstations, laptops, and IT
                                 gear with zero ownership hassle and instant support.
                             </p>

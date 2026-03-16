@@ -50,9 +50,9 @@ export default function AboutPage() {
 
                         <div className="w-[587px] h-[344px] text-gray-900 font-manrope font-normal flex flex-col opacity-100">
                             <p className="w-[596px] h-[178px] leading-tight  opacity-100">
-                                From a small computer training room in 1992 to India's go-to rental partner, this
+                                From a small computer training room in 1992 to India&apos;s go-to rental partner, this
                                 journey has been about making access smarter than ownership. The promise stays
-                                simple: rent anything needed, when it's needed, anywhere it's needed—without
+                                simple: rent anything needed, when it&apos;s needed, anywhere it&apos;s needed—without
                                 friction.
                             </p>
                             <p className="w-[596px] h-[178px] leading-tight opacity-100 -mt-20">
@@ -130,7 +130,7 @@ export default function AboutPage() {
                                 <div className="flex flex-row items-start border-b border-black/10 pb-4">
                                     <h3 className="text-lg font-semibold text-gray-900 font-manrope w-[200px] shrink-0">Rent Anything</h3>
                                     <p className="text-gray-800 font-manrope leading-relaxed text-md">
-                                        Laptops, Macs, mobiles, AV, cameras, medical and more—if it's not listed, it's sourced on request.
+                                        Laptops, Macs, mobiles, AV, cameras, medical and more—if it&apos;s not listed, it&apos;s sourced on request.
                                     </p>
                                 </div>
 
@@ -154,7 +154,7 @@ export default function AboutPage() {
                                 <div className="flex flex-row items-start border-b border-black/10 pb-4">
                                     <h3 className="text-lg font-semibold text-gray-900 font-manrope w-[200px] shrink-0">Awesome Service</h3>
                                     <p className="text-gray-800 font-manrope leading-relaxed text-md ml-8">
-                                        Laptops, Macs, mobiles, AV, cameras, medical and more—if it's not listed, it's sourced on request.
+                                        Laptops, Macs, mobiles, AV, cameras, medical and more—if it&apos;s not listed, it&apos;s sourced on request.
                                     </p>
                                 </div>
 
@@ -184,7 +184,7 @@ export default function AboutPage() {
                     <div className="lg:order-1"> {/* Wait, screenshot has text on LEFT? Yes. */}
                         <h2 className="w-[540px] h-[45px] text-[40px] font-semibold mb-6 font-poppins text-gray-800 leading-tight tracking-tight opacity-100">Why Choose Us?</h2>
                         <p className="w-[540px] h-[68px] text-base font-normal mb-5 leading-tight text-gray-800 tracking-wide opacity-100 font-poppins">
-                            Join thousands who've switched to the flexible, affordable way to access
+                            Join thousands who&apos;ve switched to the flexible, affordable way to access
                             high-end tech. IndianRenters delivers AI-ready workstations, laptops, and IT
                             gear with zero ownership hassle and instant support.
                         </p>

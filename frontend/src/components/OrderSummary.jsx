@@ -108,10 +108,10 @@ const OrderSummary = ({
 
                             <div className="text-[12px] font-medium text-gray-500">
                                 <p className="mb-4">
-                                    You're all set! We've received your payment, and your product is securely reserved. The last step before we can get your rental to you is a quick identity verification.
+                                    You&apos;re all set! We&apos;ve received your payment, and your product is securely reserved. The last step before we can get your rental to you is a quick identity verification.
                                 </p>
                                 <p>
-                                    Please fill out the KYC form to get started. Don't worry, your rental billing only kicks off once everything is approved. We'll be in touch soon to schedule your delivery!
+                                    Please fill out the KYC form to get started. Don&apos;t worry, your rental billing only kicks off once everything is approved. We&apos;ll be in touch soon to schedule your delivery!
                                 </p>
                             </div>
                         </div>

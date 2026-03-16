@@ -1,0 +1,8 @@
+M  src/app/page.js
+M  src/components/BestRentedProducts.jsx
+M  src/components/FeaturedShowcase.jsx
+M  src/components/RentByCategory.jsx
+M  src/components/RentalProcess.jsx
+M  src/components/Testimonials.jsx
+M  tsconfig.json
+?? status_log.txt
