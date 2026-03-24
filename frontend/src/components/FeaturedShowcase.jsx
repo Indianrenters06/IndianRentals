@@ -371,8 +371,8 @@ const FeaturedShowcase = () => {
     const activeBanners = cms.banners?.length > 0 ? cms.banners : FALLBACK_BANNERS;
 
     return (
-        <section className="py-8 bg-white">
-            <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
+        <section className="py-12 md:py-16 bg-white">
+            <div className="max-w-[1200px] mx-auto px-4 sm:px-6">
                 {/* 1200 × 391, gap 35px */}
                 <div
                     className="mx-auto flex flex-row items-stretch"

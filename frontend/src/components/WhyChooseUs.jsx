@@ -27,8 +27,8 @@ const WhyChooseUs = () => {
     if (loading) return <div className="h-96 w-full animate-pulse bg-slate-50 rounded-3xl" />;
 
     return (
-        <section className="py-10 md:py-20 bg-[#FFFDF7] overflow-hidden">
-            <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
+        <section className="py-12 md:py-16 bg-[#FFFDF7] overflow-hidden">
+            <div className="max-w-[1200px] mx-auto px-4 sm:px-6">
                 <div className="grid md:grid-cols-2 gap-8 md:gap-16 items-center">
 
                     {/* Text Content - always first on mobile */}

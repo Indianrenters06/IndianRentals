@@ -78,8 +78,8 @@ const Hero = () => {
     const slide = slides[activeSlide] || slides[0] || FALLBACK_SLIDES[0];
 
     return (
-        <section className="bg-white py-4 md:py-6">
-            <div className="max-w-[1440px] mx-auto px-6 sm:px-8 lg:px-6 relative">
+        <section className="py-4 md:py-8 bg-white">
+            <div className="max-w-[1200px] mx-auto px-4 sm:px-6">
 
                 {/* ── Mobile: horizontal carousel ── */}
                 <div className="md:hidden relative overflow-hidden">

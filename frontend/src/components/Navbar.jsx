@@ -147,7 +147,7 @@ const Navbar = () => {
             </div>
 
             {/* Top Bar */}
-            <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 py-3">
+            <div className="max-w-[1200px] mx-auto px-4 sm:px-6 py-3">
                 <div className="flex items-center justify-between gap-[10px]">
 
                     {/* Left Section: Mobile Menu + Logo */}
@@ -360,7 +360,7 @@ const Navbar = () => {
                 </div>
             </div>      {/* Secondary Nav - Categories */}
             <div className="hidden md:block border-t border-b border-gray-200 bg-white">
-                <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
+                <div className="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="flex items-center justify-center space-x-8 py-1 overflow-x-auto">
                         {navLinks.map((link) => (
                             <Link

@@ -91,8 +91,8 @@ const RentalProcess = () => {
     if (!cms.enabled) return null;
 
     return (
-        <section className="py-12 md:py-24 bg-white overflow-hidden">
-            <div className="max-w-[1400px] mx-auto px-4 md:px-8">
+        <section className="py-12 md:py-16 bg-white overflow-hidden">
+            <div className="max-w-[1200px] mx-auto px-4 sm:px-6">
 
                 {/* Header Section */}
                 <div style={{ width: '1192px' }} className="mx-auto flex flex-col md:flex-row md:items-start justify-between mb-10 gap-8 font-manrope">

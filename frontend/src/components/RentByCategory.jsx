@@ -134,16 +134,16 @@ const RentByCategory = () => {
     const mobileCats = displayCategories.slice(0, 7);
 
     return (
-        <section className="py-8 md:py-20 bg-white">
-            <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
+        <section className="py-12 md:py-16 bg-white">
+            <div className="max-w-[1200px] mx-auto px-4 sm:px-6 border-t border-gray-100">
                 <div className="flex items-center justify-between mb-6 md:mb-12">
                     <h2 className="text-4xl font-semibold font-manrope text-gray-900 tracking-tight">{cmsConfig.title}</h2>
                     <Link
                         href="/categories"
-                        className="hidden md:inline-flex btn-yellow-primary !h-auto !py-2 !px-6 !rounded-full gap-2 transition-colors"
+                        className="hidden md:flex items-center gap-2 text-[15px] font-semibold text-gray-900 group"
                     >
                         Explore
-                        <FaArrowRight size={8} />
+                        <FaArrowRight size={12} className="group-hover:translate-x-1 transition-transform" />
                     </Link>
                 </div>
 
@@ -186,12 +186,15 @@ const RentByCategory = () => {
                         modules={[Navigation, Autoplay]}
                         spaceBetween={20}
                         slidesPerView={'auto'}
-                        navigation
+                        navigation={{
+                            nextEl: '.swiper-button-next-custom',
+                            prevEl: '.swiper-button-prev-custom',
+                        }}
                         autoplay={{
                             delay: 3000,
                             disableOnInteraction: false,
                         }}
-                        className="py-4"
+                        className="!pb-12"
                     >
                         {displayCategories.map((cat, index) => (
                             <SwiperSlide key={cat._id || index} style={{ width: '177.33px' }}>
@@ -216,20 +219,32 @@ const RentByCategory = () => {
                                 </Link>
                             </SwiperSlide>
                         ))}
+
                     </Swiper>
 
-                    {/* Mobile Explore Button */}
-                    <div className="mt-8 text-center">
-                        <Link
-                            href="/categories"
-                            className="inline-flex btn-yellow-primary !h-auto !py-3 !px-6 !rounded-full gap-2 transition-colors"
-                        >
-                            Explore Categories
-                            <FaArrowRight size={14} />
-                        </Link>
+                    {/* Desktop Navigation Arrows - Positioned below the slider like in the image */}
+                    <div className="hidden md:flex items-center justify-end gap-3 mt-[-14px] mr-2">
+                        <div className="swiper-button-prev-custom w-10 h-10 bg-white rounded-full shadow-sm flex items-center justify-center cursor-pointer border border-gray-100 group hover:shadow-md transition-all">
+                             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-gray-400 group-hover:text-gray-800 transition-colors rotate-180">
+                                <polyline points="9 18 15 12 9 6"></polyline>
+                            </svg>
+                        </div>
+                        <div className="swiper-button-next-custom w-10 h-10 bg-white rounded-full shadow-sm flex items-center justify-center cursor-pointer border border-gray-100 group hover:shadow-md transition-all">
+                             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-gray-400 group-hover:text-gray-800 transition-colors">
+                                <polyline points="9 18 15 12 9 6"></polyline>
+                            </svg>
+                        </div>
                     </div>
                 </div>
             </div>
+            
+            <style jsx global>{`
+                .swiper-button-disabled {
+                    opacity: 0.3 !important;
+                    cursor: not-allowed !important;
+                    pointer-events: none !important;
+                }
+            `}</style>
         </section>
     );
 };
