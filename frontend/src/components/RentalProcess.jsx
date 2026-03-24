@@ -97,7 +97,7 @@ const RentalProcess = () => {
                 {/* Header Section */}
                 <div style={{ width: '1192px' }} className="mx-auto flex flex-col md:flex-row md:items-start justify-between mb-10 gap-8 font-manrope">
                     <div className="max-w-2xl">
-                        <div className="inline-block bg-[#222] text-white text-[11px] font-bold px-4 py-1.5 rounded-full mb-6 uppercase tracking-tight leading-none">
+                        <div className="inline-block bg-black text-white text-[11px] font-bold px-4 py-1.5 rounded-full mb-6 uppercase tracking-tight leading-none">
                             Rental Process
                         </div>
                         <h2 className="text-3xl md:text-[36px] font-semibold text-gray-900 font-manrope mb-4 tracking-tight leading-[1.1]">
@@ -109,10 +109,10 @@ const RentalProcess = () => {
                     </div>
 
                     <div className="flex items-center gap-2 pt-24 md:pr-12">
-                        <Link href="/rental-process" className="px-9 py-4 bg-[#FFC107] text-black font-extrabold rounded-full hover:bg-[#FFB300] transition-all hover:scale-105 shadow-sm text-[16px] tracking-tight font-manrope">
+                        <Link href="/rental-process" className="btn-yellow-primary !py-4 !px-9 !rounded-full shadow-sm text-[16px] tracking-tight hover:scale-105">
                             Rental Process
                         </Link>
-                        <Link href="/contact" className="px-9 py-4 bg-[#222] text-white font-extrabold rounded-full hover:bg-black transition-all hover:scale-105 text-[16px] tracking-tight font-manrope">
+                        <Link href="/contact" className="px-9 py-4 bg-black text-white font-extrabold rounded-full hover:bg-grey-800 transition-all hover:scale-105 text-[16px] tracking-tight font-manrope">
                             Contact
                         </Link>
                     </div>
@@ -138,10 +138,9 @@ const RentalProcess = () => {
                                         <div 
                                             style={{ 
                                                 height: '184px',
-                                                background: 'linear-gradient(125.34deg, rgba(255, 207, 70, 0.5) 1.25%, rgba(255, 185, 27, 0.9) 98.94%)',
                                                 boxShadow: '-3px -3px 15px -2px #E26E0042 inset'
                                             }}
-                                            className="px-7 py-5 flex flex-col justify-between rounded-2xl"
+                                            className="px-7 py-5 flex flex-col justify-between rounded-2xl bg-gradient-to-br from-orange-300/50 to-orange-400/90"
                                         >
                                             <div className="flex justify-between items-start">
                                                 <div className="text-[#6B4B18] scale-[1.3] origin-left pt-1">

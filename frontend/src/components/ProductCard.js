@@ -7,6 +7,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useDispatch } from 'react-redux';
 import { addToCart } from '@/redux/features/cartSlice';
+import Button from './common/Button';
 
 const ProductCard = ({ product }) => {
     const router = useRouter();
@@ -24,7 +25,7 @@ const ProductCard = ({ product }) => {
             price: product.rentPrice,
             monthlyRent: product.rentPrice,
             quantity: 1,
-            duration: 1, // Default 1 month
+            duration: parseInt(product.selectedDurationStr) || 1, // Default 1 month
             refundableAmount: 0,
             description: product.description
         }));
@@ -50,30 +51,44 @@ const ProductCard = ({ product }) => {
                 </div>
                 <div className="flex flex-col flex-1 px-1 pb-4 cursor-pointer">
                     <h3 className="text-[17px] font-semibold text-[#1D1D1F] mb-1.5 leading-snug tracking-tight line-clamp-2 transition-all duration-300 group-hover:text-[#FF3B30]">{product.name}</h3>
+                    
+                    <div className="flex items-center gap-1.5 mb-2.5 transition-all duration-300">
+                        <div className="flex text-[#FF9500]">
+                            {[1, 2, 3, 4, 5].map(s => (
+                                <FaStar key={s} size={13} className={s <= Math.round(product.rating || 4) ? "" : "opacity-30"} />
+                            ))}
+                        </div>
+                        <span className="text-[11px] font-semibold text-gray-500">{product.rating || "4.2"}({product.numReviews || 0})</span>
+                    </div>
+
                     <p className="text-[11px] line-clamp-2 leading-relaxed text-[#86868B] mb-3">{product.description}</p>
-                    <div className="mt-auto relative">
+                    <div className="mt-auto">
                         {/* Normal Price View */}
-                        <div className="flex items-baseline flex-wrap gap-x-2 gap-y-1 transition-all duration-300 group-hover:opacity-0 group-hover:-translate-y-2">
+                        <div className="flex items-baseline flex-wrap gap-x-2 gap-y-1 transition-all duration-300 mb-4">
                             <span className="text-[13px] text-[#86868B] font-medium">from</span>
                             <span className="text-[13px] text-[#86868B] line-through font-medium">₹{product.originalPrice}</span>
                             <span className="text-[19px] font-bold text-[#FF3B30]">₹{product.rentPrice}</span>
                             <span className="text-[13px] text-[#86868B] font-medium">/month</span>
                         </div>
 
-                        {/* Hover Action Buttons */}
-                        <div className="absolute inset-x-0 bottom-0 flex gap-2 opacity-0 translate-y-4 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-500 ease-out z-20">
-                            <button 
-                                className="flex-1 bg-white border border-gray-200 text-[#4A4A4A] py-2.5 rounded-xl text-[13px] font-semibold hover:bg-gray-50 transition-colors shadow-sm"
+                        {/* Action Buttons - persistent space at bottom */}
+                        <div className="flex gap-2 transition-all duration-500 ease-out z-20">
+                            <Button 
+                                variant="black"
+                                size="md"
+                                className="flex-1 !rounded-xl !min-w-0"
                                 onClick={handleQuickView}
                             >
                                 Quick View
-                            </button>
-                            <button 
-                                className={`flex-1 ${added ? 'bg-green-500' : 'bg-[#FF3B30]'} text-white py-2.5 rounded-xl text-[13px] font-semibold transition-all hover:bg-[#e0352b] hover:shadow-lg active:scale-95`}
+                            </Button>
+                            <Button 
+                                variant={added ? 'ghost' : 'yellow'}
+                                size="md"
+                                className={`flex-1 !rounded-xl !min-w-0 ${added ? 'bg-green-500 !text-white' : ''}`}
                                 onClick={handleAddToCart}
                             >
                                 {added ? 'Added!' : 'Add to Cart'}
-                            </button>
+                            </Button>
                         </div>
                     </div>
                 </div>

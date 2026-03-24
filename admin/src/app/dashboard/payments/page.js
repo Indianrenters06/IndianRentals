@@ -96,7 +96,7 @@ export default function AllTransactions() {
                     ) : loading ? (
                         <div className="p-6 space-y-4">{[...Array(6)].map((_, i) => <Skeleton key={i} className="h-12 w-full rounded-xl" />)}</div>
                     ) : (
-                        <Table aria-label="Transactions table" classNames={{ wrapper: "p-0 rounded-none shadow-none bg-transparent", th: "bg-slate-50 dark:bg-slate-950/80 uppercase text-xs font-bold h-12 pt-0 px-6", td: "py-4 px-6 border-b border-slate-100 dark:border-slate-800/50" }}>
+                        <Table aria-label="Transactions table" classNames={{ wrapper: "p-0 rounded-none shadow-none bg-transparent", th: "bg-slate-50 dark:bg-slate-950/80 uppercase text-xs font-bold h-12 pt-0 px-6", td: "py-[1.2rem] px-6 border-b border-slate-100 dark:border-slate-800/50" }}>
                             <TableHeader>
                                 <TableColumn>TXN ID</TableColumn>
                                 <TableColumn>CUSTOMER</TableColumn>

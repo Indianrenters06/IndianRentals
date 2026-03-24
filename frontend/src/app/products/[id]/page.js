@@ -93,6 +93,7 @@ export default function ProductDetailPage() {
         { label: "CONDITION", value: product.condition || "New" },
         { label: "STOCK", value: product.stock > 0 ? "In Stock" : "Out of Stock" },
         { label: "LOCATION", value: product.city || "All India" },
+        { label: "DETAILS", value: product.description || "N/A" }
     ];
 
     return (
@@ -157,10 +158,6 @@ export default function ProductDetailPage() {
                                     </div>
                                 </button>
                             ))}
-                            {/* Representative lifestyle image if available */}
-                            <div className="w-[150px] h-[110px] flex-shrink-0 bg-gray-100 rounded-[24px] overflow-hidden relative">
-                                <Image src="https://images.unsplash.com/photo-1531297484001-80022131f5a1?q=80&w=400" alt="Lifestyle" fill className="object-cover" />
-                            </div>
                         </div>
                     </div>
 
@@ -170,9 +167,11 @@ export default function ProductDetailPage() {
                             <h1 className="text-[28px] font-bold text-[#1D1D1F] leading-[1.2] mb-2">{product.name}</h1>
                             <div className="flex items-center gap-1.5 mb-2">
                                 <div className="flex text-[#FF9500]">
-                                    {[1, 2, 3, 4, 5].map(s => <FaStar key={s} size={14} className={s === 5 ? "opacity-30" : ""} />)}
+                                    {[1, 2, 3, 4, 5].map(s => (
+                                        <FaStar key={s} size={14} className={s <= Math.round(product.rating || 0) ? "" : "opacity-30"} />
+                                    ))}
                                 </div>
-                                <span className="text-[14px] font-medium text-gray-500">4.5(12)</span>
+                                <span className="text-[14px] font-medium text-gray-500">{product.rating || "4.5"}({product.numReviews || 0})</span>
                             </div>
 
                             <div className="inline-block border-b-2 border-gray-900 pb-0.5 mt-2">
@@ -340,18 +339,38 @@ export default function ProductDetailPage() {
                     </div>
 
                     <div className="bg-white border border-gray-100 rounded-[40px] p-12 shadow-[0_10px_40px_rgba(0,0,0,0.03)]">
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-y-12 gap-x-16">
-                            {specs.map((item, i) => (
-                                <div key={i} className="flex flex-col gap-2 group">
-                                    <span className="text-[13px] font-black text-gray-400 uppercase tracking-[2px] mb-1 group-hover:text-black transition-colors">{item.label}</span>
-                                    <div className="w-8 h-[2px] bg-gray-100 group-hover:w-full transition-all duration-500 mb-1" />
-                                    <span className="text-[18px] font-bold text-gray-900">{item.value}</span>
-                                </div>
-                            ))}
-                        </div>
+                        {activeTab === 'Product Details' && (
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-y-12 gap-x-16">
+                                {specs.map((item, i) => (
+                                    <div key={i} className={`flex flex-col gap-2 group ${item.label === 'DETAILS' ? 'md:col-span-2 lg:col-span-3' : ''}`}>
+                                        <span className="text-[13px] font-black text-gray-400 uppercase tracking-[2px] mb-1 group-hover:text-black transition-colors">{item.label}</span>
+                                        <div className="w-8 h-[2px] bg-gray-100 group-hover:w-full transition-all duration-500 mb-1" />
+                                        <span className="text-[18px] font-bold text-gray-900 whitespace-pre-line">{item.value}</span>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+                        {activeTab === 'Return Policy' && (
+                            <div className="prose max-w-none">
+                                <h3 className="text-xl font-bold mb-4">Return Policy</h3>
+                                <p className="text-gray-700 whitespace-pre-line leading-relaxed">
+                                    {product.returnPolicy || "Standard return policy applies. Please contact support for details."}
+                                </p>
+                            </div>
+                        )}
+                        {activeTab === 'Shipping Policy' && (
+                            <div className="prose max-w-none">
+                                <h3 className="text-xl font-bold mb-4">Shipping Policy</h3>
+                                <p className="text-gray-700 whitespace-pre-line leading-relaxed">
+                                    {product.shippingPolicy || "Standard shipping policy applies. Delivery usually takes 2-5 business days."}
+                                </p>
+                            </div>
+                        )}
                     </div>
                 </div>
             </main>
         </div>
     );
 }
+
+// Force Next.js Fast Refresh

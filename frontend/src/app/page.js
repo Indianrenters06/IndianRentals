@@ -9,6 +9,7 @@ import FeaturedShowcase from "@/components/FeaturedShowcase";
 import Testimonials from "@/components/Testimonials";
 
 export default function Home() {
+  console.log("Forcing tailwind reload...");
   return (
     <main className="min-h-screen bg-gray-50 w-full max-w-full overflow-x-hidden font-manrope">
       <Hero />

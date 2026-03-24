@@ -20,7 +20,7 @@ const heroSlideSchema = new mongoose.Schema({
     title: { type: String, default: '' },
     subtitle: { type: String, default: '' },
     image: { type: String, default: '' },
-    bgColor: { type: String, default: '#00A8FF' },
+    bgColor: { type: String, default: '#0075ff' },
     ctaText: { type: String, default: 'Rent Now' },
     ctaLink: { type: String, default: '/products' },
 }, { _id: false });

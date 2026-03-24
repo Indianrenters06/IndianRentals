@@ -22,4 +22,5 @@ const nextConfig = {
   },
 };
 
+// Force reload tailwind compiler
 export default nextConfig;

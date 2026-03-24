@@ -219,7 +219,7 @@ const ProductSelector = ({ label, selectedIds, onChange }) => {
 const DEFAULTS = {
     publishStatus: "published",
     heroEnabled: true,
-    heroSlides: [{ title: "The Tech That Powers Your Ambition. On Demand.", subtitle: "Get the latest MacBooks, Workstations, Cameras, and more.", image: "", bgColor: "#00A8FF", ctaText: "Rent Now", ctaLink: "/products" }],
+    heroSlides: [{ title: "The Tech That Powers Your Ambition. On Demand.", subtitle: "Get the latest MacBooks, Workstations, Cameras, and more.", image: "", bgColor: "#0075ff", textColor: "#ffffff", bgImage: "", ctaText: "Rent Now", ctaLink: "/products" }],
     categorySectionEnabled: true,
     categorySectionTitle: "Rent by Category",
     bestRentedEnabled: true, bestRentedTitle: "Best Rented Products", bestRentedProductIds: [],
@@ -290,9 +290,16 @@ export default function CMSHomepage() {
             if (res.ok) {
                 const d = await res.json();
                 if (d.heroSlides?.length === 0 && d.heroTitle) {
-                    d.heroSlides = [{ title: d.heroTitle, subtitle: d.heroSubtitle, image: d.heroImage, bgColor: d.heroBgColor || "#00A8FF", ctaText: "Rent Now", ctaLink: "/products" }];
+                    d.heroSlides = [{ title: d.heroTitle, subtitle: d.heroSubtitle, image: d.heroImage, bgColor: d.heroBgColor || "#0075ff", textColor: d.heroTextColor || "#ffffff", bgImage: d.heroBgImage || "", ctaText: "Rent Now", ctaLink: "/products" }];
                 } else if (!d.heroSlides || d.heroSlides.length === 0) {
-                    d.heroSlides = DEFAULTS.heroSlides;
+                    d.heroSlides = DEFAULTS.heroSlides.map(s => ({ ...s }));
+                } else {
+                    // Ensure new properties exist on older slides
+                    d.heroSlides = d.heroSlides.map(s => ({
+                        ...s,
+                        textColor: s.textColor || "#ffffff",
+                        bgImage: s.bgImage || "",
+                    }));
                 }
                 if (!d.rentalProcessSteps || d.rentalProcessSteps.length === 0) {
                     d.rentalProcessSteps = DEFAULTS.rentalProcessSteps;
@@ -373,7 +380,7 @@ export default function CMSHomepage() {
                     <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 shadow-sm space-y-6">
                         <div className="flex justify-between items-center">
                             <h3 className="text-lg font-bold flex items-center gap-2 text-slate-800 dark:text-slate-100"><PhosphorImage /> Carousel Slides</h3>
-                            <button onClick={() => set("heroSlides", [...data.heroSlides, { title: "New Slide", subtitle: "", image: "", bgColor: "#333333", ctaText: "Rent Now", ctaLink: "/products" }])}
+                            <button onClick={() => set("heroSlides", [...data.heroSlides, { title: "New Slide", subtitle: "", image: "", bgColor: "#333333", textColor: "#ffffff", bgImage: "", ctaText: "Rent Now", ctaLink: "/products" }])}
                                 className="flex items-center gap-1.5 h-8 px-4 rounded-lg bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 text-sm font-semibold hover:bg-indigo-100 dark:hover:bg-indigo-500/20 transition-all border border-indigo-200 dark:border-indigo-500/20">
                                 <Plus size={14} /> Add Slide
                             </button>
@@ -403,21 +410,36 @@ export default function CMSHomepage() {
                                                 <Field label="CTA Button Text" value={slide.ctaText} onChange={v => { const n = [...data.heroSlides]; n[index].ctaText = v; set("heroSlides", n); }} placeholder="Rent Now" />
                                                 <Field label="CTA Button Link" value={slide.ctaLink} onChange={v => { const n = [...data.heroSlides]; n[index].ctaLink = v; set("heroSlides", n); }} placeholder="/products" />
                                             </div>
-                                            <div>
-                                                <label className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider block mb-2">Background Color (Hex)</label>
-                                                <div className="flex items-center gap-3">
-                                                    <input type="color" value={slide.bgColor} onChange={e => { const n = [...data.heroSlides]; n[index].bgColor = e.target.value; set("heroSlides", n); }} className="w-10 h-10 rounded-lg cursor-pointer border border-slate-200 dark:border-slate-700" />
-                                                    <input type="text" value={slide.bgColor} onChange={e => { const n = [...data.heroSlides]; n[index].bgColor = e.target.value; set("heroSlides", n); }}
-                                                        className="flex-1 h-10 px-3 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/40 transition-all font-mono" />
+                                            <div className="grid grid-cols-2 gap-4">
+                                                <div>
+                                                    <label className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider block mb-2">Background Color</label>
+                                                    <div className="flex items-center gap-2">
+                                                        <input type="color" value={slide.bgColor} onChange={e => { const n = [...data.heroSlides]; n[index].bgColor = e.target.value; set("heroSlides", n); }} className="w-10 h-10 rounded-lg cursor-pointer border border-slate-200 dark:border-slate-700" />
+                                                        <input type="text" value={slide.bgColor} onChange={e => { const n = [...data.heroSlides]; n[index].bgColor = e.target.value; set("heroSlides", n); }}
+                                                            className="flex-1 h-10 px-3 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs font-mono" />
+                                                    </div>
+                                                </div>
+                                                <div>
+                                                    <label className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider block mb-2">Text Color</label>
+                                                    <div className="flex items-center gap-2">
+                                                        <input type="color" value={slide.textColor || "#ffffff"} onChange={e => { const n = [...data.heroSlides]; n[index].textColor = e.target.value; set("heroSlides", n); }} className="w-10 h-10 rounded-lg cursor-pointer border border-slate-200 dark:border-slate-700" />
+                                                        <input type="text" value={slide.textColor || "#ffffff"} onChange={e => { const n = [...data.heroSlides]; n[index].textColor = e.target.value; set("heroSlides", n); }}
+                                                            className="flex-1 h-10 px-3 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs font-mono" />
+                                                    </div>
                                                 </div>
                                             </div>
+                                            <ImageUploader label="Background Image (Replaces solid color)" existingUrl={slide.bgImage}
+                                                onUpload={url => { const n = [...data.heroSlides]; n[index].bgImage = url; set("heroSlides", n); }} />
                                         </div>
                                         <div className="space-y-4">
                                             <ImageUploader label="Foreground Image (Transparent PNG Recommended)" existingUrl={slide.image}
                                                 onUpload={url => { const n = [...data.heroSlides]; n[index].image = url; set("heroSlides", n); }} />
-                                            {slide.image && (
-                                                <div className="h-32 rounded-xl flex items-center justify-center p-2 border border-slate-200 dark:border-slate-700" style={{ backgroundColor: slide.bgColor }}>
-                                                    <img src={slide.image} className="max-h-full max-w-full object-contain drop-shadow-xl" alt="Preview" />
+                                            { (slide.image || slide.bgImage) && (
+                                                <div className="h-32 rounded-xl flex items-center justify-center p-2 border border-slate-200 dark:border-slate-700 relative overflow-hidden" 
+                                                     style={{ backgroundColor: slide.bgColor }}>
+                                                    {slide.bgImage && <img src={slide.bgImage} className="absolute inset-0 w-full h-full object-cover opacity-50" alt="BG Preview" />}
+                                                    <img src={slide.image || "https://res.cloudinary.com/dgkckcdk8/image/upload/v1769946716/indian-rentals/fj8ptqbhppbstdd0hs4i.png"} 
+                                                         className="relative z-10 max-h-full max-w-full object-contain drop-shadow-xl" alt="Preview" />
                                                 </div>
                                             )}
                                         </div>

@@ -24,6 +24,8 @@ const EMPTY = {
     stock: "1", condition: "Good", city: "", state: "",
     images: [""],          // array of URL strings
     isActive: true,
+    returnPolicy: "",
+    shippingPolicy: "",
 };
 
 export default function EditProduct() {
@@ -93,6 +95,8 @@ export default function EditProduct() {
                 state: p.state || "",
                 images: p.images?.length ? p.images : [""],
                 isActive: p.isActive !== undefined ? p.isActive : true,
+                returnPolicy: p.returnPolicy || "",
+                shippingPolicy: p.shippingPolicy || "",
             });
         } catch (err) {
             alert(err.message);
@@ -135,6 +139,8 @@ export default function EditProduct() {
                 state: form.state,
                 images: form.images.filter(Boolean),
                 isActive: form.isActive,
+                returnPolicy: form.returnPolicy,
+                shippingPolicy: form.shippingPolicy,
             };
 
             const res = await fetch(`${API}/api/products/${id}`, {
@@ -370,6 +376,41 @@ export default function EditProduct() {
                                         <SelectItem key="Good">Good</SelectItem>
                                         <SelectItem key="Fair">Fair</SelectItem>
                                     </Select>
+                                </div>
+                            </div>
+                        </section>
+
+                        {/* ── Policies & Additional Info ── */}
+                        <section className="space-y-6">
+                            <div className="space-y-1">
+                                <h3 className="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                                    <FloppyDisk className="text-indigo-500" size={18} /> Policies & Details
+                                </h3>
+                                <Divider className="bg-slate-100 dark:bg-slate-800" />
+                            </div>
+
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div className="flex flex-col gap-2">
+                                    <label className="text-xs font-bold text-slate-600 dark:text-slate-300 uppercase tracking-wider">Return Policy</label>
+                                    <Textarea
+                                        value={form.returnPolicy}
+                                        onValueChange={v => set("returnPolicy", v)}
+                                        placeholder="Enter return policy terms..."
+                                        variant="bordered"
+                                        minRows={3}
+                                        classNames={{ inputWrapper: "border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950/60" }}
+                                    />
+                                </div>
+                                <div className="flex flex-col gap-2">
+                                    <label className="text-xs font-bold text-slate-600 dark:text-slate-300 uppercase tracking-wider">Shipping Policy</label>
+                                    <Textarea
+                                        value={form.shippingPolicy}
+                                        onValueChange={v => set("shippingPolicy", v)}
+                                        placeholder="Enter shipping & delivery terms..."
+                                        variant="bordered"
+                                        minRows={3}
+                                        classNames={{ inputWrapper: "border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950/60" }}
+                                    />
                                 </div>
                             </div>
                         </section>

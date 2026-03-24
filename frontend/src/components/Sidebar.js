@@ -2,12 +2,24 @@
 import React from 'react';
 import { FaInfoCircle } from 'react-icons/fa';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 
 const Sidebar = ({ selectedDuration, setSelectedDuration, selectedSort, setSelectedSort }) => {
-    const categories = [
-        "Most Rented", "Apple Products", "IT Products", "AV Products",
-        "Office Equipment", "DSLR Camera & Lenses", "Latest Launch", "More"
-    ];
+    const pathname = usePathname() || "";
+    
+    const categoryLinks = {
+        "Most Rented": "/products",
+        "Apple Products": "/category/apple",
+        "IT Products": "/category/it-products",
+        "AV Products": "/category/av-products",
+        "Office Equipment": "/category/office-equipment",
+        "DSLR Camera & Lenses": "/category/dslr",
+        "Latest Launch": "/products",
+        "More": "/categories"
+    };
+
+    const categories = Object.keys(categoryLinks);
+
     const durations = ["1 month", "3 months", "6 months", "9 months", "18 months", "24 months"];
 
     return (
@@ -15,14 +27,20 @@ const Sidebar = ({ selectedDuration, setSelectedDuration, selectedSort, setSelec
             <div className="mb-10">
                 <h3 className="text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-6">Browse Categories</h3>
                 <ul className="space-y-4">
-                    {categories.map((cat) => (
+                    {categories.map((cat) => {
+                        const href = categoryLinks[cat] || "#";
+                        const isActive = pathname.startsWith(href) && href !== "/products" && href !== "/categories" 
+                                        ? true 
+                                        : pathname === href && (cat === "Most Rented" || cat === "Latest Launch" || cat === "More");
+                        
+                        return (
                         <li key={cat}>
-                            <Link href="#" className={`flex items-center justify-between text-[14px] group transition-all duration-200 ${cat === "Apple Products" ? "text-black font-semibold" : "text-gray-500 hover:text-black"}`}>
+                            <Link href={href} className={`flex items-center justify-between text-[14px] group transition-all duration-200 ${isActive ? "text-black font-semibold" : "text-gray-500 hover:text-black"}`}>
                                 {cat}
-                                <span className={`text-lg transition-transform duration-200 ${cat === "Apple Products" ? "text-black translate-x-1" : "text-gray-300 group-hover:text-black group-hover:translate-x-1"}`}>›</span>
+                                <span className={`text-lg transition-transform duration-200 ${isActive ? "text-black translate-x-1" : "text-gray-300 group-hover:text-black group-hover:translate-x-1"}`}>›</span>
                             </Link>
                         </li>
-                    ))}
+                    )})}
                 </ul>
             </div>
             <div className="mb-10 border-t border-gray-100 pt-8">

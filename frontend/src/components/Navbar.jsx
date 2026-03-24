@@ -126,15 +126,23 @@ const Navbar = () => {
         { name: "DSLR Cameras", href: "/category/dslr" },
         { name: "About Us", href: "/about" },
         { name: "Contact", href: "/contact" },
-        { name: "More", href: "/more" },
-        { name: "Latest Launch", href: "/latest" },
-        { name: "Deals %", href: "/deals" },
+        { name: "More", href: "/categories" },
+        { name: "Latest Launch", href: "/products" },
+        { name: "Deals %", href: "/products" }
     ];
+
+    const handleSearch = (e) => {
+        if (e.key === 'Enter') {
+            const query = e.target.value.trim();
+            if (query) {
+                router.push(`/products?keyword=${encodeURIComponent(query)}`);
+            }
+        }
+    };
 
     return (
         <header className="relative bg-white shadow-xs z-50">
-            {/* Top Promotional Banner */}
-            <div className="bg-amber-300 text-black text-xs font-bold text-center py-1 px-4 tracking-wide">
+            <div className="bg-orange-300 text-black text-xs font-semibold flex items-center justify-center overflow-hidden w-full h-[35px] desktop:h-[40px]">
                 ♥ SAVE Extra 5% up to ₹100 on UPI Orders ♥
             </div>
 
@@ -174,6 +182,7 @@ const Navbar = () => {
                             type="text"
                             placeholder="Search for MacBook Pro 14..."
                             className="w-full pl-10 pr-4 py-2.5 rounded-full border border-gray-200 bg-gray-50 focus:bg-white focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 outline-none transition-all duration-200 text-sm"
+                            onKeyDown={handleSearch}
                         />
                     </div>
 
@@ -304,7 +313,7 @@ const Navbar = () => {
                         ) : (
                             <button
                                 onClick={() => setIsAuthModalOpen(true)}
-                                className="px-6 py-2 text-sm font-bold text-gray-900 bg-[#FFC107] hover:bg-[#FFD54F] rounded-full transition-colors shadow-sm"
+                                className="inline-flex items-center justify-center font-semibold text-sm transition-all duration-200 cursor-pointer text-center rounded-md border h-10 w-full px-6 py-2 tablet:h-9 tablet:w-auto tablet:min-w-[110px] tablet:px-[22px] tablet:py-[9px] desktop:h-[35px] desktop:min-w-[120px] desktop:px-5 desktop:py-2 bg-orange-300 text-black border-orange-300 hover:bg-orange-400 hover:border-orange-400 active:bg-orange-500 active:border-orange-500 focus:outline-none focus:ring-2 focus:ring-blue-info focus:ring-offset-2 focus:border-blue-info disabled:bg-orange-100 disabled:text-grey-400 disabled:border-orange-100 disabled:opacity-50 disabled:cursor-not-allowed !h-auto !py-2 !px-6 !rounded-full shadow-sm"
                             >
                                 Login/Register
                             </button>
@@ -383,6 +392,7 @@ const Navbar = () => {
                                     type="text"
                                     placeholder="Search..."
                                     className="w-full px-4 py-2 rounded-lg bg-gray-50 border border-gray-200 focus:ring-2 focus:ring-indigo-500 outline-none"
+                                    onKeyDown={handleSearch}
                                 />
                                 <FaSearch className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400" />
                             </div>

@@ -132,7 +132,7 @@ const BestRentedProducts = ({ type = "bestRented", defaultTitle = "Curated Produ
                     </h2>
                     <Link
                         href="/products"
-                        className="hidden md:inline-flex items-center justify-center px-6 py-2 bg-[#FFC107] hover:bg-[#FFD54F] text-black font-bold rounded-full transition-all duration-300 shadow-sm"
+                        className="hidden md:inline-flex btn-yellow-primary !h-auto !py-2 !px-6 !rounded-full shadow-sm"
                     >
                         View All
                     </Link>
@@ -158,18 +158,18 @@ const BestRentedProducts = ({ type = "bestRented", defaultTitle = "Curated Produ
 
                                         {/* Badges */}
                                         <div className="absolute top-2 left-2 z-10 flex gap-1">
-                                            <span className="bg-[#FF3B30] text-white text-[10px] font-bold px-2 py-0.5 rounded-md shadow-sm">
+                                            <span className="bg-red-sale text-white text-[10px] font-bold px-2 py-0.5 rounded-md shadow-sm">
                                                 -20% off
                                             </span>
                                             {product.isNew && (
-                                                <span className="bg-[#34C759] text-white text-[10px] font-bold px-2 py-0.5 rounded-md shadow-sm">
+                                                <span className="bg-green-price text-white text-[10px] font-bold px-2 py-0.5 rounded-md shadow-sm">
                                                     New
                                                 </span>
                                             )}
                                         </div>
 
                                         {/* Favorite Button */}
-                                        <button className="absolute top-2 right-2 z-10 w-8 h-8 flex items-center justify-center bg-white border border-gray-100 text-[#1D1D1F] rounded-full shadow-sm hover:text-[#FF3B30] transition-all">
+                                        <button className="absolute top-2 right-2 z-10 w-8 h-8 flex items-center justify-center bg-white border border-gray-100 text-black rounded-full shadow-sm hover:text-red-sale transition-all">
                                             <FaRegHeart size={16} />
                                         </button>
 
@@ -204,23 +204,23 @@ const BestRentedProducts = ({ type = "bestRented", defaultTitle = "Curated Produ
 
                                     {/* Content */}
                                     <div className="flex flex-col gap-[8px] pt-[8px] pr-[12px] pb-[12px] pl-[12px] h-[105px] w-full relative">
-                                        <h3 className="text-[16px] font-semibold font-manrope text-[#1D1D1F] leading-[24px] tracking-tight line-clamp-1 transition-colors duration-300 group-hover:text-[#FF3B30]">
+                                        <h3 className="text-[16px] font-semibold font-manrope text-black leading-[24px] tracking-tight line-clamp-1 transition-colors duration-300 group-hover:text-red-sale">
                                             {product.name}
                                         </h3>
 
                                         {/* Row: Rating + Delivery */}
                                         <div className="flex items-center justify-between transition-all duration-300 group-hover:opacity-0 group-hover:-translate-y-1">
                                             <div className="flex items-center gap-0.5">
-                                                <div className="flex gap-0.5">
-                                                    {[...Array(5)].map((_, i) => (
-                                                        <FaStar key={`pstar-${product.id}-${i}`} size={14} className={i < 4 ? "text-[#FF9F0A]" : "text-[#FF9F0A] opacity-50"} />
+                                                <div className="flex gap-0.5 text-orange-400">
+                                                    {[1, 2, 3, 4, 5].map((_, i) => (
+                                                        <FaStar key={`pstar-${product.id}-${i}`} size={14} className={i < Math.round(product.rating || 0) ? "" : "opacity-40"} />
                                                     ))}
                                                 </div>
-                                                <span className="text-[11px] font-semibold text-[#86868B] ml-1">
-                                                    {product.rating}({product.reviews})
+                                                <span className="text-[11px] font-semibold text-grey-500 ml-1">
+                                                    {product.rating || "4.5"}({product.reviews || 0})
                                                 </span>
                                             </div>
-                                            <div className="flex items-center gap-1 text-[#86868B]">
+                                            <div className="flex items-center gap-1 text-grey-500">
                                                 <FaTruck size={14} />
                                                 <span className="text-[11px]">2-4 days</span>
                                                 <FaInfoCircle size={10} className="opacity-50" />
@@ -231,10 +231,10 @@ const BestRentedProducts = ({ type = "bestRented", defaultTitle = "Curated Produ
                                         <div className="relative mt-auto h-[32px]">
                                             {/* Price Section */}
                                             <div className="flex items-baseline gap-1.5 flex-wrap transition-all duration-300 group-hover:opacity-0 group-hover:-translate-y-2">
-                                                <span className="text-[12px] text-[#86868B] font-medium">from</span>
-                                                <span className="text-[16px] text-[#86868B] line-through font-medium opacity-50">₹{product.originalPrice}</span>
-                                                <span className="text-[22px] font-bold text-[#FF3B30] leading-none">₹{product.rentPrice}</span>
-                                                <span className="text-[13px] text-[#86868B] font-medium">/month</span>
+                                                <span className="text-[12px] text-grey-500 font-medium">from</span>
+                                                <span className="text-[16px] text-grey-500 line-through font-medium opacity-50">₹{product.originalPrice}</span>
+                                                <span className="text-[22px] font-bold text-red-sale leading-none">₹{product.rentPrice}</span>
+                                                <span className="text-[13px] text-grey-500 font-medium">/month</span>
                                             </div>
 
                                             {/* Hover Action Buttons */}
@@ -246,7 +246,7 @@ const BestRentedProducts = ({ type = "bestRented", defaultTitle = "Curated Produ
                                                     Quick View
                                                 </button>
                                                 <button 
-                                                    className={`flex-1 ${addedStatus[product.id] ? 'bg-green-500' : 'bg-[#FF3B30]'} text-white py-1.5 rounded-xl text-[12px] font-semibold transition-all hover:bg-[#e0352b] hover:shadow-lg active:scale-95`}
+                                                    className={`flex-1 ${addedStatus[product.id] ? 'bg-green-700' : 'bg-red-sale'} text-white py-1.5 rounded-xl text-[12px] font-semibold transition-all hover:bg-red-600 hover:shadow-lg active:scale-95`}
                                                     onClick={(e) => handleAddToCart(e, product)}
                                                 >
                                                     {addedStatus[product.id] ? 'Added!' : 'Add to Cart'}
@@ -264,7 +264,7 @@ const BestRentedProducts = ({ type = "bestRented", defaultTitle = "Curated Produ
                 <div className="mt-6 flex justify-center md:hidden">
                     <Link
                         href="/products"
-                        className="inline-flex items-center justify-center px-8 py-2.5 bg-[#FFC107] hover:bg-[#FFD54F] text-black font-bold rounded-full transition-all duration-300 shadow-sm"
+                        className="btn-yellow-primary !h-auto !py-2.5 !px-8 !rounded-full shadow-sm"
                     >
                         View All
                     </Link>

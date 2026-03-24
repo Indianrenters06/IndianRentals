@@ -35,6 +35,7 @@ const FALLBACK_BANNERS = [
 import { useRouter } from "next/navigation";
 import { useDispatch } from "react-redux";
 import { addToCart } from "@/redux/features/cartSlice";
+import Button from "./common/Button";
 
 // ─── Single Product Card ──────────────────────────────────────────────────────
 const ShowcaseProductCard = ({ product, index, onAddToCart, onQuickView, isAdded }) => (
@@ -94,13 +95,13 @@ const ShowcaseProductCard = ({ product, index, onAddToCart, onQuickView, isAdded
 
             <div className="flex items-center justify-between transition-all duration-300 group-hover:opacity-0 group-hover:-translate-y-1">
                 <div className="flex items-center gap-0.5">
-                    <div className="flex gap-0.5">
-                        {[...Array(5)].map((_, i) => (
-                            <FaStar key={i} size={12} className={i < 4 ? "text-[#FF9F0A]" : "text-[#FF9F0A] opacity-40"} />
+                    <div className="flex gap-0.5 text-[#FF9F0A]">
+                        {[1, 2, 3, 4, 5].map((_, i) => (
+                            <FaStar key={i} size={12} className={i < Math.round(product.rating || 0) ? "" : "opacity-40"} />
                         ))}
                     </div>
                     <span className="text-[11px] font-semibold text-[#86868B] ml-1">
-                        {product.rating}({product.reviews})
+                        {product.rating || "4.5"}({product.reviews || 0})
                     </span>
                 </div>
                 <div className="flex items-center gap-1 text-[#86868B]">
@@ -121,18 +122,22 @@ const ShowcaseProductCard = ({ product, index, onAddToCart, onQuickView, isAdded
 
                 {/* Hover Action Buttons */}
                 <div className="absolute inset-x-0 bottom-0 flex gap-2 opacity-0 translate-y-4 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-500 ease-out z-20">
-                    <button 
-                        className="flex-1 bg-white border border-gray-200 text-[#4A4A4A] py-1.5 rounded-xl text-[11px] font-semibold hover:bg-gray-50 transition-colors shadow-sm"
+                    <Button 
+                        variant="black"
+                        size="md"
+                        className="flex-1 !h-[32px] !rounded-xl !text-[11px] !min-w-0"
                         onClick={(e) => onQuickView(e, product.id)}
                     >
                         Quick View
-                    </button>
-                    <button 
-                        className={`flex-1 ${isAdded ? 'bg-green-500' : 'bg-[#FF3B30]'} text-white py-1.5 rounded-xl text-[11px] font-semibold transition-all hover:bg-[#e0352b] hover:shadow-lg active:scale-95`}
+                    </Button>
+                    <Button 
+                        variant={isAdded ? 'ghost' : 'yellow'}
+                        size="md"
+                        className={`flex-1 !h-[32px] !rounded-xl !text-[11px] !min-w-0 ${isAdded ? 'bg-green-500 !text-white' : ''}`}
                         onClick={(e) => onAddToCart(e, product)}
                     >
                         {isAdded ? 'Added!' : 'Add to Cart'}
-                    </button>
+                    </Button>
                 </div>
             </div>
         </div>

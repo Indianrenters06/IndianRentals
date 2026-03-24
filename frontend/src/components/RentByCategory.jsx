@@ -140,7 +140,7 @@ const RentByCategory = () => {
                     <h2 className="text-4xl font-semibold font-manrope text-gray-900 tracking-tight">{cmsConfig.title}</h2>
                     <Link
                         href="/categories"
-                        className="hidden md:inline-flex items-center gap-2 px-6 py-2 bg-[#FFC107] hover:bg-[#FFD54F] text-black font-bold rounded-full transition-colors"
+                        className="hidden md:inline-flex btn-yellow-primary !h-auto !py-2 !px-6 !rounded-full gap-2 transition-colors"
                     >
                         Explore
                         <FaArrowRight size={8} />
@@ -171,9 +171,9 @@ const RentByCategory = () => {
 
                     {/* View All Tile — same size as category tiles */}
                     <Link href="/categories" className="flex flex-col items-center">
-                        <div className="w-full aspect-square rounded-lg bg-white border border-[#FFC107]/30 flex flex-col items-center justify-center gap-1.5 shadow-sm">
+                        <div className="w-full aspect-square rounded-lg bg-white border border-orange-300/30 flex flex-col items-center justify-center gap-1.5 shadow-sm">
                             <span className="text-[11px] font-semibold font-manrope text-gray-600 leading-tight">View All</span>
-                            <div className="w-7 h-7 rounded-full bg-[#FFC107] flex items-center justify-center">
+                            <div className="w-7 h-7 rounded-full bg-orange-300 flex items-center justify-center">
                                 <FaArrowRight size={10} className="text-gray-900" />
                             </div>
                         </div>
@@ -196,7 +196,7 @@ const RentByCategory = () => {
                         {displayCategories.map((cat, index) => (
                             <SwiperSlide key={cat._id || index} style={{ width: '177.33px' }}>
                                 <Link href={getCategoryRoute(cat)} className="group flex flex-col items-center cursor-pointer">
-                                    <div className="w-[177.33px] h-[173px] flex items-center justify-center mb-4 relative bg-white border border-gray-200 rounded-xl group-hover:border-[#FFC107]/20 group-hover:shadow-lg transition-all duration-300 overflow-hidden shadow-md">
+                                    <div className="w-[177.33px] h-[173px] flex items-center justify-center mb-4 relative bg-white border border-gray-200 rounded-xl group-hover:border-orange-300/20 group-hover:shadow-lg transition-all duration-300 overflow-hidden shadow-md">
                                         {cat.image ? (
                                             <Image
                                                 src={cat.image}
@@ -205,7 +205,7 @@ const RentByCategory = () => {
                                                 className="object-contain mix-blend-multiply brightness-[1.05] contrast-[1.05] group-hover:scale-105 transition-transform duration-500"
                                             />
                                         ) : (
-                                            <div className="text-gray-400 group-hover:text-[#FFC107] transition-colors">
+                                            <div className="text-gray-400 group-hover:text-orange-300 transition-colors">
                                                 {getIconForCategory(cat.name)}
                                             </div>
                                         )}
@@ -222,7 +222,7 @@ const RentByCategory = () => {
                     <div className="mt-8 text-center">
                         <Link
                             href="/categories"
-                            className="inline-flex items-center gap-2 px-6 py-3 bg-[#FFC107] hover:bg-[#FFD54F] text-black font-bold font-manrope rounded-full transition-colors"
+                            className="inline-flex btn-yellow-primary !h-auto !py-3 !px-6 !rounded-full gap-2 transition-colors"
                         >
                             Explore Categories
                             <FaArrowRight size={14} />

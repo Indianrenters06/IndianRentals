@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { FaArrowRight, FaChevronLeft, FaChevronRight } from "react-icons/fa";
 import { useState, useEffect } from "react";
+import Button from "./common/Button";
 
 const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
 
@@ -12,7 +13,7 @@ const FALLBACK_SLIDES = [
         title: "The Tech That Powers Your Ambition. On Demand.",
         subtitle: "Get the latest MacBooks, Workstations, Cameras, and more. Delivered to your door with flexible monthly plans. Upgrade your toolkit, not your expenses.",
         image: "https://res.cloudinary.com/dgkckcdk8/image/upload/v1769946716/indian-rentals/fj8ptqbhppbstdd0hs4i.png",
-        bgColor: "#00A8FF",
+        bgColor: "#0075ff",
         ctaText: "Rent Now",
         ctaLink: "/store",
     },
@@ -20,7 +21,7 @@ const FALLBACK_SLIDES = [
         title: "Work Seamlessly From Anywhere.",
         subtitle: "Rent enterprise-grade laptops and accessories without upfront capital. Zero maintenance cost.",
         image: "https://res.cloudinary.com/dgkckcdk8/image/upload/v1769946716/indian-rentals/fj8ptqbhppbstdd0hs4i.png",
-        bgColor: "#0077CC",
+        bgColor: "#0075ff",
         ctaText: "Explore Laptops",
         ctaLink: "/store",
     },
@@ -51,7 +52,7 @@ const Hero = () => {
                         title: cms.heroTitle,
                         subtitle: cms.heroSubtitle,
                         image: cms.heroImage,
-                        bgColor: cms.heroBgColor || "#00A8FF",
+                        bgColor: cms.heroBgColor || "#0075ff",
                         ctaText: "Rent Now",
                         ctaLink: "/store"
                     }]);
@@ -92,16 +93,24 @@ const Hero = () => {
                                     className="relative rounded-2xl overflow-hidden"
                                     style={{ backgroundColor: s.bgColor }}
                                 >
+                                    {s.bgImage && (
+                                        <div className="absolute inset-0 z-0">
+                                            <Image src={s.bgImage} alt="" fill className="object-cover opacity-40" />
+                                        </div>
+                                    )}
                                     {/* Text */}
-                                    <div className="px-5 pt-5 pb-0 space-y-3 text-white relative z-10">
-                                        <h1 className="text-xl font-bold leading-snug">{s.title}</h1>
-                                        <p className="text-xs leading-relaxed text-white/90">{s.subtitle}</p>
-                                        <Link
+                                    <div className="px-5 pt-5 pb-0 space-y-3 relative z-10" style={{ color: s.textColor || "#ffffff" }}>
+                                        <h1 className="text-xl font-bold leading-snug" style={{ color: 'inherit' }}>{s.title}</h1>
+                                        <p className="text-xs leading-relaxed opacity-90" style={{ color: 'inherit' }}>{s.subtitle}</p>
+                                        <Button
                                             href={s.ctaLink || "/store"}
-                                            className="inline-flex items-center gap-2 bg-[#FFC107] text-gray-900 px-5 py-2 rounded-full font-bold text-sm hover:bg-[#FFD54F] transition-all shadow-md"
+                                            variant="yellow"
+                                            size="sm"
+                                            className="!w-auto !rounded-full !shadow-md !font-bold"
+                                            iconRight={<FaArrowRight size={11} />}
                                         >
-                                            {s.ctaText || "Rent Now"} <FaArrowRight size={11} />
-                                        </Link>
+                                            {s.ctaText || "Rent Now"}
+                                        </Button>
                                     </div>
                                     {/* Hero image */}
                                     <div className="relative w-full h-[160px] mt-2">
@@ -134,10 +143,20 @@ const Hero = () => {
                 {/* ── Desktop layout ── */}
                 <div className="hidden md:block relative">
                     <div
-                        className="absolute inset-0 rounded-3xl md:rounded-[2.5rem] transition-colors duration-700"
+                        className="absolute inset-0 rounded-3xl md:rounded-[2.5rem] transition-all duration-700 overflow-hidden"
                         style={{ backgroundColor: slide.bgColor }}
-                    />
-                    <div className="absolute inset-0 bg-linear-to-r from-transparent to-white/10 rounded-3xl md:rounded-[2.5rem]" />
+                    >
+                        {slide.bgImage && (
+                            <Image 
+                                src={slide.bgImage} 
+                                alt="" 
+                                fill 
+                                className="object-cover opacity-40 animate-in fade-in duration-700" 
+                                priority
+                            />
+                        )}
+                        <div className="absolute inset-0 bg-linear-to-r from-transparent to-white/10" />
+                    </div>
 
                     {/* Prev arrow */}
                     <button
@@ -158,13 +177,14 @@ const Hero = () => {
                         <div className="grid md:grid-cols-2 gap-4 lg:gap-12 items-center w-full max-w-6xl mx-auto">
 
                             {/* Text Content */}
-                            <div className="space-y-6 text-center md:text-left text-white relative z-20 w-full">
+                            <div className="space-y-6 text-center md:text-left relative z-20 w-full" style={{ color: slide.textColor || "#ffffff" }}>
                                 <motion.div
                                     key={`title-${activeSlide}`}
                                     initial={{ opacity: 0, y: 20 }}
                                     animate={{ opacity: 1, y: 0 }}
                                     transition={{ duration: 0.5 }}
-                                    className="font-bold tracking-tight text-white"
+                                    className="font-bold tracking-tight"
+                                    style={{ color: 'inherit' }}
                                 >
                                     <h1 className="text-3xl md:text-4xl lg:text-[44px] leading-[1.2] font-bold">
                                         {slide.title}
@@ -176,7 +196,8 @@ const Hero = () => {
                                     initial={{ opacity: 0, y: 20 }}
                                     animate={{ opacity: 1, y: 0 }}
                                     transition={{ duration: 0.5, delay: 0.1 }}
-                                    className="text-sm md:text-[15px] leading-snug text-white/90 font-medium"
+                                    className="text-sm md:text-[15px] leading-snug opacity-90 font-medium"
+                                    style={{ color: 'inherit' }}
                                 >
                                     <p>{slide.subtitle}</p>
                                 </motion.div>
@@ -187,12 +208,15 @@ const Hero = () => {
                                     transition={{ duration: 0.5, delay: 0.2 }}
                                     className="pt-2"
                                 >
-                                    <Link
+                                    <Button
                                         href={slide.ctaLink || "/store"}
-                                        className="inline-flex items-center gap-2 bg-[#FFC107] text-gray-900 px-7 py-3 rounded-full font-bold text-[15px] hover:bg-[#FFD54F] transition-all transform hover:scale-105 shadow-lg"
+                                        variant="yellow"
+                                        size="lg"
+                                        className="!w-auto !rounded-full !shadow-lg !font-bold !text-[15px] hover:scale-105"
+                                        iconRight={<FaArrowRight size={13} className="ml-1" />}
                                     >
-                                        {slide.ctaText || "Rent Now"} <FaArrowRight size={13} className="ml-1" />
-                                    </Link>
+                                        {slide.ctaText || "Rent Now"}
+                                    </Button>
                                 </motion.div>
 
                                 {/* Slide indicators */}
@@ -201,7 +225,12 @@ const Hero = () => {
                                         <button
                                             key={i}
                                             onClick={() => setActiveSlide(i)}
-                                            className={`rounded-full transition-all duration-300 ${i === activeSlide ? 'w-5 h-2 bg-white' : 'w-2 h-2 bg-white/40 hover:bg-white'}`}
+                                            className="rounded-full transition-all duration-300 h-2"
+                                            style={{ 
+                                                width: i === activeSlide ? '20px' : '8px', 
+                                                backgroundColor: slide.textColor || "#ffffff",
+                                                opacity: i === activeSlide ? 1 : 0.4 
+                                            }}
                                         />
                                     ))}
                                 </div>

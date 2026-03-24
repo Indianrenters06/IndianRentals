@@ -228,7 +228,7 @@ const AuthModal = ({ isOpen, onClose, initialView = "login" }) => {
                                                             required
                                                             value={identifier}
                                                             onChange={(e) => setIdentifier(e.target.value)}
-                                                            className="block w-full pl-10 pr-3 py-3 border border-gray-200 rounded-xl text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#00A8FF] focus:border-transparent transition-all text-sm bg-gray-50 focus:bg-white"
+                                                            className="w-full border border-grey-300 rounded-md px-3 transition-all duration-200 text-base font-normal h-10 tablet:h-9 desktop:h-[35px] pl-10 bg-gray-50 focus:bg-white"
                                                             placeholder="user@example.com or +919876543210"
                                                         />
                                                     </div>
@@ -237,7 +237,7 @@ const AuthModal = ({ isOpen, onClose, initialView = "login" }) => {
                                                 <button
                                                     type="submit"
                                                     disabled={loading}
-                                                    className="w-full flex justify-center items-center py-3.5 px-4 border border-transparent rounded-xl shadow-sm text-sm font-bold text-white bg-[#00A8FF] hover:bg-[#0096e6] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#00A8FF] transition-all transform hover:scale-[1.02] disabled:opacity-70 disabled:cursor-not-allowed"
+                                                    className="inline-flex items-center justify-center font-semibold text-sm transition-all duration-200 cursor-pointer text-center rounded-md border h-10 w-full px-6 py-2 tablet:h-9 tablet:w-auto tablet:min-w-[110px] tablet:px-[22px] tablet:py-[9px] desktop:h-[35px] desktop:min-w-[120px] desktop:px-5 desktop:py-2 bg-blue-secondary text-white border-blue-secondary hover:bg-[#0689ff] hover:border-[#0689ff] active:bg-[#0859c5] active:border-[#0859c5] focus:outline-none focus:ring-2 focus:ring-orange-300 focus:ring-offset-2 disabled:bg-blue-50 disabled:text-grey-400 disabled:border-blue-50 disabled:opacity-50 disabled:cursor-not-allowed w-full !rounded-xl transform hover:scale-[1.02]"
                                                 >
                                                     {loading ? "Sending..." : (
                                                         <>Get OTP <FaArrowRight className="ml-2" size={14} /></>
@@ -267,7 +267,7 @@ const AuthModal = ({ isOpen, onClose, initialView = "login" }) => {
                                                             required
                                                             value={otp}
                                                             onChange={(e) => setOtp(e.target.value)}
-                                                            className="block w-full pl-10 pr-3 py-3 border border-gray-200 rounded-xl text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#00A8FF] focus:border-transparent transition-all bg-gray-50 focus:bg-white tracking-widest text-center text-lg"
+                                                            className="w-full border border-grey-300 rounded-md px-3 transition-all duration-200 text-base font-normal h-10 tablet:h-9 desktop:h-[35px] pl-10 bg-gray-50 focus:bg-white tracking-widest text-center text-lg"
                                                             placeholder="123456"
                                                         />
                                                     </div>
@@ -276,7 +276,7 @@ const AuthModal = ({ isOpen, onClose, initialView = "login" }) => {
                                                 <button
                                                     type="submit"
                                                     disabled={loading}
-                                                    className="w-full flex justify-center items-center py-3.5 px-4 border border-transparent rounded-xl shadow-sm text-sm font-bold text-white bg-[#00A8FF] hover:bg-[#0096e6] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#00A8FF] transition-all transform hover:scale-[1.02] disabled:opacity-70 disabled:cursor-not-allowed"
+                                                    className="inline-flex items-center justify-center font-semibold text-sm transition-all duration-200 cursor-pointer text-center rounded-md border h-10 w-full px-6 py-2 tablet:h-9 tablet:w-auto tablet:min-w-[110px] tablet:px-[22px] tablet:py-[9px] desktop:h-[35px] desktop:min-w-[120px] desktop:px-5 desktop:py-2 bg-blue-secondary text-white border-blue-secondary hover:bg-[#0689ff] hover:border-[#0689ff] active:bg-[#0859c5] active:border-[#0859c5] focus:outline-none focus:ring-2 focus:ring-orange-300 focus:ring-offset-2 disabled:bg-blue-50 disabled:text-grey-400 disabled:border-blue-50 disabled:opacity-50 disabled:cursor-not-allowed w-full !rounded-xl transform hover:scale-[1.02]"
                                                 >
                                                     {loading ? "Verifying..." : (
                                                         <>Verify & Login <FaArrowRight className="ml-2" size={14} /></>
@@ -294,7 +294,7 @@ const AuthModal = ({ isOpen, onClose, initialView = "login" }) => {
                                                     <button
                                                         type="button"
                                                         onClick={handleLoginSendOtp}
-                                                        className="text-sm font-medium text-[#00A8FF] hover:text-[#008acd]"
+                                                        className="text-sm font-medium text-blue-secondary hover:text-blue-700"
                                                     >
                                                         Resend OTP
                                                     </button>
@@ -323,7 +323,7 @@ const AuthModal = ({ isOpen, onClose, initialView = "login" }) => {
                                                     required
                                                     value={registerData.name}
                                                     onChange={handleRegisterChange}
-                                                    className="block w-full pl-10 pr-3 py-3 border border-gray-200 rounded-xl text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#00A8FF] focus:border-transparent transition-all text-sm bg-gray-50 focus:bg-white"
+                                                    className="w-full border border-grey-300 rounded-md px-3 transition-all duration-200 text-base font-normal h-10 tablet:h-9 desktop:h-[35px] pl-10 bg-gray-50 focus:bg-white"
                                                     placeholder="Full Name"
                                                 />
                                             </div>
@@ -341,7 +341,7 @@ const AuthModal = ({ isOpen, onClose, initialView = "login" }) => {
                                                     required
                                                     value={registerData.email}
                                                     onChange={handleRegisterChange}
-                                                    className="block w-full pl-10 pr-3 py-3 border border-gray-200 rounded-xl text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#00A8FF] focus:border-transparent transition-all text-sm bg-gray-50 focus:bg-white"
+                                                    className="w-full border border-grey-300 rounded-md px-3 transition-all duration-200 text-base font-normal h-10 tablet:h-9 desktop:h-[35px] pl-10 bg-gray-50 focus:bg-white"
                                                     placeholder="Gmail"
                                                 />
                                             </div>
@@ -359,7 +359,7 @@ const AuthModal = ({ isOpen, onClose, initialView = "login" }) => {
                                                     required
                                                     value={registerData.phone}
                                                     onChange={handleRegisterChange}
-                                                    className="block w-full pl-10 pr-3 py-3 border border-gray-200 rounded-xl text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#00A8FF] focus:border-transparent transition-all text-sm bg-gray-50 focus:bg-white"
+                                                    className="w-full border border-grey-300 rounded-md px-3 transition-all duration-200 text-base font-normal h-10 tablet:h-9 desktop:h-[35px] pl-10 bg-gray-50 focus:bg-white"
                                                     placeholder="+91 "
                                                 />
                                             </div>
@@ -378,7 +378,7 @@ const AuthModal = ({ isOpen, onClose, initialView = "login" }) => {
                                                         required
                                                         value={registerData.password}
                                                         onChange={handleRegisterChange}
-                                                        className="block w-full pl-10 pr-3 py-3 border border-gray-200 rounded-xl text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#00A8FF] focus:border-transparent transition-all text-sm bg-gray-50 focus:bg-white"
+                                                        className="w-full border border-grey-300 rounded-md px-3 transition-all duration-200 text-base font-normal h-10 tablet:h-9 desktop:h-[35px] pl-10 bg-gray-50 focus:bg-white"
                                                         placeholder="••••••••"
                                                     />
                                                 </div>
@@ -395,7 +395,7 @@ const AuthModal = ({ isOpen, onClose, initialView = "login" }) => {
                                                         required
                                                         value={registerData.confirmPassword}
                                                         onChange={handleRegisterChange}
-                                                        className="block w-full pl-10 pr-3 py-3 border border-gray-200 rounded-xl text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#00A8FF] focus:border-transparent transition-all text-sm bg-gray-50 focus:bg-white"
+                                                        className="w-full border border-grey-300 rounded-md px-3 transition-all duration-200 text-base font-normal h-10 tablet:h-9 desktop:h-[35px] pl-10 bg-gray-50 focus:bg-white"
                                                         placeholder="••••••••"
                                                     />
                                                 </div>
@@ -405,7 +405,7 @@ const AuthModal = ({ isOpen, onClose, initialView = "login" }) => {
                                         <button
                                             type="submit"
                                             disabled={loading}
-                                            className="w-full flex justify-center items-center py-3.5 px-4 border border-transparent rounded-xl shadow-sm text-sm font-bold text-white bg-[#00A8FF] hover:bg-[#0096e6] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#00A8FF] transition-all transform hover:scale-[1.02] disabled:opacity-70 disabled:cursor-not-allowed mt-2"
+                                            className="inline-flex items-center justify-center font-semibold text-sm transition-all duration-200 cursor-pointer text-center rounded-md border h-10 w-full px-6 py-2 tablet:h-9 tablet:w-auto tablet:min-w-[110px] tablet:px-[22px] tablet:py-[9px] desktop:h-[35px] desktop:min-w-[120px] desktop:px-5 desktop:py-2 bg-blue-secondary text-white border-blue-secondary hover:bg-[#0689ff] hover:border-[#0689ff] active:bg-[#0859c5] active:border-[#0859c5] focus:outline-none focus:ring-2 focus:ring-orange-300 focus:ring-offset-2 disabled:bg-blue-50 disabled:text-grey-400 disabled:border-blue-50 disabled:opacity-50 disabled:cursor-not-allowed w-full !rounded-xl transform hover:scale-[1.02] mt-2"
                                         >
                                             {loading ? "Creating Account..." : (
                                                 <>Create Account <FaArrowRight className="ml-2" size={14} /></>
@@ -421,7 +421,7 @@ const AuthModal = ({ isOpen, onClose, initialView = "login" }) => {
                                             Don't have an account?{' '}
                                             <button
                                                 onClick={() => setView("register")}
-                                                className="font-semibold text-[#00A8FF] hover:text-[#008acd]"
+                                                className="font-semibold text-blue-secondary hover:text-blue-700"
                                             >
                                                 Create account
                                             </button>
@@ -431,7 +431,7 @@ const AuthModal = ({ isOpen, onClose, initialView = "login" }) => {
                                             Already have an account?{' '}
                                             <button
                                                 onClick={() => setView("login")}
-                                                className="font-semibold text-[#00A8FF] hover:text-[#008acd]"
+                                                className="font-semibold text-blue-secondary hover:text-blue-700"
                                             >
                                                 Sign in
                                             </button>

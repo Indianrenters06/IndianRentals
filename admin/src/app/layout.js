@@ -1,8 +1,10 @@
-import { Outfit } from "next/font/google";
+import "@fontsource/mona-sans/400.css";
+import "@fontsource/mona-sans/500.css";
+import "@fontsource/mona-sans/600.css";
+import "@fontsource/mona-sans/700.css";
+import "@fontsource/mona-sans/800.css";
 import { Providers } from "./providers";
 import "./globals.css";
-
-const outfit = Outfit({ subsets: ["latin"] });
 
 export const metadata = {
   title: "Admin Portal | IndianRentals",
@@ -12,7 +14,7 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={outfit.className}>
+      <body style={{ fontFamily: '"Mona Sans", sans-serif' }}>
         <Providers>
           <div className="relative min-h-screen bg-slate-50 dark:bg-slate-900 overflow-hidden text-slate-800 dark:text-slate-100 transition-colors duration-300">
             {/* Background animated elements */}

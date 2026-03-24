@@ -57,6 +57,14 @@ const productSchema = new mongoose.Schema({
     state: {
         type: String,
         required: [true, 'Please provide the state where the product is located']
+    },
+    returnPolicy: {
+        type: String,
+        default: ""
+    },
+    shippingPolicy: {
+        type: String,
+        default: ""
     }
 }, {
     timestamps: true

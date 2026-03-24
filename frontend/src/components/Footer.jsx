@@ -191,6 +191,7 @@ const Footer = () => {
                             <li><Link href="/ticket" className="hover:text-gray-900 transition-colors">Raise a Ticket</Link></li>
                             <li><Link href="/reviews" className="hover:text-gray-900 transition-colors">Customer Reviews</Link></li>
                             <li><Link href="/blog" className="hover:text-gray-900 transition-colors">Blog</Link></li>
+                            <li><Link href="/design-test" className="text-orange-500 font-bold hover:text-orange-600 transition-colors">Design Preview ✨</Link></li>
                         </ul>
                     </div>
                 </div>

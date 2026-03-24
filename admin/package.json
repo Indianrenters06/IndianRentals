@@ -9,6 +9,7 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@fontsource/mona-sans": "^5.2.8",
     "@heroui/react": "^2.4.0",
     "@phosphor-icons/react": "^2.1.10",
     "chart.js": "^4.5.1",
