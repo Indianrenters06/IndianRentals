@@ -45,12 +45,12 @@ const ShowcaseProductCard = ({ product, index, onAddToCart, onQuickView, isAdded
         viewport={{ once: true }}
         transition={{ duration: 0.45, delay: index * 0.1 }}
         className="group bg-white rounded-2xl flex flex-col overflow-hidden relative transition-all duration-500 hover:shadow-[0_8px_30px_rgba(0,0,0,0.10)] hover:-translate-y-1"
-        style={{ width: "285px", height: "391px", flexShrink: 0, border: "1px solid hsla(0, 0%, 89%, 1)" }}
+        style={{ width: "281px", height: "391px", flexShrink: 0, border: "1px solid hsla(0, 0%, 89%, 1)" }}
     >
         {/* Image Section — full-bleed top */}
         <div
             className="relative rounded-2xl bg-[#F7F7F7] group-hover:bg-[#F0F0F0] transition-colors duration-500 flex items-center justify-center overflow-hidden shrink-0"
-            style={{ width: "285px", height: "282px", borderRight: "1px solid hsla(0, 0%, 89%, 1)", borderBottom: "1px solid hsla(0, 0%, 89%, 1)", borderLeft: "1px solid hsla(0, 0%, 89%, 1)" }}
+            style={{ width: "281px", height: "282px", borderRight: "1px solid hsla(0, 0%, 89%, 1)", borderBottom: "1px solid hsla(0, 0%, 89%, 1)", borderLeft: "1px solid hsla(0, 0%, 89%, 1)" }}
         >
             {/* Badges */}
             <div className="absolute top-3 left-3 z-20 flex gap-1.5">
@@ -86,7 +86,7 @@ const ShowcaseProductCard = ({ product, index, onAddToCart, onQuickView, isAdded
         <Link
             href={`/products/${product.id}`}
             className="flex flex-col"
-            style={{ width: "285px", height: "105px", gap: "8px", paddingTop: "8px", paddingRight: "12px", paddingBottom: "12px", paddingLeft: "12px" }}
+            style={{ width: "281px", height: "105px", gap: "8px", paddingTop: "8px", paddingRight: "12px", paddingBottom: "12px", paddingLeft: "12px" }}
         >
             <h3
                 className="font-manrope text-[#1D1D1F] line-clamp-1 group-hover:text-[#FF3B30] transition-colors duration-300"
@@ -161,8 +161,8 @@ const BannerCarousel = ({ banners }) => {
 
     return (
         <div
-            className="relative overflow-hidden rounded-[20px] shrink-0"
-            style={{ width: "560px", height: "391px" }}
+            className="relative overflow-hidden rounded-2xl flex-1"
+            style={{ height: "391px" }}
         >
             <AnimatePresence initial={false} custom={direction}>
                 <motion.div
@@ -197,8 +197,8 @@ const BannerCarousel = ({ banners }) => {
                         />
                     </div>
 
-                    {/* Content */}
-                    <div className="relative z-10 mt-auto p-7">
+                    {/* Content — padded per Figma: 30px top/bottom, 31px left/right */}
+                    <div className="relative z-10 mt-auto" style={{ padding: "30px 31px" }}>
                         {/* Nav arrows */}
                         <div className="absolute top-1/2 -translate-y-1/2 left-5 right-5 flex justify-between pointer-events-none">
                             <button
@@ -368,20 +368,26 @@ const FeaturedShowcase = () => {
     const activeBanners = cms.banners?.length > 0 ? cms.banners : FALLBACK_BANNERS;
 
     return (
-        <section className="py-12 md:py-16 bg-white">
+        <section
+            className="bg-white w-full"
+            style={{ borderTop: "1px solid hsla(0, 0%, 89%, 1)", paddingTop: "96px", paddingBottom: "96px" }}
+        >
             <div className="max-w-[1200px] mx-auto px-4 sm:px-6">
-                {/* 1200 × 391, gap 35px */}
+                {/* Inner row: fills max-w-[1200px] container, height 391px, gap 35px */}
                 <div
-                    className="mx-auto flex flex-row items-stretch"
-                    style={{ width: "1200px", height: "391px", gap: "35px" }}
+                    className="flex flex-row items-stretch w-full"
+                    style={{ height: "391px", gap: "35px" }}
                 >
-                    {/* Left: 2 product cards */}
-                    <div className="flex flex-row" style={{ gap: "35px" }}>
+                    {/* Left: cards group — two cards side by side, gap 20px */}
+                    <div
+                        className="flex flex-row shrink-0"
+                        style={{ gap: "20px" }}
+                    >
                         {displayProducts.map((product, idx) => (
-                            <ShowcaseProductCard 
-                                key={product.id || idx} 
-                                product={product} 
-                                index={idx} 
+                            <ShowcaseProductCard
+                                key={product.id || idx}
+                                product={product}
+                                index={idx}
                                 onAddToCart={handleAddToCart}
                                 onQuickView={handleQuickView}
                                 isAdded={addedStatus[product.id]}
@@ -389,7 +395,7 @@ const FeaturedShowcase = () => {
                         ))}
                     </div>
 
-                    {/* Right: Banner carousel */}
+                    {/* Right: Banner carousel — fills remaining width */}
                     <BannerCarousel banners={activeBanners} />
                 </div>
             </div>

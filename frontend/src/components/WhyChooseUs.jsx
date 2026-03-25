@@ -52,9 +52,21 @@ const WhyChooseUs = () => {
                         </div>
                     </div>
 
-                    {/* Image Content - below text on mobile, right side on desktop */}
-                    <div className="relative">
-                        <div className="relative rounded-2xl overflow-hidden shadow-xl aspect-[4/3]">
+                    {/* Image Content */}
+                    <div className="relative md:justify-self-end w-full max-w-[508px] aspect-[508/336] mt-6 md:mt-0">
+                        {/* The yellow background shape spec */}
+                        <div 
+                            className="absolute left-[24px] top-[24px] w-full h-full"
+                            style={{ 
+                                borderRadius: '24px', 
+                                background: 'hsla(42, 100%, 55%, 1)' 
+                            }} 
+                        />
+                        {/* The primary image */}
+                        <div 
+                            className="relative z-10 w-full h-full"
+                            style={{ borderRadius: '24px', overflow: 'hidden' }}
+                        >
                             <Image
                                 src={image}
                                 alt={title}

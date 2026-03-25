@@ -5,36 +5,12 @@ import Image from 'next/image';
 import { FaFacebookF, FaInstagram, FaLinkedinIn, FaWhatsapp } from 'react-icons/fa';
 import { useSettings } from '../context/SettingsContext';
 
-// Inline SVG payment logo components — no external URL dependencies
-const PaymentUPI = () => (
-    <svg height="20" viewBox="0 0 80 30" xmlns="http://www.w3.org/2000/svg" aria-label="UPI">
-        <text x="0" y="22" fontFamily="Arial Black, sans-serif" fontWeight="900" fontSize="22" fill="#097939" letterSpacing="-0.5">UPI</text>
-        <polygon points="60,6 70,15 60,24 62,19 54,19 54,11 62,11" fill="#097939" />
-    </svg>
-);
-
-const PaymentVisa = () => (
-    <svg height="14" viewBox="0 0 75 24" xmlns="http://www.w3.org/2000/svg" aria-label="Visa">
-        <text x="0" y="20" fontFamily="Arial, sans-serif" fontWeight="900" fontSize="22" fill="#1A1F71" fontStyle="italic" letterSpacing="-1">VISA</text>
-    </svg>
-);
-
-const PaymentRuPay = () => (
-    <svg height="18" viewBox="0 0 80 24" xmlns="http://www.w3.org/2000/svg" aria-label="RuPay">
-        <text x="0" y="18" fontFamily="Arial, sans-serif" fontWeight="800" fontSize="17" fill="#005BAC">Ru</text>
-        <text x="28" y="18" fontFamily="Arial, sans-serif" fontWeight="800" fontSize="17" fill="#F47920">Pay</text>
-        <polygon points="74,2 80,12 74,22 71,12" fill="#F47920" />
-    </svg>
-);
-
-const PaymentMastercard = () => (
-    <svg height="22" viewBox="0 0 38 24" xmlns="http://www.w3.org/2000/svg" aria-label="Mastercard">
-        <circle cx="13" cy="12" r="12" fill="#EB001B" />
-        <circle cx="25" cy="12" r="12" fill="#F79E1B" />
-        <path d="M19 3.8 A12 12 0 0 1 19 20.2 A12 12 0 0 1 19 3.8Z" fill="#FF5F00" />
-    </svg>
-);
-
+const paymentLogos = [
+    "https://res.cloudinary.com/dpu9ikeqe/image/upload/v1774477006/1ea1887d77efce07ed8c13aecef4c18d75fddf84_oq3qmc.png",
+    "https://res.cloudinary.com/dpu9ikeqe/image/upload/v1774477006/43e892522e4d7cd8b9640d32b817ce5d99b2fd18_gfptzj.png",
+    "https://res.cloudinary.com/dpu9ikeqe/image/upload/v1774477005/b5f5de03b48b1e4460cf20fd295ad96cc3c1fa35_sitcbh.png",
+    "https://res.cloudinary.com/dpu9ikeqe/image/upload/v1774477006/2a84eda31c8a80fed3b9bc10e13d0243d2047d84_ewds3r.png"
+];
 
 const Footer = () => {
     const { settings } = useSettings();
@@ -45,179 +21,155 @@ const Footer = () => {
     const copyrightName = settings?.siteName || "AAA Rental LLP";
 
     return (
-        <footer className="bg-white text-gray-700 pt-8 pb-4 border-t border-gray-100">
-
-            {/* Mobile Layout */}
-            <div className="md:hidden px-4">
-                {/* Logo */}
-                <div className="mb-3">
-                    <Link href="/" className="inline-block">
-                        <Image
-                            src={siteLogo}
-                            alt={siteName}
-                            width={200}
-                            height={54}
-                            className="h-[54px] w-auto object-contain"
-                        />
-                    </Link>
-                </div>
-
-                {/* Tagline */}
-                <p className="text-gray-700 text-sm font-medium mb-5">
-                    Rent Anything, Anytime, Anywhere
-                </p>
-
-                {/* Primary Nav Links */}
-                <ul className="space-y-3 text-gray-600 text-sm mb-6">
-                    <li><Link href="/about" className="hover:text-gray-900 transition-colors">About Us</Link></li>
-                    <li><Link href="/how-it-works" className="hover:text-gray-900 transition-colors">How It Works</Link></li>
-                    <li><Link href="/careers" className="hover:text-gray-900 transition-colors">Jobs &amp; Careers</Link></li>
-                    <li><Link href="/contact" className="hover:text-gray-900 transition-colors">Contact</Link></li>
-                    <li><Link href="/b2b" className="hover:text-gray-900 transition-colors">IndianRenters (B2B Link)</Link></li>
-                </ul>
-
-                {/* Secondary Policy Links - 2 column grid */}
-                <div className="grid grid-cols-2 gap-x-6 gap-y-3 text-sm text-gray-600 mb-6">
-                    <Link href="/kyc-policy" className="hover:text-gray-900 transition-colors">KYC Policy</Link>
-                    <Link href="/faq" className="hover:text-gray-900 transition-colors">FAQs</Link>
-                    <Link href="/shipping-policy" className="hover:text-gray-900 transition-colors">Shipping Policy</Link>
-                    <Link href="/ticket" className="hover:text-gray-900 transition-colors">Raise a Ticket</Link>
-                    <Link href="/return-policy" className="hover:text-gray-900 transition-colors">Return Policy</Link>
-                    <Link href="/reviews" className="hover:text-gray-900 transition-colors">Customer Reviews</Link>
-                    <Link href="/privacy" className="hover:text-gray-900 transition-colors">Privacy Policy</Link>
-                    <Link href="/blog" className="hover:text-gray-900 transition-colors">Blog</Link>
-                    <Link href="/terms" className="hover:text-gray-900 transition-colors col-span-2">Rental Terms &amp; Conditions</Link>
-                </div>
-
-                {/* Social Icons */}
-                <div className="flex items-center gap-5 mb-6">
-                    <a href={`https://wa.me/${sitePhone.replace(/[^\d]/g, '')}`} className="transition-opacity hover:opacity-70" target="_blank" rel="noopener noreferrer">
-                        <FaWhatsapp size={22} className="text-[#25D366]" />
-                    </a>
-                    <a href="#" className="transition-opacity hover:opacity-70">
-                        <FaFacebookF size={20} className="text-[#1877F2]" />
-                    </a>
-                    <a href="#" className="transition-opacity hover:opacity-70">
-                        <FaInstagram size={22} className="text-[#E4405F]" />
-                    </a>
-                    <a href="#" className="transition-opacity hover:opacity-70">
-                        <FaLinkedinIn size={20} className="text-[#0A66C2]" />
-                    </a>
-                </div>
-
-                {/* Divider */}
-                <div className="border-t border-gray-200 pt-4">
-                    {/* Copyright */}
-                    <p className="text-gray-500 text-[11px] text-center mb-3">
-                        © {currentYear} {copyrightName}. All Rights Reserved
-                    </p>
-
-                    {/* Payment Methods */}
-                    <div className="flex items-center justify-center gap-2">
-                        <div className="h-7 px-2.5 bg-white border border-gray-200 rounded flex items-center justify-center">
-                            <PaymentUPI />
+        <>
+            {/* ── Desktop Footer ── */}
+            <footer
+                className="hidden md:flex flex-col w-full items-center"
+                style={{
+                    background: 'hsla(0, 0%, 96%, 1)',
+                    borderTop: '1px solid hsla(0, 0%, 89%, 1)',
+                    paddingTop: '36px',
+                    paddingBottom: '0px',
+                    gap: '20px'
+                }}
+            >
+                {/* Inner container: 1200px wide, 176px height, space-between */}
+                <div className="w-full max-w-[1200px] px-4 sm:px-6">
+                    <div
+                        className="flex flex-row items-start justify-between"
+                        style={{ height: '176px', gap: '20px' }}
+                    >
+                        {/* Brand Column */}
+                        <div className="flex flex-col gap-4 shrink-0">
+                            <Link href="/" className="inline-block">
+                                <Image
+                                    src={siteLogo}
+                                    alt={siteName}
+                                    width={270}
+                                    height={72}
+                                    className="h-[72px] w-auto object-contain"
+                                />
+                            </Link>
+                            <p className="text-gray-800 text-[13px] font-medium">
+                                Rent Anything, Anytime, Anywhere
+                            </p>
+                            <div className="flex items-center gap-3">
+                                <a href={`https://wa.me/${sitePhone.replace(/[^\d]/g, '')}`} className="transition-opacity hover:opacity-70" target="_blank" rel="noopener noreferrer">
+                                    <FaWhatsapp size={22} className="text-[#25D366]" />
+                                </a>
+                                <a href="#" className="transition-opacity hover:opacity-70">
+                                    <FaFacebookF size={20} className="text-[#1877F2]" />
+                                </a>
+                                <a href="#" className="transition-opacity hover:opacity-70">
+                                    <FaInstagram size={22} className="text-[#E4405F]" />
+                                </a>
+                                <a href="#" className="transition-opacity hover:opacity-70">
+                                    <FaLinkedinIn size={20} className="text-[#0A66C2]" />
+                                </a>
+                            </div>
                         </div>
-                        <div className="h-7 px-2.5 bg-white border border-gray-200 rounded flex items-center justify-center">
-                            <PaymentVisa />
-                        </div>
-                        <div className="h-7 px-2.5 bg-white border border-gray-200 rounded flex items-center justify-center">
-                            <PaymentRuPay />
-                        </div>
-                        <div className="h-7 px-2.5 bg-white border border-gray-200 rounded flex items-center justify-center">
-                            <PaymentMastercard />
+
+                        {/* Links — 3 columns */}
+                        <div 
+                            className="flex flex-row justify-between"
+                            style={{ width: '600px', height: '176px' }}
+                        >
+                            {/* Column 1 */}
+                            <ul className="flex flex-col gap-5 text-[hsla(0,0%,0%,1)] font-manrope font-medium text-[14px] tracking-tight leading-none">
+                                <li><Link href="/about" className="hover:opacity-70 transition-opacity">About Us</Link></li>
+                                <li><Link href="/how-it-works" className="hover:opacity-70 transition-opacity">How It Works</Link></li>
+                                <li><Link href="/careers" className="hover:opacity-70 transition-opacity">Jobs &amp; Careers</Link></li>
+                                <li><Link href="/contact" className="hover:opacity-70 transition-opacity">Contact</Link></li>
+                                <li><Link href="/b2b" className="hover:opacity-70 transition-opacity">IndianRenters (B2B Link)</Link></li>
+                            </ul>
+                            {/* Column 2 */}
+                            <ul className="flex flex-col gap-5 text-[hsla(0,0%,0%,1)] font-manrope font-medium text-[14px] tracking-tight leading-none">
+                                <li><Link href="/kyc-policy" className="hover:opacity-70 transition-opacity">KYC Policy</Link></li>
+                                <li><Link href="/shipping-policy" className="hover:opacity-70 transition-opacity">Shipping Policy</Link></li>
+                                <li><Link href="/return-policy" className="hover:opacity-70 transition-opacity">Return Policy</Link></li>
+                                <li><Link href="/privacy" className="hover:opacity-70 transition-opacity">Privacy Policy</Link></li>
+                                <li><Link href="/terms" className="hover:opacity-70 transition-opacity">Rental Terms &amp; Conditions</Link></li>
+                            </ul>
+                            {/* Column 3 */}
+                            <ul className="flex flex-col gap-5 text-[hsla(0,0%,0%,1)] font-manrope font-medium text-[14px] tracking-tight leading-none">
+                                <li><Link href="/faq" className="hover:opacity-70 transition-opacity">FAQs</Link></li>
+                                <li><Link href="/ticket" className="hover:opacity-70 transition-opacity">Raise a Ticket</Link></li>
+                                <li><Link href="/reviews" className="hover:opacity-70 transition-opacity">Customer Reviews</Link></li>
+                                <li><Link href="/blog" className="hover:opacity-70 transition-opacity">Blog</Link></li>
+                            </ul>
                         </div>
                     </div>
                 </div>
-            </div>
 
-            {/* Desktop Layout */}
-            <div className="hidden md:block">
-                {/* Main Footer Content */}
-                <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-16 flex flex-col lg:flex-row justify-between gap-5">
+                {/* Copyright bar */}
+                <div 
+                    className="w-full max-w-[1200px] px-4 sm:px-6 flex flex-row items-center justify-between"
+                    style={{ 
+                        height: '77px', 
+                        paddingTop: '16px', 
+                        paddingBottom: '16px',
+                        borderTop: '1px solid hsla(0, 0%, 89%, 1)'
+                    }}
+                >
+                    <p className="text-[#666666] font-manrope text-[12.5px]">
+                        © {currentYear} {copyrightName}. All Rights Reserved
+                    </p>
+                    <div className="flex items-center gap-[6px]">
+                        {paymentLogos.map((url, i) => (
+                            <img key={i} src={url} alt={`payment-method-${i}`} className="w-[45px] h-[45px] object-contain shrink-0" />
+                        ))}
+                    </div>
+                </div>
+            </footer>
 
-                    {/* Brand Column */}
-                    <div className="flex flex-col gap-4">
+            {/* ── Mobile Footer ── */}
+            <footer className="md:hidden text-gray-700 pt-8 pb-4 border-t border-gray-200" style={{ background: 'hsla(0, 0%, 96%, 1)' }}>
+                <div className="px-4">
+                    <div className="mb-3">
                         <Link href="/" className="inline-block">
-                            <Image
-                                src={siteLogo}
-                                alt={siteName}
-                                width={270}
-                                height={72}
-                                className="h-[72px] w-auto object-contain"
-                            />
+                            <Image src={siteLogo} alt={siteName} width={200} height={54} className="h-[54px] w-auto object-contain" />
                         </Link>
-                        <p className="text-gray-800 text-[13px] font-medium">
-                            Rent Anything, Anytime, Anywhere
-                        </p>
-                        <div className="flex items-center gap-3">
-                            <a href={`https://wa.me/${sitePhone.replace(/[^\d]/g, '')}`} className="transition-opacity hover:opacity-70" target="_blank" rel="noopener noreferrer">
-                                <FaWhatsapp size={22} className="text-[#25D366]" />
-                            </a>
-                            <a href="#" className="transition-opacity hover:opacity-70">
-                                <FaFacebookF size={20} className="text-[#1877F2]" />
-                            </a>
-                            <a href="#" className="transition-opacity hover:opacity-70">
-                                <FaInstagram size={22} className="text-[#E4405F]" />
-                            </a>
-                            <a href="#" className="transition-opacity hover:opacity-70">
-                                <FaLinkedinIn size={20} className="text-[#0A66C2]" />
-                            </a>
-                        </div>
+                    </div>
+                    <p className="text-gray-700 text-sm font-medium mb-5">Rent Anything, Anytime, Anywhere</p>
+
+                    <ul className="space-y-3 text-gray-600 text-sm mb-6">
+                        <li><Link href="/about" className="hover:text-gray-900 transition-colors">About Us</Link></li>
+                        <li><Link href="/how-it-works" className="hover:text-gray-900 transition-colors">How It Works</Link></li>
+                        <li><Link href="/careers" className="hover:text-gray-900 transition-colors">Jobs &amp; Careers</Link></li>
+                        <li><Link href="/contact" className="hover:text-gray-900 transition-colors">Contact</Link></li>
+                        <li><Link href="/b2b" className="hover:text-gray-900 transition-colors">IndianRenters (B2B Link)</Link></li>
+                    </ul>
+
+                    <div className="grid grid-cols-2 gap-x-6 gap-y-3 text-sm text-gray-600 mb-6">
+                        <Link href="/kyc-policy" className="hover:text-gray-900 transition-colors">KYC Policy</Link>
+                        <Link href="/faq" className="hover:text-gray-900 transition-colors">FAQs</Link>
+                        <Link href="/shipping-policy" className="hover:text-gray-900 transition-colors">Shipping Policy</Link>
+                        <Link href="/ticket" className="hover:text-gray-900 transition-colors">Raise a Ticket</Link>
+                        <Link href="/return-policy" className="hover:text-gray-900 transition-colors">Return Policy</Link>
+                        <Link href="/reviews" className="hover:text-gray-900 transition-colors">Customer Reviews</Link>
+                        <Link href="/privacy" className="hover:text-gray-900 transition-colors">Privacy Policy</Link>
+                        <Link href="/blog" className="hover:text-gray-900 transition-colors">Blog</Link>
+                        <Link href="/terms" className="hover:text-gray-900 transition-colors col-span-2">Rental Terms &amp; Conditions</Link>
                     </div>
 
-                    {/* Links Section */}
-                    <div className="flex flex-col lg:flex-row w-full lg:w-[600px] h-auto lg:h-[156px] justify-between text-[13px]">
-                        {/* Link Column 1 */}
-                        <ul className="space-y-2.5 text-gray-600">
-                            <li><Link href="/about" className="hover:text-gray-900 transition-colors">About Us</Link></li>
-                            <li><Link href="/how-it-works" className="hover:text-gray-900 transition-colors">How It Works</Link></li>
-                            <li><Link href="/careers" className="hover:text-gray-900 transition-colors">Jobs &amp; Careers</Link></li>
-                            <li><Link href="/contact" className="hover:text-gray-900 transition-colors">Contact</Link></li>
-                            <li><Link href="/b2b" className="hover:text-gray-900 transition-colors">IndianRenters (B2B Link)</Link></li>
-                        </ul>
-
-                        {/* Link Column 2 */}
-                        <ul className="space-y-2.5 text-gray-600">
-                            <li><Link href="/kyc-policy" className="hover:text-gray-900 transition-colors">KYC Policy</Link></li>
-                            <li><Link href="/shipping-policy" className="hover:text-gray-900 transition-colors">Shipping Policy</Link></li>
-                            <li><Link href="/return-policy" className="hover:text-gray-900 transition-colors">Return Policy</Link></li>
-                            <li><Link href="/privacy" className="hover:text-gray-900 transition-colors">Privacy Policy</Link></li>
-                            <li><Link href="/terms" className="hover:text-gray-900 transition-colors">Rental Terms &amp; Conditions</Link></li>
-                        </ul>
-
-                        {/* Link Column 3 */}
-                        <ul className="space-y-2.5 text-gray-600">
-                            <li><Link href="/faq" className="hover:text-gray-900 transition-colors">FAQs</Link></li>
-                            <li><Link href="/ticket" className="hover:text-gray-900 transition-colors">Raise a Ticket</Link></li>
-                            <li><Link href="/reviews" className="hover:text-gray-900 transition-colors">Customer Reviews</Link></li>
-                            <li><Link href="/blog" className="hover:text-gray-900 transition-colors">Blog</Link></li>
-                            <li><Link href="/design-test" className="text-orange-500 font-bold hover:text-orange-600 transition-colors">Design Preview ✨</Link></li>
-                        </ul>
+                    <div className="flex items-center gap-5 mb-6">
+                        <a href={`https://wa.me/${sitePhone.replace(/[^\d]/g, '')}`} className="transition-opacity hover:opacity-70" target="_blank" rel="noopener noreferrer"><FaWhatsapp size={22} className="text-[#25D366]" /></a>
+                        <a href="#" className="transition-opacity hover:opacity-70"><FaFacebookF size={20} className="text-[#1877F2]" /></a>
+                        <a href="#" className="transition-opacity hover:opacity-70"><FaInstagram size={22} className="text-[#E4405F]" /></a>
+                        <a href="#" className="transition-opacity hover:opacity-70"><FaLinkedinIn size={20} className="text-[#0A66C2]" /></a>
                     </div>
-                </div>
 
-                {/* Copyright Section */}
-                <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-16 border-t border-gray-200 mt-8 pt-5 pb-4 flex flex-col md:flex-row items-center justify-between gap-4">
-                    <p className="text-gray-500 text-[11px] text-center md:text-left">
-                        © {currentYear} {copyrightName}. All Rights Reserved
-                    </p>
-                    <div className="flex items-center gap-2">
-                        <div className="h-7 px-2.5 bg-white border border-gray-200 rounded flex items-center justify-center">
-                            <PaymentUPI />
-                        </div>
-                        <div className="h-7 px-2.5 bg-white border border-gray-200 rounded flex items-center justify-center">
-                            <PaymentVisa />
-                        </div>
-                        <div className="h-7 px-2.5 bg-white border border-gray-200 rounded flex items-center justify-center">
-                            <PaymentRuPay />
-                        </div>
-                        <div className="h-7 px-2.5 bg-white border border-gray-200 rounded flex items-center justify-center">
-                            <PaymentMastercard />
+                    <div className="border-t border-gray-200 pt-4">
+                        <p className="text-gray-500 text-[11px] text-center mb-3">© {currentYear} {copyrightName}. All Rights Reserved</p>
+                        <div className="flex items-center justify-center gap-[6px]">
+                            {paymentLogos.map((url, i) => (
+                                <img key={i} src={url} alt={`payment-method-mobile-${i}`} className="w-[45px] h-[45px] object-contain shrink-0" />
+                            ))}
                         </div>
                     </div>
                 </div>
-            </div>
-        </footer>
+            </footer>
+        </>
     );
 };
 

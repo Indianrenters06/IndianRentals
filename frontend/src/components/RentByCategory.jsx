@@ -1,15 +1,16 @@
 "use client";
 import React from 'react';
 import { Swiper, SwiperSlide } from 'swiper/react';
-import { Navigation, Autoplay } from 'swiper/modules';
+import { Navigation, Autoplay, Scrollbar } from 'swiper/modules';
 import Link from 'next/link';
 import Image from 'next/image';
-import { FaLaptop, FaCamera, FaDesktop, FaTabletAlt, FaMobileAlt, FaArrowRight } from 'react-icons/fa';
+import { FaLaptop, FaCamera, FaDesktop, FaTabletAlt, FaMobileAlt, FaArrowRight, FaChevronLeft, FaChevronRight } from 'react-icons/fa';
 import { getCategories } from '../services/categoryService';
 
 // Import Swiper styles
 import 'swiper/css';
 import 'swiper/css/navigation';
+import 'swiper/css/scrollbar';
 
 import { API } from '../services/apiConfig';
 
@@ -140,10 +141,26 @@ const RentByCategory = () => {
                     <h2 className="text-4xl font-semibold font-manrope text-gray-900 tracking-tight">{cmsConfig.title}</h2>
                     <Link
                         href="/categories"
-                        className="hidden md:flex items-center gap-2 text-[15px] font-semibold text-gray-900 group"
+                        className="hidden md:inline-flex items-center justify-center gap-[2px] text-gray-900 group hover:brightness-105 transition-all"
+                        style={{
+                            width: '95px',
+                            height: '35px',
+                            paddingTop: '6px',
+                            paddingBottom: '6px',
+                            paddingLeft: '20px',
+                            paddingRight: '20px',
+                            borderRadius: '9999px',
+                            background: 'hsla(44, 100%, 64%, 1)',
+                            borderBottom: '1px solid rgba(0,0,0,0.10)',
+                            fontFamily: 'Manrope, sans-serif',
+                            fontWeight: 500,
+                            fontSize: '14px',
+                            lineHeight: '23px',
+                            letterSpacing: '-0.01em',
+                        }}
                     >
                         Explore
-                        <FaArrowRight size={12} className="group-hover:translate-x-1 transition-transform" />
+                        <FaArrowRight size={11} className="group-hover:translate-x-0.5 transition-transform shrink-0" />
                     </Link>
                 </div>
 
@@ -183,23 +200,28 @@ const RentByCategory = () => {
                 {/* Desktop Swiper */}
                 <div className="hidden md:block relative">
                     <Swiper
-                        modules={[Navigation, Autoplay]}
-                        spaceBetween={20}
+                        modules={[Navigation, Autoplay, Scrollbar]}
+                        spaceBetween={24}
                         slidesPerView={'auto'}
                         navigation={{
-                            nextEl: '.swiper-button-next-custom',
-                            prevEl: '.swiper-button-prev-custom',
+                            nextEl: '.swiper-next-cat',
+                            prevEl: '.swiper-prev-cat',
+                        }}
+                        scrollbar={{
+                            el: '.swiper-scrollbar-cat',
+                            draggable: true,
+                            hide: false,
                         }}
                         autoplay={{
                             delay: 3000,
                             disableOnInteraction: false,
                         }}
-                        className="!pb-12"
+                        className="!pb-0"
                     >
                         {displayCategories.map((cat, index) => (
-                            <SwiperSlide key={cat._id || index} style={{ width: '177.33px' }}>
+                            <SwiperSlide key={cat._id || index} style={{ width: '177px' }}>
                                 <Link href={getCategoryRoute(cat)} className="group flex flex-col items-center cursor-pointer">
-                                    <div className="w-[177.33px] h-[173px] flex items-center justify-center mb-4 relative bg-white border border-gray-200 rounded-xl group-hover:border-orange-300/20 group-hover:shadow-lg transition-all duration-300 overflow-hidden shadow-md">
+                                    <div className="w-[177px] h-[173px] flex items-center justify-center mb-4 relative bg-white border border-gray-200 rounded-xl group-hover:border-orange-300/20 group-hover:shadow-lg transition-all duration-300 overflow-hidden shadow-md">
                                         {cat.image ? (
                                             <Image
                                                 src={cat.image}
@@ -219,30 +241,60 @@ const RentByCategory = () => {
                                 </Link>
                             </SwiperSlide>
                         ))}
-
                     </Swiper>
 
-                    {/* Desktop Navigation Arrows - Positioned below the slider like in the image */}
-                    <div className="hidden md:flex items-center justify-end gap-3 mt-[-14px] mr-2">
-                        <div className="swiper-button-prev-custom w-10 h-10 bg-white rounded-full shadow-sm flex items-center justify-center cursor-pointer border border-gray-100 group hover:shadow-md transition-all">
-                             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-gray-400 group-hover:text-gray-800 transition-colors rotate-180">
-                                <polyline points="9 18 15 12 9 6"></polyline>
-                            </svg>
-                        </div>
-                        <div className="swiper-button-next-custom w-10 h-10 bg-white rounded-full shadow-sm flex items-center justify-center cursor-pointer border border-gray-100 group hover:shadow-md transition-all">
-                             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-gray-400 group-hover:text-gray-800 transition-colors">
-                                <polyline points="9 18 15 12 9 6"></polyline>
-                            </svg>
+                    {/* Figma: scrollbar row — width 1164, height 34, gap 24px from cards */}
+                    <div className="hidden md:flex items-center gap-6 mt-6">
+                        {/* Progress scrollbar — Figma: h=0px border=3.5px solid #333 */}
+                        <div
+                            className="swiper-scrollbar-cat flex-1"
+                            style={{ height: '3.5px', position: 'relative' }}
+                        />
+                        {/* Nav arrows */}
+                        <div className="flex items-center gap-3 shrink-0">
+                            <button
+                                className="swiper-prev-cat w-10 h-10 rounded-full bg-white border border-gray-200 shadow-sm flex items-center justify-center hover:shadow-md hover:border-gray-300 transition-all group"
+                                aria-label="Previous"
+                            >
+                                <FaChevronLeft size={14} className="text-gray-400 group-hover:text-gray-800 transition-colors" />
+                            </button>
+                            <button
+                                className="swiper-next-cat w-10 h-10 rounded-full bg-white border border-gray-200 shadow-sm flex items-center justify-center hover:shadow-md hover:border-gray-300 transition-all group"
+                                aria-label="Next"
+                            >
+                                <FaChevronRight size={14} className="text-gray-400 group-hover:text-gray-800 transition-colors" />
+                            </button>
                         </div>
                     </div>
                 </div>
             </div>
             
-            <style jsx global>{`
-                .swiper-button-disabled {
-                    opacity: 0.3 !important;
-                    cursor: not-allowed !important;
-                    pointer-events: none !important;
+            <style>{`
+                /* Scrollbar track — very subtle light line */
+                .swiper-scrollbar-cat {
+                    background: hsla(0, 0%, 20%, 0.12) !important;
+                    border-radius: 0 !important;
+                    height: 3.5px !important;
+                    overflow: hidden;
+                    position: relative;
+                }
+                /* Scrollbar drag thumb — dark charcoal per Figma */
+                .swiper-scrollbar-cat .swiper-scrollbar-drag {
+                    background: hsla(0, 0%, 20%, 1) !important;
+                    border-radius: 0 !important;
+                    cursor: grab;
+                    height: 100% !important;
+                    top: 0 !important;
+                }
+                .swiper-scrollbar-cat .swiper-scrollbar-drag:active {
+                    cursor: grabbing;
+                }
+                /* Disable arrow when at start/end */
+                .swiper-prev-cat.swiper-button-disabled,
+                .swiper-next-cat.swiper-button-disabled {
+                    opacity: 0.3;
+                    cursor: not-allowed;
+                    pointer-events: none;
                 }
             `}</style>
         </section>

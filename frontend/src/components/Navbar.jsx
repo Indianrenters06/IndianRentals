@@ -1,4 +1,5 @@
 "use client";
+import React from "react";
 import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import Link from "next/link";
@@ -20,6 +21,7 @@ const Navbar = () => {
     const [userInfo, setUserInfo] = useState(null);
     const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
     const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+    const [searchQuery, setSearchQuery] = useState("");
 
     // Redux Cart Selector
     const totalQuantity = useSelector(selectCartTotalQuantity);
@@ -124,82 +126,131 @@ const Navbar = () => {
         { name: "AV Products", href: "/category/av-products" },
         { name: "Office Equipment", href: "/category/office-equipment" },
         { name: "DSLR Cameras", href: "/category/dslr" },
-        { name: "About Us", href: "/about" },
-        { name: "Contact", href: "/contact" },
         { name: "More", href: "/categories" },
-        { name: "Latest Launch", href: "/products" },
+        { name: "Latest Launch", href: "/products", separator: true },
         { name: "Deals %", href: "/products" }
     ];
 
     const handleSearch = (e) => {
         if (e.key === 'Enter') {
-            const query = e.target.value.trim();
+            const query = searchQuery.trim();
             if (query) {
                 router.push(`/products?keyword=${encodeURIComponent(query)}`);
             }
         }
     };
 
+    const handleSearchClick = () => {
+        const query = searchQuery.trim();
+        if (query) {
+            router.push(`/products?keyword=${encodeURIComponent(query)}`);
+        }
+    };
+
     return (
         <header className="relative bg-white shadow-xs z-50">
-            <div className="bg-orange-300 text-black text-xs font-semibold flex items-center justify-center overflow-hidden w-full h-[35px] desktop:h-[40px]">
-                ♥ SAVE Extra 5% up to ₹100 on UPI Orders ♥
+            <div
+                className="bg-orange-300 text-black flex items-center justify-center w-full overflow-hidden"
+                style={{ height: "24px", paddingTop: "4px", paddingBottom: "4px", paddingLeft: "30px", paddingRight: "30px" }}
+            >
+                <span
+                    style={{
+                        fontFamily: "Manrope, sans-serif",
+                        fontWeight: 700,
+                        fontSize: "12px",
+                        lineHeight: "16px",
+                        letterSpacing: "-0.4px",
+                        whiteSpace: "nowrap",
+                    }}
+                >
+                    ♥ SAVE Extra 5% up to ₹100 on UPI Orders ♥
+                </span>
             </div>
 
             {/* Top Bar */}
-            <div className="max-w-[1200px] mx-auto px-4 sm:px-6 py-3">
-                <div className="flex items-center justify-between gap-[10px]">
+            <div className="w-full bg-white border-b border-gray-100">
+                <div 
+                    className="max-w-[1200px] mx-auto px-4 sm:px-6 flex items-center justify-between" 
+                    style={{ height: "64px", gap: "10px" }}
+                >
+                    <div className="flex items-center gap-8">
+                        {/* Left Section: Mobile Menu + Logo */}
+                        <div className="flex items-center gap-3 md:gap-4">
+                            {/* Mobile Menu Toggle */}
+                            <button
+                                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                                className="md:hidden text-gray-800 focus:outline-none p-1"
+                            >
+                                {isMobileMenuOpen ? <FaTimes size={24} /> : <FaBars size={24} />}
+                            </button>
 
-                    {/* Left Section: Mobile Menu + Logo */}
-                    <div className="flex items-center gap-3 md:gap-4">
-                        {/* Mobile Menu Toggle */}
-                        <button
-                            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                            className="md:hidden text-gray-800 focus:outline-none p-1"
-                        >
-                            {isMobileMenuOpen ? <FaTimes size={24} /> : <FaBars size={24} />}
-                        </button>
-
-                        {/* Logo */}
-                        <Link href="/" className="shrink-0">
-                            <Image
-                                src={siteLogo}
-                                alt={`${siteName} - You Name it We Rent it`}
-                                width={150}
-                                height={40}
-                                className="h-10 w-auto object-contain"
-                                priority
-                            />
-                        </Link>
-                    </div>
-
-                    {/* Search Bar - Desktop */}
-                    <div className="hidden lg:flex flex-1 max-w-xl mx-auto relative group">
-                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                            <FaSearch className="text-gray-400 group-focus-within:text-indigo-600" />
+                            {/* Logo */}
+                            <Link href="/" className="shrink-0">
+                                <Image
+                                    src={siteLogo}
+                                    alt={`${siteName} - You Name it We Rent it`}
+                                    width={150}
+                                    height={40}
+                                    className="h-10 w-auto object-contain"
+                                    priority
+                                />
+                            </Link>
                         </div>
-                        <input
-                            type="text"
-                            placeholder="Search for MacBook Pro 14..."
-                            className="w-full pl-10 pr-4 py-2.5 rounded-full border border-gray-200 bg-gray-50 focus:bg-white focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 outline-none transition-all duration-200 text-sm"
-                            onKeyDown={handleSearch}
-                        />
+
+                        {/* Search Bar - Desktop */}
+                        <div className="hidden lg:flex items-center relative" style={{ width: "300px", height: "36px" }}>
+                            <input
+                                type="text"
+                                placeholder="Search for MacBook Pro, Sony A7III"
+                                className="w-full bg-white text-sm text-gray-600 placeholder-gray-400 outline-none"
+                                value={searchQuery}
+                                onChange={(e) => setSearchQuery(e.target.value)}
+                                style={{
+                                    height: "36px",
+                                    paddingTop: "6px",
+                                    paddingBottom: "6px",
+                                    paddingLeft: "10px",
+                                    paddingRight: "34px",
+                                    borderRadius: "24px",
+                                    border: "0.7px solid #D1D1D1",
+                                }}
+                                onKeyDown={handleSearch}
+                            />
+                            <div 
+                                className="absolute inset-y-0 right-0 flex items-center cursor-pointer hover:opacity-80 transition-opacity" 
+                                style={{ paddingRight: "10px" }}
+                                onClick={handleSearchClick}
+                            >
+                                <div style={{ width: "24px", height: "24px", position: "relative" }}>
+                                    <FaSearch 
+                                        className="text-gray-400" 
+                                        size={19.5} 
+                                        style={{ position: "absolute", top: "2.23px", left: "2.23px" }} 
+                                    />
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
                     {/* Right Actions (Desktop) */}
-                    <div className="hidden md:flex items-center gap-6">
-                        <div className="relative">
+                    {/* Right Actions (Desktop) */}
+                    <div className="hidden md:flex items-center" style={{ width: "289px", height: "35px", gap: "8px", justifyContent: "space-between" }}>
+                        <div className="relative h-full flex items-center">
                             <button
-                                className="flex items-center gap-2 text-gray-700 hover:text-indigo-600 transition-colors focus:outline-none font-medium"
+                                className="flex items-center gap-2 text-gray-700 hover:text-indigo-600 transition-colors focus:outline-none font-medium h-full"
                                 onClick={() => setIsCityDropdownOpen(!isCityDropdownOpen)}
+                                style={{
+                                    border: "0.7px solid #D1D1D1",
+                                    borderRadius: "9999px",
+                                    paddingLeft: "10px",
+                                    paddingRight: "10px",
+                                    backgroundColor: "#F6F6F6"
+                                }}
                             >
-                                <div className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-gray-600 shrink-0">
-                                    <FaMapMarkerAlt size={16} />
-                                </div>
-                                <span className="text-sm font-bold truncate max-w-[150px]">
-                                    {selectedCity || "Enter your location"}
+                                <FaMapMarkerAlt size={14} className="text-gray-500" />
+                                <span className="text-sm font-bold truncate max-w-[100px]">
+                                    {selectedCity || "Delhi"}
                                 </span>
-                                <FaChevronDown size={10} className={`transform transition-transform duration-200 shrink-0 ${isCityDropdownOpen ? 'rotate-180' : ''}`} />
                             </button>
 
                             {/* City Dropdown -> Location Input Modal/Popover */}
@@ -269,12 +320,12 @@ const Navbar = () => {
 
                         {/* Login/Register or Profile (Desktop) */}
                         {userInfo ? (
-                            <div className="relative">
+                            <div className="relative h-full flex items-center">
                                 <button
-                                    className="flex items-center gap-2 text-gray-700 hover:text-indigo-600 transition-colors focus:outline-none"
+                                    className="flex items-center gap-2 text-gray-700 hover:text-indigo-600 transition-colors focus:outline-none h-full"
                                     onClick={() => setIsProfileDropdownOpen(!isProfileDropdownOpen)}
                                 >
-                                    <div className="w-9 h-9 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 border border-indigo-200">
+                                    <div className="w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 border border-indigo-200">
                                         <FaUser size={14} />
                                     </div>
                                     <span className="text-sm font-medium hidden lg:block max-w-[100px] truncate">
@@ -313,25 +364,29 @@ const Navbar = () => {
                         ) : (
                             <button
                                 onClick={() => setIsAuthModalOpen(true)}
-                                className="inline-flex items-center justify-center font-semibold text-sm transition-all duration-200 cursor-pointer text-center rounded-md border h-10 w-full px-6 py-2 tablet:h-9 tablet:w-auto tablet:min-w-[110px] tablet:px-[22px] tablet:py-[9px] desktop:h-[35px] desktop:min-w-[120px] desktop:px-5 desktop:py-2 bg-orange-300 text-black border-orange-300 hover:bg-orange-400 hover:border-orange-400 active:bg-orange-500 active:border-orange-500 focus:outline-none focus:ring-2 focus:ring-blue-info focus:ring-offset-2 focus:border-blue-info disabled:bg-orange-100 disabled:text-grey-400 disabled:border-orange-100 disabled:opacity-50 disabled:cursor-not-allowed !h-auto !py-2 !px-6 !rounded-full shadow-sm"
+                                className="inline-flex items-center justify-center font-bold text-sm bg-orange-300 text-black rounded-full hover:bg-orange-400 active:bg-orange-500 transition-all duration-200 cursor-pointer text-center"
+                                style={{ height: "35px", paddingLeft: "20px", paddingRight: "20px" }}
                             >
                                 Login/Register
                             </button>
                         )}
 
                         {/* Wishlist & Cart (Desktop) */}
-                        <div className="flex items-center gap-4 text-gray-600">
-                            <button className="hover:text-indigo-600 transition-colors">
-                                <FaHeart size={20} />
-                            </button>
-                            <Link href="/cart" className="relative hover:text-indigo-600 transition-colors">
-                                <FaShoppingCart size={20} />
+                        <div className="flex items-center gap-3 text-gray-600 h-full">
+                            <Link href="/cart" className="relative hover:text-indigo-600 transition-colors flex items-center h-full">
+                                <FaShoppingCart size={22} />
                                 {totalQuantity > 0 && (
-                                    <span className="absolute -top-2 -right-2 bg-red-500 text-white text-[10px] font-bold w-4 h-4 flex items-center justify-center rounded-full">
+                                    <span 
+                                        className="absolute bg-red-500 text-white text-[10px] font-bold w-4 h-4 flex items-center justify-center rounded-full"
+                                        style={{ top: "-2px", right: "-6px" }}
+                                    >
                                         {totalQuantity}
                                     </span>
                                 )}
                             </Link>
+                            <button className="hover:text-black transition-colors flex items-center h-full">
+                                <FaBars size={22} />
+                            </button>
                         </div>
                     </div>
 
@@ -358,23 +413,29 @@ const Navbar = () => {
                         </Link>
                     </div>
                 </div>
-            </div>      {/* Secondary Nav - Categories */}
-            <div className="hidden md:block border-t border-b border-gray-200 bg-white">
-                <div className="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8">
-                    <div className="flex items-center justify-center space-x-8 py-1 overflow-x-auto">
-                        {navLinks.map((link) => (
-                            <Link
-                                key={link.name}
-                                href={link.href}
-                                className="text-[14px] font-medium text-gray-600 hover:text-black whitespace-nowrap transition-colors relative group tracking-wide"
-                            >
-                                {link.name}
-                                <span className="absolute -bottom-3 left-0 w-0 h-0.5 bg-indigo-600 transition-all duration-300 group-hover:w-full"></span>
-                            </Link>
+            </div>
+
+            {/* Secondary Nav - Categories */}
+            <div className="hidden md:block bg-white w-full border-t border-gray-100">
+                <div className="max-w-[1200px] mx-auto px-4 sm:px-6 h-[28px] flex items-center">
+                    <div className="flex items-center" style={{ width: "754px", height: "20px", gap: "17px" }}>
+                        {navLinks.map((link, index) => (
+                            <React.Fragment key={link.name}>
+                                {link.separator && (
+                                    <div className="w-[1px] h-3.5 bg-gray-300" />
+                                )}
+                                <Link
+                                    href={link.href}
+                                    className="text-[13px] font-semibold text-[#4B4B4B] hover:text-black whitespace-nowrap transition-colors"
+                                >
+                                    {link.name}
+                                </Link>
+                            </React.Fragment>
                         ))}
                     </div>
                 </div>
             </div>
+
 
             {/* Mobile Menu */}
             <AnimatePresence>
@@ -392,9 +453,16 @@ const Navbar = () => {
                                     type="text"
                                     placeholder="Search..."
                                     className="w-full px-4 py-2 rounded-lg bg-gray-50 border border-gray-200 focus:ring-2 focus:ring-indigo-500 outline-none"
+                                    value={searchQuery}
+                                    onChange={(e) => setSearchQuery(e.target.value)}
                                     onKeyDown={handleSearch}
                                 />
-                                <FaSearch className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                                <div 
+                                    className="absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer"
+                                    onClick={handleSearchClick}
+                                >
+                                    <FaSearch className="text-gray-400" />
+                                </div>
                             </div>
 
                             {/* Mobile Links */}

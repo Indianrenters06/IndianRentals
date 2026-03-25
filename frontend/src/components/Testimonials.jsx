@@ -245,27 +245,49 @@ const Testimonials = () => {
                 </div>
             </div>
 
-            {/* Desktop: Horizontal Marquee Rows */}
-            <div className="relative w-full space-y-8 pb-8 hidden lg:block">
-                <div className="absolute left-0 top-0 bottom-0 w-32 bg-linear-to-r from-white to-transparent z-20 pointer-events-none"></div>
-                <div className="absolute right-0 top-0 bottom-0 w-32 bg-linear-to-l from-white to-transparent z-20 pointer-events-none"></div>
 
-                <div className="w-full overflow-hidden">
-                    <div ref={row1Ref} className="flex w-max pl-4">
-                        {row1Items.map((review, i) => (
-                            <ReviewCard key={`row1-${i}`} review={review} />
-                        ))}
+            {/* Desktop: Horizontal Marquee Rows — full width, visually masked to 1200px */}
+            <div className="hidden lg:block pb-8 relative">
+                {/* Solid white panels covering the margin areas outside 1200px */}
+                <div
+                    className="absolute top-0 bottom-0 left-0 z-20 pointer-events-none bg-white"
+                    style={{ width: 'max(calc(50% - 600px), 0px)' }}
+                />
+                <div
+                    className="absolute top-0 bottom-0 right-0 z-20 pointer-events-none bg-white"
+                    style={{ width: 'max(calc(50% - 600px), 0px)' }}
+                />
+                {/* Soft fade at the 1200px boundary */}
+                <div
+                    className="absolute top-0 bottom-0 z-20 pointer-events-none bg-linear-to-r from-white to-transparent"
+                    style={{ left: 'max(calc(50% - 600px), 0px)', width: '64px' }}
+                />
+                <div
+                    className="absolute top-0 bottom-0 z-20 pointer-events-none bg-linear-to-l from-white to-transparent"
+                    style={{ right: 'max(calc(50% - 600px), 0px)', width: '64px' }}
+                />
+
+                <div className="space-y-8">
+                    <div className="w-full overflow-hidden">
+                        <div ref={row1Ref} className="flex w-max">
+                            {row1Items.map((review, i) => (
+                                <ReviewCard key={`row1-${i}`} review={review} />
+                            ))}
+                        </div>
                     </div>
-                </div>
-
-                <div className="w-full overflow-hidden">
-                    <div ref={row2Ref} className="flex w-max pl-4">
-                        {row2Items.map((review, i) => (
-                            <ReviewCard key={`row2-${i}`} review={review} />
-                        ))}
+                    <div className="w-full overflow-hidden">
+                        <div ref={row2Ref} className="flex w-max">
+                            {row2Items.map((review, i) => (
+                                <ReviewCard key={`row2-${i}`} review={review} />
+                            ))}
+                        </div>
                     </div>
                 </div>
             </div>
+
+
+
+
 
             {/* Mobile: Horizontal scroll snap carousel - shows 1.5 cards */}
             <div className="lg:hidden px-4 mb-6">

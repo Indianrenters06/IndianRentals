@@ -4,6 +4,7 @@ import RentByCategory from "@/components/RentByCategory";
 import WhyChooseUs from "@/components/WhyChooseUs";
 import BestRentedProducts from "@/components/BestRentedProducts";
 import FeatureSection from "@/components/FeatureSection";
+import ClientSection from "@/components/ClientSection";
 import RentalProcess from "@/components/RentalProcess";
 import FeaturedShowcase from "@/components/FeaturedShowcase";
 import Testimonials from "@/components/Testimonials";
@@ -16,6 +17,7 @@ export default function Home() {
       <RentByCategory />
       <BestRentedProducts type="bestRented" defaultTitle="Best Rented Products" />
       <FeatureSection />
+      <ClientSection />
       <BestRentedProducts type="newLaunches" defaultTitle="New Launches This Week" />
       <FeaturedShowcase />
       <RentalProcess />

@@ -132,7 +132,23 @@ const BestRentedProducts = ({ type = "bestRented", defaultTitle = "Curated Produ
                     </h2>
                     <Link
                         href="/products"
-                        className="hidden md:inline-flex btn-yellow-primary !h-auto !py-2 !px-6 !rounded-full shadow-sm"
+                        className="hidden md:inline-flex items-center justify-center gap-[2px] text-gray-900 group hover:brightness-105 transition-all"
+                        style={{
+                            width: '97px',
+                            height: '35px',
+                            paddingTop: '6px',
+                            paddingBottom: '6px',
+                            paddingLeft: '20px',
+                            paddingRight: '20px',
+                            borderRadius: '9999px',
+                            background: 'hsla(44, 100%, 64%, 1)',
+                            borderBottom: '1px solid rgba(0,0,0,0.10)',
+                            fontFamily: 'Manrope, sans-serif',
+                            fontWeight: 500,
+                            fontSize: '14px',
+                            lineHeight: '23px',
+                            letterSpacing: '-0.01em',
+                        }}
                     >
                         View All
                     </Link>

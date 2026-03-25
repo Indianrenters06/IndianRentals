@@ -95,7 +95,7 @@ const RentalProcess = () => {
             <div className="max-w-[1200px] mx-auto px-4 sm:px-6">
 
                 {/* Header Section */}
-                <div style={{ width: '1192px' }} className="mx-auto flex flex-col md:flex-row md:items-start justify-between mb-10 gap-8 font-manrope">
+                <div className="w-full flex flex-col md:flex-row md:items-start justify-between mb-10 gap-8 font-manrope">
                     <div className="max-w-2xl">
                         <div className="inline-block bg-black text-white text-[11px] font-bold px-4 py-1.5 rounded-full mb-6 uppercase tracking-tight leading-none">
                             Rental Process
@@ -108,18 +108,62 @@ const RentalProcess = () => {
                         </p>
                     </div>
 
-                    <div className="flex items-center gap-2 pt-24 md:pr-12">
-                        <Link href="/rental-process" className="btn-yellow-primary !py-4 !px-9 !rounded-full shadow-sm text-[16px] tracking-tight hover:scale-105">
+                    <div
+                        className="flex items-center pt-24 md:pr-12"
+                        style={{ width: '259px', height: '35px', gap: '10px' }}
+                    >
+                        <Link
+                            href="/rental-process"
+                            className="inline-flex items-center justify-center hover:brightness-105 transition-all"
+                            style={{
+                                width: '124px',
+                                height: '35px',
+                                paddingTop: '6px',
+                                paddingBottom: '6px',
+                                paddingLeft: '20px',
+                                paddingRight: '20px',
+                                borderRadius: '9999px',
+                                background: 'hsla(44, 100%, 64%, 1)',
+                                borderBottom: '1px solid rgba(0,0,0,0.10)',
+                                fontFamily: 'Manrope, sans-serif',
+                                fontWeight: 500,
+                                fontSize: '14px',
+                                lineHeight: '23px',
+                                letterSpacing: '-0.01em',
+                                color: '#1D1D1F',
+                                whiteSpace: 'nowrap',
+                            }}
+                        >
                             Rental Process
                         </Link>
-                        <Link href="/contact" className="px-9 py-4 bg-black text-white font-extrabold rounded-full hover:bg-grey-800 transition-all hover:scale-105 text-[16px] tracking-tight font-manrope">
+                        <Link
+                            href="/contact"
+                            className="inline-flex items-center justify-center hover:opacity-90 transition-all"
+                            style={{
+                                width: '124px',
+                                height: '35px',
+                                paddingTop: '6px',
+                                paddingBottom: '6px',
+                                paddingLeft: '20px',
+                                paddingRight: '20px',
+                                borderRadius: '9999px',
+                                background: 'hsla(0, 0%, 7%, 1)',
+                                fontFamily: 'Manrope, sans-serif',
+                                fontWeight: 500,
+                                fontSize: '14px',
+                                lineHeight: '23px',
+                                letterSpacing: '-0.01em',
+                                color: '#FFFFFF',
+                                whiteSpace: 'nowrap',
+                            }}
+                        >
                             Contact
                         </Link>
                     </div>
                 </div>
 
                 {/* Content Section: Steps and Image */}
-                <div style={{ width: '1192px', height: '500px', gap: '12px' }} className="mx-auto flex flex-row items-stretch font-manrope">
+                <div className="w-full flex flex-row items-stretch font-manrope" style={{ height: '500px', gap: '12px' }}>
 
                     {/* Left side: Steps */}
                     <div className="w-[590px] flex flex-col gap-[5px] h-full">
