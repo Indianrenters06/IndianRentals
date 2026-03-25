@@ -6,7 +6,7 @@ import { PiGauge, PiSmiley } from 'react-icons/pi';
 import BestRentedProducts from '../../components/BestRentedProducts';
 import FaqSection from '../../components/FaqSection';
 
-const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+import { API } from '@/services/apiConfig';
 
 export default function AboutPage() {
     const [activeTab, setActiveTab] = useState('vision');

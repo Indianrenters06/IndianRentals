@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
 
-const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+import { API } from '@/services/apiConfig';
 
 const WhyChooseUs = () => {
     const [cms, setCms] = useState(null);

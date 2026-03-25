@@ -5,7 +5,7 @@ import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import { FaRegHeart, FaStar, FaTruck, FaInfoCircle, FaChevronLeft, FaChevronRight, FaBolt } from "react-icons/fa";
 
-const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+import { API } from "@/services/apiConfig";
 
 // ─── Fallback banner slides ───────────────────────────────────────────────────
 const FALLBACK_BANNERS = [

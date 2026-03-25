@@ -6,7 +6,7 @@ import { getTestimonials } from '../services/testimonialService';
 
 gsap.registerPlugin(ScrollTrigger);
 
-const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+import { API } from '../services/apiConfig';
 
 const GoogleLogo = () => (
     <span className="flex items-center font-bold text-xl leading-none tracking-tight">
