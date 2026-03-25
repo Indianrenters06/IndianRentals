@@ -1,7 +1,7 @@
 "use client";
 import React from 'react';
 import Image from 'next/image';
-import { FaHeart } from 'react-icons/fa';
+import { FaHeart, FaStar } from 'react-icons/fa';
 import Link from 'next/link';
 
 import { useRouter } from 'next/navigation';

@@ -4,7 +4,7 @@ import Link from "next/link";
 import { FaRegHeart, FaStar, FaBolt, FaTruck, FaInfoCircle } from "react-icons/fa";
 import { motion } from "framer-motion";
 
-const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+import { API } from "@/services/apiConfig";
 
 // Optional: you can still use the service, but since we need multiple products by ID we'll implement it manually or use a simple fetch call.
 import { useRouter } from "next/navigation";

@@ -11,7 +11,7 @@ import { getCategories } from '../services/categoryService';
 import 'swiper/css';
 import 'swiper/css/navigation';
 
-const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+import { API } from '../services/apiConfig';
 
 const CATEGORY_ROUTES = {
     'macbook': '/category/apple',

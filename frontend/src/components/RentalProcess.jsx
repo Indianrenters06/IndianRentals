@@ -11,7 +11,7 @@ import {
   PiCheckCircle
 } from 'react-icons/pi';
 
-const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+import { API } from '../services/apiConfig';
 
 const FALLBACK_STEPS = [
     {
