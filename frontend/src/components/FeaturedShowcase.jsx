@@ -44,103 +44,100 @@ const ShowcaseProductCard = ({ product, index, onAddToCart, onQuickView, isAdded
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true }}
         transition={{ duration: 0.45, delay: index * 0.1 }}
-        className="group bg-white rounded-[20px] p-4 shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 hover:-translate-y-1 flex flex-col overflow-hidden"
-        style={{ width: "285px", height: "391px", flexShrink: 0 }}
+        className="group bg-white rounded-2xl flex flex-col overflow-hidden relative transition-all duration-500 hover:shadow-[0_8px_30px_rgba(0,0,0,0.10)] hover:-translate-y-1"
+        style={{ width: "285px", height: "391px", flexShrink: 0, border: "1px solid hsla(0, 0%, 89%, 1)" }}
     >
-        {/* Image area */}
+        {/* Image Section — full-bleed top */}
         <div
-            className="relative rounded-xl bg-gray-50/50 overflow-hidden mb-4 flex items-center justify-center"
-            style={{ height: "240px" }}
+            className="relative rounded-2xl bg-[#F7F7F7] group-hover:bg-[#F0F0F0] transition-colors duration-500 flex items-center justify-center overflow-hidden shrink-0"
+            style={{ width: "285px", height: "282px", borderRight: "1px solid hsla(0, 0%, 89%, 1)", borderBottom: "1px solid hsla(0, 0%, 89%, 1)", borderLeft: "1px solid hsla(0, 0%, 89%, 1)" }}
         >
             {/* Badges */}
-            <div className="absolute top-2 left-2 z-10 flex gap-1">
-                <span className="bg-[#FF3B30] text-white text-[10px] font-bold px-2 py-0.5 rounded-md shadow-sm">
+            <div className="absolute top-3 left-3 z-20 flex gap-1.5">
+                <span className="bg-[#FF3B30] text-white text-[11px] font-bold px-2 py-[3px] rounded-[4px] shadow-sm leading-none">
                     -20% off
                 </span>
                 {product.isNew && (
-                    <span className="bg-[#34C759] text-white text-[10px] font-bold px-2 py-0.5 rounded-md shadow-sm">
+                    <span className="bg-[#34C759] text-white text-[11px] font-bold px-2 py-[3px] rounded-[4px] shadow-sm leading-none">
                         New
                     </span>
                 )}
             </div>
             {/* Heart */}
-            <button className="absolute top-2 right-2 z-10 w-8 h-8 flex items-center justify-center bg-white border border-gray-100 text-[#1D1D1F] rounded-full shadow-sm hover:text-[#FF3B30] transition-all" onClick={(e) => { e.preventDefault(); e.stopPropagation(); }}>
+            <button
+                className="absolute top-3 right-3 z-20 w-8 h-8 flex items-center justify-center bg-white border border-gray-200 text-gray-400 rounded-full shadow-sm hover:text-[#FF3B30] hover:scale-110 transition-all duration-300"
+                onClick={(e) => { e.preventDefault(); e.stopPropagation(); }}
+            >
                 <FaRegHeart size={14} />
             </button>
-
-            <Link
-                href={`/products/${product.id}`}
-                className="w-[220px] h-[180px] flex items-center justify-center transition-transform duration-500 group-hover:scale-105"
-            >
-                {product.image && product.image !== "/images/placeholder.png" ? (
+            {/* Product Image */}
+            <Link href={`/products/${product.id}`} className="flex items-center justify-center w-full h-full">
+                <div className="w-[240px] h-[220px] relative transition-transform duration-700 ease-out group-hover:scale-105">
                     <img
                         src={product.image}
                         alt={product.name}
                         className="w-full h-full object-contain mix-blend-multiply"
                     />
-                ) : (
-                    <div className="flex flex-col items-center text-gray-300">
-                        <FaBolt className="mb-2 text-4xl opacity-20" />
-                        <span className="text-sm font-medium opacity-50">{product.category}</span>
-                    </div>
-                )}
+                </div>
             </Link>
         </div>
 
-        {/* Info */}
-        <div className="flex flex-col gap-[6px] px-1 relative mt-auto">
-            <h3 className="text-[15px] font-semibold font-manrope text-[#1D1D1F] leading-[22px] tracking-tight line-clamp-1 transition-colors duration-300 group-hover:text-[#FF3B30]">
+        {/* Text Section */}
+        <Link
+            href={`/products/${product.id}`}
+            className="flex flex-col"
+            style={{ width: "285px", height: "105px", gap: "8px", paddingTop: "8px", paddingRight: "12px", paddingBottom: "12px", paddingLeft: "12px" }}
+        >
+            <h3
+                className="font-manrope text-[#1D1D1F] line-clamp-1 group-hover:text-[#FF3B30] transition-colors duration-300"
+                style={{ fontSize: "16px", fontWeight: 600, lineHeight: "23px", letterSpacing: "-0.4px" }}
+            >
                 {product.name}
             </h3>
-
-            <div className="flex items-center justify-between transition-all duration-300 group-hover:opacity-0 group-hover:-translate-y-1">
+            <div className="flex items-center justify-between transition-all duration-500 group-hover:opacity-0 group-hover:-translate-y-1">
                 <div className="flex items-center gap-0.5">
-                    <div className="flex gap-0.5 text-[#FF9F0A]">
-                        {[1, 2, 3, 4, 5].map((_, i) => (
-                            <FaStar key={i} size={12} className={i < Math.round(product.rating || 0) ? "" : "opacity-40"} />
+                    <div className="flex text-[#FF9F0A]">
+                        {[1, 2, 3, 4, 5].map((s) => (
+                            <FaStar key={s} size={12} className={s <= Math.round(product.rating || 4) ? "" : "opacity-20"} />
                         ))}
                     </div>
-                    <span className="text-[11px] font-semibold text-[#86868B] ml-1">
+                    <span className="text-[12px] font-semibold text-[#86868B] ml-1">
                         {product.rating || "4.5"}({product.reviews || 0})
                     </span>
                 </div>
                 <div className="flex items-center gap-1 text-[#86868B]">
                     <FaTruck size={12} />
-                    <span className="text-[10px]">2-4 days</span>
+                    <span className="text-[11px] font-medium">2-4 days</span>
                     <FaInfoCircle size={9} className="opacity-40" />
                 </div>
             </div>
-
-            <div className="relative h-[32px]">
-                {/* Price Display */}
-                <div className="flex items-baseline gap-1.5 flex-wrap transition-all duration-300 group-hover:opacity-0 group-hover:-translate-y-2">
-                    <span className="text-[11px] text-[#86868B] font-medium">from</span>
-                    <span className="text-[14px] text-[#86868B] line-through font-medium opacity-50">₹{product.originalPrice}</span>
-                    <span className="text-[20px] font-bold text-[#FF3B30] leading-none">₹{product.rentPrice}</span>
-                    <span className="text-[11px] text-[#86868B] font-medium">/month</span>
+            <div className="relative">
+                <div className="flex items-baseline gap-1.5 transition-all duration-500 group-hover:opacity-0 group-hover:-translate-y-2">
+                    <span className="text-[12px] text-[#86868B] font-medium">from</span>
+                    <span className="text-[14px] text-[#86868B] line-through font-medium opacity-60">₹{product.originalPrice}</span>
+                    <span className="text-[20px] font-extrabold text-[#FF3B30] leading-none">₹{product.rentPrice}</span>
+                    <span className="text-[12px] text-[#86868B] font-medium">/month</span>
                 </div>
-
-                {/* Hover Action Buttons */}
-                <div className="absolute inset-x-0 bottom-0 flex gap-2 opacity-0 translate-y-4 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-500 ease-out z-20">
-                    <Button 
+                <div className="absolute inset-x-0 bottom-0 flex gap-2 opacity-0 translate-y-3 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-500 ease-out z-30">
+                    <Button
                         variant="black"
                         size="md"
-                        className="flex-1 !h-[32px] !rounded-xl !text-[11px] !min-w-0"
+                        className="flex-1 h-[34px]! rounded-[10px]! text-[12px]! min-w-0! font-bold active:scale-95"
                         onClick={(e) => onQuickView(e, product.id)}
                     >
                         Quick View
                     </Button>
-                    <Button 
+                    <Button
                         variant={isAdded ? 'ghost' : 'yellow'}
                         size="md"
-                        className={`flex-1 !h-[32px] !rounded-xl !text-[11px] !min-w-0 ${isAdded ? 'bg-green-500 !text-white' : ''}`}
+                        className={`flex-1 h-[34px]! rounded-[10px]! text-[12px]! min-w-0! font-bold active:scale-95 ${isAdded ? 'bg-green-500 text-white! border-none' : ''}`}
                         onClick={(e) => onAddToCart(e, product)}
                     >
                         {isAdded ? 'Added!' : 'Add to Cart'}
                     </Button>
                 </div>
             </div>
-        </div>
+        </Link>
     </motion.div>
 );
 

@@ -141,17 +141,21 @@ export default function DynamicCategoryPage({
                 {/* Subcategory grid */}
                 {!loading && filtered.length > 0 && (
                     <>
-                        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-6">
+                        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
                             {filtered.map((sub) => (
-                                <Link key={sub.href} href={sub.href} className="group block">
-                                    <div className="bg-gray-50 border border-gray-100 rounded-2xl overflow-hidden aspect-4/3 relative group-hover:shadow-md transition-shadow duration-200">
-                                        <div className="relative w-full h-full transform group-hover:scale-105 transition-transform duration-300">
+                                <Link key={sub.href} href={sub.href} className="group block" style={{ width: "220.8px" }}>
+                                    {/* Image Container */}
+                                    <div
+                                        className="rounded-lg border border-gray-200 bg-[#F5F5F7] overflow-hidden flex items-center justify-center group-hover:shadow-md group-hover:border-gray-300 transition-all duration-300"
+                                        style={{ width: "220.8px", height: "173px" }}
+                                    >
+                                        <div className="w-full h-full relative transform group-hover:scale-105 transition-transform duration-400">
                                             {sub.image ? (
                                                 <Image
                                                     src={sub.image}
                                                     alt={sub.name}
                                                     fill
-                                                    className="object-contain p-3 mix-blend-multiply"
+                                                    className="object-contain p-4 mix-blend-multiply"
                                                     sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
                                                 />
                                             ) : (
@@ -161,7 +165,11 @@ export default function DynamicCategoryPage({
                                             )}
                                         </div>
                                     </div>
-                                    <p className="mt-2 text-xs md:text-sm font-medium text-gray-800 text-center leading-snug">
+                                    {/* Label */}
+                                    <p
+                                        className="text-[14px] font-semibold text-[#1D1D1F] text-center leading-snug group-hover:text-[#FF3B30] transition-colors duration-300"
+                                        style={{ marginTop: "7px" }}
+                                    >
                                         {sub.name}
                                     </p>
                                 </Link>
