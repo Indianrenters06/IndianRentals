@@ -17,12 +17,14 @@ const rentalProcessStepSchema = new mongoose.Schema({
 }, { _id: false });
 
 const heroSlideSchema = new mongoose.Schema({
-    title: { type: String, default: '' },
-    subtitle: { type: String, default: '' },
-    image: { type: String, default: '' },
-    bgColor: { type: String, default: '#0075ff' },
-    ctaText: { type: String, default: 'Rent Now' },
-    ctaLink: { type: String, default: '/products' },
+    title:      { type: String, default: '' },
+    subtitle:   { type: String, default: '' },
+    image:      { type: String, default: '' },
+    bgColor:    { type: String, default: '#0075ff' },
+    bgGradient: { type: String, default: '' },
+    textColor:  { type: String, default: '#FFFFFF' },
+    ctaText:    { type: String, default: 'Rent Now' },
+    ctaLink:    { type: String, default: '/products' },
 }, { _id: false });
 
 const cmsSchema = new mongoose.Schema({

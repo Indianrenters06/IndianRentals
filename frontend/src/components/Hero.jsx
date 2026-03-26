@@ -1,7 +1,7 @@
 "use client";
 import Image from "next/image";
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Button from "./common/Button";
 import { API } from "@/services/apiConfig";
 
@@ -15,9 +15,10 @@ import { API } from "@/services/apiConfig";
 const FALLBACK_SLIDES = [
     {
         title: "The Tech That Powers Your Ambition. On Demand.",
-        subtitle: "Get the latest MacBooks, Workstations, Cameras, and more.",
+        subtitle: "Get the latest MacBooks, Workstations, Cameras, and more. Delivered to your door with flexible monthly plans. Upgrade your toolkit, not your expenses.",
         image: "https://res.cloudinary.com/dgkckcdk8/image/upload/v1769946716/indian-rentals/fj8ptqbhppbstdd0hs4i.png",
-        bgColor: "#00BAFF",
+        bgColor: "#01A6EE",
+        bgGradient: "linear-gradient(100.45deg, #01A6EE 10.43%, #38BDF8 92.63%)",
         textColor: "#FFFFFF",
         ctaText: "Rent Now",
         ctaLink: "/store",
@@ -52,9 +53,18 @@ const FALLBACK_SLIDES = [
 ];
 
 const Hero = () => {
-    const [active,      setActive]      = useState(0);
-    const [slides,      setSlides]      = useState(FALLBACK_SLIDES);
+    const [active, setActive] = useState(0);
+    const [slides, setSlides] = useState(FALLBACK_SLIDES);
     const [heroVisible, setHeroVisible] = useState(true);
+    
+    // Auto-advance desktop version
+    useEffect(() => {
+        if (!heroVisible || window.innerWidth < 768) return;
+        const timer = setInterval(() => {
+            setActive(prev => (prev + 1) % slides.length);
+        }, 5000);
+        return () => clearInterval(timer);
+    }, [heroVisible, slides.length]);
 
     useEffect(() => {
         (async () => {
@@ -63,13 +73,15 @@ const Hero = () => {
                 if (!r.ok) return;
                 const cms = await r.json();
                 if (cms.heroEnabled === false) { setHeroVisible(false); return; }
-                if (cms.heroSlides?.length)     setSlides(cms.heroSlides);
+                // Only use CMS slides if at least 2 are defined (otherwise keep the 4 fallback slides)
+                if (cms.heroSlides?.length >= 2)     setSlides(cms.heroSlides);
             } catch (e) { /* keep fallback */ }
         })();
     }, []);
 
     const prev = () => setActive(i => (i - 1 + slides.length) % slides.length);
     const next = () => setActive(i => (i + 1) % slides.length);
+    const desktopRef = useRef(null);
 
     if (!heroVisible) return null;
 
@@ -77,129 +89,219 @@ const Hero = () => {
         <section className="bg-white py-4 md:py-8">
 
             {/* ── Mobile ────────────────────────────────────────────── */}
-            <div className="md:hidden px-4">
-                <div className="relative overflow-hidden rounded-2xl h-[420px]">
-                    <div
-                        className="flex h-full transition-transform duration-500 ease-in-out"
-                        style={{ transform: `translateX(-${active * 100}%)` }}
+            <div 
+                className="md:hidden flex overflow-x-auto snap-x snap-mandatory"
+                style={{
+                    width: "100%",
+                    height: "369px",
+                    paddingTop: "12px",
+                    paddingBottom: "12px",
+                    paddingLeft: "16px",
+                    paddingRight: "16px",
+                    gap: "10px",
+                    backgroundColor: "hsla(0, 0%, 100%, 1)",
+                    scrollbarWidth: "none",
+                    msOverflowStyle: "none"
+                }}
+            >
+                <style dangerouslySetInnerHTML={{__html: `
+                    .md\\:hidden::-webkit-scrollbar { display: none; }
+                `}} />
+                
+                {slides.map((s, i) => (
+                    <div 
+                        key={i} 
+                        className="snap-center shrink-0 rounded-lg relative h-full flex flex-col p-[14px] overflow-hidden z-0"
+                        style={{ 
+                            width: "216px",
+                            background: s.bgGradient || s.bgColor 
+                        }}
                     >
-                        {slides.map((s, i) => (
-                            <div key={i} className="min-w-full h-full">
-                                <div className="p-8 h-full flex flex-col justify-between"
-                                     style={{ backgroundColor: s.bgColor }}>
-                                    <div className="space-y-4" style={{ color: s.textColor || "#fff" }}>
-                                        <h1 className="text-3xl font-bold leading-tight">{s.title}</h1>
-                                        <p className="text-sm opacity-90">{s.subtitle}</p>
-                                        <Button href={s.ctaLink || "/store"} variant="yellow" size="sm"
-                                                className="!w-auto !rounded-full !font-bold">
-                                            {s.ctaText || "Rent Now"}
+                        {/* Image at TOP - Absolutely positioned to allow exact overlap behind text without pushing it down */}
+                        <div 
+                            className="absolute z-0 pointer-events-none"
+                            style={{ 
+                                width: "221px", 
+                                height: "221px", 
+                                left: "-6px",
+                                top: "0px"
+                            }}
+                        >
+                            <Image 
+                                src={s.image || FALLBACK_SLIDES[0].image} 
+                                alt={s.title} 
+                                fill
+                                unoptimized
+                                className="object-contain object-center drop-shadow-[0_25px_25px_rgba(0,0,0,0.25)]" 
+                            />
+                        </div>
+
+                        {/* Text at BOTTOM */}
+                        <div 
+                            className="absolute flex flex-col z-10" 
+                            style={{ 
+                                width: "193px", 
+                                height: "103px",
+                                top: "225px",
+                                left: "13px",
+                                gap: "4px",
+                                color: s.textColor || "#fff" 
+                            }}
+                        >
+                            <h1 
+                                className="font-manrope font-semibold"
+                                style={{
+                                    maxWidth: "175px",
+                                    fontSize: "13px",
+                                    lineHeight: "18px",
+                                    letterSpacing: "-0.02em",
+                                    color: "hsla(0, 0%, 100%, 1)"
+                                }}
+                            >
+                                {s.title}
+                            </h1>
+                            <p 
+                                className="font-manrope font-normal tracking-tight"
+                                style={{
+                                    width: "193px",
+                                    height: "42px",
+                                    fontSize: "10px",
+                                    lineHeight: "14.5px",
+                                    color: "hsla(0, 0%, 100%, 0.9)"
+                                }}
+                            >
+                                {s.subtitle}
+                            </p>
+                            
+                            <div className="mt-auto">
+                                <Button 
+                                    href={s.ctaLink || "/store"} 
+                                    className="flex items-center justify-center active:scale-95 transition-transform"
+                                    style={{ 
+                                        width: "60.42px",
+                                        height: "16.95px",
+                                        paddingTop: "3.63px",
+                                        paddingBottom: "3.63px",
+                                        paddingLeft: "7.26px",
+                                        paddingRight: "7.26px",
+                                        gap: "1.21px",
+                                        borderRadius: "17.41px",
+                                        borderBottom: "0.61px solid rgba(0,0,0,0.1)",
+                                        background: "hsla(44, 100%, 64%, 1)",
+                                        minWidth: "0",
+                                        minHeight: "0"
+                                    }}
+                                >
+                                    <span className="text-black font-bold whitespace-nowrap" style={{ fontSize: "7.5px", lineHeight: "1" }}>
+                                        {s.ctaText || "Rent Now"}
+                                    </span>
+                                    <svg width="6" height="6" viewBox="0 0 24 24" fill="none" stroke="black" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
+                                        <line x1="5" y1="12" x2="19" y2="12"></line>
+                                        <polyline points="12 5 19 12 12 19"></polyline>
+                                    </svg>
+                                </Button>
+                            </div>
+                        </div>
+                    </div>
+                ))}
+            </div>
+
+            {/* ── Desktop Carousel (Aligned with Nav, No Peeking) ──────── */}
+            <div className="hidden md:block w-full max-w-[1200px] mx-auto px-4 sm:px-6 relative group" style={{ paddingTop: "10px", paddingBottom: "20px" }}>
+                
+                <div className="relative w-full h-[500px] rounded-3xl overflow-hidden shadow-sm">
+                    {/* Track */}
+                    <div 
+                        className="flex h-full transition-transform duration-500 ease-in-out"
+                        style={{
+                            transform: `translateX(-${active * 100}%)`
+                        }}
+                    >
+                        {slides.map((slide, index) => (
+                            <div
+                                key={index}
+                                className="shrink-0 w-full h-full relative"
+                                style={{
+                                    background: slide.bgGradient || slide.bgColor
+                                }}
+                            >
+                                {/* Two-column layout */}
+                                <div className="w-full h-full px-14 grid grid-cols-2 gap-8 items-center">
+
+                                    {/* Left: Text */}
+                                    <div className="space-y-6 z-10" style={{ color: slide.textColor || "#fff" }}>
+                                        <h1 className="text-[42px] leading-[1.15] font-bold tracking-tight">
+                                            {slide.title}
+                                        </h1>
+                                        <p className="text-base opacity-90 leading-relaxed max-w-sm">
+                                            {slide.subtitle}
+                                        </p>
+                                        <Button
+                                            href={slide.ctaLink || "/store"}
+                                            variant="yellow"
+                                            size="md"
+                                            className="w-auto! rounded-full! px-8 font-bold inline-flex"
+                                        >
+                                            {slide.ctaText || "Rent Now"}
                                         </Button>
                                     </div>
-                                    <div className="relative h-[200px] w-full">
-                                        <Image src={s.image || FALLBACK_SLIDES[0].image} alt="" fill
-                                               className="object-contain object-bottom" />
+
+                                    {/* Right: Image */}
+                                    <div className="relative h-[400px] w-full">
+                                        <Image
+                                            src={slide.image || FALLBACK_SLIDES[0].image}
+                                            alt={slide.title}
+                                            fill
+                                            unoptimized
+                                            className="object-contain drop-shadow-[0_20px_20px_rgba(0,0,0,0.2)]"
+                                            priority={index === 0}
+                                        />
                                     </div>
                                 </div>
                             </div>
                         ))}
                     </div>
-                    <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
+
+                    {/* Prev arrow */}
+                    <button
+                        onClick={prev}
+                        aria-label="Previous slide"
+                        className="absolute left-6 top-1/2 -translate-y-1/2 z-30
+                                   w-12 h-12 bg-white/90 backdrop-blur-sm shadow-xl rounded-full
+                                   flex items-center justify-center hover:bg-white hover:scale-105 transition-all
+                                   opacity-0 group-hover:opacity-100"
+                    >
+                        <FaChevronLeft className="text-gray-800" size={18} />
+                    </button>
+
+                    {/* Next arrow */}
+                    <button
+                        onClick={next}
+                        aria-label="Next slide"
+                        className="absolute right-6 top-1/2 -translate-y-1/2 z-30
+                                   w-12 h-12 bg-white/90 backdrop-blur-sm shadow-xl rounded-full
+                                   flex items-center justify-center hover:bg-white hover:scale-105 transition-all
+                                   opacity-0 group-hover:opacity-100"
+                    >
+                        <FaChevronRight className="text-gray-800" size={18} />
+                    </button>
+
+                    {/* Dots */}
+                    <div className="absolute bottom-6 left-0 right-0 flex justify-center items-center gap-3">
                         {slides.map((_, i) => (
-                            <button key={i} onClick={() => setActive(i)}
-                                    className={`rounded-full h-2 transition-all ${i === active ? "w-8 bg-white" : "w-2 bg-white/50"}`} />
+                            <button
+                                key={i}
+                                aria-label={`Go to slide ${i + 1}`}
+                                onClick={() => setActive(i)}
+                                className={`rounded-full transition-all duration-300 ${
+                                    i === active ? "w-9 h-[6px] bg-white opacity-100" : "w-[6px] h-[6px] bg-white opacity-50 hover:opacity-80"
+                                }`}
+                            />
                         ))}
                     </div>
                 </div>
             </div>
-
-            {/* ── Desktop: single centered 1200 × 500 slide ─────────────
-                  Same max-w-[1200px] mx-auto as the navbar —
-                  makes the slide edges align perfectly with nav content.
-            ──────────────────────────────────────────────────────────── */}
-            <div className="hidden md:block">
-                {/* The slide wrapper matches navbar container */}
-                <div className="max-w-[1200px] mx-auto px-4 sm:px-6">
-                    <div className="relative overflow-hidden rounded-3xl" style={{ height: 500 }}>
-
-                        {/* Slide track — slides wider-than-container, shifted by active index */}
-                        <div
-                            className="flex h-full transition-transform duration-500 ease-in-out"
-                            style={{ transform: `translateX(-${active * 100}%)` }}
-                        >
-                            {slides.map((slide, index) => (
-                                <div
-                                    key={index}
-                                    className="min-w-full h-full relative"
-                                    style={{ backgroundColor: slide.bgColor }}
-                                >
-                                    {/* Two-column layout */}
-                                    <div className="w-full h-full px-14 grid grid-cols-2 gap-8 items-center">
-
-                                        {/* Left: Text */}
-                                        <div className="space-y-6 z-10" style={{ color: slide.textColor || "#fff" }}>
-                                            <h1 className="text-[42px] leading-[1.15] font-bold tracking-tight">
-                                                {slide.title}
-                                            </h1>
-                                            <p className="text-base opacity-90 leading-relaxed max-w-sm">
-                                                {slide.subtitle}
-                                            </p>
-                                            <Button
-                                                href={slide.ctaLink || "/store"}
-                                                variant="yellow"
-                                                size="md"
-                                                className="!w-auto !rounded-full px-8 font-bold"
-                                            >
-                                                {slide.ctaText || "Rent Now"}
-                                            </Button>
-                                        </div>
-
-                                        {/* Right: Image */}
-                                        <div className="relative h-[400px] w-full">
-                                            <Image
-                                                src={slide.image || FALLBACK_SLIDES[0].image}
-                                                alt={slide.title}
-                                                fill
-                                                className="object-contain drop-shadow-[0_20px_20px_rgba(0,0,0,0.2)]"
-                                                priority={index === active}
-                                            />
-                                        </div>
-                                    </div>
-
-                                    {/* Dot indicators bottom-left */}
-                                    <div className="absolute bottom-7 left-14 flex items-center gap-3">
-                                        {slides.map((_, i) => (
-                                            <button key={i} onClick={() => setActive(i)}
-                                                    className={`rounded-full h-[6px] transition-all duration-300 ${
-                                                        i === active ? "w-9 bg-white" : "w-[6px] bg-white/40"
-                                                    }`} />
-                                        ))}
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-
-                        {/* Left arrow */}
-                        <button onClick={prev} aria-label="Previous slide"
-                                className="absolute left-4 top-1/2 -translate-y-1/2 z-10
-                                           w-9 h-12 bg-white/90 backdrop-blur-sm rounded-xl shadow-md
-                                           flex items-center justify-center
-                                           hover:bg-white transition-colors group">
-                            <FaChevronLeft className="text-gray-700 group-hover:text-gray-900" size={16} />
-                        </button>
-
-                        {/* Right arrow */}
-                        <button onClick={next} aria-label="Next slide"
-                                className="absolute right-4 top-1/2 -translate-y-1/2 z-10
-                                           w-9 h-12 bg-white/90 backdrop-blur-sm rounded-xl shadow-md
-                                           flex items-center justify-center
-                                           hover:bg-white transition-colors group">
-                            <FaChevronRight className="text-gray-700 group-hover:text-gray-900" size={16} />
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-        </section>
+               </section>
     );
 };
 

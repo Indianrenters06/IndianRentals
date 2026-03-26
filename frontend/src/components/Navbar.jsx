@@ -148,7 +148,7 @@ const Navbar = () => {
     };
 
     return (
-        <header className="relative bg-white shadow-xs z-50">
+        <header className="relative z-50 w-full" style={{ backgroundColor: "hsla(0, 0%, 100%, 1)", borderBottom: "1px solid hsla(0, 0%, 93%, 1)" }}>
             <div
                 className="bg-orange-300 text-black flex items-center justify-center w-full overflow-hidden"
                 style={{ height: "24px", paddingTop: "4px", paddingBottom: "4px", paddingLeft: "30px", paddingRight: "30px" }}
@@ -168,10 +168,10 @@ const Navbar = () => {
             </div>
 
             {/* Top Bar */}
-            <div className="w-full bg-white border-b border-gray-100">
+            <div className="w-full bg-white">
                 <div 
                     className="max-w-[1200px] mx-auto px-4 sm:px-6 flex items-center justify-between" 
-                    style={{ height: "64px", gap: "10px" }}
+                    style={{ height: "62px", gap: "10px" }}
                 >
                     <div className="flex items-center gap-8">
                         {/* Left Section: Mobile Menu + Logo */}
@@ -396,10 +396,18 @@ const Navbar = () => {
                         {/* Mobile Location Pill */}
                         <button
                             onClick={() => setIsCityDropdownOpen(!isCityDropdownOpen)}
-                            className="flex items-center gap-1.5 px-3 py-1.5 bg-gray-50/80 border border-gray-200 rounded-full text-xs font-bold text-gray-700 hover:bg-gray-100 max-w-[140px]"
+                            className="flex items-center gap-1.5 focus:outline-none"
+                            style={{
+                                height: "35px",
+                                border: "0.7px solid #D1D1D1",
+                                borderRadius: "9999px",
+                                paddingLeft: "10px",
+                                paddingRight: "10px",
+                                backgroundColor: "#FFFFFF"
+                            }}
                         >
-                            <FaMapMarkerAlt size={12} className="text-gray-500 shrink-0" />
-                            <span className="truncate">{selectedCity || "Location"}</span>
+                            <FaMapMarkerAlt size={14} className="text-gray-500 shrink-0" />
+                            <span className="text-sm font-medium truncate max-w-[80px] text-gray-700">{selectedCity || "Delhi"}</span>
                         </button>
 
                         {/* Mobile Cart */}
