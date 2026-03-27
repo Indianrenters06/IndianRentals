@@ -12,8 +12,16 @@ import { useDispatch } from "react-redux";
 import { addToCart } from "@/redux/features/cartSlice";
 
 const BestRentedProducts = ({ type = "bestRented", defaultTitle = "Curated Products" }) => {
+    const [isDesktop, setIsDesktop] = useState(false);
     const router = useRouter();
     const dispatch = useDispatch();
+
+    useEffect(() => {
+        const checkRes = () => setIsDesktop(window.innerWidth >= 1024);
+        checkRes();
+        window.addEventListener('resize', checkRes);
+        return () => window.removeEventListener('resize', checkRes);
+    }, []);
     const [products, setProducts] = useState([]);
     const [addedStatus, setAddedStatus] = useState({});
     const [cmsConfig, setCmsConfig] = useState({
@@ -131,10 +139,7 @@ const BestRentedProducts = ({ type = "bestRented", defaultTitle = "Curated Produ
                     : '#FFFFFF'
             }}
         >
-            <div 
-                className="mx-auto px-5 md:px-6"
-                style={{ maxWidth: '1200px' }}
-            >
+            <div className="max-w-[1200px] mx-auto px-4 sm:px-6">
 
                 {/* Header */}
                 <div 
@@ -144,19 +149,14 @@ const BestRentedProducts = ({ type = "bestRented", defaultTitle = "Curated Produ
                         minHeight: '31px' 
                     }}
                 >
-                    {type === "newLaunches" && (
-                        <div className="flex justify-center mb-2 font-manrope text-[11px] md:text-[14px] font-bold tracking-tight">
-                            <span className="text-[#007AFF]">Built for&nbsp;</span>
-                            <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#FF3B30] to-[#FF9F0A]">Apple Intelligence.</span>
-                        </div>
-                    )}
+
                     <div className="flex items-center justify-between">
                     <h2 
                         className="font-manrope tracking-tight whitespace-nowrap"
                         style={{ 
-                            width: 'var(--title-width, 248px)', // Controlled via class below
+                            width: 'var(--title-width, 289px)', 
                             height: '31px',
-                            fontSize: '24px', 
+                            fontSize: 'var(--title-size, 24px)', 
                             lineHeight: '31px',
                             fontWeight: 600,
                             color: 'hsla(0, 0%, 20%, 1)',
@@ -165,9 +165,9 @@ const BestRentedProducts = ({ type = "bestRented", defaultTitle = "Curated Produ
                     >
                         {cmsConfig.title}
                         <style jsx>{`
-                            h2 { width: 248px; }
+                            h2 { --title-width: 289px; --title-size: 24px; }
                             @media (min-width: 768px) {
-                                h2 { width: auto; font-size: 36px; line-height: 48px; }
+                                h2 { --title-width: auto; --title-size: 36px; line-height: 48px; }
                             }
                         `}</style>
                     </h2>
@@ -212,15 +212,17 @@ const BestRentedProducts = ({ type = "bestRented", defaultTitle = "Curated Produ
                                     whileInView={{ opacity: 1, y: 0 }}
                                     viewport={{ once: true }}
                                     transition={{ duration: 0.5, delay: index * 0.1 }}
-                                    className="bg-white rounded-lg md:rounded-2xl flex flex-col overflow-hidden relative transition-all duration-500 hover:shadow-[0_8px_30px_rgba(0,0,0,0.10)] hover:-translate-y-1 mx-auto w-[170px] h-[300px] md:w-[285px] md:h-[420px]"
+                                    whileHover={{ height: isDesktop ? 410 : 320 }}
+                                    className="bg-white rounded-[24px] flex flex-col overflow-hidden relative transition-all duration-500 hover:shadow-[0_12px_40px_rgba(0,0,0,0.12)] mx-auto w-[170px] md:w-[285px]"
                                     style={{ 
+                                        height: isDesktop ? '350px' : '250px',
                                         border: "1px solid hsla(0, 0%, 89%, 1)",
                                         boxShadow: "0px 1px 2px 0px hsla(0, 0%, 0%, 0.05)"
                                     }}
                                 >
                                     {/* Image Section — full-bleed top */}
                                     <div
-                                        className="relative group-hover:bg-[#F0F0F0] transition-colors duration-500 flex items-center justify-center overflow-hidden flex-shrink-0 h-[184px] md:h-[240px] rounded-lg md:rounded-t-2xl"
+                                        className="relative group-hover:bg-[#F0F0F0] transition-colors duration-500 flex items-center justify-center overflow-hidden flex-shrink-0 h-[140px] md:h-[240px] rounded-lg md:rounded-t-2xl"
                                         style={{ 
                                             background: 'hsla(0, 0%, 96%, 1)',
                                             borderWidth: '0px 1px 1px 1px',
@@ -253,56 +255,70 @@ const BestRentedProducts = ({ type = "bestRented", defaultTitle = "Curated Produ
                                     </div>
                                     {/* Text Section */}
                                     <div
-                                        className="flex flex-col flex-1 p-3 md:p-4 relative overflow-hidden font-manrope"
+                                        className="flex flex-col md:flex-1 relative overflow-hidden font-manrope"
+                                        style={{ 
+                                            width: isDesktop ? '285px' : '170px',
+                                            height: 'auto',
+                                            padding: isDesktop ? '8px 12px 12px 12px' : '2px 8px 6px 8px',
+                                            gap: isDesktop ? '4px' : '1px'
+                                        }}
                                     >
                                         <Link href={`/products/${product.id}`}>
                                             <h3
-                                                className="text-[#1D1D1F] line-clamp-2 md:line-clamp-1 transition-colors duration-300 text-[15px] md:text-[18px] font-bold leading-tight mb-1"
+                                                className="text-[#1D1D1F] line-clamp-1 transition-colors duration-300 text-[13px] md:text-[18px] font-bold leading-tight"
                                             >
                                                 {product.name}
                                             </h3>
                                         </Link>
                                         
-                                        <div className="flex items-center justify-between mb-3">
+                                        <div className="flex items-center justify-between">
                                             <div className="flex items-center gap-1">
-                                                <FaStar className="text-[#FF9F0A]" size={14} />
-                                                <span className="text-[12px] md:text-[14px] font-bold text-[#8E8E93]">
-                                                    {product.rating || "4.5"}
-                                                    <span className="font-medium ml-0.5">({product.reviews || 0})</span>
+                                                <div className="flex text-[#FF9F0A]">
+                                                    {isDesktop ? (
+                                                        [1, 2, 3, 4, 5].map((s) => (
+                                                            <FaStar key={s} size={12} className={s <= Math.round(product.rating || 4) ? "" : "opacity-20"} />
+                                                        ))
+                                                    ) : (
+                                                        <FaStar size={12} />
+                                                    )}
+                                                </div>
+                                                <span className="text-[11px] md:text-[14px] font-bold text-[#8E8E93] ml-1">
+                                                    {product.rating || "4.5"}({product.reviews || 12})
                                                 </span>
                                             </div>
-                                            <div className="flex items-center gap-1.5 text-[#8E8E93]">
-                                                <FaTruck size={14} />
-                                                <span className="text-[11px] md:text-[13px] font-semibold">2-4 days</span>
-                                                <FaInfoCircle size={10} className="ml-0.5 opacity-40" />
-                                            </div>
+                                            {isDesktop && (
+                                                <div className="flex items-center gap-1.5 text-[#8E8E93]">
+                                                    <FaTruck size={14} />
+                                                    <span className="text-[11px] md:text-[13px] font-semibold">2-4 days</span>
+                                                    <FaInfoCircle size={10} className="ml-0.5 opacity-40" />
+                                                </div>
+                                            )}
                                         </div>
 
-                                        <div className="flex flex-col gap-1 mb-4">
-                                            <div className="flex items-baseline flex-wrap gap-1.5">
-                                                <span className="text-[11px] md:text-[13px] text-[#8E8E93] font-medium">from</span>
+                                        <div className="flex flex-col">
+                                            <div className="flex items-baseline flex-nowrap gap-1">
+                                                <span className="text-[10px] md:text-[13px] text-[#8E8E93] font-medium whitespace-nowrap leading-none">from</span>
                                                 {product.originalPrice && (
-                                                    <span className="text-[12px] md:text-[15px] text-[#8E8E93] line-through font-medium opacity-50">₹{product.originalPrice}</span>
+                                                    <span className="text-[13px] md:text-[15px] text-[#8E8E93] line-through font-bold whitespace-nowrap leading-none">₹{product.originalPrice}</span>
                                                 )}
-                                                <span className="text-[18px] md:text-[24px] font-extrabold text-[#FF3B30] leading-none">₹{product.rentPrice}</span>
-                                                <span className="text-[11px] md:text-[13px] text-[#8E8E93] font-medium">/month</span>
+                                                <span className="text-[17px] md:text-[24px] font-extrabold text-[#FF3B30] leading-none whitespace-nowrap">₹{product.rentPrice}</span>
+                                                <span className="text-[10px] md:text-[13px] text-[#8E8E93] font-medium whitespace-nowrap leading-none">/month</span>
                                             </div>
                                         </div>
 
-                                        {/* Dynamic Bottom Area (Tags or Button) */}
-                                        <div className="mt-auto relative w-full h-[40px] md:h-[50px] flex items-center">
-                                            {/* Tags Section - visible by default */}
-                                            <div className="flex flex-wrap gap-1.5 transition-all duration-300 group-hover:opacity-0 group-hover:invisible w-full">
-                                                {(product.tags || product.statusTags || []).slice(0, 2).map((tag, i) => (
-                                                    <span key={i} className="px-2 py-1 border border-[#E5E5EA] rounded-full text-[9px] md:text-[11px] text-[#86868B] font-semibold whitespace-nowrap bg-white">
+                                        {!isDesktop && (
+                                            <div className="grid grid-cols-2 gap-1.5 mt-1.5 pb-1">
+                                                {(product.tags?.length ? product.tags : ["Quality tested", "Deep Cleaned", "Like New", "In Stock"]).slice(0, 4).map((tag, i) => (
+                                                    <span key={i} className="px-1 py-0.5 border border-[#C7C7CC] rounded-full text-[10px] text-[#8E8E93] font-medium text-center bg-transparent">
                                                         {tag}
                                                     </span>
                                                 ))}
                                             </div>
+                                        )}
 
                                             {/* Hover Button Section */}
                                             <div 
-                                                className="absolute inset-0 opacity-0 translate-y-3 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300 z-30 pointer-events-none group-hover:pointer-events-auto flex items-center"
+                                                className="relative w-full opacity-0 h-0 group-hover:opacity-100 group-hover:h-[50px] transition-all duration-300 z-30 overflow-hidden flex items-center pt-2"
                                             >
                                                 <button 
                                                     onClick={(e) => handleAddToCart(e, product)}
@@ -312,12 +328,11 @@ const BestRentedProducts = ({ type = "bestRented", defaultTitle = "Curated Produ
                                                 </button>
                                             </div>
                                         </div>
-                                    </div>
-                                </motion.div>
-                            </div>
-                        )
-                    })}
-                </div>
+                                    </motion.div>
+                                </div>
+                            )
+                        })}
+                    </div>
 
                 {/* Mobile View All Button */}
                 <div className="mt-6 flex justify-center md:hidden">

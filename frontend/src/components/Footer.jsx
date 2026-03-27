@@ -164,14 +164,14 @@ const Footer = () => {
                         className="grid grid-cols-2 mb-8"
                         style={{ width: '350px', height: '112px', gap: '24px' }}
                     >
-                        <div className="flex flex-col justify-between text-[#000000] font-manrope font-medium text-[13px] tracking-tight py-0.5">
+                        <div className="flex flex-col justify-between text-black font-manrope font-medium text-[13px] tracking-tight py-0.5">
                             <Link href="/kyc-policy" className="hover:opacity-70 transition-opacity">KYC Policy</Link>
                             <Link href="/shipping-policy" className="hover:opacity-70 transition-opacity">Shipping Policy</Link>
                             <Link href="/return-policy" className="hover:opacity-70 transition-opacity">Return Policy</Link>
                             <Link href="/privacy" className="hover:opacity-70 transition-opacity">Privacy Policy</Link>
                             <Link href="/terms" className="hover:opacity-70 transition-opacity whitespace-nowrap">Rental Terms &amp; Conditions</Link>
                         </div>
-                        <div className="flex flex-col justify-between text-[#000000] font-manrope font-medium text-[13px] tracking-tight py-0.5">
+                        <div className="flex flex-col justify-between text-black font-manrope font-medium text-[13px] tracking-tight py-0.5">
                             <Link href="/faq" className="hover:opacity-70 transition-opacity whitespace-nowrap">FAQs</Link>
                             <Link href="/ticket" className="hover:opacity-70 transition-opacity whitespace-nowrap">Raise a Ticket</Link>
                             <Link href="/reviews" className="hover:opacity-70 transition-opacity whitespace-nowrap">Customer Reviews</Link>

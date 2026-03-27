@@ -56,7 +56,7 @@ const Hero = () => {
     const [active, setActive] = useState(0);
     const [slides, setSlides] = useState(FALLBACK_SLIDES);
     const [heroVisible, setHeroVisible] = useState(true);
-    
+
     // Auto-advance desktop version
     useEffect(() => {
         if (!heroVisible || window.innerWidth < 768) return;
@@ -69,12 +69,12 @@ const Hero = () => {
     useEffect(() => {
         (async () => {
             try {
-                const r   = await fetch(`${API}/api/cms/homepage`, { cache: "no-store" });
+                const r = await fetch(`${API}/api/cms/homepage`, { cache: "no-store" });
                 if (!r.ok) return;
                 const cms = await r.json();
                 if (cms.heroEnabled === false) { setHeroVisible(false); return; }
                 // Only use CMS slides if at least 2 are defined (otherwise keep the 4 fallback slides)
-                if (cms.heroSlides?.length >= 2)     setSlides(cms.heroSlides);
+                if (cms.heroSlides?.length >= 2) setSlides(cms.heroSlides);
             } catch (e) { /* keep fallback */ }
         })();
     }, []);
@@ -89,7 +89,7 @@ const Hero = () => {
         <section className="bg-white py-4 md:py-8">
 
             {/* ── Mobile ────────────────────────────────────────────── */}
-            <div 
+            <div
                 className="md:hidden flex overflow-x-auto snap-x snap-mandatory"
                 style={{
                     width: "100%",
@@ -104,80 +104,82 @@ const Hero = () => {
                     msOverflowStyle: "none"
                 }}
             >
-                <style dangerouslySetInnerHTML={{__html: `
+                <style dangerouslySetInnerHTML={{
+                    __html: `
                     .md\\:hidden::-webkit-scrollbar { display: none; }
                 `}} />
-                
+
                 {slides.map((s, i) => (
-                    <div 
-                        key={i} 
+                    <div
+                        key={i}
                         className="snap-center shrink-0 rounded-lg relative h-full flex flex-col p-[14px] overflow-hidden z-0"
-                        style={{ 
+                        style={{
                             width: "216px",
-                            background: s.bgGradient || s.bgColor 
+                            background: s.bgGradient || s.bgColor
                         }}
                     >
                         {/* Image at TOP - Absolutely positioned to allow exact overlap behind text without pushing it down */}
-                        <div 
+                        <div
                             className="absolute z-0 pointer-events-none"
-                            style={{ 
-                                width: "221px", 
-                                height: "221px", 
+                            style={{
+                                width: "221px",
+                                height: "221px",
                                 left: "-6px",
                                 top: "0px"
                             }}
                         >
-                            <Image 
-                                src={s.image || FALLBACK_SLIDES[0].image} 
-                                alt={s.title} 
+                            <Image
+                                src={s.image || FALLBACK_SLIDES[0].image}
+                                alt={s.title}
                                 fill
                                 unoptimized
-                                className="object-contain object-center drop-shadow-[0_25px_25px_rgba(0,0,0,0.25)]" 
+                                className="object-contain object-center drop-shadow-[0_25px_25px_rgba(0,0,0,0.25)]"
                             />
                         </div>
 
                         {/* Text at BOTTOM */}
-                        <div 
-                            className="absolute flex flex-col z-10" 
-                            style={{ 
-                                width: "193px", 
-                                height: "103px",
-                                top: "225px",
-                                left: "13px",
-                                gap: "4px",
-                                color: s.textColor || "#fff" 
+                        <div
+                            className="absolute flex flex-col z-10"
+                            style={{
+                                width: "200px",
+                                height: "auto",
+                                top: "215px",
+                                left: "14px",
+                                gap: "2px",
+                                color: s.textColor || "#fff"
                             }}
                         >
-                            <h1 
-                                className="font-manrope font-semibold"
+                            <h1
+                                className="font-manrope font-bold"
                                 style={{
-                                    maxWidth: "175px",
-                                    fontSize: "13px",
-                                    lineHeight: "18px",
-                                    letterSpacing: "-0.02em",
+                                    width: "200px",
+                                    fontSize: "14px",
+                                    lineHeight: "16px",
+                                    letterSpacing: "-0.01em",
                                     color: "hsla(0, 0%, 100%, 1)"
                                 }}
                             >
                                 {s.title}
                             </h1>
-                            <p 
-                                className="font-manrope font-normal tracking-tight"
+                            <p
+                                className="font-manrope font-normal"
                                 style={{
                                     width: "193px",
                                     height: "42px",
                                     fontSize: "10px",
-                                    lineHeight: "14.5px",
-                                    color: "hsla(0, 0%, 100%, 0.9)"
+                                    lineHeight: "14px",
+                                    letterSpacing: "-0.01em",
+                                    color: "hsla(0, 0%, 100%, 1)"
                                 }}
                             >
                                 {s.subtitle}
                             </p>
-                            
-                            <div className="mt-auto">
-                                <Button 
-                                    href={s.ctaLink || "/store"} 
+
+                            <div className="pt-2">
+                                <Button
+                                    href={s.ctaLink || "/store"}
                                     className="flex items-center justify-center active:scale-95 transition-transform"
-                                    style={{ 
+                                    style={{
                                         width: "60.42px",
                                         height: "16.95px",
                                         paddingTop: "3.63px",
@@ -208,10 +210,10 @@ const Hero = () => {
 
             {/* ── Desktop Carousel (Aligned with Nav, No Peeking) ──────── */}
             <div className="hidden md:block w-full max-w-[1200px] mx-auto px-4 sm:px-6 relative group" style={{ paddingTop: "10px", paddingBottom: "20px" }}>
-                
+
                 <div className="relative w-full h-[500px] rounded-3xl overflow-hidden shadow-sm">
                     {/* Track */}
-                    <div 
+                    <div
                         className="flex h-full transition-transform duration-500 ease-in-out"
                         style={{
                             transform: `translateX(-${active * 100}%)`
@@ -293,15 +295,14 @@ const Hero = () => {
                                 key={i}
                                 aria-label={`Go to slide ${i + 1}`}
                                 onClick={() => setActive(i)}
-                                className={`rounded-full transition-all duration-300 ${
-                                    i === active ? "w-9 h-[6px] bg-white opacity-100" : "w-[6px] h-[6px] bg-white opacity-50 hover:opacity-80"
-                                }`}
+                                className={`rounded-full transition-all duration-300 ${i === active ? "w-9 h-[6px] bg-white opacity-100" : "w-[6px] h-[6px] bg-white opacity-50 hover:opacity-80"
+                                    }`}
                             />
                         ))}
                     </div>
                 </div>
             </div>
-               </section>
+        </section>
     );
 };
 

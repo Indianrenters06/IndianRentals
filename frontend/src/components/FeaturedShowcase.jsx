@@ -341,7 +341,7 @@ const FeaturedShowcase = () => {
 
     if (loading) return (
         <section className="py-8 bg-white">
-            <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="h-[391px] w-full max-w-[1200px] mx-auto bg-slate-50 animate-pulse rounded-[20px]" />
             </div>
         </section>

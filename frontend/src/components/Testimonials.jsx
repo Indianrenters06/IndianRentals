@@ -1,105 +1,57 @@
+"use client";
 import React, { useEffect, useState } from 'react';
-import { FaStar } from 'react-icons/fa';
+import { PiStarFill, PiStarHalfFill } from 'react-icons/pi';
 import { getTestimonials } from '../services/testimonialService';
-
 import { API } from '../services/apiConfig';
+import Link from 'next/link';
 
 const GoogleLogo = () => (
-    <span className="flex items-center font-bold text-xl leading-none tracking-tight">
-        <span className="text-[#4285F4]">G</span>
-        <span className="text-[#EA4335]">o</span>
-        <span className="text-[#FBBC05]">o</span>
-        <span className="text-[#4285F4]">g</span>
-        <span className="text-[#34A853]">l</span>
-        <span className="text-[#EA4335]">e</span>
-    </span>
+    <div className="flex items-center gap-1.5 transform scale-90 origin-left">
+        <span className="font-bold text-[15px] tracking-tight">
+            <span className="text-[#4285F4]">G</span>
+            <span className="text-[#EA4335]">o</span>
+            <span className="text-[#FBBC05]">o</span>
+            <span className="text-[#4285F4]">g</span>
+            <span className="text-[#34A853]">l</span>
+            <span className="text-[#EA4335]">e</span>
+        </span>
+    </div>
 );
 
 const staticReviews = [
-    {
-        id: 1,
-        name: "John Doe",
-        role: "AI Engineer",
-        text: "Lorem ipsum dolor sit amet consectetur. Eget pretium risus odio eu commodo amet pretium. Interdum purus sapien facilisi at senectus tempus nisi nulla. Ultricies condimentum mi ultrices integer.",
-        bg: "bg-[#FFF8E1]",
-        stars: 5,
-    },
-    {
-        id: 2,
-        name: "Sarah Smith",
-        role: "Creative Director",
-        text: "Amazing service! The equipment was top-notch and the delivery was right on time. Highly recommended for any serious creative professional.",
-        bg: "bg-[#E3F2FD]",
-        stars: 5,
-    },
-    {
-        id: 3,
-        name: "Mike Johnson",
-        role: "Photographer",
-        text: "I was skeptical at first, but IndianRenters exceeded my expectations. The camera gear was in pristine condition.",
-        bg: "bg-[#E8F5E9]",
-        stars: 5,
-    },
-    {
-        id: 4,
-        name: "Emily Davis",
-        role: "Startup Founder",
-        text: "Renting laptops for my team was seamless. Saved us a ton of capital upfront. Great support team as well!",
-        bg: "bg-[#F3E5F5]",
-        stars: 5,
-    },
-    {
-        id: 5,
-        name: "David Wilson",
-        role: "Freelancer",
-        text: "The flexibility of renting for short projects is a game changer. I can take on more work without worrying about equipment costs.",
-        bg: "bg-[#FFF3E0]",
-        stars: 5,
-    },
-    {
-        id: 6,
-        name: "Lisa Anderson",
-        role: "Event Planner",
-        text: "Used their service for a corporate event. Projectors and screens were perfect. Setup assistance was very helpful.",
-        bg: "bg-[#FCE4EC]",
-        stars: 4,
-    },
+    { id: 1, name: "John Doe", role: "AI Engineer", text: "Lorem ipsum dolor sit amet consectetur. Eget pretium risus odio eu commodo amet pretium. Interdum purus sapien facilisi at senectus tempus nisi nulla. Ultricies condimentum mi ultrices integer.", bgColor: "hsla(208, 100%, 92%, 1)", textColor: "text-[#0A4BB3]", stars: 4.5 },
+    { id: 2, name: "John Doe", role: "AI Engineer", text: "Lorem ipsum dolor sit amet consectetur. Eget pretium risus odio eu commodo amet pretium. Interdum purus sapien facilisi at senectus tempus nisi nulla. Ultricies condimentum mi ultrices integer.", bgColor: "hsla(167, 85%, 89%, 1)", textColor: "text-[#216436]", stars: 4.5 },
+    { id: 3, name: "John Doe", role: "AI Engineer", text: "Lorem ipsum dolor sit amet consectetur. Eget pretium risus odio eu commodo amet pretium. Interdum purus sapien facilisi at senectus tempus nisi nulla. Ultricies condimentum mi ultrices integer.", bgColor: "hsla(250, 100%, 95%, 1)", textColor: "text-[#553C9A]", stars: 4.5 },
+    { id: 4, name: "John Doe", role: "AI Engineer", text: "Lorem ipsum dolor sit amet consectetur. Eget pretium risus odio eu commodo amet pretium. Interdum purus sapien facilisi at senectus tempus nisi nulla. Ultricies condimentum mi ultrices integer.", bgColor: "hsla(46, 100%, 89%, 1)", textColor: "text-[#995D00]", stars: 4.5 },
+    { id: 5, name: "John Doe", role: "AI Engineer", text: "Lorem ipsum dolor sit amet consectetur. Eget pretium risus odio eu commodo amet pretium. Interdum purus sapien facilisi at senectus tempus nisi nulla. Ultricies condimentum mi ultrices integer.", bgColor: "hsla(322, 93%, 95%, 1)", textColor: "text-[#B83280]", stars: 4.5 },
+    { id: 6, name: "John Doe", role: "AI Engineer", text: "Lorem ipsum dolor sit amet consectetur. Eget pretium risus odio eu commodo amet pretium. Interdum purus sapien facilisi at senectus tempus nisi nulla. Ultricies condimentum mi ultrices integer.", bgColor: "hsla(46, 100%, 89%, 1)", textColor: "text-[#995D00]", stars: 4.5 },
 ];
 
 const Testimonials = () => {
+    const [isDesktop, setIsDesktop] = useState(false);
     const [reviewsData, setReviewsData] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [cms, setCms] = useState({
-        enabled: true,
-        title: "What Our Customers Say",
-        subtitle: "Real experiences from innovators, businesses, and creators powering their ambitions with IndianRenters.",
-        reviewCount: "5000+",
-        rating: 4.9
-    });
+
+    useEffect(() => {
+        const checkRes = () => setIsDesktop(window.innerWidth >= 1024);
+        checkRes();
+        window.addEventListener('resize', checkRes);
+        return () => window.removeEventListener('resize', checkRes);
+    }, []);
 
     useEffect(() => {
         const fetchAll = async () => {
             try {
-                // Fetch CMS
-                fetch(`${API}/api/cms/homepage`).then(r => r.ok ? r.json() : null).then(data => {
-                    if (data) {
-                        setCms({
-                            enabled: data.testimonialsEnabled !== false,
-                            title: data.testimonialSectionTitle || "What Our Customers Say",
-                            subtitle: data.testimonialSectionSubtitle || "Real experiences from innovators, businesses, and creators powering their ambitions with IndianRenters.",
-                            reviewCount: data.testimonialGoogleReviewCount || "5000+",
-                            rating: data.testimonialGoogleRating || 4.9
-                        });
-                    }
-                }).catch(console.error);
-
-                // Fetch real testimonials
                 const tData = await getTestimonials();
-                if (tData && tData.length > 0) {
-                    setReviewsData(tData);
-                } else {
-                    setReviewsData(staticReviews);
-                }
+                const processed = (tData && tData.length > 0 ? tData : staticReviews).map((rev, idx) => {
+                    const template = staticReviews[idx % staticReviews.length];
+                    return {
+                        ...rev,
+                        bgColor: rev.bgColor || template.bgColor,
+                        textColor: rev.textColor || template.textColor
+                    };
+                });
+                setReviewsData(processed);
             } catch (error) {
                 console.error("Failed to fetch testimonials", error);
                 setReviewsData(staticReviews);
@@ -110,127 +62,284 @@ const Testimonials = () => {
         fetchAll();
     }, []);
 
-    if (!cms.enabled) return null;
-
-    const ReviewCard = ({ review }) => (
+    const TestimonialCard = ({ review }) => (
         <div
-            className={`${review.bg || "bg-slate-50"} w-full rounded-[2rem] p-6 lg:p-7 flex flex-col h-[230px] transition-all hover:-translate-y-1 hover:shadow-lg duration-300 select-none`}
+            className="rounded-[2rem] p-7 md:p-8 flex flex-col h-[220px] transition-all hover:scale-[1.01] duration-300 min-w-[380px] md:min-w-[420px] lg:min-w-[385px] shadow-sm font-manrope"
+            style={{ backgroundColor: review.bgColor || '#FFFFFF' }}
         >
-            <div className="mb-4">
-                <h3 className="text-lg font-bold text-gray-900 leading-none mb-1">{review.name}</h3>
-                <p className="text-sm font-medium text-gray-500">{review.role}</p>
+            <div className="flex flex-col mb-4">
+                <span className={`text-[18px] font-bold ${review.textColor || "text-[#1D1D1F]"} leading-tight`}>{review.name}</span>
+                <span className={`text-[13px] ${review.textColor || "text-[#86868B]"} opacity-80`}>{review.role || "Verified User"}</span>
             </div>
 
-            <p className="text-[#333] text-[15px] leading-[1.6] mb-4 grow font-medium line-clamp-4">
+            <p className={`text-[14px] ${review.textColor || "text-[#1D1D1F]"} leading-[1.4] mb-auto grow overflow-hidden line-clamp-4`}>
                 {review.message || review.text}
             </p>
 
-            <div className="flex items-end justify-between mt-auto">
-                <div className="translate-y-1">
-                    <GoogleLogo />
-                </div>
-                <div className="flex text-[#F4B400] gap-0.5 text-lg">
-                    {[...Array(5)].map((_, j) => (
-                        <FaStar key={`star-${review._id || review.id || 'r'}-${j}`} className={j < (review.rating || review.stars) ? "text-[#FAB005]" : "text-gray-300"} />
+            <div className="flex items-center justify-between mt-4">
+                <GoogleLogo />
+                <div className="flex items-center gap-0.5 text-[#FFB323]">
+                    {[...Array(4)].map((_, i) => (
+                        <PiStarFill key={i} size={18} />
                     ))}
+                    <PiStarHalfFill size={18} />
                 </div>
             </div>
         </div>
     );
 
-    if (loading) return <div className="h-96 w-full animate-pulse bg-slate-50 flex items-center justify-center">Loading reviews...</div>;
+    if (loading) return null;
 
-    const parseTitle = (text) => {
-        // Attempt to style the target word dynamically if it exists (e.g. Customers)
-        // For simplicity, just rendering it exactly as entered, but we can highlight keywords
-        if (text.includes('Customers')) {
-            const parts = text.split('Customers');
-            return <>{parts[0]}<span className="text-[#0A99FF]">Customers</span>{parts[1]}</>;
-        }
-        return text;
-    }
+    // Row 1: Bright Sky Blue, Soft Teal Green, Vivid Violet
+    const row1 = [
+        { ...staticReviews[0] },
+        { ...staticReviews[1] },
+        { ...staticReviews[2] },
+        { ...staticReviews[0] },
+        { ...staticReviews[1] },
+        { ...staticReviews[2] }
+    ];
+
+    // Row 2: Warm Gold Yellow, Luminous Magenta, Warm Gold Yellow
+    const row2 = [
+        { ...staticReviews[3] },
+        { ...staticReviews[4] },
+        { ...staticReviews[5] },
+        { ...staticReviews[3] },
+        { ...staticReviews[4] },
+        { ...staticReviews[5] }
+    ];
 
     return (
-        <section className="py-12 md:py-16 bg-white relative overflow-hidden">
-            <div className="max-w-[1200px] mx-auto px-4 sm:px-6 relative z-10 mb-8">
-                {/* Header */}
-                <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
-                    <div className="space-y-2 md:space-y-4 max-w-2xl">
-                        <h2 className="text-4xl font-semibold font-manrope text-gray-900 tracking-tight">
-                            {parseTitle(cms.title)}
+        <section 
+            className="w-full flex flex-col items-center"
+            style={{ 
+                background: isDesktop ? '#F5F5F5' : 'hsla(0, 0%, 96%, 1)',
+                width: isDesktop ? '100%' : '390px',
+                height: isDesktop ? 'auto' : '404px',
+                margin: '0 auto',
+                overflow: 'hidden'
+            }}
+        >
+            {/* Outer Frame */}
+            <div 
+                className="w-full h-full mx-auto flex flex-col items-center"
+                style={{
+                    maxWidth: isDesktop ? '1200px' : '100%',
+                    paddingTop: isDesktop ? '96px' : '48px',
+                    paddingBottom: isDesktop ? '96px' : '48px',
+                    paddingLeft: isDesktop ? '24px' : '20px',
+                    paddingRight: isDesktop ? '24px' : '20px',
+                    gap: isDesktop ? '32px' : '10px'
+                }}
+            >
+                
+                {/* Header Row — Figma Width: 1200px, Height: 105px */}
+                <div 
+                    className="w-full flex flex-col md:flex-row md:items-end justify-between font-manrope mb-8 gap-6 md:gap-0" 
+                >
+                    <div 
+                        className="flex flex-col md:w-[512px]" 
+                        style={{ 
+                            width: isDesktop ? '512px' : '350px',
+                            height: isDesktop ? 'auto' : '81px',
+                            justifyContent: isDesktop ? 'flex-start' : 'space-between',
+                            gap: isDesktop ? '5px' : '0'
+                        }}
+                    >
+                        <h2 
+                            className="font-manrope font-semibold"
+                            style={{
+                                width: isDesktop ? 'auto' : '292px',
+                                height: isDesktop ? 'auto' : '31px',
+                                fontSize: isDesktop ? '36px' : '24px',
+                                color: isDesktop ? '#1D1D1F' : 'hsla(0, 0%, 20%, 1)',
+                                lineHeight: isDesktop ? '1.1' : '31px',
+                                tracking: isDesktop ? 'tight' : 'normal'
+                            }}
+                        >
+                            What Our Customers Say
                         </h2>
-                        <p className="text-gray-600 text-sm md:text-lg">
-                            {cms.subtitle}
+                        <p 
+                            className="font-manrope"
+                            style={{
+                                width: isDesktop ? 'auto' : '350px',
+                                height: isDesktop ? 'auto' : '36px',
+                                fontSize: isDesktop ? '16px' : '13.5px',
+                                fontWeight: '500',
+                                color: 'hsla(0, 0%, 0%, 1)',
+                                lineHeight: isDesktop ? '1.2' : '18px',
+                                maxWidth: isDesktop ? '512px' : 'none'
+                            }}
+                        >
+                            Real experiences from innovators, businesses, and creators powering their ambitions with IndianRenters.
                         </p>
                     </div>
 
-                    {/* Google Reviews Badge - desktop only */}
-                    <div className="hidden md:flex items-center gap-4 bg-white border border-gray-100 px-6 py-3 rounded-2xl shadow-sm hover:shadow-md transition-shadow cursor-pointer">
-                        <GoogleLogo />
-                        <div className="flex flex-col border-l border-gray-200 pl-4">
-                            <span className="text-xs text-gray-500 font-bold uppercase tracking-wider">{cms.reviewCount} reviews</span>
-                            <div className="flex items-center gap-2">
-                                <div className="flex text-[#F4B400] text-sm">
-                                    <FaStar /><FaStar /><FaStar /><FaStar /><FaStar />
+                    {/* Google Badge (Hidden on Mobile) */}
+                    <div className="hidden md:flex items-center gap-3 self-end mb-1">
+                        <div className="bg-white border border-[#E5E5E7] rounded-full px-4 py-1.5 flex items-center gap-3 shadow-sm">
+                            <div className="flex items-center bg-white">
+                                <span className="font-bold text-[14px] tracking-tight">
+                                    <span className="text-blue-500">G</span>
+                                    <span className="text-red-500">o</span>
+                                    <span className="text-yellow-500">o</span>
+                                    <span className="text-blue-500">g</span>
+                                    <span className="text-green-500">l</span>
+                                    <span className="text-red-500">e</span>
+                                </span>
+                            </div>
+                            <div className="h-4 w-[1px] bg-[#D2D2D7]" />
+                            <span className="text-[12px] font-bold text-[#1D1D1F]">5000+ reviews</span>
+                            <div className="flex items-center gap-1">
+                                <div className="flex text-[#FFB323]">
+                                    <PiStarFill size={12} /><PiStarFill size={12} /><PiStarFill size={12} /><PiStarFill size={12} /><PiStarFill size={12} />
                                 </div>
-                                <span className="text-gray-900 font-bold text-sm">{cms.rating}</span>
+                                <span className="text-[12px] font-bold text-[#1D1D1F]">4.9</span>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
 
-            {/* Desktop: Grid View */}
-            <div className="hidden lg:block max-w-[1200px] mx-auto px-4 sm:px-6 mb-12 relative z-10">
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
-                    {reviewsData.slice(0, 6).map((review, i) => (
-                        <ReviewCard key={`desktop-rev-${review._id || i}`} review={review} />
-                    ))}
-                </div>
-            </div>
-
-
-
-
-
-            {/* Mobile: Horizontal scroll snap carousel - shows 1.5 cards */}
-            <div className="lg:hidden px-4 mb-6">
-                <div className="flex gap-3 overflow-x-auto snap-x snap-mandatory pb-3 scrollbar-hide" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
-                    {reviewsData.map((review, i) => (
+                {/* Inner Clipping Container - 1160px for Grid */}
+                <div
+                    className="w-full max-w-[1160px] flex flex-col overflow-hidden"
+                    style={{ gap: '24px' }}
+                >
+                    {/* Desktop: Staggered Grid Container (lg:flex) */}
+                    <div
+                        className="hidden lg:flex flex-col relative"
+                        style={{
+                            width: '100%',
+                            height: '460px',
+                            marginTop: '8px'
+                        }}
+                    >
+                        {/* Edge Fade Gradients */}
                         <div
-                            key={`mobile-rev-${review._id || i}`}
-                            className={`${review.bg || "bg-slate-50"} min-w-[75vw] max-w-[75vw] snap-start rounded-3xl p-5 flex flex-col min-h-[200px] shadow-sm shrink-0`}
+                            className="absolute pointer-events-none z-10"
+                            style={{
+                                width: '26px',
+                                height: '479px',
+                                top: '-6px',
+                                left: '-3px',
+                                background: 'linear-gradient(270deg, rgba(255, 255, 255, 0) 0%, #FFFFFF 100%)'
+                            }}
+                        />
+                        <div
+                            className="absolute pointer-events-none z-10"
+                            style={{
+                                width: '27px',
+                                height: '479px',
+                                top: '-6px',
+                                left: '1134px',
+                                transform: 'rotate(-180deg)',
+                                background: 'linear-gradient(270deg, rgba(255, 255, 255, 0) 0%, #FFFFFF 100%)'
+                            }}
+                        />
+
+                        {/* Upper Row - Figma: left: -113.63px, top: 0px */}
+                        <div
+                            className="absolute flex flex-row opacity-100"
+                            style={{
+                                left: '-113.63px',
+                                top: '0px',
+                                width: '1195px',
+                                gap: '20px'
+                            }}
                         >
-                            <div className="mb-3">
-                                <h3 className="text-base font-bold text-gray-900 leading-none mb-0.5">{review.name}</h3>
-                                <p className="text-xs font-medium text-gray-500">{review.role}</p>
-                            </div>
-
-                            <p className="text-[#333] text-xs leading-[1.6] mb-4 grow font-medium line-clamp-5">
-                                {review.message || review.text}
-                            </p>
-
-                            <div className="flex items-end justify-between mt-auto">
-                                <GoogleLogo />
-                                <div className="flex text-[#FAB005] gap-0.5 text-base">
-                                    {[...Array(5)].map((_, j) => (
-                                        <FaStar key={`r1-s-${i}-${j}`} className={j < (review.rating || review.stars) ? "text-[#FAB005]" : "text-gray-300"} />
-                                    ))}
-                                </div>
-                            </div>
+                            {row1.map((rev, i) => (
+                                <TestimonialCard key={`r1-${i}`} review={rev} />
+                            ))}
                         </div>
-                    ))}
+
+                        {/* Lower Row - Figma: left: 78.63px, top: 240px */}
+                        <div
+                            className="absolute flex flex-row opacity-100"
+                            style={{
+                                left: '78.63px',
+                                top: '240px',
+                                width: '1195px',
+                                gap: '20px'
+                            }}
+                        >
+                            {row2.map((rev, i) => (
+                                <TestimonialCard key={`r2-${i}`} review={rev} />
+                            ))}
+                        </div>
+                    </div>
+
+                    {/* Mobile: Original Horizontal Scroll Snap Carousel (lg:hidden) */}
+                    <div 
+                        className="lg:hidden w-full overflow-x-auto snap-x snap-mandatory scrollbar-hide"
+                        style={{ width: '350px', height: '203px' }}
+                    >
+                        <div className="flex gap-4 w-max px-2 h-full">
+                            {reviewsData.map((review, i) => (
+                                <div
+                                    key={`mobile-rev-${i}`}
+                                    className="snap-start rounded-xl flex flex-col shadow-sm transition-all duration-300 font-manrope"
+                                    style={{ 
+                                        backgroundColor: review.bgColor || '#FFFFFF',
+                                        minWidth: '229px',
+                                        height: '156px',
+                                        padding: '8px 12px',
+                                        gap: '20px'
+                                    }}
+                                >
+                                    <div className="flex flex-col">
+                                        <h3 className={`text-[15px] font-bold ${review.textColor || "text-[#1D1D1F]"} leading-none mb-0.5`}>{review.name}</h3>
+                                        <p className={`text-[11px] ${review.textColor || "text-[#86868B]"} opacity-80`}>{review.role || "Verified User"}</p>
+                                    </div>
+                                    <p 
+                                        className="font-manrope"
+                                        style={{ 
+                                            width: '205px',
+                                            height: '56px',
+                                            fontSize: '11px', 
+                                            fontWeight: '500',
+                                            color: 'hsla(23, 98%, 37%, 1)',
+                                            lineHeight: '18px',
+                                            overflow: 'hidden',
+                                            display: '-webkit-box',
+                                            WebkitLineClamp: 3,
+                                            WebkitBoxOrient: 'vertical'
+                                        }}
+                                    >
+                                        {review.message || review.text}
+                                    </p>
+                                    <div className="flex items-center justify-between mt-auto">
+                                        <div className="scale-75 origin-left">
+                                            <GoogleLogo />
+                                        </div>
+                                        <div className="flex text-[#FFB323] gap-0.5 scale-75 origin-right">
+                                            {[...Array(5)].map((_, j) => (
+                                                <PiStarFill key={`s-${i}-${j}`} size={16} />
+                                            ))}
+                                        </div>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+
+                    {/* Read All Reviews Button (Hidden on Mobile) */}
+                    <div className="hidden md:flex mt-8 md:mt-16 w-full justify-center z-10">
+                        <Link
+                            href="/testimonials"
+                            className="bg-[#007AFF] hover:bg-[#0062CC] text-white font-semibold flex items-center justify-center transition-all shadow-md hover:shadow-lg"
+                            style={{ width: '185px', height: '42.58px', borderRadius: '9999px', fontSize: '14px' }}
+                        >
+                            Read All Reviews
+                        </Link>
+                    </div>
                 </div>
             </div>
 
-            {/* Read All Reviews Button */}
-            <div className="max-w-[1200px] mx-auto px-4 sm:px-6 relative z-30 pt-2">
-                <div className="flex justify-center">
-                    <button className="px-8 py-3 md:px-10 md:py-4 bg-[#007AFF] text-white font-bold rounded-full hover:bg-blue-600 transition-all shadow-lg hover:shadow-blue-200 hover:-translate-y-1 text-sm md:text-base">
-                        Read All Reviews
-                    </button>
-                </div>
-            </div>
+            <style jsx>{`
+                .scrollbar-hide::-webkit-scrollbar { display: none; }
+                .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+            `}</style>
         </section>
     );
 };

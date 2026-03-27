@@ -142,7 +142,7 @@ const RentByCategory = () => {
                 borderBottom: '0.7px solid hsla(0, 0%, 89%, 1)'
             }}
         >
-            <div className="max-w-[1200px] mx-auto px-[18px] md:px-4 sm:px-6">
+            <div className="max-w-[1200px] mx-auto px-4 sm:px-6">
                 <div className="flex items-center justify-between mb-4 md:mb-12">
                     <h2 className="text-[22px] md:text-3xl lg:text-4xl font-semibold font-manrope text-[#333333] tracking-[-0.02em] leading-tight">{cmsConfig.title}</h2>
                     <Link
