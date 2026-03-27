@@ -123,47 +123,103 @@ const Footer = () => {
             </footer>
 
             {/* ── Mobile Footer ── */}
-            <footer className="md:hidden text-gray-700 pt-8 pb-4 border-t border-gray-200" style={{ background: 'hsla(0, 0%, 96%, 1)' }}>
-                <div className="px-4">
-                    <div className="mb-3">
+            {/* ── Mobile Footer ── */}
+            <footer 
+                className="md:hidden w-full font-manrope overflow-hidden"
+                style={{ 
+                    background: 'hsla(0, 0%, 96%, 1)', 
+                    borderTop: '1px solid hsla(0, 0%, 89%, 1)',
+                    paddingTop: '32px',
+                    paddingBottom: '24px',
+                    minHeight: '575px'
+                }}
+            >
+                <div className="mx-auto" style={{ width: '350px' }}>
+                    {/* Logo Area (Target 137x61) */}
+                    <div className="flex flex-col mb-8" style={{ width: '137px', height: '61px', gap: '10px' }}>
                         <Link href="/" className="inline-block">
-                            <Image src={siteLogo} alt={siteName} width={200} height={54} className="h-[54px] w-auto object-contain" />
+                            <Image src={siteLogo} alt={siteName} width={137} height={40} className="h-[40px] w-auto object-contain" />
                         </Link>
+                        <p className="text-[#1D1D1F] text-[10px] font-medium leading-none tracking-tight whitespace-nowrap">
+                            Rent Anything, Anytime, Anywhere
+                        </p>
                     </div>
-                    <p className="text-gray-700 text-sm font-medium mb-5">Rent Anything, Anytime, Anywhere</p>
-
-                    <ul className="space-y-3 text-gray-600 text-sm mb-6">
-                        <li><Link href="/about" className="hover:text-gray-900 transition-colors">About Us</Link></li>
-                        <li><Link href="/how-it-works" className="hover:text-gray-900 transition-colors">How It Works</Link></li>
-                        <li><Link href="/careers" className="hover:text-gray-900 transition-colors">Jobs &amp; Careers</Link></li>
-                        <li><Link href="/contact" className="hover:text-gray-900 transition-colors">Contact</Link></li>
-                        <li><Link href="/b2b" className="hover:text-gray-900 transition-colors">IndianRenters (B2B Link)</Link></li>
-                    </ul>
-
-                    <div className="grid grid-cols-2 gap-x-6 gap-y-3 text-sm text-gray-600 mb-6">
-                        <Link href="/kyc-policy" className="hover:text-gray-900 transition-colors">KYC Policy</Link>
-                        <Link href="/faq" className="hover:text-gray-900 transition-colors">FAQs</Link>
-                        <Link href="/shipping-policy" className="hover:text-gray-900 transition-colors">Shipping Policy</Link>
-                        <Link href="/ticket" className="hover:text-gray-900 transition-colors">Raise a Ticket</Link>
-                        <Link href="/return-policy" className="hover:text-gray-900 transition-colors">Return Policy</Link>
-                        <Link href="/reviews" className="hover:text-gray-900 transition-colors">Customer Reviews</Link>
-                        <Link href="/privacy" className="hover:text-gray-900 transition-colors">Privacy Policy</Link>
-                        <Link href="/blog" className="hover:text-gray-900 transition-colors">Blog</Link>
-                        <Link href="/terms" className="hover:text-gray-900 transition-colors col-span-2">Rental Terms &amp; Conditions</Link>
+                    {/* Primary Links (Target 134x112) */}
+                    <div 
+                        className="flex flex-col mb-8"
+                        style={{ width: '134px', height: '112px', gap: '8px' }}
+                    >
+                        <Link href="/about" className="text-black font-manrope font-semibold text-[14px] leading-tight hover:opacity-70 transition-opacity whitespace-nowrap">About Us</Link>
+                        <Link href="/how-it-works" className="text-black font-manrope font-semibold text-[14px] leading-tight hover:opacity-70 transition-opacity whitespace-nowrap">How It Works</Link>
+                        <Link href="/careers" className="text-black font-manrope font-semibold text-[14px] leading-tight hover:opacity-70 transition-opacity whitespace-nowrap">Jobs &amp; Careers</Link>
+                        <Link href="/contact" className="text-black font-manrope font-semibold text-[14px] leading-tight hover:opacity-70 transition-opacity whitespace-nowrap">Contact</Link>
+                        <Link href="/b2b" className="text-black font-manrope font-semibold text-[14px] leading-tight hover:opacity-70 transition-opacity whitespace-nowrap">IndianRenters (B2B Link)</Link>
                     </div>
 
-                    <div className="flex items-center gap-5 mb-6">
-                        <a href={`https://wa.me/${sitePhone.replace(/[^\d]/g, '')}`} className="transition-opacity hover:opacity-70" target="_blank" rel="noopener noreferrer"><FaWhatsapp size={22} className="text-[#25D366]" /></a>
-                        <a href="#" className="transition-opacity hover:opacity-70"><FaFacebookF size={20} className="text-[#1877F2]" /></a>
-                        <a href="#" className="transition-opacity hover:opacity-70"><FaInstagram size={22} className="text-[#E4405F]" /></a>
-                        <a href="#" className="transition-opacity hover:opacity-70"><FaLinkedinIn size={20} className="text-[#0A66C2]" /></a>
+                    {/* Divider 1 */}
+                    <div className="h-[1px] w-full bg-[#E5E5EA] mb-8"></div>
+
+                    {/* Secondary Links - 2 Columns (Target 350x112) */}
+                    <div 
+                        className="grid grid-cols-2 mb-8"
+                        style={{ width: '350px', height: '112px', gap: '24px' }}
+                    >
+                        <div className="flex flex-col justify-between text-[#000000] font-manrope font-medium text-[13px] tracking-tight py-0.5">
+                            <Link href="/kyc-policy" className="hover:opacity-70 transition-opacity">KYC Policy</Link>
+                            <Link href="/shipping-policy" className="hover:opacity-70 transition-opacity">Shipping Policy</Link>
+                            <Link href="/return-policy" className="hover:opacity-70 transition-opacity">Return Policy</Link>
+                            <Link href="/privacy" className="hover:opacity-70 transition-opacity">Privacy Policy</Link>
+                            <Link href="/terms" className="hover:opacity-70 transition-opacity whitespace-nowrap">Rental Terms &amp; Conditions</Link>
+                        </div>
+                        <div className="flex flex-col justify-between text-[#000000] font-manrope font-medium text-[13px] tracking-tight py-0.5">
+                            <Link href="/faq" className="hover:opacity-70 transition-opacity whitespace-nowrap">FAQs</Link>
+                            <Link href="/ticket" className="hover:opacity-70 transition-opacity whitespace-nowrap">Raise a Ticket</Link>
+                            <Link href="/reviews" className="hover:opacity-70 transition-opacity whitespace-nowrap">Customer Reviews</Link>
+                            <Link href="/blog" className="hover:opacity-70 transition-opacity whitespace-nowrap">Blog</Link>
+                            <div className="h-[20px]"></div> {/* Spacer for alignment */}
+                        </div>
                     </div>
 
-                    <div className="border-t border-gray-200 pt-4">
-                        <p className="text-gray-500 text-[11px] text-center mb-3">© {currentYear} {copyrightName}. All Rights Reserved</p>
-                        <div className="flex items-center justify-center gap-[6px]">
+                    {/* Divider 2 */}
+                    <div className="h-[1px] w-full bg-[#E5E5EA] mb-8"></div>
+
+                    {/* Social Icons row */}
+                    <div className="flex items-center gap-4 mb-8">
+                        <a href={`https://wa.me/${sitePhone.replace(/[^\d]/g, '')}`} className="w-[42px] h-[42px] rounded-full bg-white flex items-center justify-center shadow-sm" target="_blank" rel="noopener noreferrer">
+                            <FaWhatsapp size={22} className="text-[#25D366]" />
+                        </a>
+                        <a href="#" className="w-[42px] h-[42px] rounded-full bg-white flex items-center justify-center shadow-sm">
+                            <FaFacebookF size={20} className="text-[#1877F2]" />
+                        </a>
+                        <a href="#" className="w-[42px] h-[42px] rounded-full bg-white flex items-center justify-center shadow-sm">
+                            <FaInstagram size={22} className="text-[#E4405F]" />
+                        </a>
+                        <a href="#" className="w-[42px] h-[42px] rounded-full bg-white flex items-center justify-center shadow-sm">
+                            <FaLinkedinIn size={18} className="text-[#0A66C2]" />
+                        </a>
+                    </div>
+
+                    {/* Bottom Section Border Layer */}
+                    <div 
+                        className="flex flex-col items-start px-0"
+                        style={{ 
+                            width: '350px', 
+                            height: '103px',
+                            paddingTop: '16px',
+                            paddingBottom: '16px',
+                            borderTop: '1px solid hsla(0, 0%, 93%, 1)',
+                            gap: '10px'
+                        }}
+                    >
+                        <p className="text-[#86868B] text-[12px] font-medium font-manrope">
+                            © 2025 {copyrightName}. All Rights Reserved
+                        </p>
+                        <div 
+                            className="flex items-center justify-between"
+                            style={{ width: '150px', height: '45px' }}
+                        >
                             {paymentLogos.map((url, i) => (
-                                <img key={i} src={url} alt={`payment-method-mobile-${i}`} className="w-[45px] h-[45px] object-contain shrink-0" />
+                                <img key={i} src={url} alt={`payment-mobile-${i}`} className="h-[32px] w-auto object-contain shrink-0" />
                             ))}
                         </div>
                     </div>

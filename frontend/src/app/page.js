@@ -17,9 +17,13 @@ export default function Home() {
       <RentByCategory />
       <BestRentedProducts type="bestRented" defaultTitle="Best Rented Products" />
       <FeatureSection />
-      <ClientSection />
+      <div className="hidden md:block">
+        <ClientSection />
+      </div>
       <BestRentedProducts type="newLaunches" defaultTitle="New Launches This Week" />
-      <FeaturedShowcase />
+      <div className="hidden md:block">
+        <FeaturedShowcase />
+      </div>
       <RentalProcess />
       <WhyChooseUs />
       <Testimonials />

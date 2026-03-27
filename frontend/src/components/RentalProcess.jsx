@@ -91,70 +91,57 @@ const RentalProcess = () => {
     if (!cms.enabled) return null;
 
     return (
-        <section className="py-12 md:py-16 bg-white overflow-hidden">
-            <div className="max-w-[1200px] mx-auto px-4 sm:px-6">
+        <section 
+            className="py-12 md:py-16 overflow-hidden"
+            style={{ 
+                minHeight: '738px',
+                background: 'linear-gradient(180deg, #FFFFFF 0%, rgba(255, 228, 133, 0.63) 100%)'
+            }}
+        >
+            <div 
+                className="mx-auto px-5 md:px-6"
+                style={{ maxWidth: '1200px' }}
+            >
 
                 {/* Header Section */}
-                <div className="w-full flex flex-col md:flex-row md:items-start justify-between mb-10 gap-8 font-manrope">
-                    <div className="max-w-2xl">
-                        <div className="inline-block bg-black text-white text-[11px] font-bold px-4 py-1.5 rounded-full mb-6 uppercase tracking-tight leading-none">
-                            Rental Process
-                        </div>
-                        <h2 className="text-3xl md:text-[36px] font-semibold text-gray-900 font-manrope mb-4 tracking-tight leading-[1.1]">
+                <div 
+                    className="w-full flex flex-col md:flex-row md:items-start justify-between mb-8 md:mb-16 max-w-[350px] md:max-w-none mx-auto md:mx-0 font-manrope"
+                >
+                    <div className="flex flex-col mb-4 md:mb-0" style={{ gap: '8px' }}>
+                        <h2 
+                            className="text-[28px] md:text-[36px] font-bold text-gray-900 tracking-tight leading-none"
+                        >
                             {cms.title}
                         </h2>
-                        <p className="text-gray-600 text-base md:text-[18px] leading-[1.3] tracking-tight max-w-md pt-1">
+                        <p className="text-gray-600 text-[13px] md:text-[18px] leading-[1.4] tracking-tight max-w-sm md:max-w-md">
                             {cms.subtitle}
                         </p>
                     </div>
 
                     <div
-                        className="flex items-center pt-24 md:pr-12"
-                        style={{ width: '259px', height: '35px', gap: '10px' }}
+                        className="flex items-center gap-3"
                     >
                         <Link
                             href="/rental-process"
-                            className="inline-flex items-center justify-center hover:brightness-105 transition-all"
+                            className="inline-flex items-center justify-center hover:brightness-105 transition-all text-black font-semibold text-[13px]"
                             style={{
                                 width: '124px',
                                 height: '35px',
-                                paddingTop: '6px',
-                                paddingBottom: '6px',
-                                paddingLeft: '20px',
-                                paddingRight: '20px',
                                 borderRadius: '9999px',
-                                background: 'hsla(44, 100%, 64%, 1)',
+                                background: '#FFCF46',
                                 borderBottom: '1px solid rgba(0,0,0,0.10)',
-                                fontFamily: 'Manrope, sans-serif',
-                                fontWeight: 500,
-                                fontSize: '14px',
-                                lineHeight: '23px',
-                                letterSpacing: '-0.01em',
-                                color: '#1D1D1F',
-                                whiteSpace: 'nowrap',
                             }}
                         >
                             Rental Process
                         </Link>
                         <Link
                             href="/contact"
-                            className="inline-flex items-center justify-center hover:opacity-90 transition-all"
+                            className="inline-flex items-center justify-center hover:opacity-90 transition-all text-white font-semibold text-[13px]"
                             style={{
                                 width: '124px',
                                 height: '35px',
-                                paddingTop: '6px',
-                                paddingBottom: '6px',
-                                paddingLeft: '20px',
-                                paddingRight: '20px',
                                 borderRadius: '9999px',
-                                background: 'hsla(0, 0%, 7%, 1)',
-                                fontFamily: 'Manrope, sans-serif',
-                                fontWeight: 500,
-                                fontSize: '14px',
-                                lineHeight: '23px',
-                                letterSpacing: '-0.01em',
-                                color: '#FFFFFF',
-                                whiteSpace: 'nowrap',
+                                background: '#1D1D1F',
                             }}
                         >
                             Contact
@@ -162,11 +149,11 @@ const RentalProcess = () => {
                     </div>
                 </div>
 
-                {/* Content Section: Steps and Image */}
-                <div className="w-full flex flex-row items-stretch font-manrope" style={{ height: '500px', gap: '12px' }}>
-
-                    {/* Left side: Steps */}
-                    <div className="w-[590px] flex flex-col gap-[5px] h-full">
+                {/* Content Section: Steps (Mobile: List, Desktop: Steps+Image) */}
+                <div 
+                    className="w-full flex flex-col md:flex-row items-stretch font-manrope md:h-[500px] max-w-[350px] md:max-w-none mx-auto md:mx-0 gap-[10px] md:gap-12 min-h-[509px]"
+                >
+                    <div className="flex flex-col flex-1" style={{ gap: '10px' }}>
                         {cms.steps.map((step, index) => {
                             const isActive = activeStep === index;
                             const idxNum = index + 1;
@@ -174,58 +161,60 @@ const RentalProcess = () => {
                             return (
                                 <div
                                     key={`rp-step-${index}`}
+                                    className="relative overflow-hidden cursor-pointer"
                                     onClick={() => setActiveStep(index)}
-                                    className="cursor-pointer"
                                 >
-                                    {isActive ? (
-                                        // Active Step Card
-                                        <div 
-                                            style={{ 
-                                                height: '184px',
-                                                boxShadow: '-3px -3px 15px -2px #E26E0042 inset'
-                                            }}
-                                            className="px-7 py-5 flex flex-col justify-between rounded-2xl bg-gradient-to-br from-orange-300/50 to-orange-400/90"
-                                        >
-                                            <div className="flex justify-between items-start">
-                                                <div className="text-[#6B4B18] scale-[1.3] origin-left pt-1">
-                                                    <DynamicIcon name={step.icon} size={28} />
+                                    <div 
+                                        className={`px-[16px] py-[20px] rounded-2xl relative z-10 ${
+                                            isActive 
+                                            ? "bg-gradient-to-br from-[#FFD66B] to-[#FFB323] text-[#6B4B18]" 
+                                            : "bg-white border border-[#F2F2F7] text-gray-900"
+                                        }`}
+                                        style={{ 
+                                            height: isActive ? '118px' : 'auto',
+                                            minHeight: !isActive ? '110px' : 'auto',
+                                            boxShadow: isActive ? '-3px -3px 15px -2px hsla(29, 100%, 44%, 0.26) inset' : '0px 2px 4px rgba(0,0,0,0.02)'
+                                        }}
+                                    >
+                                        <div className="flex flex-col" style={{ gap: '5px', height: '78px' }}>
+                                            <div className="flex items-start gap-3.5 pt-0.5">
+                                                <div className={`${isActive ? 'text-[#6B4B18]' : 'text-gray-900'} shrink-0`}>
+                                                    <DynamicIcon name={step.icon} size={18} />
                                                 </div>
-                                                <div className="px-5 py-2 bg-white text-[13px] font-bold text-[#6B4B18] rounded-full tracking-tighter shadow-sm">
-                                                    Step {idxNum}
-                                                </div>
-                                            </div>
-                                            <div className="flex-1 flex flex-col justify-center gap-1.5 pt-2">
-                                                <h3 className="text-[28px] font-semibold text-[#6B4B18] tracking-[-0.04em] leading-none font-manrope">
+                                                <h3 className={`text-[17px] md:text-[22px] font-bold ${isActive ? 'text-[#6B4B18]' : 'text-gray-900'} tracking-[-0.02em] leading-tight`}>
                                                     {step.title}
                                                 </h3>
-                                                <p className="text-[#846221] text-[16px] leading-[1.4] font-medium tracking-tight font-manrope opacity-95">
-                                                    {step.description}
-                                                </p>
                                             </div>
+                                            
+                                            <p 
+                                                className={`font-manrope font-medium leading-[1.3] tracking-[-0.01em] ${isActive ? 'text-[#846221]' : 'text-[#8E8E93]'} overflow-hidden md:overflow-visible`}
+                                                style={{ 
+                                                    fontSize: '13px',
+                                                    height: isActive ? '54px' : 'auto', 
+                                                    color: isActive ? 'hsla(19, 84%, 26%, 1)' : undefined,
+                                                    opacity: isActive ? 0.7 : 1,
+                                                }}
+                                            >
+                                                {step.description}
+                                            </p>
                                         </div>
-                                    ) : (
-                                        // Inactive Step Card
-                                        <div className="h-[100px] px-7 py-5 flex flex-col justify-center bg-white border border-gray-100 shadow-sm hover:border-gray-200 rounded-2xl">
-                                            <div className="flex justify-between items-start mb-1.5">
-                                                <div className="text-gray-900 scale-[1.2] origin-left pt-1">
-                                                    <DynamicIcon name={step.icon} size={24} />
-                                                </div>
-                                                <div className="px-4 py-1.5 border border-gray-200 text-[12px] font-bold text-gray-400 rounded-full tracking-tighter bg-transparent">
-                                                    Step {idxNum}
-                                                </div>
-                                            </div>
-                                            <h3 className="text-[22px] font-semibold text-gray-900 tracking-[-0.04em] mt-1.5 leading-none font-manrope">
-                                                {step.title}
-                                            </h3>
+
+                                        {/* Large Background Number */}
+                                        <div 
+                                            className={`absolute -right-2 top-1/2 -translate-y-1/2 text-[80px] md:text-[100px] font-black pointer-events-none select-none ${
+                                                isActive ? 'text-black/5' : 'text-black/[0.03]'
+                                            }`}
+                                        >
+                                            {idxNum}
                                         </div>
-                                    )}
+                                    </div>
                                 </div>
                             )
                         })}
                     </div>
 
-                    {/* Right side: Image Container */}
-                    <div className="w-[590px] relative h-full rounded-[3rem] overflow-hidden shadow-xl bg-gray-100">
+                    {/* Right side: Image Container - Desktop Only */}
+                    <div className="hidden md:block w-full md:w-[590px] relative h-[300px] md:h-full rounded-[3rem] overflow-hidden shadow-xl bg-gray-100">
                         {cms.steps[activeStep] && (
                             <Image
                                 key={`rp-img-${activeStep}`}

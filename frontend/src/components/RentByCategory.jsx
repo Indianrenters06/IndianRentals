@@ -135,10 +135,16 @@ const RentByCategory = () => {
     const mobileCats = displayCategories.slice(0, 7);
 
     return (
-        <section className="py-12 md:py-16 bg-white">
-            <div className="max-w-[1200px] mx-auto px-4 sm:px-6 border-t border-gray-100">
-                <div className="flex items-center justify-between mb-6 md:mb-12">
-                    <h2 className="text-4xl font-semibold font-manrope text-gray-900 tracking-tight">{cmsConfig.title}</h2>
+        <section 
+            className="py-6 md:py-16 relative overflow-hidden"
+            style={{ 
+                background: 'linear-gradient(180deg, #FFFFFF 0%, #FFFAEC 100%)',
+                borderBottom: '0.7px solid hsla(0, 0%, 89%, 1)'
+            }}
+        >
+            <div className="max-w-[1200px] mx-auto px-[18px] md:px-4 sm:px-6">
+                <div className="flex items-center justify-between mb-4 md:mb-12">
+                    <h2 className="text-[22px] md:text-3xl lg:text-4xl font-semibold font-manrope text-[#333333] tracking-[-0.02em] leading-tight">{cmsConfig.title}</h2>
                     <Link
                         href="/categories"
                         className="hidden md:inline-flex items-center justify-center gap-[2px] text-gray-900 group hover:brightness-105 transition-all"
@@ -165,10 +171,10 @@ const RentByCategory = () => {
                 </div>
 
                 {/* Mobile Grid: updated to match requested card style */}
-                <div className="md:hidden grid grid-cols-4 gap-3">
+                <div className="md:hidden grid grid-cols-4 gap-[10px]">
                     {mobileCats.map((cat, index) => (
                         <Link key={cat._id || index} href={getCategoryRoute(cat)} className="flex flex-col items-center">
-                            <div className="w-full aspect-square rounded-lg bg-white border border-gray-100 flex items-center justify-center overflow-hidden relative shadow-sm">
+                            <div className="w-full aspect-square rounded-[10px] bg-white border border-gray-100 flex items-center justify-center overflow-hidden relative shadow-sm">
                                 {cat.image ? (
                                     <Image
                                         src={cat.image}
@@ -182,16 +188,16 @@ const RentByCategory = () => {
                                     </div>
                                 )}
                             </div>
-                            <span className="text-[10px] font-semibold font-manrope text-gray-600 text-center mt-2 leading-tight">{cat.name}</span>
+                            <span className="text-[11px] font-semibold font-manrope text-[#4b5563] text-center mt-2 leading-tight">{cat.name}</span>
                         </Link>
                     ))}
 
                     {/* View All Tile — same size as category tiles */}
                     <Link href="/categories" className="flex flex-col items-center">
-                        <div className="w-full aspect-square rounded-lg bg-white border border-orange-300/30 flex flex-col items-center justify-center gap-1.5 shadow-sm">
-                            <span className="text-[11px] font-semibold font-manrope text-gray-600 leading-tight">View All</span>
-                            <div className="w-7 h-7 rounded-full bg-orange-300 flex items-center justify-center">
-                                <FaArrowRight size={10} className="text-gray-900" />
+                        <div className="w-full aspect-square rounded-[10px] bg-[#fff3d4] border border-[#fbd38d]/30 flex flex-col items-center justify-center gap-1 shadow-sm">
+                            <span className="text-[10px] font-semibold font-manrope text-[#d97706] leading-tight">View All</span>
+                            <div className="w-6 h-6 rounded-full bg-[#f6ad55] flex items-center justify-center">
+                                <FaArrowRight size={8} className="text-white" />
                             </div>
                         </div>
                     </Link>

@@ -1,10 +1,6 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { FaStar } from 'react-icons/fa';
-import gsap from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { getTestimonials } from '../services/testimonialService';
-
-gsap.registerPlugin(ScrollTrigger);
 
 import { API } from '../services/apiConfig';
 
@@ -81,10 +77,6 @@ const Testimonials = () => {
         rating: 4.9
     });
 
-    const wrapperRef = useRef(null);
-    const row1Ref = useRef(null);
-    const row2Ref = useRef(null);
-
     useEffect(() => {
         const fetchAll = async () => {
             try {
@@ -118,68 +110,11 @@ const Testimonials = () => {
         fetchAll();
     }, []);
 
-    useEffect(() => {
-        if (loading || reviewsData.length === 0 || !cms.enabled) return;
-        let ctx = gsap.context(() => {
-            const rows = [
-                { ref: row1Ref.current, dir: -1 },
-                { ref: row2Ref.current, dir: 1 }
-            ];
-
-            rows.forEach((row, index) => {
-                if (!row.ref) return;
-
-                const content = row.ref;
-                const totalWidth = content.scrollWidth;
-                const uniqueWidth = totalWidth / 4;
-
-                if (row.dir === 1) {
-                    gsap.set(content, { x: -uniqueWidth * 2 });
-                } else {
-                    gsap.set(content, { x: 0 });
-                }
-
-                const tween = gsap.to(content, {
-                    x: (row.dir === -1)
-                        ? `-=${uniqueWidth}`
-                        : `+=${uniqueWidth}`,
-                    duration: 30 + (index * 5),
-                    ease: "none",
-                    repeat: -1,
-                });
-
-                ScrollTrigger.create({
-                    trigger: wrapperRef.current,
-                    start: "top bottom",
-                    end: "bottom top",
-                    onUpdate: (self) => {
-                        let v = self.getVelocity();
-                        let timeScale = 1 + Math.abs(v) / 300;
-                        gsap.to(tween, {
-                            timeScale: timeScale,
-                            duration: 0.5,
-                            overwrite: true,
-                            onComplete: () => gsap.to(tween, { timeScale: 1, duration: 0.5 })
-                        });
-                    }
-                });
-            });
-
-        }, wrapperRef);
-
-        return () => ctx.revert();
-    }, [loading, reviewsData, cms.enabled]);
-
     if (!cms.enabled) return null;
-
-    const topReviews = reviewsData.slice(0, Math.ceil(reviewsData.length / 2));
-    const bottomReviews = reviewsData.slice(Math.ceil(reviewsData.length / 2));
-    const row1Items = [...topReviews, ...topReviews, ...topReviews, ...topReviews];
-    const row2Items = [...bottomReviews, ...bottomReviews, ...bottomReviews, ...bottomReviews];
 
     const ReviewCard = ({ review }) => (
         <div
-            className={`${review.bg || "bg-slate-50"} w-[250px] md:w-[400px] shrink-0 rounded-[2rem] p-6 lg:p-7 flex flex-col h-[230px] transition-all hover:-translate-y-1 hover:shadow-lg duration-300 select-none mr-6`}
+            className={`${review.bg || "bg-slate-50"} w-full rounded-[2rem] p-6 lg:p-7 flex flex-col h-[230px] transition-all hover:-translate-y-1 hover:shadow-lg duration-300 select-none`}
         >
             <div className="mb-4">
                 <h3 className="text-lg font-bold text-gray-900 leading-none mb-1">{review.name}</h3>
@@ -216,7 +151,7 @@ const Testimonials = () => {
     }
 
     return (
-        <section ref={wrapperRef} className="py-12 md:py-16 bg-white relative overflow-hidden">
+        <section className="py-12 md:py-16 bg-white relative overflow-hidden">
             <div className="max-w-[1200px] mx-auto px-4 sm:px-6 relative z-10 mb-8">
                 {/* Header */}
                 <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
@@ -245,43 +180,12 @@ const Testimonials = () => {
                 </div>
             </div>
 
-
-            {/* Desktop: Horizontal Marquee Rows — full width, visually masked to 1200px */}
-            <div className="hidden lg:block pb-8 relative">
-                {/* Solid white panels covering the margin areas outside 1200px */}
-                <div
-                    className="absolute top-0 bottom-0 left-0 z-20 pointer-events-none bg-white"
-                    style={{ width: 'max(calc(50% - 600px), 0px)' }}
-                />
-                <div
-                    className="absolute top-0 bottom-0 right-0 z-20 pointer-events-none bg-white"
-                    style={{ width: 'max(calc(50% - 600px), 0px)' }}
-                />
-                {/* Soft fade at the 1200px boundary */}
-                <div
-                    className="absolute top-0 bottom-0 z-20 pointer-events-none bg-linear-to-r from-white to-transparent"
-                    style={{ left: 'max(calc(50% - 600px), 0px)', width: '64px' }}
-                />
-                <div
-                    className="absolute top-0 bottom-0 z-20 pointer-events-none bg-linear-to-l from-white to-transparent"
-                    style={{ right: 'max(calc(50% - 600px), 0px)', width: '64px' }}
-                />
-
-                <div className="space-y-8">
-                    <div className="w-full overflow-hidden">
-                        <div ref={row1Ref} className="flex w-max">
-                            {row1Items.map((review, i) => (
-                                <ReviewCard key={`row1-${i}`} review={review} />
-                            ))}
-                        </div>
-                    </div>
-                    <div className="w-full overflow-hidden">
-                        <div ref={row2Ref} className="flex w-max">
-                            {row2Items.map((review, i) => (
-                                <ReviewCard key={`row2-${i}`} review={review} />
-                            ))}
-                        </div>
-                    </div>
+            {/* Desktop: Grid View */}
+            <div className="hidden lg:block max-w-[1200px] mx-auto px-4 sm:px-6 mb-12 relative z-10">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
+                    {reviewsData.slice(0, 6).map((review, i) => (
+                        <ReviewCard key={`desktop-rev-${review._id || i}`} review={review} />
+                    ))}
                 </div>
             </div>
 

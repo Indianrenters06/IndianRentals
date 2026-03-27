@@ -122,13 +122,54 @@ const BestRentedProducts = ({ type = "bestRented", defaultTitle = "Curated Produ
     if (!cmsConfig.enabled) return null;
 
     return (
-        <section className="py-12 md:py-16 bg-white">
-            <div className="max-w-[1200px] mx-auto px-4 sm:px-6">
+        <section 
+            className="overflow-hidden py-12 md:py-16"
+            style={{ 
+                minHeight: '449px',
+                background: type === 'newLaunches' 
+                    ? 'linear-gradient(180deg, #FFFFFF 0%, #EDF9FF 100%)' 
+                    : '#FFFFFF'
+            }}
+        >
+            <div 
+                className="mx-auto px-5 md:px-6"
+                style={{ maxWidth: '1200px' }}
+            >
 
                 {/* Header */}
-                <div className="flex items-center justify-between mb-6 md:mb-12">
-                    <h2 className="text-4xl font-semibold font-manrope text-gray-900 tracking-tight">
+                <div 
+                    className="flex flex-col mb-6 md:mb-12 max-w-[350px] md:max-w-none w-full mx-auto md:mx-0"
+                    style={{ 
+                        height: 'auto', 
+                        minHeight: '31px' 
+                    }}
+                >
+                    {type === "newLaunches" && (
+                        <div className="flex justify-center mb-2 font-manrope text-[11px] md:text-[14px] font-bold tracking-tight">
+                            <span className="text-[#007AFF]">Built for&nbsp;</span>
+                            <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#FF3B30] to-[#FF9F0A]">Apple Intelligence.</span>
+                        </div>
+                    )}
+                    <div className="flex items-center justify-between">
+                    <h2 
+                        className="font-manrope tracking-tight whitespace-nowrap"
+                        style={{ 
+                            width: 'var(--title-width, 248px)', // Controlled via class below
+                            height: '31px',
+                            fontSize: '24px', 
+                            lineHeight: '31px',
+                            fontWeight: 600,
+                            color: 'hsla(0, 0%, 20%, 1)',
+                            letterSpacing: '-0.02em', 
+                        }}
+                    >
                         {cmsConfig.title}
+                        <style jsx>{`
+                            h2 { width: 248px; }
+                            @media (min-width: 768px) {
+                                h2 { width: auto; font-size: 36px; line-height: 48px; }
+                            }
+                        `}</style>
                     </h2>
                     <Link
                         href="/products"
@@ -153,110 +194,125 @@ const BestRentedProducts = ({ type = "bestRented", defaultTitle = "Curated Produ
                         View All
                     </Link>
                 </div>
+            </div>
 
                 {/* Grid */}
-                <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-8">
+                <div 
+                    className="grid grid-cols-2 lg:grid-cols-4 gap-[10px] md:gap-8"
+                    style={{ height: 'auto', minHeight: '300px' }}
+                >
                     {products.map((product, index) => {
                         return (
                             <div
                                 key={product.id || index}
-                                className="relative"
+                                className="relative group"
                             >
                                 <motion.div
                                     initial={{ opacity: 0, y: 20 }}
                                     whileInView={{ opacity: 1, y: 0 }}
                                     viewport={{ once: true }}
                                     transition={{ duration: 0.5, delay: index * 0.1 }}
-                                    className="group bg-white rounded-2xl flex flex-col overflow-hidden relative transition-all duration-500 hover:shadow-[0_8px_30px_rgba(0,0,0,0.10)] hover:-translate-y-1 md:w-[285px] md:h-[391px] mx-auto"
-                                    style={{ border: "1px solid hsla(0, 0%, 89%, 1)" }}
+                                    className="bg-white rounded-lg md:rounded-2xl flex flex-col overflow-hidden relative transition-all duration-500 hover:shadow-[0_8px_30px_rgba(0,0,0,0.10)] hover:-translate-y-1 mx-auto w-[170px] h-[300px] md:w-[285px] md:h-[420px]"
+                                    style={{ 
+                                        border: "1px solid hsla(0, 0%, 89%, 1)",
+                                        boxShadow: "0px 1px 2px 0px hsla(0, 0%, 0%, 0.05)"
+                                    }}
                                 >
                                     {/* Image Section — full-bleed top */}
                                     <div
-                                        className="relative rounded-2xl bg-[#F7F7F7] group-hover:bg-[#F0F0F0] transition-colors duration-500 flex items-center justify-center overflow-hidden flex-shrink-0"
-                                        style={{ width: "285px", height: "282px", borderRight: "1px solid hsla(0, 0%, 89%, 1)", borderBottom: "1px solid hsla(0, 0%, 89%, 1)", borderLeft: "1px solid hsla(0, 0%, 89%, 1)" }}
+                                        className="relative group-hover:bg-[#F0F0F0] transition-colors duration-500 flex items-center justify-center overflow-hidden flex-shrink-0 h-[184px] md:h-[240px] rounded-lg md:rounded-t-2xl"
+                                        style={{ 
+                                            background: 'hsla(0, 0%, 96%, 1)',
+                                            borderWidth: '0px 1px 1px 1px',
+                                            borderStyle: 'solid',
+                                            borderColor: 'hsla(0, 0%, 93%, 1)',
+                                            boxShadow: `
+                                                0px 4px 8px 0px hsla(0, 0%, 87%, 0.1),
+                                                0px 15px 15px 0px hsla(0, 0%, 87%, 0.09),
+                                                0px 33px 20px 0px hsla(0, 0%, 87%, 0.05),
+                                                0px 59px 23px 0px hsla(0, 0%, 87%, 0.01),
+                                                0px 91px 26px 0px hsla(0, 0%, 87%, 0)
+                                            `
+                                        }}
                                     >
                                         {/* Badges */}
-                                        <div className="absolute top-3 left-3 z-20 flex gap-1.5">
-                                            <span className="bg-[#FF3B30] text-white text-[11px] font-bold px-2 py-[3px] rounded-[4px] shadow-sm leading-none">
+                                        <div className="absolute top-2 left-2 z-20 flex gap-1">
+                                            <span className="bg-[#FF3B30] text-white text-[9px] md:text-[11px] font-bold px-1.5 py-[2px] rounded-[4px] shadow-sm leading-none">
                                                 -20% off
                                             </span>
-                                            {product.isNew && (
-                                                <span className="bg-[#34C759] text-white text-[11px] font-bold px-2 py-[3px] rounded-[4px] shadow-sm leading-none">
-                                                    New
-                                                </span>
-                                            )}
                                         </div>
-                                        {/* Heart */}
-                                        <button
-                                            className="absolute top-3 right-3 z-20 w-8 h-8 flex items-center justify-center bg-white border border-gray-200 text-gray-400 rounded-full shadow-sm hover:text-[#FF3B30] hover:scale-110 transition-all duration-300"
-                                            onClick={(e) => { e.preventDefault(); e.stopPropagation(); }}
-                                        >
-                                            <FaRegHeart size={14} />
-                                        </button>
+                                        
                                         {/* Product Image */}
-                                        <Link href={`/products/${product.id}`} className="flex items-center justify-center w-full h-full">
-                                            <div className="w-[240px] h-[220px] relative transition-transform duration-700 ease-out group-hover:scale-105">
-                                                <img
-                                                    src={product.image}
-                                                    alt={product.name}
-                                                    className="w-full h-full object-contain mix-blend-multiply"
-                                                />
-                                            </div>
+                                        <Link href={`/products/${product.id}`} className="flex items-center justify-center w-full h-full p-4">
+                                            <img
+                                                src={product.image}
+                                                alt={product.name}
+                                                className="w-full h-full object-contain mix-blend-multiply transition-transform duration-700 ease-out group-hover:scale-105"
+                                            />
                                         </Link>
                                     </div>
-
                                     {/* Text Section */}
-                                    <Link
-                                        href={`/products/${product.id}`}
-                                        className="flex flex-col"
-                                        style={{ width: "285px", height: "105px", gap: "8px", paddingTop: "8px", paddingRight: "12px", paddingBottom: "12px", paddingLeft: "12px" }}
+                                    <div
+                                        className="flex flex-col flex-1 p-3 md:p-4 relative overflow-hidden font-manrope"
                                     >
-                                        <h3
-                                            className="font-manrope text-[#1D1D1F] line-clamp-1 group-hover:text-[#FF3B30] transition-colors duration-300"
-                                            style={{ fontSize: "16px", fontWeight: 600, lineHeight: "23px", letterSpacing: "-0.4px" }}
-                                        >
-                                            {product.name}
-                                        </h3>
-                                        <div className="flex items-center justify-between transition-all duration-500 group-hover:opacity-0 group-hover:-translate-y-1">
-                                            <div className="flex items-center gap-0.5">
-                                                <div className="flex text-[#FF9F0A]">
-                                                    {[1, 2, 3, 4, 5].map((s) => (
-                                                        <FaStar key={s} size={12} className={s <= Math.round(product.rating || 4) ? "" : "opacity-20"} />
-                                                    ))}
-                                                </div>
-                                                <span className="text-[12px] font-semibold text-[#86868B] ml-1">
-                                                    {product.rating || "4.5"}({product.reviews || 0})
+                                        <Link href={`/products/${product.id}`}>
+                                            <h3
+                                                className="text-[#1D1D1F] line-clamp-2 md:line-clamp-1 transition-colors duration-300 text-[15px] md:text-[18px] font-bold leading-tight mb-1"
+                                            >
+                                                {product.name}
+                                            </h3>
+                                        </Link>
+                                        
+                                        <div className="flex items-center justify-between mb-3">
+                                            <div className="flex items-center gap-1">
+                                                <FaStar className="text-[#FF9F0A]" size={14} />
+                                                <span className="text-[12px] md:text-[14px] font-bold text-[#8E8E93]">
+                                                    {product.rating || "4.5"}
+                                                    <span className="font-medium ml-0.5">({product.reviews || 0})</span>
                                                 </span>
                                             </div>
-                                            <div className="flex items-center gap-1 text-[#86868B]">
-                                                <FaTruck size={12} />
-                                                <span className="text-[11px] font-medium">2-4 days</span>
-                                                <FaInfoCircle size={9} className="opacity-40" />
+                                            <div className="flex items-center gap-1.5 text-[#8E8E93]">
+                                                <FaTruck size={14} />
+                                                <span className="text-[11px] md:text-[13px] font-semibold">2-4 days</span>
+                                                <FaInfoCircle size={10} className="ml-0.5 opacity-40" />
                                             </div>
                                         </div>
-                                        <div className="relative">
-                                            <div className="flex items-baseline gap-1.5 transition-all duration-500 group-hover:opacity-0 group-hover:-translate-y-2">
-                                                <span className="text-[12px] text-[#86868B] font-medium">from</span>
-                                                <span className="text-[14px] text-[#86868B] line-through font-medium opacity-60">₹{product.originalPrice}</span>
-                                                <span className="text-[20px] font-extrabold text-[#FF3B30] leading-none">₹{product.rentPrice}</span>
-                                                <span className="text-[12px] text-[#86868B] font-medium">/month</span>
+
+                                        <div className="flex flex-col gap-1 mb-4">
+                                            <div className="flex items-baseline flex-wrap gap-1.5">
+                                                <span className="text-[11px] md:text-[13px] text-[#8E8E93] font-medium">from</span>
+                                                {product.originalPrice && (
+                                                    <span className="text-[12px] md:text-[15px] text-[#8E8E93] line-through font-medium opacity-50">₹{product.originalPrice}</span>
+                                                )}
+                                                <span className="text-[18px] md:text-[24px] font-extrabold text-[#FF3B30] leading-none">₹{product.rentPrice}</span>
+                                                <span className="text-[11px] md:text-[13px] text-[#8E8E93] font-medium">/month</span>
                                             </div>
-                                            <div className="absolute inset-x-0 bottom-0 flex gap-2 opacity-0 translate-y-3 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-500 ease-out z-30">
-                                                <button
-                                                    className="flex-1 bg-white border border-gray-200 text-[#4A4A4A] rounded-[10px] text-[12px] font-bold hover:bg-gray-50 transition-colors shadow-sm h-[34px] active:scale-95"
-                                                    onClick={(e) => handleQuickView(e, product.id)}
-                                                >
-                                                    Quick View
-                                                </button>
-                                                <button
-                                                    className={`flex-1 ${addedStatus[product.id] ? 'bg-green-500 text-white' : 'bg-[#FFCF46] text-black'} rounded-[10px] text-[12px] font-bold transition-all hover:shadow-lg active:scale-95 h-[34px]`}
+                                        </div>
+
+                                        {/* Dynamic Bottom Area (Tags or Button) */}
+                                        <div className="mt-auto relative w-full h-[40px] md:h-[50px] flex items-center">
+                                            {/* Tags Section - visible by default */}
+                                            <div className="flex flex-wrap gap-1.5 transition-all duration-300 group-hover:opacity-0 group-hover:invisible w-full">
+                                                {(product.tags || product.statusTags || []).slice(0, 2).map((tag, i) => (
+                                                    <span key={i} className="px-2 py-1 border border-[#E5E5EA] rounded-full text-[9px] md:text-[11px] text-[#86868B] font-semibold whitespace-nowrap bg-white">
+                                                        {tag}
+                                                    </span>
+                                                ))}
+                                            </div>
+
+                                            {/* Hover Button Section */}
+                                            <div 
+                                                className="absolute inset-0 opacity-0 translate-y-3 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300 z-30 pointer-events-none group-hover:pointer-events-auto flex items-center"
+                                            >
+                                                <button 
                                                     onClick={(e) => handleAddToCart(e, product)}
+                                                    className="w-full h-full rounded-full bg-[#FFCF46] text-[#1D1D1F] font-bold text-[14px] md:text-[16px] shadow-md active:scale-95 transition-all hover:brightness-105"
                                                 >
-                                                    {addedStatus[product.id] ? 'Added!' : 'Add to Cart'}
+                                                    Rent Now
                                                 </button>
                                             </div>
                                         </div>
-                                    </Link>
+                                    </div>
                                 </motion.div>
                             </div>
                         )
@@ -267,7 +323,24 @@ const BestRentedProducts = ({ type = "bestRented", defaultTitle = "Curated Produ
                 <div className="mt-6 flex justify-center md:hidden">
                     <Link
                         href="/products"
-                        className="btn-yellow-primary !h-auto !py-2.5 !px-8 !rounded-full shadow-sm"
+                        style={{
+                            width: '82px',
+                            height: '30px',
+                            paddingTop: '6px',
+                            paddingBottom: '6px',
+                            paddingLeft: '20px',
+                            paddingRight: '20px',
+                            borderRadius: '9999px',
+                            background: 'hsla(44, 100%, 64%, 1)',
+                            borderBottom: '1px solid rgba(0,0,0,0.10)',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            fontSize: '11px',
+                            fontWeight: '600',
+                            color: '#1D1D1F',
+                            whiteSpace: 'nowrap'
+                        }}
                     >
                         View All
                     </Link>
