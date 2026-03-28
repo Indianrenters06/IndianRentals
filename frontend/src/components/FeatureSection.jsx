@@ -213,14 +213,15 @@ const FeatureSection = () => {
                     <div
                         className="w-full flex-row lg:flex-col items-center justify-between lg:items-start z-10 order-3 lg:mt-0 flex"
                         style={{
-                            width: isDesktop ? '142px' : '350px',
-                            height: isDesktop ? '339px' : 'auto',
-                            gap: isDesktop ? '29px' : '16px',
-                            minHeight: isDesktop ? '339px' : '92px',
+                            width: isDesktop ? '142px' : '358px',
+                            height: isDesktop ? '339px' : '113px',
+                            gap: isDesktop ? '29px' : '10px',
+                            minHeight: isDesktop ? '339px' : '113px',
                             paddingTop: isDesktop ? '0' : '0px',
                             justifyContent: isDesktop ? 'flex-start' : 'space-between',
                             margin: isDesktop ? '0' : '0 auto',
-                            paddingBottom: isDesktop ? '0' : '12px'
+                            paddingBottom: isDesktop ? '0' : '0px',
+                            opacity: 1
                         }}
                     >
                         {stats.slice(0, 3).map((stat, idx) => {

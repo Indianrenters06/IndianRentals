@@ -13,7 +13,7 @@ import {
 import { API } from '../services/apiConfig';
 
 const FALLBACK_STEPS = [
-    { title: "Choose Your Tech", description: "Browse our curated selection of premium, performance tested devices. Use the search or categories to find the perfect tool for your needs.", icon: "Laptop", highlight: true },
+    { title: "Choose Your Tech", description: "Browse our curated selection of premium, performance\ntested devices. Use the search or categories to find the\nperfect tool for your needs.", icon: "Laptop", highlight: true },
     { title: "Complete KYC", description: "Pick a flexible rental tenure from 1 to 12 months. Then, complete our KYC process online with your basic documents (PAN and Address Proof).", icon: "IdentificationCard", highlight: false },
     { title: "Secure Your Order", description: "Confirm your rental and complete the payment online. This includes the first month's rent and a fully refundable security deposit.", icon: "ShoppingCart", highlight: false },
     { title: "Receive & Create", description: "We deliver your tech right to your doorstep, typically within 2-3 business days. It arrives fully charged, sanitized, and ready to use straight out of the box. Now, go build something amazing!", icon: "Package", highlight: false }
@@ -68,21 +68,22 @@ const RentalProcess = () => {
 
     return (
         <section 
-            className="w-full overflow-hidden md:bg-[#F5F5F5] bg-white"
+            className="w-full overflow-hidden md:bg-[#F5F5F5]"
             style={{ 
-                width: isDesktop ? '100%' : '390px',
+                width: '100%',
                 margin: '0 auto',
-                minHeight: isDesktop ? '847px' : '738px',
+                minHeight: isDesktop ? '847px' : '752px',
                 paddingTop: isDesktop ? '120px' : '48px',
                 paddingBottom: isDesktop ? '120px' : '48px',
-                background: isDesktop ? '#F5F5F5' : 'linear-gradient(180deg, #FFFFFF 0%, rgba(255, 228, 133, 0.63) 100%)'
+                background: isDesktop ? '#F5F5F5' : 'linear-gradient(180deg, #FFFFFF 0%, rgba(255, 228, 133, 0.63) 100%)',
+                opacity: 1
             }}
         >
             <div 
                 className="max-w-[1200px] mx-auto flex flex-col md:gap-[32px] gap-[20px]"
                 style={{
-                    paddingLeft: isDesktop ? '24px' : '20px',
-                    paddingRight: isDesktop ? '24px' : '20px'
+                    paddingLeft: isDesktop ? '24px' : '16px',
+                    paddingRight: isDesktop ? '24px' : '16px'
                 }}
             >
                 {/* Desktop Header Row */}
@@ -103,15 +104,17 @@ const RentalProcess = () => {
                 {/* Mobile Header */}
                 <div 
                     className="md:hidden flex flex-col pt-4 mx-auto" 
-                    style={{ width: '350px', height: '113px', gap: '10px' }}
+                    style={{ width: '100%', maxWidth: '358px', height: '113px', gap: '10px' }}
                 >
                     <div className="flex flex-col" style={{ gap: '2px' }}>
                         <h2 className="text-[32px] font-bold text-[#1D1D1F] leading-[1.1] tracking-tight">{cms.title}</h2>
                         <p className="text-[#1D1D1F]/70 text-[11.5px] leading-tight font-medium max-w-[340px]">{cms.subtitle}</p>
                     </div>
-                    <div className="flex items-center gap-3">
-                        <Link href="/rental-process" className="inline-flex items-center justify-center text-black font-bold text-[12px] w-[114px] h-[34px] rounded-full bg-[#FFCF46] shadow-sm">Rental Process</Link>
-                        <Link href="/contact" className="inline-flex items-center justify-center text-white font-bold text-[12px] w-[90px] h-[34px] rounded-full bg-[#323232]">Contact</Link>
+                    <div className="flex items-center" style={{ width: '184px', height: '30px', gap: '10px' }}>
+                        <Link href="/rental-process" className="inline-flex items-center justify-center rounded-full bg-[#FFCF46] shadow-sm font-manrope" style={{ width: '100px', height: '30px', color: 'hsla(0, 0%, 12%, 1)', fontWeight: '500', fontSize: '11px', lineHeight: '18px' }}>
+                            <span style={{ width: '81px', height: '18px', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', letterSpacing: '-0.01em' }}>Rental Process</span>
+                        </Link>
+                        <Link href="/contact" className="inline-flex items-center justify-center font-manrope text-white" style={{ width: '69px', height: '30px', padding: '6px 12px', background: 'var(--color-grey-grey-700, hsla(0, 0%, 20%, 1))', borderRadius: '32px', borderBottom: '1px solid rgba(255, 255, 255, 0.1)', fontWeight: '500', fontSize: '11px', lineHeight: '18px', gap: '2px', opacity: 1 }}>Contact</Link>
                     </div>
                 </div>
 
@@ -123,8 +126,9 @@ const RentalProcess = () => {
                         <div 
                             className="flex flex-col mx-auto"
                             style={{ 
-                                width: '350px',
-                                height: '509px',
+                                width: '100%',
+                                maxWidth: '358px',
+                                height: '523px',
                                 gap: '12px'
                             }}
                         >
@@ -134,20 +138,48 @@ const RentalProcess = () => {
                                     <div
                                         key={`mobile-step-${index}`}
                                         onClick={() => setActiveStep(index)}
-                                        className={`relative cursor-pointer transition-all duration-300 rounded-[1.2rem] overflow-hidden flex-1 flex flex-col justify-center ${isActive ? "" : "bg-white border border-[#E5E5E7]"}`}
+                                        className={`relative cursor-pointer transition-all duration-300 rounded-2xl overflow-hidden flex flex-col justify-center ${isActive ? "" : "bg-white border border-[#E5E5E7]"}`}
                                         style={{ 
+                                            width: '100%',
+                                            maxWidth: '358px',
                                             height: isActive ? '118px' : 'auto',
+                                            minHeight: isActive ? '118px' : '92px',
                                             padding: '20px 16px',
                                             background: isActive ? 'linear-gradient(125.34deg, rgba(255, 207, 70, 0.5) 1.25%, rgba(255, 185, 27, 0.9) 98.94%)' : undefined,
                                             boxShadow: isActive ? '-3px -3px 15px -2px hsla(29, 100%, 44%, 0.26) inset' : undefined,
                                         }}
                                     >
-                                        <div className="flex flex-col">
-                                            <div className="flex items-center gap-3 mb-1">
+                                        <div 
+                                            className="flex flex-col"
+                                            style={{
+                                                width: '100%',
+                                                height: '78px',
+                                                gap: '5px',
+                                                display: 'flex',
+                                                flexDirection: 'column',
+                                                justifyContent: 'center'
+                                            }}
+                                        >
+                                            <div className="flex items-center gap-3" style={{ height: '19px' }}>
                                                 <div className={isActive ? 'text-[#6B4B18]' : 'text-[#1D1D1F]'}><DynamicIcon name={step.icon} size={22} /></div>
                                                 <h3 className={`text-[15px] font-bold ${isActive ? 'text-[#6B4B18]' : 'text-[#1D1D1F]'} leading-tight tracking-tight`}>{step.title}</h3>
                                             </div>
-                                            <p className={`${isActive ? 'text-[#6B4B18]/90' : 'text-[#1D1D1F]/60'} text-[11px] leading-snug font-medium`}>{step.description}</p>
+                                            <p 
+                                                className={`font-manrope ${isActive ? "" : "text-[#1D1D1F]"}`}
+                                                style={{
+                                                    fontSize: '11px',
+                                                    fontWeight: '500',
+                                                    width: '100%',
+                                                    height: '54px',
+                                                    color: isActive ? 'hsla(19, 84%, 26%, 0.7)' : 'rgba(29, 29, 31, 0.6)',
+                                                    lineHeight: '18px',
+                                                    letterSpacing: '-0.01em',
+                                                    overflow: 'hidden',
+                                                    whiteSpace: 'pre-line'
+                                                }}
+                                            >
+                                                {step.description}
+                                            </p>
                                         </div>
                                         <div className={`absolute -right-2 top-1/2 -translate-y-1/2 text-[80px] font-black pointer-events-none select-none ${isActive ? 'text-[#6B4B18]/10' : 'text-black/[0.03]'}`}>{index + 1}</div>
                                     </div>
@@ -215,8 +247,8 @@ const RentalProcess = () => {
                         </div>
                     )}
 
-                    {/* Image Column */}
-                    <div className="relative flex-1 rounded-[2rem] overflow-hidden bg-white shadow-sm h-[300px] md:h-[500px]">
+                    {/* Image Column - Hidden on mobile to maintain 738px layout height */}
+                    <div className="relative hidden md:flex flex-1 rounded-[2rem] overflow-hidden bg-white shadow-sm md:h-[500px]">
                         {cms.steps[activeStep] && <Image key={activeStep} src={cms.steps[activeStep].image || STEP_IMAGES[activeStep] || STEP_IMAGES[0]} alt={cms.steps[activeStep].title} fill className="object-cover animate-fadeIn" priority />}
                     </div>
                 </div>
