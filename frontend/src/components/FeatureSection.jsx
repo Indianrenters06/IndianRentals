@@ -154,7 +154,6 @@ const FeatureSection = () => {
                                 }}
                             >
                                 {cms.featureSectionCtaText || "Rent Now"}
-                                <FaArrowRight size={isDesktop ? 12 : 9} className="ml-1" />
                             </Link>
                         </motion.div>
                     </div>

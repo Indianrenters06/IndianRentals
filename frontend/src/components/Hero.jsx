@@ -141,7 +141,7 @@ const Hero = () => {
                             <h1 className="text-sm font-bold leading-tight mb-1">{s.title}</h1>
                             <p className="text-[10px] opacity-90 mb-2">{s.subtitle}</p>
                             <Button href={s.ctaLink || "/store"} className="h-6 rounded-full bg-[#fbc02d] text-black text-[8px] px-3 font-bold">
-                                {s.ctaText || "Rent Now"}
+                                {(s.ctaText || "Rent Now").replace(/ [^\w\s]+.*$| [→➔➜]|^.*[→➔➜]$| \-\>/g, "").trim()}
                             </Button>
                         </div>
                     </div>
@@ -213,7 +213,7 @@ const SlideItem = ({ slide, isActive, width }) => (
                 <p className="text-[18px] opacity-90 font-medium leading-relaxed max-w-md">{slide.subtitle}</p>
                 <div className="pt-2">
                     <Button href={slide.ctaLink || "/store"} variant="yellow" size="md" className="w-auto! rounded-full! px-10 py-4 font-bold inline-flex shadow-lg hover:scale-105 transition-transform">
-                        {slide.ctaText || "Rent Now"}
+                        {(slide.ctaText || "Rent Now").replace(/ [^\w\s]+.*$| [→➔➜]|^.*[→➔➜]$| \-\>/g, "").trim()}
                     </Button>
                 </div>
             </div>

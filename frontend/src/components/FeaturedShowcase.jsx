@@ -3,7 +3,7 @@ import React, { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
-import { FaRegHeart, FaStar, FaTruck, FaInfoCircle, FaChevronLeft, FaChevronRight, FaBolt } from "react-icons/fa";
+import { FaRegHeart, FaStar, FaTruck, FaInfoCircle, FaChevronLeft, FaChevronRight } from "react-icons/fa";
 
 import { API } from "@/services/apiConfig";
 
@@ -35,115 +35,180 @@ const FALLBACK_BANNERS = [
 import { useRouter } from "next/navigation";
 import { useDispatch } from "react-redux";
 import { addToCart } from "@/redux/features/cartSlice";
-import Button from "./common/Button";
 
 // ─── Single Product Card ──────────────────────────────────────────────────────
-const ShowcaseProductCard = ({ product, index, onAddToCart, onQuickView, isAdded }) => (
-    <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true }}
-        transition={{ duration: 0.45, delay: index * 0.1 }}
-        className="group bg-white rounded-2xl flex flex-col overflow-hidden relative transition-all duration-500 hover:shadow-[0_8px_30px_rgba(0,0,0,0.10)] hover:-translate-y-1"
-        style={{ width: "281px", height: "391px", flexShrink: 0, border: "1px solid hsla(0, 0%, 89%, 1)" }}
-    >
-        {/* Image Section — full-bleed top */}
+const ShowcaseProductCard = ({ product, index, isDesktop, handleAddToCart }) => {
+    const [isHovered, setIsHovered] = useState(false);
+
+    return (
         <div
-            className="relative rounded-2xl bg-[#F7F7F7] group-hover:bg-[#F0F0F0] transition-colors duration-500 flex items-center justify-center overflow-hidden shrink-0"
-            style={{ width: "281px", height: "282px", borderRight: "1px solid hsla(0, 0%, 89%, 1)", borderBottom: "1px solid hsla(0, 0%, 89%, 1)", borderLeft: "1px solid hsla(0, 0%, 89%, 1)" }}
+            className="relative group h-full"
+            onMouseEnter={() => setIsHovered(true)}
+            onMouseLeave={() => setIsHovered(false)}
+            onTouchStart={() => setIsHovered(true)}
         >
-            {/* Badges */}
-            <div className="absolute top-3 left-3 z-20 flex gap-1.5">
-                <span className="bg-[#FF3B30] text-white text-[11px] font-bold px-2 py-[3px] rounded-[4px] shadow-sm leading-none">
-                    -20% off
-                </span>
-                {product.isNew && (
-                    <span className="bg-[#34C759] text-white text-[11px] font-bold px-2 py-[3px] rounded-[4px] shadow-sm leading-none">
-                        New
-                    </span>
-                )}
-            </div>
-            {/* Heart */}
-            <button
-                className="absolute top-3 right-3 z-20 w-8 h-8 flex items-center justify-center bg-white border border-gray-200 text-gray-400 rounded-full shadow-sm hover:text-[#FF3B30] hover:scale-110 transition-all duration-300"
-                onClick={(e) => { e.preventDefault(); e.stopPropagation(); }}
+            <motion.div
+                animate={isHovered ? "hover" : "initial"}
+                initial="initial"
+                className="bg-white rounded-[24px] flex flex-col overflow-hidden relative mx-auto w-[173px] md:w-[285px]"
+                style={{ 
+                    height: isDesktop ? '350px' : '260px',
+                    border: "1px solid hsla(0, 0%, 89%, 1)",
+                    boxShadow: "0px 1px 2px 0px hsla(0, 0%, 0%, 0.05)",
+                    willChange: "transform, height"
+                }}
+                variants={{
+                    initial: { 
+                        height: isDesktop ? 350 : 260,
+                        boxShadow: "0px 1px 2px 0px hsla(0, 0%, 0%, 0.05)"
+                    },
+                    hover: { 
+                        height: isDesktop ? 405 : 330,
+                        boxShadow: "0px 12px 40px rgba(0,0,0,0.12)",
+                        transition: { duration: 0.45, ease: [0.25, 1, 0.5, 1] }
+                    }
+                }}
             >
-                <FaRegHeart size={14} />
-            </button>
-            {/* Product Image */}
-            <Link href={`/products/${product.id}`} className="flex items-center justify-center w-full h-full">
-                <div className="w-[240px] h-[220px] relative transition-transform duration-700 ease-out group-hover:scale-105">
-                    <img
-                        src={product.image}
-                        alt={product.name}
-                        className="w-full h-full object-contain mix-blend-multiply"
-                    />
-                </div>
-            </Link>
-        </div>
-
-        {/* Text Section */}
-        <Link
-            href={`/products/${product.id}`}
-            className="flex flex-col"
-            style={{ width: "281px", height: "105px", gap: "8px", paddingTop: "8px", paddingRight: "12px", paddingBottom: "12px", paddingLeft: "12px" }}
-        >
-            <h3
-                className="font-manrope text-[#1D1D1F] line-clamp-1 group-hover:text-[#FF3B30] transition-colors duration-300"
-                style={{ fontSize: "16px", fontWeight: 600, lineHeight: "23px", letterSpacing: "-0.4px" }}
-            >
-                {product.name}
-            </h3>
-            <div className="flex items-center justify-between transition-all duration-500 group-hover:opacity-0 group-hover:-translate-y-1">
-                <div className="flex items-center gap-0.5">
-                    <div className="flex text-[#FF9F0A]">
-                        {[1, 2, 3, 4, 5].map((s) => (
-                            <FaStar key={s} size={12} className={s <= Math.round(product.rating || 4) ? "" : "opacity-20"} />
-                        ))}
+                {/* Image Section — full-bleed top */}
+                <div
+                    className="relative bg-[#F9F9F9] flex items-center justify-center overflow-hidden shrink-0 h-[146px] md:h-[240px] rounded-t-2xl"
+                    style={{ 
+                        borderWidth: '0px 1px 1px 1px',
+                        borderStyle: 'solid',
+                        borderColor: 'hsla(0, 0%, 93%, 1)',
+                        boxShadow: '0px 4px 8px 0px hsla(0, 0%, 87%, 0.1)'
+                    }}
+                >
+                    {/* Badges */}
+                    <div className="absolute top-2 left-2 z-20 flex gap-1">
+                        <span className="bg-[#FF3B30] text-white text-[9px] md:text-[11px] font-bold px-1.5 py-[2px] rounded-[4px] shadow-sm leading-none">
+                            -20% off
+                        </span>
                     </div>
-                    <span className="text-[12px] font-semibold text-[#86868B] ml-1">
-                        {product.rating || "4.5"}({product.reviews || 0})
-                    </span>
-                </div>
-                <div className="flex items-center gap-1 text-[#86868B]">
-                    <FaTruck size={12} />
-                    <span className="text-[11px] font-medium">2-4 days</span>
-                    <FaInfoCircle size={9} className="opacity-40" />
-                </div>
-            </div>
-            <div className="relative">
-                <div className="flex items-baseline gap-1.5 transition-all duration-500 group-hover:opacity-0 group-hover:-translate-y-2">
-                    <span className="text-[12px] text-[#86868B] font-medium">from</span>
-                    <span className="text-[14px] text-[#86868B] line-through font-medium opacity-60">₹{product.originalPrice}</span>
-                    <span className="text-[20px] font-extrabold text-[#FF3B30] leading-none">₹{product.rentPrice}</span>
-                    <span className="text-[12px] text-[#86868B] font-medium">/month</span>
-                </div>
-                <div className="absolute inset-x-0 bottom-0 flex gap-2 opacity-0 translate-y-3 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-500 ease-out z-30">
-                    <Button
-                        variant="black"
-                        size="md"
-                        className="flex-1 h-[34px]! rounded-[10px]! text-[12px]! min-w-0! font-bold active:scale-95"
-                        onClick={(e) => onQuickView(e, product.id)}
+                    
+                    {/* Heart */}
+                    <button
+                        className="absolute top-2 right-2 z-20 w-7 h-7 md:w-8 md:h-8 flex items-center justify-center bg-white border border-gray-200 text-gray-400 rounded-full shadow-sm hover:text-[#FF3B30] hover:scale-110 transition-all duration-300"
+                        onClick={(e) => { e.preventDefault(); e.stopPropagation(); }}
                     >
-                        Quick View
-                    </Button>
-                    <Button
-                        variant={isAdded ? 'ghost' : 'yellow'}
-                        size="md"
-                        className={`flex-1 h-[34px]! rounded-[10px]! text-[12px]! min-w-0! font-bold active:scale-95 ${isAdded ? 'bg-green-500 text-white! border-none' : ''}`}
-                        onClick={(e) => onAddToCart(e, product)}
-                    >
-                        {isAdded ? 'Added!' : 'Add to Cart'}
-                    </Button>
-                </div>
-            </div>
-        </Link>
-    </motion.div>
-);
+                        <FaRegHeart size={isDesktop ? 14 : 12} />
+                    </button>
 
+                    {/* Product Image */}
+                    <Link 
+                        href={`/products/${product.id}`} 
+                        className="flex items-center justify-center w-full h-full p-4"
+                        onClick={(e) => {
+                            if (!isDesktop && !isHovered) {
+                                e.preventDefault();
+                                setIsHovered(true);
+                            }
+                        }}
+                    >
+                        <motion.img
+                            variants={{
+                                initial: { scale: 1 },
+                                hover: { scale: 1.05 }
+                            }}
+                            src={product.image}
+                            alt={product.name}
+                            className="w-full h-full object-contain mix-blend-multiply"
+                        />
+                    </Link>
+                </div>
+                {/* Text Section */}
+                <div
+                    className="flex flex-col relative overflow-hidden font-manrope"
+                    style={{ 
+                        width: isDesktop ? '285px' : '173px',
+                        height: 'auto',
+                        padding: isDesktop ? '8px 12px 12px 12px' : '6px 10px 8px 10px',
+                        gap: isDesktop ? '4px' : '2px'
+                    }}
+                >
+                    <Link 
+                        href={`/products/${product.id}`}
+                        onClick={(e) => {
+                            if (!isDesktop && !isHovered) {
+                                e.preventDefault();
+                                setIsHovered(true);
+                            }
+                        }}
+                    >
+                        <h3 className="text-[#1D1D1F] line-clamp-1 text-[14px] md:text-[18px] font-bold leading-tight">
+                            {product.name}
+                        </h3>
+                    </Link>
+                    
+                    <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-1">
+                            <div className="flex text-[#FF9F0A]">
+                                {isDesktop ? (
+                                    [1, 2, 3, 4, 5].map((s) => (
+                                        <FaStar key={s} size={12} className={s <= Math.round(product.rating || 4) ? "" : "opacity-20"} />
+                                    ))
+                                ) : (
+                                    <FaStar size={10} />
+                                )}
+                            </div>
+                            <span className="text-[11px] md:text-[14px] font-bold text-[#8E8E93] ml-1">
+                                {product.rating || "4.5"}({product.reviews || 12})
+                            </span>
+                        </div>
+                        <div className="flex items-center gap-1.5 text-[#8E8E93]">
+                            <FaTruck size={14} />
+                            <span className="text-[13px] font-semibold">2-4 days</span>
+                            <FaInfoCircle size={10} className="ml-0.5 opacity-40" />
+                        </div>
+                    </div>
+
+                    <div className="flex flex-col">
+                        <div className="flex items-baseline flex-nowrap gap-1">
+                            <span className="text-[10px] md:text-[13px] text-[#8E8E93] font-medium whitespace-nowrap leading-none">from</span>
+                            {product.originalPrice && (
+                                <span className="text-[13px] md:text-[15px] text-[#8E8E93] line-through font-bold whitespace-nowrap leading-none">₹{product.originalPrice}</span>
+                            )}
+                            <span className="text-[17px] md:text-[24px] font-extrabold text-[#FF3B30] leading-none whitespace-nowrap">₹{product.rentPrice}</span>
+                            <span className="text-[10px] md:text-[13px] text-[#8E8E93] font-medium whitespace-nowrap leading-none">/month</span>
+                        </div>
+                    </div>
+
+                    <motion.div 
+                        variants={{
+                            initial: { opacity: 0, height: 0 },
+                            hover: { 
+                                opacity: 1, 
+                                height: 60, 
+                                transition: { 
+                                    height: { duration: 0.4, ease: [0.4, 0, 0.2, 1] },
+                                    opacity: { duration: 0.3 }
+                                }
+                            }
+                        }}
+                        className="relative w-full z-30 overflow-hidden flex items-center pt-2 pb-1"
+                    >
+                        <motion.button 
+                            variants={{
+                                initial: { y: 60 },
+                                hover: { 
+                                    y: 0,
+                                    transition: { type: "spring", stiffness: 300, damping: 25, delay: 0.1 }
+                                }
+                            }}
+                            onClick={(e) => handleAddToCart(e, product)}
+                            className="w-full h-[50px] rounded-full bg-[#fbc02d] text-[#1D1D1F] font-bold text-[14px] md:text-[16px] shadow-md active:scale-95 transition-all hover:brightness-105"
+                        >
+                            Rent Now
+                        </motion.button>
+                    </motion.div>
+                </div>
+            </motion.div>
+        </div>
+    );
+};
 
 // ─── Banner Carousel ──────────────────────────────────────────────────────────
-const BannerCarousel = ({ banners }) => {
+const BannerCarousel = ({ banners, height = "391px" }) => {
     const [current, setCurrent] = useState(0);
     const [direction, setDirection] = useState(1);
 
@@ -160,10 +225,7 @@ const BannerCarousel = ({ banners }) => {
     const slide = banners[current];
 
     return (
-        <div
-            className="relative overflow-hidden rounded-2xl flex-1"
-            style={{ height: "391px" }}
-        >
+        <div className="relative overflow-hidden rounded-2xl flex-1" style={{ height }}>
             <AnimatePresence initial={false} custom={direction}>
                 <motion.div
                     key={current}
@@ -180,7 +242,6 @@ const BannerCarousel = ({ banners }) => {
                     className="absolute inset-0 flex flex-col"
                     style={{ background: slide.bg }}
                 >
-                    {/* Background image */}
                     <div className="absolute inset-0 z-0">
                         {slide.image && (
                             <Image
@@ -196,35 +257,27 @@ const BannerCarousel = ({ banners }) => {
                             style={{ background: "linear-gradient(to top, rgba(0,0,0,0.72) 0%, transparent 100%)" }}
                         />
                     </div>
-
-                    {/* Content — padded per Figma: 30px top/bottom, 31px left/right */}
                     <div className="relative z-10 mt-auto" style={{ padding: "30px 31px" }}>
-                        {/* Nav arrows */}
                         <div className="absolute top-1/2 -translate-y-1/2 left-5 right-5 flex justify-between pointer-events-none">
                             <button
                                 onClick={(e) => { e.stopPropagation(); go(-1); }}
-                                className="pointer-events-auto w-8 h-8 rounded-full bg-white/20 backdrop-blur-sm border border-white/30 flex items-center justify-center text-white hover:bg-white/40 transition-all"
+                                className="pointer-events-auto w-8 h-8 rounded-full bg-white/20 backdrop-blur-sm border border-white/30 flex items-center justify-center text-white hover:bg-white/40"
                             >
                                 <FaChevronLeft size={12} />
                             </button>
                             <button
                                 onClick={(e) => { e.stopPropagation(); go(1); }}
-                                className="pointer-events-auto w-8 h-8 rounded-full bg-white/20 backdrop-blur-sm border border-white/30 flex items-center justify-center text-white hover:bg-white/40 transition-all"
+                                className="pointer-events-auto w-8 h-8 rounded-full bg-white/20 backdrop-blur-sm border border-white/30 flex items-center justify-center text-white hover:bg-white/40"
                             >
                                 <FaChevronRight size={12} />
                             </button>
                         </div>
-
                         <Link href={slide.href || "/products"}>
                             <h3 className="text-white text-[22px] font-bold font-manrope tracking-tight leading-tight mb-1.5 hover:underline">
                                 {slide.title}
                             </h3>
                         </Link>
-                        <p className="text-white/75 text-[13px] font-medium tracking-tight mb-4">
-                            {slide.subtitle}
-                        </p>
-
-                        {/* Dots */}
+                        <p className="text-white/75 text-[13px] font-medium mb-4">{slide.subtitle}</p>
                         <div className="flex gap-2">
                             {banners.map((_, i) => (
                                 <button
@@ -249,6 +302,14 @@ const FeaturedShowcase = () => {
     const [products, setProducts] = useState([]);
     const [loading, setLoading] = useState(true);
     const [addedStatus, setAddedStatus] = useState({});
+    const [isDesktop, setIsDesktop] = useState(false);
+
+    useEffect(() => {
+        const checkRes = () => setIsDesktop(window.innerWidth >= 1024);
+        checkRes();
+        window.addEventListener('resize', checkRes);
+        return () => window.removeEventListener('resize', checkRes);
+    }, []);
 
     const handleAddToCart = (e, product) => {
         e.preventDefault();
@@ -273,13 +334,10 @@ const FeaturedShowcase = () => {
         e.stopPropagation();
         router.push(`/products/${productId}`);
     };
-    
-    // ... useEffect remains the same
 
     useEffect(() => {
         const load = async () => {
             try {
-                // 1. Fetch CMS config
                 const cmsRes = await fetch(`${API}/api/cms/homepage`, { cache: "no-store" });
                 let pinnedIds = [];
                 let banners = FALLBACK_BANNERS;
@@ -297,7 +355,6 @@ const FeaturedShowcase = () => {
                 setCms({ enabled, productIds: pinnedIds, banners });
                 if (!enabled) { setLoading(false); return; }
 
-                // 2. Fetch pinned products, fallback to generic
                 let fetchedProducts = [];
                 if (pinnedIds.length > 0) {
                     const results = await Promise.all(
@@ -342,14 +399,13 @@ const FeaturedShowcase = () => {
     if (loading) return (
         <section className="py-8 bg-white">
             <div className="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8">
-                <div className="h-[391px] w-full max-w-[1200px] mx-auto bg-slate-50 animate-pulse rounded-[20px]" />
+                <div className="h-[391px] w-full bg-slate-50 animate-pulse rounded-[20px]" />
             </div>
         </section>
     );
 
     if (!cms.enabled) return null;
 
-    // Pad to exactly 2 product cards
     const displayProducts = products.length >= 2 ? products.slice(0, 2) : [
         ...products,
         ...Array(2 - products.length).fill(null).map((_, i) => ({
@@ -368,35 +424,23 @@ const FeaturedShowcase = () => {
     const activeBanners = cms.banners?.length > 0 ? cms.banners : FALLBACK_BANNERS;
 
     return (
-        <section
-            className="bg-white w-full"
-            style={{ borderTop: "1px solid hsla(0, 0%, 89%, 1)", paddingTop: "96px", paddingBottom: "96px" }}
-        >
+        <section className="bg-white w-full" style={{ borderTop: "1px solid hsla(0, 0%, 89%, 1)", paddingTop: "96px", paddingBottom: "120px" }}>
             <div className="max-w-[1200px] mx-auto px-4 sm:px-6">
-                {/* Inner row: fills max-w-[1200px] container, height 391px, gap 35px */}
-                <div
-                    className="flex flex-row items-stretch w-full"
-                    style={{ height: "391px", gap: "35px" }}
-                >
-                    {/* Left: cards group — two cards side by side, gap 20px */}
-                    <div
-                        className="flex flex-row shrink-0"
-                        style={{ gap: "20px" }}
-                    >
+                <div className="flex flex-col md:flex-row items-stretch w-full" style={{ minHeight: isDesktop ? "350px" : "auto", gap: "35px" }}>
+                    <div className="flex flex-row shrink-0" style={{ gap: "20px" }}>
                         {displayProducts.map((product, idx) => (
                             <ShowcaseProductCard
                                 key={product.id || idx}
                                 product={product}
                                 index={idx}
-                                onAddToCart={handleAddToCart}
-                                onQuickView={handleQuickView}
-                                isAdded={addedStatus[product.id]}
+                                isDesktop={isDesktop}
+                                handleAddToCart={handleAddToCart}
                             />
                         ))}
                     </div>
-
-                    {/* Right: Banner carousel — fills remaining width */}
-                    <BannerCarousel banners={activeBanners} />
+                    <div className="flex-1" style={{ height: isDesktop ? "350px" : "391px" }}>
+                         <BannerCarousel banners={activeBanners} height={isDesktop ? "350px" : "391px"} />
+                    </div>
                 </div>
             </div>
         </section>
