@@ -12,172 +12,197 @@ import { addToCart } from "@/redux/features/cartSlice";
 
 const ProductCard = ({ product, index, isDesktop, handleAddToCart }) => {
     const [isHovered, setIsHovered] = useState(false);
+    const router = useRouter();
 
     return (
         <div
-            className="relative group h-full"
+            className="relative group h-full flex-1"
             onMouseEnter={() => setIsHovered(true)}
             onMouseLeave={() => setIsHovered(false)}
             onTouchStart={() => setIsHovered(true)}
+            onClick={() => router.push(`/products/${product.id}`)}
         >
             <motion.div
                 animate={isHovered ? "hover" : "initial"}
                 initial="initial"
-                className="bg-white rounded-[24px] flex flex-col overflow-hidden relative mx-auto w-[173px] md:w-[285px]"
+                className="bg-white flex flex-col overflow-hidden relative mx-auto w-full rounded-[16px]"
                 style={{ 
-                    height: isDesktop ? '387px' : '260px',
+                    height: isDesktop ? '387px' : '256px',
+                    width: isDesktop ? '285px' : '170px',
                     border: "1px solid hsla(0, 0%, 89%, 1)",
                     boxShadow: "0px 1px 2px 0px hsla(0, 0%, 0%, 0.05)",
                     willChange: "transform, height",
                     cursor: "pointer",
-                    backgroundColor: "hsla(0, 0%, 100%, 1)"
+                    backgroundColor: "hsla(0, 0%, 100%, 1)",
+                    borderRadius: isDesktop ? "16px" : "8px",
+                    opacity: 1
                 }}
                 variants={{
-                    initial: { 
-                        height: isDesktop ? 387 : 260,
-                    },
+                    initial: { height: isDesktop ? 387 : 256 },
                     hover: { 
                         height: isDesktop ? 440 : 330,
                         transition: { duration: 0.3, ease: [0.45, 1.45, 0.8, 1] }
                     }
                 }}
-                onClick={() => router.push(`/products/${product.id}`)}
             >
-                {/* Image Section — full-bleed top */}
+                {/* Image Section */}
                 <div
-                    className="relative bg-[#F9F9F9] flex items-center justify-center overflow-hidden shrink-0 h-[146px] md:h-[282px] rounded-t-[24px]"
-                    style={{ 
+                    className="relative bg-white group-hover:bg-[#F9F9F9] transition-colors duration-500 flex items-center justify-center overflow-hidden shrink-0 h-[184px] md:h-[282px]"
+                    style={{
+                        width: isDesktop ? '285px' : '170px',
+                        borderRadius: isDesktop ? "16px" : "8px",
                         borderWidth: "0px 1px 1px 1px",
                         borderStyle: "solid",
                         borderColor: "hsla(0, 0%, 93%, 1)",
-                        borderRadius: "16px",
+                        backgroundColor: "hsla(0, 0%, 100%, 1)",
+                        opacity: 1,
                         boxShadow: "0px 4px 8px 0px hsla(0, 0%, 87%, 0.1), 0px 15px 15px 0px hsla(0, 0%, 87%, 0.09), 0px 33px 20px 0px hsla(0, 0%, 87%, 0.05), 0px 59px 23px 0px hsla(0, 0%, 87%, 0.01), 0px 91px 26px 0px hsla(0, 0%, 87%, 0)"
                     }}
                 >
-                    {/* Badges */}
-                    <div className="absolute top-2 left-2 z-20 flex gap-1">
-                        <span className="bg-[#FF3B30] text-white text-[9px] md:text-[11px] font-bold px-1.5 py-[2px] rounded-[4px] shadow-sm leading-none">
+                    <div 
+                        className="absolute z-20 flex items-center" 
+                        style={{ 
+                            top: "19.57px", 
+                            left: "13.49px", 
+                            gap: "4px",
+                            width: "92px",
+                            height: "22px"
+                        }}
+                    >
+                        <span className="bg-[#FF3B30] text-white text-[10px] font-bold px-2 py-[4px] rounded-[4px] shadow-sm leading-none flex items-center justify-center h-full">
                             -20% off
                         </span>
+                        {product.isNew && (
+                            <span 
+                                className="text-white text-[10px] font-bold shadow-sm leading-none flex items-center justify-center h-full translate-x-1.5"
+                                style={{
+                                    width: "34px",
+                                    height: "22px",
+                                    paddingTop: "4px",
+                                    paddingRight: "5px",
+                                    paddingBottom: "4px",
+                                    paddingLeft: "5px",
+                                    borderRadius: "6px",
+                                    backgroundColor: "hsla(122, 100%, 35%, 1)",
+                                    boxShadow: "0px 0px 1px 0px hsla(0, 0%, 47%, 0.1), 0px 1px 1px 0px hsla(0, 0%, 47%, 0.09), 0px 3px 2px 0px hsla(0, 0%, 47%, 0.05), 0px 5px 2px 0px hsla(0, 0%, 47%, 0.01), 0px 9px 2px 0px hsla(0, 0%, 47%, 0)"
+                                }}
+                            >
+                                New
+                            </span>
+                        )}
                     </div>
                     
-                    {/* Heart */}
                     <button
-                        className="absolute top-2 right-2 z-20 w-7 h-7 md:w-8 md:h-8 flex items-center justify-center bg-white border border-gray-200 text-gray-400 rounded-full shadow-sm hover:text-[#FF3B30] hover:scale-110 transition-all duration-300"
+                        className="absolute z-20 flex items-center justify-center rounded-full shadow-sm hover:scale-110 transition-all duration-300"
+                        style={{ width: "28px", height: "28px", top: "8px", right: "8px", backgroundColor: "white", border: "1px solid #E5E5EA" }}
                         onClick={(e) => { e.preventDefault(); e.stopPropagation(); }}
                     >
-                        <FaRegHeart size={isDesktop ? 14 : 12} />
+                        <FaRegHeart size={14} color="#8E8E93" />
                     </button>
                     
-                    {/* Product Image */}
-                    <Link 
-                        href={`/products/${product.id}`} 
-                        className="flex items-center justify-center w-full h-full p-4"
-                        onClick={(e) => {
-                            if (!isDesktop && !isHovered) {
-                                e.preventDefault();
-                                setIsHovered(true);
-                            }
-                        }}
-                    >
+                    <div className="relative w-full h-full p-4 flex items-center justify-center">
                         <motion.img
-                            variants={{
-                                initial: { scale: 1 },
-                                hover: { scale: 1.05 }
-                            }}
+                            variants={{ initial: { scale: 1 }, hover: { scale: 1.05 } }}
                             src={product.image}
                             alt={product.name}
-                            className="w-full h-full object-contain mix-blend-multiply"
+                            className="max-w-full max-h-full object-contain mix-blend-multiply transition-transform duration-700 ease-out"
                         />
-                    </Link>
+                    </div>
                 </div>
-                {/* Text Section — explicitly handles its own entrance */}
+
+                {/* Text Section */}
                 <div
-                    className="flex flex-col relative overflow-hidden font-manrope"
+                    className="flex flex-col relative font-manrope bg-white"
                     style={{ 
-                        width: isDesktop ? '285px' : '173px',
-                        height: 'auto',
-                        padding: isDesktop ? '8px 12px 12px 12px' : '6px 10px 8px 10px',
-                        gap: isDesktop ? '4px' : '2px'
+                        width: isDesktop ? '285px' : '100%',
+                        height: isDesktop ? (isHovered ? '158px' : '105px') : '72px',
+                        paddingTop: isDesktop ? '8px' : '4px',
+                        paddingRight: isDesktop ? '12px' : '8px',
+                        paddingBottom: isDesktop ? '12px' : '8px',
+                        paddingLeft: isDesktop ? '12px' : '8px',
+                        gap: isDesktop ? '8px' : '4px',
+                        opacity: 1,
+                        transition: 'height 0.3s ease'
                     }}
                 >
-                    <Link 
-                        href={`/products/${product.id}`}
-                        onClick={(e) => {
-                            if (!isDesktop && !isHovered) {
-                                e.preventDefault();
-                                setIsHovered(true);
-                            }
+                    <h3 
+                        className="font-manrope line-clamp-1 group-hover:text-[#FF3B30] transition-colors duration-300 shrink-0"
+                        style={{ 
+                            width: isDesktop ? "261px" : "100%",
+                            height: isDesktop ? "25px" : "auto",
+                            fontSize: isDesktop ? "18px" : "15px", 
+                            fontWeight: 600, 
+                            lineHeight: isDesktop ? "25px" : "normal", 
+                            letterSpacing: isDesktop ? "-0.4px" : "normal",
+                            color: "hsla(0, 0%, 16%, 1)"
                         }}
                     >
-                        <h3 className="text-[#1D1D1F] line-clamp-1 text-[14px] md:text-[18px] font-bold leading-tight">
-                            {product.name}
-                        </h3>
-                    </Link>
+                        {product.name}
+                    </h3>
                     
-                    <div className="flex items-center justify-between">
+                    <div 
+                        className="flex items-center justify-between shrink-0"
+                        style={{
+                            width: isDesktop ? "261px" : "154px",
+                            height: "16px"
+                        }}
+                    >
                         <div className="flex items-center gap-1">
-                            <div className="flex text-[#FF9F0A]">
-                                {isDesktop ? (
-                                    [1, 2, 3, 4, 5].map((s) => (
-                                        <FaStar key={s} size={12} className={s <= Math.round(product.rating || 4) ? "" : "opacity-20"} />
-                                    ))
-                                ) : (
-                                    <FaStar size={10} />
-                                )}
-                            </div>
-                            <span className="text-[11px] md:text-[14px] font-bold text-[#8E8E93] ml-1">
-                                {product.rating || "4.5"}({product.reviews || 12})
+                            {!isDesktop ? (
+                                <FaStar size={10} className="text-[#FF9F0A]" />
+                            ) : (
+                                <div className="flex text-[#FF9F0A]">
+                                    {[1, 2, 3, 4, 5].map((s) => (
+                                        <FaStar key={s} size={11} className={s <= Math.round(product.rating || 4) ? "" : "opacity-20"} />
+                                    ))}
+                                </div>
+                            )}
+                            <span className="text-[12px] font-medium text-[#1D1D1F] ml-0.5">
+                                {product.rating || "4.5"} <span className="text-[#8E8E93]">({product.reviews || 12})</span>
                             </span>
                         </div>
-                        <div className="flex items-center gap-1.5 text-[#8E8E93]">
-                            <FaTruck size={14} />
-                            <span className="text-[13px] font-semibold">2-4 days</span>
-                            <FaInfoCircle size={10} className="ml-0.5 opacity-40" />
+                        <div className="flex items-center gap-1 text-[#8E8E93]">
+                            <FaTruck size={13} />
+                            <span className="text-[12px] font-medium">2-4 days</span>
+                            <FaInfoCircle size={10} className="ml-0.5 opacity-40 hidden md:block" />
                         </div>
                     </div>
 
-                    <div className="flex flex-col">
-                        <div className="flex items-baseline flex-nowrap gap-1">
-                            <span className="text-[10px] md:text-[13px] text-[#8E8E93] font-medium whitespace-nowrap leading-none">from</span>
-                            {product.originalPrice && (
-                                <span className="text-[13px] md:text-[15px] text-[#8E8E93] line-through font-bold whitespace-nowrap leading-none">₹{product.originalPrice}</span>
-                            )}
-                            <span className="text-[17px] md:text-[24px] font-extrabold text-[#FF3B30] leading-none whitespace-nowrap">₹{product.rentPrice}</span>
-                            <span className="text-[10px] md:text-[13px] text-[#8E8E93] font-medium whitespace-nowrap leading-none">/month</span>
-                        </div>
-                    </div>
-
-
-
-                    <motion.div 
-                        variants={{
-                            initial: { opacity: 0, height: 0 },
-                            hover: { 
-                                opacity: 1, 
-                                height: 60, 
-                                transition: { 
-                                    height: { duration: 0.4, ease: [0.4, 0, 0.2, 1] },
-                                    opacity: { duration: 0.3 }
-                                }
-                            }
+                    <div 
+                        className="flex items-center shrink-0"
+                        style={{
+                            width: isDesktop ? "209px" : "100%",
+                            height: isDesktop ? "28px" : "auto",
+                            gap: isDesktop ? "3px" : "6px",
+                            opacity: 1,
+                            marginTop: "-4px"
                         }}
-                        className="relative w-full z-30 overflow-hidden flex items-center pt-2 pb-1"
                     >
-                        <motion.button 
-                            variants={{
-                                initial: { y: 60 },
-                                hover: { 
-                                    y: 0,
-                                    transition: { type: "spring", stiffness: 300, damping: 25, delay: 0.1 }
-                                }
-                            }}
-                            onClick={(e) => handleAddToCart(e, product)}
-                            className="w-full h-[50px] rounded-full bg-[#fbc02d] text-[#1D1D1F] font-bold text-[14px] md:text-[16px] shadow-md active:scale-95 transition-all hover:brightness-105"
+                        <span className="text-[10px] md:text-[11px] font-semibold text-[#1D1D1F]">from</span>
+                        {product.originalPrice && (
+                            <span className="text-[12px] md:text-[17px] font-bold text-[#8E8E93] line-through">₹{product.originalPrice}</span>
+                        )}
+                        <span className="text-[16px] md:text-[22px] font-bold text-[#FF3B30]">₹{product.rentPrice}</span>
+                        <span className="text-[10px] md:text-[11px] font-semibold text-[#1D1D1F]">/month</span>
+                    </div>
+
+                    {/* Rent Now Button Entrance */}
+                    <div 
+                        className="relative w-full z-30 overflow-hidden flex items-center transition-all duration-300 ease-out"
+                        style={{
+                            height: isHovered ? (isDesktop ? '50px' : '44px') : '0px',
+                            opacity: isHovered ? 1 : 0,
+                            paddingTop: isHovered ? '8px' : '0px'
+                        }}
+                    >
+                        <button 
+                            onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleAddToCart(e, product); }}
+                            className="w-full h-full rounded-full bg-[#FFCF46] text-[#1D1D1F] font-bold text-[14px] shadow-sm transform transition-all duration-300 ease-out active:scale-95 hover:brightness-105"
+                            style={{ transform: isHovered ? 'translateY(0)' : 'translateY(15px)' }}
                         >
                             Rent Now
-                        </motion.button>
-                    </motion.div>
+                        </button>
+                    </div>
                 </div>
             </motion.div>
         </div>

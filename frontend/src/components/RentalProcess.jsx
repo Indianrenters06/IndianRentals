@@ -72,9 +72,10 @@ const RentalProcess = () => {
         <section
             className="w-full overflow-hidden md:bg-[#F5F5F5]"
             style={{
-                width: '100%',
+                width: isDesktop ? '100%' : '390px',
                 margin: '0 auto',
-                minHeight: isDesktop ? '847px' : '752px',
+                height: isDesktop ? 'auto' : '734px',
+                minHeight: isDesktop ? '847px' : '734px',
                 paddingTop: isDesktop ? '120px' : '48px',
                 paddingBottom: isDesktop ? '120px' : '48px',
                 background: isDesktop ? '#F5F5F5' : 'linear-gradient(180deg, #FFFFFF 0%, rgba(255, 228, 133, 0.63) 100%)',
@@ -84,8 +85,8 @@ const RentalProcess = () => {
             <div
                 className="max-w-[1200px] mx-auto flex flex-col md:gap-[32px] gap-[20px]"
                 style={{
-                    paddingLeft: isDesktop ? '24px' : '16px',
-                    paddingRight: isDesktop ? '24px' : '16px'
+                    paddingLeft: isDesktop ? '24px' : '20px',
+                    paddingRight: isDesktop ? '24px' : '20px'
                 }}
             >
                 {/* Desktop Header Row */}
@@ -123,11 +124,9 @@ const RentalProcess = () => {
                     {/* MOBILE VERSION (390px layout) */}
                     {!isDesktop && (
                         <div
-                            className="flex flex-col mx-auto"
+                            className="flex flex-col"
                             style={{
-                                width: '100%',
-                                maxWidth: '358px',
-                                height: '523px',
+                                width: '350px',
                                 gap: '12px'
                             }}
                         >
@@ -139,8 +138,7 @@ const RentalProcess = () => {
                                         onClick={() => setActiveStep(index)}
                                         className={`relative cursor-pointer transition-all duration-300 rounded-2xl overflow-hidden flex flex-col justify-center ${isActive ? "" : "bg-white border border-[#E5E5E7]"}`}
                                         style={{
-                                            width: '100%',
-                                            maxWidth: '358px',
+                                            width: isDesktop ? '100%' : '350px',
                                             height: isActive ? '118px' : 'auto',
                                             minHeight: isActive ? '118px' : '92px',
                                             padding: '20px 16px',
@@ -151,7 +149,7 @@ const RentalProcess = () => {
                                         <div
                                             className="flex flex-col"
                                             style={{
-                                                width: '100%',
+                                                width: '318px',
                                                 height: '78px',
                                                 gap: '5px',
                                                 display: 'flex',
@@ -180,7 +178,24 @@ const RentalProcess = () => {
                                                 {step.description}
                                             </p>
                                         </div>
-                                        <div className={`absolute -right-2 top-1/2 -translate-y-1/2 text-[80px] font-black pointer-events-none select-none ${isActive ? 'text-[#6B4B18]/10' : 'text-black/[0.03]'}`}>{index + 1}</div>
+                                        <div 
+                                            className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none select-none font-manrope" 
+                                            style={{
+                                                width: "18px",
+                                                height: "45px",
+                                                fontWeight: "800",
+                                                fontSize: "45px",
+                                                lineHeight: "45px",
+                                                color: isActive ? "hsla(19, 84%, 26%, 0.2)" : "rgba(255, 255, 255, 1)",
+                                                opacity: 1,
+                                                textAlign: "center",
+                                                display: "flex",
+                                                alignItems: "center",
+                                                justifyContent: "center"
+                                            }}
+                                        >
+                                            {index + 1}
+                                        </div>
                                     </div>
                                 );
                             })}
