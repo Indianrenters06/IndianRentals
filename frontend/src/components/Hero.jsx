@@ -3,6 +3,7 @@ import Image from "next/image";
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
 import { useState, useEffect, useRef } from "react";
 import Button from "./common/Button";
+import Link from "next/link";
 import { API } from "@/services/apiConfig";
 
 /* ─── Figma Spec ──────────────────────────────────────────────────────────
@@ -128,7 +129,7 @@ const Hero = () => {
     const translateX = -(currentIndex * (SIDE_WIDTH + GAP) + mainWidth / 2);
 
     return (
-        <section className="bg-white py-4 md:py-10 w-full overflow-x-clip">
+        <section className="bg-white pt-2 md:pt-6 pb-4 md:pb-10 w-full overflow-x-clip">
             {/* Mobile View */}
             <div className="md:hidden flex overflow-x-auto snap-x snap-mandatory px-4 gap-3 no-scrollbar" style={{ height: "369px" }}>
                 {slides.map((s, i) => (
@@ -144,13 +145,14 @@ const Hero = () => {
                                 {(s.ctaText || "Rent Now").replace(/ [^\w\s]+.*$| [→➔➜]|^.*[→➔➜]$| \-\>/g, "").trim()}
                             </Button>
                         </div>
+                        {s.slideLink && <Link href={s.slideLink} className="absolute inset-0 z-20" />}
                     </div>
                 ))}
             </div>
 
             {/* Desktop View */}
-            <div className="hidden md:flex flex-col items-center w-full relative group" style={{ minHeight: "560px", paddingTop: "10px" }}>
-                <div className="relative w-full h-[520px] flex items-center justify-center overflow-visible">
+            <div className="hidden md:flex flex-col items-center w-full relative group" style={{ minHeight: "530px", paddingTop: "0px" }}>
+                <div className="relative w-full h-[510px] flex items-center justify-center overflow-visible">
                     <div
                         onTransitionEnd={handleTransitionEnd}
                         className={`flex h-[500px] absolute left-1/2 items-center ${isTransitioning ? 'transition-all duration-700 ease-[cubic-bezier(0.25,1,0.5,1)]' : 'transition-none'}`}
@@ -194,19 +196,8 @@ const Hero = () => {
     );
 };
 
-const SlideItem = ({ slide, isActive, width }) => (
-    <div
-        className="shrink-0 relative rounded-[32px] overflow-hidden transition-all duration-700 ease-[cubic-bezier(0.25,1,0.5,1)]"
-        style={{
-            width: width,
-            minWidth: width,
-            height: '500px',
-            background: slide.bgGradient || slide.bgColor,
-            opacity: isActive ? 1 : 0.85,
-            boxShadow: isActive ? '0 30px 60px -12px rgba(0,0,0,0.3)' : '0 10px 20px -5px rgba(0,0,0,0.1)',
-            zIndex: isActive ? 20 : 10
-        }}
-    >
+const SlideItem = ({ slide, isActive, width }) => {
+    const content = (
         <div className="w-full h-full px-16 grid grid-cols-2 gap-12 items-center">
             <div className={`space-y-6 transition-all duration-700 ${isActive ? 'opacity-100 translate-y-0 scale-100 blur-0' : 'opacity-30 -translate-y-4 scale-95 origin-left blur-[1px]'}`} style={{ color: slide.textColor || "#fff" }}>
                 <h1 className="text-[48px] leading-[1.1] font-bold tracking-tight">{slide.title}</h1>
@@ -218,10 +209,41 @@ const SlideItem = ({ slide, isActive, width }) => (
                 </div>
             </div>
             <div className={`relative h-[420px] w-full transition-all duration-700 ${isActive ? 'opacity-100 scale-105 rotate-0 blur-0' : 'opacity-30 scale-90 -rotate-3 blur-[1px]'}`}>
-                <Image src={slide.image || FALLBACK_SLIDES[0].image} alt={slide.title} fill unoptimized className="object-contain drop-shadow-[0_35px_35px_rgba(0,0,0,0.3)]" />
+                <Image src={slide.image || "https://res.cloudinary.com/dgkckcdk8/image/upload/v1769946716/indian-rentals/fj8ptqbhppbstdd0hs4i.png"} alt={slide.title} fill unoptimized className="object-contain drop-shadow-[0_35px_35px_rgba(0,0,0,0.3)]" />
             </div>
         </div>
-    </div>
-);
+    );
+
+    const containerStyle = {
+        width: width,
+        minWidth: width,
+        height: '500px',
+        background: slide.bgGradient || slide.bgColor,
+        opacity: isActive ? 1 : 0.85,
+        boxShadow: isActive ? '0 30px 60px -12px rgba(0,0,0,0.3)' : '0 10px 20px -5px rgba(0,0,0,0.1)',
+        zIndex: isActive ? 20 : 10
+    };
+
+    if (slide.slideLink) {
+        return (
+            <Link 
+                href={slide.slideLink}
+                className="shrink-0 relative rounded-[32px] overflow-hidden transition-all duration-700 ease-[cubic-bezier(0.25,1,0.5,1)] cursor-pointer"
+                style={containerStyle}
+            >
+                {content}
+            </Link>
+        );
+    }
+
+    return (
+        <div
+            className="shrink-0 relative rounded-[32px] overflow-hidden transition-all duration-700 ease-[cubic-bezier(0.25,1,0.5,1)]"
+            style={containerStyle}
+        >
+            {content}
+        </div>
+    );
+};
 
 export default Hero;

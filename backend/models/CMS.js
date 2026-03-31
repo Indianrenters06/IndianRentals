@@ -1,11 +1,11 @@
 const mongoose = require('mongoose');
 
 const featuredShowcaseBannerSchema = new mongoose.Schema({
-    title:    { type: String, default: '' },
+    title: { type: String, default: '' },
     subtitle: { type: String, default: '' },
-    image:    { type: String, default: '' },
-    bg:       { type: String, default: 'linear-gradient(135deg, #2a1a5e 0%, #4c3099 40%, #7c5cbf 70%, #b08ad4 100%)' },
-    href:     { type: String, default: '/products' },
+    image: { type: String, default: '' },
+    bg: { type: String, default: 'linear-gradient(135deg, #2a1a5e 0%, #4c3099 40%, #7c5cbf 70%, #b08ad4 100%)' },
+    href: { type: String, default: '/products' },
 }, { _id: false });
 
 const rentalProcessStepSchema = new mongoose.Schema({
@@ -14,17 +14,19 @@ const rentalProcessStepSchema = new mongoose.Schema({
     icon: { type: String, default: 'FaLaptopCode' }, // icon name string
     highlight: { type: Boolean, default: false }, // yellow highlight card
     image: { type: String, default: '' },
+    link: { type: String, default: '' },
 }, { _id: false });
 
 const heroSlideSchema = new mongoose.Schema({
-    title:      { type: String, default: '' },
-    subtitle:   { type: String, default: '' },
-    image:      { type: String, default: '' },
-    bgColor:    { type: String, default: '#0075ff' },
+    title: { type: String, default: '' },
+    subtitle: { type: String, default: '' },
+    image: { type: String, default: '' },
+    bgColor: { type: String, default: '#0075ff' },
     bgGradient: { type: String, default: '' },
-    textColor:  { type: String, default: '#FFFFFF' },
-    ctaText:    { type: String, default: 'Rent Now' },
-    ctaLink:    { type: String, default: '/products' },
+    textColor: { type: String, default: '#FFFFFF' },
+    ctaText: { type: String, default: 'Rent Now' },
+    ctaLink: { type: String, default: '/products' },
+    slideLink: { type: String, default: '' },
 }, { _id: false });
 
 const cmsSchema = new mongoose.Schema({
@@ -43,7 +45,7 @@ const cmsSchema = new mongoose.Schema({
     heroImage: { type: String, default: '' },
     overlayColor: { type: String, default: 'rgba(0,0,0,0.5)' },
     heroBgColor: { type: String, default: '' },
-    
+
     // ── Rent By Category (homepage) ──────────────────────────────────────────
     categorySectionEnabled: { type: Boolean, default: true },
     categorySectionTitle: { type: String, default: 'Rent by Category' },
@@ -82,14 +84,14 @@ const cmsSchema = new mongoose.Schema({
     statsCities: { type: String, default: '401+' },
 
     // ── Featured Showcase Section (homepage) ──────────────────────────────────
-    featuredShowcaseEnabled:    { type: Boolean, default: true },
+    featuredShowcaseEnabled: { type: Boolean, default: true },
     featuredShowcaseProductIds: { type: [String], default: [] }, // 2 pinned product _ids
     featuredShowcaseBanners: {
         type: [featuredShowcaseBannerSchema],
         default: [
-            { title: 'Apple Products',   subtitle: 'MacBooks | iPads | iPhones | Mac Studio | Mac Mini', image: '', bg: 'linear-gradient(135deg, #2a1a5e 0%, #4c3099 40%, #7c5cbf 70%, #b08ad4 100%)', href: '/categories/apple' },
-            { title: 'Gaming Laptops',   subtitle: 'ASUS ROG | Lenovo Legion | MSI | HP Omen',          image: '', bg: 'linear-gradient(135deg, #0a1628 0%, #1a3a5c 40%, #1e5f8c 70%, #2a9fd6 100%)', href: '/categories/gaming' },
-            { title: 'Smart Devices',    subtitle: 'Tablets | Smartwatches | Earbuds | Accessories',    image: '', bg: 'linear-gradient(135deg, #1a2e1a 0%, #1e5c3a 40%, #25874f 70%, #3ac47d 100%)', href: '/categories/smart-devices' },
+            { title: 'Apple Products', subtitle: 'MacBooks | iPads | iPhones | Mac Studio | Mac Mini', image: '', bg: 'linear-gradient(135deg, #2a1a5e 0%, #4c3099 40%, #7c5cbf 70%, #b08ad4 100%)', href: '/categories/apple' },
+            { title: 'Gaming Laptops', subtitle: 'ASUS ROG | Lenovo Legion | MSI | HP Omen', image: '', bg: 'linear-gradient(135deg, #0a1628 0%, #1a3a5c 40%, #1e5f8c 70%, #2a9fd6 100%)', href: '/categories/gaming' },
+            { title: 'Smart Devices', subtitle: 'Tablets | Smartwatches | Earbuds | Accessories', image: '', bg: 'linear-gradient(135deg, #1a2e1a 0%, #1e5c3a 40%, #25874f 70%, #3ac47d 100%)', href: '/categories/smart-devices' },
         ]
     },
 

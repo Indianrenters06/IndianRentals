@@ -34,7 +34,7 @@ const Footer = () => {
                 }}
             >
                 {/* Inner container: 1200px wide, 176px height, space-between */}
-                <div className="w-full max-w-[1200px] px-4 sm:px-6">
+                <div className="w-full max-w-[1400px] mx-auto px-4 md:px-8">
                     <div
                         className="flex flex-row items-start justify-between"
                         style={{ height: '176px', gap: '20px' }}
@@ -103,7 +103,7 @@ const Footer = () => {
 
                 {/* Copyright bar */}
                 <div 
-                    className="w-full max-w-[1200px] px-4 sm:px-6 flex flex-row items-center justify-between"
+                    className="w-full max-w-[1400px] mx-auto px-4 md:px-8 flex flex-row items-center justify-between"
                     style={{ 
                         height: '77px', 
                         paddingTop: '16px', 

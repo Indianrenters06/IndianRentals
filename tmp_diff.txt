@@ -1,0 +1,296 @@
+diff --git a/frontend/src/components/RentalProcess.jsx b/frontend/src/components/RentalProcess.jsx
+index 4d67489..1b29dda 100644
+--- a/frontend/src/components/RentalProcess.jsx
++++ b/frontend/src/components/RentalProcess.jsx
+@@ -2,12 +2,13 @@
+ import React, { useState, useEffect } from 'react';
+ import Image from 'next/image';
+ import Link from 'next/link';
+-import { 
+-  PiLaptop as DeviceLaptop, 
+-  PiUserCheck as UserCheck, 
+-  PiShoppingCartSimple as ShoppingCartSimple, 
+-  PiBoxArrowUp as BoxArrowUp,
+-  PiCheckCircle
++import {
++    PiLaptop as DeviceLaptop,
++    PiUserCheck as UserCheck,
++    PiShoppingCartSimple as ShoppingCartSimple,
++    PiBoxArrowUp as BoxArrowUp,
++    PiCheckCircle,
++    PiCaretRight
+ } from 'react-icons/pi';
+ 
+ import { API } from '../services/apiConfig';
+@@ -24,6 +25,7 @@ const ICON_MAP = {
+     "IdentificationCard": UserCheck,
+     "ShoppingCart": ShoppingCartSimple,
+     "Package": BoxArrowUp,
++    "Arrow": PiCaretRight
+ };
+ 
+ const DynamicIcon = ({ name, size = 24, className = "" }) => {
+@@ -47,7 +49,7 @@ const RentalProcess = () => {
+         const checkRes = () => setIsDesktop(window.innerWidth >= 768);
+         checkRes();
+         window.addEventListener('resize', checkRes);
+-        
++
+         fetch(`${API}/api/cms/homepage`, { cache: 'no-store' })
+             .then(r => r.ok ? r.json() : null)
+             .then(data => {
+@@ -67,9 +69,9 @@ const RentalProcess = () => {
+     if (!cms.enabled) return null;
+ 
+     return (
+-        <section 
++        <section
+             className="w-full overflow-hidden md:bg-[#F5F5F5]"
+-            style={{ 
++            style={{
+                 width: '100%',
+                 margin: '0 auto',
+                 minHeight: isDesktop ? '847px' : '752px',
+@@ -79,7 +81,7 @@ const RentalProcess = () => {
+                 opacity: 1
+             }}
+         >
+-            <div 
++            <div
+                 className="max-w-[1200px] mx-auto flex flex-col md:gap-[32px] gap-[20px]"
+                 style={{
+                     paddingLeft: isDesktop ? '24px' : '16px',
+@@ -87,23 +89,20 @@ const RentalProcess = () => {
+                 }}
+             >
+                 {/* Desktop Header Row */}
+-                <div className="w-full hidden md:flex flex-row items-center justify-between mx-auto font-manrope max-w-[1165px] h-[123px]">
+-                    <div className="flex flex-col gap-[10px]">
+-                        <div className="bg-[#1D1D1F]/70 text-white text-[10.61px] font-bold flex items-center justify-center rounded-full w-[82.72px] h-[19.45px]">
+-                            Rental Process
+-                        </div>
++                <div className="w-full hidden md:flex flex-row items-center justify-between mx-auto font-manrope max-w-[1165px] h-[94px]">
++                    <div className="flex flex-col h-full gap-[10px] justify-center">
+                         <h2 className="text-[36px] font-bold text-[#1D1D1F] tracking-tight leading-none">{cms.title}</h2>
+-                        <p className="text-[#86868B] text-[18px] leading-[1.3] tracking-tight max-w-md">{cms.subtitle}</p>
++                        <p className="text-[#86868B] text-[16px] leading-[1.3] tracking-tight max-w-md">{cms.subtitle}</p>
+                     </div>
+-                    <div className="flex items-center gap-3 self-end mb-2">
++                    <div className="flex items-center gap-3 self-end mb-1">
+                         <Link href="/rental-process" className="inline-flex items-center justify-center hover:brightness-105 transition-all text-black font-semibold text-[13px] w-[124px] h-[35px] rounded-full bg-[#FFCF46] border-b border-black/10">Rental Process</Link>
+                         <Link href="/contact" className="inline-flex items-center justify-center hover:opacity-90 transition-all text-white font-semibold text-[13px] w-[124px] h-[35px] rounded-full bg-[#1D1D1F]">Contact</Link>
+                     </div>
+                 </div>
+- 
++
+                 {/* Mobile Header */}
+-                <div 
+-                    className="md:hidden flex flex-col pt-4 mx-auto" 
++                <div
++                    className="md:hidden flex flex-col pt-4 mx-auto"
+                     style={{ width: '100%', maxWidth: '358px', height: '113px', gap: '10px' }}
+                 >
+                     <div className="flex flex-col" style={{ gap: '2px' }}>
+@@ -120,12 +119,12 @@ const RentalProcess = () => {
+ 
+                 {/* Main Content Area */}
+                 <div className="w-full flex flex-col md:flex-row items-stretch mx-auto font-manrope md:gap-[20px] gap-[10px] max-w-[1200px]">
+-                    
++
+                     {/* MOBILE VERSION (390px layout) */}
+                     {!isDesktop && (
+-                        <div 
++                        <div
+                             className="flex flex-col mx-auto"
+-                            style={{ 
++                            style={{
+                                 width: '100%',
+                                 maxWidth: '358px',
+                                 height: '523px',
+@@ -139,7 +138,7 @@ const RentalProcess = () => {
+                                         key={`mobile-step-${index}`}
+                                         onClick={() => setActiveStep(index)}
+                                         className={`relative cursor-pointer transition-all duration-300 rounded-2xl overflow-hidden flex flex-col justify-center ${isActive ? "" : "bg-white border border-[#E5E5E7]"}`}
+-                                        style={{ 
++                                        style={{
+                                             width: '100%',
+                                             maxWidth: '358px',
+                                             height: isActive ? '118px' : 'auto',
+@@ -149,7 +148,7 @@ const RentalProcess = () => {
+                                             boxShadow: isActive ? '-3px -3px 15px -2px hsla(29, 100%, 44%, 0.26) inset' : undefined,
+                                         }}
+                                     >
+-                                        <div 
++                                        <div
+                                             className="flex flex-col"
+                                             style={{
+                                                 width: '100%',
+@@ -164,7 +163,7 @@ const RentalProcess = () => {
+                                                 <div className={isActive ? 'text-[#6B4B18]' : 'text-[#1D1D1F]'}><DynamicIcon name={step.icon} size={22} /></div>
+                                                 <h3 className={`text-[15px] font-bold ${isActive ? 'text-[#6B4B18]' : 'text-[#1D1D1F]'} leading-tight tracking-tight`}>{step.title}</h3>
+                                             </div>
+-                                            <p 
++                                            <p
+                                                 className={`font-manrope ${isActive ? "" : "text-[#1D1D1F]"}`}
+                                                 style={{
+                                                     fontSize: '11px',
+@@ -190,58 +189,116 @@ const RentalProcess = () => {
+ 
+                     {/* DESKTOP VERSION (1200px layout) */}
+                     {isDesktop && (
+-                        <div 
+-                            className="flex flex-col" 
+-                            style={{ 
+-                                width: '590px', 
+-                                height: '500px', 
+-                                gap: '12px' 
++                        <div
++                            className="flex flex-col"
++                            style={{
++                                width: '590px',
++                                height: '500px',
++                                gap: '12px'
+                             }}
+                         >
+                             {cms.steps.map((step, index) => {
+                                 const isActive = activeStep === index;
+                                 return (
+-                                <div
+-                                    key={`desktop-step-${index}`}
+-                                    onClick={() => setActiveStep(index)}
+-                                    className={`relative cursor-pointer transition-all duration-300 rounded-2xl overflow-hidden ${
+-                                        isActive 
+-                                        ? "" 
+-                                        : "bg-white border-[1.2px] border-[hsla(0,0%,93%,1)]"
+-                                    }`}
+-                                    style={{ 
+-                                        height: isActive ? '184px' : '92px', 
+-                                        background: isActive 
+-                                            ? 'linear-gradient(125.34deg, rgba(255, 207, 70, 0.5) 1.25%, rgba(255, 185, 27, 0.9) 98.94%)' 
+-                                            : 'hsla(0,0%,100%,1)',
+-                                        boxShadow: isActive ? '-3px -3px 15px -2px hsla(29, 100%, 44%, 0.26) inset' : undefined,
+-                                        border: isActive ? 'none' : undefined
+-                                    }}
+-                                >
+-                                    <div className="flex flex-col h-full">
+-                                        {/* Top Section */}
+-                                        <div className="flex flex-col p-4" style={{ gap: isActive ? '5px' : '9px' }}>
+-                                            <div className="flex items-center justify-between">
+-                                                <div className={isActive ? 'text-[#6B4B18]' : 'text-[#1D1D1F]'}><DynamicIcon name={step.icon} size={22} /></div>
+-                                                <div className={`text-[12px] font-bold px-3 py-1 rounded-full border ${isActive ? 'bg-[#FFF9E9] border-[#6B4B18]/20 text-[#6B4B18]' : 'bg-[#F5F5F7] border-[#E5E5E7] text-[#86868B]'}`}>
+-                                                    {"ΓÇó Step " + (index + 1)}
++                                    <div
++                                        key={`desktop-step-${index}`}
++                                        onClick={() => setActiveStep(index)}
++                                        className={`relative cursor-pointer transition-all duration-300 rounded-2xl overflow-hidden ${isActive
++                                                ? ""
++                                                : "bg-white border-[1.2px] border-[hsla(0,0%,93%,1)]"
++                                            }`}
++                                        style={{
++                                            width: '590px',
++                                            height: isActive ? '213px' : '92px',
++                                            background: isActive
++                                                ? 'linear-gradient(125.34deg, rgba(255, 207, 70, 0.5) 1.25%, rgba(255, 185, 27, 0.9) 98.94%)'
++                                                : 'hsla(0,0%,100%,1)',
++                                            boxShadow: isActive ? '-3px -3px 15px -2px hsla(29, 100%, 44%, 0.26) inset' : undefined,
++                                            border: isActive ? 'none' : undefined,
++                                            opacity: 1
++                                        }}
++                                    >
++                                        <div className="flex flex-col h-full justify-between">
++                                            {/* Top Section */}
++                                            <div className="flex flex-col p-5" style={{ gap: isActive ? '12px' : '9px' }}>
++                                                <div className="flex items-center justify-between">
++                                                    <div 
++                                                        style={{ 
++                                                            width: '170px', 
++                                                            height: '62px', 
++                                                            display: 'flex', 
++                                                            flexDirection: 'column', 
++                                                            gap: '9px',
++                                                            opacity: 1
++                                                        }}
++                                                    >
++                                                        <div className={isActive ? 'text-[#6B4B18]' : 'text-[#1D1D1F]'}><DynamicIcon name={step.icon} size={24} /></div>
++                                                        <h3 
++                                                            className={`font-semibold transition-all`} 
++                                                            style={{ 
++                                                                color: isActive ? 'hsla(19, 84%, 26%, 1)' : '#1D1D1F',
++                                                                fontFamily: 'Manrope, sans-serif',
++                                                                fontWeight: 600,
++                                                                fontSize: '20px',
++                                                                lineHeight: '28px',
++                                                                whiteSpace: 'nowrap',
++                                                                height: '28px'
++                                                            }}
++                                                        >
++                                                            {step.title}
++                                                        </h3>
++                                                    </div>
++
++                                                    <div 
++                                                        className={`font-bold flex items-center justify-center self-start`}
++                                                        style={{
++                                                            width: '69px',
++                                                            height: '31px',
++                                                            padding: '4px 8px',
++                                                            gap: '4px',
++                                                            borderRadius: '8px',
++                                                            border: isActive ? '1px solid hsla(19, 84%, 26%, 1)' : '1px solid #E5E5E7',
++                                                            background: isActive ? 'hsla(46, 100%, 89%, 1)' : '#F5F5F7',
++                                                            color: isActive ? 'hsla(19, 84%, 26%, 1)' : '#86868B',
++                                                            fontSize: '12px',
++                                                            opacity: 1
++                                                        }}
++                                                    >
++                                                        {"ΓÇó Step " + (index + 1)}
++                                                    </div>
+                                                 </div>
+                                             </div>
+-                                            <h3 className={`text-[20px] font-bold ${isActive ? 'text-[#6B4B18]' : 'text-[#1D1D1F]'} leading-tight`}>{step.title}</h3>
+-                                        </div>
+ 
+-                                        {/* Bottom/Description Section (Two-tone effect) */}
+-                                        {isActive ? (
+-                                            <div className="flex-1 bg-white/30 border-t border-[#6B4B18]/10 p-4 pt-3 mt-auto">
+-                                                <p className="text-[#6B4B18]/90 text-[15px] leading-snug font-medium animate-fadeIn">{step.description}</p>
+-                                            </div>
+-                                        ) : (
+-                                            <div className="px-4 pb-4">
+-                                                <p className="text-[#1D1D1F]/40 text-[15px] leading-none font-medium line-clamp-1">Click to see details</p>
+-                                            </div>
+-                                        )}
++                                            {/* Bottom/Description Section (Two-tone effect) */}
++                                            {isActive ? (
++                                                <div 
++                                                    className="w-full bg-[#FFF3C9] border-t border-[#6B4B18]/10 animate-fadeIn"
++                                                    style={{ 
++                                                        height: '78px',
++                                                        padding: '16px',
++                                                        opacity: 1,
++                                                        display: 'flex',
++                                                        flexDirection: 'column',
++                                                        gap: '10px'
++                                                    }}
++                                                >
++                                                    <p className="text-[#6B4B18]/90 text-[13px] leading-[1.3] font-medium">{step.description}</p>
++                                                    {step.link && (
++                                                        <Link 
++                                                            href={step.link}
++                                                            className="inline-flex items-center gap-1 text-[12px] font-bold text-[#6B4B18] hover:underline mt-1"
++                                                        >
++                                                            Learn More <DynamicIcon name="Arrow" size={12} />
++                                                        </Link>
++                                                    )}
++                                                </div>
++                                            ) : (
++                                                <div className="px-5 pb-5">
++                                                    <p className="text-[#1D1D1F]/40 text-[15px] leading-none font-medium line-clamp-1">Click to see details</p>
++                                                </div>
++                                            )}
++                                        </div>
+                                     </div>
+-                                </div>
+                                 );
+                             })}
+                         </div>

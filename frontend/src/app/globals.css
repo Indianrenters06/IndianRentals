@@ -110,4 +110,15 @@
     @apply font-manrope bg-white text-grey-700 antialiased;
   }
 }
+
+/* Custom Utilities */
+@layer utilities {
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+}
 

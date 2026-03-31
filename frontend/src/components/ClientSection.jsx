@@ -7,12 +7,12 @@ import "swiper/css";
 
 // Placeholder client logos — replace with real logos/images as needed
 const clients = [
-    { id: 1, name: "TechCorp India", logo: null, bg: "bg-[#F5F5F7]" },
-    { id: 2, name: "StartupHub", logo: null, bg: "bg-[#F5F5F7]" },
-    { id: 3, name: "CreativeStudio", logo: null, bg: "bg-[#F5F5F7]" },
-    { id: 4, name: "MediaWorks", logo: null, bg: "bg-[#F5F5F7]" },
-    { id: 5, name: "InnovateLab", logo: null, bg: "bg-[#F5F5F7]" },
-    { id: 6, name: "BuildSpace", logo: null, bg: "bg-[#F5F5F7]" },
+    { id: 1, name: "Reliance", logo: "RELIANCE" },
+    { id: 2, name: "Tata", logo: "TATA" },
+    { id: 3, name: "Adani", logo: "ADANI" },
+    { id: 4, name: "Mahindra", logo: "MAHINDRA" },
+    { id: 5, name: "Infosys", logo: "INFOSYS" },
+    { id: 6, name: "Wipro", logo: "WIPRO" },
 ];
 
 const ClientSection = () => {
@@ -20,9 +20,10 @@ const ClientSection = () => {
     const nextRef = useRef(null);
 
     return (
-        <section className="py-12 md:py-16 bg-white overflow-hidden">
+        <section className="py-20 bg-white">
             <div
                 className="max-w-[1200px] mx-auto px-4 sm:px-6"
+                style={{ height: "300px" }}
             >
                 <div className="relative">
                     <Swiper
@@ -47,12 +48,22 @@ const ClientSection = () => {
                         {clients.map((client) => (
                             <SwiperSlide key={client.id}>
                                 <div
-                                    className={`${client.bg} rounded-3xl flex items-center justify-center select-none`}
-                                    style={{ height: "300px" }}
+                                    className="flex items-center justify-center select-none transition-all hover:scale-[1.02] duration-300 shadow-sm hover:shadow-md"
+                                    style={{ 
+                                        height: "300px",
+                                        borderRadius: "18px",
+                                        background: "hsla(44, 100%, 64%, 1)",
+                                        opacity: 1
+                                    }}
                                 >
-                                    <span className="text-[#999] font-manrope font-semibold text-xl tracking-wide">
-                                        {client.name}
-                                    </span>
+                                    <div className="flex flex-col items-center gap-4">
+                                        <div className="w-20 h-20 rounded-full bg-black/10 flex items-center justify-center text-black font-black text-3xl border border-black/5">
+                                            {client.logo[0]}
+                                        </div>
+                                        <span className="text-black font-manrope font-bold text-[32px] tracking-tight">
+                                            {client.name}
+                                        </span>
+                                    </div>
                                 </div>
                             </SwiperSlide>
                         ))}

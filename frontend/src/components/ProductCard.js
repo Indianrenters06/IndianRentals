@@ -41,22 +41,30 @@ const ProductCard = ({ product }) => {
     return (
         /* Card shell: no padding, overflow-hidden so image inherits top border-radius */
         <div
-            className="group bg-white rounded-2xl flex flex-col overflow-hidden relative transition-all duration-500 hover:shadow-[0_8px_30px_rgba(0,0,0,0.10)] hover:-translate-y-1"
+            className="group bg-white flex flex-col overflow-hidden relative"
             style={{
                 width: "285px",
-                height: "391px",
-                border: "1px solid hsla(0, 0%, 89%, 1)"
+                height: "387px",
+                border: "1px solid hsla(0, 0%, 89%, 1)",
+                borderRadius: "16px",
+                backgroundColor: "hsla(0, 0%, 100%, 1)",
+                boxShadow: "0px 1px 2px 0px hsla(0, 0%, 0%, 0.05)",
+                transition: "all 300ms cubic-bezier(0.45, 1.45, 0.8, 1)",
+                cursor: "pointer"
             }}
+            onClick={() => router.push(`/products/${product.id}`)}
         >
             {/* ── Image Section (full-bleed, top of card) ─────────── */}
             <div
-                className="relative rounded-2xl bg-[#F7F7F7] group-hover:bg-[#F0F0F0] transition-colors duration-500 flex items-center justify-center overflow-hidden flex-shrink-0"
+                className="relative bg-white group-hover:bg-[#F9F9F9] transition-colors duration-500 flex items-center justify-center overflow-hidden flex-shrink-0"
                 style={{
                     width: "285px",
                     height: "282px",
-                    borderRight: "1px solid hsla(0, 0%, 89%, 1)",
-                    borderBottom: "1px solid hsla(0, 0%, 89%, 1)",
-                    borderLeft: "1px solid hsla(0, 0%, 89%, 1)"
+                    borderWidth: "0px 1px 1px 1px",
+                    borderStyle: "solid",
+                    borderColor: "hsla(0, 0%, 93%, 1)",
+                    borderRadius: "16px",
+                    boxShadow: "0px 4px 8px 0px hsla(0, 0%, 87%, 0.1), 0px 15px 15px 0px hsla(0, 0%, 87%, 0.09), 0px 33px 20px 0px hsla(0, 0%, 87%, 0.05), 0px 59px 23px 0px hsla(0, 0%, 87%, 0.01), 0px 91px 26px 0px hsla(0, 0%, 87%, 0)"
                 }}
             >
                 {/* Badges — top-left */}
@@ -73,10 +81,20 @@ const ProductCard = ({ product }) => {
 
                 {/* Heart Button — top-right */}
                 <button
-                    className="absolute top-3 right-3 z-20 w-8 h-8 flex items-center justify-center bg-white border border-gray-200 text-gray-400 rounded-full shadow-sm hover:text-[#FF3B30] hover:scale-110 transition-all duration-300"
+                    className="absolute z-20 flex items-center justify-center rounded-full shadow-sm hover:scale-110 transition-all duration-300"
+                    style={{
+                        width: "33px",
+                        height: "33px",
+                        top: "10.5px",
+                        right: "12.5px",
+                        backgroundColor: "hsla(0, 0%, 93%, 1)",
+                        border: "0.2px solid hsla(0, 0%, 80%, 1)"
+                    }}
                     onClick={(e) => { e.preventDefault(); e.stopPropagation(); }}
                 >
-                    <FaHeart size={14} />
+                    <div style={{ width: '20.6px', height: '17.6px', display: 'flex', alignItems: 'center', justifyItems: 'center', marginTop: '1px' }}>
+                        <FaHeart size={18} color="hsla(0, 0%, 0%, 1)" />
+                    </div>
                 </button>
 
                 {/* Product Image */}
@@ -111,8 +129,16 @@ const ProductCard = ({ product }) => {
             >
                 {/* Product Name */}
                 <h3
-                    className="font-manrope text-[#1D1D1F] line-clamp-1 group-hover:text-[#FF3B30] transition-colors duration-300"
-                    style={{ fontSize: "16px", fontWeight: 600, lineHeight: "23px", letterSpacing: "-0.4px" }}
+                    className="font-manrope line-clamp-1 group-hover:text-[#FF3B30] transition-colors duration-300"
+                    style={{ 
+                        width: "261px",
+                        height: "25px",
+                        fontSize: "18px", 
+                        fontWeight: 600, 
+                        lineHeight: "25px", 
+                        letterSpacing: "-0.4px",
+                        color: "hsla(0, 0%, 16%, 1)"
+                    }}
                 >
                     {product.name}
                 </h3>
@@ -144,11 +170,63 @@ const ProductCard = ({ product }) => {
                 {/* Price + Hover Buttons */}
                 <div className="relative">
                     {/* Price row */}
-                    <div className="flex items-baseline gap-1.5 transition-all duration-500 group-hover:opacity-0 group-hover:-translate-y-2">
-                        <span className="text-[12px] text-[#86868B] font-medium">from</span>
-                        <span className="text-[14px] text-[#86868B] line-through font-medium opacity-60">₹{product.originalPrice}</span>
-                        <span className="text-[20px] font-extrabold text-[#FF3B30] leading-none">₹{product.rentPrice}</span>
-                        <span className="text-[12px] text-[#86868B] font-medium">/month</span>
+                    <div 
+                        className="flex items-baseline transition-all duration-500 group-hover:opacity-0 group-hover:-translate-y-2"
+                        style={{ 
+                            width: "209px", 
+                            height: "28px", 
+                            gap: "3px" 
+                        }}
+                    >
+                        <span 
+                            style={{ 
+                                height: "16px", 
+                                fontSize: "12px", 
+                                fontWeight: 500, 
+                                lineHeight: "16px", 
+                                color: "hsla(0, 0%, 0%, 1)",
+                                letterSpacing: "-0.4px"
+                            }}
+                        >
+                            from
+                        </span>
+                        <span 
+                            style={{ 
+                                height: "28px", 
+                                fontSize: "20px", 
+                                fontWeight: 600, 
+                                lineHeight: "28px", 
+                                color: "hsla(0, 0%, 46%, 1)",
+                                textDecoration: "line-through",
+                                opacity: 0.6
+                            }}
+                        >
+                            ₹{product.originalPrice}
+                        </span>
+                        <span 
+                            style={{ 
+                                height: "28px", 
+                                fontSize: "20px", 
+                                fontWeight: 600, 
+                                lineHeight: "28px", 
+                                color: "hsla(3, 100%, 56%, 1)",
+                                letterSpacing: "-0.4px"
+                            }}
+                        >
+                            ₹{product.rentPrice}
+                        </span>
+                        <span 
+                            style={{ 
+                                height: "16px", 
+                                fontSize: "12px", 
+                                fontWeight: 500, 
+                                lineHeight: "16px", 
+                                color: "hsla(0, 0%, 0%, 1)",
+                                letterSpacing: "-0.4px"
+                            }}
+                        >
+                            /month
+                        </span>
                     </div>
 
                     {/* Hover buttons */}

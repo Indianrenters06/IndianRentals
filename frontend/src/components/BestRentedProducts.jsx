@@ -25,31 +25,33 @@ const ProductCard = ({ product, index, isDesktop, handleAddToCart }) => {
                 initial="initial"
                 className="bg-white rounded-[24px] flex flex-col overflow-hidden relative mx-auto w-[173px] md:w-[285px]"
                 style={{ 
-                    height: isDesktop ? '350px' : '260px',
+                    height: isDesktop ? '387px' : '260px',
                     border: "1px solid hsla(0, 0%, 89%, 1)",
                     boxShadow: "0px 1px 2px 0px hsla(0, 0%, 0%, 0.05)",
-                    willChange: "transform, height"
+                    willChange: "transform, height",
+                    cursor: "pointer",
+                    backgroundColor: "hsla(0, 0%, 100%, 1)"
                 }}
                 variants={{
                     initial: { 
-                        height: isDesktop ? 350 : 260,
-                        boxShadow: "0px 1px 2px 0px hsla(0, 0%, 0%, 0.05)"
+                        height: isDesktop ? 387 : 260,
                     },
                     hover: { 
-                        height: isDesktop ? 405 : 330,
-                        boxShadow: "0px 12px 40px rgba(0,0,0,0.12)",
-                        transition: { duration: 0.45, ease: [0.25, 1, 0.5, 1] }
+                        height: isDesktop ? 440 : 330,
+                        transition: { duration: 0.3, ease: [0.45, 1.45, 0.8, 1] }
                     }
                 }}
+                onClick={() => router.push(`/products/${product.id}`)}
             >
                 {/* Image Section — full-bleed top */}
                 <div
-                    className="relative bg-[#F9F9F9] flex items-center justify-center overflow-hidden flex-shrink-0 h-[146px] md:h-[240px] rounded-t-2xl"
+                    className="relative bg-[#F9F9F9] flex items-center justify-center overflow-hidden shrink-0 h-[146px] md:h-[282px] rounded-t-[24px]"
                     style={{ 
-                        borderWidth: '0px 1px 1px 1px',
-                        borderStyle: 'solid',
-                        borderColor: 'hsla(0, 0%, 93%, 1)',
-                        boxShadow: '0px 4px 8px 0px hsla(0, 0%, 87%, 0.1)'
+                        borderWidth: "0px 1px 1px 1px",
+                        borderStyle: "solid",
+                        borderColor: "hsla(0, 0%, 93%, 1)",
+                        borderRadius: "16px",
+                        boxShadow: "0px 4px 8px 0px hsla(0, 0%, 87%, 0.1), 0px 15px 15px 0px hsla(0, 0%, 87%, 0.09), 0px 33px 20px 0px hsla(0, 0%, 87%, 0.05), 0px 59px 23px 0px hsla(0, 0%, 87%, 0.01), 0px 91px 26px 0px hsla(0, 0%, 87%, 0)"
                     }}
                 >
                     {/* Badges */}
@@ -108,9 +110,7 @@ const ProductCard = ({ product, index, isDesktop, handleAddToCart }) => {
                             }
                         }}
                     >
-                        <h3
-                            className="text-[#1D1D1F] line-clamp-1 text-[14px] md:text-[18px] font-bold leading-tight"
-                        >
+                        <h3 className="text-[#1D1D1F] line-clamp-1 text-[14px] md:text-[18px] font-bold leading-tight">
                             {product.name}
                         </h3>
                     </Link>
@@ -183,6 +183,14 @@ const ProductCard = ({ product, index, isDesktop, handleAddToCart }) => {
         </div>
     );
 };
+
+import { Swiper, SwiperSlide } from 'swiper/react';
+import { Navigation, Autoplay, Scrollbar } from 'swiper/modules';
+
+// Import Swiper styles
+import 'swiper/css';
+import 'swiper/css/navigation';
+import 'swiper/css/scrollbar';
 
 const BestRentedProducts = ({ type = "bestRented", defaultTitle = "Curated Products" }) => {
     const [isDesktop, setIsDesktop] = useState(false);
@@ -277,7 +285,7 @@ const BestRentedProducts = ({ type = "bestRented", defaultTitle = "Curated Produ
                     tags: ["Quality tested", "Deep Cleaned"],
                     statusTags: ["Like New", "In Stock"],
                 }));
-                setProducts(mappedProducts.slice(0, 4));
+                setProducts(mappedProducts);
                 setLoading(false);
             } catch (error) {
                 console.error("Failed to fetch products or cms", error);
@@ -290,6 +298,9 @@ const BestRentedProducts = ({ type = "bestRented", defaultTitle = "Curated Produ
     if (loading) return <div className="h-48 w-full bg-slate-50 animate-pulse my-4" />;
     if (!cmsConfig.enabled) return null;
 
+    // Use a unique selector suffix based on section type
+    const sectionSuffix = type === 'bestRented' ? 'best' : 'launch';
+
     return (
         <section 
             className="overflow-hidden py-12 md:py-16"
@@ -301,7 +312,7 @@ const BestRentedProducts = ({ type = "bestRented", defaultTitle = "Curated Produ
             }}
         >
             <div className="max-w-[1200px] mx-auto px-4 sm:px-6">
-                <div className="flex flex-col mb-6 md:mb-12 max-w-[350px] md:max-w-none w-full mx-auto md:mx-0">
+                <div className="flex flex-col mb-6 md:mb-10 max-w-[350px] md:max-w-none w-full mx-auto md:mx-0">
                     <div className="flex items-center justify-between">
                         <h2 className="font-manrope tracking-tight whitespace-nowrap text-[24px] md:text-[36px] font-semibold text-[#333] leading-tight md:leading-[48px]">
                             {cmsConfig.title}
@@ -315,7 +326,67 @@ const BestRentedProducts = ({ type = "bestRented", defaultTitle = "Curated Produ
                     </div>
                 </div>
 
-                <div className="grid grid-cols-2 lg:grid-cols-4 gap-[10px] md:gap-8 min-h-[300px]">
+                <div className="hidden md:block relative">
+                    <Swiper
+                        modules={[Navigation, Autoplay, Scrollbar]}
+                        spaceBetween={24}
+                        slidesPerView={'auto'}
+                        navigation={{
+                            nextEl: `.swiper-next-${sectionSuffix}`,
+                            prevEl: `.swiper-prev-${sectionSuffix}`,
+                        }}
+                        scrollbar={{
+                            el: `.swiper-scrollbar-${sectionSuffix}`,
+                            draggable: true,
+                            hide: false,
+                        }}
+                        autoplay={{
+                            delay: 4000,
+                            disableOnInteraction: false,
+                        }}
+                        className="!pb-0"
+                    >
+                        {products.map((product, index) => (
+                            <SwiperSlide key={product.id || index} style={{ width: '285px' }}>
+                                <ProductCard 
+                                    product={product}
+                                    index={index}
+                                    isDesktop={isDesktop}
+                                    handleAddToCart={handleAddToCart}
+                                />
+                            </SwiperSlide>
+                        ))}
+                    </Swiper>
+
+                    {/* Progress Bar & Navigation Arrows */}
+                    <div className="flex items-center gap-6 mt-10">
+                        <div
+                            className={`swiper-scrollbar-${sectionSuffix} flex-1`}
+                            style={{ height: '3.5px', position: 'relative' }}
+                        />
+                        <div className="flex items-center gap-3 shrink-0">
+                            <button
+                                className={`swiper-prev-${sectionSuffix} w-10 h-10 rounded-full bg-white border border-gray-200 shadow-sm flex items-center justify-center hover:shadow-md hover:border-gray-300 transition-all group`}
+                                aria-label="Previous"
+                            >
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" className="text-gray-400 group-hover:text-gray-800 transition-colors">
+                                    <path d="M15 18L9 12L15 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                                </svg>
+                            </button>
+                            <button
+                                className={`swiper-next-${sectionSuffix} w-10 h-10 rounded-full bg-white border border-gray-200 shadow-sm flex items-center justify-center hover:shadow-md hover:border-gray-300 transition-all group`}
+                                aria-label="Next"
+                            >
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" className="text-gray-400 group-hover:text-gray-800 transition-colors">
+                                    <path d="M9 18L15 12L9 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Mobile View: static grid */}
+                <div className="md:hidden grid grid-cols-2 gap-[10px]">
                     {products.map((product, index) => (
                         <ProductCard 
                             key={product.id || index}
@@ -327,15 +398,36 @@ const BestRentedProducts = ({ type = "bestRented", defaultTitle = "Curated Produ
                     ))}
                 </div>
 
-                <div className="mt-6 flex justify-center md:hidden">
+                <div className="mt-8 flex justify-center md:hidden">
                     <Link
                         href="/products"
-                        className="bg-[#FBC02D] px-5 py-1.5 rounded-full text-[11px] font-semibold text-[#1D1D1F] whitespace-nowrap"
+                        className="bg-[#FBC02D] px-5 py-2 rounded-full text-[12px] font-bold text-[#1D1D1F] whitespace-nowrap shadow-sm"
                     >
-                        View All
+                        View All Products
                     </Link>
                 </div>
             </div>
+
+            <style>{`
+                .swiper-scrollbar-${sectionSuffix} {
+                    background: hsla(0, 0%, 20%, 0.12) !important;
+                    border-radius: 0 !important;
+                    height: 3.5px !important;
+                    overflow: hidden;
+                    position: relative;
+                }
+                .swiper-scrollbar-${sectionSuffix} .swiper-scrollbar-drag {
+                    background: hsla(0, 0%, 20%, 1) !important;
+                    border-radius: 0 !important;
+                    height: 100% !important;
+                }
+                .swiper-prev-${sectionSuffix}.swiper-button-disabled,
+                .swiper-next-${sectionSuffix}.swiper-button-disabled {
+                    opacity: 0.3;
+                    cursor: not-allowed;
+                    pointer-events: none;
+                }
+            `}</style>
         </section>
     );
 };

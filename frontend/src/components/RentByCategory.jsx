@@ -138,8 +138,7 @@ const RentByCategory = () => {
         <section 
             className="py-6 md:py-16 relative overflow-hidden"
             style={{ 
-                background: 'linear-gradient(180deg, #FFFFFF 0%, #FFFAEC 100%)',
-                borderBottom: '0.7px solid hsla(0, 0%, 89%, 1)'
+                background: '#FFFFFF'
             }}
         >
             <div className="max-w-[1200px] mx-auto px-4 sm:px-6">

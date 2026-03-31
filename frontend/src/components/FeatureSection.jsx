@@ -5,7 +5,7 @@ import Image from 'next/image';
 import { motion } from 'framer-motion';
 import { FaArrowRight } from 'react-icons/fa';
 
-const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+import { API } from '../services/apiConfig';
 
 const FeatureSection = () => {
     const [isDesktop, setIsDesktop] = React.useState(false);
@@ -43,14 +43,14 @@ const FeatureSection = () => {
 
     return (
         <section className="bg-white overflow-hidden relative pb-6 md:py-16 text-black">
-            <div className="w-full max-w-[1200px] mx-auto px-0 md:px-4">
+            <div className={isDesktop ? "w-full max-w-[1200px] mx-auto px-4 sm:px-6" : "w-full max-w-[1200px] mx-auto px-0"}>
 
-                {/* Inner radial gradient container - 1140x339 Desktop, 390x390 Mobile */}
+                {/* Inner radial gradient container - Optimized for 1200px lane */}
                 <div
                     className="relative flex flex-col lg:flex-row items-center lg:items-start justify-between overflow-hidden"
                     style={{
                         background: 'radial-gradient(181.93% 64.7% at 50% 72.89%, #FFFFFF 0%, #D6F1FF 100%)',
-                        width: isDesktop ? '1140px' : '390px',
+                        width: isDesktop ? '100%' : '390px',
                         minHeight: isDesktop ? '339px' : '390px',
                         height: isDesktop ? '339px' : 'auto',
                         margin: isDesktop ? '0 auto' : '0',
@@ -321,7 +321,7 @@ const FeatureSection = () => {
                     >
                         <h3 className="font-manrope text-[14px] md:text-xl font-bold tracking-tight pb-2">
                             <span className="text-[#3b82f6]">Built for </span>
-                            <span className="bg-clip-text text-transparent bg-gradient-to-r from-purple-500 via-pink-500 to-orange-500">
+                            <span className="bg-clip-text text-transparent bg-linear-to-r from-purple-500 via-pink-500 to-orange-500">
                                 Apple Intelligence.
                             </span>
                         </h3>

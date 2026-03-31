@@ -170,7 +170,7 @@ const Navbar = () => {
             {/* Top Bar */}
             <div className="w-full bg-white">
                 <div 
-                    className="max-w-[1200px] mx-auto px-4 sm:px-6 flex items-center justify-between" 
+                    className="max-w-[1400px] mx-auto px-4 md:px-8 flex items-center justify-between" 
                     style={{ height: "62px", gap: "10px" }}
                 >
                     <div className="flex items-center gap-8">
@@ -425,7 +425,7 @@ const Navbar = () => {
 
             {/* Secondary Nav - Categories */}
             <div className="hidden md:block bg-white w-full border-t border-gray-100">
-                <div className="max-w-[1200px] mx-auto px-4 sm:px-6 h-[28px] flex items-center">
+                <div className="max-w-[1400px] mx-auto px-4 md:px-8 h-[28px] flex items-center">
                     <div className="flex items-center" style={{ width: "754px", height: "20px", gap: "17px" }}>
                         {navLinks.map((link, index) => (
                             <React.Fragment key={link.name}>

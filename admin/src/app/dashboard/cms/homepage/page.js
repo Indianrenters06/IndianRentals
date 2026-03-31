@@ -219,7 +219,7 @@ const ProductSelector = ({ label, selectedIds, onChange }) => {
 const DEFAULTS = {
     publishStatus: "published",
     heroEnabled: true,
-    heroSlides: [{ title: "The Tech That Powers Your Ambition. On Demand.", subtitle: "Get the latest MacBooks, Workstations, Cameras, and more.", image: "", bgColor: "#0075ff", textColor: "#ffffff", bgImage: "", ctaText: "Rent Now", ctaLink: "/products" }],
+    heroSlides: [{ title: "The Tech That Powers Your Ambition. On Demand.", subtitle: "Get the latest MacBooks, Workstations, Cameras, and more.", image: "", bgColor: "#0075ff", textColor: "#ffffff", bgImage: "", ctaText: "Rent Now", ctaLink: "/products", slideLink: "" }],
     categorySectionEnabled: true,
     categorySectionTitle: "Rent by Category",
     bestRentedEnabled: true, bestRentedTitle: "Best Rented Products", bestRentedProductIds: [],
@@ -239,10 +239,10 @@ const DEFAULTS = {
     rentalProcessTitle: "Rental Process",
     rentalProcessSubtitle: "Choose, secure, receive, and create with zero hassle. No installation, no configuration, no delay.",
     rentalProcessSteps: [
-        { title: "Choose Your Tech", description: "Browse our curated selection...", icon: "Laptop", highlight: true },
-        { title: "Complete KYC", description: "Pick a flexible rental tenure...", icon: "IdentificationCard", highlight: false },
-        { title: "Secure Your Order", description: "Confirm your rental...", icon: "ShoppingCart", highlight: false },
-        { title: "Receive & Create", description: "We deliver your tech...", icon: "Package", highlight: false },
+        { title: "Choose Your Tech", description: "Browse our curated selection...", icon: "Laptop", highlight: true, link: "" },
+        { title: "Complete KYC", description: "Pick a flexible rental tenure...", icon: "IdentificationCard", highlight: false, link: "" },
+        { title: "Secure Your Order", description: "Confirm your rental...", icon: "ShoppingCart", highlight: false, link: "" },
+        { title: "Receive & Create", description: "We deliver your tech...", icon: "Package", highlight: false, link: "" },
     ],
     testimonialsEnabled: true,
     testimonialSectionTitle: "What Our Customers Say",
@@ -256,21 +256,21 @@ const DEFAULTS = {
     featuredShowcaseEnabled: true,
     featuredShowcaseProductIds: [],
     featuredShowcaseBanners: [
-        { title: 'Apple Products',   subtitle: 'MacBooks | iPads | iPhones | Mac Studio | Mac Mini', image: '', bg: 'linear-gradient(135deg, #2a1a5e 0%, #4c3099 40%, #7c5cbf 70%, #b08ad4 100%)', href: '/categories/apple' },
-        { title: 'Gaming Laptops',   subtitle: 'ASUS ROG | Lenovo Legion | MSI | HP Omen',          image: '', bg: 'linear-gradient(135deg, #0a1628 0%, #1a3a5c 40%, #1e5f8c 70%, #2a9fd6 100%)', href: '/categories/gaming' },
-        { title: 'Smart Devices',    subtitle: 'Tablets | Smartwatches | Earbuds | Accessories',    image: '', bg: 'linear-gradient(135deg, #1a2e1a 0%, #1e5c3a 40%, #25874f 70%, #3ac47d 100%)', href: '/categories/smart-devices' },
+        { title: 'Apple Products', subtitle: 'MacBooks | iPads | iPhones | Mac Studio | Mac Mini', image: '', bg: 'linear-gradient(135deg, #2a1a5e 0%, #4c3099 40%, #7c5cbf 70%, #b08ad4 100%)', href: '/categories/apple' },
+        { title: 'Gaming Laptops', subtitle: 'ASUS ROG | Lenovo Legion | MSI | HP Omen', image: '', bg: 'linear-gradient(135deg, #0a1628 0%, #1a3a5c 40%, #1e5f8c 70%, #2a9fd6 100%)', href: '/categories/gaming' },
+        { title: 'Smart Devices', subtitle: 'Tablets | Smartwatches | Earbuds | Accessories', image: '', bg: 'linear-gradient(135deg, #1a2e1a 0%, #1e5c3a 40%, #25874f 70%, #3ac47d 100%)', href: '/categories/smart-devices' },
     ],
     metaTitle: "", metaDescription: "",
 };
 
 const TABS = [
-    { key: "hero",     label: "Hero Slides",       icon: <Layout size={15} /> },
-    { key: "products", label: "Curated Grids",     icon: <Package size={15} /> },
+    { key: "hero", label: "Hero Slides", icon: <Layout size={15} /> },
+    { key: "products", label: "Curated Grids", icon: <Package size={15} /> },
     { key: "showcase", label: "Featured Showcase", icon: <PhosphorImage size={15} /> },
-    { key: "feature",  label: "Feature Section",   icon: <Star size={15} /> },
-    { key: "process",  label: "Rental Process",    icon: <ArrowsLeftRight size={15} /> },
-    { key: "trust",    label: "Trust Factors",     icon: <ChatText size={15} /> },
-    { key: "seo",      label: "SEO Settings",      icon: <Globe size={15} /> },
+    { key: "feature", label: "Feature Section", icon: <Star size={15} /> },
+    { key: "process", label: "Rental Process", icon: <ArrowsLeftRight size={15} /> },
+    { key: "trust", label: "Trust Factors", icon: <ChatText size={15} /> },
+    { key: "seo", label: "SEO Settings", icon: <Globe size={15} /> },
 ];
 
 // ── Main Page ────────────────────────────────────────────────────────────────
@@ -290,7 +290,7 @@ export default function CMSHomepage() {
             if (res.ok) {
                 const d = await res.json();
                 if (d.heroSlides?.length === 0 && d.heroTitle) {
-                    d.heroSlides = [{ title: d.heroTitle, subtitle: d.heroSubtitle, image: d.heroImage, bgColor: d.heroBgColor || "#0075ff", textColor: d.heroTextColor || "#ffffff", bgImage: d.heroBgImage || "", ctaText: "Rent Now", ctaLink: "/products" }];
+                    d.heroSlides = [{ title: d.heroTitle, subtitle: d.heroSubtitle, image: d.heroImage, bgColor: d.heroBgColor || "#0075ff", textColor: d.heroTextColor || "#ffffff", bgImage: d.heroBgImage || "", ctaText: "Rent Now", ctaLink: "/products", slideLink: "" }];
                 } else if (!d.heroSlides || d.heroSlides.length === 0) {
                     d.heroSlides = DEFAULTS.heroSlides.map(s => ({ ...s }));
                 } else {
@@ -299,6 +299,7 @@ export default function CMSHomepage() {
                         ...s,
                         textColor: s.textColor || "#ffffff",
                         bgImage: s.bgImage || "",
+                        slideLink: s.slideLink || "",
                     }));
                 }
                 if (!d.rentalProcessSteps || d.rentalProcessSteps.length === 0) {
@@ -410,6 +411,7 @@ export default function CMSHomepage() {
                                                 <Field label="CTA Button Text" value={slide.ctaText} onChange={v => { const n = [...data.heroSlides]; n[index].ctaText = v; set("heroSlides", n); }} placeholder="Rent Now" />
                                                 <Field label="CTA Button Link" value={slide.ctaLink} onChange={v => { const n = [...data.heroSlides]; n[index].ctaLink = v; set("heroSlides", n); }} placeholder="/products" />
                                             </div>
+                                            <Field label="Entire Slide Link (Optional)" value={slide.slideLink || ""} onChange={v => { const n = [...data.heroSlides]; n[index].slideLink = v; set("heroSlides", n); }} placeholder="https://..." />
                                             <div className="grid grid-cols-2 gap-4">
                                                 <div>
                                                     <label className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider block mb-2">Background Color</label>
@@ -434,12 +436,12 @@ export default function CMSHomepage() {
                                         <div className="space-y-4">
                                             <ImageUploader label="Foreground Image (Transparent PNG Recommended)" existingUrl={slide.image}
                                                 onUpload={url => { const n = [...data.heroSlides]; n[index].image = url; set("heroSlides", n); }} />
-                                            { (slide.image || slide.bgImage) && (
-                                                <div className="h-32 rounded-xl flex items-center justify-center p-2 border border-slate-200 dark:border-slate-700 relative overflow-hidden" 
-                                                     style={{ backgroundColor: slide.bgColor }}>
+                                            {(slide.image || slide.bgImage) && (
+                                                <div className="h-32 rounded-xl flex items-center justify-center p-2 border border-slate-200 dark:border-slate-700 relative overflow-hidden"
+                                                    style={{ backgroundColor: slide.bgColor }}>
                                                     {slide.bgImage && <img src={slide.bgImage} className="absolute inset-0 w-full h-full object-cover opacity-50" alt="BG Preview" />}
-                                                    <img src={slide.image || "https://res.cloudinary.com/dgkckcdk8/image/upload/v1769946716/indian-rentals/fj8ptqbhppbstdd0hs4i.png"} 
-                                                         className="relative z-10 max-h-full max-w-full object-contain drop-shadow-xl" alt="Preview" />
+                                                    <img src={slide.image || "https://res.cloudinary.com/dgkckcdk8/image/upload/v1769946716/indian-rentals/fj8ptqbhppbstdd0hs4i.png"}
+                                                        className="relative z-10 max-h-full max-w-full object-contain drop-shadow-xl" alt="Preview" />
                                                 </div>
                                             )}
                                         </div>
@@ -700,7 +702,7 @@ export default function CMSHomepage() {
                         <div>
                             <div className="flex justify-between items-center bg-slate-900 text-white px-5 py-3 rounded-t-xl">
                                 <h4 className="font-semibold text-sm">Flow Steps Configuration</h4>
-                                <button onClick={() => set("rentalProcessSteps", [...data.rentalProcessSteps, { title: "New Step", description: "Write description...", icon: "FaSearch", highlight: false }])}
+                                <button onClick={() => set("rentalProcessSteps", [...data.rentalProcessSteps, { title: "New Step", description: "Write description...", icon: "FaSearch", highlight: false, link: "" }])}
                                     className="flex items-center gap-1.5 text-xs font-semibold bg-white/20 hover:bg-white/30 px-3 py-1.5 rounded-lg transition-all">
                                     <Plus size={12} /> Add Step
                                 </button>
@@ -724,6 +726,7 @@ export default function CMSHomepage() {
                                             <div className="space-y-3">
                                                 <Field label="Title" value={step.title} onChange={v => { const n = [...data.rentalProcessSteps]; n[idx].title = v; set("rentalProcessSteps", n); }} />
                                                 <Field label="Icon Name (e.g. Laptop)" value={step.icon} onChange={v => { const n = [...data.rentalProcessSteps]; n[idx].icon = v; set("rentalProcessSteps", n); }} placeholder="Laptop" />
+                                                <Field label="Target Link (URL)" value={step.link || ""} onChange={v => { const n = [...data.rentalProcessSteps]; n[idx].link = v; set("rentalProcessSteps", n); }} placeholder="/categories/laptops" />
                                                 <ImageUploader label="Step Illustration" existingUrl={step.image} onUpload={url => { const n = [...data.rentalProcessSteps]; n[idx].image = url; set("rentalProcessSteps", n); }} />
                                             </div>
                                             <Field label="Body Description" value={step.description} onChange={v => { const n = [...data.rentalProcessSteps]; n[idx].description = v; set("rentalProcessSteps", n); }} rows={5} />
