@@ -2,7 +2,7 @@
 import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { FaFacebookF, FaInstagram, FaLinkedinIn, FaWhatsapp } from 'react-icons/fa';
+import { FacebookLogo, InstagramLogo, LinkedinLogo, WhatsappLogo } from '@phosphor-icons/react';
 import { useSettings } from '../context/SettingsContext';
 
 const paymentLogos = [
@@ -55,16 +55,16 @@ const Footer = () => {
                             </p>
                             <div className="flex items-center gap-3">
                                 <a href={`https://wa.me/${sitePhone.replace(/[^\d]/g, '')}`} className="transition-opacity hover:opacity-70" target="_blank" rel="noopener noreferrer">
-                                    <FaWhatsapp size={22} className="text-[#25D366]" />
+                                    <WhatsappLogo size={22} weight="fill" className="text-[#25D366]" />
                                 </a>
                                 <a href="#" className="transition-opacity hover:opacity-70">
-                                    <FaFacebookF size={20} className="text-[#1877F2]" />
+                                    <FacebookLogo size={22} weight="fill" className="text-[#1877F2]" />
                                 </a>
                                 <a href="#" className="transition-opacity hover:opacity-70">
-                                    <FaInstagram size={22} className="text-[#E4405F]" />
+                                    <InstagramLogo size={22} weight="fill" className="text-[#E4405F]" />
                                 </a>
                                 <a href="#" className="transition-opacity hover:opacity-70">
-                                    <FaLinkedinIn size={20} className="text-[#0A66C2]" />
+                                    <LinkedinLogo size={22} weight="fill" className="text-[#0A66C2]" />
                                 </a>
                             </div>
                         </div>
@@ -186,16 +186,16 @@ const Footer = () => {
                     {/* Social Icons row */}
                     <div className="flex items-center gap-4 mb-8">
                         <a href={`https://wa.me/${sitePhone.replace(/[^\d]/g, '')}`} className="w-[42px] h-[42px] rounded-full bg-white flex items-center justify-center shadow-sm" target="_blank" rel="noopener noreferrer">
-                            <FaWhatsapp size={22} className="text-[#25D366]" />
+                            <WhatsappLogo size={22} weight="fill" className="text-[#25D366]" />
                         </a>
                         <a href="#" className="w-[42px] h-[42px] rounded-full bg-white flex items-center justify-center shadow-sm">
-                            <FaFacebookF size={20} className="text-[#1877F2]" />
+                            <FacebookLogo size={22} weight="fill" className="text-[#1877F2]" />
                         </a>
                         <a href="#" className="w-[42px] h-[42px] rounded-full bg-white flex items-center justify-center shadow-sm">
-                            <FaInstagram size={22} className="text-[#E4405F]" />
+                            <InstagramLogo size={22} weight="fill" className="text-[#E4405F]" />
                         </a>
                         <a href="#" className="w-[42px] h-[42px] rounded-full bg-white flex items-center justify-center shadow-sm">
-                            <FaLinkedinIn size={18} className="text-[#0A66C2]" />
+                            <LinkedinLogo size={22} weight="fill" className="text-[#0A66C2]" />
                         </a>
                     </div>
 

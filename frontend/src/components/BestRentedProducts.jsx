@@ -1,7 +1,7 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
-import { FaRegHeart, FaStar, FaBolt, FaTruck, FaInfoCircle } from "react-icons/fa";
+import { Heart, Star, Lightning, Truck, Info } from "@phosphor-icons/react";
 import { motion } from "framer-motion";
 
 import { API } from "@/services/apiConfig";
@@ -97,7 +97,7 @@ const ProductCard = ({ product, index, isDesktop, handleAddToCart }) => {
                         style={{ width: "28px", height: "28px", top: "8px", right: "8px", backgroundColor: "white", border: "1px solid #E5E5EA" }}
                         onClick={(e) => { e.preventDefault(); e.stopPropagation(); }}
                     >
-                        <FaRegHeart size={14} color="#8E8E93" />
+                        <Heart size={14} color="#8E8E93" weight="fill" />
                     </button>
                     
                     <div className="relative w-full h-full p-4 flex items-center justify-center">
@@ -149,11 +149,11 @@ const ProductCard = ({ product, index, isDesktop, handleAddToCart }) => {
                     >
                         <div className="flex items-center gap-1">
                             {!isDesktop ? (
-                                <FaStar size={10} className="text-[#FF9F0A]" />
+                                <Star size={10} weight="fill" className="text-[#FF9F0A]" />
                             ) : (
                                 <div className="flex text-[#FF9F0A]">
                                     {[1, 2, 3, 4, 5].map((s) => (
-                                        <FaStar key={s} size={11} className={s <= Math.round(product.rating || 4) ? "" : "opacity-20"} />
+                                        <Star key={s} size={11} weight="fill" className={s <= Math.round(product.rating || 4) ? "" : "opacity-20"} />
                                     ))}
                                 </div>
                             )}
@@ -162,9 +162,9 @@ const ProductCard = ({ product, index, isDesktop, handleAddToCart }) => {
                             </span>
                         </div>
                         <div className="flex items-center gap-1 text-[#8E8E93]">
-                            <FaTruck size={13} />
+                            <Truck size={13} weight="fill" />
                             <span className="text-[12px] font-medium">2-4 days</span>
-                            <FaInfoCircle size={10} className="ml-0.5 opacity-40 hidden md:block" />
+                            <Info size={10} weight="fill" className="ml-0.5 opacity-40 hidden md:block" />
                         </div>
                     </div>
 
@@ -331,9 +331,7 @@ const BestRentedProducts = ({ type = "bestRented", defaultTitle = "Curated Produ
             className="overflow-hidden py-12 md:py-16"
             style={{ 
                 minHeight: '449px',
-                background: type === 'newLaunches' 
-                    ? 'linear-gradient(180deg, #FFFFFF 0%, #EDF9FF 100%)' 
-                    : '#FFFFFF'
+                background: '#FFFFFF'
             }}
         >
             <div className="max-w-[1200px] mx-auto px-4 sm:px-6">

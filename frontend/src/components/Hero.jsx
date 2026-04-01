@@ -1,6 +1,6 @@
 "use client";
 import Image from "next/image";
-import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
+import { CaretLeft, CaretRight } from "@phosphor-icons/react";
 import { useState, useEffect, useRef } from "react";
 import Button from "./common/Button";
 import Link from "next/link";
@@ -136,7 +136,7 @@ const Hero = () => {
                     <div key={i} className="snap-center shrink-0 rounded-lg relative h-full flex flex-col p-4 overflow-hidden"
                         style={{ width: "216px", background: s.bgGradient || s.bgColor }}>
                         <div className="absolute top-0 left-0 w-full h-[220px]">
-                            <Image src={s.image || FALLBACK_SLIDES[0].image} alt={s.title} fill unoptimized className="object-contain drop-shadow-xl" />
+                            <Image src={s.image || FALLBACK_SLIDES[0].image} alt={s.title} fill unoptimized className="object-contain drop-shadow-gray-50" />
                         </div>
                         <div className="mt-auto relative z-10" style={{ color: s.textColor || "#fff" }}>
                             <h1 className="text-sm font-bold leading-tight mb-1">{s.title}</h1>
@@ -176,11 +176,17 @@ const Hero = () => {
 
                     {/* Navigation */}
                     <div className="absolute inset-x-0 top-1/2 -translate-y-1/2 pointer-events-none z-30 max-w-[1280px] mx-auto px-4 flex items-center justify-between">
-                        <button onClick={prev} className="pointer-events-auto w-14 h-14 bg-white/95 backdrop-blur-md shadow-2xl rounded-full flex items-center justify-center hover:bg-white hover:scale-110 active:scale-95 transition-all opacity-0 group-hover:opacity-100">
-                            <FaChevronLeft className="text-gray-800" size={20} />
+                        <button
+                            onClick={prev}
+                            className="pointer-events-auto w-14 h-14 bg-white/95 backdrop-blur-md shadow-2xl rounded-full flex items-center justify-center hover:bg-white hover:scale-110 active:scale-95 transition-all opacity-0 group-hover:opacity-100"
+                        >
+                            <CaretLeft size={20} weight="fill" className="text-gray-800" />
                         </button>
-                        <button onClick={next} className="pointer-events-auto w-14 h-14 bg-white/95 backdrop-blur-md shadow-2xl rounded-full flex items-center justify-center hover:bg-white hover:scale-110 active:scale-95 transition-all opacity-0 group-hover:opacity-100">
-                            <FaChevronRight className="text-gray-800" size={20} />
+                        <button
+                            onClick={next}
+                            className="pointer-events-auto w-14 h-14 bg-white/95 backdrop-blur-md shadow-2xl rounded-full flex items-center justify-center hover:bg-white hover:scale-110 active:scale-95 transition-all opacity-0 group-hover:opacity-100"
+                        >
+                            <CaretRight size={20} weight="fill" className="text-gray-800" />
                         </button>
                     </div>
 
@@ -226,7 +232,7 @@ const SlideItem = ({ slide, isActive, width }) => {
 
     if (slide.slideLink) {
         return (
-            <Link 
+            <Link
                 href={slide.slideLink}
                 className="shrink-0 relative rounded-[32px] overflow-hidden transition-all duration-700 ease-[cubic-bezier(0.25,1,0.5,1)] cursor-pointer"
                 style={containerStyle}

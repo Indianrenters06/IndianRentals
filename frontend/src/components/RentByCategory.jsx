@@ -4,7 +4,7 @@ import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation, Autoplay, Scrollbar } from 'swiper/modules';
 import Link from 'next/link';
 import Image from 'next/image';
-import { FaLaptop, FaCamera, FaDesktop, FaTabletAlt, FaMobileAlt, FaArrowRight, FaChevronLeft, FaChevronRight } from 'react-icons/fa';
+import { Laptop, Camera, Desktop, DeviceTablet, DeviceMobile, ArrowRight, CaretLeft, CaretRight } from '@phosphor-icons/react';
 import { getCategories } from '../services/categoryService';
 
 // Import Swiper styles
@@ -119,13 +119,13 @@ const RentByCategory = () => {
 
     const getIconForCategory = (name) => {
         const lowerName = name.toLowerCase();
-        if (lowerName.includes('macbook')) return <FaLaptop size={40} />;
-        if (lowerName.includes('dslr') || lowerName.includes('camera')) return <FaCamera size={40} />;
-        if (lowerName.includes('all in one')) return <FaDesktop size={40} />;
-        if (lowerName.includes('ipad')) return <FaTabletAlt size={40} />;
-        if (lowerName.includes('smartphone') || lowerName.includes('phone')) return <FaMobileAlt size={40} />;
-        if (lowerName.includes('desktop')) return <FaDesktop size={40} />;
-        return <FaLaptop size={40} />;
+        if (lowerName.includes('macbook')) return <Laptop size={40} weight="fill" />;
+        if (lowerName.includes('dslr') || lowerName.includes('camera')) return <Camera size={40} weight="fill" />;
+        if (lowerName.includes('all in one')) return <Desktop size={40} weight="fill" />;
+        if (lowerName.includes('ipad')) return <DeviceTablet size={40} weight="fill" />;
+        if (lowerName.includes('smartphone') || lowerName.includes('phone')) return <DeviceMobile size={40} weight="fill" />;
+        if (lowerName.includes('desktop')) return <Desktop size={40} weight="fill" />;
+        return <Laptop size={40} weight="fill" />;
     };
 
     if (loading) return null;
@@ -135,9 +135,9 @@ const RentByCategory = () => {
     const mobileCats = displayCategories.slice(0, 7);
 
     return (
-        <section 
+        <section
             className="py-6 md:py-16 relative overflow-hidden"
-            style={{ 
+            style={{
                 background: '#FFFFFF'
             }}
         >
@@ -146,14 +146,14 @@ const RentByCategory = () => {
                     <h2 className="text-[22px] md:text-3xl lg:text-4xl font-semibold font-manrope text-[#333333] tracking-[-0.02em] leading-tight">{cmsConfig.title}</h2>
                     <Link
                         href="/categories"
-                        className="hidden md:inline-flex items-center justify-center gap-[2px] text-gray-900 group hover:brightness-105 transition-all"
+                        className="hidden md:inline-flex items-center justify-center text-gray-900 hover:brightness-105 transition-all"
                         style={{
                             width: '95px',
                             height: '35px',
                             paddingTop: '6px',
                             paddingBottom: '6px',
-                            paddingLeft: '20px',
-                            paddingRight: '20px',
+                            paddingLeft: '10px',
+                            paddingRight: '10px',
                             borderRadius: '9999px',
                             background: 'hsla(44, 100%, 64%, 1)',
                             borderBottom: '1px solid rgba(0,0,0,0.10)',
@@ -165,7 +165,6 @@ const RentByCategory = () => {
                         }}
                     >
                         Explore
-                        <FaArrowRight size={11} className="group-hover:translate-x-0.5 transition-transform shrink-0" />
                     </Link>
                 </div>
 
@@ -196,7 +195,7 @@ const RentByCategory = () => {
                         <div className="w-full aspect-square rounded-[10px] bg-[#fff3d4] border border-[#fbd38d]/30 flex flex-col items-center justify-center gap-1 shadow-sm">
                             <span className="text-[10px] font-semibold font-manrope text-[#d97706] leading-tight">View All</span>
                             <div className="w-6 h-6 rounded-full bg-[#f6ad55] flex items-center justify-center">
-                                <FaArrowRight size={8} className="text-white" />
+                                <ArrowRight size={8} weight="fill" className="text-white" />
                             </div>
                         </div>
                     </Link>
@@ -261,19 +260,19 @@ const RentByCategory = () => {
                                 className="swiper-prev-cat w-10 h-10 rounded-full bg-white border border-gray-200 shadow-sm flex items-center justify-center hover:shadow-md hover:border-gray-300 transition-all group"
                                 aria-label="Previous"
                             >
-                                <FaChevronLeft size={14} className="text-gray-400 group-hover:text-gray-800 transition-colors" />
+                                <CaretLeft size={14} weight="fill" className="text-black group-hover:text-gray-800 transition-colors" />
                             </button>
                             <button
                                 className="swiper-next-cat w-10 h-10 rounded-full bg-white border border-gray-200 shadow-sm flex items-center justify-center hover:shadow-md hover:border-gray-300 transition-all group"
                                 aria-label="Next"
                             >
-                                <FaChevronRight size={14} className="text-gray-400 group-hover:text-gray-800 transition-colors" />
+                                <CaretRight size={14} weight="fill" className="text-black group-hover:text-gray-800 transition-colors" />
                             </button>
                         </div>
                     </div>
                 </div>
             </div>
-            
+
             <style>{`
                 /* Scrollbar track — very subtle light line */
                 .swiper-scrollbar-cat {

@@ -1,12 +1,12 @@
 "use client";
 import React from 'react';
-import { FaInfoCircle } from 'react-icons/fa';
+import { Info } from '@phosphor-icons/react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
 const Sidebar = ({ selectedDuration, setSelectedDuration, selectedSort, setSelectedSort }) => {
     const pathname = usePathname() || "";
-    
+
     const categoryLinks = {
         "Most Rented": "/products",
         "Apple Products": "/category/apple",
@@ -29,24 +29,25 @@ const Sidebar = ({ selectedDuration, setSelectedDuration, selectedSort, setSelec
                 <ul className="space-y-4">
                     {categories.map((cat) => {
                         const href = categoryLinks[cat] || "#";
-                        const isActive = pathname.startsWith(href) && href !== "/products" && href !== "/categories" 
-                                        ? true 
-                                        : pathname === href && (cat === "Most Rented" || cat === "Latest Launch" || cat === "More");
-                        
+                        const isActive = pathname.startsWith(href) && href !== "/products" && href !== "/categories"
+                            ? true
+                            : pathname === href && (cat === "Most Rented" || cat === "Latest Launch" || cat === "More");
+
                         return (
-                        <li key={cat}>
-                            <Link href={href} className={`flex items-center justify-between text-[14px] group transition-all duration-200 ${isActive ? "text-black font-semibold" : "text-gray-500 hover:text-black"}`}>
-                                {cat}
-                                <span className={`text-lg transition-transform duration-200 ${isActive ? "text-black translate-x-1" : "text-gray-300 group-hover:text-black group-hover:translate-x-1"}`}>›</span>
-                            </Link>
-                        </li>
-                    )})}
+                            <li key={cat}>
+                                <Link href={href} className={`flex items-center justify-between text-[14px] group transition-all duration-200 ${isActive ? "text-black font-semibold" : "text-gray-500 hover:text-black"}`}>
+                                    {cat}
+                                    <span className={`text-lg transition-transform duration-200 ${isActive ? "text-black translate-x-1" : "text-gray-300 group-hover:text-black group-hover:translate-x-1"}`}>›</span>
+                                </Link>
+                            </li>
+                        )
+                    })}
                 </ul>
             </div>
             <div className="mb-10 border-t border-gray-100 pt-8">
                 <div className="flex items-center gap-2 mb-5">
                     <h3 className="text-[11px] font-bold text-gray-400 uppercase tracking-widest">Rent For</h3>
-                    <FaInfoCircle className="text-gray-300 hover:text-gray-500 cursor-help" size={12} />
+                    <Info className="text-gray-300 hover:text-gray-500 cursor-help" size={12} weight="fill" />
                 </div>
                 <div className="grid grid-cols-2 gap-3">
                     {durations.map((duration) => (

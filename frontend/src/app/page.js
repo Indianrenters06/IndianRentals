@@ -18,12 +18,12 @@ export default function Home() {
       <BestRentedProducts type="bestRented" defaultTitle="Best Rented Products" />
       <FeatureSection />
       <div className="hidden md:block">
+        <FeaturedShowcase />
+      </div>
+      <div className="hidden md:block">
         <ClientSection />
       </div>
       <BestRentedProducts type="newLaunches" defaultTitle="New Launches This Week" />
-      <div className="hidden md:block">
-        <FeaturedShowcase />
-      </div>
       <RentalProcess />
       <WhyChooseUs />
       <Testimonials />

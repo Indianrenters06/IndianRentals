@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { FaSearch, FaUser, FaShoppingCart, FaMapMarkerAlt, FaBars, FaTimes, FaChevronDown, FaHeart, FaSignOutAlt, FaLocationArrow } from "react-icons/fa";
+import { User, MapPin, ArrowRight, CaretLeft, Heart, ShoppingCart, List, MagnifyingGlass, X, CaretDown, SignOut, NavigationArrow } from "@phosphor-icons/react";
 import { motion, AnimatePresence } from "framer-motion";
 import AuthModal from "./AuthModal";
 import { useSelector } from "react-redux";
@@ -181,7 +181,7 @@ const Navbar = () => {
                                 onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
                                 className="md:hidden text-gray-800 focus:outline-none p-1"
                             >
-                                {isMobileMenuOpen ? <FaTimes size={24} /> : <FaBars size={24} />}
+                                {isMobileMenuOpen ? <X size={24} weight="fill" /> : <List size={24} weight="fill" />}
                             </button>
 
                             {/* Logo */}
@@ -222,9 +222,10 @@ const Navbar = () => {
                                 onClick={handleSearchClick}
                             >
                                 <div style={{ width: "24px", height: "24px", position: "relative" }}>
-                                    <FaSearch 
+                                    <MagnifyingGlass 
                                         className="text-gray-400" 
                                         size={19.5} 
+                                        weight="fill"
                                         style={{ position: "absolute", top: "2.23px", left: "2.23px" }} 
                                     />
                                 </div>
@@ -234,103 +235,193 @@ const Navbar = () => {
 
                     {/* Right Actions (Desktop) */}
                     {/* Right Actions (Desktop) */}
-                    <div className="hidden md:flex items-center" style={{ width: "289px", height: "35px", gap: "8px", justifyContent: "space-between" }}>
-                        <div className="relative h-full flex items-center">
+                    <div className="hidden md:flex items-center justify-end" style={{ width: "auto", minWidth: "191px", height: "33px", gap: "8px" }}>
+                        <div className="relative flex items-center shrink-0">
                             <button
-                                className="flex items-center gap-2 text-gray-700 hover:text-indigo-600 transition-colors focus:outline-none font-medium h-full"
+                                className="flex items-center outline-none h-[33px] group"
                                 onClick={() => setIsCityDropdownOpen(!isCityDropdownOpen)}
                                 style={{
-                                    border: "0.7px solid #D1D1D1",
+                                    border: "1.5px solid #d1d1d1",
                                     borderRadius: "9999px",
-                                    paddingLeft: "10px",
-                                    paddingRight: "10px",
-                                    backgroundColor: "#F6F6F6"
+                                    paddingLeft: "8px",
+                                    paddingRight: "14px",
+                                    gap: "4px",
+                                    backgroundColor: "#FFFFFF",
+                                    boxShadow: "0 1px 2px rgba(0,0,0,0.02)"
                                 }}
                             >
-                                <FaMapMarkerAlt size={14} className="text-gray-500" />
-                                <span className="text-sm font-bold truncate max-w-[100px]">
+                                <MapPin size={18} color="#1D1D1F" weight="regular" />
+                                <span className="text-[14.5px] text-[#1D1D1F] font-medium truncate" style={{ maxWidth: "150px" }}>
                                     {selectedCity || "Delhi"}
                                 </span>
                             </button>
 
-                            {/* City Dropdown -> Location Input Modal/Popover */}
+                            {/* City Drawer -> Location Sidebar */}
                             <AnimatePresence>
                                 {isCityDropdownOpen && (
-                                    <motion.div
-                                        initial={{ opacity: 0, y: 10 }}
-                                        animate={{ opacity: 1, y: 0 }}
-                                        exit={{ opacity: 0, y: 10 }}
-                                        className="absolute top-full right-0 mt-2 w-72 bg-white rounded-xl shadow-xl border border-gray-100 p-4 z-50"
-                                    >
-                                        <label className="block text-sm font-bold text-gray-800 mb-2">
-                                            Enter your location
-                                        </label>
-                                        <div className="flex flex-col gap-3">
-                                            <input
-                                                type="text"
-                                                value={locationInput}
-                                                onChange={(e) => setLocationInput(e.target.value)}
-                                                placeholder="e.g. MG Road, Bangalore"
-                                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-sm"
-                                                autoFocus
-                                                onKeyDown={(e) => {
-                                                    if (e.key === 'Enter') {
-                                                        const val = locationInput.trim();
-                                                        if (val) {
-                                                            setSelectedCity(val);
-                                                            localStorage.setItem('userLocation', val);
-                                                            setIsCityDropdownOpen(false);
-                                                        }
-                                                    }
-                                                }}
-                                            />
-                                            <button
-                                                className="w-full bg-indigo-600 text-white font-bold text-sm py-2 rounded-lg hover:bg-indigo-700 transition"
-                                                onClick={() => {
-                                                    const val = locationInput.trim();
-                                                    if (val && val !== "Fetching...") {
-                                                        setSelectedCity(val);
-                                                        localStorage.setItem('userLocation', val);
-                                                        setIsCityDropdownOpen(false);
-                                                    }
-                                                }}
+                                    <>
+                                        {/* Backdrop */}
+                                        <motion.div 
+                                            initial={{ opacity: 0 }}
+                                            animate={{ opacity: 1 }}
+                                            exit={{ opacity: 0 }}
+                                            className="fixed inset-0 bg-black/20 backdrop-blur-sm z-[998]"
+                                            onClick={() => setIsCityDropdownOpen(false)}
+                                        />
+                                        
+                                        {/* Sidebar itself */}
+                                        <motion.div
+                                            initial={{ x: "100%" }}
+                                            animate={{ x: 0 }}
+                                            exit={{ x: "100%" }}
+                                            transition={{ type: "spring", damping: 25, stiffness: 200 }}
+                                            className="fixed right-0 top-0 h-screen bg-white shadow-[-10px_0_30px_rgba(0,0,0,0.05)] z-[999] overflow-y-auto scrollbar-hide flex flex-col"
+                                            style={{ width: '410px' }}
+                                        >
+                                            {/* Header / Pincode Section */}
+                                            <div 
+                                                className="w-full flex flex-col items-center shrink-0 border-b border-gray-100"
+                                                style={{ height: '300px', paddingTop: '40px' }}
                                             >
-                                                Save Location
-                                            </button>
+                                                <div className="flex items-center justify-between w-full px-8 mb-8">
+                                                    <h2 className="text-xl font-bold text-gray-900">Delivery Location</h2>
+                                                    <button 
+                                                        onClick={() => setIsCityDropdownOpen(false)}
+                                                        className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+                                                    >
+                                                        <X size={20} weight="bold" />
+                                                    </button>
+                                                </div>
 
-                                            <div className="relative flex items-center py-1">
-                                                <div className="grow border-t border-gray-100"></div>
-                                                <span className="shrink-0 mx-2 text-gray-400 text-xs">OR</span>
-                                                <div className="grow border-t border-gray-100"></div>
+                                                <div className="flex items-center justify-center gap-2 mb-6 text-center">
+                                                    <MapPin size={24} color="#0066FF" weight="fill" />
+                                                    <h2 
+                                                        className="font-manrope text-center"
+                                                        style={{ 
+                                                            width: '265px', 
+                                                            height: '28px', 
+                                                            fontWeight: 600, 
+                                                            fontSize: '20px', 
+                                                            lineHeight: '28px', 
+                                                            color: 'hsla(0, 0%, 0%, 1)',
+                                                            opacity: 1
+                                                        }}
+                                                    >
+                                                        Enter Your Pincode
+                                                    </h2>
+                                                </div>
+                                                
+                                                <div 
+                                                    className="relative mb-3 mx-auto"
+                                                    style={{ width: '299px', height: '39.46px' }}
+                                                >
+                                                    <input
+                                                        type="text"
+                                                        value={locationInput}
+                                                        onChange={(e) => setLocationInput(e.target.value)}
+                                                        placeholder="Enter Your Delivery Pincode"
+                                                        className="w-full h-full pl-4 pr-10 border border-[#3B82F6] rounded-[8px] focus:outline-none focus:ring-1 focus:ring-blue-500 text-[13px] font-medium text-gray-800 placeholder-gray-500"
+                                                        onKeyDown={(e) => {
+                                                            if (e.key === 'Enter') {
+                                                                const val = locationInput.trim();
+                                                                if (val) {
+                                                                    setSelectedCity(val);
+                                                                    localStorage.setItem('userLocation', val);
+                                                                    setIsCityDropdownOpen(false);
+                                                                }
+                                                            }
+                                                        }}
+                                                    />
+                                                    <button 
+                                                        className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-black focus:outline-none"
+                                                        onClick={() => {
+                                                            const val = locationInput.trim();
+                                                            if (val) {
+                                                                setSelectedCity(val);
+                                                                localStorage.setItem('userLocation', val);
+                                                                setIsCityDropdownOpen(false);
+                                                            }
+                                                        }}
+                                                    >
+                                                        <ArrowRight size={18} weight="regular" />
+                                                    </button>
+                                                </div>
+                                                <p className="text-[12px] text-center text-gray-400 font-medium mt-2">
+                                                    Current: <span className="text-[#1D1D1F] font-bold">{selectedCity || "110034"}</span>
+                                                </p>
                                             </div>
 
-                                            <button
-                                                className="w-full flex items-center justify-center gap-2 bg-gray-50 text-indigo-600 border border-indigo-100 font-bold text-sm py-2 rounded-lg hover:bg-indigo-50 transition"
-                                                onClick={fetchLocation}
-                                            >
-                                                <FaLocationArrow size={12} />
-                                                Use my current location
-                                            </button>
-                                        </div>
-                                    </motion.div>
+                                            {/* Cities Section */}
+                                            <div className="flex-1 px-8 py-10 bg-gray-50/50">
+                                                <h3 className="text-[14px] font-bold text-gray-400 uppercase tracking-wider mb-8">Select Delivery City</h3>
+                                                
+                                                <div 
+                                                    className="grid grid-cols-4"
+                                                    style={{ width: '360px', rowGap: '42px', columnGap: '10px' }}
+                                                >
+                                                    {[
+                                                        { name: "Delhi" },
+                                                        { name: "Noida" },
+                                                        { name: "Mumbai" },
+                                                        { name: "Pune" },
+                                                        { name: "Bangalore" },
+                                                        { name: "Hyderabad" },
+                                                        { name: "Kolkata" },
+                                                        { name: "Chennai" }
+                                                    ].map((city) => (
+                                                        <div 
+                                                            key={city.name} 
+                                                            className="flex flex-col items-center gap-2 cursor-pointer group"
+                                                            onClick={() => {
+                                                                setSelectedCity(city.name);
+                                                                setLocationInput(city.name);
+                                                                localStorage.setItem('userLocation', city.name);
+                                                                setIsCityDropdownOpen(false);
+                                                            }}
+                                                        >
+                                                            <div className={`w-[80px] h-[80px] rounded-[20px] overflow-hidden border-2 transition-all duration-300 shadow-sm ${selectedCity === city.name ? 'border-[#FFCF46]' : 'border-transparent group-hover:border-gray-200 group-hover:scale-105'}`}>
+                                                                <img 
+                                                                    src={`/images/cities/${city.name.toLowerCase()}.jpg`} 
+                                                                    alt={city.name} 
+                                                                    className="w-full h-full object-cover" 
+                                                                    onError={(e) => { e.target.onError = null; e.target.src = `https://placehold.co/150x150/F5F5F5/808080?font=montserrat&text=${city.name}` }} 
+                                                                />
+                                                            </div>
+                                                            <span className={`text-[12px] transition-colors ${selectedCity === city.name ? 'text-[#1D1D1F] font-bold' : 'text-gray-500 font-medium group-hover:text-black'}`}>{city.name}</span>
+                                                        </div>
+                                                    ))}
+                                                </div>
+
+                                                <div className="mt-16">
+                                                    <button 
+                                                        onClick={() => setIsCityDropdownOpen(false)}
+                                                        className="w-full bg-[#FFCF46] text-[#1D1D1F] py-4 rounded-xl font-bold text-[16px] shadow-sm transform transition-all duration-300 ease-out active:scale-95 hover:brightness-105"
+                                                    >
+                                                        Continue with {selectedCity || "Location"}
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </motion.div>
+                                    </>
                                 )}
                             </AnimatePresence>
                         </div>
 
-
                         {/* Login/Register or Profile (Desktop) */}
                         {userInfo ? (
-                            <div className="relative h-full flex items-center">
+                            <div className="relative flex items-center shrink-0">
                                 <button
-                                    className="flex items-center gap-2 text-gray-700 hover:text-indigo-600 transition-colors focus:outline-none h-full"
+                                    className="flex items-center text-gray-700 hover:text-black transition-colors focus:outline-none h-full"
                                     onClick={() => setIsProfileDropdownOpen(!isProfileDropdownOpen)}
                                 >
-                                    <div className="w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 border border-indigo-200">
-                                        <FaUser size={14} />
+                                    <div style={{ width: "20px", height: "20px", position: "relative" }}>
+                                        <User 
+                                            size={16.25} 
+                                            color="#000000" 
+                                            weight="regular"
+                                            style={{ position: "absolute", top: "1.88px", left: "1.88px" }}
+                                        />
                                     </div>
-                                    <span className="text-sm font-medium hidden lg:block max-w-[100px] truncate">
-                                        {userInfo.name || userInfo.email}
-                                    </span>
                                 </button>
 
                                 {/* Profile Dropdown */}
@@ -348,14 +439,14 @@ const Navbar = () => {
                                             </div>
 
                                             <Link href="/profile" className="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors" onClick={() => setIsProfileDropdownOpen(false)}>
-                                                <FaUser size={14} className="text-gray-400" /> My Profile
+                                                <User size={14} weight="fill" className="text-gray-400" /> My Profile
                                             </Link>
 
                                             <button
                                                 onClick={handleLogout}
                                                 className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors text-left"
                                             >
-                                                <FaSignOutAlt size={14} /> Logout
+                                                <SignOut size={14} weight="fill" /> Logout
                                             </button>
                                         </motion.div>
                                     )}
@@ -371,23 +462,28 @@ const Navbar = () => {
                             </button>
                         )}
 
-                        {/* Wishlist & Cart (Desktop) */}
-                        <div className="flex items-center gap-3 text-gray-600 h-full">
-                            <Link href="/cart" className="relative hover:text-indigo-600 transition-colors flex items-center h-full">
-                                <FaShoppingCart size={22} />
-                                {totalQuantity > 0 && (
-                                    <span 
-                                        className="absolute bg-red-500 text-white text-[10px] font-bold w-4 h-4 flex items-center justify-center rounded-full"
-                                        style={{ top: "-2px", right: "-6px" }}
-                                    >
-                                        {totalQuantity}
-                                    </span>
-                                )}
-                            </Link>
-                            <button className="hover:text-black transition-colors flex items-center h-full">
-                                <FaBars size={22} />
-                            </button>
-                        </div>
+                        {/* Wishlist */}
+                        <Link href="/wishlist" className="flex items-center justify-center hover:opacity-80 transition-opacity shrink-0 ml-1" style={{ width: "24px", height: "24px" }}>
+                            <Heart size={21} color="#1D1D1F" weight="regular" />
+                        </Link>
+
+                        {/* Cart */}
+                        <Link href="/cart" className="relative flex items-center justify-center hover:opacity-80 transition-opacity shrink-0" style={{ width: "24px", height: "24px" }}>
+                            <ShoppingCart size={21} color="#1D1D1F" weight="regular" />
+                            {totalQuantity > 0 && (
+                                <span 
+                                    className="absolute bg-red-500 text-white text-[10px] font-bold w-[16px] h-[16px] flex items-center justify-center rounded-full"
+                                    style={{ top: "-6px", right: "-8px" }}
+                                >
+                                    {totalQuantity}
+                                </span>
+                            )}
+                        </Link>
+
+                        {/* Menu Hamburger */}
+                        <button className="flex items-center justify-center hover:opacity-80 transition-opacity shrink-0" style={{ width: "24px", height: "24px" }}>
+                            <List size={23} color="#1D1D1F" weight="regular" />
+                        </button>
                     </div>
 
 
@@ -406,13 +502,13 @@ const Navbar = () => {
                                 backgroundColor: "#FFFFFF"
                             }}
                         >
-                            <FaMapMarkerAlt size={14} className="text-gray-500 shrink-0" />
+                            <MapPin size={18} weight="fill" className="text-gray-500 shrink-0" />
                             <span className="text-sm font-medium truncate max-w-[80px] text-gray-700">{selectedCity || "Delhi"}</span>
                         </button>
 
                         {/* Mobile Cart */}
                         <Link href="/cart" className="relative text-gray-700 hover:text-indigo-600 p-1">
-                            <FaShoppingCart size={20} />
+                            <ShoppingCart size={20} weight="fill" />
                             {totalQuantity > 0 && (
                                 <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[9px] font-bold w-3.5 h-3.5 flex items-center justify-center rounded-full border border-white">
                                     {totalQuantity}
@@ -469,7 +565,7 @@ const Navbar = () => {
                                     className="absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer"
                                     onClick={handleSearchClick}
                                 >
-                                    <FaSearch className="text-gray-400" />
+                                    <MagnifyingGlass size={18} weight="bold" className="text-gray-400" />
                                 </div>
                             </div>
 
@@ -493,7 +589,7 @@ const Navbar = () => {
                                     <div className="space-y-3">
                                         <div className="flex items-center gap-3 p-3 bg-indigo-50 rounded-xl">
                                             <div className="w-10 h-10 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 border border-indigo-200">
-                                                <FaUser size={16} />
+                                                <User size={18} weight="fill" />
                                             </div>
                                             <div className="flex-1 min-w-0">
                                                 <p className="text-sm font-bold text-gray-900 truncate">{userInfo.name || "User"}</p>
@@ -529,7 +625,7 @@ const Navbar = () => {
                                     <div className="flex flex-col gap-3 relative w-full">
                                         <div className="flex gap-2 w-full">
                                             <div className="relative flex-1">
-                                                <FaMapMarkerAlt className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                                                <MapPin size={18} weight="fill" className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
                                                 <input
                                                     type="text"
                                                     value={locationInput}
@@ -562,7 +658,7 @@ const Navbar = () => {
                                             className="w-full flex items-center justify-center gap-2 bg-white text-indigo-600 border border-indigo-200 font-bold text-sm py-2 rounded-lg hover:bg-indigo-50 transition"
                                             onClick={fetchLocation}
                                         >
-                                            <FaLocationArrow size={12} />
+                                            <NavigationArrow size={12} weight="fill" />
                                             Use my current location
                                         </button>
                                     </div>

@@ -3,7 +3,7 @@ import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
-import { FaArrowRight } from 'react-icons/fa';
+import { ArrowRight } from '@phosphor-icons/react';
 
 import { API } from '../services/apiConfig';
 

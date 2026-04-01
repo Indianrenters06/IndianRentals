@@ -1,4 +1,10 @@
+import React from 'react';
 import { motion } from 'framer-motion';
+import { useRouter } from 'next/navigation';
+import { useDispatch } from 'react-redux';
+import { addToCart } from '../redux/features/cartSlice';
+import { Heart, Star, Truck, Info } from '@phosphor-icons/react';
+import Image from 'next/image';
 
 const ProductCard = ({ product }) => {
     const router = useRouter();
@@ -130,7 +136,7 @@ const ProductCard = ({ product }) => {
                         onClick={(e) => { e.preventDefault(); e.stopPropagation(); }}
                     >
                         <div style={{ width: '20.6px', height: '17.6px', display: 'flex', alignItems: 'center', justifyItems: 'center', marginTop: '1px' }}>
-                            <FaHeart size={18} color="hsla(0, 0%, 0%, 1)" />
+                            <Heart size={18} color="hsla(0, 0%, 0%, 1)" weight="fill" />
                         </div>
                     </button>
 
@@ -193,25 +199,20 @@ const ProductCard = ({ product }) => {
                             {!isMobile ? (
                                 <div className="flex text-[#FF9F0A]">
                                     {[1, 2, 3, 4, 5].map((s) => (
-                                        <FaStar key={s} size={12} className={s <= Math.round(product.rating || 4) ? "" : "opacity-20"} />
+                                        <Star key={s} size={12} weight="fill" className={s <= Math.round(product.rating || 4) ? "" : "opacity-20"} />
                                     ))}
                                 </div>
                             ) : (
-                                <FaStar size={10} className="text-[#FF9F0A]" />
+                                <Star size={10} weight="fill" className="text-[#FF9F0A]" />
                             )}
                             <span className="text-[12px] font-medium text-[#1D1D1F] ml-0.5">
                                 {product.rating || "4.5"} <span className="text-[#86868B]">({product.numReviews || product.reviewCount || 12})</span>
                             </span>
                         </div>
                         <div className="flex items-center gap-1 text-[#86868B]">
-                            <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 17a2 2 0 11-4 0 2 2 0 014 0zM19 17a2 2 0 11-4 0 2 2 0 014 0z" />
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10a1 1 0 001 1h1m8-1a1 1 0 01-1 1H9m4-1V8a1 1 0 011-1h2.586a1 1 0 01.707.293l3.414 3.414a1 1 0 01.293.707V16a1 1 0 01-1 1h-1m-6-1a1 1 0 001 1h1M5 17a2 2 0 104 0m-4 0a2 2 0 110-4m14 4a2 2 0 104 0m-4 0a2 2 0 110-4" />
-                            </svg>
+                            <Truck size={13} weight="fill" />
                             <span className="text-[11px] font-medium">2-4 days</span>
-                            <svg width="10" height="10" fill="none" stroke="currentColor" viewBox="0 0 24 24" className="opacity-40 hidden md:block">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                            </svg>
+                            <Info size={10} weight="fill" className="opacity-40 hidden md:block" />
                         </div>
                     </div>
 
@@ -235,17 +236,30 @@ const ProductCard = ({ product }) => {
 
                     {/* Rent Now Button Entrance */}
                     <div 
-                        className="relative w-full z-30 overflow-hidden flex items-center transition-all duration-300 ease-out"
+                        className="relative w-full z-30 overflow-hidden flex items-center justify-center transition-all duration-300 ease-out"
                         style={{
-                            height: isHovered ? (isMobile ? '44px' : '50px') : '0px',
+                            height: isHovered ? '43px' : '0px',
                             opacity: isHovered ? 1 : 0,
                             paddingTop: isHovered ? '8px' : '0px'
                         }}
                     >
                         <button 
                             onClick={handleAddToCart}
-                            className="w-full h-full rounded-full bg-[#FFCF46] text-[#1D1D1F] font-bold text-[14px] shadow-sm transform transition-all duration-300 ease-out active:scale-95 hover:brightness-105"
-                            style={{ transform: isHovered ? 'translateY(0)' : 'translateY(15px)' }}
+                            className="flex items-center justify-center rounded-full shadow-sm transform transition-all duration-300 ease-out active:scale-95 hover:brightness-105"
+                            style={{ 
+                                width: isMobile ? "100%" : "257px",
+                                height: "35px",
+                                backgroundColor: "hsla(44, 100%, 64%, 1)",
+                                color: "hsla(0, 0%, 12%, 1)",
+                                fontFamily: "Manrope, sans-serif",
+                                fontWeight: 500,
+                                fontSize: "14px",
+                                letterSpacing: "0.7px",
+                                padding: "6px 20px",
+                                gap: "2px",
+                                borderBottom: "1px solid rgba(0, 0, 0, 0.05)",
+                                transform: isHovered ? 'translateY(0)' : 'translateY(15px)' 
+                            }}
                         >
                             {added ? 'Added!' : 'Rent Now'}
                         </button>

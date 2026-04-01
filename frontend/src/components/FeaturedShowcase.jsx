@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FaChevronLeft, FaChevronRight, FaRegHeart, FaStar, FaHeart, FaTruck, FaInfoCircle } from 'react-icons/fa';
+import { CaretLeft, CaretRight, Heart, Star, Truck, Info } from '@phosphor-icons/react';
 import { useDispatch } from 'react-redux';
 import { addToCart } from '../redux/features/cartSlice';
 import { useRouter } from 'next/navigation';
@@ -78,11 +78,11 @@ const BannerCarousel = ({ banners, height = "387px", width = "560px" }) => {
 
                     <div className="relative z-10 text-center px-6">
                         <div className="flex items-center justify-center gap-4 mb-1">
-                             <button onClick={() => go(-1)} className="w-6 h-6 rounded-full bg-white/20 flex items-center justify-center text-white"><FaChevronLeft size={10}/></button>
+                             <button onClick={() => go(-1)} className="w-6 h-6 rounded-full bg-white/20 flex items-center justify-center text-white"><CaretLeft size={10} weight="fill"/></button>
                              <h3 className="text-white text-[24px] font-bold tracking-tight">
                                 {slide.title}
                             </h3>
-                             <button onClick={() => go(1)} className="w-6 h-6 rounded-full bg-white/20 flex items-center justify-center text-white"><FaChevronRight size={10}/></button>
+                             <button onClick={() => go(1)} className="w-6 h-6 rounded-full bg-white/20 flex items-center justify-center text-white"><CaretRight size={10} weight="fill"/></button>
                         </div>
                         <p className="text-white/80 text-[14px] font-medium opacity-80 leading-tight mb-4">
                             {slide.subtitle}
@@ -192,7 +192,7 @@ const ShowcaseProductCard = ({ product, index, isDesktop, handleAddToCart }) => 
                         style={{ width: "28px", height: "28px", top: "8px", right: "8px", backgroundColor: "white", border: "1px solid #E5E5EA" }}
                         onClick={(e) => { e.preventDefault(); e.stopPropagation(); }}
                     >
-                        <FaRegHeart size={14} color="#8E8E93" />
+                        <Heart size={14} color="#8E8E93" weight="fill" />
                     </button>
                     
                     <div className="relative w-full h-full p-4 flex items-center justify-center">
@@ -244,11 +244,11 @@ const ShowcaseProductCard = ({ product, index, isDesktop, handleAddToCart }) => 
                     >
                         <div className="flex items-center gap-1">
                             {!isDesktop ? (
-                                <FaStar size={10} className="text-[#FF9F0A]" />
+                                <Star size={10} weight="fill" className="text-[#FF9F0A]" />
                             ) : (
                                 <div className="flex text-[#FF9F0A]">
                                     {[1, 2, 3, 4, 5].map((s) => (
-                                        <FaStar key={s} size={11} className={s <= Math.round(product.rating || 4) ? "" : "opacity-20"} />
+                                        <Star key={s} size={11} weight="fill" className={s <= Math.round(product.rating || 4) ? "" : "opacity-20"} />
                                     ))}
                                 </div>
                             )}
@@ -257,9 +257,9 @@ const ShowcaseProductCard = ({ product, index, isDesktop, handleAddToCart }) => 
                             </span>
                         </div>
                         <div className="flex items-center gap-1 text-[#8E8E93]">
-                            <FaTruck size={13} />
+                            <Truck size={13} weight="fill" />
                             <span className="text-[12px] font-medium">2-4 days</span>
-                            <FaInfoCircle size={10} className="ml-0.5 opacity-40 hidden md:block" />
+                            <Info size={10} weight="fill" className="ml-0.5 opacity-40 hidden md:block" />
                         </div>
                     </div>
 

@@ -1,7 +1,7 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { FaEnvelope, FaLock, FaGoogle, FaApple, FaArrowRight, FaPhone, FaArrowLeft, FaTimes, FaUser } from "react-icons/fa";
+import { EnvelopeSimple, Lock, GoogleLogo, AppleLogo, ArrowRight, Phone, ArrowLeft, X, User } from "@phosphor-icons/react";
 import { useRouter } from "next/navigation";
 import { API_BASE_URL } from "../services/apiConfig";
 
@@ -181,7 +181,7 @@ const AuthModal = ({ isOpen, onClose, initialView = "login" }) => {
                                 onClick={onClose}
                                 className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 z-10 p-2 bg-gray-50 rounded-full"
                             >
-                                <FaTimes />
+                                <X size={20} weight="fill" />
                             </button>
 
                             <div className="px-8 py-10">
@@ -221,7 +221,7 @@ const AuthModal = ({ isOpen, onClose, initialView = "login" }) => {
                                                     </label>
                                                     <div className="relative">
                                                         <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
-                                                            <FaEnvelope size={16} />
+                                                            <EnvelopeSimple size={16} weight="fill" />
                                                         </div>
                                                         <input
                                                             type="text"
@@ -240,7 +240,7 @@ const AuthModal = ({ isOpen, onClose, initialView = "login" }) => {
                                                     className="inline-flex items-center justify-center font-semibold text-sm transition-all duration-200 cursor-pointer text-center rounded-md border h-10 w-full px-6 py-2 tablet:h-9 tablet:w-auto tablet:min-w-[110px] tablet:px-[22px] tablet:py-[9px] desktop:h-[35px] desktop:min-w-[120px] desktop:px-5 desktop:py-2 bg-blue-secondary text-white border-blue-secondary hover:bg-[#0689ff] hover:border-[#0689ff] active:bg-[#0859c5] active:border-[#0859c5] focus:outline-none focus:ring-2 focus:ring-orange-300 focus:ring-offset-2 disabled:bg-blue-50 disabled:text-grey-400 disabled:border-blue-50 disabled:opacity-50 disabled:cursor-not-allowed w-full !rounded-xl transform hover:scale-[1.02]"
                                                 >
                                                     {loading ? "Sending..." : (
-                                                        <>Get OTP <FaArrowRight className="ml-2" size={14} /></>
+                                                        <>Get OTP <ArrowRight className="ml-2" size={14} weight="fill" /></>
                                                     )}
                                                 </button>
                                             </motion.form>
@@ -259,7 +259,7 @@ const AuthModal = ({ isOpen, onClose, initialView = "login" }) => {
                                                     </label>
                                                     <div className="relative">
                                                         <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
-                                                            <FaLock size={16} />
+                                                            <Lock size={16} weight="fill" />
                                                         </div>
                                                         <input
                                                             type="text"
@@ -279,7 +279,7 @@ const AuthModal = ({ isOpen, onClose, initialView = "login" }) => {
                                                     className="inline-flex items-center justify-center font-semibold text-sm transition-all duration-200 cursor-pointer text-center rounded-md border h-10 w-full px-6 py-2 tablet:h-9 tablet:w-auto tablet:min-w-[110px] tablet:px-[22px] tablet:py-[9px] desktop:h-[35px] desktop:min-w-[120px] desktop:px-5 desktop:py-2 bg-blue-secondary text-white border-blue-secondary hover:bg-[#0689ff] hover:border-[#0689ff] active:bg-[#0859c5] active:border-[#0859c5] focus:outline-none focus:ring-2 focus:ring-orange-300 focus:ring-offset-2 disabled:bg-blue-50 disabled:text-grey-400 disabled:border-blue-50 disabled:opacity-50 disabled:cursor-not-allowed w-full !rounded-xl transform hover:scale-[1.02]"
                                                 >
                                                     {loading ? "Verifying..." : (
-                                                        <>Verify & Login <FaArrowRight className="ml-2" size={14} /></>
+                                                        <>Verify & Login <ArrowRight className="ml-2" size={14} weight="fill" /></>
                                                     )}
                                                 </button>
 
@@ -289,7 +289,7 @@ const AuthModal = ({ isOpen, onClose, initialView = "login" }) => {
                                                         onClick={() => setLoginStep(1)}
                                                         className="text-sm text-gray-500 hover:text-gray-700 flex items-center"
                                                     >
-                                                        <FaArrowLeft className="mr-1" size={12} /> Change {otpType}
+                                                        <ArrowLeft className="mr-1" size={12} weight="fill" /> Change {otpType}
                                                     </button>
                                                     <button
                                                         type="button"
@@ -315,7 +315,7 @@ const AuthModal = ({ isOpen, onClose, initialView = "login" }) => {
                                             <label className="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
                                             <div className="relative">
                                                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
-                                                    <FaUser size={14} />
+                                                    <User size={14} weight="fill" />
                                                 </div>
                                                 <input
                                                     name="name"
@@ -333,7 +333,7 @@ const AuthModal = ({ isOpen, onClose, initialView = "login" }) => {
                                             <label className="block text-sm font-medium text-gray-700 mb-1">Email Address</label>
                                             <div className="relative">
                                                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
-                                                    <FaEnvelope size={14} />
+                                                    <EnvelopeSimple size={14} weight="fill" />
                                                 </div>
                                                 <input
                                                     name="email"
@@ -351,7 +351,7 @@ const AuthModal = ({ isOpen, onClose, initialView = "login" }) => {
                                             <label className="block text-sm font-medium text-gray-700 mb-1">Phone Number</label>
                                             <div className="relative">
                                                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
-                                                    <FaPhone size={14} />
+                                                    <Phone size={14} weight="fill" />
                                                 </div>
                                                 <input
                                                     name="phone"
@@ -370,7 +370,7 @@ const AuthModal = ({ isOpen, onClose, initialView = "login" }) => {
                                                 <label className="block text-sm font-medium text-gray-700 mb-1">Password</label>
                                                 <div className="relative">
                                                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
-                                                        <FaLock size={14} />
+                                                        <Lock size={14} weight="fill" />
                                                     </div>
                                                     <input
                                                         name="password"
@@ -387,7 +387,7 @@ const AuthModal = ({ isOpen, onClose, initialView = "login" }) => {
                                                 <label className="block text-sm font-medium text-gray-700 mb-1">Confirm</label>
                                                 <div className="relative">
                                                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
-                                                        <FaLock size={14} />
+                                                        <Lock size={14} weight="fill" />
                                                     </div>
                                                     <input
                                                         name="confirmPassword"
@@ -408,7 +408,7 @@ const AuthModal = ({ isOpen, onClose, initialView = "login" }) => {
                                             className="inline-flex items-center justify-center font-semibold text-sm transition-all duration-200 cursor-pointer text-center rounded-md border h-10 w-full px-6 py-2 tablet:h-9 tablet:w-auto tablet:min-w-[110px] tablet:px-[22px] tablet:py-[9px] desktop:h-[35px] desktop:min-w-[120px] desktop:px-5 desktop:py-2 bg-blue-secondary text-white border-blue-secondary hover:bg-[#0689ff] hover:border-[#0689ff] active:bg-[#0859c5] active:border-[#0859c5] focus:outline-none focus:ring-2 focus:ring-orange-300 focus:ring-offset-2 disabled:bg-blue-50 disabled:text-grey-400 disabled:border-blue-50 disabled:opacity-50 disabled:cursor-not-allowed w-full !rounded-xl transform hover:scale-[1.02] mt-2"
                                         >
                                             {loading ? "Creating Account..." : (
-                                                <>Create Account <FaArrowRight className="ml-2" size={14} /></>
+                                                <>Create Account <ArrowRight className="ml-2" size={14} weight="fill" /></>
                                             )}
                                         </button>
                                     </motion.form>

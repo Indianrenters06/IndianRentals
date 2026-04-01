@@ -291,8 +291,8 @@ const Testimonials = () => {
                 <div className="hidden md:flex mt-8 md:mt-16 w-full justify-center z-10">
                     <Link
                         href="/testimonials"
-                        className="bg-[#007AFF] hover:bg-[#0062CC] text-white font-semibold flex items-center justify-center transition-all shadow-md hover:shadow-lg"
-                        style={{ width: '185px', height: '42.58px', borderRadius: '9999px', fontSize: '14px' }}
+                        className="bg-[#007AFF] text-white font-bold flex items-center justify-center transition-all shadow-md hover:shadow-lg hover:brightness-105 active:scale-95"
+                        style={{ width: '185px', height: '42.58px', borderRadius: '9999px', fontSize: '14px', letterSpacing: '0.01em' }}
                     >
                         Read All Reviews
                     </Link>

@@ -2,7 +2,7 @@
 import React, { useRef } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation, Autoplay } from "swiper/modules";
-import { FaChevronRight, FaChevronLeft } from "react-icons/fa";
+import { CaretRight, CaretLeft } from "@phosphor-icons/react";
 import "swiper/css";
 
 // Placeholder client logos — replace with real logos/images as needed
@@ -69,12 +69,12 @@ const ClientSection = () => {
                         ))}
                     </Swiper>
 
-                    <button className="client-prev hidden" ref={prevRef}><FaChevronLeft /></button>
+                    <button className="client-prev hidden" ref={prevRef}><CaretLeft weight="fill" /></button>
                     <button
                         className="client-next absolute right-0 top-1/2 -translate-y-1/2 translate-x-1/2 z-10 w-10 h-10 rounded-full bg-white border border-gray-200 shadow-md flex items-center justify-center hover:shadow-lg hover:border-gray-300 transition-all group"
                         ref={nextRef}
                     >
-                        <FaChevronRight size={13} className="text-gray-400 group-hover:text-gray-800 transition-colors" />
+                        <CaretRight size={13} weight="fill" className="text-gray-400 group-hover:text-gray-800 transition-colors" />
                     </button>
                 </div>
             </div>

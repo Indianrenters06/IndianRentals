@@ -3,13 +3,13 @@ import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import {
-    PiLaptop as DeviceLaptop,
-    PiUserCheck as UserCheck,
-    PiShoppingCartSimple as ShoppingCartSimple,
-    PiBoxArrowUp as BoxArrowUp,
-    PiCheckCircle,
-    PiCaretRight
-} from 'react-icons/pi';
+    Laptop,
+    UserCheck,
+    ShoppingCartSimple,
+    Package,
+    CheckCircle,
+    CaretRight
+} from '@phosphor-icons/react';
 
 import { API } from '../services/apiConfig';
 
@@ -21,16 +21,16 @@ const FALLBACK_STEPS = [
 ];
 
 const ICON_MAP = {
-    "Laptop": DeviceLaptop,
+    "Laptop": Laptop,
     "IdentificationCard": UserCheck,
     "ShoppingCart": ShoppingCartSimple,
-    "Package": BoxArrowUp,
-    "Arrow": PiCaretRight
+    "Package": Package,
+    "Arrow": CaretRight
 };
 
 const DynamicIcon = ({ name, size = 24, className = "" }) => {
-    const IconComponent = ICON_MAP[name] || PiCheckCircle;
-    return <IconComponent size={size} className={className} />;
+    const IconComponent = ICON_MAP[name] || CheckCircle;
+    return <IconComponent size={size} className={className} weight="fill" />;
 };
 
 const STEP_IMAGES = [
@@ -70,7 +70,7 @@ const RentalProcess = () => {
 
     return (
         <section
-            className="w-full overflow-hidden md:bg-[#F5F5F5]"
+            className="w-full overflow-hidden bg-white"
             style={{
                 width: isDesktop ? '100%' : '390px',
                 margin: '0 auto',
@@ -78,7 +78,7 @@ const RentalProcess = () => {
                 minHeight: isDesktop ? '847px' : '734px',
                 paddingTop: isDesktop ? '120px' : '48px',
                 paddingBottom: isDesktop ? '120px' : '48px',
-                background: isDesktop ? '#F5F5F5' : 'linear-gradient(180deg, #FFFFFF 0%, rgba(255, 228, 133, 0.63) 100%)',
+                background: '#FFFFFF',
                 opacity: 1
             }}
         >
@@ -93,11 +93,11 @@ const RentalProcess = () => {
                 <div className="w-full hidden md:flex flex-row items-center justify-between mx-auto font-manrope max-w-[1165px] h-[94px]">
                     <div className="flex flex-col h-full gap-[10px] justify-center">
                         <h2 className="text-[36px] font-bold text-[#1D1D1F] tracking-tight leading-none">{cms.title}</h2>
-                        <p className="text-[#86868B] text-[16px] leading-[1.3] tracking-tight max-w-md">{cms.subtitle}</p>
+                        <p className="text-[#1D1D1F] text-[16px] leading-[1.3] tracking-tight max-w-md opacity-80">{cms.subtitle}</p>
                     </div>
                     <div className="flex items-center gap-3 self-end mb-1">
                         <Link href="/rental-process" className="inline-flex items-center justify-center hover:brightness-105 transition-all text-black font-semibold text-[13px] w-[124px] h-[35px] rounded-full bg-[#FFCF46] border-b border-black/10">Rental Process</Link>
-                        <Link href="/contact" className="inline-flex items-center justify-center hover:opacity-90 transition-all text-white font-semibold text-[13px] w-[124px] h-[35px] rounded-full bg-[#1D1D1F]">Contact</Link>
+                        <Link href="/contact" className="inline-flex items-center justify-center hover:bg-gray-50 transition-all text-black font-semibold text-[13px] w-[124px] h-[35px] rounded-full bg-white border-2 border-black">Contact</Link>
                     </div>
                 </div>
 
@@ -108,13 +108,13 @@ const RentalProcess = () => {
                 >
                     <div className="flex flex-col" style={{ gap: '2px' }}>
                         <h2 className="text-[32px] font-bold text-[#1D1D1F] leading-[1.1] tracking-tight">{cms.title}</h2>
-                        <p className="text-[#1D1D1F]/70 text-[11.5px] leading-tight font-medium max-w-[340px]">{cms.subtitle}</p>
+                        <p className="text-[#1D1D1F] text-[11.5px] leading-tight font-medium max-w-[340px] opacity-80">{cms.subtitle}</p>
                     </div>
                     <div className="flex items-center" style={{ width: '184px', height: '30px', gap: '10px' }}>
                         <Link href="/rental-process" className="inline-flex items-center justify-center rounded-full bg-[#FFCF46] shadow-sm font-manrope" style={{ width: '100px', height: '30px', color: 'hsla(0, 0%, 12%, 1)', fontWeight: '500', fontSize: '11px', lineHeight: '18px' }}>
                             <span style={{ width: '81px', height: '18px', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', letterSpacing: '-0.01em' }}>Rental Process</span>
                         </Link>
-                        <Link href="/contact" className="inline-flex items-center justify-center font-manrope text-white" style={{ width: '69px', height: '30px', padding: '6px 12px', background: 'var(--color-grey-grey-700, hsla(0, 0%, 20%, 1))', borderRadius: '32px', borderBottom: '1px solid rgba(255, 255, 255, 0.1)', fontWeight: '500', fontSize: '11px', lineHeight: '18px', gap: '2px', opacity: 1 }}>Contact</Link>
+                        <Link href="/contact" className="inline-flex items-center justify-center font-manrope text-black" style={{ width: '69px', height: '30px', padding: '6px 12px', background: '#FFFFFF', borderRadius: '32px', border: '1.5px solid #8B5CF6', fontWeight: '500', fontSize: '11px', lineHeight: '18px', gap: '2px', opacity: 1 }}>Contact</Link>
                     </div>
                 </div>
 
@@ -178,8 +178,8 @@ const RentalProcess = () => {
                                                 {step.description}
                                             </p>
                                         </div>
-                                        <div 
-                                            className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none select-none font-manrope" 
+                                        <div
+                                            className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none select-none font-manrope"
                                             style={{
                                                 width: "18px",
                                                 height: "45px",
@@ -219,8 +219,8 @@ const RentalProcess = () => {
                                         key={`desktop-step-${index}`}
                                         onClick={() => setActiveStep(index)}
                                         className={`relative cursor-pointer transition-all duration-300 rounded-2xl overflow-hidden ${isActive
-                                                ? ""
-                                                : "bg-white border-[1.2px] border-[hsla(0,0%,93%,1)]"
+                                            ? ""
+                                            : "bg-white border-[1.2px] border-[hsla(0,0%,93%,1)]"
                                             }`}
                                         style={{
                                             width: '590px',
@@ -237,20 +237,20 @@ const RentalProcess = () => {
                                             {/* Top Section */}
                                             <div className="flex flex-col p-5" style={{ gap: isActive ? '12px' : '9px' }}>
                                                 <div className="flex items-center justify-between">
-                                                    <div 
-                                                        style={{ 
-                                                            width: '170px', 
-                                                            height: '62px', 
-                                                            display: 'flex', 
-                                                            flexDirection: 'column', 
+                                                    <div
+                                                        style={{
+                                                            width: '170px',
+                                                            height: '62px',
+                                                            display: 'flex',
+                                                            flexDirection: 'column',
                                                             gap: '9px',
                                                             opacity: 1
                                                         }}
                                                     >
                                                         <div className={isActive ? 'text-[#6B4B18]' : 'text-[#1D1D1F]'}><DynamicIcon name={step.icon} size={24} /></div>
-                                                        <h3 
-                                                            className={`font-semibold transition-all`} 
-                                                            style={{ 
+                                                        <h3
+                                                            className={`font-semibold transition-all`}
+                                                            style={{
                                                                 color: isActive ? 'hsla(19, 84%, 26%, 1)' : '#1D1D1F',
                                                                 fontFamily: 'Manrope, sans-serif',
                                                                 fontWeight: 600,
@@ -264,8 +264,8 @@ const RentalProcess = () => {
                                                         </h3>
                                                     </div>
 
-                                                    <div 
-                                                        className={`font-bold flex items-center justify-center self-start`}
+                                                    <div
+                                                        className={`font-semibold flex items-center justify-center self-start`}
                                                         style={{
                                                             width: '69px',
                                                             height: '31px',
@@ -275,6 +275,7 @@ const RentalProcess = () => {
                                                             border: isActive ? '1px solid hsla(19, 84%, 26%, 1)' : '1px solid #E5E5E7',
                                                             background: isActive ? 'hsla(46, 100%, 89%, 1)' : '#F5F5F7',
                                                             color: isActive ? 'hsla(19, 84%, 26%, 1)' : '#86868B',
+                                                            fontFamily: 'Manrope, sans-serif',
                                                             fontSize: '12px',
                                                             opacity: 1
                                                         }}
@@ -286,9 +287,9 @@ const RentalProcess = () => {
 
                                             {/* Bottom/Description Section (Two-tone effect) */}
                                             {isActive ? (
-                                                <div 
+                                                <div
                                                     className="w-full bg-[#FFF3C9] border-t border-[#6B4B18]/10 animate-fadeIn"
-                                                    style={{ 
+                                                    style={{
                                                         height: '78px',
                                                         padding: '16px',
                                                         opacity: 1,
@@ -299,7 +300,7 @@ const RentalProcess = () => {
                                                 >
                                                     <p className="text-[#6B4B18]/90 text-[13px] leading-[1.3] font-medium">{step.description}</p>
                                                     {step.link && (
-                                                        <Link 
+                                                        <Link
                                                             href={step.link}
                                                             className="inline-flex items-center gap-1 text-[12px] font-bold text-[#6B4B18] hover:underline mt-1"
                                                         >
