@@ -180,13 +180,13 @@ const Hero = () => {
                             onClick={prev}
                             className="pointer-events-auto w-14 h-14 bg-white/95 backdrop-blur-md shadow-2xl rounded-full flex items-center justify-center hover:bg-white hover:scale-110 active:scale-95 transition-all opacity-0 group-hover:opacity-100"
                         >
-                            <CaretLeft size={20} weight="fill" className="text-gray-800" />
+                            <CaretLeft size={24} weight="regular" className="text-gray-800" />
                         </button>
                         <button
                             onClick={next}
                             className="pointer-events-auto w-14 h-14 bg-white/95 backdrop-blur-md shadow-2xl rounded-full flex items-center justify-center hover:bg-white hover:scale-110 active:scale-95 transition-all opacity-0 group-hover:opacity-100"
                         >
-                            <CaretRight size={20} weight="fill" className="text-gray-800" />
+                            <CaretRight size={24} weight="regular" className="text-gray-800" />
                         </button>
                     </div>
 

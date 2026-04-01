@@ -15,29 +15,30 @@ const FALLBACK_BANNERS = [
         subtitle: "MacBooks | iPads | iPhones | Mac Studio | Mac Mini",
         image: "/images/banner-apple.png",
         href: "/products",
-        bg: "linear-gradient(to bottom, #8E2DE2, #4A00E0)"
+        bg: "linear-gradient(to bottom, #8E2DE2, #4A00E0)",
+        category: "MacBook"
     },
     {
         title: "Smart Devices",
         subtitle: "Everything you need for your smart home.",
         image: "/images/banner-smart.png",
         href: "/products",
-        bg: "linear-gradient(to bottom, #2D6A4F, #1B4332)"
+        bg: "linear-gradient(to bottom, #2D6A4F, #1B4332)",
+        category: "SmartPhone"
     }
 ];
 
 // ─── Banner Carousel ──────────────────────────────────────────────────────────
-const BannerCarousel = ({ banners, height = "387px", width = "560px" }) => {
-    const [current, setCurrent] = useState(0);
+const BannerCarousel = ({ banners, current, setCurrent, height = "387px" }) => {
     const [direction, setDirection] = useState(1);
 
     const go = useCallback((dir) => {
         setDirection(dir);
         setCurrent(prev => (prev + dir + banners.length) % banners.length);
-    }, [banners.length]);
+    }, [banners.length, setCurrent]);
 
     useEffect(() => {
-        const t = setInterval(() => go(1), 5000);
+        const t = setInterval(() => go(1), 8000);
         return () => clearInterval(t);
     }, [go]);
 
@@ -69,7 +70,6 @@ const BannerCarousel = ({ banners, height = "387px", width = "560px" }) => {
                     className="absolute inset-0 flex flex-col items-center justify-end pb-8"
                     style={{ background: slide.bg || "#F5F5F7" }}
                 >
-                    {/* Background Image Placeholder */}
                     <div className="absolute inset-x-0 top-0 h-[65%] flex items-center justify-center p-8">
                          <div className="w-full h-full bg-white/20 rounded-2xl backdrop-blur-xl flex items-center justify-center border border-white/10">
                             <span className="text-white/50 text-sm">Product Visual</span>
@@ -281,7 +281,6 @@ const ShowcaseProductCard = ({ product, index, isDesktop, handleAddToCart }) => 
                         <span className="text-[10px] md:text-[11px] font-semibold text-[#1D1D1F]">/month</span>
                     </div>
 
-                    {/* Rent Now Button Entrance */}
                     <div 
                         className="relative w-full z-30 overflow-hidden flex items-center transition-all duration-300 ease-out"
                         style={{
@@ -311,6 +310,8 @@ const FeaturedShowcase = () => {
     const [products, setProducts] = useState([]);
     const [loading, setLoading] = useState(true);
     const [isDesktop, setIsDesktop] = useState(false);
+    const [currentBanner, setCurrentBanner] = useState(0);
+    const [fetchingProducts, setFetchingProducts] = useState(false);
 
     useEffect(() => {
         const checkRes = () => setIsDesktop(window.innerWidth >= 1024);
@@ -333,57 +334,90 @@ const FeaturedShowcase = () => {
         }));
     };
 
+    // Sync products when banner changes
     useEffect(() => {
-        const load = async () => {
-             try {
-                const res = await fetch(`${API}/api/products?limit=2`);
-                if (res.ok) {
-                    const data = await res.json();
+        const activeCategory = cms.banners[currentBanner]?.category;
+        
+        const loadProducts = async () => {
+            setFetchingProducts(true);
+            try {
+                // 1. Try fetching products filtered by category
+                let url = activeCategory 
+                    ? `${API}/api/products?category=${activeCategory}&limit=2` 
+                    : `${API}/api/products?limit=2`;
+                
+                let res = await fetch(url);
+                let data = res.ok ? await res.json() : { products: [] };
+
+                // 2. Fallback: If no products found for category, fetch general 'Best Rented' products
+                if (data.products.length === 0 && activeCategory) {
+                    const fallbackRes = await fetch(`${API}/api/products?limit=2`);
+                    if (fallbackRes.ok) {
+                        data = await fallbackRes.json();
+                    }
+                }
+                
+                if (data.products) {
                     setProducts(data.products.map(p => ({
                         id: p._id,
                         name: p.name,
                         image: p.images?.[0] || "/images/placeholder.png",
                         rating: p.rating || 4.5,
                         reviews: p.numReviews || 12,
-                        originalPrice: 8999,
+                        originalPrice: p.rentalPrice ? Math.round(p.rentalPrice * 1.5) : 8999,
                         rentPrice: p.rentalPrice || 5000,
+                        isNew: p.isNew || false
                     })));
                 }
-             } catch (err) {
-                 console.error(err);
-             } finally {
-                 setLoading(false);
-             }
+            } catch (err) {
+                console.error("Showcase fetch error:", err);
+            } finally {
+                setFetchingProducts(false);
+                setLoading(false);
+            }
         };
-        load();
-    }, []);
+
+        loadProducts();
+    }, [currentBanner, cms.banners]);
 
     if (loading) return null;
 
     return (
-        <section className="bg-white py-12 md:py-20">
+        <section className="bg-white py-12 md:py-20 overflow-hidden">
             <div className="max-w-[1200px] mx-auto px-4 sm:px-6">
                 <div 
                     className="flex flex-col lg:flex-row items-stretch"
                     style={{ gap: isDesktop ? "35px" : "20px" }}
                 >
-                    {/* Left: Product 1 */}
-                    {products[0] && (
-                        <div className="lg:shrink-0">
+                    {/* Left: Product Cards */}
+                    <div 
+                        className="flex flex-col md:flex-row items-stretch gap-4 md:gap-6 flex-1 lg:flex-none transition-all duration-500"
+                        style={{ 
+                            opacity: fetchingProducts ? 0.6 : 1,
+                            transform: fetchingProducts ? 'translateX(-10px)' : 'translateX(0)',
+                            filter: fetchingProducts ? 'blur(1px)' : 'none'
+                        }}
+                    >
+                        {products[0] ? (
                             <ShowcaseProductCard product={products[0]} isDesktop={isDesktop} handleAddToCart={handleAddToCart} />
-                        </div>
-                    )}
-                    
-                    {/* Center: Product 2 */}
-                    {products[1] && (
-                        <div className="lg:shrink-0">
+                        ) : (
+                             /* Placeholder if no products found for category */
+                             <div className="w-[285px] h-[387px] bg-gray-50 rounded-[16px] border border-gray-100 flex items-center justify-center text-gray-300 italic text-sm">No products found</div>
+                        )}
+                        
+                        {products[1] && (
                             <ShowcaseProductCard product={products[1]} isDesktop={isDesktop} handleAddToCart={handleAddToCart} />
-                        </div>
-                    )}
+                        )}
+                    </div>
 
-                    {/* Right: Banner */}
-                    <div className="flex-1">
-                        <BannerCarousel banners={cms.banners} height="387px" />
+                    {/* Right: Banner Carousel */}
+                    <div className="w-full lg:w-[560px] shrink-0">
+                        <BannerCarousel 
+                            banners={cms.banners} 
+                            current={currentBanner} 
+                            setCurrent={setCurrentBanner}
+                            height="387px" 
+                        />
                     </div>
                 </div>
             </div>

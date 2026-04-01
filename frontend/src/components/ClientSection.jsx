@@ -69,12 +69,17 @@ const ClientSection = () => {
                         ))}
                     </Swiper>
 
-                    <button className="client-prev hidden" ref={prevRef}><CaretLeft weight="fill" /></button>
                     <button
-                        className="client-next absolute right-0 top-1/2 -translate-y-1/2 translate-x-1/2 z-10 w-10 h-10 rounded-full bg-white border border-gray-200 shadow-md flex items-center justify-center hover:shadow-lg hover:border-gray-300 transition-all group"
+                        className="client-prev absolute left-0 top-1/2 -translate-y-1/2 -translate-x-1/2 z-10 w-10 h-10 rounded-full bg-white border border-gray-200 shadow-md flex items-center justify-center hover:shadow-lg hover:border-gray-300 transition-all"
+                        ref={prevRef}
+                    >
+                        <CaretLeft size={20} weight="regular" className="text-gray-800" />
+                    </button>
+                    <button
+                        className="client-next absolute right-0 top-1/2 -translate-y-1/2 translate-x-1/2 z-10 w-10 h-10 rounded-full bg-white border border-gray-200 shadow-md flex items-center justify-center hover:shadow-lg hover:border-gray-300 transition-all"
                         ref={nextRef}
                     >
-                        <CaretRight size={13} weight="fill" className="text-gray-400 group-hover:text-gray-800 transition-colors" />
+                        <CaretRight size={20} weight="regular" className="text-gray-800" />
                     </button>
                 </div>
             </div>

@@ -22,6 +22,9 @@ const Navbar = () => {
     const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
     const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
     const [searchQuery, setSearchQuery] = useState("");
+    const [pincodeLoading, setPincodeLoading] = useState(false);
+    const [pincodeArea, setPincodeArea] = useState("");
+    const [pincodeError, setPincodeError] = useState("");
 
     // Redux Cart Selector
     const totalQuantity = useSelector(selectCartTotalQuantity);
@@ -110,6 +113,35 @@ const Navbar = () => {
                 alert("Please allow location access to use this feature.");
             }
         );
+    };
+
+    const fetchPincodeArea = async (pincode) => {
+        if (!/^\d{6}$/.test(pincode)) {
+            setPincodeError("Please enter a valid 6-digit pincode");
+            return;
+        }
+        setPincodeLoading(true);
+        setPincodeArea("");
+        setPincodeError("");
+        try {
+            const res = await fetch(`https://api.postalpincode.in/pincode/${pincode}`);
+            const data = await res.json();
+            if (data[0]?.Status === "Success" && data[0]?.PostOffice?.length > 0) {
+                const po = data[0].PostOffice[0];
+                const areaLabel = `${po.Name}, ${po.District}`;
+                setPincodeArea(areaLabel);
+                setSelectedCity(areaLabel);
+                localStorage.setItem('userLocation', areaLabel);
+                // Close after short delay so user sees the area
+                setTimeout(() => setIsCityDropdownOpen(false), 900);
+            } else {
+                setPincodeError("Pincode not found. Please try again.");
+            }
+        } catch (e) {
+            setPincodeError("Failed to fetch. Check your connection.");
+        } finally {
+            setPincodeLoading(false);
+        }
     };
 
     const handleLogout = () => {
@@ -275,103 +307,103 @@ const Navbar = () => {
                                             animate={{ x: 0 }}
                                             exit={{ x: "100%" }}
                                             transition={{ type: "spring", damping: 25, stiffness: 200 }}
-                                            className="fixed right-0 top-0 h-screen bg-white shadow-[-10px_0_30px_rgba(0,0,0,0.05)] z-[999] overflow-y-auto scrollbar-hide flex flex-col"
-                                            style={{ width: '410px' }}
+                                            className="fixed right-0 top-0 h-screen z-[999] overflow-y-auto scrollbar-hide flex flex-col rounded-l-3xl shadow-[-10px_0_30px_rgba(0,0,0,0.08)]"
+                                            style={{ width: '360px', background: '#F2F2F7', padding: '16px' }}
                                         >
-                                            {/* Header / Pincode Section */}
-                                            <div 
-                                                className="w-full flex flex-col items-center shrink-0 border-b border-gray-100"
-                                                style={{ height: '300px', paddingTop: '40px' }}
-                                            >
-                                                <div className="flex items-center justify-between w-full px-8 mb-8">
-                                                    <h2 className="text-xl font-bold text-gray-900">Delivery Location</h2>
-                                                    <button 
+                                            {/* Card 1 — Pincode */}
+                                            <div className="bg-white rounded-2xl p-4 mb-3">
+                                                {/* Back pill — sits in its own row, never touches text */}
+                                                <div className="flex justify-end mb-3">
+                                                    <button
                                                         onClick={() => setIsCityDropdownOpen(false)}
-                                                        className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+                                                        className="flex items-center"
+                                                        style={{
+                                                            height: '24px',
+                                                            minWidth: '66px',
+                                                            borderRadius: '18px',
+                                                            border: '1px solid hsla(3, 88%, 42%, 1)',
+                                                            background: 'hsla(4, 100%, 97%, 1)',
+                                                            paddingTop: '2px',
+                                                            paddingBottom: '2px',
+                                                            paddingLeft: '6px',
+                                                            paddingRight: '10px',
+                                                            gap: '2px',
+                                                            color: 'hsla(3, 88%, 42%, 1)',
+                                                            fontSize: '11px',
+                                                            fontWeight: 600,
+                                                        }}
                                                     >
-                                                        <X size={20} weight="bold" />
+                                                        <CaretLeft size={10} weight="bold" />
+                                                        Back
                                                     </button>
                                                 </div>
 
-                                                <div className="flex items-center justify-center gap-2 mb-6 text-center">
-                                                    <MapPin size={24} color="#0066FF" weight="fill" />
-                                                    <h2 
-                                                        className="font-manrope text-center"
-                                                        style={{ 
-                                                            width: '265px', 
-                                                            height: '28px', 
-                                                            fontWeight: 600, 
-                                                            fontSize: '20px', 
-                                                            lineHeight: '28px', 
-                                                            color: 'hsla(0, 0%, 0%, 1)',
-                                                            opacity: 1
-                                                        }}
-                                                    >
-                                                        Enter Your Pincode
+                                                <div className="flex items-center gap-2 mb-4">
+                                                    <MapPin size={22} color="#0066FF" weight="regular" />
+                                                    <h2 className="text-[16px] font-bold text-gray-900 font-manrope tracking-tight">
+                                                        Enter Your Delivery Location
                                                     </h2>
                                                 </div>
-                                                
-                                                <div 
-                                                    className="relative mb-3 mx-auto"
-                                                    style={{ width: '299px', height: '39.46px' }}
-                                                >
+
+                                                <div className="relative mb-3">
                                                     <input
                                                         type="text"
                                                         value={locationInput}
-                                                        onChange={(e) => setLocationInput(e.target.value)}
+                                                        onChange={(e) => {
+                                                            setLocationInput(e.target.value);
+                                                            setPincodeArea("");
+                                                            setPincodeError("");
+                                                        }}
                                                         placeholder="Enter Your Delivery Pincode"
-                                                        className="w-full h-full pl-4 pr-10 border border-[#3B82F6] rounded-[8px] focus:outline-none focus:ring-1 focus:ring-blue-500 text-[13px] font-medium text-gray-800 placeholder-gray-500"
+                                                        maxLength={6}
+                                                        className="w-full pl-4 pr-10 border border-[#3B82F6] rounded-xl focus:outline-none focus:ring-1 focus:ring-blue-500 text-[13px] font-medium text-gray-800 placeholder-gray-400"
+                                                        style={{ height: '42px' }}
                                                         onKeyDown={(e) => {
-                                                            if (e.key === 'Enter') {
-                                                                const val = locationInput.trim();
-                                                                if (val) {
-                                                                    setSelectedCity(val);
-                                                                    localStorage.setItem('userLocation', val);
-                                                                    setIsCityDropdownOpen(false);
-                                                                }
-                                                            }
+                                                            if (e.key === 'Enter') fetchPincodeArea(locationInput.trim());
                                                         }}
                                                     />
-                                                    <button 
-                                                        className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-black focus:outline-none"
-                                                        onClick={() => {
-                                                            const val = locationInput.trim();
-                                                            if (val) {
-                                                                setSelectedCity(val);
-                                                                localStorage.setItem('userLocation', val);
-                                                                setIsCityDropdownOpen(false);
-                                                            }
-                                                        }}
+                                                    <button
+                                                        className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-blue-500 focus:outline-none disabled:opacity-40"
+                                                        onClick={() => fetchPincodeArea(locationInput.trim())}
+                                                        disabled={pincodeLoading}
                                                     >
-                                                        <ArrowRight size={18} weight="regular" />
+                                                        {pincodeLoading
+                                                            ? <span className="block w-3.5 h-3.5 border-2 border-blue-400 border-t-transparent rounded-full animate-spin" />
+                                                            : <ArrowRight size={18} weight="regular" />}
                                                     </button>
                                                 </div>
-                                                <p className="text-[12px] text-center text-gray-400 font-medium mt-2">
-                                                    Current: <span className="text-[#1D1D1F] font-bold">{selectedCity || "110034"}</span>
-                                                </p>
+
+                                                {pincodeArea && (
+                                                    <p className="text-[11px] text-center text-green-600 font-semibold mb-1">📍 {pincodeArea}</p>
+                                                )}
+                                                {pincodeError && (
+                                                    <p className="text-[11px] text-center text-red-500 font-medium mb-1">{pincodeError}</p>
+                                                )}
+                                                {!pincodeArea && !pincodeError && (
+                                                    <p className="text-[12px] text-center text-gray-400 font-medium">
+                                                        Your currently selected pincode : <span className="text-[#646464] font-bold">{selectedCity || "110034"}</span>
+                                                    </p>
+                                                )}
                                             </div>
 
-                                            {/* Cities Section */}
-                                            <div className="flex-1 px-8 py-10 bg-gray-50/50">
-                                                <h3 className="text-[14px] font-bold text-gray-400 uppercase tracking-wider mb-8">Select Delivery City</h3>
-                                                
-                                                <div 
-                                                    className="grid grid-cols-4"
-                                                    style={{ width: '360px', rowGap: '42px', columnGap: '10px' }}
-                                                >
+                                            {/* Card 2 — City Grid */}
+                                            <div className="bg-white rounded-2xl p-5">
+                                                <h3 className="text-[13px] font-bold text-gray-400 uppercase tracking-wider mb-4">or Select your Delivery City</h3>
+
+                                                <div className="grid grid-cols-4 gap-x-2 gap-y-4">
                                                     {[
-                                                        { name: "Delhi" },
-                                                        { name: "Noida" },
-                                                        { name: "Mumbai" },
-                                                        { name: "Pune" },
-                                                        { name: "Bangalore" },
-                                                        { name: "Hyderabad" },
-                                                        { name: "Kolkata" },
-                                                        { name: "Chennai" }
+                                                        { name: "Delhi",     img: "https://images.unsplash.com/photo-1587474260584-136574528ed5?w=200&q=80" },
+                                                        { name: "Noida",     img: "https://images.unsplash.com/photo-1680374657222-df1b21f26a6e?w=200&q=80" },
+                                                        { name: "Mumbai",    img: "https://images.unsplash.com/photo-1529253355930-ddbe423a2ac7?w=200&q=80" },
+                                                        { name: "Pune",      img: "https://images.unsplash.com/photo-1570168007204-dfb528c6958f?w=200&q=80" },
+                                                        { name: "Bangalore", img: "https://images.unsplash.com/photo-1596176530529-78163a4f7af2?w=200&q=80" },
+                                                        { name: "Hyderabad", img: "https://images.unsplash.com/photo-1558431382-27e303142255?w=200&q=80" },
+                                                        { name: "Kolkata",   img: "https://images.unsplash.com/photo-1558431382-27e303142255?w=200&q=80" },
+                                                        { name: "Chennai",   img: "https://images.unsplash.com/photo-1582510003544-4d00b7f74220?w=200&q=80" },
                                                     ].map((city) => (
-                                                        <div 
-                                                            key={city.name} 
-                                                            className="flex flex-col items-center gap-2 cursor-pointer group"
+                                                        <div
+                                                            key={city.name}
+                                                            className="flex flex-col items-center gap-1.5 cursor-pointer group"
                                                             onClick={() => {
                                                                 setSelectedCity(city.name);
                                                                 setLocationInput(city.name);
@@ -379,25 +411,36 @@ const Navbar = () => {
                                                                 setIsCityDropdownOpen(false);
                                                             }}
                                                         >
-                                                            <div className={`w-[80px] h-[80px] rounded-[20px] overflow-hidden border-2 transition-all duration-300 shadow-sm ${selectedCity === city.name ? 'border-[#FFCF46]' : 'border-transparent group-hover:border-gray-200 group-hover:scale-105'}`}>
-                                                                <img 
-                                                                    src={`/images/cities/${city.name.toLowerCase()}.jpg`} 
-                                                                    alt={city.name} 
-                                                                    className="w-full h-full object-cover" 
-                                                                    onError={(e) => { e.target.onError = null; e.target.src = `https://placehold.co/150x150/F5F5F5/808080?font=montserrat&text=${city.name}` }} 
+                                                            <div className={`w-[68px] h-[68px] rounded-xl overflow-hidden border-2 transition-all duration-300 shadow-sm ${selectedCity === city.name ? 'border-[#FFCF46] scale-105' : 'border-transparent group-hover:border-gray-200 group-hover:scale-105'}`}>
+                                                                <img
+                                                                    src={city.img}
+                                                                    alt={city.name}
+                                                                    className="w-full h-full object-cover"
+                                                                    onError={(e) => { e.target.onError = null; e.target.src = `https://placehold.co/150x150/E5E7EB/6B7280?font=montserrat&text=${city.name[0]}` }}
                                                                 />
                                                             </div>
-                                                            <span className={`text-[12px] transition-colors ${selectedCity === city.name ? 'text-[#1D1D1F] font-bold' : 'text-gray-500 font-medium group-hover:text-black'}`}>{city.name}</span>
+                                                            <span className={`text-[10px] transition-colors text-center leading-tight ${selectedCity === city.name ? 'text-[#1D1D1F] font-bold' : 'text-gray-500 font-medium group-hover:text-black'}`}>{city.name}</span>
                                                         </div>
                                                     ))}
                                                 </div>
 
-                                                <div className="mt-16">
-                                                    <button 
+                                                <div className="mt-5 flex justify-center">
+                                                    <button
                                                         onClick={() => setIsCityDropdownOpen(false)}
-                                                        className="w-full bg-[#FFCF46] text-[#1D1D1F] py-4 rounded-xl font-bold text-[16px] shadow-sm transform transition-all duration-300 ease-out active:scale-95 hover:brightness-105"
+                                                        className="font-medium text-black transition-all duration-200 active:scale-95 hover:brightness-105 flex items-center justify-center whitespace-nowrap"
+                                                        style={{
+                                                            width: '68px',
+                                                            height: '23px',
+                                                            borderRadius: '9999px',
+                                                            background: 'hsla(44, 100%, 64%, 1)',
+                                                            fontFamily: 'Manrope, sans-serif',
+                                                            fontWeight: 500,
+                                                            fontSize: '11px',
+                                                            letterSpacing: '-0.2px',
+                                                            padding: '0'
+                                                        }}
                                                     >
-                                                        Continue with {selectedCity || "Location"}
+                                                        Continue
                                                     </button>
                                                 </div>
                                             </div>

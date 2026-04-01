@@ -9,8 +9,8 @@ import { getCategories } from '../services/categoryService';
 
 // Import Swiper styles
 import 'swiper/css';
-import 'swiper/css/navigation';
 import 'swiper/css/scrollbar';
+import 'swiper/css/free-mode';
 
 import { API } from '../services/apiConfig';
 
@@ -168,37 +168,79 @@ const RentByCategory = () => {
                     </Link>
                 </div>
 
-                {/* Mobile Grid: updated to match requested card style */}
-                <div className="md:hidden grid grid-cols-4 gap-[10px]">
-                    {mobileCats.map((cat, index) => (
-                        <Link key={cat._id || index} href={getCategoryRoute(cat)} className="flex flex-col items-center">
-                            <div className="w-full aspect-square rounded-[10px] bg-white border border-gray-100 flex items-center justify-center overflow-hidden relative shadow-sm">
-                                {cat.image ? (
-                                    <Image
-                                        src={cat.image}
-                                        alt={cat.name}
-                                        fill
-                                        className="object-contain mix-blend-multiply brightness-[1.05] contrast-[1.05]"
-                                    />
-                                ) : (
-                                    <div className="text-gray-400">
-                                        {getIconForCategory(cat.name)}
+                {/* Mobile Swiper Carousel with caret navigation */}
+                <div className="md:hidden relative">
+                    <Swiper
+                        modules={[Navigation, Scrollbar]}
+                        spaceBetween={10}
+                        slidesPerView={'auto'}
+                        navigation={{
+                            nextEl: '.swiper-next-cat-mobile',
+                            prevEl: '.swiper-prev-cat-mobile',
+                        }}
+                        scrollbar={{
+                            el: '.swiper-scrollbar-cat-mobile',
+                            draggable: true,
+                            hide: false,
+                        }}
+                        className="!pb-0"
+                    >
+                        {displayCategories.map((cat, index) => (
+                            <SwiperSlide key={cat._id || index} style={{ width: '80px' }}>
+                                <Link href={getCategoryRoute(cat)} className="flex flex-col items-center">
+                                    <div className="w-[80px] h-[78px] rounded-[10px] bg-white border border-gray-100 flex items-center justify-center overflow-hidden relative shadow-sm">
+                                        {cat.image ? (
+                                            <Image
+                                                src={cat.image}
+                                                alt={cat.name}
+                                                fill
+                                                className="object-contain mix-blend-multiply brightness-[1.05] contrast-[1.05]"
+                                            />
+                                        ) : (
+                                            <div className="text-gray-400">
+                                                {getIconForCategory(cat.name)}
+                                            </div>
+                                        )}
                                     </div>
-                                )}
-                            </div>
-                            <span className="text-[11px] font-semibold font-manrope text-[#4b5563] text-center mt-2 leading-tight">{cat.name}</span>
-                        </Link>
-                    ))}
+                                    <span className="text-[11px] font-semibold font-manrope text-[#4b5563] text-center mt-2 leading-tight">{cat.name}</span>
+                                </Link>
+                            </SwiperSlide>
+                        ))}
 
-                    {/* View All Tile — same size as category tiles */}
-                    <Link href="/categories" className="flex flex-col items-center">
-                        <div className="w-full aspect-square rounded-[10px] bg-[#fff3d4] border border-[#fbd38d]/30 flex flex-col items-center justify-center gap-1 shadow-sm">
-                            <span className="text-[10px] font-semibold font-manrope text-[#d97706] leading-tight">View All</span>
-                            <div className="w-6 h-6 rounded-full bg-[#f6ad55] flex items-center justify-center">
-                                <ArrowRight size={8} weight="fill" className="text-white" />
-                            </div>
+                        {/* View All Tile */}
+                        <SwiperSlide style={{ width: '80px' }}>
+                            <Link href="/categories" className="flex flex-col items-center">
+                                <div className="w-[80px] h-[78px] rounded-[10px] bg-[#fff3d4] border border-[#fbd38d]/30 flex flex-col items-center justify-center gap-1 shadow-sm">
+                                    <span className="text-[10px] font-semibold font-manrope text-[#d97706] leading-tight">View All</span>
+                                    <div className="w-6 h-6 rounded-full bg-[#f6ad55] flex items-center justify-center">
+                                        <ArrowRight size={8} weight="fill" className="text-white" />
+                                    </div>
+                                </div>
+                            </Link>
+                        </SwiperSlide>
+                    </Swiper>
+
+                    {/* Mobile scrollbar + nav row */}
+                    <div className="flex items-center gap-4 mt-4">
+                        <div
+                            className="swiper-scrollbar-cat-mobile flex-1"
+                            style={{ height: '3.5px', position: 'relative' }}
+                        />
+                        <div className="flex items-center gap-2 shrink-0">
+                            <button
+                                className="swiper-prev-cat-mobile w-9 h-9 rounded-full bg-white border border-gray-200 shadow-sm flex items-center justify-center hover:shadow-md hover:border-gray-300 transition-all"
+                                aria-label="Previous"
+                            >
+                                <CaretLeft size={20} weight="regular" className="text-gray-800" />
+                            </button>
+                            <button
+                                className="swiper-next-cat-mobile w-9 h-9 rounded-full bg-white border border-gray-200 shadow-sm flex items-center justify-center hover:shadow-md hover:border-gray-300 transition-all"
+                                aria-label="Next"
+                            >
+                                <CaretRight size={20} weight="regular" className="text-gray-800" />
+                            </button>
                         </div>
-                    </Link>
+                    </div>
                 </div>
 
                 {/* Desktop Swiper */}
@@ -257,16 +299,16 @@ const RentByCategory = () => {
                         {/* Nav arrows */}
                         <div className="flex items-center gap-3 shrink-0">
                             <button
-                                className="swiper-prev-cat w-10 h-10 rounded-full bg-white border border-gray-200 shadow-sm flex items-center justify-center hover:shadow-md hover:border-gray-300 transition-all group"
+                                className="swiper-prev-cat w-10 h-10 rounded-full bg-white border border-gray-200 shadow-sm flex items-center justify-center hover:shadow-md hover:border-gray-300 transition-all"
                                 aria-label="Previous"
                             >
-                                <CaretLeft size={14} weight="fill" className="text-black group-hover:text-gray-800 transition-colors" />
+                                <CaretLeft size={24} weight="regular" className="text-gray-800" />
                             </button>
                             <button
-                                className="swiper-next-cat w-10 h-10 rounded-full bg-white border border-gray-200 shadow-sm flex items-center justify-center hover:shadow-md hover:border-gray-300 transition-all group"
+                                className="swiper-next-cat w-10 h-10 rounded-full bg-white border border-gray-200 shadow-sm flex items-center justify-center hover:shadow-md hover:border-gray-300 transition-all"
                                 aria-label="Next"
                             >
-                                <CaretRight size={14} weight="fill" className="text-black group-hover:text-gray-800 transition-colors" />
+                                <CaretRight size={24} weight="regular" className="text-gray-800" />
                             </button>
                         </div>
                     </div>
@@ -274,8 +316,17 @@ const RentByCategory = () => {
             </div>
 
             <style>{`
+                /* Kill Swiper's default ::after arrow injection on all nav buttons */
+                .swiper-prev-cat::after,
+                .swiper-next-cat::after,
+                .swiper-prev-cat-mobile::after,
+                .swiper-next-cat-mobile::after {
+                    content: none !important;
+                    display: none !important;
+                }
                 /* Scrollbar track — very subtle light line */
-                .swiper-scrollbar-cat {
+                .swiper-scrollbar-cat,
+                .swiper-scrollbar-cat-mobile {
                     background: hsla(0, 0%, 20%, 0.12) !important;
                     border-radius: 0 !important;
                     height: 3.5px !important;
@@ -283,19 +334,23 @@ const RentByCategory = () => {
                     position: relative;
                 }
                 /* Scrollbar drag thumb — dark charcoal per Figma */
-                .swiper-scrollbar-cat .swiper-scrollbar-drag {
+                .swiper-scrollbar-cat .swiper-scrollbar-drag,
+                .swiper-scrollbar-cat-mobile .swiper-scrollbar-drag {
                     background: hsla(0, 0%, 20%, 1) !important;
                     border-radius: 0 !important;
                     cursor: grab;
                     height: 100% !important;
                     top: 0 !important;
                 }
-                .swiper-scrollbar-cat .swiper-scrollbar-drag:active {
+                .swiper-scrollbar-cat .swiper-scrollbar-drag:active,
+                .swiper-scrollbar-cat-mobile .swiper-scrollbar-drag:active {
                     cursor: grabbing;
                 }
                 /* Disable arrow when at start/end */
                 .swiper-prev-cat.swiper-button-disabled,
-                .swiper-next-cat.swiper-button-disabled {
+                .swiper-next-cat.swiper-button-disabled,
+                .swiper-prev-cat-mobile.swiper-button-disabled,
+                .swiper-next-cat-mobile.swiper-button-disabled {
                     opacity: 0.3;
                     cursor: not-allowed;
                     pointer-events: none;
