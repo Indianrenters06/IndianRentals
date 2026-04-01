@@ -230,6 +230,7 @@ const DEFAULTS = {
     featureSectionImage: "https://res.cloudinary.com/dgkckcdk8/image/upload/v1769961205/indian-rentals/gfjrzgp5llzcjap30wkt.png",
     featureSectionCtaText: "Rent Now",
     featureSectionCtaLink: "/store",
+    featureSectionLink: "",
     featureSectionStats: [
         { value: '23x', label: 'Up to', sublabel: 'faster than the fastest Intel-based MacBook Air' },
         { value: '2x', label: 'Up to', sublabel: 'faster than MacBook Air(M1)' },
@@ -646,6 +647,7 @@ export default function CMSHomepage() {
                                     <Field label="CTA Text" value={data.featureSectionCtaText} onChange={v => set("featureSectionCtaText", v)} placeholder="Rent Now" />
                                     <Field label="CTA Link" value={data.featureSectionCtaLink} onChange={v => set("featureSectionCtaLink", v)} placeholder="/store" />
                                 </div>
+                                <Field label="Entire Section Link (Optional)" value={data.featureSectionLink || ""} onChange={v => set("featureSectionLink", v)} placeholder="https://..." />
                             </div>
                             <div>
                                 <ImageUploader label="Feature Image" existingUrl={data.featureSectionImage} onUpload={url => set("featureSectionImage", url)} />

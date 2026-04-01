@@ -467,31 +467,115 @@ const Navbar = () => {
                                     </div>
                                 </button>
 
-                                {/* Profile Dropdown */}
+                                 {/* Profile Dropdown */}
                                 <AnimatePresence>
                                     {isProfileDropdownOpen && (
-                                        <motion.div
-                                            initial={{ opacity: 0, y: 10 }}
-                                            animate={{ opacity: 1, y: 0 }}
-                                            exit={{ opacity: 0, y: 10 }}
-                                            className="absolute top-full right-0 mt-2 w-48 bg-white/60 backdrop-blur-lg rounded-xl shadow-xl border border-gray-100 py-2 z-50 overflow-hidden"
-                                        >
-                                            <div className="px-4 py-3 border-b border-gray-50">
-                                                <p className="text-sm font-bold text-gray-900 truncate">{userInfo.name || "User"}</p>
-                                                <p className="text-xs text-gray-500 truncate">{userInfo.email}</p>
-                                            </div>
-
-                                            <Link href="/profile" className="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors" onClick={() => setIsProfileDropdownOpen(false)}>
-                                                <User size={14} weight="fill" className="text-gray-400" /> My Profile
-                                            </Link>
-
-                                            <button
-                                                onClick={handleLogout}
-                                                className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors text-left"
+                                        <>
+                                            {/* Backdrop to close on click outside */}
+                                            <div 
+                                                className="fixed inset-0 z-40" 
+                                                onClick={() => setIsProfileDropdownOpen(false)}
+                                            />
+                                             <motion.div
+                                                initial={{ opacity: 0, y: 5, scale: 0.98 }}
+                                                animate={{ opacity: 1, y: 0, scale: 1 }}
+                                                exit={{ opacity: 0, y: 5, scale: 0.98 }}
+                                                transition={{ duration: 0.15 }}
+                                                className="absolute top-full right-0 mt-2 bg-white z-50 overflow-hidden"
+                                                style={{ 
+                                                    width: "173px",
+                                                    height: "202px",
+                                                    padding: "16px",
+                                                    borderRadius: "12px",
+                                                    boxShadow: "0px 0px 6px 0px hsla(0, 0%, 60%, 0.25)",
+                                                    fontFamily: "Manrope, sans-serif",
+                                                    display: "flex",
+                                                    flexDirection: "column"
+                                                }}
                                             >
-                                                <SignOut size={14} weight="fill" /> Logout
-                                            </button>
-                                        </motion.div>
+                                                {/* Header */}
+                                                <div className="mb-2">
+                                                     <div className="flex items-center gap-1.5 mb-1">
+                                                        <span 
+                                                            style={{ 
+                                                                width: "52px", 
+                                                                height: "16px", 
+                                                                fontFamily: "'Manrope', sans-serif", 
+                                                                fontWeight: 600, 
+                                                                fontSize: "11px", 
+                                                                color: "hsla(0, 0%, 46%, 1)",
+                                                                lineHeight: "16px",
+                                                                letterSpacing: "0.2px", // approximation of spacing/8
+                                                                display: "inline-flex",
+                                                                alignItems: "center"
+                                                            }}
+                                                        >
+                                                            Welcome
+                                                        </span>
+                                                        <span className="text-[11px] leading-[16px]">👋</span>
+                                                    </div>
+                                                     <p 
+                                                        style={{ 
+                                                            width: "141px", 
+                                                            height: "16px", 
+                                                            fontFamily: "'Manrope', sans-serif", 
+                                                            fontWeight: 600, 
+                                                            fontSize: "11px", 
+                                                            color: "hsla(0, 0%, 33%, 1)",
+                                                            lineHeight: "16px",
+                                                            letterSpacing: "0.2px",
+                                                            display: "flex",
+                                                            alignItems: "center"
+                                                        }}
+                                                        className="truncate"
+                                                    >
+                                                        {userInfo.name || "Aryton Senna"}
+                                                    </p>
+                                                </div>
+
+                                                 {/* Divider - Exact Specs: 141px width, centered, grey-200 color */}
+                                                <div className="flex justify-center w-full mb-3">
+                                                    <div 
+                                                        style={{ 
+                                                            width: "141px", 
+                                                            height: "0px", 
+                                                            borderTop: "1px solid hsla(0, 0%, 89%, 1)" 
+                                                        }} 
+                                                    />
+                                                </div>
+
+                                                 {/* Menu Items */}
+                                                <div className="flex flex-col gap-[10px]">
+                                                    {[
+                                                        { label: "Profile Settings", href: "/profile" },
+                                                        { label: "My Orders", href: "/profile/orders" },
+                                                        { label: "KYC Documentation", href: "/kyc" },
+                                                        { label: "My Invoices", href: "/profile/invoices" }
+                                                    ].map((item) => (
+                                                        <Link 
+                                                            key={item.label}
+                                                            href={item.href} 
+                                                            style={{ 
+                                                                width: "141px", 
+                                                                height: "20px", 
+                                                                fontFamily: "'Manrope', sans-serif", 
+                                                                fontWeight: 600, 
+                                                                fontSize: "13px", 
+                                                                color: "hsla(0, 0%, 20%, 1)",
+                                                                lineHeight: "20px",
+                                                                letterSpacing: "0.15px",
+                                                                display: "flex",
+                                                                alignItems: "center"
+                                                            }}
+                                                            className="hover:text-[#007AFF] transition-colors whitespace-nowrap"
+                                                            onClick={() => setIsProfileDropdownOpen(false)}
+                                                        >
+                                                            {item.label}
+                                                        </Link>
+                                                    ))}
+                                                </div>
+                                            </motion.div>
+                                        </>
                                     )}
                                 </AnimatePresence>
                             </div>

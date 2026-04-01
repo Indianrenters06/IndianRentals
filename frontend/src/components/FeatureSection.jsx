@@ -136,7 +136,7 @@ const FeatureSection = () => {
                             whileInView={{ opacity: 1, y: 0 }}
                             viewport={{ once: true }}
                             transition={{ delay: 0.2 }}
-                            className="flex"
+                            className="flex relative z-30"
                         >
                             <Link
                                 href={cms.featureSectionCtaLink || "/store"}
@@ -326,6 +326,15 @@ const FeatureSection = () => {
                             </span>
                         </h3>
                     </motion.div>
+
+                    {/* Entire Section Link Overlay */}
+                    {cms.featureSectionLink && (
+                        <Link 
+                            href={cms.featureSectionLink} 
+                            className="absolute inset-0 z-20" 
+                            aria-label="View Project"
+                        />
+                    )}
                 </div>
             </div>
         </section>
