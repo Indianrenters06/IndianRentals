@@ -4,8 +4,8 @@ import Image from 'next/image';
 import Link from 'next/link';
 import {
     Laptop,
-    UserCheck,
-    ShoppingCartSimple,
+    UserFocus,
+    ShoppingCart,
     Package,
     CheckCircle,
     CaretRight
@@ -22,15 +22,15 @@ const FALLBACK_STEPS = [
 
 const ICON_MAP = {
     "Laptop": Laptop,
-    "IdentificationCard": UserCheck,
-    "ShoppingCart": ShoppingCartSimple,
+    "IdentificationCard": UserFocus,
+    "ShoppingCart": ShoppingCart,
     "Package": Package,
     "Arrow": CaretRight
 };
 
-const DynamicIcon = ({ name, size = 24, className = "" }) => {
+const DynamicIcon = ({ name, size = 32, className = "" }) => {
     const IconComponent = ICON_MAP[name] || CheckCircle;
-    return <IconComponent size={size} className={className} weight="fill" />;
+    return <IconComponent size={size} className={className} weight="bold" />;
 };
 
 const STEP_IMAGES = [
@@ -158,7 +158,7 @@ const RentalProcess = () => {
                                             }}
                                         >
                                             <div className="flex items-center gap-3" style={{ height: '19px' }}>
-                                                <div className={isActive ? 'text-[#6B4B18]' : 'text-[#1D1D1F]'}><DynamicIcon name={step.icon} size={22} /></div>
+                                                <div className={isActive ? 'text-[#6B4B18]' : 'text-[#1D1D1F]'}><DynamicIcon name={step.icon} size={32} /></div>
                                                 <h3 className={`text-[15px] font-bold ${isActive ? 'text-[#6B4B18]' : 'text-[#1D1D1F]'} leading-tight tracking-tight`}>{step.title}</h3>
                                             </div>
                                             <p
@@ -247,7 +247,7 @@ const RentalProcess = () => {
                                                             opacity: 1
                                                         }}
                                                     >
-                                                        <div className={isActive ? 'text-[#6B4B18]' : 'text-[#1D1D1F]'}><DynamicIcon name={step.icon} size={24} /></div>
+                                                        <div className={isActive ? 'text-[#6B4B18]' : 'text-[#1D1D1F]'}><DynamicIcon name={step.icon} size={32} /></div>
                                                         <h3
                                                             className={`font-semibold transition-all`}
                                                             style={{

@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import { FaArrowLeft } from 'react-icons/fa';
 import { FiPackage } from 'react-icons/fi';
 import { getProductsBySubcategory, getProducts } from '../services/productService';
+import ProductCard from './ProductCard';
 
 /**
  * SubcategoryProductsPage
@@ -140,39 +141,18 @@ export default function SubcategoryProductsPage({ subcategoryId, subcategoryName
                 {!loading && !error && sortedProducts.length > 0 && (
                     <>
                         <p className="text-xs text-gray-400 mb-4">{sortedProducts.length} product{sortedProducts.length !== 1 ? 's' : ''} found</p>
-                        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-6">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
                             {sortedProducts.map((product) => (
-                                <Link key={product._id} href={`/products/${product._id}`} className="group block">
-                                    {/* Image tile */}
-                                    <div className="bg-gray-50 border border-gray-100 rounded-2xl overflow-hidden aspect-4/3 relative group-hover:shadow-md transition-shadow duration-200">
-                                        <div className="relative w-full h-full transform group-hover:scale-105 transition-transform duration-300">
-                                            {product.images?.[0] ? (
-                                                <Image
-                                                    src={product.images[0]}
-                                                    alt={product.name}
-                                                    fill
-                                                    className="object-contain p-3 mix-blend-multiply"
-                                                    sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
-                                                />
-                                            ) : (
-                                                <div className="w-full h-full flex items-center justify-center">
-                                                    <FiPackage size={36} className="text-gray-300" />
-                                                </div>
-                                            )}
-                                        </div>
-                                        {/* Stock badge */}
-                                        {product.stock === 0 && (
-                                            <span className="absolute top-2 right-2 text-[10px] bg-red-100 text-red-600 font-medium px-2 py-0.5 rounded-full">
-                                                Out of stock
-                                            </span>
-                                        )}
-                                    </div>
-                                    {/* Info */}
-                                    <div className="mt-2 text-center px-1">
-                                        <p className="text-xs md:text-sm font-medium text-gray-800 leading-snug line-clamp-2">{product.name}</p>
-                                        <p className="text-xs text-gray-500 mt-0.5">₹{product.rentalPrice?.toLocaleString()}/month</p>
-                                    </div>
-                                </Link>
+                                <ProductCard 
+                                    key={product._id} 
+                                    product={{
+                                        ...product,
+                                        id: product._id,
+                                        image: product.images?.[0] || "/images/placeholder.png",
+                                        rentPrice: product.rentalPrice,
+                                        originalPrice: product.rentalPrice ? Math.round(product.rentalPrice * 1.5) : 8999
+                                    }} 
+                                />
                             ))}
                         </div>
                     </>

@@ -96,10 +96,16 @@ const ProductCard = ({ product }) => {
                             left: "13.49px",
                             gap: "4px",
                             width: "92px",
-                            height: "22px"
+                            height: "28px"
                         }}
                     >
-                        <span className="bg-[#FF3B30] text-white text-[10px] font-bold px-2 py-[4px] rounded-[4px] shadow-sm leading-none flex items-center justify-center h-full">
+                        <span className="text-white text-[10px] font-bold px-2 py-[4px] rounded-[6px] shadow-sm leading-none flex items-center justify-center"
+                            style={{
+                                width: "64px",
+                                height: "28px",
+                                background: "hsla(3, 100%, 56%, 1)"
+                            }}
+                        >
                             {product.discount || "-20% off"}
                         </span>
                         {product.isNew && (
@@ -128,16 +134,15 @@ const ProductCard = ({ product }) => {
                         style={{
                             width: "33px",
                             height: "33px",
-                            top: "10.5px",
-                            right: "12.5px",
+                            top: "10.57px",
+                            right: "12.51px",
                             backgroundColor: "hsla(0, 0%, 93%, 1)",
-                            border: "0.2px solid hsla(0, 0%, 80%, 1)"
+                            border: "0.2px solid hsla(0, 0%, 80%, 1)",
+                            borderRadius: "100%"
                         }}
                         onClick={(e) => { e.preventDefault(); e.stopPropagation(); }}
                     >
-                        <div style={{ width: '20.6px', height: '17.6px', display: 'flex', alignItems: 'center', justifyItems: 'center', marginTop: '1px' }}>
-                            <Heart size={18} color="hsla(0, 0%, 0%, 1)" weight="fill" />
-                        </div>
+                        <Heart size={18} color="#000000" weight="thin" />
                     </button>
 
                     <div
@@ -176,13 +181,13 @@ const ProductCard = ({ product }) => {
                 >
                     {/* Product Name */}
                     <h3
-                        className="font-manrope line-clamp-1 group-hover:text-[#FF3B30] transition-colors duration-300 shrink-0"
+                        className="line-clamp-1 group-hover:text-[#FF3B30] transition-colors duration-300 shrink-0 font-manrope"
                         style={{
                             width: isMobile ? "154px" : "261px",
-                            height: isMobile ? "auto" : "25px",
+                            height: isMobile ? "22px" : "25px",
                             fontSize: isMobile ? "15px" : "18px",
                             fontWeight: 600,
-                            lineHeight: isMobile ? "normal" : "25px",
+                            lineHeight: isMobile ? "22px" : "25px",
                             letterSpacing: isMobile ? "normal" : "-0.4px",
                             color: "hsla(0, 0%, 16%, 1)"
                         }}
@@ -196,23 +201,38 @@ const ProductCard = ({ product }) => {
                         style={{ width: isMobile ? "154px" : "261px", height: "16px" }}
                     >
                         <div className="flex items-center gap-1">
-                            {!isMobile ? (
-                                <div className="flex text-[#FF9F0A]">
-                                    {[1, 2, 3, 4, 5].map((s) => (
-                                        <Star key={s} size={12} weight="fill" className={s <= Math.round(product.rating || 4) ? "" : "opacity-20"} />
-                                    ))}
-                                </div>
-                            ) : (
-                                <Star size={10} weight="fill" className="text-[#FF9F0A]" />
-                            )}
-                            <span className="text-[12px] font-medium text-[#1D1D1F] ml-0.5">
-                                {product.rating || "4.5"} <span className="text-[#86868B]">({product.numReviews || product.reviewCount || 12})</span>
+                            <div className="flex text-[#FF9500]">
+                                {[1, 2, 3, 4, 5].map((s) => (
+                                    <Star key={s} size={isMobile ? 12 : 14} weight="fill" className={s <= Math.round(product.rating || 4) ? "" : "opacity-20"} />
+                                ))}
+                            </div>
+                            <span 
+                                className="ml-1"
+                                style={{
+                                    fontFamily: "'Mona Sans', sans-serif",
+                                    fontSize: "11px",
+                                    fontWeight: 500,
+                                    color: "hsla(0, 0%, 33%, 1)",
+                                    letterSpacing: "-0.01em"
+                                }}
+                            >
+                                {product.rating || "4.5"} ({product.reviewCount || 12})
                             </span>
                         </div>
-                        <div className="flex items-center gap-1 text-[#86868B]">
-                            <Truck size={13} weight="fill" />
-                            <span className="text-[11px] font-medium">2-4 days</span>
-                            <Info size={10} weight="fill" className="opacity-40 hidden md:block" />
+                        <div className="flex items-center gap-1.5" style={{ color: "hsla(0, 0%, 46%, 1)" }}>
+                            <Truck size={isMobile ? 14 : 16} weight="regular" />
+                            <span 
+                                className="font-manrope"
+                                style={{
+                                    fontSize: "12px",
+                                    fontWeight: 500,
+                                    lineHeight: "120%",
+                                    letterSpacing: "-0.04em"
+                                }}
+                            >
+                                2-4 days
+                            </span>
+                            <Info size={12} weight="regular" className="opacity-80" />
                         </div>
                     </div>
 
@@ -226,12 +246,57 @@ const ProductCard = ({ product }) => {
                             marginTop: "-4px"
                         }}
                     >
-                        <span className="text-[10px] md:text-[11px] font-semibold text-[#1D1D1F]">from</span>
+                        <span 
+                            className="lowercase"
+                            style={{
+                                fontFamily: "'Mona Sans', sans-serif",
+                                fontSize: "11px",
+                                fontWeight: 500,
+                                color: "hsla(0, 0%, 0%, 1)",
+                                letterSpacing: "-0.01em"
+                            }}
+                        >
+                            from
+                        </span>
                         {product.originalPrice && (
-                            <span className="text-[12px] md:text-[17px] font-bold text-[#8E8E93] line-through">₹{product.originalPrice}</span>
+                            <span 
+                                className="line-through decoration-[1.5px]"
+                                style={{
+                                    fontFamily: "'Mona Sans', sans-serif",
+                                    fontSize: isMobile ? "13px" : "16px",
+                                    fontWeight: 600,
+                                    color: "hsla(0, 0%, 46%, 1)",
+                                    letterSpacing: "-0.04em"
+                                }}
+                            >
+                                ₹{product.originalPrice}
+                            </span>
                         )}
-                        <span className="text-[16px] md:text-[22px] font-bold text-[#FF3B30] leading-none">₹{product.rentPrice}</span>
-                        <span className="text-[10px] md:text-[11px] font-semibold text-[#1D1D1F]">/mo</span>
+                        <span 
+                            className="font-bold tracking-tight ml-1 leading-none"
+                            style={{
+                                fontFamily: "'Mona Sans', sans-serif",
+                                fontSize: isMobile ? "20px" : "26px",
+                                fontWeight: 600,
+                                color: "hsla(3, 100%, 56%, 1)",
+                                letterSpacing: "-0.04em"
+                            }}
+                        >
+                            ₹{product.rentPrice}
+                        </span>
+                        <span 
+                            className="lowercase"
+                            style={{
+                                fontFamily: "'Mona Sans', sans-serif",
+                                fontSize: "11px",
+                                fontWeight: 500,
+                                color: "hsla(0, 0%, 24%, 1)",
+                                letterSpacing: "-0.01em",
+                                marginLeft: "2px"
+                            }}
+                        >
+                            /month
+                        </span>
                     </div>
 
                     {/* Rent Now Button Entrance */}

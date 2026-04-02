@@ -161,15 +161,21 @@ const ShowcaseProductCard = ({ product, index, isDesktop, handleAddToCart }) => 
                             left: "13.49px", 
                             gap: "4px",
                             width: "92px",
-                            height: "22px"
+                            height: "28px"
                         }}
                     >
-                        <span className="bg-[#FF3B30] text-white text-[10px] font-bold px-2 py-[4px] rounded-[4px] shadow-sm leading-none flex items-center justify-center h-full">
+                        <span className="text-white text-[10px] font-bold px-2 py-[4px] rounded-[6px] shadow-sm leading-none flex items-center justify-center"
+                            style={{
+                                width: "64px",
+                                height: "28px",
+                                background: "hsla(3, 100%, 56%, 1)"
+                            }}
+                        >
                             -20% off
                         </span>
                         {product.isNew && (
                             <span 
-                                className="text-white text-[10px] font-bold shadow-sm leading-none flex items-center justify-center h-full translate-x-1.5"
+                                className="text-white text-[10px] font-bold shadow-sm leading-none flex items-center justify-center translate-x-1.5"
                                 style={{
                                     width: "34px",
                                     height: "22px",
@@ -189,10 +195,18 @@ const ShowcaseProductCard = ({ product, index, isDesktop, handleAddToCart }) => 
                     
                     <button
                         className="absolute z-20 flex items-center justify-center rounded-full shadow-sm hover:scale-110 transition-all duration-300"
-                        style={{ width: "28px", height: "28px", top: "8px", right: "8px", backgroundColor: "white", border: "1px solid #E5E5EA" }}
+                        style={{ 
+                            width: "33px", 
+                            height: "33px", 
+                            top: "10.57px", 
+                            right: "12.51px", 
+                            backgroundColor: "hsla(0, 0%, 93%, 1)", 
+                            border: "0.2px solid hsla(0, 0%, 80%, 1)",
+                            borderRadius: "100%" 
+                        }}
                         onClick={(e) => { e.preventDefault(); e.stopPropagation(); }}
                     >
-                        <Heart size={14} color="#8E8E93" weight="fill" />
+                        <Heart size={18} color="#000000" weight="thin" />
                     </button>
                     
                     <div className="relative w-full h-full p-4 flex items-center justify-center">
@@ -224,10 +238,10 @@ const ShowcaseProductCard = ({ product, index, isDesktop, handleAddToCart }) => 
                         className="font-manrope line-clamp-1 group-hover:text-[#FF3B30] transition-colors duration-300 shrink-0"
                         style={{ 
                             width: isDesktop ? "261px" : "100%",
-                            height: isDesktop ? "25px" : "auto",
+                            height: isDesktop ? "25px" : "22px",
                             fontSize: isDesktop ? "18px" : "15px", 
                             fontWeight: 600, 
-                            lineHeight: isDesktop ? "25px" : "normal", 
+                            lineHeight: isDesktop ? "25px" : "22px", 
                             letterSpacing: isDesktop ? "-0.4px" : "normal",
                             color: "hsla(0, 0%, 16%, 1)"
                         }}
@@ -243,23 +257,38 @@ const ShowcaseProductCard = ({ product, index, isDesktop, handleAddToCart }) => 
                         }}
                     >
                         <div className="flex items-center gap-1">
-                            {!isDesktop ? (
-                                <Star size={10} weight="fill" className="text-[#FF9F0A]" />
-                            ) : (
-                                <div className="flex text-[#FF9F0A]">
-                                    {[1, 2, 3, 4, 5].map((s) => (
-                                        <Star key={s} size={11} weight="fill" className={s <= Math.round(product.rating || 4) ? "" : "opacity-20"} />
-                                    ))}
-                                </div>
-                            )}
-                            <span className="text-[12px] font-medium text-[#1D1D1F] ml-0.5">
-                                {product.rating || "4.5"} <span className="text-[#8E8E93]">({product.reviews || 12})</span>
+                            <div className="flex text-[#FF9500]">
+                                {[1, 2, 3, 4, 5].map((s) => (
+                                    <Star key={s} size={isDesktop ? 14 : 12} weight="fill" className={s <= Math.round(product.rating || 4) ? "" : "opacity-20"} />
+                                ))}
+                            </div>
+                            <span 
+                                className="ml-1"
+                                style={{
+                                    fontFamily: "'Mona Sans', sans-serif",
+                                    fontSize: "11px",
+                                    fontWeight: 500,
+                                    color: "hsla(0, 0%, 33%, 1)",
+                                    letterSpacing: "-0.01em"
+                                }}
+                            >
+                                {product.rating || "4.5"} ({product.reviews || 12})
                             </span>
                         </div>
-                        <div className="flex items-center gap-1 text-[#8E8E93]">
-                            <Truck size={13} weight="fill" />
-                            <span className="text-[12px] font-medium">2-4 days</span>
-                            <Info size={10} weight="fill" className="ml-0.5 opacity-40 hidden md:block" />
+                        <div className="flex items-center gap-1.5" style={{ color: "hsla(0, 0%, 46%, 1)" }}>
+                            <Truck size={isDesktop ? 16 : 14} weight="regular" />
+                            <span 
+                                className="font-manrope"
+                                style={{
+                                    fontSize: "12px",
+                                    fontWeight: 500,
+                                    lineHeight: "120%",
+                                    letterSpacing: "-0.04em"
+                                }}
+                            >
+                                2-4 days
+                            </span>
+                            <Info size={12} weight="regular" className="ml-0.5 opacity-80 hidden md:block" />
                         </div>
                     </div>
 
@@ -273,12 +302,57 @@ const ShowcaseProductCard = ({ product, index, isDesktop, handleAddToCart }) => 
                             marginTop: "-4px"
                         }}
                     >
-                        <span className="text-[10px] md:text-[11px] font-semibold text-[#1D1D1F]">from</span>
+                        <span 
+                            className="lowercase"
+                            style={{
+                                fontFamily: "'Mona Sans', sans-serif",
+                                fontSize: "11px",
+                                fontWeight: 500,
+                                color: "hsla(0, 0%, 0%, 1)",
+                                letterSpacing: "-0.01em"
+                            }}
+                        >
+                            from
+                        </span>
                         {product.originalPrice && (
-                            <span className="text-[12px] md:text-[17px] font-bold text-[#8E8E93] line-through">₹{product.originalPrice}</span>
+                            <span 
+                                className="line-through decoration-[1.5px]"
+                                style={{
+                                    fontFamily: "'Mona Sans', sans-serif",
+                                    fontSize: isDesktop ? "16px" : "13px",
+                                    fontWeight: 600,
+                                    color: "hsla(0, 0%, 46%, 1)",
+                                    letterSpacing: "-0.04em"
+                                }}
+                            >
+                                ₹{product.originalPrice}
+                            </span>
                         )}
-                        <span className="text-[16px] md:text-[22px] font-bold text-[#FF3B30]">₹{product.rentPrice}</span>
-                        <span className="text-[10px] md:text-[11px] font-semibold text-[#1D1D1F]">/month</span>
+                        <span 
+                            className="font-bold tracking-tight ml-1 leading-none"
+                            style={{
+                                fontFamily: "'Mona Sans', sans-serif",
+                                fontSize: isDesktop ? "26px" : "20px",
+                                fontWeight: 600,
+                                color: "hsla(3, 100%, 56%, 1)",
+                                letterSpacing: "-0.04em"
+                            }}
+                        >
+                            ₹{product.rentPrice}
+                        </span>
+                        <span 
+                            className="lowercase"
+                            style={{
+                                fontFamily: "'Mona Sans', sans-serif",
+                                fontSize: "11px",
+                                fontWeight: 500,
+                                color: "hsla(0, 0%, 24%, 1)",
+                                letterSpacing: "-0.01em",
+                                marginLeft: "2px"
+                            }}
+                        >
+                            /month
+                        </span>
                     </div>
 
                     <div 

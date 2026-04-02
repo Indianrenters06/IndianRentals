@@ -26,7 +26,7 @@ const ProductCard = ({ product, index, isDesktop, handleAddToCart }) => {
                 animate={isHovered ? "hover" : "initial"}
                 initial="initial"
                 className="bg-white flex flex-col overflow-hidden relative mx-auto w-full rounded-[16px]"
-                style={{ 
+                style={{
                     height: isDesktop ? '387px' : '256px',
                     width: isDesktop ? '285px' : '170px',
                     border: "1px solid hsla(0, 0%, 89%, 1)",
@@ -39,7 +39,7 @@ const ProductCard = ({ product, index, isDesktop, handleAddToCart }) => {
                 }}
                 variants={{
                     initial: { height: isDesktop ? 387 : 256 },
-                    hover: { 
+                    hover: {
                         height: isDesktop ? 440 : 330,
                         transition: { duration: 0.3, ease: [0.45, 1.45, 0.8, 1] }
                     }
@@ -59,21 +59,27 @@ const ProductCard = ({ product, index, isDesktop, handleAddToCart }) => {
                         boxShadow: "0px 4px 8px 0px hsla(0, 0%, 87%, 0.1), 0px 15px 15px 0px hsla(0, 0%, 87%, 0.09), 0px 33px 20px 0px hsla(0, 0%, 87%, 0.05), 0px 59px 23px 0px hsla(0, 0%, 87%, 0.01), 0px 91px 26px 0px hsla(0, 0%, 87%, 0)"
                     }}
                 >
-                    <div 
-                        className="absolute z-20 flex items-center" 
-                        style={{ 
-                            top: "19.57px", 
-                            left: "13.49px", 
+                    <div
+                        className="absolute z-20 flex items-center"
+                        style={{
+                            top: "19.57px",
+                            left: "13.49px",
                             gap: "4px",
                             width: "92px",
-                            height: "22px"
+                            height: "28px"
                         }}
                     >
-                        <span className="bg-[#FF3B30] text-white text-[10px] font-bold px-2 py-[4px] rounded-[4px] shadow-sm leading-none flex items-center justify-center h-full">
+                        <span className="text-white text-[10px] font-bold px-2 py-[4px] rounded-[6px] shadow-sm leading-none flex items-center justify-center"
+                            style={{
+                                width: "64px",
+                                height: "28px",
+                                background: "hsla(3, 100%, 56%, 1)"
+                            }}
+                        >
                             -20% off
                         </span>
                         {product.isNew && (
-                            <span 
+                            <span
                                 className="text-white text-[10px] font-bold shadow-sm leading-none flex items-center justify-center h-full translate-x-1.5"
                                 style={{
                                     width: "34px",
@@ -91,15 +97,23 @@ const ProductCard = ({ product, index, isDesktop, handleAddToCart }) => {
                             </span>
                         )}
                     </div>
-                    
+
                     <button
                         className="absolute z-20 flex items-center justify-center rounded-full shadow-sm hover:scale-110 transition-all duration-300"
-                        style={{ width: "28px", height: "28px", top: "8px", right: "8px", backgroundColor: "white", border: "1px solid #E5E5EA" }}
+                        style={{
+                            width: "33px",
+                            height: "33px",
+                            top: "10.57px",
+                            right: "12.51px",
+                            backgroundColor: "hsla(0, 0%, 93%, 1)",
+                            border: "0.2px solid hsla(0, 0%, 80%, 1)",
+                            borderRadius: "100%"
+                        }}
                         onClick={(e) => { e.preventDefault(); e.stopPropagation(); }}
                     >
-                        <Heart size={14} color="#8E8E93" weight="fill" />
+                        <Heart size={18} color="#000000" weight="regular" />
                     </button>
-                    
+
                     <div className="relative w-full h-full p-4 flex items-center justify-center">
                         <motion.img
                             variants={{ initial: { scale: 1 }, hover: { scale: 1.05 } }}
@@ -113,7 +127,7 @@ const ProductCard = ({ product, index, isDesktop, handleAddToCart }) => {
                 {/* Text Section */}
                 <div
                     className="flex flex-col relative font-manrope bg-white"
-                    style={{ 
+                    style={{
                         width: isDesktop ? '285px' : '100%',
                         height: isDesktop ? (isHovered ? '158px' : '105px') : '72px',
                         paddingTop: isDesktop ? '8px' : '4px',
@@ -125,22 +139,22 @@ const ProductCard = ({ product, index, isDesktop, handleAddToCart }) => {
                         transition: 'height 0.3s ease'
                     }}
                 >
-                    <h3 
+                    <h3
                         className="font-manrope line-clamp-1 group-hover:text-[#FF3B30] transition-colors duration-300 shrink-0"
-                        style={{ 
+                        style={{
                             width: isDesktop ? "261px" : "100%",
-                            height: isDesktop ? "25px" : "auto",
-                            fontSize: isDesktop ? "18px" : "15px", 
-                            fontWeight: 600, 
-                            lineHeight: isDesktop ? "25px" : "normal", 
+                            height: isDesktop ? "25px" : "22px",
+                            fontSize: isDesktop ? "18px" : "15px",
+                            fontWeight: 600,
+                            lineHeight: isDesktop ? "25px" : "22px",
                             letterSpacing: isDesktop ? "-0.4px" : "normal",
                             color: "hsla(0, 0%, 16%, 1)"
                         }}
                     >
                         {product.name}
                     </h3>
-                    
-                    <div 
+
+                    <div
                         className="flex items-center justify-between shrink-0"
                         style={{
                             width: isDesktop ? "261px" : "154px",
@@ -148,27 +162,42 @@ const ProductCard = ({ product, index, isDesktop, handleAddToCart }) => {
                         }}
                     >
                         <div className="flex items-center gap-1">
-                            {!isDesktop ? (
-                                <Star size={10} weight="fill" className="text-[#FF9F0A]" />
-                            ) : (
-                                <div className="flex text-[#FF9F0A]">
-                                    {[1, 2, 3, 4, 5].map((s) => (
-                                        <Star key={s} size={11} weight="fill" className={s <= Math.round(product.rating || 4) ? "" : "opacity-20"} />
-                                    ))}
-                                </div>
-                            )}
-                            <span className="text-[12px] font-medium text-[#1D1D1F] ml-0.5">
-                                {product.rating || "4.5"} <span className="text-[#8E8E93]">({product.reviews || 12})</span>
+                            <div className="flex text-[#FF9500]">
+                                {[1, 2, 3, 4, 5].map((s) => (
+                                    <Star key={s} size={isDesktop ? 14 : 12} weight="fill" className={s <= Math.round(product.rating || 4) ? "" : "opacity-20"} />
+                                ))}
+                            </div>
+                            <span 
+                                className="ml-1"
+                                style={{
+                                    fontFamily: "'Mona Sans', sans-serif",
+                                    fontSize: "11px",
+                                    fontWeight: 500,
+                                    color: "hsla(0, 0%, 33%, 1)",
+                                    letterSpacing: "-0.01em"
+                                }}
+                            >
+                                {product.rating || "4.5"} ({product.reviews || 12})
                             </span>
                         </div>
-                        <div className="flex items-center gap-1 text-[#8E8E93]">
-                            <Truck size={13} weight="fill" />
-                            <span className="text-[12px] font-medium">2-4 days</span>
-                            <Info size={10} weight="fill" className="ml-0.5 opacity-40 hidden md:block" />
+                        <div className="flex items-center gap-1.5" style={{ color: "hsla(0, 0%, 46%, 1)" }}>
+                            <Truck size={isDesktop ? 16 : 14} weight="regular" />
+                            <span 
+                                className="font-manrope"
+                                style={{
+                                    fontSize: "12px",
+                                    fontWeight: 500,
+                                    lineHeight: "120%",
+                                    letterSpacing: "-0.04em"
+                                }}
+                            >
+                                2-4 days
+                            </span>
+                            <Info size={12} weight="regular" className="ml-0.5 opacity-80 hidden md:block" />
                         </div>
                     </div>
 
-                    <div 
+                    <div
                         className="flex items-center shrink-0"
                         style={{
                             width: isDesktop ? "209px" : "100%",
@@ -178,16 +207,61 @@ const ProductCard = ({ product, index, isDesktop, handleAddToCart }) => {
                             marginTop: "-4px"
                         }}
                     >
-                        <span className="text-[10px] md:text-[11px] font-semibold text-[#1D1D1F]">from</span>
+                        <span 
+                            className="lowercase"
+                            style={{
+                                fontFamily: "'Mona Sans', sans-serif",
+                                fontSize: "11px",
+                                fontWeight: 500,
+                                color: "hsla(0, 0%, 0%, 1)",
+                                letterSpacing: "-0.01em"
+                            }}
+                        >
+                            from
+                        </span>
                         {product.originalPrice && (
-                            <span className="text-[12px] md:text-[17px] font-bold text-[#8E8E93] line-through">₹{product.originalPrice}</span>
+                            <span 
+                                className="line-through decoration-[1.5px]"
+                                style={{
+                                    fontFamily: "'Mona Sans', sans-serif",
+                                    fontSize: isDesktop ? "16px" : "13px",
+                                    fontWeight: 600,
+                                    color: "hsla(0, 0%, 46%, 1)",
+                                    letterSpacing: "-0.04em"
+                                }}
+                            >
+                                ₹{product.originalPrice}
+                            </span>
                         )}
-                        <span className="text-[16px] md:text-[22px] font-bold text-[#FF3B30]">₹{product.rentPrice}</span>
-                        <span className="text-[10px] md:text-[11px] font-semibold text-[#1D1D1F]">/month</span>
+                        <span 
+                            className="font-bold tracking-tight ml-1 leading-none"
+                            style={{
+                                fontFamily: "'Mona Sans', sans-serif",
+                                fontSize: isDesktop ? "26px" : "20px",
+                                fontWeight: 600,
+                                color: "hsla(3, 100%, 56%, 1)",
+                                letterSpacing: "-0.04em"
+                            }}
+                        >
+                            ₹{product.rentPrice}
+                        </span>
+                        <span 
+                            className="lowercase"
+                            style={{
+                                fontFamily: "'Mona Sans', sans-serif",
+                                fontSize: "11px",
+                                fontWeight: 500,
+                                color: "hsla(0, 0%, 24%, 1)",
+                                letterSpacing: "-0.01em",
+                                marginLeft: "2px"
+                            }}
+                        >
+                            /month
+                        </span>
                     </div>
 
                     {/* Rent Now Button Entrance */}
-                    <div 
+                    <div
                         className="relative w-full z-30 overflow-hidden flex items-center transition-all duration-300 ease-out"
                         style={{
                             height: isHovered ? (isDesktop ? '50px' : '44px') : '0px',
@@ -195,7 +269,7 @@ const ProductCard = ({ product, index, isDesktop, handleAddToCart }) => {
                             paddingTop: isHovered ? '8px' : '0px'
                         }}
                     >
-                        <button 
+                        <button
                             onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleAddToCart(e, product); }}
                             className="w-full h-full rounded-full bg-[#FFCF46] text-[#1D1D1F] font-bold text-[14px] shadow-sm transform transition-all duration-300 ease-out active:scale-95 hover:brightness-105"
                             style={{ transform: isHovered ? 'translateY(0)' : 'translateY(15px)' }}
@@ -236,7 +310,7 @@ const BestRentedProducts = ({ type = "bestRented", defaultTitle = "Curated Produ
         productIds: []
     });
     const [loading, setLoading] = useState(true);
-    
+
     const handleAddToCart = (e, product) => {
         e.preventDefault();
         e.stopPropagation();
@@ -327,9 +401,9 @@ const BestRentedProducts = ({ type = "bestRented", defaultTitle = "Curated Produ
     const sectionSuffix = type === 'bestRented' ? 'best' : 'launch';
 
     return (
-        <section 
+        <section
             className="overflow-hidden py-12 md:py-16"
-            style={{ 
+            style={{
                 minHeight: '449px',
                 background: '#FFFFFF'
             }}
@@ -371,7 +445,7 @@ const BestRentedProducts = ({ type = "bestRented", defaultTitle = "Curated Produ
                     >
                         {products.map((product, index) => (
                             <SwiperSlide key={product.id || index} style={{ width: '285px' }}>
-                                <ProductCard 
+                                <ProductCard
                                     product={product}
                                     index={index}
                                     isDesktop={isDesktop}
@@ -393,7 +467,7 @@ const BestRentedProducts = ({ type = "bestRented", defaultTitle = "Curated Produ
                                 aria-label="Previous"
                             >
                                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" className="text-gray-400 group-hover:text-gray-800 transition-colors">
-                                    <path d="M15 18L9 12L15 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                                    <path d="M15 18L9 12L15 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                                 </svg>
                             </button>
                             <button
@@ -401,7 +475,7 @@ const BestRentedProducts = ({ type = "bestRented", defaultTitle = "Curated Produ
                                 aria-label="Next"
                             >
                                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" className="text-gray-400 group-hover:text-gray-800 transition-colors">
-                                    <path d="M9 18L15 12L9 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                                    <path d="M9 18L15 12L9 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                                 </svg>
                             </button>
                         </div>
@@ -411,7 +485,7 @@ const BestRentedProducts = ({ type = "bestRented", defaultTitle = "Curated Produ
                 {/* Mobile View: static grid */}
                 <div className="md:hidden grid grid-cols-2 gap-[10px]">
                     {products.map((product, index) => (
-                        <ProductCard 
+                        <ProductCard
                             key={product.id || index}
                             product={product}
                             index={index}

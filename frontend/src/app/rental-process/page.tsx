@@ -4,15 +4,16 @@ import React, { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { 
-  PiLaptop, 
-  PiUserCheck, 
-  PiShoppingCartSimple, 
-  PiBoxArrowUp, 
-  PiClock, 
-  PiCalendar, 
-  PiTruck, 
-  PiCurrencyInr 
-} from 'react-icons/pi';
+import { 
+  Laptop as PiLaptop, 
+  UserFocus as PiUserFocus, 
+  ShoppingCart as PiShoppingCart, 
+  Package as PiBoxArrowUp, 
+  Clock as PiClock, 
+  Calendar as PiCalendar, 
+  Truck as PiTruck, 
+  CurrencyInr as PiCurrencyInr 
+} from '@phosphor-icons/react';
 import Testimonials from '@/components/Testimonials';
 
 export default function RentalProcessPage() {
@@ -27,12 +28,12 @@ export default function RentalProcessPage() {
         {
             title: "Complete KYC",
             description: "Pick a flexible rental tenure from 1 to 12 months. Then, complete our KYC process online with your basic documents (PAN and Address Proof).",
-            icon: PiUserCheck,
+            icon: PiUserFocus,
         },
         {
             title: "Secure Your Order",
             description: "Confirm your rental and complete the payment online. This includes the first month's rent and a fully refundable security deposit.",
-            icon: PiShoppingCartSimple,
+            icon: PiShoppingCart,
         },
         {
             title: "Receive & Create",
@@ -109,8 +110,8 @@ export default function RentalProcessPage() {
                                             className="px-7 py-5 flex flex-col justify-between rounded-2xl"
                                         >
                                             <div className="flex justify-between items-start">
-                                                <div className="text-[#6B4B18] scale-[1.3] origin-left pt-1">
-                                                    <Icon size={24} />
+                                                <div className="text-[#6B4B18] pt-1">
+                                                    <Icon size={32} weight="bold" />
                                                 </div>
                                                 <div className="px-5 py-2 bg-white text-[13px] font-bold text-[#6B4B18] rounded-full tracking-tighter shadow-sm">
                                                     Step {idxNum}
@@ -129,8 +130,8 @@ export default function RentalProcessPage() {
                                         // Inactive Step Card
                                         <div className="h-[100px] px-7 py-5 flex flex-col justify-center bg-white border border-gray-100 shadow-sm hover:border-gray-200 rounded-2xl">
                                             <div className="flex justify-between items-start mb-1.5">
-                                                <div className="text-gray-900 scale-[1.2] origin-left pt-1">
-                                                    <Icon size={24} />
+                                                <div className="text-gray-900 pt-1">
+                                                    <Icon size={32} weight="bold" />
                                                 </div>
                                                 <div className="px-4 py-1.5 border border-gray-200 text-[12px] font-bold text-gray-400 rounded-full tracking-tighter bg-transparent">
                                                     Step {idxNum}
