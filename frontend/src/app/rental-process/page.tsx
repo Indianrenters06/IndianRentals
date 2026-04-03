@@ -127,16 +127,26 @@ export default function RentalProcessPage() {
                                         </div>
                                     ) : (
                                         // Inactive Step Card
-                                        <div className="h-[100px] px-7 py-5 flex flex-col justify-center bg-white border border-gray-100 shadow-sm hover:border-gray-200 rounded-2xl">
-                                            <div className="flex justify-between items-start mb-1.5">
-                                                <div className="text-gray-900 pt-1">
+                                        <div className="px-7 py-5 flex flex-col justify-center bg-white border border-gray-100 shadow-sm hover:border-gray-200 rounded-2xl gap-3">
+                                            <div className="flex justify-between items-start">
+                                                <div className="text-gray-900">
                                                     <Icon size={32} weight="bold" />
                                                 </div>
                                                 <div className="px-4 py-1.5 border border-gray-200 text-[12px] font-bold text-gray-400 rounded-full tracking-tighter bg-transparent">
                                                     Step {idxNum}
                                                 </div>
                                             </div>
-                                            <h3 className="text-[22px] font-semibold text-gray-900 tracking-[-0.04em] mt-1.5 leading-none font-manrope">
+                                            <h3 
+                                                className="font-semibold tracking-[-0.04em] leading-none"
+                                                style={{
+                                                    fontFamily: '"Mona Sans", "Manrope", sans-serif',
+                                                    fontSize: '20px',
+                                                    lineHeight: '28px',
+                                                    height: '28px',
+                                                    width: '144px',
+                                                    color: 'hsla(0, 0%, 20%, 1)'
+                                                }}
+                                            >
                                                 {step.title}
                                             </h3>
                                         </div>

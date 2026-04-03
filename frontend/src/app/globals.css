@@ -1,11 +1,14 @@
 @import "tailwindcss";
 
 @theme {
-  /* Fonts */
-  --font-manrope: "Mona Sans", var(--font-manrope), ui-sans-serif, system-ui, sans-serif;
-  --font-satoshi: "Satoshi", ui-sans-serif, system-ui, sans-serif;
-  --font-sf-pro: "SF Pro", ui-sans-serif, system-ui, sans-serif;
-  --font-sans: var(--font-manrope);
+  /* Fonts - Enforcing Mona Sans Globally */
+  --font-mona: "Mona Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-manrope: var(--font-mona);
+  --font-satoshi: var(--font-mona);
+  --font-sf-pro: var(--font-mona);
+  --font-sans: var(--font-mona);
+  --font-serif: var(--font-mona);
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
 
   /* Colors - Orange (Primary) */
   --color-orange-50: #fffaeb;
@@ -111,14 +114,33 @@
   }
 }
 
-/* Custom Utilities */
-@layer utilities {
-  .scrollbar-hide::-webkit-scrollbar {
-    display: none;
+/* Button Design System (from configuration) */
+@layer components {
+  .btn-primary {
+    @apply px-7 h-[42px] rounded-pill font-bold shadow-sm transition-all duration-300 flex items-center justify-center whitespace-nowrap;
+    background-color: var(--color-orange-200); color: #1D1D1F;
   }
-  .scrollbar-hide {
-    -ms-overflow-style: none;
-    scrollbar-width: none;
+  .btn-primary:hover { background-color: var(--color-orange-300); }
+  .btn-primary:active { background-color: var(--color-orange-400); }
+  .btn-primary:focus { outline: none; border: 2px solid var(--color-orange-600); }
+  .btn-primary:disabled { opacity: 0.4; background-color: #f6f6f6; color: #afafaf; cursor: not-allowed; }
+
+  .btn-secondary {
+    @apply px-7 h-[42px] rounded-pill font-bold border border-[#1D1D1F] transition-all duration-300 flex items-center justify-center whitespace-nowrap;
+    background-color: transparent; color: #1D1D1F;
   }
+  .btn-secondary:hover { background-color: #1D1D1F; color: white; }
+  .btn-secondary:active { background-color: #333333; color: white; }
+  .btn-secondary:focus { border-color: #007AFF; }
+  .btn-secondary:disabled { opacity: 0.4; border-color: #afafaf; color: #afafaf; cursor: not-allowed; }
+
+  .btn-accent {
+    @apply px-7 h-[42px] rounded-pill font-bold shadow-sm transition-all duration-300 flex items-center justify-center whitespace-nowrap;
+    background-color: var(--color-blue-500); color: white;
+  }
+  .btn-accent:hover { background-color: var(--color-blue-400); }
+  .btn-accent:active { background-color: var(--color-blue-600); }
+  .btn-accent:focus { outline: none; border: 2px solid var(--color-blue-100); }
+  .btn-accent:disabled { opacity: 0.4; background-color: var(--color-blue-100); color: var(--color-blue-400); cursor: not-allowed; }
 }
 

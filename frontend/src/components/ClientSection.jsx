@@ -1,9 +1,10 @@
 "use client";
 import React, { useRef } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
-import { Navigation, Autoplay } from "swiper/modules";
+import { Navigation, Autoplay, Pagination } from "swiper/modules";
 import { CaretRight, CaretLeft } from "@phosphor-icons/react";
 import "swiper/css";
+import "swiper/css/pagination";
 
 // Placeholder client logos — replace with real logos/images as needed
 const clients = [
@@ -21,13 +22,30 @@ const ClientSection = () => {
 
     return (
         <section className="py-20 bg-white">
+            <style jsx global>{`
+                .client-pagination .swiper-pagination-bullet {
+                    width: 7px;
+                    height: 7px;
+                    background: #1D1D1F;
+                    opacity: 0.3;
+                    margin: 0 4px !important;
+                    transition: all 0.3s ease;
+                }
+                .client-pagination .swiper-pagination-bullet-active {
+                    opacity: 1;
+                    background: transparent;
+                    border: 1.5px solid #1D1D1F;
+                    width: 7px;
+                    height: 7px;
+                }
+            `}</style>
             <div
                 className="max-w-[1200px] mx-auto px-4 sm:px-6"
-                style={{ height: "300px" }}
+                style={{ height: "auto" }}
             >
-                <div className="relative">
+                <div className="relative pb-16">
                     <Swiper
-                        modules={[Navigation, Autoplay]}
+                        modules={[Navigation, Autoplay, Pagination]}
                         spaceBetween={20}
                         slidesPerView={2}
                         slidesPerGroup={1}
@@ -35,32 +53,36 @@ const ClientSection = () => {
                             nextEl: ".client-next",
                             prevEl: ".client-prev",
                         }}
+                        pagination={{
+                            clickable: true,
+                            el: ".client-pagination"
+                        }}
                         autoplay={{
                             delay: 4000,
                             disableOnInteraction: false,
                         }}
                         loop={true}
                         breakpoints={{
-                            0: { slidesPerView: 1, spaceBetween: 16 },
-                            768: { slidesPerView: 2, spaceBetween: 20 },
+                            0: { slidesPerView: 1.2, spaceBetween: 16 },
+                            768: { slidesPerView: 2, spaceBetween: 32 },
                         }}
                     >
                         {clients.map((client) => (
                             <SwiperSlide key={client.id}>
                                 <div
-                                    className="flex items-center justify-center select-none transition-all hover:scale-[1.02] duration-300 shadow-sm hover:shadow-md"
+                                    className="flex items-center justify-center select-none transition-all hover:scale-[1.01] duration-300 shadow-sm"
                                     style={{ 
-                                        height: "300px",
-                                        borderRadius: "18px",
+                                        height: "280px",
+                                        borderRadius: "24px",
                                         background: "hsla(44, 100%, 64%, 1)",
                                         opacity: 1
                                     }}
                                 >
                                     <div className="flex flex-col items-center gap-4">
-                                        <div className="w-20 h-20 rounded-full bg-black/10 flex items-center justify-center text-black font-black text-3xl border border-black/5">
+                                        <div className="w-16 h-16 rounded-full bg-black/10 flex items-center justify-center text-black font-black text-2xl border border-black/5">
                                             {client.logo[0]}
                                         </div>
-                                        <span className="text-black font-manrope font-bold text-[32px] tracking-tight">
+                                        <span className="text-black font-manrope font-extrabold text-[28px] tracking-tight">
                                             {client.name}
                                         </span>
                                     </div>
@@ -69,14 +91,19 @@ const ClientSection = () => {
                         ))}
                     </Swiper>
 
+                    {/* Custom Pagination Container */}
+                    <div className="client-pagination absolute bottom-0 left-0 right-0 flex justify-center z-10" />
+
                     <button
-                        className="client-prev absolute left-0 top-1/2 -translate-y-1/2 -translate-x-1/2 z-10 w-10 h-10 rounded-full bg-white border border-gray-200 shadow-md flex items-center justify-center hover:shadow-lg hover:border-gray-300 transition-all"
+                        className="client-prev absolute left-0 top-[140px] -translate-y-1/2 -translate-x-1/2 z-10 w-[26px] h-[40px] rounded-[9px] flex items-center justify-center hover:scale-110 active:scale-95 shadow-sm hover:shadow-md transition-all"
+                        style={{ background: 'var(--color-grey-grey-100, hsla(0, 0%, 93%, 1))', opacity: 1 }}
                         ref={prevRef}
                     >
                         <CaretLeft size={20} weight="regular" className="text-gray-800" />
                     </button>
                     <button
-                        className="client-next absolute right-0 top-1/2 -translate-y-1/2 translate-x-1/2 z-10 w-10 h-10 rounded-full bg-white border border-gray-200 shadow-md flex items-center justify-center hover:shadow-lg hover:border-gray-300 transition-all"
+                        className="client-next absolute right-0 top-[140px] -translate-y-1/2 translate-x-1/2 z-10 w-[26px] h-[40px] rounded-[9px] flex items-center justify-center hover:scale-110 active:scale-95 shadow-sm hover:shadow-md transition-all"
+                        style={{ background: 'var(--color-grey-grey-100, hsla(0, 0%, 93%, 1))', opacity: 1 }}
                         ref={nextRef}
                     >
                         <CaretRight size={20} weight="regular" className="text-gray-800" />

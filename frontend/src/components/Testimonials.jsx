@@ -87,7 +87,16 @@ const Testimonials = () => {
                 <span className={`text-[13px] ${review.textColor || "text-[#86868B]"} opacity-80`}>{review.role || "Verified User"}</span>
             </div>
 
-            <p className={`text-[14px] ${review.textColor || "text-[#1D1D1F]"} leading-[1.4] mb-auto grow`}>
+            <p 
+                className={`grow mb-auto ${review.textColor || "text-[#1D1D1F]"}`}
+                style={{
+                    fontFamily: "'Mona Sans', sans-serif",
+                    fontSize: "12.5px",
+                    fontWeight: 500,
+                    lineHeight: "1.4",
+                    letterSpacing: "0.01em"
+                }}
+            >
                 {review.message || review.text}
             </p>
 
@@ -205,7 +214,7 @@ const Testimonials = () => {
                 {/* Masonry Grid Container */}
                 <div
                     className="hidden lg:grid grid-cols-3 w-full"
-                    style={{ 
+                    style={{
                         minHeight: '1005px',
                         gap: '24px',
                         opacity: 1
@@ -287,12 +296,21 @@ const Testimonials = () => {
                     </div>
                 </div>
 
-                {/* Read All Reviews Button (Hidden on Mobile) */}
-                <div className="hidden md:flex mt-8 md:mt-16 w-full justify-center z-10">
+                <div className="hidden md:flex mt-8 md:mt-12 w-full justify-center z-10">
                     <Link
-                        href="/testimonials"
-                        className="bg-[#007AFF] text-white font-bold flex items-center justify-center transition-all shadow-md hover:shadow-lg hover:brightness-105 active:scale-95"
-                        style={{ width: '185px', height: '42.58px', borderRadius: '9999px', fontSize: '14px', letterSpacing: '0.01em' }}
+                        href="/reviews"
+                        className="inline-flex items-center justify-center rounded-full transition-all hover:brightness-110 shadow-md active:scale-95"
+                        style={{
+                            width: '163px',
+                            height: '35px',
+                            backgroundColor: 'hsla(212, 100%, 50%, 1)',
+                            color: '#FFFFFF',
+                            fontFamily: "'Mona Sans', sans-serif",
+                            fontSize: "14px",
+                            fontWeight: 500,
+                            letterSpacing: "0.01em",
+                            lineHeight: "35px"
+                        }}
                     >
                         Read All Reviews
                     </Link>

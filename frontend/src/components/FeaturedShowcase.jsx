@@ -7,13 +7,13 @@ import { useDispatch } from 'react-redux';
 import { addToCart } from '../redux/features/cartSlice';
 import { useRouter } from 'next/navigation';
 
-const API = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+import { API } from '@/services/apiConfig';
 
 const FALLBACK_BANNERS = [
     {
         title: "Apple Products",
         subtitle: "MacBooks | iPads | iPhones | Mac Studio | Mac Mini",
-        image: "/images/banner-apple.png",
+        image: "https://res.cloudinary.com/dpu9ikeqe/image/upload/v1775219840/f6540bc8c3d4a91dfd954f6fe1cf8d3803b81b4a_1_bosgoq.png",
         href: "/products",
         bg: "linear-gradient(to bottom, #8E2DE2, #4A00E0)",
         category: "MacBook"
@@ -38,7 +38,7 @@ const BannerCarousel = ({ banners, current, setCurrent, height = "387px" }) => {
     }, [banners.length, setCurrent]);
 
     useEffect(() => {
-        const t = setInterval(() => go(1), 8000);
+        const t = setInterval(() => go(1), 5000);
         return () => clearInterval(t);
     }, [go]);
 
@@ -46,12 +46,12 @@ const BannerCarousel = ({ banners, current, setCurrent, height = "387px" }) => {
 
     return (
         <div 
-            className="relative overflow-hidden shadow-xl"
+            className="relative overflow-hidden shadow-xl rounded-2xl"
             style={{ 
                 height,
                 width: "100%",
-                borderRadius: "30px",
-                maxWidth: "100%"
+                maxWidth: "100%",
+                background: "#000"
             }}
         >
             <AnimatePresence initial={false} custom={direction}>
@@ -67,33 +67,66 @@ const BannerCarousel = ({ banners, current, setCurrent, height = "387px" }) => {
                     animate="center"
                     exit="exit"
                     transition={{ duration: 0.45, ease: "easeInOut" }}
-                    className="absolute inset-0 flex flex-col items-center justify-end pb-8"
-                    style={{ background: slide.bg || "#F5F5F7" }}
+                    className="absolute inset-0 flex flex-col items-center justify-end"
                 >
-                    <div className="absolute inset-x-0 top-0 h-[65%] flex items-center justify-center p-8">
-                         <div className="w-full h-full bg-white/20 rounded-2xl backdrop-blur-xl flex items-center justify-center border border-white/10">
-                            <span className="text-white/50 text-sm">Product Visual</span>
-                         </div>
+                    {/* Background Image */}
+                    <div className="absolute inset-0 z-0">
+                        <Image 
+                            src={slide.image} 
+                            alt={slide.title} 
+                            fill 
+                            unoptimized 
+                            className="object-cover" 
+                        />
+                        {/* Gradient Overlay */}
+                        <div 
+                            className="absolute inset-0"
+                            style={{
+                                background: "linear-gradient(180.66deg, rgba(0, 0, 0, 0) 52.71%, rgba(0, 0, 0, 0.8) 86.37%)"
+                            }}
+                        />
                     </div>
 
-                    <div className="relative z-10 text-center px-6">
+                    {/* Content Layer */}
+                    <div className="relative z-10 text-center w-full" style={{ padding: "30px 31px" }}>
                         <div className="flex items-center justify-center gap-4 mb-1">
-                             <button onClick={() => go(-1)} className="w-6 h-6 rounded-full bg-white/20 flex items-center justify-center text-white"><CaretLeft size={10} weight="fill"/></button>
-                             <h3 className="text-white text-[24px] font-bold tracking-tight">
+                            <button onClick={() => go(-1)} className="w-[30px] h-[30px] rounded-full bg-white shadow-sm flex items-center justify-center text-gray-900 hover:bg-gray-100 transition-colors"><CaretLeft size={16} weight="bold" /></button>
+                            <h3 
+                                className="text-white leading-tight"
+                                style={{
+                                    fontFamily: "'Mona Sans', sans-serif",
+                                    fontSize: "32px",
+                                    fontWeight: 600,
+                                    height: "35px",
+                                    letterSpacing: "-0.04em",
+                                    lineHeight: "35px"
+                                }}
+                            >
                                 {slide.title}
                             </h3>
-                             <button onClick={() => go(1)} className="w-6 h-6 rounded-full bg-white/20 flex items-center justify-center text-white"><CaretRight size={10} weight="fill"/></button>
+                            <button onClick={() => go(1)} className="w-[30px] h-[30px] rounded-full bg-white shadow-sm flex items-center justify-center text-gray-900 hover:bg-gray-100 transition-colors"><CaretRight size={16} weight="bold" /></button>
                         </div>
-                        <p className="text-white/80 text-[14px] font-medium opacity-80 leading-tight mb-4">
+                        <p 
+                            className="text-white/90 leading-tight mb-4 mx-auto"
+                            style={{
+                                fontFamily: "'Mona Sans', sans-serif",
+                                fontSize: "16px",
+                                fontWeight: 400,
+                                height: "28px",
+                                maxWidth: "526px",
+                                textAlign: "center",
+                                letterSpacing: "-0.01em"
+                            }}
+                        >
                             {slide.subtitle}
                         </p>
 
-                        <div className="flex justify-center gap-1.5">
+                        <div className="flex justify-center gap-2">
                             {banners.map((_, i) => (
                                 <button
                                     key={i}
                                     onClick={() => { setDirection(i > current ? 1 : -1); setCurrent(i); }}
-                                    className={`transition-all duration-300 rounded-full h-1.5 ${i === current ? "w-6 bg-white" : "w-1.5 bg-white/40"}`}
+                                    className={`transition-all duration-300 rounded-full h-2 ${i === current ? "w-10 bg-white" : "w-1.5 bg-white/40"}`}
                                 />
                             ))}
                         </div>
@@ -120,8 +153,8 @@ const ShowcaseProductCard = ({ product, index, isDesktop, handleAddToCart }) => 
             <motion.div
                 animate={isHovered ? "hover" : "initial"}
                 initial="initial"
-                className="bg-white flex flex-col overflow-hidden relative mx-auto w-full rounded-[16px]"
-                style={{ 
+                className="bg-white flex flex-col overflow-hidden relative mx-auto w-full rounded-xl"
+                style={{
                     height: isDesktop ? '387px' : '256px',
                     width: isDesktop ? '285px' : '170px',
                     border: "1px solid hsla(0, 0%, 89%, 1)",
@@ -133,9 +166,11 @@ const ShowcaseProductCard = ({ product, index, isDesktop, handleAddToCart }) => 
                     opacity: 1
                 }}
                 variants={{
-                    initial: { height: isDesktop ? 387 : 256 },
-                    hover: { 
+                    initial: { height: isDesktop ? 387 : 256, y: 0, boxShadow: "0px 2px 4px 0px hsla(0, 0%, 0%, 0.04)" },
+                    hover: {
                         height: isDesktop ? 440 : 330,
+                        y: isDesktop ? -10 : -8,
+                        boxShadow: "0px 25px 50px -12px hsla(0, 0%, 0%, 0.15)",
                         transition: { duration: 0.3, ease: [0.45, 1.45, 0.8, 1] }
                     }
                 }}
@@ -154,11 +189,11 @@ const ShowcaseProductCard = ({ product, index, isDesktop, handleAddToCart }) => 
                         boxShadow: "0px 4px 8px 0px hsla(0, 0%, 87%, 0.1), 0px 15px 15px 0px hsla(0, 0%, 87%, 0.09), 0px 33px 20px 0px hsla(0, 0%, 87%, 0.05), 0px 59px 23px 0px hsla(0, 0%, 87%, 0.01), 0px 91px 26px 0px hsla(0, 0%, 87%, 0)"
                     }}
                 >
-                    <div 
-                        className="absolute z-20 flex items-center" 
-                        style={{ 
-                            top: "19.57px", 
-                            left: "13.49px", 
+                    <div
+                        className="absolute z-20 flex items-center"
+                        style={{
+                            top: "19.57px",
+                            left: "13.49px",
                             gap: "4px",
                             width: "92px",
                             height: "28px"
@@ -174,7 +209,7 @@ const ShowcaseProductCard = ({ product, index, isDesktop, handleAddToCart }) => 
                             -20% off
                         </span>
                         {product.isNew && (
-                            <span 
+                            <span
                                 className="text-white text-[10px] font-bold shadow-sm leading-none flex items-center justify-center translate-x-1.5"
                                 style={{
                                     width: "34px",
@@ -192,23 +227,23 @@ const ShowcaseProductCard = ({ product, index, isDesktop, handleAddToCart }) => 
                             </span>
                         )}
                     </div>
-                    
+
                     <button
                         className="absolute z-20 flex items-center justify-center rounded-full shadow-sm hover:scale-110 transition-all duration-300"
-                        style={{ 
-                            width: "33px", 
-                            height: "33px", 
-                            top: "10.57px", 
-                            right: "12.51px", 
-                            backgroundColor: "hsla(0, 0%, 93%, 1)", 
+                        style={{
+                            width: "33px",
+                            height: "33px",
+                            top: "10.57px",
+                            right: "12.51px",
+                            backgroundColor: "hsla(0, 0%, 93%, 1)",
                             border: "0.2px solid hsla(0, 0%, 80%, 1)",
-                            borderRadius: "100%" 
+                            borderRadius: "100%"
                         }}
                         onClick={(e) => { e.preventDefault(); e.stopPropagation(); }}
                     >
                         <Heart size={18} color="#000000" weight="thin" />
                     </button>
-                    
+
                     <div className="relative w-full h-full p-4 flex items-center justify-center">
                         <motion.img
                             variants={{ initial: { scale: 1 }, hover: { scale: 1.05 } }}
@@ -222,7 +257,7 @@ const ShowcaseProductCard = ({ product, index, isDesktop, handleAddToCart }) => 
                 {/* Text Section */}
                 <div
                     className="flex flex-col relative font-manrope bg-white"
-                    style={{ 
+                    style={{
                         width: isDesktop ? '285px' : '100%',
                         height: isDesktop ? (isHovered ? '158px' : '105px') : '72px',
                         paddingTop: isDesktop ? '8px' : '4px',
@@ -234,22 +269,22 @@ const ShowcaseProductCard = ({ product, index, isDesktop, handleAddToCart }) => 
                         transition: 'height 0.3s ease'
                     }}
                 >
-                    <h3 
+                    <h3
                         className="font-manrope line-clamp-1 group-hover:text-[#FF3B30] transition-colors duration-300 shrink-0"
-                        style={{ 
+                        style={{
                             width: isDesktop ? "261px" : "100%",
                             height: isDesktop ? "25px" : "22px",
-                            fontSize: isDesktop ? "18px" : "15px", 
-                            fontWeight: 600, 
-                            lineHeight: isDesktop ? "25px" : "22px", 
+                            fontSize: isDesktop ? "18px" : "15px",
+                            fontWeight: 600,
+                            lineHeight: isDesktop ? "25px" : "22px",
                             letterSpacing: isDesktop ? "-0.4px" : "normal",
                             color: "hsla(0, 0%, 16%, 1)"
                         }}
                     >
                         {product.name}
                     </h3>
-                    
-                    <div 
+
+                    <div
                         className="flex items-center justify-between shrink-0"
                         style={{
                             width: isDesktop ? "261px" : "154px",
@@ -262,7 +297,7 @@ const ShowcaseProductCard = ({ product, index, isDesktop, handleAddToCart }) => 
                                     <Star key={s} size={isDesktop ? 14 : 12} weight="fill" className={s <= Math.round(product.rating || 4) ? "" : "opacity-20"} />
                                 ))}
                             </div>
-                            <span 
+                            <span
                                 className="ml-1"
                                 style={{
                                     fontFamily: "'Mona Sans', sans-serif",
@@ -277,7 +312,7 @@ const ShowcaseProductCard = ({ product, index, isDesktop, handleAddToCart }) => 
                         </div>
                         <div className="flex items-center gap-1.5" style={{ color: "hsla(0, 0%, 46%, 1)" }}>
                             <Truck size={isDesktop ? 16 : 14} weight="regular" />
-                            <span 
+                            <span
                                 className="font-manrope"
                                 style={{
                                     fontSize: "12px",
@@ -292,7 +327,7 @@ const ShowcaseProductCard = ({ product, index, isDesktop, handleAddToCart }) => 
                         </div>
                     </div>
 
-                    <div 
+                    <div
                         className="flex items-center shrink-0"
                         style={{
                             width: isDesktop ? "209px" : "100%",
@@ -302,7 +337,7 @@ const ShowcaseProductCard = ({ product, index, isDesktop, handleAddToCart }) => 
                             marginTop: "-4px"
                         }}
                     >
-                        <span 
+                        <span
                             className="lowercase"
                             style={{
                                 fontFamily: "'Mona Sans', sans-serif",
@@ -315,7 +350,7 @@ const ShowcaseProductCard = ({ product, index, isDesktop, handleAddToCart }) => 
                             from
                         </span>
                         {product.originalPrice && (
-                            <span 
+                            <span
                                 className="line-through decoration-[1.5px]"
                                 style={{
                                     fontFamily: "'Mona Sans', sans-serif",
@@ -328,7 +363,7 @@ const ShowcaseProductCard = ({ product, index, isDesktop, handleAddToCart }) => 
                                 ₹{product.originalPrice}
                             </span>
                         )}
-                        <span 
+                        <span
                             className="font-bold tracking-tight ml-1 leading-none"
                             style={{
                                 fontFamily: "'Mona Sans', sans-serif",
@@ -340,7 +375,7 @@ const ShowcaseProductCard = ({ product, index, isDesktop, handleAddToCart }) => 
                         >
                             ₹{product.rentPrice}
                         </span>
-                        <span 
+                        <span
                             className="lowercase"
                             style={{
                                 fontFamily: "'Mona Sans', sans-serif",
@@ -355,7 +390,7 @@ const ShowcaseProductCard = ({ product, index, isDesktop, handleAddToCart }) => 
                         </span>
                     </div>
 
-                    <div 
+                    <div
                         className="relative w-full z-30 overflow-hidden flex items-center transition-all duration-300 ease-out"
                         style={{
                             height: isHovered ? (isDesktop ? '50px' : '44px') : '0px',
@@ -363,7 +398,7 @@ const ShowcaseProductCard = ({ product, index, isDesktop, handleAddToCart }) => 
                             paddingTop: isHovered ? '8px' : '0px'
                         }}
                     >
-                        <button 
+                        <button
                             onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleAddToCart(e, product); }}
                             className="w-full h-full rounded-full bg-[#FFCF46] text-[#1D1D1F] font-bold text-[14px] shadow-sm transform transition-all duration-300 ease-out active:scale-95 hover:brightness-105"
                             style={{ transform: isHovered ? 'translateY(0)' : 'translateY(15px)' }}
@@ -410,16 +445,18 @@ const FeaturedShowcase = () => {
 
     // Sync products when banner changes
     useEffect(() => {
+        if (!cms?.banners || !cms.banners[currentBanner]) return;
+
         const activeCategory = cms.banners[currentBanner]?.category;
-        
+
         const loadProducts = async () => {
             setFetchingProducts(true);
             try {
                 // 1. Try fetching products filtered by category
-                let url = activeCategory 
-                    ? `${API}/api/products?category=${activeCategory}&limit=2` 
+                let url = activeCategory
+                    ? `${API}/api/products?category=${activeCategory}&limit=2`
                     : `${API}/api/products?limit=2`;
-                
+
                 let res = await fetch(url);
                 let data = res.ok ? await res.json() : { products: [] };
 
@@ -430,7 +467,7 @@ const FeaturedShowcase = () => {
                         data = await fallbackRes.json();
                     }
                 }
-                
+
                 if (data.products) {
                     setProducts(data.products.map(p => ({
                         id: p._id,
@@ -440,7 +477,6 @@ const FeaturedShowcase = () => {
                         reviews: p.numReviews || 12,
                         originalPrice: p.rentalPrice ? Math.round(p.rentalPrice * 1.5) : 8999,
                         rentPrice: p.rentalPrice || 5000,
-                        isNew: p.isNew || false
                     })));
                 }
             } catch (err) {
@@ -457,16 +493,18 @@ const FeaturedShowcase = () => {
     if (loading) return null;
 
     return (
-        <section className="bg-white py-12 md:py-20 overflow-hidden">
-            <div className="max-w-[1200px] mx-auto px-4 sm:px-6">
-                <div 
-                    className="flex flex-col lg:flex-row items-stretch"
-                    style={{ gap: isDesktop ? "35px" : "20px" }}
+        <section className="bg-white py-12 md:py-16">
+            <div className="max-w-[1224px] mx-auto px-4 sm:px-6"> 
+                {/* 1200px inner + padding roughly matches other components */}
+                <div
+                    className="flex flex-col lg:flex-row items-stretch justify-center"
+                    style={{ gap: isDesktop ? "24px" : "20px" }}
                 >
-                    {/* Left: Product Cards */}
+                    {/* Left: Product Cards Cluster (Fits 588px) */}
                     <div 
-                        className="flex flex-col md:flex-row items-stretch gap-4 md:gap-6 flex-1 lg:flex-none transition-all duration-500"
+                        className="flex flex-col md:flex-row items-stretch gap-4 md:gap-[18px] transition-all duration-500"
                         style={{ 
+                            width: isDesktop ? "588px" : "100%",
                             opacity: fetchingProducts ? 0.6 : 1,
                             transform: fetchingProducts ? 'translateX(-10px)' : 'translateX(0)',
                             filter: fetchingProducts ? 'blur(1px)' : 'none'
@@ -475,21 +513,20 @@ const FeaturedShowcase = () => {
                         {products[0] ? (
                             <ShowcaseProductCard product={products[0]} isDesktop={isDesktop} handleAddToCart={handleAddToCart} />
                         ) : (
-                             /* Placeholder if no products found for category */
-                             <div className="w-[285px] h-[387px] bg-gray-50 rounded-[16px] border border-gray-100 flex items-center justify-center text-gray-300 italic text-sm">No products found</div>
+                            <div className="w-[285px] h-[387px] bg-gray-50 rounded-xl border border-gray-100 flex items-center justify-center text-gray-300 italic text-sm">No products found</div>
                         )}
-                        
+
                         {products[1] && (
                             <ShowcaseProductCard product={products[1]} isDesktop={isDesktop} handleAddToCart={handleAddToCart} />
                         )}
                     </div>
 
-                    {/* Right: Banner Carousel */}
-                    <div className="w-full lg:w-[560px] shrink-0">
+                    {/* Right: Banner Carousel (Adjusted to fit 1152px total content) */}
+                    <div className="w-full lg:w-[540px] shrink-0">
                         <BannerCarousel 
                             banners={cms.banners} 
                             current={currentBanner} 
-                            setCurrent={setCurrentBanner}
+                            setCurrent={setCurrentBanner} 
                             height="387px" 
                         />
                     </div>

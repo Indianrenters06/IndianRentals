@@ -233,9 +233,9 @@ const RentalProcess = () => {
                                             opacity: 1
                                         }}
                                     >
-                                        <div className="flex flex-col h-full justify-between">
+                                        <div className={`flex flex-col h-full ${isActive ? 'justify-between' : 'justify-center'}`}>
                                             {/* Top Section */}
-                                            <div className="flex flex-col p-5" style={{ gap: isActive ? '12px' : '9px' }}>
+                                            <div className={`flex flex-col px-5 ${isActive ? 'pt-5' : ''}`} style={{ gap: isActive ? '12px' : '9px' }}>
                                                 <div className="flex items-center justify-between">
                                                     <div
                                                         style={{
@@ -249,15 +249,18 @@ const RentalProcess = () => {
                                                     >
                                                         <div className={isActive ? 'text-[#6B4B18]' : 'text-[#1D1D1F]'}><DynamicIcon name={step.icon} size={32} /></div>
                                                         <h3
-                                                            className={`font-semibold transition-all`}
+                                                            className={`transition-all`}
                                                             style={{
-                                                                color: isActive ? 'hsla(19, 84%, 26%, 1)' : '#1D1D1F',
-                                                                fontFamily: 'Manrope, sans-serif',
+                                                                color: isActive ? 'hsla(19, 84%, 26%, 1)' : 'hsla(0, 0%, 20%, 1)',
+                                                                fontFamily: '"Mona Sans", "Manrope", sans-serif',
                                                                 fontWeight: 600,
                                                                 fontSize: '20px',
                                                                 lineHeight: '28px',
                                                                 whiteSpace: 'nowrap',
-                                                                height: '28px'
+                                                                height: '28px',
+                                                                width: '144px',
+                                                                letterSpacing: '-0.02em',
+                                                                textAlign: 'left'
                                                             }}
                                                         >
                                                             {step.title}
@@ -308,11 +311,7 @@ const RentalProcess = () => {
                                                         </Link>
                                                     )}
                                                 </div>
-                                            ) : (
-                                                <div className="px-5 pb-5">
-                                                    <p className="text-[#1D1D1F]/40 text-[15px] leading-none font-medium line-clamp-1">Click to see details</p>
-                                                </div>
-                                            )}
+                                            ) : null}
                                         </div>
                                     </div>
                                 );

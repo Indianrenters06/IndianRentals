@@ -228,16 +228,18 @@ const RentByCategory = () => {
                         />
                         <div className="flex items-center gap-2 shrink-0">
                             <button
-                                className="swiper-prev-cat-mobile w-9 h-9 rounded-full bg-white border border-gray-200 shadow-sm flex items-center justify-center hover:shadow-md hover:border-gray-300 transition-all"
+                                className="swiper-prev-cat-mobile w-[34px] h-[34px] rounded-[69px] flex items-center justify-center hover:opacity-80 transition-all"
+                                style={{ background: 'var(--color-grey-grey-100, hsla(0, 0%, 93%, 1))', opacity: 1 }}
                                 aria-label="Previous"
                             >
-                                <CaretLeft size={20} weight="regular" className="text-gray-800" />
+                                <CaretLeft size={16} weight="regular" className="text-gray-800" />
                             </button>
                             <button
-                                className="swiper-next-cat-mobile w-9 h-9 rounded-full bg-white border border-gray-200 shadow-sm flex items-center justify-center hover:shadow-md hover:border-gray-300 transition-all"
+                                className="swiper-next-cat-mobile w-[34px] h-[34px] rounded-[69px] flex items-center justify-center hover:opacity-80 transition-all"
+                                style={{ background: 'var(--color-grey-grey-100, hsla(0, 0%, 93%, 1))', opacity: 1 }}
                                 aria-label="Next"
                             >
-                                <CaretRight size={20} weight="regular" className="text-gray-800" />
+                                <CaretRight size={16} weight="regular" className="text-gray-800" />
                             </button>
                         </div>
                     </div>
@@ -299,16 +301,18 @@ const RentByCategory = () => {
                         {/* Nav arrows */}
                         <div className="flex items-center gap-3 shrink-0">
                             <button
-                                className="swiper-prev-cat w-10 h-10 rounded-full bg-white border border-gray-200 shadow-sm flex items-center justify-center hover:shadow-md hover:border-gray-300 transition-all"
+                                className="swiper-prev-cat w-[34px] h-[34px] rounded-[69px] flex items-center justify-center hover:opacity-80 transition-all"
+                                style={{ background: 'var(--color-grey-grey-100, hsla(0, 0%, 93%, 1))', opacity: 1 }}
                                 aria-label="Previous"
                             >
-                                <CaretLeft size={24} weight="regular" className="text-gray-800" />
+                                <CaretLeft size={18} weight="regular" className="text-gray-800" />
                             </button>
                             <button
-                                className="swiper-next-cat w-10 h-10 rounded-full bg-white border border-gray-200 shadow-sm flex items-center justify-center hover:shadow-md hover:border-gray-300 transition-all"
+                                className="swiper-next-cat w-[34px] h-[34px] rounded-[69px] flex items-center justify-center hover:opacity-80 transition-all"
+                                style={{ background: 'var(--color-grey-grey-100, hsla(0, 0%, 93%, 1))', opacity: 1 }}
                                 aria-label="Next"
                             >
-                                <CaretRight size={24} weight="regular" className="text-gray-800" />
+                                <CaretRight size={18} weight="regular" className="text-gray-800" />
                             </button>
                         </div>
                     </div>

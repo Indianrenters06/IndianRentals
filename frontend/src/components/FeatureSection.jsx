@@ -58,8 +58,8 @@ const FeatureSection = () => {
                         justifyContent: 'space-between',
                         borderRadius: isDesktop ? '30px' : '0px',
                         overflow: 'hidden',
-                        paddingTop: isDesktop ? '40px' : '24px',
-                        paddingBottom: isDesktop ? '40px' : '24px',
+                        paddingTop: isDesktop ? '25px' : '24px',
+                        paddingBottom: isDesktop ? '55px' : '24px',
                         paddingLeft: isDesktop ? '30px' : '24px',
                         paddingRight: isDesktop ? '60px' : '24px',
                         gap: isDesktop ? '0' : '10px'
@@ -124,6 +124,7 @@ const FeatureSection = () => {
                                     lineHeight: isDesktop ? '1.5' : '18px',
                                     maxWidth: isDesktop ? '235px' : 'none',
                                     overflow: 'hidden',
+                                    marginTop: isDesktop ? '12px' : '8px',
                                     marginBottom: isDesktop ? '0' : '4px'
                                 }}
                             >
@@ -317,7 +318,7 @@ const FeatureSection = () => {
                         whileInView={{ opacity: 1 }}
                         viewport={{ once: true }}
                         transition={{ delay: 0.5 }}
-                        className={isDesktop ? "w-full text-center relative z-10 order-4 pt-4 lg:absolute lg:bottom-[2px] lg:left-1/2 lg:-translate-x-1/2 pointer-events-none" : "w-full text-center relative z-20 order-4 mt-auto"}
+                        className={isDesktop ? "w-full text-center relative z-10 order-4 pt-4 lg:absolute lg:bottom-[12px] lg:left-1/2 lg:-translate-x-1/2 pointer-events-none" : "w-full text-center relative z-20 order-4 mt-auto"}
                     >
                         <h3 className="font-manrope text-[14px] md:text-xl font-bold tracking-tight pb-2">
                             <span className="text-[#3b82f6]">Built for </span>

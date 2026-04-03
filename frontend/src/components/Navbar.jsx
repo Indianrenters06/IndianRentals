@@ -179,30 +179,51 @@ const Navbar = () => {
         }
     };
 
+    const announcements = [
+        "♥ SAVE Extra 5% up to ₹100 on UPI Orders ♥",
+        "♥ Free Delivery on orders above ₹500 ♥",
+        "♥ Use code FIRSTRENT for 10% off your first month ♥"
+    ];
+    const [announcementIndex, setAnnouncementIndex] = useState(0);
+
+    useEffect(() => {
+        const interval = setInterval(() => {
+            setAnnouncementIndex(prev => (prev + 1) % announcements.length);
+        }, 5000);
+        return () => clearInterval(interval);
+    }, [announcements.length]);
+
     return (
         <header className="relative z-50 w-full" style={{ backgroundColor: "hsla(0, 0%, 100%, 1)", borderBottom: "1px solid hsla(0, 0%, 93%, 1)" }}>
             <div
-                className="bg-orange-300 text-black flex items-center justify-center w-full overflow-hidden"
-                style={{ height: "24px", paddingTop: "4px", paddingBottom: "4px", paddingLeft: "30px", paddingRight: "30px" }}
+                className="bg-orange-300 text-black flex items-center justify-center w-full overflow-hidden relative"
+                style={{ height: "24px", paddingTop: "4px", paddingBottom: "4px" }}
             >
-                <span
-                    style={{
-                        fontFamily: "Manrope, sans-serif",
-                        fontWeight: 700,
-                        fontSize: "12px",
-                        lineHeight: "16px",
-                        letterSpacing: "-0.4px",
-                        whiteSpace: "nowrap",
-                    }}
-                >
-                    ♥ SAVE Extra 5% up to ₹100 on UPI Orders ♥
-                </span>
+                <AnimatePresence mode="wait">
+                    <motion.span
+                        key={announcementIndex}
+                        initial={{ y: 20, opacity: 0 }}
+                        animate={{ y: 0, opacity: 1 }}
+                        exit={{ y: -20, opacity: 0 }}
+                        transition={{ duration: 0.5, ease: "easeInOut" }}
+                        className="absolute w-full text-center"
+                        style={{
+                            fontFamily: "'Mona Sans', sans-serif",
+                            fontWeight: 700,
+                            fontSize: "12px",
+                            lineHeight: "16px",
+                            letterSpacing: "-0.4px",
+                            whiteSpace: "nowrap",
+                        }}
+                    >
+                        {announcements[announcementIndex]}
+                    </motion.span>
+                </AnimatePresence>
             </div>
 
-            {/* Top Bar */}
             <div className="w-full bg-white">
                 <div 
-                    className="max-w-[1400px] mx-auto px-4 md:px-8 flex items-center justify-between" 
+                    className="max-w-[1200px] mx-auto px-4 md:px-8 flex items-center justify-between" 
                     style={{ height: "62px", gap: "10px" }}
                 >
                     <div className="flex items-center gap-8">
@@ -646,9 +667,8 @@ const Navbar = () => {
                 </div>
             </div>
 
-            {/* Secondary Nav - Categories */}
             <div className="hidden md:block bg-white w-full border-t border-gray-100">
-                <div className="max-w-[1400px] mx-auto px-4 md:px-8 h-[28px] flex items-center">
+                <div className="max-w-[1200px] mx-auto px-4 md:px-8 h-[28px] flex items-center">
                     <div className="flex items-center" style={{ width: "754px", height: "20px", gap: "17px" }}>
                         {navLinks.map((link, index) => (
                             <React.Fragment key={link.name}>

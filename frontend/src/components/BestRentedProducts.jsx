@@ -1,7 +1,7 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
-import { Heart, Star, Lightning, Truck, Info } from "@phosphor-icons/react";
+import { Heart, Star, Lightning, Truck, Info, CaretLeft, CaretRight } from "@phosphor-icons/react";
 import { motion } from "framer-motion";
 
 import { API } from "@/services/apiConfig";
@@ -38,9 +38,11 @@ const ProductCard = ({ product, index, isDesktop, handleAddToCart }) => {
                     opacity: 1
                 }}
                 variants={{
-                    initial: { height: isDesktop ? 387 : 256 },
+                    initial: { height: isDesktop ? 387 : 256, y: 0, boxShadow: "0px 2px 4px 0px hsla(0, 0%, 0%, 0.04)" },
                     hover: {
                         height: isDesktop ? 440 : 330,
+                        y: isDesktop ? -10 : -8,
+                        boxShadow: "0px 25px 50px -12px hsla(0, 0%, 0%, 0.15)",
                         transition: { duration: 0.3, ease: [0.45, 1.45, 0.8, 1] }
                     }
                 }}
@@ -167,7 +169,7 @@ const ProductCard = ({ product, index, isDesktop, handleAddToCart }) => {
                                     <Star key={s} size={isDesktop ? 14 : 12} weight="fill" className={s <= Math.round(product.rating || 4) ? "" : "opacity-20"} />
                                 ))}
                             </div>
-                            <span 
+                            <span
                                 className="ml-1"
                                 style={{
                                     fontFamily: "'Mona Sans', sans-serif",
@@ -182,7 +184,7 @@ const ProductCard = ({ product, index, isDesktop, handleAddToCart }) => {
                         </div>
                         <div className="flex items-center gap-1.5" style={{ color: "hsla(0, 0%, 46%, 1)" }}>
                             <Truck size={isDesktop ? 16 : 14} weight="regular" />
-                            <span 
+                            <span
                                 className="font-manrope"
                                 style={{
                                     fontSize: "12px",
@@ -207,7 +209,7 @@ const ProductCard = ({ product, index, isDesktop, handleAddToCart }) => {
                             marginTop: "-4px"
                         }}
                     >
-                        <span 
+                        <span
                             className="lowercase"
                             style={{
                                 fontFamily: "'Mona Sans', sans-serif",
@@ -220,7 +222,7 @@ const ProductCard = ({ product, index, isDesktop, handleAddToCart }) => {
                             from
                         </span>
                         {product.originalPrice && (
-                            <span 
+                            <span
                                 className="line-through decoration-[1.5px]"
                                 style={{
                                     fontFamily: "'Mona Sans', sans-serif",
@@ -233,7 +235,7 @@ const ProductCard = ({ product, index, isDesktop, handleAddToCart }) => {
                                 ₹{product.originalPrice}
                             </span>
                         )}
-                        <span 
+                        <span
                             className="font-bold tracking-tight ml-1 leading-none"
                             style={{
                                 fontFamily: "'Mona Sans', sans-serif",
@@ -245,7 +247,7 @@ const ProductCard = ({ product, index, isDesktop, handleAddToCart }) => {
                         >
                             ₹{product.rentPrice}
                         </span>
-                        <span 
+                        <span
                             className="lowercase"
                             style={{
                                 fontFamily: "'Mona Sans', sans-serif",
@@ -402,7 +404,7 @@ const BestRentedProducts = ({ type = "bestRented", defaultTitle = "Curated Produ
 
     return (
         <section
-            className="overflow-hidden py-12 md:py-16"
+            className="py-12 md:py-16"
             style={{
                 minHeight: '449px',
                 background: '#FFFFFF'
@@ -441,7 +443,7 @@ const BestRentedProducts = ({ type = "bestRented", defaultTitle = "Curated Produ
                             delay: 4000,
                             disableOnInteraction: false,
                         }}
-                        className="!pb-0"
+                        className="!pb-0 !overflow-visible"
                     >
                         {products.map((product, index) => (
                             <SwiperSlide key={product.id || index} style={{ width: '285px' }}>
@@ -459,24 +461,22 @@ const BestRentedProducts = ({ type = "bestRented", defaultTitle = "Curated Produ
                     <div className="flex items-center gap-6 mt-10">
                         <div
                             className={`swiper-scrollbar-${sectionSuffix} flex-1`}
-                            style={{ height: '3.5px', position: 'relative' }}
+                            style={{ height: '2px', position: 'relative' }}
                         />
                         <div className="flex items-center gap-3 shrink-0">
                             <button
-                                className={`swiper-prev-${sectionSuffix} w-10 h-10 rounded-full bg-white border border-gray-200 shadow-sm flex items-center justify-center hover:shadow-md hover:border-gray-300 transition-all group`}
+                                className={`swiper-prev-${sectionSuffix} w-[34px] h-[34px] rounded-[69px] flex items-center justify-center hover:opacity-80 transition-all`}
+                                style={{ background: 'var(--color-grey-grey-100, hsla(0, 0%, 93%, 1))', opacity: 1 }}
                                 aria-label="Previous"
                             >
-                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" className="text-gray-400 group-hover:text-gray-800 transition-colors">
-                                    <path d="M15 18L9 12L15 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                                </svg>
+                                <CaretLeft size={18} weight="regular" className="text-gray-800" />
                             </button>
                             <button
-                                className={`swiper-next-${sectionSuffix} w-10 h-10 rounded-full bg-white border border-gray-200 shadow-sm flex items-center justify-center hover:shadow-md hover:border-gray-300 transition-all group`}
+                                className={`swiper-next-${sectionSuffix} w-[34px] h-[34px] rounded-[69px] flex items-center justify-center hover:opacity-80 transition-all`}
+                                style={{ background: 'var(--color-grey-grey-100, hsla(0, 0%, 93%, 1))', opacity: 1 }}
                                 aria-label="Next"
                             >
-                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" className="text-gray-400 group-hover:text-gray-800 transition-colors">
-                                    <path d="M9 18L15 12L9 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                                </svg>
+                                <CaretRight size={18} weight="regular" className="text-gray-800" />
                             </button>
                         </div>
                     </div>
@@ -507,14 +507,14 @@ const BestRentedProducts = ({ type = "bestRented", defaultTitle = "Curated Produ
 
             <style>{`
                 .swiper-scrollbar-${sectionSuffix} {
-                    background: hsla(0, 0%, 20%, 0.12) !important;
+                    background: hsla(0, 0%, 93%, 1) !important;
                     border-radius: 0 !important;
-                    height: 3.5px !important;
+                    height: 2px !important;
                     overflow: hidden;
                     position: relative;
                 }
                 .swiper-scrollbar-${sectionSuffix} .swiper-scrollbar-drag {
-                    background: hsla(0, 0%, 20%, 1) !important;
+                    background: #1A1A1A !important;
                     border-radius: 0 !important;
                     height: 100% !important;
                 }

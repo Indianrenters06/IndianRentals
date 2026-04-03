@@ -131,23 +131,50 @@ const Hero = () => {
     return (
         <section className="bg-white pt-2 md:pt-6 pb-4 md:pb-10 w-full overflow-x-clip">
             {/* Mobile View */}
-            <div className="md:hidden flex overflow-x-auto snap-x snap-mandatory px-4 gap-3 no-scrollbar" style={{ height: "369px" }}>
-                {slides.map((s, i) => (
-                    <div key={i} className="snap-center shrink-0 rounded-lg relative h-full flex flex-col p-4 overflow-hidden"
-                        style={{ width: "216px", background: s.bgGradient || s.bgColor }}>
-                        <div className="absolute top-0 left-0 w-full h-[220px]">
-                            <Image src={s.image || FALLBACK_SLIDES[0].image} alt={s.title} fill unoptimized className="object-contain drop-shadow-gray-50" />
+            <div className="md:hidden relative w-full h-[369px] group">
+                <div 
+                    id="mobile-hero-slider"
+                    className="flex overflow-x-auto snap-x snap-mandatory px-4 gap-3 no-scrollbar h-full scroll-smooth"
+                    onScroll={(e) => {
+                        const scrollLeft = e.currentTarget.scrollLeft;
+                        const width = e.currentTarget.offsetWidth - 32; // adjusted for px-4
+                        const index = Math.round(scrollLeft / width);
+                        if (index !== activeSlideIndex) {
+                            setCurrentIndex(index + CLONES_AT_START);
+                        }
+                    }}
+                >
+                    {slides.map((s, i) => (
+                        <div key={i} className="snap-center shrink-0 rounded-[24px] relative h-full flex flex-col p-6 overflow-hidden shadow-sm"
+                            style={{ width: "calc(100vw - 32px)", background: s.bgGradient || s.bgColor }}>
+                            <div className="absolute top-0 left-0 w-full h-[220px]">
+                                <Image src={s.image || FALLBACK_SLIDES[0].image} alt={s.title} fill unoptimized className="object-contain drop-shadow-lg" />
+                            </div>
+                            <div className="mt-auto relative z-10" style={{ color: s.textColor || "#fff" }}>
+                                <h1 className="text-xl font-bold leading-tight mb-2">{s.title}</h1>
+                                <p className="text-xs opacity-90 mb-4">{s.subtitle}</p>
+                                <Button href={s.ctaLink || "/store"} className="h-9 rounded-full bg-[#fbc02d] text-black text-xs px-5 font-bold shadow-md">
+                                    {(s.ctaText || "Rent Now").replace(/ [^\w\s]+.*$| [→➔➜]|^.*[→➔➜]$| \-\>/g, "").trim()}
+                                </Button>
+                            </div>
+                            {s.slideLink && <Link href={s.slideLink} className="absolute inset-0 z-20" />}
                         </div>
-                        <div className="mt-auto relative z-10" style={{ color: s.textColor || "#fff" }}>
-                            <h1 className="text-sm font-bold leading-tight mb-1">{s.title}</h1>
-                            <p className="text-[10px] opacity-90 mb-2">{s.subtitle}</p>
-                            <Button href={s.ctaLink || "/store"} className="h-6 rounded-full bg-[#fbc02d] text-black text-[8px] px-3 font-bold">
-                                {(s.ctaText || "Rent Now").replace(/ [^\w\s]+.*$| [→➔➜]|^.*[→➔➜]$| \-\>/g, "").trim()}
-                            </Button>
-                        </div>
-                        {s.slideLink && <Link href={s.slideLink} className="absolute inset-0 z-20" />}
-                    </div>
-                ))}
+                    ))}
+                </div>
+                
+                {/* Mobile Dots */}
+                <div className="absolute bottom-4 left-0 right-0 flex justify-center items-center gap-1.5 z-30">
+                    {slides.map((_, i) => (
+                        <div 
+                            key={i} 
+                            className={`transition-all duration-300 rounded-full ${
+                                i === activeSlideIndex 
+                                ? "w-[24px] h-[6px] bg-white opacity-100" 
+                                : "w-[6px] h-[6px] bg-white/40"
+                            }`} 
+                        />
+                    ))}
+                </div>
             </div>
 
             {/* Desktop View */}
@@ -175,26 +202,40 @@ const Hero = () => {
                     </div>
 
                     {/* Navigation */}
-                    <div className="absolute inset-x-0 top-1/2 -translate-y-1/2 pointer-events-none z-30 max-w-[1280px] mx-auto px-4 flex items-center justify-between">
+                    <div 
+                        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none z-30 flex items-center justify-between"
+                        style={{ width: `${mainWidth + GAP + 26}px` }}
+                    >
                         <button
                             onClick={prev}
-                            className="pointer-events-auto w-14 h-14 bg-white/95 backdrop-blur-md shadow-2xl rounded-full flex items-center justify-center hover:bg-white hover:scale-110 active:scale-95 transition-all opacity-0 group-hover:opacity-100"
+                            className="pointer-events-auto w-[26px] h-[40px] rounded-[9px] flex items-center justify-center hover:scale-110 active:scale-95 transition-all opacity-0 group-hover:opacity-100 shadow-sm"
+                            style={{ background: "var(--color-grey-grey-100, hsla(0, 0%, 93%, 1))" }}
                         >
-                            <CaretLeft size={24} weight="regular" className="text-gray-800" />
+                            <CaretLeft size={20} weight="regular" className="text-gray-800" />
                         </button>
                         <button
                             onClick={next}
-                            className="pointer-events-auto w-14 h-14 bg-white/95 backdrop-blur-md shadow-2xl rounded-full flex items-center justify-center hover:bg-white hover:scale-110 active:scale-95 transition-all opacity-0 group-hover:opacity-100"
+                            className="pointer-events-auto w-[26px] h-[40px] rounded-[9px] flex items-center justify-center hover:scale-110 active:scale-95 transition-all opacity-0 group-hover:opacity-100 shadow-sm"
+                            style={{ background: "var(--color-grey-grey-100, hsla(0, 0%, 93%, 1))" }}
                         >
-                            <CaretRight size={24} weight="regular" className="text-gray-800" />
+                            <CaretRight size={20} weight="regular" className="text-gray-800" />
                         </button>
                     </div>
 
-                    <div className="absolute bottom-6 left-0 right-0 z-30 flex justify-center items-center gap-3">
-                        {slides.map((_, i) => (
-                            <button key={i} onClick={() => isTransitioning && setCurrentIndex(i + CLONES_AT_START)}
-                                className={`rounded-full transition-all duration-300 ${i === activeSlideIndex ? "w-10 h-2 bg-white shadow-md" : "w-2 h-2 bg-white/40 hover:bg-white/60"}`} />
-                        ))}
+                    <div className="absolute bottom-10 left-1/2 -translate-x-1/2 z-30 pointer-events-none flex justify-start" style={{ width: `${mainWidth}px` }}>
+                        <div className="flex items-center gap-2 pointer-events-auto px-16">
+                            {slides.map((_, i) => (
+                                <button 
+                                    key={i} 
+                                    onClick={() => isTransitioning && setCurrentIndex(i + CLONES_AT_START)}
+                                    className={`transition-all duration-300 rounded-full ${
+                                        i === activeSlideIndex 
+                                        ? "w-[36px] h-[8px] bg-white shadow-md active:scale-95" 
+                                        : "w-[8px] h-[8px] bg-white/40 hover:bg-white/60 hover:scale-110 active:scale-90"
+                                    }`} 
+                                />
+                            ))}
+                        </div>
                     </div>
                 </div>
             </div>
@@ -204,10 +245,35 @@ const Hero = () => {
 
 const SlideItem = ({ slide, isActive, width }) => {
     const content = (
-        <div className="w-full h-full px-16 grid grid-cols-2 gap-12 items-center">
+        <div className="w-full h-full px-16 grid grid-cols-[1.2fr_0.8fr] gap-4 items-center">
             <div className={`space-y-6 transition-all duration-700 ${isActive ? 'opacity-100 translate-y-0 scale-100 blur-0' : 'opacity-30 -translate-y-4 scale-95 origin-left blur-[1px]'}`} style={{ color: slide.textColor || "#fff" }}>
-                <h1 className="text-[48px] leading-[1.1] font-bold tracking-tight">{slide.title}</h1>
-                <p className="text-[18px] opacity-90 font-medium leading-relaxed max-w-md">{slide.subtitle}</p>
+                <h1 
+                    className="tracking-tight"
+                    style={{
+                        width: '630px',
+                        fontFamily: "'Mona Sans', sans-serif",
+                        fontSize: "48px",
+                        fontWeight: 600,
+                        lineHeight: "56px",
+                        letterSpacing: "-0.01em",
+                        marginBottom: "16px"
+                    }}
+                >
+                    {slide.title}
+                </h1>
+                <p 
+                    className="opacity-90 leading-relaxed"
+                    style={{
+                        fontFamily: "'Mona Sans', sans-serif",
+                        fontSize: "14px",
+                        fontWeight: 400,
+                        maxWidth: "520px",
+                        lineHeight: "22px",
+                        marginBottom: "24px"
+                    }}
+                >
+                    {slide.subtitle}
+                </p>
                 <div className="pt-2">
                     <Button href={slide.ctaLink || "/store"} variant="yellow" size="md" className="w-auto! rounded-full! px-10 py-4 font-bold inline-flex shadow-lg hover:scale-105 transition-transform">
                         {(slide.ctaText || "Rent Now").replace(/ [^\w\s]+.*$| [→➔➜]|^.*[→➔➜]$| \-\>/g, "").trim()}
