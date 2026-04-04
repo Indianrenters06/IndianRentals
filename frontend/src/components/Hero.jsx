@@ -68,18 +68,24 @@ const Hero = () => {
     const CLONES_AT_START = 2;
 
     const [mainWidth, setMainWidth] = useState(1200);
+    const [viewType, setViewType] = useState('mobile');
 
     useEffect(() => {
-        const updateWidth = () => {
-            if (window.innerWidth < 1440) {
-                setMainWidth(Math.min(1200, window.innerWidth * 0.90));
+        const updateView = () => {
+            const w = window.innerWidth;
+            if (w >= 1024) setViewType('desktop');
+            else if (w >= 768) setViewType('tablet');
+            else setViewType('mobile');
+
+            if (w < 1440) {
+                setMainWidth(Math.min(1200, w * 0.90));
             } else {
                 setMainWidth(1200);
             }
         };
-        updateWidth();
-        window.addEventListener('resize', updateWidth);
-        return () => window.removeEventListener('resize', updateWidth);
+        updateView();
+        window.addEventListener('resize', updateView);
+        return () => window.removeEventListener('resize', updateView);
     }, []);
 
     const displaySlides = [...slides.slice(-CLONES_AT_START), ...slides, ...slides.slice(0, CLONES_AT_START)];
@@ -128,16 +134,20 @@ const Hero = () => {
 
     const translateX = -(currentIndex * (SIDE_WIDTH + GAP) + mainWidth / 2);
 
+    // Tablet slide height: 380 - 24 (pt) - 24 (pb) = 332px
+    const slideHeight = viewType === 'tablet' ? 332 : 500;
+    const trackHeight = viewType === 'tablet' ? 332 : 510;
+
     return (
         <section className="bg-white pt-2 md:pt-6 pb-4 md:pb-10 w-full overflow-x-clip">
             {/* Mobile View */}
-            <div className="md:hidden relative w-full h-[369px] group">
-                <div 
+            <div className={`${viewType === 'mobile' ? 'block' : 'hidden'} relative w-full h-[369px] group`}>
+                <div
                     id="mobile-hero-slider"
                     className="flex overflow-x-auto snap-x snap-mandatory px-4 gap-3 no-scrollbar h-full scroll-smooth"
                     onScroll={(e) => {
                         const scrollLeft = e.currentTarget.scrollLeft;
-                        const width = e.currentTarget.offsetWidth - 32; // adjusted for px-4
+                        const width = e.currentTarget.offsetWidth - 32;
                         const index = Math.round(scrollLeft / width);
                         if (index !== activeSlideIndex) {
                             setCurrentIndex(index + CLONES_AT_START);
@@ -154,36 +164,50 @@ const Hero = () => {
                                 <h1 className="text-xl font-bold leading-tight mb-2">{s.title}</h1>
                                 <p className="text-xs opacity-90 mb-4">{s.subtitle}</p>
                                 <Button href={s.ctaLink || "/store"} className="h-9 rounded-full bg-[#fbc02d] text-black text-xs px-5 font-bold shadow-md">
-                                    {(s.ctaText || "Rent Now").replace(/ [^\w\s]+.*$| [→➔➜]|^.*[→➔➜]$| \-\>/g, "").trim()}
+                                    {(s.ctaText || "Rent Now").replace(/ [^\w\s]+.*$| [→➔➜]|^.*[→➔➜]$| \->/g, "").trim()}
                                 </Button>
                             </div>
                             {s.slideLink && <Link href={s.slideLink} className="absolute inset-0 z-20" />}
                         </div>
                     ))}
                 </div>
-                
+
                 {/* Mobile Dots */}
                 <div className="absolute bottom-4 left-0 right-0 flex justify-center items-center gap-1.5 z-30">
                     {slides.map((_, i) => (
-                        <div 
-                            key={i} 
+                        <div
+                            key={i}
                             className={`transition-all duration-300 rounded-full ${
-                                i === activeSlideIndex 
-                                ? "w-[24px] h-[6px] bg-white opacity-100" 
+                                i === activeSlideIndex
+                                ? "w-[24px] h-[6px] bg-white opacity-100"
                                 : "w-[6px] h-[6px] bg-white/40"
-                            }`} 
+                            }`}
                         />
                     ))}
                 </div>
             </div>
 
-            {/* Desktop View */}
-            <div className="hidden md:flex flex-col items-center w-full relative group" style={{ minHeight: "530px", paddingTop: "0px" }}>
-                <div className="relative w-full h-[510px] flex items-center justify-center overflow-visible">
+            {/* Tablet / Desktop View — identical layout, just scaled on tablet */}
+            <div
+                className={`${viewType === 'mobile' ? 'hidden' : 'flex'} flex-col items-center w-full relative group`}
+                style={{
+                    minHeight: viewType === 'tablet' ? '380px' : '530px',
+                    paddingTop: viewType === 'tablet' ? '24px' : '0px',
+                    paddingBottom: viewType === 'tablet' ? '24px' : '0px',
+                    background: viewType === 'tablet'
+                        ? 'radial-gradient(181.93% 64.7% at 50% 72.89%, #FFFFFF 0%, #D6F1FF 100%)'
+                        : 'transparent'
+                }}
+            >
+                <div
+                    className="relative w-full flex items-center justify-center overflow-visible"
+                    style={{ height: `${trackHeight}px` }}
+                >
                     <div
                         onTransitionEnd={handleTransitionEnd}
-                        className={`flex h-[500px] absolute left-1/2 items-center ${isTransitioning ? 'transition-all duration-700 ease-[cubic-bezier(0.25,1,0.5,1)]' : 'transition-none'}`}
+                        className={`flex absolute left-1/2 items-center ${isTransitioning ? 'transition-all duration-700 ease-[cubic-bezier(0.25,1,0.5,1)]' : 'transition-none'}`}
                         style={{
+                            height: `${slideHeight}px`,
                             transform: `translateX(${translateX}px)`,
                             gap: `${GAP}px`
                         }}
@@ -196,13 +220,15 @@ const Hero = () => {
                                     slide={s}
                                     width={isCurrent ? `${mainWidth}px` : `${SIDE_WIDTH}px`}
                                     isActive={isCurrent}
+                                    viewType={viewType}
+                                    slideHeight={slideHeight}
                                 />
                             );
                         })}
                     </div>
 
-                    {/* Navigation */}
-                    <div 
+                    {/* Navigation Arrows */}
+                    <div
                         className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none z-30 flex items-center justify-between"
                         style={{ width: `${mainWidth + GAP + 26}px` }}
                     >
@@ -222,17 +248,18 @@ const Hero = () => {
                         </button>
                     </div>
 
+                    {/* Slide Dots */}
                     <div className="absolute bottom-10 left-1/2 -translate-x-1/2 z-30 pointer-events-none flex justify-start" style={{ width: `${mainWidth}px` }}>
                         <div className="flex items-center gap-2 pointer-events-auto px-16">
                             {slides.map((_, i) => (
-                                <button 
-                                    key={i} 
+                                <button
+                                    key={i}
                                     onClick={() => isTransitioning && setCurrentIndex(i + CLONES_AT_START)}
                                     className={`transition-all duration-300 rounded-full ${
-                                        i === activeSlideIndex 
-                                        ? "w-[36px] h-[8px] bg-white shadow-md active:scale-95" 
+                                        i === activeSlideIndex
+                                        ? "w-[36px] h-[8px] bg-white shadow-md active:scale-95"
                                         : "w-[8px] h-[8px] bg-white/40 hover:bg-white/60 hover:scale-110 active:scale-90"
-                                    }`} 
+                                    }`}
                                 />
                             ))}
                         </div>
@@ -243,45 +270,66 @@ const Hero = () => {
     );
 };
 
-const SlideItem = ({ slide, isActive, width }) => {
+const SlideItem = ({ slide, isActive, width, viewType, slideHeight }) => {
+    const isTablet = viewType === 'tablet';
+
     const content = (
         <div className="w-full h-full px-16 grid grid-cols-[1.2fr_0.8fr] gap-4 items-center">
-            <div className={`space-y-6 transition-all duration-700 ${isActive ? 'opacity-100 translate-y-0 scale-100 blur-0' : 'opacity-30 -translate-y-4 scale-95 origin-left blur-[1px]'}`} style={{ color: slide.textColor || "#fff" }}>
-                <h1 
+            {/* Left: Text */}
+            <div
+                className={`transition-all duration-700 ${isActive ? 'opacity-100 translate-y-0 scale-100 blur-0' : 'opacity-30 -translate-y-4 scale-95 origin-left blur-[1px]'}`}
+                style={{ color: slide.textColor || "#fff", display: 'flex', flexDirection: 'column', gap: isTablet ? '8px' : '16px' }}
+            >
+                <h1
                     className="tracking-tight"
                     style={{
-                        width: '630px',
+                        width: viewType === 'desktop' ? '630px' : '100%',
+                        maxWidth: viewType === 'desktop' ? '630px' : (isTablet ? '420px' : '480px'),
                         fontFamily: "'Mona Sans', sans-serif",
-                        fontSize: "48px",
+                        fontSize: viewType === 'desktop' ? "48px" : (isTablet ? "32px" : "36px"),
                         fontWeight: 600,
-                        lineHeight: "56px",
+                        lineHeight: viewType === 'desktop' ? "56px" : (isTablet ? "38px" : "42px"),
                         letterSpacing: "-0.01em",
-                        marginBottom: "16px"
                     }}
                 >
                     {slide.title}
                 </h1>
-                <p 
+                <p
                     className="opacity-90 leading-relaxed"
                     style={{
                         fontFamily: "'Mona Sans', sans-serif",
-                        fontSize: "14px",
+                        fontSize: isTablet ? "12px" : "14px",
                         fontWeight: 400,
-                        maxWidth: "520px",
-                        lineHeight: "22px",
-                        marginBottom: "24px"
+                        maxWidth: isTablet ? "380px" : "520px",
+                        lineHeight: isTablet ? "18px" : "22px",
                     }}
                 >
                     {slide.subtitle}
                 </p>
-                <div className="pt-2">
-                    <Button href={slide.ctaLink || "/store"} variant="yellow" size="md" className="w-auto! rounded-full! px-10 py-4 font-bold inline-flex shadow-lg hover:scale-105 transition-transform">
-                        {(slide.ctaText || "Rent Now").replace(/ [^\w\s]+.*$| [→➔➜]|^.*[→➔➜]$| \-\>/g, "").trim()}
+                <div>
+                    <Button
+                        href={slide.ctaLink || "/store"}
+                        variant="yellow"
+                        size="md"
+                        className={`w-auto! rounded-full! font-bold inline-flex shadow-lg hover:scale-105 transition-transform ${isTablet ? 'px-8 py-2' : 'px-10 py-4'}`}
+                    >
+                        {(slide.ctaText || "Rent Now").replace(/ [^\w\s]+.*$| [→➔➜]|^.*[→➔➜]$| \->/g, "").trim()}
                     </Button>
                 </div>
             </div>
-            <div className={`relative h-[420px] w-full transition-all duration-700 ${isActive ? 'opacity-100 scale-105 rotate-0 blur-0' : 'opacity-30 scale-90 -rotate-3 blur-[1px]'}`}>
-                <Image src={slide.image || "https://res.cloudinary.com/dgkckcdk8/image/upload/v1769946716/indian-rentals/fj8ptqbhppbstdd0hs4i.png"} alt={slide.title} fill unoptimized className="object-contain drop-shadow-[0_35px_35px_rgba(0,0,0,0.3)]" />
+
+            {/* Right: Image */}
+            <div
+                className={`relative w-full transition-all duration-700 ${isActive ? 'opacity-100 scale-105 rotate-0 blur-0' : 'opacity-30 scale-90 -rotate-3 blur-[1px]'}`}
+                style={{ height: isTablet ? '280px' : '420px' }}
+            >
+                <Image
+                    src={slide.image || "https://res.cloudinary.com/dgkckcdk8/image/upload/v1769946716/indian-rentals/fj8ptqbhppbstdd0hs4i.png"}
+                    alt={slide.title}
+                    fill
+                    unoptimized
+                    className="object-contain drop-shadow-[0_35px_35px_rgba(0,0,0,0.3)]"
+                />
             </div>
         </div>
     );
@@ -289,7 +337,7 @@ const SlideItem = ({ slide, isActive, width }) => {
     const containerStyle = {
         width: width,
         minWidth: width,
-        height: '500px',
+        height: `${slideHeight}px`,
         background: slide.bgGradient || slide.bgColor,
         opacity: isActive ? 1 : 0.85,
         boxShadow: isActive ? '0 30px 60px -12px rgba(0,0,0,0.3)' : '0 10px 20px -5px rgba(0,0,0,0.1)',

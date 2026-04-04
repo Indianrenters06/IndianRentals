@@ -32,6 +32,19 @@ const RentByCategory = () => {
         enabled: true,
         title: "Rent by Category"
     });
+    const [viewType, setViewType] = React.useState('mobile');
+
+    React.useEffect(() => {
+        const checkRes = () => {
+            const w = window.innerWidth;
+            if (w >= 1024) setViewType('desktop');
+            else if (w >= 768) setViewType('tablet');
+            else setViewType('mobile');
+        };
+        checkRes();
+        window.addEventListener('resize', checkRes);
+        return () => window.removeEventListener('resize', checkRes);
+    }, []);
 
     const getCategoryRoute = (cat) => {
         const lowerName = cat.name.toLowerCase();
@@ -168,8 +181,8 @@ const RentByCategory = () => {
                     </Link>
                 </div>
 
-                {/* Mobile Swiper Carousel with caret navigation */}
-                <div className="md:hidden relative">
+                {/* Mobile Swiper Carousel */}
+                <div className={`${viewType === 'mobile' ? 'block' : 'hidden'} relative`}>
                     <Swiper
                         modules={[Navigation, Scrollbar]}
                         spaceBetween={10}
@@ -245,11 +258,17 @@ const RentByCategory = () => {
                     </div>
                 </div>
 
-                {/* Desktop Swiper */}
-                <div className="hidden md:block relative">
+                {/* Tablet/Desktop Swiper */}
+                <div className={`${viewType === 'mobile' ? 'hidden' : 'block'} relative`}>
+                    <div style={{
+                        width: viewType === 'tablet' ? '708px' : '100%',
+                        height: viewType === 'tablet' ? '208px' : 'auto',
+                        margin: viewType === 'tablet' ? '0 auto' : undefined,
+                        overflow: 'hidden'
+                    }}>
                     <Swiper
                         modules={[Navigation, Autoplay, Scrollbar]}
-                        spaceBetween={24}
+                        spaceBetween={viewType === 'tablet' ? 15 : 24}
                         slidesPerView={'auto'}
                         navigation={{
                             nextEl: '.swiper-next-cat',
@@ -267,9 +286,15 @@ const RentByCategory = () => {
                         className="!pb-0"
                     >
                         {displayCategories.map((cat, index) => (
-                            <SwiperSlide key={cat._id || index} style={{ width: '177px' }}>
+                            <SwiperSlide key={cat._id || index} style={{ width: viewType === 'tablet' ? '165px' : '177px' }}>
                                 <Link href={getCategoryRoute(cat)} className="group flex flex-col items-center cursor-pointer">
-                                    <div className="w-[177px] h-[173px] flex items-center justify-center mb-4 relative bg-white border border-gray-200 rounded-xl group-hover:border-orange-300/20 group-hover:shadow-lg transition-all duration-300 overflow-hidden shadow-md">
+                                    <div
+                                        className="flex items-center justify-center mb-2 relative bg-white border border-gray-200 rounded-xl group-hover:border-orange-300/20 group-hover:shadow-lg transition-all duration-300 overflow-hidden shadow-md"
+                                        style={{
+                                            width: viewType === 'tablet' ? '165px' : '177px',
+                                            height: viewType === 'tablet' ? '158px' : '173px'
+                                        }}
+                                    >
                                         {cat.image ? (
                                             <Image
                                                 src={cat.image}
@@ -283,13 +308,17 @@ const RentByCategory = () => {
                                             </div>
                                         )}
                                     </div>
-                                    <h3 className="text-[15px] font-semibold font-manrope text-gray-600 text-center group-hover:text-gray-700 transition-colors">
+                                    <h3
+                                        className="font-semibold font-manrope text-gray-600 text-center group-hover:text-gray-700 transition-colors"
+                                        style={{ fontSize: viewType === 'tablet' ? '12px' : '15px' }}
+                                    >
                                         {cat.name}
                                     </h3>
                                 </Link>
                             </SwiperSlide>
                         ))}
                     </Swiper>
+                    </div>
 
                     {/* Figma: scrollbar row — width 1164, height 34, gap 24px from cards */}
                     <div className="hidden md:flex items-center gap-6 mt-6">

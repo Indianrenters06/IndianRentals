@@ -227,12 +227,12 @@ const Navbar = () => {
                     style={{ height: "62px", gap: "10px" }}
                 >
                     <div className="flex items-center gap-8">
-                        {/* Left Section: Mobile Menu + Logo */}
+                        {/* Left Section: Mobile/Tablet Menu + Logo */}
                         <div className="flex items-center gap-3 md:gap-4">
-                            {/* Mobile Menu Toggle */}
+                            {/* Mobile/Tablet Menu Toggle */}
                             <button
                                 onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                                className="md:hidden text-gray-800 focus:outline-none p-1"
+                                className="lg:hidden text-gray-800 focus:outline-none p-1"
                             >
                                 {isMobileMenuOpen ? <X size={24} weight="fill" /> : <List size={24} weight="fill" />}
                             </button>
@@ -286,9 +286,8 @@ const Navbar = () => {
                         </div>
                     </div>
 
-                    {/* Right Actions (Desktop) */}
-                    {/* Right Actions (Desktop) */}
-                    <div className="hidden md:flex items-center justify-end" style={{ width: "auto", minWidth: "191px", height: "33px", gap: "8px" }}>
+                    {/* Right Actions (Desktop/Tablet) */}
+                    <div className="hidden lg:flex items-center justify-end" style={{ width: "auto", minWidth: "191px", height: "33px", gap: "8px" }}>
                         <div className="relative flex items-center shrink-0">
                             <button
                                 className="flex items-center outline-none h-[33px] group"
@@ -635,8 +634,8 @@ const Navbar = () => {
                     </div>
 
 
-                    {/* Mobile Controls (Right: Location + Cart) */}
-                    <div className="md:hidden flex items-center gap-3">
+                    {/* Tablet/Mobile Controls (Right: Location + Cart) */}
+                    <div className="lg:hidden flex items-center gap-3">
                         {/* Mobile Location Pill */}
                         <button
                             onClick={() => setIsCityDropdownOpen(!isCityDropdownOpen)}
@@ -667,7 +666,7 @@ const Navbar = () => {
                 </div>
             </div>
 
-            <div className="hidden md:block bg-white w-full border-t border-gray-100">
+            <div className="hidden lg:block bg-white w-full border-t border-gray-100">
                 <div className="max-w-[1200px] mx-auto px-4 md:px-8 h-[28px] flex items-center">
                     <div className="flex items-center" style={{ width: "754px", height: "20px", gap: "17px" }}>
                         {navLinks.map((link, index) => (
@@ -695,7 +694,7 @@ const Navbar = () => {
                         initial={{ opacity: 0, height: 0 }}
                         animate={{ opacity: 1, height: "auto" }}
                         exit={{ opacity: 0, height: 0 }}
-                        className="md:hidden bg-white border-t border-gray-100 overflow-hidden shadow-lg"
+                        className="lg:hidden bg-white border-t border-gray-100 overflow-hidden shadow-lg"
                     >
                         <div className="px-4 py-4 space-y-4">
                             {/* Mobile Search */}

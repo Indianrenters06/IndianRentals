@@ -40,12 +40,17 @@ const staticReviews = [
 ];
 
 const Testimonials = () => {
-    const [isDesktop, setIsDesktop] = useState(false);
+    const [viewType, setViewType] = useState('mobile');
     const [reviewsData, setReviewsData] = useState([]);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        const checkRes = () => setIsDesktop(window.innerWidth >= 1024);
+        const checkRes = () => {
+            const w = window.innerWidth;
+            if (w >= 1024) setViewType('desktop');
+            else if (w >= 768) setViewType('tablet');
+            else setViewType('mobile');
+        };
         checkRes();
         window.addEventListener('resize', checkRes);
         return () => window.removeEventListener('resize', checkRes);
@@ -137,60 +142,60 @@ const Testimonials = () => {
         <section
             className="w-full flex flex-col items-center"
             style={{
-                background: isDesktop ? '#F5F5F5' : 'hsla(0, 0%, 96%, 1)',
-                width: isDesktop ? '100%' : '390px',
-                height: isDesktop ? 'auto' : '404px',
+                background: viewType === 'desktop' ? '#F5F5F5' : (viewType === 'tablet' ? '#FFFFFF' : 'hsla(0, 0%, 96%, 1)'),
+                width: viewType === 'mobile' ? '390px' : '100%',
+                height: viewType === 'mobile' ? '404px' : 'auto',
                 margin: '0 auto',
                 overflow: 'hidden'
             }}
         >
-            {/* Outer Frame */}
             <div
                 className="w-full h-full mx-auto flex flex-col items-center"
                 style={{
-                    maxWidth: isDesktop ? '1200px' : '100%',
-                    paddingTop: isDesktop ? '96px' : '48px',
-                    paddingBottom: isDesktop ? '96px' : '48px',
-                    paddingLeft: isDesktop ? '24px' : '20px',
-                    paddingRight: isDesktop ? '24px' : '20px',
-                    gap: isDesktop ? '32px' : '10px'
+                    maxWidth: viewType === 'desktop' ? '1200px' : (viewType === 'tablet' ? '768px' : '100%'),
+                    paddingTop: viewType === 'desktop' ? '96px' : (viewType === 'tablet' ? '96px' : '48px'),
+                    paddingBottom: viewType === 'desktop' ? '96px' : (viewType === 'tablet' ? '96px' : '48px'),
+                    paddingLeft: viewType === 'desktop' ? '24px' : (viewType === 'tablet' ? '30px' : '20px'),
+                    paddingRight: viewType === 'desktop' ? '24px' : (viewType === 'tablet' ? '30px' : '20px'),
+                    gap: viewType === 'desktop' ? '32px' : (viewType === 'tablet' ? '24px' : '10px')
                 }}
             >
 
                 <div
-                    className="w-full flex flex-col md:flex-row md:items-end justify-between font-manrope mb-8 gap-6 md:gap-0"
+                    className="w-full flex justify-between font-manrope mb-10 gap-6"
+                    style={{
+                        flexDirection: viewType === 'desktop' ? 'row' : 'column',
+                        alignItems: viewType === 'desktop' ? 'flex-end' : 'flex-start'
+                    }}
                 >
                     <div
-                        className="flex flex-col md:w-[600px]"
+                        className="flex flex-col"
                         style={{
-                            width: isDesktop ? '600px' : '350px',
-                            height: isDesktop ? 'auto' : '81px',
-                            justifyContent: isDesktop ? 'flex-start' : 'space-between',
-                            gap: isDesktop ? '8px' : '0'
+                            width: viewType === 'desktop' ? '600px' : '100%',
+                            height: 'auto',
+                            justifyContent: 'flex-start',
+                            gap: viewType === 'desktop' ? '8px' : '8px'
                         }}
                     >
                         <h2
                             className="font-manrope font-bold"
                             style={{
-                                width: isDesktop ? 'auto' : '292px',
-                                height: isDesktop ? 'auto' : '31px',
-                                fontSize: isDesktop ? '38px' : '24px',
-                                color: isDesktop ? '#1D1D1F' : 'hsla(0, 0%, 20%, 1)',
-                                lineHeight: isDesktop ? '1.1' : '31px',
-                                tracking: isDesktop ? 'tight' : 'normal'
+                                width: '100%',
+                                fontSize: viewType === 'desktop' ? '38px' : '34px',
+                                color: viewType === 'desktop' ? '#1D1D1F' : '#333333',
+                                lineHeight: '1.2'
                             }}
                         >
                             What Our Customers Say
                         </h2>
                         <p
-                            className="font-manrope text-[#86868B] leading-snug max-w-[500px]"
+                            className="font-manrope leading-normal"
                             style={{
-                                width: isDesktop ? 'auto' : '350px',
-                                height: isDesktop ? 'auto' : '36px',
-                                fontSize: isDesktop ? '16px' : '13.5px',
+                                width: '100%',
+                                maxWidth: '600px',
+                                fontSize: viewType === 'desktop' ? '16px' : '15px',
                                 fontWeight: '500',
-                                color: isDesktop ? '#86868B' : 'hsla(0, 0%, 0%, 1)',
-                                lineHeight: isDesktop ? '1.2' : '18px'
+                                color: '#86868B'
                             }}
                         >
                             Real experiences from innovators, businesses, and creators powering their ambitions with IndianRenters.
@@ -198,7 +203,7 @@ const Testimonials = () => {
                     </div>
 
                     {/* Google Badge */}
-                    <div className="hidden md:flex items-center gap-2 self-end mb-2">
+                    <div className={`${viewType === 'desktop' ? 'flex' : 'hidden'} items-center gap-2 self-end mb-2`}>
                         <GoogleGLogo />
                         <span className="text-[13px] font-semibold text-[#1D1D1F]">5000+ reviews</span>
                         <div className="h-4 w-[1px] bg-[#D2D2D7] mx-1" />
@@ -211,40 +216,42 @@ const Testimonials = () => {
                     </div>
                 </div>
 
-                {/* Masonry Grid Container */}
+                {/* Grid Container */}
                 <div
-                    className="hidden lg:grid grid-cols-3 w-full"
+                    className={`${viewType === 'desktop' ? 'grid grid-cols-3' : (viewType === 'tablet' ? 'grid grid-cols-2' : 'hidden')} w-full`}
                     style={{
-                        minHeight: '1005px',
+                        minHeight: viewType === 'desktop' ? '1005px' : 'auto',
                         gap: '24px',
                         opacity: 1
                     }}
                 >
                     {/* Column 1 */}
-                    <div className="flex flex-col gap-6">
+                    <div className="flex flex-col" style={{ gap: viewType === 'desktop' ? '24px' : '20px' }}>
                         <TestimonialCard review={reviewsData[0] || staticReviews[0]} />
                         <TestimonialCard review={reviewsData[1] || staticReviews[1]} />
                         <TestimonialCard review={reviewsData[2] || staticReviews[2]} />
                     </div>
 
                     {/* Column 2 */}
-                    <div className="flex flex-col gap-6">
+                    <div className="flex flex-col" style={{ gap: viewType === 'desktop' ? '24px' : '20px' }}>
                         <TestimonialCard review={reviewsData[3] || staticReviews[3]} />
                         <TestimonialCard review={reviewsData[4] || staticReviews[4]} />
                         <TestimonialCard review={reviewsData[5] || staticReviews[5]} />
                     </div>
 
-                    {/* Column 3 */}
-                    <div className="flex flex-col gap-6">
-                        <TestimonialCard review={reviewsData[6] || staticReviews[6]} />
-                        <TestimonialCard review={reviewsData[7] || staticReviews[7]} />
-                        <TestimonialCard review={reviewsData[8] || staticReviews[8]} />
-                    </div>
+                    {/* Column 3 - Desktop Only */}
+                    {viewType === 'desktop' && (
+                        <div className="flex flex-col" style={{ gap: '24px' }}>
+                            <TestimonialCard review={reviewsData[6] || staticReviews[6]} />
+                            <TestimonialCard review={reviewsData[7] || staticReviews[7]} />
+                            <TestimonialCard review={reviewsData[8] || staticReviews[8]} />
+                        </div>
+                    )}
                 </div>
 
-                {/* Mobile: Original Horizontal Scroll Snap Carousel (lg:hidden) */}
+                {/* Mobile: Original Horizontal Scroll Snap Carousel */}
                 <div
-                    className="lg:hidden w-full overflow-x-auto snap-x snap-mandatory scrollbar-hide"
+                    className={`${viewType === 'mobile' ? 'block' : 'hidden'} w-full overflow-x-auto snap-x snap-mandatory scrollbar-hide`}
                     style={{ width: '350px', height: '203px' }}
                 >
                     <div className="flex gap-4 w-max px-2 h-full">

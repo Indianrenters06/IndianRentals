@@ -20,10 +20,12 @@ export default function Home() {
       <div className="hidden md:block">
         <FeaturedShowcase />
       </div>
-      <div className="hidden md:block">
+      <div className="hidden lg:block">
         <ClientSection />
       </div>
-      <BestRentedProducts type="newLaunches" defaultTitle="New Launches This Week" />
+      <div className="block md:hidden lg:block">
+        <BestRentedProducts type="newLaunches" defaultTitle="New Launches This Week" />
+      </div>
       <RentalProcess />
       <WhyChooseUs />
       <Testimonials />

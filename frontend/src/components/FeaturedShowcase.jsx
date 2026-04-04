@@ -138,9 +138,11 @@ const BannerCarousel = ({ banners, current, setCurrent, height = "387px" }) => {
 };
 
 // ─── Product Card Component ──────────────────────────────────────────────────
-const ShowcaseProductCard = ({ product, index, isDesktop, handleAddToCart }) => {
+const ShowcaseProductCard = ({ product, index, viewType = 'desktop', handleAddToCart }) => {
     const [isHovered, setIsHovered] = useState(false);
     const router = useRouter();
+    const isDesktop = viewType === 'desktop';
+    const isTablet = viewType === 'tablet';
 
     return (
         <div
@@ -153,22 +155,22 @@ const ShowcaseProductCard = ({ product, index, isDesktop, handleAddToCart }) => 
             <motion.div
                 animate={isHovered ? "hover" : "initial"}
                 initial="initial"
-                className="bg-white flex flex-col overflow-hidden relative mx-auto w-full rounded-xl"
+                className="bg-white flex flex-col overflow-hidden relative mx-auto w-full"
                 style={{
-                    height: isDesktop ? '387px' : '256px',
-                    width: isDesktop ? '285px' : '170px',
-                    border: "1px solid hsla(0, 0%, 89%, 1)",
-                    boxShadow: "0px 1px 2px 0px hsla(0, 0%, 0%, 0.05)",
+                    height: isDesktop ? '387px' : (isTablet ? '387px' : '256px'),
+                    width: isDesktop ? '285px' : (isTablet ? '223px' : '170px'),
+                    border: isTablet ? '0.84px solid hsla(0, 0%, 89%, 1)' : '1px solid hsla(0, 0%, 89%, 1)',
+                    boxShadow: isTablet ? '0px 0.84px 1.68px 0px hsla(0, 0%, 0%, 0.05)' : '0px 1px 2px 0px hsla(0, 0%, 0%, 0.05)',
                     willChange: "transform, height",
                     cursor: "pointer",
                     backgroundColor: "hsla(0, 0%, 100%, 1)",
-                    borderRadius: isDesktop ? "16px" : "8px",
+                    borderRadius: isDesktop ? '16px' : (isTablet ? '17px' : '8px'),
                     opacity: 1
                 }}
                 variants={{
-                    initial: { height: isDesktop ? 387 : 256, y: 0, boxShadow: "0px 2px 4px 0px hsla(0, 0%, 0%, 0.04)" },
+                    initial: { height: isDesktop ? 387 : (isTablet ? 387 : 256), y: 0, boxShadow: "0px 2px 4px 0px hsla(0, 0%, 0%, 0.04)" },
                     hover: {
-                        height: isDesktop ? 440 : 330,
+                        height: isDesktop ? 440 : (isTablet ? 440 : 330),
                         y: isDesktop ? -10 : -8,
                         boxShadow: "0px 25px 50px -12px hsla(0, 0%, 0%, 0.15)",
                         transition: { duration: 0.3, ease: [0.45, 1.45, 0.8, 1] }
@@ -177,16 +179,19 @@ const ShowcaseProductCard = ({ product, index, isDesktop, handleAddToCart }) => 
             >
                 {/* Image Section */}
                 <div
-                    className="relative bg-white group-hover:bg-[#F9F9F9] transition-colors duration-500 flex items-center justify-center overflow-hidden shrink-0 h-[184px] md:h-[282px]"
+                    className="relative bg-white group-hover:bg-[#F9F9F9] transition-colors duration-500 flex items-center justify-center overflow-hidden shrink-0"
                     style={{
-                        width: isDesktop ? '285px' : '170px',
-                        borderRadius: isDesktop ? "16px" : "8px",
-                        borderWidth: "0px 1px 1px 1px",
+                        width: isDesktop ? '285px' : (isTablet ? '223px' : '170px'),
+                        height: isDesktop ? '282px' : (isTablet ? '302px' : '184px'),
+                        borderRadius: isDesktop ? '16px' : (isTablet ? '17px' : '8px'),
+                        borderWidth: isTablet ? '0px 0.84px 0.84px 0.84px' : '0px 1px 1px 1px',
                         borderStyle: "solid",
                         borderColor: "hsla(0, 0%, 93%, 1)",
                         backgroundColor: "hsla(0, 0%, 100%, 1)",
                         opacity: 1,
-                        boxShadow: "0px 4px 8px 0px hsla(0, 0%, 87%, 0.1), 0px 15px 15px 0px hsla(0, 0%, 87%, 0.09), 0px 33px 20px 0px hsla(0, 0%, 87%, 0.05), 0px 59px 23px 0px hsla(0, 0%, 87%, 0.01), 0px 91px 26px 0px hsla(0, 0%, 87%, 0)"
+                        boxShadow: isTablet
+                            ? "0px 3.35px 6.71px 0px hsla(0, 0%, 87%, 0.1), 0px 12.58px 12.58px 0px hsla(0, 0%, 87%, 0.09), 0px 27.67px 16.77px 0px hsla(0, 0%, 87%, 0.05), 0px 49.48px 19.29px 0px hsla(0, 0%, 87%, 0.01), 0px 76.31px 21.8px 0px hsla(0, 0%, 87%, 0)"
+                            : "0px 4px 8px 0px hsla(0, 0%, 87%, 0.1), 0px 15px 15px 0px hsla(0, 0%, 87%, 0.09), 0px 33px 20px 0px hsla(0, 0%, 87%, 0.05), 0px 59px 23px 0px hsla(0, 0%, 87%, 0.01), 0px 91px 26px 0px hsla(0, 0%, 87%, 0)"
                     }}
                 >
                     <div
@@ -258,13 +263,13 @@ const ShowcaseProductCard = ({ product, index, isDesktop, handleAddToCart }) => 
                 <div
                     className="flex flex-col relative font-manrope bg-white"
                     style={{
-                        width: isDesktop ? '285px' : '100%',
-                        height: isDesktop ? (isHovered ? '158px' : '105px') : '72px',
-                        paddingTop: isDesktop ? '8px' : '4px',
-                        paddingRight: isDesktop ? '12px' : '8px',
-                        paddingBottom: isDesktop ? '12px' : '8px',
-                        paddingLeft: isDesktop ? '12px' : '8px',
-                        gap: isDesktop ? '8px' : '4px',
+                        width: isDesktop ? '285px' : (isTablet ? '223px' : '100%'),
+                        height: isDesktop ? (isHovered ? '158px' : '105px') : (isTablet ? (isHovered ? '130px' : '85px') : '72px'),
+                        paddingTop: isDesktop ? '8px' : (isTablet ? '6.71px' : '4px'),
+                        paddingRight: isDesktop ? '12px' : (isTablet ? '10.06px' : '8px'),
+                        paddingBottom: isDesktop ? '12px' : (isTablet ? '10.06px' : '8px'),
+                        paddingLeft: isDesktop ? '12px' : (isTablet ? '10.06px' : '8px'),
+                        gap: isDesktop ? '8px' : (isTablet ? '6.71px' : '4px'),
                         opacity: 1,
                         transition: 'height 0.3s ease'
                     }}
@@ -273,11 +278,11 @@ const ShowcaseProductCard = ({ product, index, isDesktop, handleAddToCart }) => 
                         className="font-manrope line-clamp-1 group-hover:text-[#FF3B30] transition-colors duration-300 shrink-0"
                         style={{
                             width: isDesktop ? "261px" : "100%",
-                            height: isDesktop ? "25px" : "22px",
-                            fontSize: isDesktop ? "18px" : "15px",
+                            height: isDesktop ? "25px" : "20px",
+                            fontSize: isDesktop ? "18px" : (isTablet ? "14px" : "15px"),
                             fontWeight: 600,
-                            lineHeight: isDesktop ? "25px" : "22px",
-                            letterSpacing: isDesktop ? "-0.4px" : "normal",
+                            lineHeight: isDesktop ? "25px" : "20px",
+                            letterSpacing: isDesktop ? "-0.4px" : (isTablet ? "-0.3px" : "normal"),
                             color: "hsla(0, 0%, 16%, 1)"
                         }}
                     >
@@ -287,14 +292,14 @@ const ShowcaseProductCard = ({ product, index, isDesktop, handleAddToCart }) => 
                     <div
                         className="flex items-center justify-between shrink-0"
                         style={{
-                            width: isDesktop ? "261px" : "154px",
+                            width: isDesktop ? "261px" : (isTablet ? "203px" : "154px"),
                             height: "16px"
                         }}
                     >
                         <div className="flex items-center gap-1">
                             <div className="flex text-[#FF9500]">
                                 {[1, 2, 3, 4, 5].map((s) => (
-                                    <Star key={s} size={isDesktop ? 14 : 12} weight="fill" className={s <= Math.round(product.rating || 4) ? "" : "opacity-20"} />
+                                    <Star key={s} size={isDesktop ? 14 : (isTablet ? 13 : 12)} weight="fill" className={s <= Math.round(product.rating || 4) ? "" : "opacity-20"} />
                                 ))}
                             </div>
                             <span
@@ -332,9 +337,9 @@ const ShowcaseProductCard = ({ product, index, isDesktop, handleAddToCart }) => 
                         style={{
                             width: isDesktop ? "209px" : "100%",
                             height: isDesktop ? "28px" : "auto",
-                            gap: isDesktop ? "3px" : "6px",
+                            gap: isDesktop ? "3px" : (isTablet ? "4px" : "6px"),
                             opacity: 1,
-                            marginTop: "-4px"
+                            marginTop: "-2px"
                         }}
                     >
                         <span
@@ -354,7 +359,7 @@ const ShowcaseProductCard = ({ product, index, isDesktop, handleAddToCart }) => 
                                 className="line-through decoration-[1.5px]"
                                 style={{
                                     fontFamily: "'Mona Sans', sans-serif",
-                                    fontSize: isDesktop ? "16px" : "13px",
+                                    fontSize: isDesktop ? "16px" : (isTablet ? "14px" : "13px"),
                                     fontWeight: 600,
                                     color: "hsla(0, 0%, 46%, 1)",
                                     letterSpacing: "-0.04em"
@@ -367,7 +372,7 @@ const ShowcaseProductCard = ({ product, index, isDesktop, handleAddToCart }) => 
                             className="font-bold tracking-tight ml-1 leading-none"
                             style={{
                                 fontFamily: "'Mona Sans', sans-serif",
-                                fontSize: isDesktop ? "26px" : "20px",
+                                fontSize: isDesktop ? "26px" : (isTablet ? "22px" : "20px"),
                                 fontWeight: 600,
                                 color: "hsla(3, 100%, 56%, 1)",
                                 letterSpacing: "-0.04em"
@@ -418,12 +423,17 @@ const FeaturedShowcase = () => {
     const [cms, setCms] = useState({ enabled: true, banners: FALLBACK_BANNERS });
     const [products, setProducts] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [isDesktop, setIsDesktop] = useState(false);
     const [currentBanner, setCurrentBanner] = useState(0);
     const [fetchingProducts, setFetchingProducts] = useState(false);
+    const [viewType, setViewType] = useState('mobile');
 
     useEffect(() => {
-        const checkRes = () => setIsDesktop(window.innerWidth >= 1024);
+        const checkRes = () => {
+            const w = window.innerWidth;
+            if (w >= 1024) setViewType('desktop');
+            else if (w >= 768) setViewType('tablet');
+            else setViewType('mobile');
+        };
         checkRes();
         window.addEventListener('resize', checkRes);
         return () => window.removeEventListener('resize', checkRes);
@@ -494,40 +504,54 @@ const FeaturedShowcase = () => {
 
     return (
         <section className="bg-white py-12 md:py-16">
-            <div className="max-w-[1224px] mx-auto px-4 sm:px-6"> 
-                {/* 1200px inner + padding roughly matches other components */}
+            <div className={viewType === 'tablet' ? "w-full mx-auto px-[30px]" : "max-w-[1224px] mx-auto px-4 sm:px-6"}>
                 <div
-                    className="flex flex-col lg:flex-row items-stretch justify-center"
-                    style={{ gap: isDesktop ? "24px" : "20px" }}
+                    className="flex items-stretch justify-center"
+                    style={{
+                        flexDirection: viewType === 'mobile' ? 'column' : 'row',
+                        gap: viewType === 'desktop' ? "24px" : (viewType === 'tablet' ? "35px" : "20px"),
+                        width: viewType === 'tablet' ? '708px' : 'auto',
+                        height: viewType === 'tablet' ? '387px' : 'auto',
+                        margin: viewType === 'tablet' ? '0 auto' : undefined
+                    }}
                 >
-                    {/* Left: Product Cards Cluster (Fits 588px) */}
-                    <div 
+                    {/* Left: Product Card — 1 on tablet, 2 on desktop */}
+                    <div
                         className="flex flex-col md:flex-row items-stretch gap-4 md:gap-[18px] transition-all duration-500"
-                        style={{ 
-                            width: isDesktop ? "588px" : "100%",
+                        style={{
+                            width: viewType === 'desktop' ? "588px" : (viewType === 'tablet' ? '223px' : '100%'),
+                            height: viewType === 'tablet' ? '387px' : 'auto',
+                            flexShrink: 0,
                             opacity: fetchingProducts ? 0.6 : 1,
                             transform: fetchingProducts ? 'translateX(-10px)' : 'translateX(0)',
                             filter: fetchingProducts ? 'blur(1px)' : 'none'
                         }}
                     >
                         {products[0] ? (
-                            <ShowcaseProductCard product={products[0]} isDesktop={isDesktop} handleAddToCart={handleAddToCart} />
+                            <ShowcaseProductCard product={products[0]} viewType={viewType} handleAddToCart={handleAddToCart} />
                         ) : (
                             <div className="w-[285px] h-[387px] bg-gray-50 rounded-xl border border-gray-100 flex items-center justify-center text-gray-300 italic text-sm">No products found</div>
                         )}
 
-                        {products[1] && (
-                            <ShowcaseProductCard product={products[1]} isDesktop={isDesktop} handleAddToCart={handleAddToCart} />
+                        {/* Only show 2nd card on desktop */}
+                        {viewType === 'desktop' && products[1] && (
+                            <ShowcaseProductCard product={products[1]} viewType={viewType} handleAddToCart={handleAddToCart} />
                         )}
                     </div>
 
-                    {/* Right: Banner Carousel (Adjusted to fit 1152px total content) */}
-                    <div className="w-full lg:w-[540px] shrink-0">
-                        <BannerCarousel 
-                            banners={cms.banners} 
-                            current={currentBanner} 
-                            setCurrent={setCurrentBanner} 
-                            height="387px" 
+                    {/* Right: Banner Carousel */}
+                    <div
+                        style={{
+                            width: viewType === 'tablet' ? '450px' : (viewType === 'desktop' ? '540px' : '100%'),
+                            height: viewType === 'tablet' ? '387px' : 'auto',
+                            flexShrink: 0
+                        }}
+                    >
+                        <BannerCarousel
+                            banners={cms.banners}
+                            current={currentBanner}
+                            setCurrent={setCurrentBanner}
+                            height="387px"
                         />
                     </div>
                 </div>

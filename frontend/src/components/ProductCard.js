@@ -14,7 +14,7 @@ const ProductCard = ({ product }) => {
     const [isHovered, setIsHovered] = React.useState(false);
 
     React.useEffect(() => {
-        const checkRes = () => setIsMobile(window.innerWidth < 1024);
+        const checkRes = () => setIsMobile(window.innerWidth < 768);
         checkRes();
         window.addEventListener('resize', checkRes);
         return () => window.removeEventListener('resize', checkRes);

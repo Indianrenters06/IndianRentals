@@ -10,7 +10,10 @@ import { useRouter } from "next/navigation";
 import { useDispatch } from "react-redux";
 import { addToCart } from "@/redux/features/cartSlice";
 
-const ProductCard = ({ product, index, isDesktop, handleAddToCart }) => {
+const ProductCard = ({ product, index, viewType = 'desktop', handleAddToCart }) => {
+    const isDesktop = viewType === 'desktop';
+    const isTablet = viewType === 'tablet';
+    const isMobile = viewType === 'mobile';
     const [isHovered, setIsHovered] = useState(false);
     const router = useRouter();
 
@@ -25,22 +28,22 @@ const ProductCard = ({ product, index, isDesktop, handleAddToCart }) => {
             <motion.div
                 animate={isHovered ? "hover" : "initial"}
                 initial="initial"
-                className="bg-white flex flex-col overflow-hidden relative mx-auto w-full rounded-[16px]"
+                className="bg-white flex flex-col overflow-hidden relative mx-auto w-full"
                 style={{
-                    height: isDesktop ? '387px' : '256px',
-                    width: isDesktop ? '285px' : '170px',
-                    border: "1px solid hsla(0, 0%, 89%, 1)",
-                    boxShadow: "0px 1px 2px 0px hsla(0, 0%, 0%, 0.05)",
+                    height: isDesktop ? '387px' : (isTablet ? '321px' : '256px'),
+                    width: isDesktop ? '285px' : (isTablet ? '223px' : '170px'),
+                    border: isTablet ? '0.84px solid hsla(0, 0%, 89%, 1)' : '1px solid hsla(0, 0%, 89%, 1)',
+                    boxShadow: isTablet ? '0px 0.84px 1.68px 0px hsla(0, 0%, 0%, 0.05)' : '0px 1px 2px 0px hsla(0, 0%, 0%, 0.05)',
                     willChange: "transform, height",
                     cursor: "pointer",
                     backgroundColor: "hsla(0, 0%, 100%, 1)",
-                    borderRadius: isDesktop ? "16px" : "8px",
+                    borderRadius: isDesktop ? '16px' : (isTablet ? '17px' : '8px'),
                     opacity: 1
                 }}
                 variants={{
-                    initial: { height: isDesktop ? 387 : 256, y: 0, boxShadow: "0px 2px 4px 0px hsla(0, 0%, 0%, 0.04)" },
+                    initial: { height: isDesktop ? 387 : (isTablet ? 321 : 256), y: 0, boxShadow: "0px 2px 4px 0px hsla(0, 0%, 0%, 0.04)" },
                     hover: {
-                        height: isDesktop ? 440 : 330,
+                        height: isDesktop ? 440 : (isTablet ? 374 : 330),
                         y: isDesktop ? -10 : -8,
                         boxShadow: "0px 25px 50px -12px hsla(0, 0%, 0%, 0.15)",
                         transition: { duration: 0.3, ease: [0.45, 1.45, 0.8, 1] }
@@ -49,16 +52,19 @@ const ProductCard = ({ product, index, isDesktop, handleAddToCart }) => {
             >
                 {/* Image Section */}
                 <div
-                    className="relative bg-white group-hover:bg-[#F9F9F9] transition-colors duration-500 flex items-center justify-center overflow-hidden shrink-0 h-[184px] md:h-[282px]"
+                    className="relative bg-white group-hover:bg-[#F9F9F9] transition-colors duration-500 flex items-center justify-center overflow-hidden shrink-0"
                     style={{
-                        width: isDesktop ? '285px' : '170px',
-                        borderRadius: isDesktop ? "16px" : "8px",
-                        borderWidth: "0px 1px 1px 1px",
+                        width: isDesktop ? '285px' : (isTablet ? '223px' : '170px'),
+                        height: isDesktop ? '282px' : (isTablet ? '236px' : '184px'),
+                        borderRadius: isDesktop ? '16px' : (isTablet ? '17px' : '8px'),
+                        borderWidth: isTablet ? '0px 0.84px 0.84px 0.84px' : '0px 1px 1px 1px',
                         borderStyle: "solid",
                         borderColor: "hsla(0, 0%, 93%, 1)",
                         backgroundColor: "hsla(0, 0%, 100%, 1)",
                         opacity: 1,
-                        boxShadow: "0px 4px 8px 0px hsla(0, 0%, 87%, 0.1), 0px 15px 15px 0px hsla(0, 0%, 87%, 0.09), 0px 33px 20px 0px hsla(0, 0%, 87%, 0.05), 0px 59px 23px 0px hsla(0, 0%, 87%, 0.01), 0px 91px 26px 0px hsla(0, 0%, 87%, 0)"
+                        boxShadow: isTablet
+                            ? "0px 3.35px 6.71px 0px hsla(0, 0%, 87%, 0.1), 0px 12.58px 12.58px 0px hsla(0, 0%, 87%, 0.09), 0px 27.67px 16.77px 0px hsla(0, 0%, 87%, 0.05), 0px 49.48px 19.29px 0px hsla(0, 0%, 87%, 0.01), 0px 76.31px 21.8px 0px hsla(0, 0%, 87%, 0)"
+                            : "0px 4px 8px 0px hsla(0, 0%, 87%, 0.1), 0px 15px 15px 0px hsla(0, 0%, 87%, 0.09), 0px 33px 20px 0px hsla(0, 0%, 87%, 0.05), 0px 59px 23px 0px hsla(0, 0%, 87%, 0.01), 0px 91px 26px 0px hsla(0, 0%, 87%, 0)"
                     }}
                 >
                     <div
@@ -130,13 +136,13 @@ const ProductCard = ({ product, index, isDesktop, handleAddToCart }) => {
                 <div
                     className="flex flex-col relative font-manrope bg-white"
                     style={{
-                        width: isDesktop ? '285px' : '100%',
-                        height: isDesktop ? (isHovered ? '158px' : '105px') : '72px',
-                        paddingTop: isDesktop ? '8px' : '4px',
-                        paddingRight: isDesktop ? '12px' : '8px',
-                        paddingBottom: isDesktop ? '12px' : '8px',
-                        paddingLeft: isDesktop ? '12px' : '8px',
-                        gap: isDesktop ? '8px' : '4px',
+                        width: isDesktop ? '285px' : (isTablet ? '223px' : '100%'),
+                        height: isDesktop ? (isHovered ? '158px' : '105px') : (isTablet ? (isHovered ? '130px' : '85px') : '72px'),
+                        paddingTop: isDesktop ? '8px' : (isTablet ? '6.71px' : '4px'),
+                        paddingRight: isDesktop ? '12px' : (isTablet ? '10.06px' : '8px'),
+                        paddingBottom: isDesktop ? '12px' : (isTablet ? '10.06px' : '8px'),
+                        paddingLeft: isDesktop ? '12px' : (isTablet ? '10.06px' : '8px'),
+                        gap: isDesktop ? '8px' : (isTablet ? '6.71px' : '4px'),
                         opacity: 1,
                         transition: 'height 0.3s ease'
                     }}
@@ -145,11 +151,11 @@ const ProductCard = ({ product, index, isDesktop, handleAddToCart }) => {
                         className="font-manrope line-clamp-1 group-hover:text-[#FF3B30] transition-colors duration-300 shrink-0"
                         style={{
                             width: isDesktop ? "261px" : "100%",
-                            height: isDesktop ? "25px" : "22px",
-                            fontSize: isDesktop ? "18px" : "15px",
+                            height: isDesktop ? "25px" : "20px",
+                            fontSize: isDesktop ? "18px" : (isTablet ? "14px" : "15px"),
                             fontWeight: 600,
-                            lineHeight: isDesktop ? "25px" : "22px",
-                            letterSpacing: isDesktop ? "-0.4px" : "normal",
+                            lineHeight: isDesktop ? "25px" : "20px",
+                            letterSpacing: isDesktop ? "-0.4px" : (isTablet ? "-0.3px" : "normal"),
                             color: "hsla(0, 0%, 16%, 1)"
                         }}
                     >
@@ -159,14 +165,14 @@ const ProductCard = ({ product, index, isDesktop, handleAddToCart }) => {
                     <div
                         className="flex items-center justify-between shrink-0"
                         style={{
-                            width: isDesktop ? "261px" : "154px",
+                            width: isDesktop ? "261px" : (isTablet ? "203px" : "154px"),
                             height: "16px"
                         }}
                     >
                         <div className="flex items-center gap-1">
                             <div className="flex text-[#FF9500]">
                                 {[1, 2, 3, 4, 5].map((s) => (
-                                    <Star key={s} size={isDesktop ? 14 : 12} weight="fill" className={s <= Math.round(product.rating || 4) ? "" : "opacity-20"} />
+                                    <Star key={s} size={isDesktop ? 14 : (isTablet ? 13 : 12)} weight="fill" className={s <= Math.round(product.rating || 4) ? "" : "opacity-20"} />
                                 ))}
                             </div>
                             <span
@@ -204,9 +210,9 @@ const ProductCard = ({ product, index, isDesktop, handleAddToCart }) => {
                         style={{
                             width: isDesktop ? "209px" : "100%",
                             height: isDesktop ? "28px" : "auto",
-                            gap: isDesktop ? "3px" : "6px",
+                            gap: isDesktop ? "3px" : (isTablet ? "4px" : "6px"),
                             opacity: 1,
-                            marginTop: "-4px"
+                            marginTop: "-2px"
                         }}
                     >
                         <span
@@ -226,7 +232,7 @@ const ProductCard = ({ product, index, isDesktop, handleAddToCart }) => {
                                 className="line-through decoration-[1.5px]"
                                 style={{
                                     fontFamily: "'Mona Sans', sans-serif",
-                                    fontSize: isDesktop ? "16px" : "13px",
+                                    fontSize: isDesktop ? "16px" : (isTablet ? "14px" : "13px"),
                                     fontWeight: 600,
                                     color: "hsla(0, 0%, 46%, 1)",
                                     letterSpacing: "-0.04em"
@@ -239,7 +245,7 @@ const ProductCard = ({ product, index, isDesktop, handleAddToCart }) => {
                             className="font-bold tracking-tight ml-1 leading-none"
                             style={{
                                 fontFamily: "'Mona Sans', sans-serif",
-                                fontSize: isDesktop ? "26px" : "20px",
+                                fontSize: isDesktop ? "26px" : (isTablet ? "22px" : "20px"),
                                 fontWeight: 600,
                                 color: "hsla(3, 100%, 56%, 1)",
                                 letterSpacing: "-0.04em"
@@ -298,8 +304,15 @@ const BestRentedProducts = ({ type = "bestRented", defaultTitle = "Curated Produ
     const router = useRouter();
     const dispatch = useDispatch();
 
+    const [viewType, setViewType] = useState('mobile');
+
     useEffect(() => {
-        const checkRes = () => setIsDesktop(window.innerWidth >= 1024);
+        const checkRes = () => {
+            const w = window.innerWidth;
+            if (w >= 1024) setViewType('desktop');
+            else if (w >= 768) setViewType('tablet');
+            else setViewType('mobile');
+        };
         checkRes();
         window.addEventListener('resize', checkRes);
         return () => window.removeEventListener('resize', checkRes);
@@ -425,7 +438,8 @@ const BestRentedProducts = ({ type = "bestRented", defaultTitle = "Curated Produ
                     </div>
                 </div>
 
-                <div className="hidden md:block relative">
+                <div className={`${viewType === 'mobile' ? 'hidden' : 'block'} relative`}>
+                    <div style={viewType === 'tablet' ? { overflow: 'hidden' } : {}}>
                     <Swiper
                         modules={[Navigation, Autoplay, Scrollbar]}
                         spaceBetween={24}
@@ -443,19 +457,20 @@ const BestRentedProducts = ({ type = "bestRented", defaultTitle = "Curated Produ
                             delay: 4000,
                             disableOnInteraction: false,
                         }}
-                        className="!pb-0 !overflow-visible"
+                        className={viewType === 'desktop' ? '!pb-0 !overflow-visible' : '!pb-0'}
                     >
                         {products.map((product, index) => (
-                            <SwiperSlide key={product.id || index} style={{ width: '285px' }}>
+                            <SwiperSlide key={product.id || index} style={{ width: viewType === 'desktop' ? '285px' : '223px' }}>
                                 <ProductCard
                                     product={product}
                                     index={index}
-                                    isDesktop={isDesktop}
+                                    viewType={viewType}
                                     handleAddToCart={handleAddToCart}
                                 />
                             </SwiperSlide>
                         ))}
                     </Swiper>
+                    </div>
 
                     {/* Progress Bar & Navigation Arrows */}
                     <div className="flex items-center gap-6 mt-10">
@@ -483,13 +498,13 @@ const BestRentedProducts = ({ type = "bestRented", defaultTitle = "Curated Produ
                 </div>
 
                 {/* Mobile View: static grid */}
-                <div className="md:hidden grid grid-cols-2 gap-[10px]">
+                <div className={`${viewType === 'mobile' ? 'grid' : 'hidden'} grid-cols-2 gap-[10px]`}>
                     {products.map((product, index) => (
                         <ProductCard
                             key={product.id || index}
                             product={product}
                             index={index}
-                            isDesktop={isDesktop}
+                            viewType={viewType}
                             handleAddToCart={handleAddToCart}
                         />
                     ))}
