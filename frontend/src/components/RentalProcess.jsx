@@ -300,7 +300,7 @@ const RentalProcess = () => {
                 style={{ paddingLeft: '24px', paddingRight: '24px' }}
             >
                 {/* Desktop Header Row */}
-                <div className="grid grid-cols-4 gap-8 w-full max-w-[1165px] mx-auto">
+                <div className="w-full flex flex-row items-center justify-between mx-auto font-manrope max-w-[1165px] h-[94px]">
                     <div className="flex flex-col h-full gap-[10px] justify-center">
                         <h2 className="text-[36px] font-bold text-[#1D1D1F] tracking-tight leading-none">{cms.title}</h2>
                         <p className="text-[#1D1D1F] text-[16px] leading-[1.3] tracking-tight max-w-md opacity-80">{cms.subtitle}</p>

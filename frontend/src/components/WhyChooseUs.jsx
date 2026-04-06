@@ -96,7 +96,7 @@ const WhyChooseUs = () => {
                     </div>
 
                     {/* Image Content */}
-                    <div className={`relative ${viewType === 'desktop' ? 'justify-self-end max-w-[508px]' : 'w-[calc(100%-24px)]'} aspect-[508/336] mt-4 md:mt-2`}>
+                    <div className={`relative ${viewType === 'desktop' ? 'justify-self-end w-full max-w-[508px]' : 'w-[calc(100%-24px)]'} aspect-[508/336] mt-4 md:mt-2`}>
                         {/* The yellow background shape spec */}
                         <div 
                             className="absolute left-[24px] top-[24px] w-full h-full"

@@ -97,275 +97,275 @@ export default function ProductDetailPage() {
     ];
 
     return (
-        <div className="min-h-screen bg-white font-manrope text-[#1D1D1F] tracking-tight antialiased">
+        <div className="min-h-screen bg-[#F7F7F7] font-manrope text-[#1D1D1F] tracking-tight antialiased pt-10 pb-10">
             {/* Breadcrumb */}
-            <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 py-4 text-xs font-medium text-gray-500">
+            <div className="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8 py-3 text-[14px] font-medium text-[#586A84]">
                 <div className="flex items-center gap-2">
-                    <Link href="/" className="hover:text-black">Shop all</Link>
-                    <span className="text-gray-300">›</span>
-                    <Link href={`/category/${product.category?.toLowerCase() || 'all'}`} className="hover:text-black">{product.category || 'Category'}</Link>
-                    <span className="text-gray-300">›</span>
-                    <span className="text-black font-bold truncate max-w-[200px]">{product.name}</span>
+                    <Link href="/" className="hover:text-black transition-colors">Shop all</Link>
+                    <span className="text-gray-300 text-[16px] leading-none mb-0.5">›</span>
+                    <Link href={`/category/${product.category?.toLowerCase() || 'all'}`} className="hover:text-black transition-colors">{product.category || 'Category'}</Link>
+                    <span className="text-gray-300 text-[16px] leading-none mb-0.5">›</span>
+                    <span className="text-[#1D1D1F] font-bold truncate max-w-[300px]">{product.name}</span>
                 </div>
             </div>
 
-            <main className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 py-4">
-                <div className="flex flex-col lg:flex-row gap-10">
+            <main className="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8 pt-4 pb-10">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-x-5 gap-y-12 items-start">
 
-                    {/* Left Column - Images */}
-                    <div className="lg:w-[58%]">
-                        <div className="relative mb-6 group">
-                            <span className="absolute top-4 left-4 z-10 bg-[#FF3B30] text-white text-[10px] font-bold px-3 py-1 rounded-md uppercase tracking-wider">20% off</span>
+                    {/* Left Column - Images & Details */}
+                    <div className="flex flex-col gap-5">
+                        
+                        {/* Main Image Area */}
+                        <div className="relative w-full h-[523px] bg-white border border-[#EDEDED] rounded-xl flex items-center justify-center p-10 group overflow-hidden shrink-0">
+                            <span className="absolute top-6 left-6 z-10 bg-[#FF3B30] text-white text-[12px] font-bold px-3 py-1 rounded-[6px] tracking-wide">20% off</span>
 
-                            {/* Action Buttons */}
-                            <div className="absolute top-4 right-4 z-10 flex flex-col gap-3">
-                                <button className="w-10 h-10 flex items-center justify-center rounded-full bg-white shadow-md border border-gray-100 text-gray-400 hover:text-[#FF3B30] transition-colors">
-                                    <FaHeart size={18} />
+                            <div className="absolute top-6 right-6 z-10 flex flex-col gap-3">
+                                <button className="w-10 h-10 flex items-center justify-center rounded-full bg-[#f6f6f6] text-[#555] hover:text-[#FF3B30] hover:bg-white transition-colors border border-transparent hover:border-gray-200">
+                                    <FaHeart size={15} />
                                 </button>
-                                <button className="w-10 h-10 flex items-center justify-center rounded-full bg-white shadow-md border border-gray-100 text-gray-400 hover:text-black transition-colors">
-                                    <FaShareAlt size={16} />
-                                </button>
-                            </div>
-
-                            {/* Main Image Box */}
-                            <div className="border border-gray-100 rounded-[32px] bg-white p-10 relative flex items-center justify-center aspect-[4/3] w-full max-h-[500px] shadow-[0_4px_20px_rgba(0,0,0,0.02)]">
-                                <Image
-                                    src={mainImage}
-                                    alt={product.name}
-                                    fill
-                                    className="object-contain p-8 group-hover:scale-105 transition-transform duration-700 ease-out"
-                                    priority
-                                />
-
-                                {/* Nav Arrows (Visible on Hover) */}
-                                <button className="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 flex items-center justify-center rounded-full bg-white/80 border border-gray-100 opacity-0 group-hover:opacity-100 transition-opacity">
-                                    <span className="sr-only">Prev</span>
-                                    <span className="text-xl">‹</span>
-                                </button>
-                                <button className="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 flex items-center justify-center rounded-full bg-white/80 border border-gray-100 opacity-0 group-hover:opacity-100 transition-opacity">
-                                    <span className="sr-only">Next</span>
-                                    <span className="text-xl">›</span>
+                                <button className="w-10 h-10 flex items-center justify-center rounded-full bg-[#f6f6f6] text-[#555] hover:text-black hover:bg-white transition-colors border border-transparent hover:border-gray-200">
+                                    <FaShareAlt size={15} />
                                 </button>
                             </div>
+                            
+                            <Image
+                                src={mainImage}
+                                alt={product.name}
+                                fill
+                                className="object-contain mix-blend-darken brightness-[1.08] contrast-[1.04] p-8 group-hover:scale-105 transition-transform duration-700 ease-out"
+                                priority
+                            />
+                            
+                            {/* Nav Arrows */}
+                            <button className="absolute left-6 top-1/2 -translate-y-1/2 w-10 h-10 flex items-center justify-center rounded-full bg-[#f6f6f6] text-[#666] hover:bg-gray-200 transition-colors">
+                                <span className="text-[22px] leading-none -mt-[3px]">{"‹"}</span>
+                            </button>
+                            <button className="absolute right-6 top-1/2 -translate-y-1/2 w-10 h-10 flex items-center justify-center rounded-full bg-[#f6f6f6] text-[#666] hover:bg-gray-200 transition-colors">
+                                <span className="text-[22px] leading-none -mt-[3px]">{"›"}</span>
+                            </button>
                         </div>
 
                         {/* Thumbnails */}
-                        <div className="flex gap-4 px-2 overflow-x-auto pb-4 scrollbar-hide">
+                        <div className="flex items-center gap-4 w-full">
                             {[mainImage, mainImage, mainImage, mainImage].map((img, i) => (
-                                <button key={i} className={`w-[110px] h-[110px] flex-shrink-0 bg-white border-2 ${i === 0 ? 'border-gray-200' : 'border-gray-50'} rounded-[24px] p-3 flex items-center justify-center hover:border-gray-300 transition-all shadow-sm`}>
+                                <button key={i} className={`w-[110px] h-[110px] flex-shrink-0 bg-white border ${i === 0 ? 'border-[#0F172A] border-[2px]' : 'border-[#EDEDED]'} rounded-xl p-3 flex items-center justify-center transition-all shadow-sm hover:border-gray-400`}>
                                     <div className="w-full h-full relative">
-                                        <Image src={img} alt={`Thumb ${i}`} fill className="object-contain" />
+                                        <Image src={img} alt={`Thumb ${i}`} fill className="object-contain mix-blend-darken brightness-[1.08] contrast-[1.04]" />
                                     </div>
                                 </button>
                             ))}
                         </div>
+
+                        {/* Tabs + Table Details */}
+                        <div className="w-full mb-10">
+                            <div className="border border-gray-200 rounded-[28px] overflow-hidden bg-white shadow-sm">
+                                {/* Tabs Header */}
+                                <div className="flex items-center gap-4 px-6 pt-5 pb-5 border-b border-gray-100">
+                                    {['Product Details', 'Return Policy', 'Shipping Policy'].map((tab) => (
+                                        <button
+                                            key={tab}
+                                            onClick={() => setActiveTab(tab)}
+                                            className={`text-[15px] font-bold transition-all px-[20px] py-[10px] rounded-[24px] ${activeTab === tab ? 'bg-[#333333] text-white shadow-sm' : 'text-gray-800 hover:bg-gray-50 bg-transparent'}`}
+                                        >
+                                            {tab}
+                                        </button>
+                                    ))}
+                                </div>
+
+                                {/* Tab Content */}
+                                <div className="px-10 py-10 min-h-[300px]">
+                                    {activeTab === 'Product Details' && (
+                                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-y-10 gap-x-8">
+                                            {specs.map((item, i) => (
+                                                <div key={i} className="flex flex-col gap-2">
+                                                    <span className="text-[13px] font-black text-[#1D1D1F] uppercase">{item.label}</span>
+                                                    <span className="text-[15px] font-medium text-gray-600 whitespace-pre-line">{item.value}</span>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    )}
+                                    {activeTab === 'Return Policy' && (
+                                        <div className="prose max-w-none">
+                                            <p className="text-[#1D1D1F] whitespace-pre-line leading-relaxed font-medium">
+                                                {product.returnPolicy || "Standard return policy applies. Please contact support for details."}
+                                            </p>
+                                        </div>
+                                    )}
+                                    {activeTab === 'Shipping Policy' && (
+                                        <div className="prose max-w-none">
+                                            <p className="text-[#1D1D1F] whitespace-pre-line leading-relaxed font-medium">
+                                                {product.shippingPolicy || "Standard shipping policy applies. Delivery usually takes 2-5 business days."}
+                                            </p>
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
                     {/* Right Column - Product Purchase Details */}
-                    <div className="lg:w-[38%] flex flex-col pt-2">
-                        <div className="mb-4">
-                            <h1 className="text-[28px] font-bold text-[#1D1D1F] leading-[1.2] mb-2">{product.name}</h1>
-                            <div className="flex items-center gap-1.5 mb-2">
+                    <div className="flex flex-col gap-[32px]">
+                        <div className="flex flex-col gap-[8px] mx-2 shrink-0">
+                            <h1 className="text-[24px] xl:text-[26px] font-bold text-[#1D1D1F] leading-[1.2]">
+                                {product.name}
+                            </h1>
+                            <div className="flex items-center gap-2">
                                 <div className="flex text-[#FF9500]">
                                     {[1, 2, 3, 4, 5].map(s => (
-                                        <FaStar key={s} size={14} className={s <= Math.round(product.rating || 0) ? "" : "opacity-30"} />
+                                        <FaStar key={s} size={15} className={s <= Math.round(product.rating || 0) ? "" : "text-gray-200"} />
                                     ))}
                                 </div>
-                                <span className="text-[14px] font-medium text-gray-500">{product.rating || "4.5"}({product.numReviews || 0})</span>
-                            </div>
-
-                            <div className="inline-block border-b-2 border-gray-900 pb-0.5 mt-2">
-                                <span className="text-[15px] font-bold">Refundable Amount - ₹{product.securityDeposit || 10000}</span>
+                                <span className="text-[13px] font-medium text-gray-500">{product.rating || "4.5"} ({product.numReviews || 12})</span>
                             </div>
                         </div>
 
                         {/* Rental Configuration Card */}
-                        <div className="border border-gray-100 rounded-[32px] bg-white shadow-[0_8px_30px_rgba(0,0,0,0.04)] mb-4 p-5">
-                            <div className="flex justify-between items-center mb-6">
-                                <h3 className="text-[15px] font-bold">
-                                    Select your <span className="underline decoration-gray-900 underline-offset-4">minimum rental period</span>
+                        <div className="flex flex-col bg-white border border-[#EDEDED] rounded-lg shrink-0 h-[333px] justify-between px-6 pt-6 pb-5 shadow-[0_2px_12px_rgba(0,0,0,0.02)]">
+                            
+                            {/* Header */}
+                            <div>
+                                <h3 className="text-[14px] font-medium text-[#1D1D1F] mb-6">
+                                    Select your <span className="underline decoration-gray-400 underline-offset-4 decoration-[1.5px]">minimum rental period</span>
                                 </h3>
-                                <Link href="#" className="text-[12px] font-bold text-[#FF9500] hover:underline">compare all tenures</Link>
-                            </div>
 
-                            {/* Custom Slider */}
-                            <div className="relative px-2 mb-10">
-                                <div className="absolute top-[10px] left-2 right-2 h-[4px] bg-gray-100 rounded-full" />
-                                <div
-                                    className="absolute top-[10px] left-2 h-[4px] bg-[#FF4500] rounded-full transition-all duration-300"
-                                    style={{ width: `${(((duration <= 1 ? 1 : duration <= 3 ? 2 : duration <= 6 ? 3 : duration <= 9 ? 4 : 5) - 1) / 4) * 100}%` }}
-                                />
-                                <input
-                                    type="range"
-                                    min="1"
-                                    max="5"
-                                    step="1"
-                                    value={duration <= 1 ? 1 : duration <= 3 ? 2 : duration <= 6 ? 3 : duration <= 9 ? 4 : 5}
-                                    onChange={(e) => {
-                                        const step = parseInt(e.target.value);
-                                        const months = [1, 3, 6, 9, 12];
-                                        setDuration(months[step - 1]);
-                                    }}
-                                    className="relative w-full appearance-none bg-transparent h-6 cursor-pointer z-10 [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:bg-white [&::-webkit-slider-thumb]:border-[3px] [&::-webkit-slider-thumb]:border-[#FF4500] [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:shadow-md"
-                                />
-                                {/* Ticks */}
-                                <div className="flex justify-between px-[1px] -mt-1 pb-4">
-                                    {[1, 2, 3, 4, 5].map((i) => (
-                                        <div key={i} className={`w-[8px] h-[8px] rounded-full border-2 ${i <= (duration <= 1 ? 1 : duration <= 3 ? 2 : duration <= 6 ? 3 : duration <= 9 ? 4 : 5) ? 'bg-[#FF4500] border-[#FF4500]' : 'bg-gray-300 border-gray-300'}`} />
-                                    ))}
-                                </div>
-                                <div className="flex justify-between text-[13px] font-bold text-gray-800">
-                                    {tenures.map(t => (
-                                        <span key={t.months} className={duration === t.months ? "text-[#FF4500]" : "text-gray-400"}>
-                                            {t.label}
-                                        </span>
-                                    ))}
-                                </div>
-                            </div>
-
-                            {/* Quantity Selector */}
-                            <div className="flex items-center gap-4 mb-6">
-                                <span className="text-[14px] font-bold text-gray-900">Quantity</span>
-                                <div className="flex items-center border border-gray-200 rounded-full h-10 px-2 gap-4 bg-white">
-                                    <button onClick={() => setQuantity(Math.max(1, quantity - 1))} className="w-8 h-8 flex items-center justify-center text-gray-400 hover:text-black transition-colors"><FaMinus size={10} /></button>
-                                    <span className="text-[15px] font-bold w-4 text-center">{quantity}</span>
-                                    <button onClick={() => setQuantity(quantity + 1)} className="w-8 h-8 flex items-center justify-center text-gray-400 hover:text-black transition-colors"><FaPlus size={10} /></button>
+                                {/* Tenure Slider */}
+                                <div className="relative mb-0 mt-4">
+                                    {/* Track */}
+                                    <div className="relative h-[8px] bg-[#FDE68A] rounded-full flex items-center">
+                                        {[1, 2, 3, 4, 5].map(step => {
+                                            const pct = ((step - 1) / 4) * 100;
+                                            return (
+                                                <div 
+                                                    key={step} 
+                                                    className="absolute w-[16px] h-[16px] rounded-full bg-white transition-colors duration-300 z-10 shadow-sm border border-gray-100" 
+                                                    style={{ left: `calc(${pct}% - 8px)` }} 
+                                                />
+                                            );
+                                        })}
+                                        <input
+                                            type="range"
+                                            min="1"
+                                            max="5"
+                                            step="1"
+                                            value={duration <= 1 ? 1 : duration <= 3 ? 2 : duration <= 6 ? 3 : duration <= 9 ? 4 : 5}
+                                            onChange={(e) => {
+                                                const step = parseInt(e.target.value);
+                                                const months = [1, 3, 6, 9, 12];
+                                                setDuration(months[step - 1]);
+                                            }}
+                                            className="absolute w-full h-full opacity-0 cursor-pointer z-20"
+                                        />
+                                    </div>
+                                    
+                                    {/* Labels Below */}
+                                    <div className="flex justify-between mt-[16px] text-[13px] text-gray-500 font-medium">
+                                        <span className="text-center w-6">1+</span>
+                                        <span className="text-center w-6">3+</span>
+                                        <span className="text-center w-6">6+</span>
+                                        <span className="text-center w-6">9+</span>
+                                        <span className="text-center w-8">12+</span>
+                                    </div>
                                 </div>
                             </div>
 
-                            {/* Price and Benefits Box */}
-                            <div className="bg-gray-50/50 border border-gray-100 rounded-[20px] overflow-hidden">
-                                <div className="flex p-4">
-                                    <div className="flex-1 flex flex-col justify-center">
-                                        <div className="flex items-baseline gap-1.5">
-                                            <span className="text-[28px] font-bold text-[#1D1D1F]">₹{currentPlan.price * quantity}</span>
-                                            <span className="text-[14px] font-medium text-gray-500">/month</span>
-                                            <span className="text-[16px] text-gray-400 line-through ml-2 font-medium">₹{Math.round(currentPlan.price * 1.5)}</span>
+                            {/* Links */}
+                            <div className="flex justify-between items-center text-[13px] font-medium text-[#EA580C] underline decoration-orange-200 underline-offset-4 mb-1">
+                                <Link href="#" className="hover:text-orange-700 transition">price breakdown</Link>
+                                <Link href="#" className="hover:text-orange-700 transition">compare all tenures</Link>
+                            </div>
+
+                            {/* Price Line (Full Width Borders) */}
+                            <div className="border-t border-b border-[#EDEDED] py-5 flex justify-between items-center bg-white -mx-6 px-6">
+                                <div className="flex items-end gap-[6px]">
+                                    <span className="text-[34px] font-bold text-[#FF3B30] leading-[0.8] tracking-tight">₹{currentPlan.price}</span>
+                                    <span className="text-[14px] font-medium text-gray-500 opacity-90 leading-[1.2]">/month</span>
+                                    <span className="text-[14px] font-medium text-gray-400 line-through leading-[1.2] ml-1">₹{Math.round(currentPlan.price * 1.5)}</span>
+                                </div>
+
+                                <div className="flex items-center gap-4">
+                                    <span className="text-[13px] text-[#1D1D1F] font-bold">Quantity</span>
+                                    <div className="flex items-center gap-4 border border-[#EDEDED] rounded-lg px-3 py-1.5 bg-white shadow-sm">
+                                        <button onClick={() => setQuantity(Math.max(1, quantity - 1))} className="text-gray-400 hover:text-black w-4 h-4 flex items-center justify-center">
+                                            <FaMinus size={10} />
+                                        </button>
+                                        <span className="text-[14px] font-medium w-3 text-center text-[#1D1D1F]">{quantity}</span>
+                                        <button onClick={() => setQuantity(quantity + 1)} className="text-gray-400 hover:text-black w-4 h-4 flex items-center justify-center">
+                                            <FaPlus size={10} />
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <button className="w-full pt-1 text-[12px] font-bold text-black bg-transparent hover:text-gray-700 transition-colors uppercase tracking-[0.08em] text-center">
+                                VIEW ALL BENEFITS
+                            </button>
+                        </div>
+
+                        {/* Refundable Deposit & Value Props Stack */}
+                        <div className="flex flex-col gap-5 shrink-0 px-2 mt-[-6px]">
+                            {/* Refundable Deposit Line */}
+                            <div className="flex justify-between items-center px-1">
+                                <span className="text-[12.5px] font-medium text-gray-600 tracking-tight">
+                                    100% Refundable Deposit <span className="text-[13px] text-gray-400 line-through mx-[3px] decoration-gray-400">₹{product.securityDeposit ? product.securityDeposit + 4999 : '24,999'}</span> <span className="font-bold text-[#1D1D1F] text-[16px]">₹{product.securityDeposit || '20,000'}</span>
+                                </span>
+                                <div className="w-[15px] h-[15px] rounded-full border border-[#FF3B30] flex items-center justify-center text-[#FF3B30] text-[10px] font-bold font-serif leading-none opacity-80 cursor-pointer hover:opacity-100 transition-opacity">
+                                    i
+                                </div>
+                            </div>
+
+                            {/* Value Props */}
+                            <div className="flex flex-col gap-[8px]">
+                                {[
+                                    { icon: <FaStar size={13}/>, text: 'Fully Functional (100% Tested)' },
+                                    { icon: <BsBoxSeam size={13}/>, text: 'Original Accessories Included' },
+                                    { icon: <BsTruck size={13}/>, text: 'Free Repairs & Maintenance' },
+                                    { icon: <BsBoxSeam size={13}/>, text: 'Professionally sanitized' }
+                                ].map((item, i) => (
+                                    <div key={i} className="flex items-center gap-4 bg-[#F8F8F8] rounded-[10px] px-4 py-3.5">
+                                        <div className="text-gray-500 opacity-90">
+                                            {item.icon}
                                         </div>
+                                        <span className="text-[12.5px] font-semibold text-gray-700 tracking-tight">{item.text}</span>
                                     </div>
-
-                                    <div className="w-[1px] bg-gray-200 mx-4" />
-
-                                    <div className="flex-1 py-1">
-                                        <ul className="space-y-1.5">
-                                            <li className="flex items-center gap-2 text-[12px] font-bold text-gray-700">
-                                                <div className="w-1.5 h-1.5 rounded-full bg-gray-900" />
-                                                Free relocation
-                                            </li>
-                                            <li className="flex items-center gap-2 text-[12px] font-bold text-gray-700">
-                                                <div className="w-1.5 h-1.5 rounded-full bg-gray-900" />
-                                                Free upgrades
-                                            </li>
-                                        </ul>
-                                    </div>
-                                </div>
-                                <button className="w-full py-2 bg-gray-100/80 text-[12px] font-bold text-gray-600 hover:bg-gray-200 transition-colors uppercase tracking-widest border-t border-gray-100">
-                                    View All Benefits
-                                </button>
+                                ))}
                             </div>
                         </div>
 
                         {/* Secondary Info Cards */}
-                        <div className="grid grid-cols-2 gap-3 mb-6">
-                            <div className="border border-[#FFE0B2] bg-[#FFF8E1] p-4 rounded-2xl flex flex-col gap-1 cursor-pointer hover:shadow-sm transition-shadow">
-                                <div className="w-8 h-8 flex items-center justify-center rounded-full bg-orange-100 mb-1">
-                                    <BsBoxSeam className="text-orange-600" size={16} />
+                        <div className="grid grid-cols-2 gap-4 shrink-0">
+                            <div className="border border-[#FDE68A] bg-[#FFF8E1] px-5 py-6 rounded-2xl flex flex-col gap-2 cursor-pointer hover:shadow-sm transition-shadow opacity-90 hover:opacity-100">
+                                <div className="flex items-center gap-2 mb-2">
+                                    <BsTruck className="text-gray-700" size={18} />
+                                    <span className="text-[12px] font-bold text-gray-900 leading-snug">What if I cancel or return before 6 months?</span>
                                 </div>
-                                <span className="text-[11px] font-bold text-gray-800 leading-tight">What if I cancel or return before 6 months?</span>
-                                <span className="text-[11px] font-bold text-[#FF4500] mt-auto">View Details</span>
+                                <span className="text-[12px] font-bold text-[#EA580C] self-end mt-auto xl:mr-1">View Details</span>
                             </div>
-                            <div className="border border-[#FFE0B2] bg-[#FFF8E1] p-4 rounded-2xl flex flex-col gap-1 cursor-pointer hover:shadow-sm transition-shadow">
-                                <div className="w-8 h-8 flex items-center justify-center rounded-full bg-orange-100 mb-1">
-                                    <BsTruck className="text-orange-600" size={16} />
+                            <div className="border border-[#FDE68A] bg-[#FFF8E1] px-5 py-6 rounded-2xl flex flex-col gap-2 cursor-pointer hover:shadow-sm transition-shadow opacity-90 hover:opacity-100">
+                                <div className="flex items-center gap-2 mb-2">
+                                    <FaStar className="text-gray-700" size={18} />
+                                    <span className="text-[12px] font-bold text-gray-900 leading-snug">How do I extend tenure after 6 months?</span>
                                 </div>
-                                <span className="text-[11px] font-bold text-gray-800 leading-tight">How do I extend tenure after 6 months?</span>
-                                <span className="text-[11px] font-bold text-[#FF4500] mt-auto">View Details</span>
+                                <span className="text-[12px] font-bold text-[#EA580C] self-end mt-auto xl:mr-1">View Details</span>
                             </div>
                         </div>
 
                         {/* Primary CTA */}
                         <button
                             onClick={handleAddToCart}
-                            className="w-full bg-[#FFB300] hover:bg-[#FFA000] active:scale-[0.98] text-white font-black py-4.5 rounded-2xl text-[17px] shadow-lg shadow-[#FFB300]/20 transition-all flex items-center justify-center gap-3 mb-8"
+                            className="w-full bg-[#FFCC00] hover:bg-[#F5C200] active:scale-[0.99] text-[#1D1D1F] font-bold py-[18px] rounded-2xl text-[16px] transition-all flex items-center justify-center shrink-0 mt-2 shadow-[0_2px_12px_rgba(255,204,0,0.25)]"
                         >
-                            Book Your Plan <FaShoppingCart className="text-xl" />
+                            Rent Now
                         </button>
 
-                        {/* Assurance Cards */}
-                        <div className="grid grid-cols-3 gap-3">
-                            <div className="bg-[#E3F2FD] p-3 rounded-2xl flex flex-col gap-3">
-                                <div className="w-8 h-8 flex items-center justify-center rounded-xl bg-blue-100 text-blue-600">
-                                    <FaStar size={14} />
-                                </div>
-                                <div>
-                                    <h4 className="text-[11px] font-bold text-blue-900 leading-tight mb-1">Great Condition Promise</h4>
-                                    <p className="text-[10px] font-medium text-blue-800/80 leading-snug">Product as good as new</p>
-                                </div>
+                        {/* Delivery Details */}
+                        <div className="flex justify-between items-start pt-[2px] shrink-0">
+                            <div className="flex flex-col relative pl-3">
+                                <div className="absolute left-0 top-[6px] w-[5px] h-[5px] bg-green-500 rounded-full" />
+                                <span className="text-[12px] font-bold text-gray-900 leading-tight mb-[2px]">Delivery</span>
+                                <span className="text-[11px] text-gray-500">Deliver to: <span className="text-gray-900 font-medium">[110001]</span></span>
                             </div>
-                            <div className="bg-[#E3F2FD] p-3 rounded-2xl flex flex-col gap-3">
-                                <div className="w-8 h-8 flex items-center justify-center rounded-xl bg-blue-100 text-blue-600">
-                                    <BsBoxSeam size={14} />
-                                </div>
-                                <div>
-                                    <h4 className="text-[11px] font-bold text-blue-900 leading-tight mb-1">Support</h4>
-                                    <p className="text-[10px] font-medium text-blue-800/80 leading-snug">Free Repairs & Maintenance</p>
-                                </div>
-                            </div>
-                            <div className="bg-[#E3F2FD] p-3 rounded-2xl flex flex-col gap-3">
-                                <div className="w-8 h-8 flex items-center justify-center rounded-xl bg-blue-100 text-blue-600">
-                                    <BsCreditCard size={14} />
-                                </div>
-                                <div>
-                                    <h4 className="text-[11px] font-bold text-blue-900 leading-tight mb-1">Easy Payments</h4>
-                                    <p className="text-[10px] font-medium text-blue-800/80 leading-snug">No Deposits, Small, secure payments</p>
-                                </div>
-                            </div>
+                            <span className="text-[11.5px] font-bold text-[#EA580C] max-w-[130px] text-right font-manrope">Check availability in your state</span>
                         </div>
-                    </div>
-                </div>
-
-                {/* Technical Specs / Tabbed details */}
-                <div className="mt-16 mb-20">
-                    <div className="flex justify-center gap-3 mb-12">
-                        {['Product Details', 'Return Policy', 'Shipping Policy'].map((tab) => (
-                            <button
-                                key={tab}
-                                onClick={() => setActiveTab(tab)}
-                                className={`px-10 py-3.5 rounded-full text-[15px] font-bold transition-all ${activeTab === tab ? 'bg-gray-900 text-white shadow-xl translate-y-[-2px]' : 'bg-gray-100 text-gray-500 hover:bg-gray-200'}`}
-                            >
-                                {tab}
-                            </button>
-                        ))}
-                    </div>
-
-                    <div className="bg-white border border-gray-100 rounded-[40px] p-12 shadow-[0_10px_40px_rgba(0,0,0,0.03)]">
-                        {activeTab === 'Product Details' && (
-                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-y-12 gap-x-16">
-                                {specs.map((item, i) => (
-                                    <div key={i} className={`flex flex-col gap-2 group ${item.label === 'DETAILS' ? 'md:col-span-2 lg:col-span-3' : ''}`}>
-                                        <span className="text-[13px] font-black text-gray-400 uppercase tracking-[2px] mb-1 group-hover:text-black transition-colors">{item.label}</span>
-                                        <div className="w-8 h-[2px] bg-gray-100 group-hover:w-full transition-all duration-500 mb-1" />
-                                        <span className="text-[18px] font-bold text-gray-900 whitespace-pre-line">{item.value}</span>
-                                    </div>
-                                ))}
-                            </div>
-                        )}
-                        {activeTab === 'Return Policy' && (
-                            <div className="prose max-w-none">
-                                <h3 className="text-xl font-bold mb-4">Return Policy</h3>
-                                <p className="text-gray-700 whitespace-pre-line leading-relaxed">
-                                    {product.returnPolicy || "Standard return policy applies. Please contact support for details."}
-                                </p>
-                            </div>
-                        )}
-                        {activeTab === 'Shipping Policy' && (
-                            <div className="prose max-w-none">
-                                <h3 className="text-xl font-bold mb-4">Shipping Policy</h3>
-                                <p className="text-gray-700 whitespace-pre-line leading-relaxed">
-                                    {product.shippingPolicy || "Standard shipping policy applies. Delivery usually takes 2-5 business days."}
-                                </p>
-                            </div>
-                        )}
                     </div>
                 </div>
             </main>
