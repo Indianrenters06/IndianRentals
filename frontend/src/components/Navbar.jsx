@@ -323,15 +323,15 @@ const Navbar = () => {
                                         
                                         {/* Sidebar itself */}
                                         <motion.div
-                                            initial={{ x: "100%" }}
+                                            initial={{ x: "-100%" }}
                                             animate={{ x: 0 }}
-                                            exit={{ x: "100%" }}
+                                            exit={{ x: "-100%" }}
                                             transition={{ type: "spring", damping: 25, stiffness: 200 }}
-                                            className="fixed right-0 top-0 h-screen z-[999] overflow-y-auto scrollbar-hide flex flex-col rounded-l-3xl shadow-[-10px_0_30px_rgba(0,0,0,0.08)]"
-                                            style={{ width: '360px', background: '#F2F2F7', padding: '16px' }}
+                                            className="fixed left-0 top-0 h-screen z-[999] overflow-y-auto scrollbar-hide flex flex-col rounded-r-3xl shadow-[10px_0_30px_rgba(0,0,0,0.08)]"
+                                            style={{ width: '360px', background: '#F2F2F7', padding: '12px' }}
                                         >
                                             {/* Card 1 — Pincode */}
-                                            <div className="bg-white rounded-2xl p-4 mb-3">
+                                            <div className="bg-white rounded-2xl p-3 mb-2">
                                                 {/* Back pill — sits in its own row, never touches text */}
                                                 <div className="flex justify-end mb-3">
                                                     <button
@@ -360,7 +360,7 @@ const Navbar = () => {
 
                                                 <div className="flex items-center gap-2 mb-4">
                                                     <MapPin size={22} color="#0066FF" weight="regular" />
-                                                    <h2 className="text-[16px] font-bold text-gray-900 font-manrope tracking-tight">
+                                                    <h2 className="text-[16px] font-bold text-gray-900 font-sans tracking-tight">
                                                         Enter Your Delivery Location
                                                     </h2>
                                                 </div>
@@ -453,7 +453,7 @@ const Navbar = () => {
                                                             height: '23px',
                                                             borderRadius: '9999px',
                                                             background: 'hsla(44, 100%, 64%, 1)',
-                                                            fontFamily: 'Manrope, sans-serif',
+                                                            fontFamily: '"Mona Sans", sans-serif',
                                                             fontWeight: 500,
                                                             fontSize: '11px',
                                                             letterSpacing: '-0.2px',
@@ -477,13 +477,10 @@ const Navbar = () => {
                                     className="flex items-center text-gray-700 hover:text-black transition-colors focus:outline-none h-full"
                                     onClick={() => setIsProfileDropdownOpen(!isProfileDropdownOpen)}
                                 >
-                                    <div style={{ width: "20px", height: "20px", position: "relative" }}>
-                                        <User 
-                                            size={16.25} 
-                                            color="#000000" 
-                                            weight="regular"
-                                            style={{ position: "absolute", top: "1.88px", left: "1.88px" }}
-                                        />
+                                    <div className="flex items-center justify-center cursor-pointer transition-transform hover:scale-105" style={{ width: "30px", height: "30px" }}>
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" style={{ width: "26.25px", height: "26.25px", color: "#000000" }}>
+                                            <path strokeLinecap="round" strokeLinejoin="round" d="M17.982 18.725A7.488 7.488 0 0 0 12 15.75a7.488 7.488 0 0 0-5.982 2.975m11.963 0a9 9 0 1 0-11.963 0m11.963 0A8.966 8.966 0 0 1 12 21a8.966 8.966 0 0 1-5.982-2.275M15 9.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+                                        </svg>
                                     </div>
                                 </button>
 
@@ -508,7 +505,7 @@ const Navbar = () => {
                                                     padding: "16px",
                                                     borderRadius: "12px",
                                                     boxShadow: "0px 0px 6px 0px hsla(0, 0%, 60%, 0.25)",
-                                                    fontFamily: "Manrope, sans-serif",
+                                                    fontFamily: "'Mona Sans', sans-serif",
                                                     display: "flex",
                                                     flexDirection: "column"
                                                 }}
@@ -520,7 +517,7 @@ const Navbar = () => {
                                                             style={{ 
                                                                 width: "52px", 
                                                                 height: "16px", 
-                                                                fontFamily: "'Manrope', sans-serif", 
+                                                                fontFamily: "'Mona Sans', sans-serif", 
                                                                 fontWeight: 600, 
                                                                 fontSize: "11px", 
                                                                 color: "hsla(0, 0%, 46%, 1)",
@@ -538,7 +535,7 @@ const Navbar = () => {
                                                         style={{ 
                                                             width: "141px", 
                                                             height: "16px", 
-                                                            fontFamily: "'Manrope', sans-serif", 
+                                                            fontFamily: "'Mona Sans', sans-serif", 
                                                             fontWeight: 600, 
                                                             fontSize: "11px", 
                                                             color: "hsla(0, 0%, 33%, 1)",
@@ -578,7 +575,7 @@ const Navbar = () => {
                                                             style={{ 
                                                                 width: "141px", 
                                                                 height: "20px", 
-                                                                fontFamily: "'Manrope', sans-serif", 
+                                                                fontFamily: "'Mona Sans', sans-serif", 
                                                                 fontWeight: 600, 
                                                                 fontSize: "13px", 
                                                                 color: "hsla(0, 0%, 20%, 1)",
@@ -610,17 +607,17 @@ const Navbar = () => {
                         )}
 
                         {/* Wishlist */}
-                        <Link href="/wishlist" className="flex items-center justify-center hover:opacity-80 transition-opacity shrink-0 ml-1" style={{ width: "24px", height: "24px" }}>
-                            <Heart size={21} color="#1D1D1F" weight="regular" />
+                        <Link href="/wishlist" className="flex items-center justify-center hover:opacity-80 transition-opacity shrink-0 ml-1" style={{ width: "30px", height: "30px" }}>
+                            <Heart size={26.25} color="#000000" weight="regular" />
                         </Link>
 
                         {/* Cart */}
-                        <Link href="/cart" className="relative flex items-center justify-center hover:opacity-80 transition-opacity shrink-0" style={{ width: "24px", height: "24px" }}>
-                            <ShoppingCart size={21} color="#1D1D1F" weight="regular" />
+                        <Link href="/cart" className="relative flex items-center justify-center hover:opacity-80 transition-opacity shrink-0" style={{ width: "30px", height: "30px" }}>
+                            <ShoppingCart size={26.25} color="#000000" weight="regular" />
                             {totalQuantity > 0 && (
                                 <span 
                                     className="absolute bg-red-500 text-white text-[10px] font-bold w-[16px] h-[16px] flex items-center justify-center rounded-full"
-                                    style={{ top: "-6px", right: "-8px" }}
+                                    style={{ top: "-2px", right: "-4px" }}
                                 >
                                     {totalQuantity}
                                 </span>
@@ -628,8 +625,8 @@ const Navbar = () => {
                         </Link>
 
                         {/* Menu Hamburger */}
-                        <button className="flex items-center justify-center hover:opacity-80 transition-opacity shrink-0" style={{ width: "24px", height: "24px" }}>
-                            <List size={23} color="#1D1D1F" weight="regular" />
+                        <button className="flex items-center justify-center hover:opacity-80 transition-opacity shrink-0" style={{ width: "30px", height: "30px" }}>
+                            <List size={26.25} color="#000000" weight="regular" />
                         </button>
                     </div>
 
@@ -735,7 +732,9 @@ const Navbar = () => {
                                     <div className="space-y-3">
                                         <div className="flex items-center gap-3 p-3 bg-indigo-50 rounded-xl">
                                             <div className="w-10 h-10 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 border border-indigo-200">
-                                                <User size={18} weight="fill" />
+                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-[18px] h-[18px]">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" d="M17.982 18.725A7.488 7.488 0 0 0 12 15.75a7.488 7.488 0 0 0-5.982 2.975m11.963 0a9 9 0 1 0-11.963 0m11.963 0A8.966 8.966 0 0 1 12 21a8.966 8.966 0 0 1-5.982-2.275M15 9.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+                                                </svg>
                                             </div>
                                             <div className="flex-1 min-w-0">
                                                 <p className="text-sm font-bold text-gray-900 truncate">{userInfo.name || "User"}</p>

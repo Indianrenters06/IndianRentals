@@ -156,7 +156,7 @@ const RentByCategory = () => {
         >
             <div className="max-w-[1200px] mx-auto px-4 sm:px-6">
                 <div className="flex items-center justify-between mb-4 md:mb-12">
-                    <h2 className="text-[22px] md:text-3xl lg:text-4xl font-semibold font-manrope text-[#333333] tracking-[-0.02em] leading-tight">{cmsConfig.title}</h2>
+                    <h2 className="text-[22px] md:text-3xl lg:text-4xl font-semibold font-sans text-[#333333] tracking-[-0.02em] leading-tight">{cmsConfig.title}</h2>
                     <Link
                         href="/categories"
                         className="hidden md:inline-flex items-center justify-center text-gray-900 hover:brightness-105 transition-all"
@@ -170,7 +170,7 @@ const RentByCategory = () => {
                             borderRadius: '9999px',
                             background: 'hsla(44, 100%, 64%, 1)',
                             borderBottom: '1px solid rgba(0,0,0,0.10)',
-                            fontFamily: 'Manrope, sans-serif',
+                            fontFamily: '"Mona Sans", sans-serif',
                             fontWeight: 500,
                             fontSize: '14px',
                             lineHeight: '23px',
@@ -215,7 +215,7 @@ const RentByCategory = () => {
                                             </div>
                                         )}
                                     </div>
-                                    <span className="text-[11px] font-semibold font-manrope text-[#4b5563] text-center mt-2 leading-tight">{cat.name}</span>
+                                    <span className="text-[11px] font-semibold font-sans text-[#4b5563] text-center mt-2 leading-tight">{cat.name}</span>
                                 </Link>
                             </SwiperSlide>
                         ))}
@@ -224,7 +224,7 @@ const RentByCategory = () => {
                         <SwiperSlide style={{ width: '80px' }}>
                             <Link href="/categories" className="flex flex-col items-center">
                                 <div className="w-[80px] h-[78px] rounded-[10px] bg-[#fff3d4] border border-[#fbd38d]/30 flex flex-col items-center justify-center gap-1 shadow-sm">
-                                    <span className="text-[10px] font-semibold font-manrope text-[#d97706] leading-tight">View All</span>
+                                    <span className="text-[10px] font-semibold font-sans text-[#d97706] leading-tight">View All</span>
                                     <div className="w-6 h-6 rounded-full bg-[#f6ad55] flex items-center justify-center">
                                         <ArrowRight size={8} weight="fill" className="text-white" />
                                     </div>
@@ -309,7 +309,7 @@ const RentByCategory = () => {
                                         )}
                                     </div>
                                     <h3
-                                        className="font-semibold font-manrope text-gray-600 text-center group-hover:text-gray-700 transition-colors"
+                                        className="font-semibold font-sans text-gray-600 text-center group-hover:text-gray-700 transition-colors"
                                         style={{ fontSize: viewType === 'tablet' ? '12px' : '15px' }}
                                     >
                                         {cat.name}

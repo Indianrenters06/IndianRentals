@@ -91,7 +91,7 @@ const FeatureSection = () => {
                                 initial={{ opacity: 0, y: 20 }}
                                 whileInView={{ opacity: 1, y: 0 }}
                                 viewport={{ once: true }}
-                                className="font-manrope"
+                                className="font-sans"
                                 style={{
                                     width: 'auto',
                                     height: 'auto',
@@ -114,7 +114,7 @@ const FeatureSection = () => {
                                 whileInView={{ opacity: 1, y: 0 }}
                                 viewport={{ once: true }}
                                 transition={{ delay: 0.1 }}
-                                className="font-manrope"
+                                className="font-sans"
                                 style={{
                                     width: viewType === 'desktop' ? '235px' : (viewType === 'tablet' ? '190px' : 'auto'),
                                     height: viewType === 'desktop' ? '115px' : 'auto',
@@ -256,7 +256,7 @@ const FeatureSection = () => {
                                         }}
                                     >
                                         <p
-                                            className="font-manrope"
+                                            className="font-sans"
                                             style={{
                                                 fontSize: viewType === 'desktop' ? '13px' : '9px',
                                                 fontWeight: viewType === 'desktop' ? '600' : '500',
@@ -272,7 +272,7 @@ const FeatureSection = () => {
                                             {stat.label}
                                         </p>
                                         <h4
-                                            className="font-manrope"
+                                            className="font-sans"
                                             style={{
                                                 fontSize: viewType === 'mobile' ? '24px' : '32px',
                                                 fontWeight: viewType === 'desktop' ? '500' : 'bold',
@@ -293,7 +293,7 @@ const FeatureSection = () => {
                                         </h4>
                                     </div>
                                     <p
-                                        className="font-manrope"
+                                        className="font-sans"
                                         style={{
                                             fontSize: viewType === 'desktop' ? '12px' : '9px',
                                             fontWeight: viewType === 'desktop' ? '600' : '500',
@@ -327,7 +327,7 @@ const FeatureSection = () => {
                             marginTop: viewType === 'mobile' ? '24px' : 0
                         }}
                     >
-                        <h3 className="font-manrope text-[14px] md:text-xl font-bold tracking-tight pb-2">
+                        <h3 className="font-sans text-[14px] md:text-xl font-bold tracking-tight pb-2">
                             <span className="text-[#3b82f6]">Built for </span>
                             <span className="bg-clip-text text-transparent bg-linear-to-r from-purple-500 via-pink-500 to-orange-500">
                                 Apple Intelligence.

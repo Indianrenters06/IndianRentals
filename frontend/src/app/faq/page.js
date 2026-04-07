@@ -17,7 +17,7 @@ export default function FaqPage() {
                         className="object-cover object-center brightness-75"
                     />
                     <div className="absolute inset-0 flex items-center justify-center">
-                        <h1 className="text-white text-5xl md:text-7xl font-semibold drop-shadow-lg font-manrope">FAQs</h1>
+                        <h1 className="text-white text-5xl md:text-7xl font-semibold drop-shadow-lg font-sans">FAQs</h1>
                     </div>
                 </div>
             </div>

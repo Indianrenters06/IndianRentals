@@ -82,7 +82,7 @@ const ClientSection = () => {
                                         <div className="w-16 h-16 rounded-full bg-black/10 flex items-center justify-center text-black font-black text-2xl border border-black/5">
                                             {client.logo[0]}
                                         </div>
-                                        <span className="text-black font-manrope font-extrabold text-[28px] tracking-tight">
+                                        <span className="text-black font-sans font-extrabold text-[28px] tracking-tight">
                                             {client.name}
                                         </span>
                                     </div>

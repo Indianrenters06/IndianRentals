@@ -37,7 +37,7 @@ const ProductCard = ({ product, index, viewType = 'desktop', handleAddToCart }) 
                     willChange: "transform, height",
                     cursor: "pointer",
                     backgroundColor: "hsla(0, 0%, 100%, 1)",
-                    borderRadius: isDesktop ? '16px' : (isTablet ? '17px' : '8px'),
+                    borderRadius: isDesktop ? '20px' : (isTablet ? '17px' : '8px'),
                     opacity: 1
                 }}
                 variants={{
@@ -56,7 +56,7 @@ const ProductCard = ({ product, index, viewType = 'desktop', handleAddToCart }) 
                     style={{
                         width: isDesktop ? '285px' : (isTablet ? '223px' : '170px'),
                         height: isDesktop ? '282px' : (isTablet ? '236px' : '184px'),
-                        borderRadius: isDesktop ? '16px' : (isTablet ? '17px' : '8px'),
+                        borderRadius: isDesktop ? '20px' : (isTablet ? '17px' : '8px'),
                         borderWidth: isTablet ? '0px 0.84px 0.84px 0.84px' : '0px 1px 1px 1px',
                         borderStyle: "solid",
                         borderColor: "hsla(0, 0%, 93%, 1)",
@@ -70,18 +70,26 @@ const ProductCard = ({ product, index, viewType = 'desktop', handleAddToCart }) 
                     <div
                         className="absolute z-20 flex items-center"
                         style={{
-                            top: "19.57px",
-                            left: "13.49px",
-                            gap: "4px",
-                            width: "92px",
-                            height: "28px"
+                            top: "20px",
+                            left: "20px",
+                            gap: "6px"
                         }}
                     >
-                        <span className="text-white text-[10px] font-bold px-2 py-[4px] rounded-[6px] shadow-sm leading-none flex items-center justify-center"
+                        <span className="text-[10.5px] leading-none flex items-center justify-center whitespace-nowrap"
                             style={{
-                                width: "64px",
-                                height: "28px",
-                                background: "hsla(3, 100%, 56%, 1)"
+                                height: "24px",
+                                opacity: 1,
+                                borderRadius: "27px",
+                                paddingTop: "4px",
+                                paddingRight: "10px",
+                                paddingBottom: "4px",
+                                paddingLeft: "10px",
+                                background: "hsla(3, 86%, 51%, 1)",
+                                boxShadow: "0px 0px 1px 0px hsla(0, 0%, 47%, 0.1), 0px 1px 1px 0px hsla(0, 0%, 47%, 0.09), 0px 3px 2px 0px hsla(0, 0%, 47%, 0.05), 0px 5px 2px 0px hsla(0, 0%, 47%, 0.01), 0px 9px 2px 0px hsla(0, 0%, 47%, 0)",
+                                color: "hsla(4, 100%, 97%, 1)",
+                                fontFamily: "'Mona Sans', sans-serif",
+                                fontWeight: 600,
+                                letterSpacing: "0.02em"
                             }}
                         >
                             -20% off
@@ -90,13 +98,13 @@ const ProductCard = ({ product, index, viewType = 'desktop', handleAddToCart }) 
                             <span
                                 className="text-white text-[10px] font-bold shadow-sm leading-none flex items-center justify-center h-full translate-x-1.5"
                                 style={{
-                                    width: "34px",
-                                    height: "22px",
+                                    width: "45px",
+                                    height: "24px",
                                     paddingTop: "4px",
-                                    paddingRight: "5px",
+                                    paddingRight: "10px",
                                     paddingBottom: "4px",
-                                    paddingLeft: "5px",
-                                    borderRadius: "6px",
+                                    paddingLeft: "10px",
+                                    borderRadius: "27px",
                                     backgroundColor: "hsla(122, 100%, 35%, 1)",
                                     boxShadow: "0px 0px 1px 0px hsla(0, 0%, 47%, 0.1), 0px 1px 1px 0px hsla(0, 0%, 47%, 0.09), 0px 3px 2px 0px hsla(0, 0%, 47%, 0.05), 0px 5px 2px 0px hsla(0, 0%, 47%, 0.01), 0px 9px 2px 0px hsla(0, 0%, 47%, 0)"
                                 }}
@@ -112,10 +120,10 @@ const ProductCard = ({ product, index, viewType = 'desktop', handleAddToCart }) 
                             width: "33px",
                             height: "33px",
                             top: "10.57px",
-                            right: "12.51px",
+                            right: "16.51px",
                             backgroundColor: "hsla(0, 0%, 93%, 1)",
                             border: "0.2px solid hsla(0, 0%, 80%, 1)",
-                            borderRadius: "100%"
+                            borderRadius: "9999px"
                         }}
                         onClick={(e) => { e.preventDefault(); e.stopPropagation(); }}
                     >
@@ -134,7 +142,7 @@ const ProductCard = ({ product, index, viewType = 'desktop', handleAddToCart }) 
 
                 {/* Text Section */}
                 <div
-                    className="flex flex-col relative font-manrope bg-white"
+                    className="flex flex-col relative font-sans bg-white"
                     style={{
                         width: isDesktop ? '285px' : (isTablet ? '223px' : '100%'),
                         height: isDesktop ? (isHovered ? '158px' : '105px') : (isTablet ? (isHovered ? '130px' : '85px') : '72px'),
@@ -148,7 +156,7 @@ const ProductCard = ({ product, index, viewType = 'desktop', handleAddToCart }) 
                     }}
                 >
                     <h3
-                        className="font-manrope line-clamp-1 group-hover:text-[#FF3B30] transition-colors duration-300 shrink-0"
+                        className="font-sans line-clamp-1 group-hover:text-[#FF3B30] transition-colors duration-300 shrink-0"
                         style={{
                             width: isDesktop ? "261px" : "100%",
                             height: isDesktop ? "25px" : "20px",
@@ -191,7 +199,7 @@ const ProductCard = ({ product, index, viewType = 'desktop', handleAddToCart }) 
                         <div className="flex items-center gap-1.5" style={{ color: "hsla(0, 0%, 46%, 1)" }}>
                             <Truck size={isDesktop ? 16 : 14} weight="regular" />
                             <span
-                                className="font-manrope"
+                                className="font-sans"
                                 style={{
                                     fontSize: "12px",
                                     fontWeight: 500,
@@ -279,7 +287,7 @@ const ProductCard = ({ product, index, viewType = 'desktop', handleAddToCart }) 
                     >
                         <button
                             onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleAddToCart(e, product); }}
-                            className="w-full h-full rounded-full bg-[#FFCF46] text-[#1D1D1F] font-bold text-[14px] shadow-sm transform transition-all duration-300 ease-out active:scale-95 hover:brightness-105"
+                            className="inline-flex items-center justify-center gap-0.5 w-full h-full rounded-full border-b border-black/5 bg-[hsla(44,100%,64%,1)] text-[#1D1D1F] font-medium text-sm py-[6px] px-5 opacity-100 shadow-sm active:scale-95 hover:border-b-2 hover:rounded-4xl hover:bg-[hsla(42,100%,55%,1)] transition-all duration-300 ease-out"
                             style={{ transform: isHovered ? 'translateY(0)' : 'translateY(15px)' }}
                         >
                             Rent Now
@@ -426,7 +434,7 @@ const BestRentedProducts = ({ type = "bestRented", defaultTitle = "Curated Produ
             <div className="max-w-[1200px] mx-auto px-4 sm:px-6">
                 <div className="flex flex-col mb-6 md:mb-10 max-w-[350px] md:max-w-none w-full mx-auto md:mx-0">
                     <div className="flex items-center justify-between">
-                        <h2 className="font-manrope tracking-tight whitespace-nowrap text-[24px] md:text-[36px] font-semibold text-[#333] leading-tight md:leading-[48px]">
+                        <h2 className="font-sans tracking-tight whitespace-nowrap text-[24px] md:text-[36px] font-semibold text-[#333] leading-tight md:leading-[48px]">
                             {cmsConfig.title}
                         </h2>
                         <Link
@@ -440,36 +448,36 @@ const BestRentedProducts = ({ type = "bestRented", defaultTitle = "Curated Produ
 
                 <div className={`${viewType === 'mobile' ? 'hidden' : 'block'} relative`}>
                     <div style={viewType === 'tablet' ? { overflow: 'hidden' } : {}}>
-                    <Swiper
-                        modules={[Navigation, Autoplay, Scrollbar]}
-                        spaceBetween={24}
-                        slidesPerView={'auto'}
-                        navigation={{
-                            nextEl: `.swiper-next-${sectionSuffix}`,
-                            prevEl: `.swiper-prev-${sectionSuffix}`,
-                        }}
-                        scrollbar={{
-                            el: `.swiper-scrollbar-${sectionSuffix}`,
-                            draggable: true,
-                            hide: false,
-                        }}
-                        autoplay={{
-                            delay: 4000,
-                            disableOnInteraction: false,
-                        }}
-                        className={viewType === 'desktop' ? '!pb-0 !overflow-visible' : '!pb-0'}
-                    >
-                        {products.map((product, index) => (
-                            <SwiperSlide key={product.id || index} style={{ width: viewType === 'desktop' ? '285px' : '223px' }}>
-                                <ProductCard
-                                    product={product}
-                                    index={index}
-                                    viewType={viewType}
-                                    handleAddToCart={handleAddToCart}
-                                />
-                            </SwiperSlide>
-                        ))}
-                    </Swiper>
+                        <Swiper
+                            modules={[Navigation, Autoplay, Scrollbar]}
+                            spaceBetween={24}
+                            slidesPerView={'auto'}
+                            navigation={{
+                                nextEl: `.swiper-next-${sectionSuffix}`,
+                                prevEl: `.swiper-prev-${sectionSuffix}`,
+                            }}
+                            scrollbar={{
+                                el: `.swiper-scrollbar-${sectionSuffix}`,
+                                draggable: true,
+                                hide: false,
+                            }}
+                            autoplay={{
+                                delay: 4000,
+                                disableOnInteraction: false,
+                            }}
+                            className={viewType === 'desktop' ? '!pb-0 !overflow-visible' : '!pb-0'}
+                        >
+                            {products.map((product, index) => (
+                                <SwiperSlide key={product.id || index} style={{ width: viewType === 'desktop' ? '285px' : '223px' }}>
+                                    <ProductCard
+                                        product={product}
+                                        index={index}
+                                        viewType={viewType}
+                                        handleAddToCart={handleAddToCart}
+                                    />
+                                </SwiperSlide>
+                            ))}
+                        </Swiper>
                     </div>
 
                     {/* Progress Bar & Navigation Arrows */}

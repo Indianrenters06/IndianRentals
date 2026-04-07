@@ -65,7 +65,7 @@ const RegisterPage = () => {
     };
 
     return (
-        <div className="min-h-[calc(100vh-80px)] flex items-center justify-center bg-gray-50 px-4 py-12 sm:px-6 lg:px-8 relative overflow-hidden font-manrope">
+        <div className="min-h-[calc(100vh-80px)] flex items-center justify-center bg-gray-50 px-4 py-12 sm:px-6 lg:px-8 relative overflow-hidden font-sans">
             {/* Background Blobs */}
             <div className="absolute top-[-10%] right-[-5%] w-[400px] h-[400px] bg-[#00A8FF]/20 rounded-full blur-[80px] pointer-events-none" />
             <div className="absolute bottom-[10%] left-[-5%] w-[400px] h-[400px] bg-[#FFC107]/20 rounded-full blur-[80px] pointer-events-none" />

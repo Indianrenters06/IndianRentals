@@ -110,7 +110,7 @@
 
 @layer base {
   body {
-    @apply font-manrope bg-white text-grey-700 antialiased;
+    @apply font-sans bg-white text-grey-700 antialiased;
   }
 }
 

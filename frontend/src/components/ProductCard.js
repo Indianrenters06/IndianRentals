@@ -59,7 +59,7 @@ const ProductCard = ({ product }) => {
                 className="bg-white flex flex-col overflow-hidden relative w-full"
                 style={{
                     border: "1px solid hsla(0, 0%, 89%, 1)",
-                    borderRadius: isMobile ? "8px" : "16px",
+                    borderRadius: isMobile ? "8px" : "20px",
                     backgroundColor: "hsla(0, 0%, 100%, 1)",
                     boxShadow: "0px 1px 2px 0px hsla(0, 0%, 0%, 0.05)",
                     cursor: "pointer",
@@ -67,7 +67,7 @@ const ProductCard = ({ product }) => {
                 }}
                 variants={{
                     initial: { height: isMobile ? 256 : 387 },
-                    hover: { 
+                    hover: {
                         height: isMobile ? 330 : 440,
                         transition: { duration: 0.3, ease: [0.45, 1.45, 0.8, 1] }
                     }
@@ -79,7 +79,7 @@ const ProductCard = ({ product }) => {
                     style={{
                         width: isMobile ? "170px" : "285px",
                         height: isMobile ? "184px" : "282px",
-                        borderRadius: isMobile ? "8px" : "16px",
+                        borderRadius: isMobile ? "8px" : "20px",
                         borderWidth: "0px 1px 1px 1px",
                         borderStyle: "solid",
                         borderColor: "hsla(0, 0%, 93%, 1)",
@@ -88,22 +88,29 @@ const ProductCard = ({ product }) => {
                         boxShadow: "0px 4px 8px 0px hsla(0, 0%, 87%, 0.1), 0px 15px 15px 0px hsla(0, 0%, 87%, 0.09), 0px 33px 20px 0px hsla(0, 0%, 87%, 0.05), 0px 59px 23px 0px hsla(0, 0%, 87%, 0.01), 0px 91px 26px 0px hsla(0, 0%, 87%, 0)"
                     }}
                 >
-                    {/* Badges — top-left */}
                     <div
                         className="absolute z-20 flex items-center"
                         style={{
-                            top: "19.57px",
-                            left: "13.49px",
-                            gap: "4px",
-                            width: "92px",
-                            height: "28px"
+                            top: "20px",
+                            left: "20px",
+                            gap: "6px"
                         }}
                     >
-                        <span className="text-white text-[10px] font-bold px-2 py-[4px] rounded-[6px] shadow-sm leading-none flex items-center justify-center"
+                        <span className="text-[10.5px] leading-none flex items-center justify-center whitespace-nowrap"
                             style={{
-                                width: "64px",
-                                height: "28px",
-                                background: "hsla(3, 100%, 56%, 1)"
+                                height: "24px",
+                                opacity: 1,
+                                borderRadius: "27px",
+                                paddingTop: "4px",
+                                paddingRight: "10px",
+                                paddingBottom: "4px",
+                                paddingLeft: "10px",
+                                background: "hsla(3, 86%, 51%, 1)",
+                                boxShadow: "0px 0px 1px 0px hsla(0, 0%, 47%, 0.1), 0px 1px 1px 0px hsla(0, 0%, 47%, 0.09), 0px 3px 2px 0px hsla(0, 0%, 47%, 0.05), 0px 5px 2px 0px hsla(0, 0%, 47%, 0.01), 0px 9px 2px 0px hsla(0, 0%, 47%, 0)",
+                                color: "hsla(4, 100%, 97%, 1)",
+                                fontFamily: "'Mona Sans', sans-serif",
+                                fontWeight: 600,
+                                letterSpacing: "0.02em"
                             }}
                         >
                             {product.discount || "-20% off"}
@@ -112,13 +119,13 @@ const ProductCard = ({ product }) => {
                             <span
                                 className="text-white text-[10px] font-bold shadow-sm leading-none flex items-center justify-center h-full translate-x-1.5"
                                 style={{
-                                    width: "34px",
-                                    height: "22px",
+                                    width: "45px",
+                                    height: "24px",
                                     paddingTop: "4px",
-                                    paddingRight: "5px",
+                                    paddingRight: "10px",
                                     paddingBottom: "4px",
-                                    paddingLeft: "5px",
-                                    borderRadius: "6px",
+                                    paddingLeft: "10px",
+                                    borderRadius: "27px",
                                     backgroundColor: "hsla(122, 100%, 35%, 1)",
                                     boxShadow: "0px 0px 1px 0px hsla(0, 0%, 47%, 0.1), 0px 1px 1px 0px hsla(0, 0%, 47%, 0.09), 0px 3px 2px 0px hsla(0, 0%, 47%, 0.05), 0px 5px 2px 0px hsla(0, 0%, 47%, 0.01), 0px 9px 2px 0px hsla(0, 0%, 47%, 0)"
                                 }}
@@ -135,14 +142,14 @@ const ProductCard = ({ product }) => {
                             width: "33px",
                             height: "33px",
                             top: "10.57px",
-                            right: "12.51px",
+                            right: "16.51px",
                             backgroundColor: "hsla(0, 0%, 93%, 1)",
                             border: "0.2px solid hsla(0, 0%, 80%, 1)",
-                            borderRadius: "100%"
+                            borderRadius: "9999px"
                         }}
                         onClick={(e) => { e.preventDefault(); e.stopPropagation(); }}
                     >
-                        <Heart size={18} color="#000000" weight="thin" />
+                        <Heart size={18} color="#000000" weight="regular" />
                     </button>
 
                     <div
@@ -167,7 +174,7 @@ const ProductCard = ({ product }) => {
 
                 {/* ── Text Section ──────────────────────────────────────── */}
                 <div
-                    className="flex flex-col font-manrope bg-white shrink-0"
+                    className="flex flex-col font-sans bg-white shrink-0"
                     style={{
                         width: isMobile ? "170px" : "285px",
                         height: isMobile ? (isHovered ? '146px' : '72px') : (isHovered ? '158px' : '105px'),
@@ -181,7 +188,7 @@ const ProductCard = ({ product }) => {
                 >
                     {/* Product Name */}
                     <h3
-                        className="line-clamp-1 group-hover:text-[#FF3B30] transition-colors duration-300 shrink-0 font-manrope"
+                        className="line-clamp-1 group-hover:text-[#FF3B30] transition-colors duration-300 shrink-0 font-sans"
                         style={{
                             width: isMobile ? "154px" : "261px",
                             height: isMobile ? "22px" : "25px",
@@ -196,7 +203,7 @@ const ProductCard = ({ product }) => {
                     </h3>
 
                     {/* Rating + Delivery */}
-                    <div 
+                    <div
                         className="flex items-center justify-between shrink-0"
                         style={{ width: isMobile ? "154px" : "261px", height: "16px" }}
                     >
@@ -206,7 +213,7 @@ const ProductCard = ({ product }) => {
                                     <Star key={s} size={isMobile ? 12 : 14} weight="fill" className={s <= Math.round(product.rating || 4) ? "" : "opacity-20"} />
                                 ))}
                             </div>
-                            <span 
+                            <span
                                 className="ml-1"
                                 style={{
                                     fontFamily: "'Mona Sans', sans-serif",
@@ -221,8 +228,8 @@ const ProductCard = ({ product }) => {
                         </div>
                         <div className="flex items-center gap-1.5" style={{ color: "hsla(0, 0%, 46%, 1)" }}>
                             <Truck size={isMobile ? 14 : 16} weight="regular" />
-                            <span 
-                                className="font-manrope"
+                            <span
+                                className="'Mona Sans', sans-serif"
                                 style={{
                                     fontSize: "12px",
                                     fontWeight: 500,
@@ -246,7 +253,7 @@ const ProductCard = ({ product }) => {
                             marginTop: "-4px"
                         }}
                     >
-                        <span 
+                        <span
                             className="lowercase"
                             style={{
                                 fontFamily: "'Mona Sans', sans-serif",
@@ -259,7 +266,7 @@ const ProductCard = ({ product }) => {
                             from
                         </span>
                         {product.originalPrice && (
-                            <span 
+                            <span
                                 className="line-through decoration-[1.5px]"
                                 style={{
                                     fontFamily: "'Mona Sans', sans-serif",
@@ -272,7 +279,7 @@ const ProductCard = ({ product }) => {
                                 ₹{product.originalPrice}
                             </span>
                         )}
-                        <span 
+                        <span
                             className="font-bold tracking-tight ml-1 leading-none"
                             style={{
                                 fontFamily: "'Mona Sans', sans-serif",
@@ -284,7 +291,7 @@ const ProductCard = ({ product }) => {
                         >
                             ₹{product.rentPrice}
                         </span>
-                        <span 
+                        <span
                             className="lowercase"
                             style={{
                                 fontFamily: "'Mona Sans', sans-serif",
@@ -300,7 +307,7 @@ const ProductCard = ({ product }) => {
                     </div>
 
                     {/* Rent Now Button Entrance */}
-                    <div 
+                    <div
                         className="relative w-full z-30 overflow-hidden flex items-center justify-center transition-all duration-300 ease-out"
                         style={{
                             height: isHovered ? '43px' : '0px',
@@ -308,22 +315,13 @@ const ProductCard = ({ product }) => {
                             paddingTop: isHovered ? '8px' : '0px'
                         }}
                     >
-                        <button 
+                        <button
                             onClick={handleAddToCart}
-                            className="flex items-center justify-center rounded-full shadow-sm transform transition-all duration-300 ease-out active:scale-95 hover:brightness-105"
-                            style={{ 
-                                width: isMobile ? "100%" : "257px",
-                                height: "35px",
-                                backgroundColor: "hsla(44, 100%, 64%, 1)",
-                                color: "hsla(0, 0%, 12%, 1)",
-                                fontFamily: "Manrope, sans-serif",
-                                fontWeight: 500,
-                                fontSize: "14px",
-                                letterSpacing: "0.7px",
-                                padding: "6px 20px",
-                                gap: "2px",
-                                borderBottom: "1px solid rgba(0, 0, 0, 0.05)",
-                                transform: isHovered ? 'translateY(0)' : 'translateY(15px)' 
+                            className="inline-flex items-center justify-center gap-0.5 rounded-full border-b border-black/5 bg-[hsla(44,100%,64%,1)] text-[#1D1D1F] font-medium text-sm py-[6px] px-5 opacity-100 shadow-sm active:scale-95 hover:border-b-2 hover:rounded-4xl hover:bg-[hsla(42,100%,55%,1)] transition-all duration-300 ease-out"
+                            style={{
+                                width: isMobile ? '100%' : '111px',
+                                height: '35px',
+                                transform: isHovered ? 'translateY(0)' : 'translateY(15px)'
                             }}
                         >
                             {added ? 'Added!' : 'Rent Now'}

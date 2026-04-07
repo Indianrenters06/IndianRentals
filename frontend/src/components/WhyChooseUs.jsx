@@ -55,7 +55,7 @@ const WhyChooseUs = () => {
                     {/* Text Content - always first on mobile */}
                     <div className="space-y-6">
                         <div className="flex flex-col gap-[10px]">
-                            <h2 className="text-4xl font-semibold font-manrope text-gray-900">
+                            <h2 className="text-4xl font-semibold font-sans text-gray-900">
                                 {title}
                             </h2>
                             <p className="text-gray-600 leading-relaxed text-sm md:text-[15px]">
@@ -67,7 +67,7 @@ const WhyChooseUs = () => {
                             {stats.map((s, i) => (
                                 <div key={i} className="flex flex-col gap-1">
                                     <h3 
-                                        className="font-manrope text-2xl font-bold"
+                                        className="font-sans text-2xl font-bold"
                                         style={{ 
                                             fontSize: viewType === 'desktop' ? '48px' : '32px', 
                                             fontWeight: viewType === 'desktop' ? '500' : 'bold', 
@@ -80,7 +80,7 @@ const WhyChooseUs = () => {
                                         {s.value}
                                     </h3>
                                     <p 
-                                        className="font-manrope font-medium text-gray-500"
+                                        className="font-sans font-medium text-gray-500"
                                         style={{ 
                                             fontSize: viewType === 'desktop' ? '13.5px' : '13px', 
                                             fontWeight: viewType === 'desktop' ? '500' : '500', 

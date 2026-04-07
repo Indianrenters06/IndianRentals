@@ -53,22 +53,22 @@ export default function RentalProcessPage() {
                         className="object-cover object-center opacity-60"
                     />
                     <div className="absolute inset-0 flex items-center justify-center">
-                        <h1 className="text-white text-5xl md:text-7xl font-semibold drop-shadow-lg font-manrope">Rental Process</h1>
+                        <h1 className="text-white text-5xl md:text-7xl font-semibold drop-shadow-lg font-sans">Rental Process</h1>
                     </div>
                 </div>
             </div>
 
             {/* 2. Rental Process Steps Section */}
-            <div className="max-w-[1440px] mx-auto px-4 md:px-8 mb-24 font-manrope">
+            <div className="max-w-[1440px] mx-auto px-4 md:px-8 mb-24 font-sans">
                 <div style={{ width: '1200px' }} className="mx-auto flex flex-col md:flex-row md:items-start justify-between mb-12 gap-6">
                     <div className="max-w-2xl">
-                        <div className="inline-block bg-[#333] font-manrope text-white text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-widest leading-none">
+                        <div className="inline-block bg-[#333] font-sans text-white text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-widest leading-none">
                             Rental Process
                         </div>
-                        <h2 className="text-3xl md:text-[36px] font-semibold text-gray-900 font-manrope mb-4 tracking-tight leading-[1.1]">
+                        <h2 className="text-3xl md:text-[36px] font-semibold text-gray-900 font-sans mb-4 tracking-tight leading-[1.1]">
                             Rental Process
                         </h2>
-                        <p className="text-gray-600 font-manrope text-lg">
+                        <p className="text-gray-600 font-sans text-lg">
                             Choose, secure, receive, and create with zero hassle. <br className="hidden md:block" />
                             No installation, no configuration, no delay.
                         </p>
@@ -76,7 +76,7 @@ export default function RentalProcessPage() {
                     <div className="pt-24 md:pr-12">
                         <Link
                             href="/contact"
-                            className="inline-flex items-center justify-center px-8 py-3 bg-[#333] text-white font-bold rounded-full hover:bg-black transition-transform hover:-translate-y-1 font-manrope"
+                            className="inline-flex items-center justify-center px-8 py-3 bg-[#333] text-white font-bold rounded-full hover:bg-black transition-transform hover:-translate-y-1 font-sans"
                         >
                             Contact
                         </Link>
@@ -117,10 +117,10 @@ export default function RentalProcessPage() {
                                                 </div>
                                             </div>
                                             <div className="flex-1 flex flex-col justify-center gap-1.5 pt-2">
-                                                <h3 className="text-[28px] font-semibold text-[#6B4B18] tracking-[-0.04em] leading-none font-manrope mb-2">
+                                                <h3 className="text-[28px] font-semibold text-[#6B4B18] tracking-[-0.04em] leading-none font-sans mb-2">
                                                     {step.title}
                                                 </h3>
-                                                <p className="text-[#846221] text-[16px] leading-[1.4] font-medium tracking-tight font-manrope opacity-95">
+                                                <p className="text-[#846221] text-[16px] leading-[1.4] font-medium tracking-tight font-sans opacity-95">
                                                     {step.description}
                                                 </p>
                                             </div>
@@ -139,7 +139,7 @@ export default function RentalProcessPage() {
                                             <h3 
                                                 className="font-semibold tracking-[-0.04em] leading-none"
                                                 style={{
-                                                    fontFamily: '"Mona Sans", "Manrope", sans-serif',
+                                                    fontFamily: '"Mona Sans", sans-serif',
                                                     fontSize: '20px',
                                                     lineHeight: '28px',
                                                     height: '28px',
@@ -172,8 +172,8 @@ export default function RentalProcessPage() {
             {/* 3. Features Section */}
             <div className="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8 mb-24">
                 <div className="text-center max-w-2xl mx-auto mb-16">
-                    <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6 font-manrope">Features</h2>
-                    <p className="text-gray-600 font-manrope text-lg">
+                    <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6 font-sans">Features</h2>
+                    <p className="text-gray-600 font-sans text-lg">
                         Rent with confidence. Every product comes with transparent pricing, flexible terms, and reliable support—so you focus on your work, not equipment hassles.
                     </p>
                 </div>
@@ -183,32 +183,32 @@ export default function RentalProcessPage() {
                         <div className="w-16 h-16 rounded-full bg-white border-2 border-gray-900 flex items-center justify-center mb-6">
                             <PiClock size={28} className="text-gray-900" />
                         </div>
-                        <h3 className="text-xl font-bold text-gray-900 mb-2 font-manrope">Quick Support</h3>
-                        <p className="text-gray-500 text-sm font-manrope">Get expert help fast</p>
+                        <h3 className="text-xl font-bold text-gray-900 mb-2 font-sans">Quick Support</h3>
+                        <p className="text-gray-500 text-sm font-sans">Get expert help fast</p>
                     </div>
 
                     <div className="flex flex-col items-center text-center p-6">
                         <div className="w-16 h-16 rounded-full bg-white border-2 border-gray-900 flex items-center justify-center mb-6">
                             <PiCalendar size={24} className="text-gray-900" />
                         </div>
-                        <h3 className="text-xl font-bold text-gray-900 mb-2 font-manrope">Rental Flexibility</h3>
-                        <p className="text-gray-500 text-sm font-manrope">Choose your rental plan</p>
+                        <h3 className="text-xl font-bold text-gray-900 mb-2 font-sans">Rental Flexibility</h3>
+                        <p className="text-gray-500 text-sm font-sans">Choose your rental plan</p>
                     </div>
 
                     <div className="flex flex-col items-center text-center p-6">
                         <div className="w-16 h-16 rounded-full bg-white border-2 border-gray-900 flex items-center justify-center mb-6">
                             <PiTruck size={28} className="text-gray-900" />
                         </div>
-                        <h3 className="text-xl font-bold text-gray-900 mb-2 font-manrope">Fast Delivery</h3>
-                        <p className="text-gray-500 text-sm font-manrope">We deliver quickly across India within 48-72 hour</p>
+                        <h3 className="text-xl font-bold text-gray-900 mb-2 font-sans">Fast Delivery</h3>
+                        <p className="text-gray-500 text-sm font-sans">We deliver quickly across India within 48-72 hour</p>
                     </div>
 
                     <div className="flex flex-col items-center text-center p-6">
                         <div className="w-16 h-16 rounded-full bg-white border-2 border-gray-900 flex items-center justify-center mb-6">
                             <PiCurrencyInr size={24} className="text-gray-900" />
                         </div>
-                        <h3 className="text-xl font-bold text-gray-900 mb-2 font-manrope">No Hidden Charges</h3>
-                        <p className="text-gray-500 text-sm font-manrope">One transparent invoice</p>
+                        <h3 className="text-xl font-bold text-gray-900 mb-2 font-sans">No Hidden Charges</h3>
+                        <p className="text-gray-500 text-sm font-sans">One transparent invoice</p>
                     </div>
                 </div>
             </div>
@@ -218,8 +218,8 @@ export default function RentalProcessPage() {
                 <div className="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
                         <div>
-                            <h2 className="text-4xl md:text-5xl font-bold mb-6 font-manrope text-gray-900">Why Choose Us?</h2>
-                            <p className="text-gray-600 mb-10 leading-relaxed font-manrope max-w-lg text-lg">
+                            <h2 className="text-4xl md:text-5xl font-bold mb-6 font-sans text-gray-900">Why Choose Us?</h2>
+                            <p className="text-gray-600 mb-10 leading-relaxed font-sans max-w-lg text-lg">
                                 Join thousands who&apos;ve switched to the flexible, affordable way to access
                                 high-end tech. IndianRenters delivers AI-ready workstations, laptops, and IT
                                 gear with zero ownership hassle and instant support.
@@ -227,16 +227,16 @@ export default function RentalProcessPage() {
 
                             <div className="grid grid-cols-3 gap-8 pt-8 border-t border-gray-200/60">
                                 <div>
-                                    <h3 className="text-4xl md:text-5xl font-bold font-manrope text-gray-900 mb-2">90k+</h3>
-                                    <p className="text-sm font-medium text-gray-500 font-manrope tracking-wide">Devices in Stock</p>
+                                    <h3 className="text-4xl md:text-5xl font-bold font-sans text-gray-900 mb-2">90k+</h3>
+                                    <p className="text-sm font-medium text-gray-500 font-sans tracking-wide">Devices in Stock</p>
                                 </div>
                                 <div>
-                                    <h3 className="text-4xl md:text-5xl font-bold font-manrope text-gray-900 mb-2">30k+</h3>
-                                    <p className="text-sm font-medium text-gray-500 font-manrope tracking-wide">Happy Customers</p>
+                                    <h3 className="text-4xl md:text-5xl font-bold font-sans text-gray-900 mb-2">30k+</h3>
+                                    <p className="text-sm font-medium text-gray-500 font-sans tracking-wide">Happy Customers</p>
                                 </div>
                                 <div>
-                                    <h3 className="text-4xl md:text-5xl font-bold font-manrope text-gray-900 mb-2">401+</h3>
-                                    <p className="text-sm font-medium text-gray-500 font-manrope tracking-wide">Cities Covered</p>
+                                    <h3 className="text-4xl md:text-5xl font-bold font-sans text-gray-900 mb-2">401+</h3>
+                                    <p className="text-sm font-medium text-gray-500 font-sans tracking-wide">Cities Covered</p>
                                 </div>
                             </div>
                         </div>

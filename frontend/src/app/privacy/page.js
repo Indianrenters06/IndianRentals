@@ -45,7 +45,7 @@ export default function PrivacyPage() {
                         className="object-cover object-center brightness-75 transition-transform duration-700 group-hover:scale-105"
                     />
                     <div className="absolute inset-0 flex items-center justify-center">
-                        <h1 className="text-white text-5xl md:text-7xl font-semibold drop-shadow-lg font-manrope text-center px-4">
+                        <h1 className="text-white text-5xl md:text-7xl font-semibold drop-shadow-lg font-sans text-center px-4">
                             {bannerTitle}
                         </h1>
                     </div>

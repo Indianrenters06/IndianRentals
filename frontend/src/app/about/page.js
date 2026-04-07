@@ -46,9 +46,9 @@ export default function AboutPage() {
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-[57px] items-center h-[625px] opacity-100">
                     {/* Left Content */}
                     <div className="w-[562px] h-[429px] flex flex-col gap-[27px] opacity-100">
-                        <h2 className="w-[492px] h-[58px] text-4xl md:text-5xl font-medium leading-tight font-manrope text-gray-900 opacity-100">Our Story</h2>
+                        <h2 className="w-[492px] h-[58px] text-4xl md:text-5xl font-medium leading-tight font-sans text-gray-900 opacity-100">Our Story</h2>
 
-                        <div className="w-[587px] h-[344px] text-gray-900 font-manrope font-normal flex flex-col opacity-100">
+                        <div className="w-[587px] h-[344px] text-gray-900 font-sans font-normal flex flex-col opacity-100">
                             <p className="w-[596px] h-[178px] leading-tight  opacity-100">
                                 From a small computer training room in 1992 to India&apos;s go-to rental partner, this
                                 journey has been about making access smarter than ownership. The promise stays
@@ -69,8 +69,8 @@ export default function AboutPage() {
                                 <div className="w-[76px] h-[76px] bg-[#FF8A00] rounded-xl flex items-center justify-center text-white mb-3 shadow-sm">
                                     <PiGauge size={50} weight="bold" />
                                 </div>
-                                <h3 className="text-3xl font-bold font-manrope text-gray-900">4.8/5.0</h3>
-                                <p className="text-sm font-medium text-gray-500 font-manrope mt-1">Customer Satisfaction Rate</p>
+                                <h3 className="text-3xl font-bold font-sans text-gray-900">4.8/5.0</h3>
+                                <p className="text-sm font-medium text-gray-500 font-sans mt-1">Customer Satisfaction Rate</p>
                             </div>
 
                             {/* Stat 2 */}
@@ -78,8 +78,8 @@ export default function AboutPage() {
                                 <div className="w-[76px] h-[76px] bg-[#FF8A00] rounded-xl flex items-center justify-center text-white mb-3 shadow-sm">
                                     <PiSmiley size={50} weight="bold" />
                                 </div>
-                                <h3 className="text-3xl font-bold font-manrope text-gray-900">10,000+</h3>
-                                <p className="text-sm font-medium text-gray-500 font-manrope mt-1">Happy Clients</p>
+                                <h3 className="text-3xl font-bold font-sans text-gray-900">10,000+</h3>
+                                <p className="text-sm font-medium text-gray-500 font-sans mt-1">Happy Clients</p>
                             </div>
                         </div>
                     </div>
@@ -104,7 +104,7 @@ export default function AboutPage() {
                     <div className="flex gap-4 w-[350px] shrink-0 opacity-100">
                         <button
                             onClick={() => setActiveTab('vision')}
-                            className={`h-[42px] px-6 rounded-full font-normal font-manrope text-xl transition-transform hover:scale-105 text-center whitespace-nowrap ${activeTab === 'vision'
+                            className={`h-[42px] px-6 rounded-full font-normal font-sans text-xl transition-transform hover:scale-105 text-center whitespace-nowrap ${activeTab === 'vision'
                                 ? 'bg-[#333] text-white shadow-md'
                                 : 'border border-gray-800 text-gray-800 hover:bg-black/5'
                                 }`}
@@ -113,7 +113,7 @@ export default function AboutPage() {
                         </button>
                         <button
                             onClick={() => setActiveTab('mission')}
-                            className={`h-[42px] px-6 rounded-full font-normal font-manrope text-xl transition-transform hover:scale-105 text-center whitespace-nowrap ${activeTab === 'mission'
+                            className={`h-[42px] px-6 rounded-full font-normal font-sans text-xl transition-transform hover:scale-105 text-center whitespace-nowrap ${activeTab === 'mission'
                                 ? 'bg-[#333] text-white shadow-md'
                                 : 'border border-gray-800 text-gray-800 hover:bg-black/5'
                                 }`}
@@ -128,22 +128,22 @@ export default function AboutPage() {
                             <>
                                 {/* Vision Content */}
                                 <div className="flex flex-row items-start border-b border-black/10 pb-4">
-                                    <h3 className="text-lg font-semibold text-gray-900 font-manrope w-[200px] shrink-0">Rent Anything</h3>
-                                    <p className="text-gray-800 font-manrope leading-relaxed text-md">
+                                    <h3 className="text-lg font-semibold text-gray-900 font-sans w-[200px] shrink-0">Rent Anything</h3>
+                                    <p className="text-gray-800 font-sans leading-relaxed text-md">
                                         Laptops, Macs, mobiles, AV, cameras, medical and more—if it&apos;s not listed, it&apos;s sourced on request.
                                     </p>
                                 </div>
 
                                 <div className="flex flex-row items-start border-b border-black/10 pb-4">
-                                    <h3 className="text-lg font-semibold text-gray-900 font-manrope w-[200px] shrink-0">Rent Anytime</h3>
-                                    <p className="text-gray-800 font-manrope leading-relaxed text-md">
+                                    <h3 className="text-lg font-semibold text-gray-900 font-sans w-[200px] shrink-0">Rent Anytime</h3>
+                                    <p className="text-gray-800 font-sans leading-relaxed text-md">
                                         Tenures that fit the job: 1, 3, 6, or 12 months, with easy extensions and mid-term upgrades.
                                     </p>
                                 </div>
 
                                 <div className="flex flex-row items-start">
-                                    <h3 className="text-lg font-semibold text-gray-900 font-manrope w-[200px] shrink-0">Rent Anywhere</h3>
-                                    <p className="text-gray-800 font-manrope leading-relaxed text-md">
+                                    <h3 className="text-lg font-semibold text-gray-900 font-sans w-[200px] shrink-0">Rent Anywhere</h3>
+                                    <p className="text-gray-800 font-sans leading-relaxed text-md">
                                         Rapid delivery and support across major Indian cities through a reliable partner network.
                                     </p>
                                 </div>
@@ -152,22 +152,22 @@ export default function AboutPage() {
                             <>
                                 {/* Mission Content */}
                                 <div className="flex flex-row items-start border-b border-black/10 pb-4">
-                                    <h3 className="text-lg font-semibold text-gray-900 font-manrope w-[200px] shrink-0">Awesome Service</h3>
-                                    <p className="text-gray-800 font-manrope leading-relaxed text-md ml-8">
+                                    <h3 className="text-lg font-semibold text-gray-900 font-sans w-[200px] shrink-0">Awesome Service</h3>
+                                    <p className="text-gray-800 font-sans leading-relaxed text-md ml-8">
                                         Laptops, Macs, mobiles, AV, cameras, medical and more—if it&apos;s not listed, it&apos;s sourced on request.
                                     </p>
                                 </div>
 
                                 <div className="flex flex-row items-start border-b border-black/10 pb-4">
-                                    <h3 className="text-lg font-semibold text-gray-900 font-manrope w-[200px] shrink-0">Awesome Quality</h3>
-                                    <p className="text-gray-800 font-manrope leading-relaxed text-md ml-8">
+                                    <h3 className="text-lg font-semibold text-gray-900 font-sans w-[200px] shrink-0">Awesome Quality</h3>
+                                    <p className="text-gray-800 font-sans leading-relaxed text-md ml-8">
                                         Tenures that fit the job: 1, 3, 6, or 12 months, with easy extensions and mid-term upgrades.
                                     </p>
                                 </div>
 
                                 <div className="flex flex-row items-start">
-                                    <h3 className="text-lg font-semibold text-gray-900 font-manrope w-[200px] shrink-0">Always Happy Customer</h3>
-                                    <p className="text-gray-800 font-manrope leading-relaxed text-md ml-8">
+                                    <h3 className="text-lg font-semibold text-gray-900 font-sans w-[200px] shrink-0">Always Happy Customer</h3>
+                                    <p className="text-gray-800 font-sans leading-relaxed text-md ml-8">
                                         Rapid delivery and support across major Indian cities through a reliable partner network.
                                     </p>
                                 </div>
@@ -192,16 +192,16 @@ export default function AboutPage() {
                         {/* Stats Row */}
                         <div className="w-[540px] h-[79px] grid grid-cols-3 gap-[96px] pt-4 border-t border-gray-300 opacity-100">
                             <div className="w-[111px] h-[79px] opacity-100">
-                                <h3 className="w-[106px] h-[58px] text-[48px] font-medium font-manrope text-gray-700 mb-1 ml-1 opacity-100">90k+</h3>
-                                <p className="text-sm text-gray-500 font-manrope">Devices in Stock</p>
+                                <h3 className="w-[106px] h-[58px] text-[48px] font-medium font-sans text-gray-700 mb-1 ml-1 opacity-100">90k+</h3>
+                                <p className="text-sm text-gray-500 font-sans">Devices in Stock</p>
                             </div>
                             <div className="w-[123px] h-[79px] opacity-100">
-                                <h3 className="w-[103px] h-[58px] text-[48px] font-medium font-manrope text-gray-700 mb-1 opacity-100">30k+</h3>
-                                <p className="text-sm text-gray-500 font-manrope">Happy Customers</p> {/* Using 30k from screenshot */}
+                                <h3 className="w-[103px] h-[58px] text-[48px] font-medium font-sans text-gray-700 mb-1 opacity-100">30k+</h3>
+                                <p className="text-sm text-gray-500 font-sans">Happy Customers</p> {/* Using 30k from screenshot */}
                             </div>
                             <div className="w-[102px] h-[79px] opacity-100">
-                                <h3 className="w-[100px] h-[58px] text-[48px] font-medium font-manrope text-gray-700 mb-1 opacity-100">401+</h3>
-                                <p className="text-sm text-gray-500 font-manrope">Cities Covered</p>
+                                <h3 className="w-[100px] h-[58px] text-[48px] font-medium font-sans text-gray-700 mb-1 opacity-100">401+</h3>
+                                <p className="text-sm text-gray-500 font-sans">Cities Covered</p>
                             </div>
                         </div>
                     </div>

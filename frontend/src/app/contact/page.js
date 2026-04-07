@@ -93,7 +93,7 @@ export default function ContactPage() {
                                 <button
                                     key={city}
                                     onClick={() => setSelectedCity(city)}
-                                    className={`px-3.5 py-1 rounded-full font-manrope font-light text-[13px] transition-all text-center ${selectedCity === city ? 'bg-[#333] text-white' : 'bg-gray-100 text-black hover:bg-gray-200'
+                                    className={`px-3.5 py-1 rounded-full font-sans font-light text-[13px] transition-all text-center ${selectedCity === city ? 'bg-[#333] text-white' : 'bg-gray-100 text-black hover:bg-gray-200'
                                         }`}
                                 >
                                     {city}
@@ -114,8 +114,8 @@ export default function ContactPage() {
                                     </div>
                                 </div>
                                 <div>
-                                    <h3 className="font-bold font-manrope  text-gray-900 mb-1">Address</h3>
-                                    <p className="text-sm text-blue-600 leading-relaxed font-manrope ">
+                                    <h3 className="font-bold font-sans  text-gray-900 mb-1">Address</h3>
+                                    <p className="text-sm text-blue-600 leading-relaxed font-sans ">
                                         {cityDetails[selectedCity].address}
                                     </p>
                                 </div>
@@ -131,8 +131,8 @@ export default function ContactPage() {
                                     </div>
                                 </div>
                                 <div>
-                                    <h3 className="font-bold text-gray-900 mb-1 font-manrope ">Phone</h3>
-                                    <p className="text-sm text-blue-600 font-manrope ">
+                                    <h3 className="font-bold text-gray-900 mb-1 font-sans ">Phone</h3>
+                                    <p className="text-sm text-blue-600 font-sans ">
                                         {cityDetails[selectedCity].phone} (Support)
                                     </p>
                                 </div>
@@ -149,8 +149,8 @@ export default function ContactPage() {
                                     </div>
                                 </div>
                                 <div>
-                                    <h3 className="font-bold text-gray-900 mb-1 font-manrope ">Email</h3>
-                                    <a href={`mailto:${cityDetails[selectedCity].email}`} className="text-sm text-blue-600 hover:underline font-manrope ">
+                                    <h3 className="font-bold text-gray-900 mb-1 font-sans ">Email</h3>
+                                    <a href={`mailto:${cityDetails[selectedCity].email}`} className="text-sm text-blue-600 hover:underline font-sans ">
                                         {cityDetails[selectedCity].email}
                                     </a>
                                 </div>
@@ -167,12 +167,12 @@ export default function ContactPage() {
                                     </div>
                                 </div>
                                 <div>
-                                    <h3 className="font-bold text-gray-900 mb-1 font-manrope ">Timings</h3>
-                                    <p className="text-sm text-blue-600 font-manrope ">
-                                        <span className="font-semibold text-gray-700 font-manrope ">Monday - Saturday:</span> 10:00 AM - 07:30 PM
+                                    <h3 className="font-bold text-gray-900 mb-1 font-sans ">Timings</h3>
+                                    <p className="text-sm text-blue-600 font-sans ">
+                                        <span className="font-semibold text-gray-700 font-sans ">Monday - Saturday:</span> 10:00 AM - 07:30 PM
                                     </p>
-                                    <p className="text-sm text-blue-600 font-manrope ">
-                                        <span className="font-semibold text-gray-700 font-manrope ">Sunday:</span> Closed
+                                    <p className="text-sm text-blue-600 font-sans ">
+                                        <span className="font-semibold text-gray-700 font-sans ">Sunday:</span> Closed
                                     </p>
                                 </div>
                             </div>
@@ -198,53 +198,53 @@ export default function ContactPage() {
 
                     {/* Right Column: Form */}
                     <div className="flex-1">
-                        <h1 className="text-4xl font-semibold text-gray-800 mb-3 font-manrope">We are here to help</h1>
-                        <p className="text-gray-900 mb-8 max-w-4xl font-manrope font-medium ">
+                        <h1 className="text-4xl font-semibold text-gray-800 mb-3 font-sans">We are here to help</h1>
+                        <p className="text-gray-900 mb-8 max-w-4xl font-sans font-medium ">
                             Want us to Call you back, Please fill in the form Below and our Executive will reach you as soon as possible.
                         </p>
 
                         <form className="space-y-6">
                             <div>
-                                <label className="block text-xs font-semibold text-gray-500 mb-1.5 font-manrope ">
+                                <label className="block text-xs font-semibold text-gray-500 mb-1.5 font-sans ">
                                     Full Name <span className="text-red-500">*</span>
                                 </label>
                                 <input
                                     type="text"
                                     placeholder="Enter Your Name"
-                                    className="w-full border border-gray-300 rounded-lg px-4 py-3 text-sm font-manrope focus:outline-none focus:border-blue-500 transition-colors"
+                                    className="w-full border border-gray-300 rounded-lg px-4 py-3 text-sm font-sans focus:outline-none focus:border-blue-500 transition-colors"
                                 />
                             </div>
 
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div>
-                                    <label className="block text-xs font-semibold text-gray-500 mb-1.5 font-manrope ">
+                                    <label className="block text-xs font-semibold text-gray-500 mb-1.5 font-sans ">
                                         Mobile No. <span className="text-red-500">*</span>
                                     </label>
                                     <input
                                         type="text"
                                         placeholder="+91-9XXXXXXX"
-                                        className="w-full border border-gray-300 rounded-lg font-manrope px-4 py-3 text-sm focus:outline-none focus:border-blue-500 transition-colors"
+                                        className="w-full border border-gray-300 rounded-lg font-sans px-4 py-3 text-sm focus:outline-none focus:border-blue-500 transition-colors"
                                     />
                                 </div>
                                 <div>
-                                    <label className="block text-xs font-semibold text-gray-500 mb-1.5 font-manrope ">
+                                    <label className="block text-xs font-semibold text-gray-500 mb-1.5 font-sans ">
                                         Email ID <span className="text-red-500">*</span>
                                     </label>
                                     <input
                                         type="email"
                                         placeholder="hemxxx@gmail.com"
-                                        className="w-full border border-gray-300 rounded-lg font-manrope px-4 py-3 text-sm focus:outline-none focus:border-blue-500 transition-colors"
+                                        className="w-full border border-gray-300 rounded-lg font-sans px-4 py-3 text-sm focus:outline-none focus:border-blue-500 transition-colors"
                                     />
                                 </div>
                             </div>
 
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div>
-                                    <label className="block text-xs font-semibold text-gray-500 mb-1.5 font-manrope ">
+                                    <label className="block text-xs font-semibold text-gray-500 mb-1.5 font-sans ">
                                         Rental Product <span className="text-red-500">*</span>
                                     </label>
                                     <div className="relative">
-                                        <select className="w-full border border-gray-300 rounded-lg px-4 py-3 text-sm text-gray-400 focus:outline-none focus:border-blue-500 font-manrope transition-colors appearance-none bg-white">
+                                        <select className="w-full border border-gray-300 rounded-lg px-4 py-3 text-sm text-gray-400 focus:outline-none focus:border-blue-500 font-sans transition-colors appearance-none bg-white">
                                             <option>macbook pro m4</option>
                                         </select>
                                         <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400">
@@ -253,11 +253,11 @@ export default function ContactPage() {
                                     </div>
                                 </div>
                                 <div>
-                                    <label className="block text-xs font-semibold text-gray-500 mb-1.5 font-manrope ">
+                                    <label className="block text-xs font-semibold text-gray-500 mb-1.5 font-sans ">
                                         Requirement City <span className="text-red-500">*</span>
                                     </label>
                                     <div className="relative">
-                                        <select className="w-full border border-gray-300 rounded-lg px-4 py-3 text-sm text-gray-400 focus:outline-none focus:border-blue-500 font-manrope transition-colors appearance-none bg-white">
+                                        <select className="w-full border border-gray-300 rounded-lg px-4 py-3 text-sm text-gray-400 focus:outline-none focus:border-blue-500 font-sans transition-colors appearance-none bg-white">
                                             <option>Delhi....</option>
                                         </select>
                                         <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400">

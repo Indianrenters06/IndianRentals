@@ -81,7 +81,7 @@ const Testimonials = () => {
 
     const TestimonialCard = ({ review }) => (
         <div
-            className="rounded-[2rem] p-7 md:p-8 flex flex-col transition-all hover:scale-[1.01] duration-300 shadow-sm font-manrope"
+            className="rounded-[2rem] p-7 md:p-8 flex flex-col transition-all hover:scale-[1.01] duration-300 shadow-sm font-sans"
             style={{
                 backgroundColor: review.bgColor || '#FFFFFF',
                 width: '100%'
@@ -162,7 +162,7 @@ const Testimonials = () => {
             >
 
                 <div
-                    className="w-full flex justify-between font-manrope mb-10 gap-6"
+                    className="w-full flex justify-between font-sans mb-10 gap-6"
                     style={{
                         flexDirection: viewType === 'desktop' ? 'row' : 'column',
                         alignItems: viewType === 'desktop' ? 'flex-end' : 'flex-start'
@@ -178,7 +178,7 @@ const Testimonials = () => {
                         }}
                     >
                         <h2
-                            className="font-manrope font-bold"
+                            className="font-sans font-bold"
                             style={{
                                 width: '100%',
                                 fontSize: viewType === 'desktop' ? '38px' : '34px',
@@ -189,7 +189,7 @@ const Testimonials = () => {
                             What Our Customers Say
                         </h2>
                         <p
-                            className="font-manrope leading-normal"
+                            className="font-sans leading-normal"
                             style={{
                                 width: '100%',
                                 maxWidth: '600px',
@@ -258,7 +258,7 @@ const Testimonials = () => {
                         {reviewsData.map((review, i) => (
                             <div
                                 key={`mobile-rev-${i}`}
-                                className="snap-start rounded-xl flex flex-col shadow-sm transition-all duration-300 font-manrope"
+                                className="snap-start rounded-xl flex flex-col shadow-sm transition-all duration-300 font-sans"
                                 style={{
                                     backgroundColor: review.bgColor || '#FFFFFF',
                                     minWidth: '229px',
@@ -272,7 +272,7 @@ const Testimonials = () => {
                                     <p className={`text-[11px] ${review.textColor || "text-[#86868B]"} opacity-80`}>{review.role || "Verified User"}</p>
                                 </div>
                                 <p
-                                    className="font-manrope"
+                                    className="font-sans"
                                     style={{
                                         width: '205px',
                                         height: '56px',

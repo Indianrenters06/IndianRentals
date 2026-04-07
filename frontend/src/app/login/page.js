@@ -88,7 +88,7 @@ const LoginPage = () => {
     };
 
     return (
-        <div className="min-h-[calc(100vh-80px)] flex items-center justify-center bg-gray-50 px-4 py-12 sm:px-6 lg:px-8 relative overflow-hidden font-manrope">
+        <div className="min-h-[calc(100vh-80px)] flex items-center justify-center bg-gray-50 px-4 py-12 sm:px-6 lg:px-8 relative overflow-hidden font-sans">
             {/* Background Blobs */}
             <div className="absolute top-[-20%] left-[-10%] w-[500px] h-[500px] bg-[#00A8FF]/20 rounded-full blur-[100px] pointer-events-none" />
             <div className="absolute bottom-[-20%] right-[-10%] w-[500px] h-[500px] bg-[#FFC107]/20 rounded-full blur-[100px] pointer-events-none" />

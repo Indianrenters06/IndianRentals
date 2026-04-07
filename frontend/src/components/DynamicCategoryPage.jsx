@@ -88,7 +88,7 @@ export default function DynamicCategoryPage({
         : subcategories;
 
     return (
-        <div className="min-h-screen bg-white font-manrope">
+        <div className="min-h-screen bg-white font-sans">
             <main className="px-4 pt-5 pb-10 max-w-7xl mx-auto sm:px-6 lg:px-8">
 
                 {/* Filter Grid */}

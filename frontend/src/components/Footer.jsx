@@ -89,7 +89,7 @@ const Footer = () => {
                             style={{ width: viewType === 'desktop' ? '600px' : '480px', maxWidth: '600px', height: viewType === 'desktop' ? '176px' : 'auto', gap: viewType === 'tablet' ? '12px' : '30px' }}
                         >
                             {/* Column 1 */}
-                            <ul className="flex flex-col gap-[18px] text-[hsla(0,0%,0%,1)] font-manrope font-medium text-[13px] tracking-tight leading-none">
+                            <ul className="flex flex-col gap-[18px] text-[hsla(0,0%,0%,1)] font-sans font-medium text-[13px] tracking-tight leading-none">
                                 <li><Link href="/about" className="hover:opacity-70 transition-opacity">About Us</Link></li>
                                 <li><Link href="/how-it-works" className="hover:opacity-70 transition-opacity">How It Works</Link></li>
                                 <li><Link href="/careers" className="hover:opacity-70 transition-opacity">Jobs &amp; Careers</Link></li>
@@ -97,7 +97,7 @@ const Footer = () => {
                                 <li><Link href="/b2b" className="hover:opacity-70 transition-opacity">IndianRenters (B2B Link)</Link></li>
                             </ul>
                             {/* Column 2 */}
-                            <ul className="flex flex-col gap-[18px] text-[hsla(0,0%,0%,1)] font-manrope font-medium text-[13px] tracking-tight leading-none">
+                            <ul className="flex flex-col gap-[18px] text-[hsla(0,0%,0%,1)] font-sans font-medium text-[13px] tracking-tight leading-none">
                                 <li><Link href="/kyc-policy" className="hover:opacity-70 transition-opacity">KYC Policy</Link></li>
                                 <li><Link href="/shipping-policy" className="hover:opacity-70 transition-opacity">Shipping Policy</Link></li>
                                 <li><Link href="/return-policy" className="hover:opacity-70 transition-opacity">Return Policy</Link></li>
@@ -105,7 +105,7 @@ const Footer = () => {
                                 <li><Link href="/terms" className="hover:opacity-70 transition-opacity">Rental Terms &amp; Conditions</Link></li>
                             </ul>
                             {/* Column 3 */}
-                            <ul className="flex flex-col gap-[18px] text-[hsla(0,0%,0%,1)] font-manrope font-medium text-[13px] tracking-tight leading-none">
+                            <ul className="flex flex-col gap-[18px] text-[hsla(0,0%,0%,1)] font-sans font-medium text-[13px] tracking-tight leading-none">
                                 <li><Link href="/faq" className="hover:opacity-70 transition-opacity">FAQs</Link></li>
                                 <li><Link href="/ticket" className="hover:opacity-70 transition-opacity">Raise a Ticket</Link></li>
                                 <li><Link href="/reviews" className="hover:opacity-70 transition-opacity">Customer Reviews</Link></li>
@@ -126,7 +126,7 @@ const Footer = () => {
                         gap: '16px'
                     }}
                 >
-                    <p className="text-[#666666] font-manrope text-[12.5px]">
+                    <p className="text-[#666666] font-sans text-[12.5px]">
                         © {currentYear} {copyrightName}. All Rights Reserved
                     </p>
                     <div className="flex items-center gap-[6px]">
@@ -139,7 +139,7 @@ const Footer = () => {
 
             {/* ── Mobile Footer ── */}
             <footer 
-                className={`${viewType === 'mobile' ? 'block' : 'hidden'} w-full font-manrope overflow-hidden`}
+                className={`${viewType === 'mobile' ? 'block' : 'hidden'} w-full font-sans overflow-hidden`}
                 style={{ 
                     background: 'hsla(0, 0%, 96%, 1)', 
                     borderTop: '1px solid hsla(0, 0%, 89%, 1)',

@@ -33,8 +33,8 @@ const FaqSection = () => {
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-24">
                 {/* Left Column */}
                 <div className="lg:col-span-5">
-                    <span className="text-gray-600 font-medium text-lg mb-4 block font-manrope">Welcome to FAQ!</span>
-                    <h2 className="text-4xl md:text-5xl font-bold text-gray-900 leading-tight font-manrope">
+                    <span className="text-gray-600 font-medium text-lg mb-4 block font-sans">Welcome to FAQ!</span>
+                    <h2 className="text-4xl md:text-5xl font-bold text-gray-900 leading-tight font-sans">
                         Everything you need to know about renting with IndianRenters.com
                     </h2>
                 </div>
@@ -48,7 +48,7 @@ const FaqSection = () => {
                                     className="w-full flex items-center justify-between py-6 text-left focus:outline-none group"
                                     onClick={() => toggleFaq(index)}
                                 >
-                                    <span className="text-lg md:text-xl font-bold text-gray-900 font-manrope pr-8 group-hover:text-blue-600 transition-colors">
+                                    <span className="text-lg md:text-xl font-bold text-gray-900 font-sans pr-8 group-hover:text-blue-600 transition-colors">
                                         {faq.question}
                                     </span>
                                     <span className="flex-shrink-0 text-gray-400 group-hover:text-blue-600 transition-colors">
@@ -63,7 +63,7 @@ const FaqSection = () => {
                                     className={`overflow-hidden transition-all duration-300 ease-in-out ${activeIndex === index ? 'max-h-96 opacity-100 mb-6' : 'max-h-0 opacity-0'
                                         }`}
                                 >
-                                    <p className="text-gray-600 leading-relaxed font-manrope text-base">
+                                    <p className="text-gray-600 leading-relaxed font-sans text-base">
                                         {faq.answer}
                                     </p>
                                 </div>

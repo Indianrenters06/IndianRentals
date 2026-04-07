@@ -8,13 +8,14 @@ import {
     ShoppingCart,
     Package,
     CheckCircle,
-    CaretRight
+    CaretRight,
+    Dot
 } from '@phosphor-icons/react';
 
 import { API } from '../services/apiConfig';
 
 const FALLBACK_STEPS = [
-    { title: "Choose Your Tech", description: "Browse our curated selection of premium, performance\ntested devices. Use the search or categories to find the\nperfect tool for your needs.", icon: "Laptop", highlight: true },
+    { title: "Choose Your Tech", description: "Browse our curated selection of premium, performance\ntested devices. Use the search or categories to find the\nperfect tool for your needs.", icon: "Dot", highlight: true },
     { title: "Complete KYC", description: "Pick a flexible rental tenure from 1 to 12 months. Then, complete our KYC process online with your basic documents (PAN and Address Proof).", icon: "IdentificationCard", highlight: false },
     { title: "Secure Your Order", description: "Confirm your rental and complete the payment online. This includes the first month's rent and a fully refundable security deposit.", icon: "ShoppingCart", highlight: false },
     { title: "Receive & Create", description: "We deliver your tech right to your doorstep, typically within 2-3 business days. It arrives fully charged, sanitized, and ready to use straight out of the box. Now, go build something amazing!", icon: "Package", highlight: false }
@@ -25,7 +26,8 @@ const ICON_MAP = {
     "IdentificationCard": UserFocus,
     "ShoppingCart": ShoppingCart,
     "Package": Package,
-    "Arrow": CaretRight
+    "Arrow": CaretRight,
+    "Dot": Dot
 };
 
 const DynamicIcon = ({ name, size = 32, className = "", weight = "bold" }) => {
@@ -94,7 +96,7 @@ const RentalProcess = () => {
                     <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between' }}>
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', maxWidth: '380px' }}>
                             <h2 style={{
-                                fontFamily: "'Mona Sans', 'Manrope', sans-serif",
+                                fontFamily: "'Mona Sans', sans-serif",
                                 fontSize: '36px',
                                 fontWeight: 700,
                                 color: '#1D1D1F',
@@ -105,7 +107,7 @@ const RentalProcess = () => {
                                 {cms.title}
                             </h2>
                             <p style={{
-                                fontFamily: "'Mona Sans', 'Manrope', sans-serif",
+                                fontFamily: "'Mona Sans', sans-serif",
                                 fontSize: '14px',
                                 fontWeight: 400,
                                 color: 'rgba(29,29,31,0.7)',
@@ -166,14 +168,14 @@ const RentalProcess = () => {
 
                                     {/* Inner Text Container (314x122 exact match) */}
                                     <div style={{ display: 'flex', flexDirection: 'column', gap: '5px', width: '314px', height: '122px', justifyContent: 'center' }}>
-                                        
+
                                         {/* Icon + Title */}
                                         <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                                             <div style={{ color: isActive ? '#6B4B18' : '#1D1D1F', flexShrink: 0, lineHeight: 0 }}>
                                                 <DynamicIcon name={step.icon} size={20} weight={isActive ? "regular" : "bold"} />
                                             </div>
                                             <h3 style={{
-                                                fontFamily: "'Mona Sans', 'Manrope', sans-serif",
+                                                fontFamily: "'Mona Sans', sans-serif",
                                                 fontSize: '18px',
                                                 fontWeight: 600,
                                                 color: isActive ? 'hsla(19,84%,26%,1)' : '#1D1D1F',
@@ -187,7 +189,7 @@ const RentalProcess = () => {
 
                                         {/* Description */}
                                         <p style={{
-                                            fontFamily: "'Mona Sans', 'Manrope', sans-serif",
+                                            fontFamily: "'Mona Sans', sans-serif",
                                             fontSize: '15px',
                                             fontWeight: 400,
                                             color: isActive ? 'hsla(19,84%,26%,0.7)' : 'rgba(29,29,31,0.7)',
@@ -233,10 +235,10 @@ const RentalProcess = () => {
                             <p className="text-[#1D1D1F] text-[11.5px] leading-tight font-medium max-w-[340px] opacity-80">{cms.subtitle}</p>
                         </div>
                         <div className="flex items-center" style={{ height: '30px', gap: '10px' }}>
-                            <Link href="/rental-process" className="inline-flex items-center justify-center rounded-full bg-[#FFCF46] shadow-sm font-manrope" style={{ width: '100px', height: '30px', color: 'hsla(0, 0%, 12%, 1)', fontWeight: '500', fontSize: '11px' }}>
+                            <Link href="/rental-process" className="inline-flex items-center justify-center rounded-full bg-[#FFCF46] shadow-sm font-sans" style={{ width: '100px', height: '30px', color: 'hsla(0, 0%, 12%, 1)', fontWeight: '500', fontSize: '11px' }}>
                                 Rental Process
                             </Link>
-                            <Link href="/contact" className="inline-flex items-center justify-center font-manrope text-black" style={{ width: '69px', height: '30px', padding: '6px 12px', background: '#FFFFFF', borderRadius: '32px', border: '1.5px solid #8B5CF6', fontWeight: '500', fontSize: '11px' }}>Contact</Link>
+                            <Link href="/contact" className="inline-flex items-center justify-center font-sans text-black" style={{ width: '69px', height: '30px', padding: '6px 12px', background: '#FFFFFF', borderRadius: '32px', border: '1.5px solid #8B5CF6', fontWeight: '500', fontSize: '11px' }}>Contact</Link>
                         </div>
                     </div>
 
@@ -263,11 +265,11 @@ const RentalProcess = () => {
                                             <div className={isActive ? 'text-[#6B4B18]' : 'text-[#1D1D1F]'}><DynamicIcon name={step.icon} size={32} /></div>
                                             <h3 className={`text-[15px] font-bold ${isActive ? 'text-[#6B4B18]' : 'text-[#1D1D1F]'} leading-tight tracking-tight`}>{step.title}</h3>
                                         </div>
-                                        <p className="font-manrope" style={{ fontSize: '11px', fontWeight: '500', color: isActive ? 'hsla(19, 84%, 26%, 0.7)' : 'rgba(29, 29, 31, 0.6)', lineHeight: '18px', letterSpacing: '-0.01em', overflow: 'hidden', whiteSpace: 'pre-line' }}>
+                                        <p className="font-sans" style={{ fontSize: '11px', fontWeight: '500', color: isActive ? 'hsla(19, 84%, 26%, 0.7)' : 'rgba(29, 29, 31, 0.6)', lineHeight: '18px', letterSpacing: '-0.01em', overflow: 'hidden', whiteSpace: 'pre-line' }}>
                                             {step.description}
                                         </p>
                                     </div>
-                                    <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none select-none font-manrope" style={{ fontWeight: '800', fontSize: '45px', lineHeight: '45px', color: isActive ? 'hsla(19, 84%, 26%, 0.2)' : 'rgba(255,255,255,1)' }}>
+                                    <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none select-none font-sans" style={{ fontWeight: '800', fontSize: '45px', lineHeight: '45px', color: isActive ? 'hsla(19, 84%, 26%, 0.2)' : 'rgba(255,255,255,1)' }}>
                                         {index + 1}
                                     </div>
                                 </div>
@@ -300,7 +302,7 @@ const RentalProcess = () => {
                 style={{ paddingLeft: '24px', paddingRight: '24px' }}
             >
                 {/* Desktop Header Row */}
-                <div className="w-full flex flex-row items-center justify-between mx-auto font-manrope max-w-[1165px] h-[94px]">
+                <div className="w-full flex flex-row items-center justify-between mx-auto font-sans max-w-[1165px] h-[94px]">
                     <div className="flex flex-col h-full gap-[10px] justify-center">
                         <h2 className="text-[36px] font-bold text-[#1D1D1F] tracking-tight leading-none">{cms.title}</h2>
                         <p className="text-[#1D1D1F] text-[16px] leading-[1.3] tracking-tight max-w-md opacity-80">{cms.subtitle}</p>
@@ -312,7 +314,7 @@ const RentalProcess = () => {
                 </div>
 
                 {/* Desktop Main: Step Accordion + Image */}
-                <div className="w-full flex flex-row items-stretch mx-auto font-manrope gap-[20px] max-w-[1200px]">
+                <div className="w-full flex flex-row items-stretch mx-auto font-sans gap-[20px] max-w-[1200px]">
                     <div className="flex flex-col" style={{ width: '590px', height: '500px', gap: '12px' }}>
                         {cms.steps.map((step, index) => {
                             const isActive = activeStep === index;
@@ -331,15 +333,16 @@ const RentalProcess = () => {
                                 >
                                     <div className={`flex flex-col h-full ${isActive ? 'justify-between' : 'justify-center'}`}>
                                         <div className={`flex flex-col px-5 ${isActive ? 'pt-5' : ''}`} style={{ gap: isActive ? '12px' : '9px' }}>
-                                            <div className="flex items-center justify-between">
+                                            <div className="flex items-start justify-between">
                                                 <div style={{ width: '170px', height: '62px', display: 'flex', flexDirection: 'column', gap: '9px' }}>
                                                     <div className={isActive ? 'text-[#6B4B18]' : 'text-[#1D1D1F]'}><DynamicIcon name={step.icon} size={32} /></div>
-                                                    <h3 style={{ color: isActive ? 'hsla(19, 84%, 26%, 1)' : 'hsla(0, 0%, 20%, 1)', fontFamily: '"Mona Sans", "Manrope", sans-serif', fontWeight: 600, fontSize: '20px', lineHeight: '28px', whiteSpace: 'nowrap', letterSpacing: '-0.02em' }}>
+                                                    <h3 style={{ color: isActive ? 'hsla(19, 84%, 26%, 1)' : 'hsla(0, 0%, 20%, 1)', fontFamily: '"Mona Sans", sans-serif', fontWeight: 600, fontSize: '20px', lineHeight: '28px', whiteSpace: 'nowrap', letterSpacing: '-0.02em' }}>
                                                         {step.title}
                                                     </h3>
                                                 </div>
-                                                <div style={{ width: '69px', height: '31px', padding: '4px 8px', borderRadius: '8px', border: isActive ? '1px solid hsla(19, 84%, 26%, 1)' : '1px solid #E5E5E7', background: isActive ? 'hsla(46, 100%, 89%, 1)' : '#F5F5F7', color: isActive ? 'hsla(19, 84%, 26%, 1)' : '#86868B', fontSize: '12px', fontWeight: 600, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                                    {'• Step ' + (index + 1)}
+                                                <div style={{ width: '56px', height: '26px', borderRadius: '6px', border: isActive ? '1px solid hsla(19, 84%, 26%, 1)' : '1px solid #E5E5E7', background: isActive ? 'hsla(46, 100%, 89%, 1)' : '#F5F5F7', color: isActive ? 'hsla(19, 84%, 26%, 1)' : '#86868B', fontSize: '13px', fontWeight: 600, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0px', marginTop: '0px', paddingRight: '4px' }}>
+                                                    <Dot size={32} weight="bold" style={{ marginLeft: '-11px' }} />
+                                                    <span style={{ letterSpacing: '-0.01em', lineHeight: 1, marginLeft: '-10px' }}>{'Step ' + (index + 1)}</span>
                                                 </div>
                                             </div>
                                         </div>

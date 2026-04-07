@@ -97,7 +97,7 @@ export default function ProductDetailPage() {
     ];
 
     return (
-        <div className="min-h-screen bg-[#F7F7F7] font-manrope text-[#1D1D1F] tracking-tight antialiased pt-10 pb-10">
+        <div className="min-h-screen bg-[#F7F7F7] font-sans text-[#1D1D1F] tracking-tight antialiased pt-10 pb-10">
             {/* Breadcrumb */}
             <div className="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8 py-3 text-[14px] font-medium text-[#586A84]">
                 <div className="flex items-center gap-2">
@@ -364,7 +364,7 @@ export default function ProductDetailPage() {
                                 <span className="text-[12px] font-bold text-gray-900 leading-tight mb-[2px]">Delivery</span>
                                 <span className="text-[11px] text-gray-500">Deliver to: <span className="text-gray-900 font-medium">[110001]</span></span>
                             </div>
-                            <span className="text-[11.5px] font-bold text-[#EA580C] max-w-[130px] text-right font-manrope">Check availability in your state</span>
+                            <span className="text-[11.5px] font-bold text-[#EA580C] max-w-[130px] text-right font-sans">Check availability in your state</span>
                         </div>
                     </div>
                 </div>

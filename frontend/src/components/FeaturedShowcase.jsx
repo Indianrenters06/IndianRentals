@@ -45,9 +45,9 @@ const BannerCarousel = ({ banners, current, setCurrent, height = "387px" }) => {
     const slide = banners[current];
 
     return (
-        <div 
+        <div
             className="relative overflow-hidden shadow-xl rounded-2xl"
-            style={{ 
+            style={{
                 height,
                 width: "100%",
                 maxWidth: "100%",
@@ -61,7 +61,7 @@ const BannerCarousel = ({ banners, current, setCurrent, height = "387px" }) => {
                     variants={{
                         enter: (d) => ({ x: d > 0 ? "100%" : "-100%", opacity: 0 }),
                         center: { x: 0, opacity: 1 },
-                        exit:  (d) => ({ x: d > 0 ? "-100%" : "100%", opacity: 0 }),
+                        exit: (d) => ({ x: d > 0 ? "-100%" : "100%", opacity: 0 }),
                     }}
                     initial="enter"
                     animate="center"
@@ -71,15 +71,15 @@ const BannerCarousel = ({ banners, current, setCurrent, height = "387px" }) => {
                 >
                     {/* Background Image */}
                     <div className="absolute inset-0 z-0">
-                        <Image 
-                            src={slide.image} 
-                            alt={slide.title} 
-                            fill 
-                            unoptimized 
-                            className="object-cover" 
+                        <Image
+                            src={slide.image}
+                            alt={slide.title}
+                            fill
+                            unoptimized
+                            className="object-cover"
                         />
                         {/* Gradient Overlay */}
-                        <div 
+                        <div
                             className="absolute inset-0"
                             style={{
                                 background: "linear-gradient(180.66deg, rgba(0, 0, 0, 0) 52.71%, rgba(0, 0, 0, 0.8) 86.37%)"
@@ -88,10 +88,10 @@ const BannerCarousel = ({ banners, current, setCurrent, height = "387px" }) => {
                     </div>
 
                     {/* Content Layer */}
-                    <div className="relative z-10 text-center w-full" style={{ padding: "30px 31px" }}>
+                    <div className="relative z-10 text-center w-full" style={{ padding: "20px 24px" }}>
                         <div className="flex items-center justify-center gap-4 mb-1">
                             <button onClick={() => go(-1)} className="w-[30px] h-[30px] rounded-full bg-white shadow-sm flex items-center justify-center text-gray-900 hover:bg-gray-100 transition-colors"><CaretLeft size={16} weight="bold" /></button>
-                            <h3 
+                            <h3
                                 className="text-white leading-tight"
                                 style={{
                                     fontFamily: "'Mona Sans', sans-serif",
@@ -106,7 +106,7 @@ const BannerCarousel = ({ banners, current, setCurrent, height = "387px" }) => {
                             </h3>
                             <button onClick={() => go(1)} className="w-[30px] h-[30px] rounded-full bg-white shadow-sm flex items-center justify-center text-gray-900 hover:bg-gray-100 transition-colors"><CaretRight size={16} weight="bold" /></button>
                         </div>
-                        <p 
+                        <p
                             className="text-white/90 leading-tight mb-4 mx-auto"
                             style={{
                                 fontFamily: "'Mona Sans', sans-serif",
@@ -164,7 +164,7 @@ const ShowcaseProductCard = ({ product, index, viewType = 'desktop', handleAddTo
                     willChange: "transform, height",
                     cursor: "pointer",
                     backgroundColor: "hsla(0, 0%, 100%, 1)",
-                    borderRadius: isDesktop ? '16px' : (isTablet ? '17px' : '8px'),
+                    borderRadius: isDesktop ? '20px' : (isTablet ? '17px' : '8px'),
                     opacity: 1
                 }}
                 variants={{
@@ -183,7 +183,7 @@ const ShowcaseProductCard = ({ product, index, viewType = 'desktop', handleAddTo
                     style={{
                         width: isDesktop ? '285px' : (isTablet ? '223px' : '170px'),
                         height: isDesktop ? '282px' : (isTablet ? '302px' : '184px'),
-                        borderRadius: isDesktop ? '16px' : (isTablet ? '17px' : '8px'),
+                        borderRadius: isDesktop ? '20px' : (isTablet ? '17px' : '8px'),
                         borderWidth: isTablet ? '0px 0.84px 0.84px 0.84px' : '0px 1px 1px 1px',
                         borderStyle: "solid",
                         borderColor: "hsla(0, 0%, 93%, 1)",
@@ -197,18 +197,26 @@ const ShowcaseProductCard = ({ product, index, viewType = 'desktop', handleAddTo
                     <div
                         className="absolute z-20 flex items-center"
                         style={{
-                            top: "19.57px",
-                            left: "13.49px",
-                            gap: "4px",
-                            width: "92px",
-                            height: "28px"
+                            top: "20px",
+                            left: "20px",
+                            gap: "6px"
                         }}
                     >
-                        <span className="text-white text-[10px] font-bold px-2 py-[4px] rounded-[6px] shadow-sm leading-none flex items-center justify-center"
+                        <span className="text-[10.5px] leading-none flex items-center justify-center whitespace-nowrap"
                             style={{
-                                width: "64px",
-                                height: "28px",
-                                background: "hsla(3, 100%, 56%, 1)"
+                                height: "24px",
+                                opacity: 1,
+                                borderRadius: "27px",
+                                paddingTop: "4px",
+                                paddingRight: "10px",
+                                paddingBottom: "4px",
+                                paddingLeft: "10px",
+                                background: "hsla(3, 86%, 51%, 1)",
+                                boxShadow: "0px 0px 1px 0px hsla(0, 0%, 47%, 0.1), 0px 1px 1px 0px hsla(0, 0%, 47%, 0.09), 0px 3px 2px 0px hsla(0, 0%, 47%, 0.05), 0px 5px 2px 0px hsla(0, 0%, 47%, 0.01), 0px 9px 2px 0px hsla(0, 0%, 47%, 0)",
+                                color: "hsla(4, 100%, 97%, 1)",
+                                fontFamily: "'Mona Sans', sans-serif",
+                                fontWeight: 600,
+                                letterSpacing: "0.02em"
                             }}
                         >
                             -20% off
@@ -217,13 +225,13 @@ const ShowcaseProductCard = ({ product, index, viewType = 'desktop', handleAddTo
                             <span
                                 className="text-white text-[10px] font-bold shadow-sm leading-none flex items-center justify-center translate-x-1.5"
                                 style={{
-                                    width: "34px",
-                                    height: "22px",
+                                    width: "45px",
+                                    height: "24px",
                                     paddingTop: "4px",
-                                    paddingRight: "5px",
+                                    paddingRight: "10px",
                                     paddingBottom: "4px",
-                                    paddingLeft: "5px",
-                                    borderRadius: "6px",
+                                    paddingLeft: "10px",
+                                    borderRadius: "27px",
                                     backgroundColor: "hsla(122, 100%, 35%, 1)",
                                     boxShadow: "0px 0px 1px 0px hsla(0, 0%, 47%, 0.1), 0px 1px 1px 0px hsla(0, 0%, 47%, 0.09), 0px 3px 2px 0px hsla(0, 0%, 47%, 0.05), 0px 5px 2px 0px hsla(0, 0%, 47%, 0.01), 0px 9px 2px 0px hsla(0, 0%, 47%, 0)"
                                 }}
@@ -239,14 +247,14 @@ const ShowcaseProductCard = ({ product, index, viewType = 'desktop', handleAddTo
                             width: "33px",
                             height: "33px",
                             top: "10.57px",
-                            right: "12.51px",
+                            right: "16.51px",
                             backgroundColor: "hsla(0, 0%, 93%, 1)",
                             border: "0.2px solid hsla(0, 0%, 80%, 1)",
-                            borderRadius: "100%"
+                            borderRadius: "9999px"
                         }}
                         onClick={(e) => { e.preventDefault(); e.stopPropagation(); }}
                     >
-                        <Heart size={18} color="#000000" weight="thin" />
+                        <Heart size={18} color="#000000" weight="regular" />
                     </button>
 
                     <div className="relative w-full h-full p-4 flex items-center justify-center">
@@ -261,7 +269,7 @@ const ShowcaseProductCard = ({ product, index, viewType = 'desktop', handleAddTo
 
                 {/* Text Section */}
                 <div
-                    className="flex flex-col relative font-manrope bg-white"
+                    className="flex flex-col relative font-sans bg-white"
                     style={{
                         width: isDesktop ? '285px' : (isTablet ? '223px' : '100%'),
                         height: isDesktop ? (isHovered ? '158px' : '105px') : (isTablet ? (isHovered ? '130px' : '85px') : '72px'),
@@ -275,7 +283,7 @@ const ShowcaseProductCard = ({ product, index, viewType = 'desktop', handleAddTo
                     }}
                 >
                     <h3
-                        className="font-manrope line-clamp-1 group-hover:text-[#FF3B30] transition-colors duration-300 shrink-0"
+                        className="font-sans line-clamp-1 group-hover:text-[#FF3B30] transition-colors duration-300 shrink-0"
                         style={{
                             width: isDesktop ? "261px" : "100%",
                             height: isDesktop ? "25px" : "20px",
@@ -318,7 +326,7 @@ const ShowcaseProductCard = ({ product, index, viewType = 'desktop', handleAddTo
                         <div className="flex items-center gap-1.5" style={{ color: "hsla(0, 0%, 46%, 1)" }}>
                             <Truck size={isDesktop ? 16 : 14} weight="regular" />
                             <span
-                                className="font-manrope"
+                                className="font-sans"
                                 style={{
                                     fontSize: "12px",
                                     fontWeight: 500,
@@ -459,26 +467,32 @@ const FeaturedShowcase = () => {
 
         const activeCategory = cms.banners[currentBanner]?.category;
 
+        const safeFetch = async (url) => {
+            try {
+                const res = await fetch(url);
+                if (!res.ok) return { products: [] };
+                return await res.json();
+            } catch {
+                return { products: [] };
+            }
+        };
+
         const loadProducts = async () => {
             setFetchingProducts(true);
             try {
                 // 1. Try fetching products filtered by category
-                let url = activeCategory
-                    ? `${API}/api/products?category=${activeCategory}&limit=2`
+                const url = activeCategory
+                    ? `${API}/api/products?category=${encodeURIComponent(activeCategory)}&limit=2`
                     : `${API}/api/products?limit=2`;
 
-                let res = await fetch(url);
-                let data = res.ok ? await res.json() : { products: [] };
+                let data = await safeFetch(url);
 
-                // 2. Fallback: If no products found for category, fetch general 'Best Rented' products
-                if (data.products.length === 0 && activeCategory) {
-                    const fallbackRes = await fetch(`${API}/api/products?limit=2`);
-                    if (fallbackRes.ok) {
-                        data = await fallbackRes.json();
-                    }
+                // 2. Fallback: If no products found for category, fetch general products
+                if ((!data.products || data.products.length === 0) && activeCategory) {
+                    data = await safeFetch(`${API}/api/products?limit=2`);
                 }
 
-                if (data.products) {
+                if (data.products && data.products.length > 0) {
                     setProducts(data.products.map(p => ({
                         id: p._id,
                         name: p.name,
@@ -489,8 +503,6 @@ const FeaturedShowcase = () => {
                         rentPrice: p.rentalPrice || 5000,
                     })));
                 }
-            } catch (err) {
-                console.error("Showcase fetch error:", err);
             } finally {
                 setFetchingProducts(false);
                 setLoading(false);
