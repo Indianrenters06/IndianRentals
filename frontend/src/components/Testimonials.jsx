@@ -162,14 +162,15 @@ const Testimonials = () => {
             >
 
                 <div
-                    className="w-full flex justify-between font-sans mb-10 gap-6"
+                    className="w-full flex font-sans mb-10 gap-6"
                     style={{
                         flexDirection: viewType === 'desktop' ? 'row' : 'column',
-                        alignItems: viewType === 'desktop' ? 'flex-end' : 'flex-start'
+                        alignItems: viewType === 'desktop' ? 'flex-end' : 'flex-start',
+                        justifyContent: viewType === 'desktop' ? 'space-between' : 'flex-start'
                     }}
                 >
                     <div
-                        className="flex flex-col mx-auto"
+                        className="flex flex-col"
                         style={{
                             width: viewType === 'mobile' ? '100%' : (viewType === 'desktop' ? '600px' : '100%'),
                             maxWidth: viewType === 'mobile' ? '350px' : undefined,

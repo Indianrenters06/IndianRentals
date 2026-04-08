@@ -63,7 +63,7 @@ const Hero = () => {
     const [isTransitioning, setIsTransitioning] = useState(true);
     const [heroVisible, setHeroVisible] = useState(true);
 
-    const GAP = 24;
+    const GAP = 20;
     const SIDE_WIDTH = 931;
     const CLONES_AT_START = 2;
 
@@ -139,7 +139,7 @@ const Hero = () => {
     const trackHeight = viewType === 'tablet' ? 332 : 510;
 
     return (
-        <section className="bg-white pt-2 md:pt-6 pb-4 md:pb-10 w-full overflow-x-clip">
+        <section className="bg-white max-w-[1440px] w-full pt-8 pb-8 px-4 mx-auto gap-[10px] overflow-x-clip">
             {/* ── Mobile (Restored from March 28) ────────────────────── */}
             <div
                 className="block md:hidden flex overflow-x-auto snap-x snap-mandatory"
@@ -303,18 +303,18 @@ const Hero = () => {
                     {/* Navigation Arrows */}
                     <div
                         className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none z-30 flex items-center justify-between"
-                        style={{ width: `${mainWidth + GAP + 26}px` }}
+                        style={{ width: `${mainWidth + GAP + 60}px` }}
                     >
                         <button
                             onClick={prev}
-                            className="pointer-events-auto w-[26px] h-[40px] rounded-[9px] flex items-center justify-center hover:scale-110 active:scale-95 transition-all opacity-0 group-hover:opacity-100 shadow-sm"
+                            className="pointer-events-auto w-[26px] h-[40px] rounded-[9px] flex items-center justify-center hover:scale-110 active:scale-95 transition-all shadow-sm opacity-100"
                             style={{ background: "var(--color-grey-grey-100, hsla(0, 0%, 93%, 1))" }}
                         >
                             <CaretLeft size={20} weight="regular" className="text-gray-800" />
                         </button>
                         <button
                             onClick={next}
-                            className="pointer-events-auto w-[26px] h-[40px] rounded-[9px] flex items-center justify-center hover:scale-110 active:scale-95 transition-all opacity-0 group-hover:opacity-100 shadow-sm"
+                            className="pointer-events-auto w-[26px] h-[40px] rounded-[9px] flex items-center justify-center hover:scale-110 active:scale-95 transition-all shadow-sm opacity-100"
                             style={{ background: "var(--color-grey-grey-100, hsla(0, 0%, 93%, 1))" }}
                         >
                             <CaretRight size={20} weight="regular" className="text-gray-800" />
@@ -328,11 +328,10 @@ const Hero = () => {
                                 <button
                                     key={i}
                                     onClick={() => isTransitioning && setCurrentIndex(i + CLONES_AT_START)}
-                                    className={`transition-all duration-300 rounded-full ${
-                                        i === activeSlideIndex
+                                    className={`transition-all duration-300 rounded-full ${i === activeSlideIndex
                                         ? "w-[36px] h-[8px] bg-white shadow-md active:scale-95"
                                         : "w-[8px] h-[8px] bg-white/40 hover:bg-white/60 hover:scale-110 active:scale-90"
-                                    }`}
+                                        }`}
                                 />
                             ))}
                         </div>
@@ -413,7 +412,7 @@ const SlideItem = ({ slide, isActive, width, viewType, slideHeight }) => {
         height: `${slideHeight}px`,
         background: slide.bgGradient || slide.bgColor,
         opacity: isActive ? 1 : 0.85,
-        boxShadow: isActive ? '0 30px 60px -12px rgba(0,0,0,0.3)' : '0 10px 20px -5px rgba(0,0,0,0.1)',
+        boxShadow: isActive ? '0 12px 24px -6px rgba(0,0,0,0.12)' : '0 4px 8px -2px rgba(0,0,0,0.06)',
         zIndex: isActive ? 20 : 10
     };
 
