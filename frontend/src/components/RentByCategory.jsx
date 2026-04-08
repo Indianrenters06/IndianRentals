@@ -156,7 +156,18 @@ const RentByCategory = () => {
         >
             <div className="max-w-[1200px] mx-auto px-4 sm:px-6">
                 <div className="flex items-center justify-between mb-4 md:mb-12">
-                    <h2 className="text-[22px] md:text-3xl lg:text-4xl font-semibold font-sans text-[#333333] tracking-[-0.02em] leading-tight">{cmsConfig.title}</h2>
+                    <h2 
+                        className="text-[24px] md:text-[36px] leading-[32px] md:leading-[45px]"
+                        style={{
+                            fontFamily: '"Mona Sans", sans-serif',
+                            fontWeight: 600,
+                            letterSpacing: '-0.02em',
+                            color: 'hsla(0, 0%, 20%, 1)',
+                            margin: 0
+                        }}
+                    >
+                        {cmsConfig.title}
+                    </h2>
                     <Link
                         href="/categories"
                         className="hidden md:inline-flex items-center justify-center text-gray-900 hover:brightness-105 transition-all"
@@ -181,81 +192,37 @@ const RentByCategory = () => {
                     </Link>
                 </div>
 
-                {/* Mobile Swiper Carousel */}
-                <div className={`${viewType === 'mobile' ? 'block' : 'hidden'} relative`}>
-                    <Swiper
-                        modules={[Navigation, Scrollbar]}
-                        spaceBetween={10}
-                        slidesPerView={'auto'}
-                        navigation={{
-                            nextEl: '.swiper-next-cat-mobile',
-                            prevEl: '.swiper-prev-cat-mobile',
-                        }}
-                        scrollbar={{
-                            el: '.swiper-scrollbar-cat-mobile',
-                            draggable: true,
-                            hide: false,
-                        }}
-                        className="!pb-0"
-                    >
-                        {displayCategories.map((cat, index) => (
-                            <SwiperSlide key={cat._id || index} style={{ width: '80px' }}>
-                                <Link href={getCategoryRoute(cat)} className="flex flex-col items-center">
-                                    <div className="w-[80px] h-[78px] rounded-[10px] bg-white border border-gray-100 flex items-center justify-center overflow-hidden relative shadow-sm">
-                                        {cat.image ? (
-                                            <Image
-                                                src={cat.image}
-                                                alt={cat.name}
-                                                fill
-                                                className="object-contain mix-blend-multiply brightness-[1.05] contrast-[1.05]"
-                                            />
-                                        ) : (
-                                            <div className="text-gray-400">
-                                                {getIconForCategory(cat.name)}
-                                            </div>
-                                        )}
+                {/* Mobile Grid View */}
+                <div className={`${viewType === 'mobile' ? 'grid' : 'hidden'} grid-cols-4 gap-[10px]`}>
+                    {displayCategories.slice(0, 7).map((cat, index) => (
+                        <Link key={cat._id || index} href={getCategoryRoute(cat)} className="flex flex-col items-center">
+                            <div className="w-[80px] h-[78px] rounded-[10px] bg-white border border-gray-100 flex items-center justify-center overflow-hidden relative shadow-sm">
+                                {cat.image ? (
+                                    <Image
+                                        src={cat.image}
+                                        alt={cat.name}
+                                        fill
+                                        className="object-contain mix-blend-multiply brightness-[1.05] contrast-[1.05]"
+                                    />
+                                ) : (
+                                    <div className="text-gray-400">
+                                        {getIconForCategory(cat.name)}
                                     </div>
-                                    <span className="text-[11px] font-semibold font-sans text-[#4b5563] text-center mt-2 leading-tight">{cat.name}</span>
-                                </Link>
-                            </SwiperSlide>
-                        ))}
+                                )}
+                            </div>
+                            <span className="text-[11px] font-semibold font-sans text-[#4b5563] text-center mt-2 leading-tight">{cat.name}</span>
+                        </Link>
+                    ))}
 
-                        {/* View All Tile */}
-                        <SwiperSlide style={{ width: '80px' }}>
-                            <Link href="/categories" className="flex flex-col items-center">
-                                <div className="w-[80px] h-[78px] rounded-[10px] bg-[#fff3d4] border border-[#fbd38d]/30 flex flex-col items-center justify-center gap-1 shadow-sm">
-                                    <span className="text-[10px] font-semibold font-sans text-[#d97706] leading-tight">View All</span>
-                                    <div className="w-6 h-6 rounded-full bg-[#f6ad55] flex items-center justify-center">
-                                        <ArrowRight size={8} weight="fill" className="text-white" />
-                                    </div>
-                                </div>
-                            </Link>
-                        </SwiperSlide>
-                    </Swiper>
-
-                    {/* Mobile scrollbar + nav row */}
-                    <div className="flex items-center gap-4 mt-4">
-                        <div
-                            className="swiper-scrollbar-cat-mobile flex-1"
-                            style={{ height: '3.5px', position: 'relative' }}
-                        />
-                        <div className="flex items-center gap-2 shrink-0">
-                            <button
-                                className="swiper-prev-cat-mobile w-[34px] h-[34px] rounded-[69px] flex items-center justify-center hover:opacity-80 transition-all"
-                                style={{ background: 'var(--color-grey-grey-100, hsla(0, 0%, 93%, 1))', opacity: 1 }}
-                                aria-label="Previous"
-                            >
-                                <CaretLeft size={16} weight="regular" className="text-gray-800" />
-                            </button>
-                            <button
-                                className="swiper-next-cat-mobile w-[34px] h-[34px] rounded-[69px] flex items-center justify-center hover:opacity-80 transition-all"
-                                style={{ background: 'var(--color-grey-grey-100, hsla(0, 0%, 93%, 1))', opacity: 1 }}
-                                aria-label="Next"
-                            >
-                                <CaretRight size={16} weight="regular" className="text-gray-800" />
-                            </button>
+                    {/* View All Tile */}
+                    <Link href="/categories" className="flex flex-col items-center">
+                        <div className="w-[80px] h-[78px] rounded-[10px] bg-[#fff3d4] border border-[#fbd38d]/30 flex flex-col items-center justify-center gap-1 shadow-sm">
+                            <span className="text-[10px] font-semibold font-sans text-[#d97706] leading-tight">View All</span>
+                            <div className="w-6 h-6 rounded-full bg-[#f6ad55] flex items-center justify-center">
+                                <ArrowRight size={8} weight="fill" className="text-white" />
+                            </div>
                         </div>
-                    </div>
+                    </Link>
                 </div>
 
                 {/* Tablet/Desktop Swiper */}
@@ -300,7 +267,7 @@ const RentByCategory = () => {
                                                 src={cat.image}
                                                 alt={cat.name}
                                                 fill
-                                                className="object-contain mix-blend-multiply brightness-[1.05] contrast-[1.05] group-hover:scale-105 transition-transform duration-500"
+                                                className="object-contain mix-blend-multiply brightness-[1.05] contrast-[1.05]"
                                             />
                                         ) : (
                                             <div className="text-gray-400 group-hover:text-orange-300 transition-colors">

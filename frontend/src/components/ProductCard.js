@@ -47,7 +47,7 @@ const ProductCard = ({ product }) => {
     return (
         /* Card shell: fixed width, animated height */
         <div
-            className="group block relative mx-auto"
+            className={`group block relative mx-auto transition-transform duration-300 ease-out ${isHovered ? '-translate-y-4' : 'translate-y-0'}`}
             onMouseEnter={() => setIsHovered(true)}
             onMouseLeave={() => setIsHovered(false)}
             onTouchStart={() => setIsHovered(true)}
@@ -59,16 +59,19 @@ const ProductCard = ({ product }) => {
                 className="bg-white flex flex-col overflow-hidden relative w-full"
                 style={{
                     border: "1px solid hsla(0, 0%, 89%, 1)",
-                    borderRadius: isMobile ? "8px" : "20px",
+                    borderRadius: "20px",
                     backgroundColor: "hsla(0, 0%, 100%, 1)",
-                    boxShadow: "0px 1px 2px 0px hsla(0, 0%, 0%, 0.05)",
                     cursor: "pointer",
                     willChange: "transform, height"
                 }}
                 variants={{
-                    initial: { height: isMobile ? 256 : 387 },
+                    initial: { 
+                        height: isMobile ? 250 : 387, 
+                        boxShadow: "0px 1px 2px 0px hsla(0, 0%, 0%, 0.05)"
+                    },
                     hover: {
-                        height: isMobile ? 330 : 440,
+                        height: isMobile ? 250 : 440,
+                        boxShadow: "0px 10px 20px -4px hsla(0, 0%, 0%, 0.08)",
                         transition: { duration: 0.3, ease: [0.45, 1.45, 0.8, 1] }
                     }
                 }}
@@ -79,7 +82,7 @@ const ProductCard = ({ product }) => {
                     style={{
                         width: isMobile ? "170px" : "285px",
                         height: isMobile ? "184px" : "282px",
-                        borderRadius: isMobile ? "8px" : "20px",
+                        borderRadius: "20px",
                         borderWidth: "0px 1px 1px 1px",
                         borderStyle: "solid",
                         borderColor: "hsla(0, 0%, 93%, 1)",
@@ -91,13 +94,17 @@ const ProductCard = ({ product }) => {
                     <div
                         className="absolute z-20 flex items-center"
                         style={{
-                            top: "20px",
-                            left: "20px",
-                            gap: "6px"
+                            top: !isMobile ? "14.57px" : "12.57px",
+                            left: !isMobile ? "14.49px" : "13.49px",
+                            gap: "4px",
+                            width: !isMobile ? "114px" : "92px",
+                            height: !isMobile ? "24px" : "28px"
                         }}
                     >
-                        <span className="text-[10.5px] leading-none flex items-center justify-center whitespace-nowrap"
+                        <span className="text-xs leading-none flex items-center justify-center whitespace-nowrap"
                             style={{
+                                width: "auto",
+                                minWidth: "45px",
                                 height: "24px",
                                 opacity: 1,
                                 borderRadius: "27px",
@@ -115,7 +122,7 @@ const ProductCard = ({ product }) => {
                         >
                             {product.discount || "-20% off"}
                         </span>
-                        {product.isNew && (
+                        {(product.isNew || product.condition === 'New') && (
                             <span
                                 className="text-white text-[10px] font-bold shadow-sm leading-none flex items-center justify-center h-full translate-x-1.5"
                                 style={{
@@ -139,17 +146,18 @@ const ProductCard = ({ product }) => {
                     <button
                         className="absolute z-20 flex items-center justify-center rounded-full shadow-sm hover:scale-110 transition-all duration-300"
                         style={{
-                            width: "33px",
-                            height: "33px",
-                            top: "10.57px",
-                            right: "16.51px",
-                            backgroundColor: "hsla(0, 0%, 93%, 1)",
-                            border: "0.2px solid hsla(0, 0%, 80%, 1)",
-                            borderRadius: "9999px"
+                            width: "28px",
+                            height: "28px",
+                            top: isMobile ? "11px" : "10.57px",
+                            right: "12px",
+                            backgroundColor: "hsla(0,0%,100%,0.9)",
+                            border: "1px solid hsla(0, 0%, 89%, 1)",
+                            borderRadius: "9999px",
+                            boxShadow: "0px 2px 4px rgba(0,0,0,0.05)"
                         }}
                         onClick={(e) => { e.preventDefault(); e.stopPropagation(); }}
                     >
-                        <Heart size={18} color="#000000" weight="regular" />
+                        <Heart size={15} color="#000000" weight="regular" />
                     </button>
 
                     <div
@@ -158,7 +166,7 @@ const ProductCard = ({ product }) => {
                         <div
                             className="relative transition-transform duration-700 ease-out group-hover:scale-105"
                             style={{
-                                width: isMobile ? "150px" : "240px",
+                                width: isMobile ? "140px" : "240px",
                                 height: isMobile ? "140px" : "220px"
                             }}
                         >
@@ -177,7 +185,7 @@ const ProductCard = ({ product }) => {
                     className="flex flex-col font-sans bg-white shrink-0"
                     style={{
                         width: isMobile ? "170px" : "285px",
-                        height: isMobile ? (isHovered ? '146px' : '72px') : (isHovered ? '158px' : '105px'),
+                        height: isMobile ? 'auto' : (isHovered ? '158px' : '105px'),
                         gap: isMobile ? "4px" : "8px",
                         paddingTop: isMobile ? "4px" : "8px",
                         paddingRight: isMobile ? "8px" : "12px",
@@ -190,12 +198,12 @@ const ProductCard = ({ product }) => {
                     <h3
                         className="line-clamp-1 group-hover:text-[#FF3B30] transition-colors duration-300 shrink-0 font-sans"
                         style={{
-                            width: isMobile ? "154px" : "261px",
-                            height: isMobile ? "22px" : "25px",
-                            fontSize: isMobile ? "15px" : "18px",
+                            width: isMobile ? "261px" : "261px",
+                            height: isMobile ? "23px" : "25px",
+                            fontSize: isMobile ? "16px" : "18px",
                             fontWeight: 600,
-                            lineHeight: isMobile ? "22px" : "25px",
-                            letterSpacing: isMobile ? "normal" : "-0.4px",
+                            lineHeight: isMobile ? "23px" : "25px",
+                            letterSpacing: isMobile ? "-0.4px" : "-0.4px",
                             color: "hsla(0, 0%, 16%, 1)"
                         }}
                     >
@@ -209,9 +217,13 @@ const ProductCard = ({ product }) => {
                     >
                         <div className="flex items-center gap-1">
                             <div className="flex text-[#FF9500]">
-                                {[1, 2, 3, 4, 5].map((s) => (
-                                    <Star key={s} size={isMobile ? 12 : 14} weight="fill" className={s <= Math.round(product.rating || 4) ? "" : "opacity-20"} />
-                                ))}
+                                {isMobile ? (
+                                    <Star size={12} weight="fill" />
+                                ) : (
+                                    [1, 2, 3, 4, 5].map((s) => (
+                                        <Star key={s} size={14} weight="fill" className={s <= Math.round(product.rating || 4) ? "" : "opacity-20"} />
+                                    ))
+                                )}
                             </div>
                             <span
                                 className="ml-1"
@@ -239,7 +251,7 @@ const ProductCard = ({ product }) => {
                             >
                                 2-4 days
                             </span>
-                            <Info size={12} weight="regular" className="opacity-80" />
+
                         </div>
                     </div>
 
@@ -247,9 +259,9 @@ const ProductCard = ({ product }) => {
                     <div
                         className="flex items-center shrink-0"
                         style={{
-                            width: isMobile ? "154px" : "209px",
+                            width: isMobile ? "261px" : "209px",
                             height: isMobile ? "24px" : "28px",
-                            gap: isMobile ? "6px" : "3px",
+                            gap: isMobile ? "8px" : "3px",
                             marginTop: "-4px"
                         }}
                     >

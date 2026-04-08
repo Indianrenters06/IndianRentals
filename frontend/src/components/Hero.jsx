@@ -140,51 +140,124 @@ const Hero = () => {
 
     return (
         <section className="bg-white pt-2 md:pt-6 pb-4 md:pb-10 w-full overflow-x-clip">
-            {/* Mobile View */}
-            <div className={`${viewType === 'mobile' ? 'block' : 'hidden'} relative w-full h-[369px] group`}>
-                <div
-                    id="mobile-hero-slider"
-                    className="flex overflow-x-auto snap-x snap-mandatory px-4 gap-3 no-scrollbar h-full scroll-smooth"
-                    onScroll={(e) => {
-                        const scrollLeft = e.currentTarget.scrollLeft;
-                        const width = e.currentTarget.offsetWidth - 32;
-                        const index = Math.round(scrollLeft / width);
-                        if (index !== activeSlideIndex) {
-                            setCurrentIndex(index + CLONES_AT_START);
-                        }
-                    }}
-                >
-                    {slides.map((s, i) => (
-                        <div key={i} className="snap-center shrink-0 rounded-[24px] relative h-full flex flex-col p-6 overflow-hidden shadow-sm"
-                            style={{ width: "calc(100vw - 32px)", background: s.bgGradient || s.bgColor }}>
-                            <div className="absolute top-0 left-0 w-full h-[220px]">
-                                <Image src={s.image || FALLBACK_SLIDES[0].image} alt={s.title} fill unoptimized className="object-contain drop-shadow-lg" />
-                            </div>
-                            <div className="mt-auto relative z-10" style={{ color: s.textColor || "#fff" }}>
-                                <h1 className="text-xl font-bold leading-tight mb-2">{s.title}</h1>
-                                <p className="text-xs opacity-90 mb-4">{s.subtitle}</p>
-                                <Button href={s.ctaLink || "/store"} className="h-9 rounded-full bg-[#fbc02d] text-black text-xs px-5 font-bold shadow-md">
-                                    {(s.ctaText || "Rent Now").replace(/ [^\w\s]+.*$| [→➔➜]|^.*[→➔➜]$| \->/g, "").trim()}
+            {/* ── Mobile (Restored from March 28) ────────────────────── */}
+            <div
+                className="block md:hidden flex overflow-x-auto snap-x snap-mandatory"
+                style={{
+                    width: "100%",
+                    height: "369px",
+                    paddingTop: "12px",
+                    paddingBottom: "12px",
+                    paddingLeft: "16px",
+                    paddingRight: "16px",
+                    gap: "10px",
+                    backgroundColor: "hsla(0, 0%, 100%, 1)",
+                    scrollbarWidth: "none",
+                    msOverflowStyle: "none"
+                }}
+            >
+                <style dangerouslySetInnerHTML={{
+                    __html: `
+                    .md\\:hidden::-webkit-scrollbar { display: none; }
+                `}} />
+
+                {slides.map((s, i) => (
+                    <div
+                        key={i}
+                        className="snap-center shrink-0 rounded-lg relative h-full flex flex-col p-[14px] overflow-hidden z-0"
+                        style={{
+                            width: "216px",
+                            background: s.bgGradient || s.bgColor
+                        }}
+                    >
+                        {/* Image at TOP */}
+                        <div
+                            className="absolute z-0 pointer-events-none"
+                            style={{
+                                width: "221px",
+                                height: "221px",
+                                left: "-6px",
+                                top: "0px"
+                            }}
+                        >
+                            <Image
+                                src={s.image || FALLBACK_SLIDES[0].image}
+                                alt={s.title}
+                                fill
+                                unoptimized
+                                className="object-contain object-center drop-shadow-[0_25px_25px_rgba(0,0,0,0.25)]"
+                            />
+                        </div>
+
+                        {/* Text at BOTTOM */}
+                        <div
+                            className="absolute flex flex-col z-10"
+                            style={{
+                                width: "200px",
+                                height: "auto",
+                                top: "215px",
+                                left: "14px",
+                                gap: "2px",
+                                color: s.textColor || "#fff"
+                            }}
+                        >
+                            <h1
+                                className="font-manrope font-bold"
+                                style={{
+                                    width: "200px",
+                                    fontSize: "14px",
+                                    lineHeight: "16px",
+                                    letterSpacing: "-0.01em",
+                                    color: "hsla(0, 0%, 100%, 1)"
+                                }}
+                            >
+                                {s.title}
+                            </h1>
+                            <p
+                                className="font-manrope font-normal"
+                                style={{
+                                    width: "193px",
+                                    height: "42px",
+                                    fontSize: "10px",
+                                    lineHeight: "14px",
+                                    letterSpacing: "-0.01em",
+                                    color: "hsla(0, 0%, 100%, 1)"
+                                }}
+                            >
+                                {s.subtitle}
+                            </p>
+
+                            <div className="pt-2">
+                                <Button
+                                    href={s.ctaLink || "/store"}
+                                    className="flex items-center justify-center active:scale-95 transition-transform"
+                                    style={{
+                                        width: "60.42px",
+                                        height: "16.95px",
+                                        paddingTop: "3.63px",
+                                        paddingBottom: "3.63px",
+                                        paddingLeft: "7.26px",
+                                        paddingRight: "7.26px",
+                                        gap: "1.21px",
+                                        borderRadius: "17.41px",
+                                        borderBottom: "0.61px solid rgba(0,0,0,0.1)",
+                                        background: "hsla(44, 100%, 64%, 1)",
+                                        minWidth: "0",
+                                        minHeight: "0"
+                                    }}
+                                >
+                                    <span className="text-black font-bold whitespace-nowrap" style={{ fontSize: "7.5px", lineHeight: "1" }}>
+                                        {s.ctaText || "Rent Now"}
+                                    </span>
+                                    <svg width="6" height="6" viewBox="0 0 24 24" fill="none" stroke="black" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
+                                        <line x1="5" y1="12" x2="19" y2="12"></line>
+                                        <polyline points="12 5 19 12 12 19"></polyline>
+                                    </svg>
                                 </Button>
                             </div>
-                            {s.slideLink && <Link href={s.slideLink} className="absolute inset-0 z-20" />}
                         </div>
-                    ))}
-                </div>
-
-                {/* Mobile Dots */}
-                <div className="absolute bottom-4 left-0 right-0 flex justify-center items-center gap-1.5 z-30">
-                    {slides.map((_, i) => (
-                        <div
-                            key={i}
-                            className={`transition-all duration-300 rounded-full ${
-                                i === activeSlideIndex
-                                ? "w-[24px] h-[6px] bg-white opacity-100"
-                                : "w-[6px] h-[6px] bg-white/40"
-                            }`}
-                        />
-                    ))}
-                </div>
+                    </div>
+                ))}
             </div>
 
             {/* Tablet / Desktop View — identical layout, just scaled on tablet */}

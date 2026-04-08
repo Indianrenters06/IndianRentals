@@ -30,7 +30,7 @@ const Button = ({
   href,
   ...props
 }) => {
-  
+
   const baseClasses = 'inline-flex items-center justify-center font-semibold text-sm transition-all duration-200 cursor-pointer text-center rounded-md border h-10 w-full px-6 py-2 tablet:h-9 tablet:w-auto tablet:min-w-[110px] tablet:px-5.5 tablet:py-2.5 desktop:h-[35px] desktop:min-w-[120px] desktop:px-5 desktop:py-2';
 
   const variants = {

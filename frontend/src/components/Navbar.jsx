@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { User, MapPin, ArrowRight, CaretLeft, Heart, ShoppingCart, List, MagnifyingGlass, X, CaretDown, SignOut, NavigationArrow } from "@phosphor-icons/react";
+import { User, MapPin, ArrowRight, CaretLeft, Heart, ShoppingCartSimple, List, MagnifyingGlass, X, CaretDown, SignOut, NavigationArrow } from "@phosphor-icons/react";
 import { motion, AnimatePresence } from "framer-motion";
 import AuthModal from "./AuthModal";
 import { useSelector } from "react-redux";
@@ -222,19 +222,24 @@ const Navbar = () => {
             </div>
 
             <div className="w-full bg-white">
-                <div 
-                    className="max-w-[1200px] mx-auto px-4 md:px-8 flex items-center justify-between" 
-                    style={{ height: "62px", gap: "10px" }}
+                <div
+                    className="max-w-[1200px] mx-auto flex items-center justify-between px-4 md:px-8"
+                    style={{
+                        height: "64px",
+                        gap: "10px",
+                        paddingTop: "12px",
+                        paddingBottom: "12px"
+                    }}
                 >
                     <div className="flex items-center gap-8">
                         {/* Left Section: Mobile/Tablet Menu + Logo */}
-                        <div className="flex items-center gap-3 md:gap-4">
+                        <div className="flex items-center gap-[6px] md:gap-4">
                             {/* Mobile/Tablet Menu Toggle */}
                             <button
                                 onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
                                 className="lg:hidden text-gray-800 focus:outline-none p-1"
                             >
-                                {isMobileMenuOpen ? <X size={24} weight="fill" /> : <List size={24} weight="fill" />}
+                                {isMobileMenuOpen ? <X size={20} color="hsla(0, 0%, 16%, 1)" /> : <List size={20} color="hsla(0, 0%, 16%, 1)" />}
                             </button>
 
                             {/* Logo */}
@@ -242,9 +247,9 @@ const Navbar = () => {
                                 <Image
                                     src={siteLogo}
                                     alt={`${siteName} - You Name it We Rent it`}
-                                    width={150}
-                                    height={40}
-                                    className="h-10 w-auto object-contain"
+                                    width={135}
+                                    height={36}
+                                    className="h-9 md:h-10 w-auto object-contain"
                                     priority
                                 />
                             </Link>
@@ -269,17 +274,17 @@ const Navbar = () => {
                                 }}
                                 onKeyDown={handleSearch}
                             />
-                            <div 
-                                className="absolute inset-y-0 right-0 flex items-center cursor-pointer hover:opacity-80 transition-opacity" 
+                            <div
+                                className="absolute inset-y-0 right-0 flex items-center cursor-pointer hover:opacity-80 transition-opacity"
                                 style={{ paddingRight: "10px" }}
                                 onClick={handleSearchClick}
                             >
                                 <div style={{ width: "24px", height: "24px", position: "relative" }}>
-                                    <MagnifyingGlass 
-                                        className="text-gray-400" 
-                                        size={19.5} 
+                                    <MagnifyingGlass
+                                        className="text-gray-400"
+                                        size={19.5}
                                         weight="fill"
-                                        style={{ position: "absolute", top: "2.23px", left: "2.23px" }} 
+                                        style={{ position: "absolute", top: "2.23px", left: "2.23px" }}
                                     />
                                 </div>
                             </div>
@@ -313,14 +318,14 @@ const Navbar = () => {
                                 {isCityDropdownOpen && (
                                     <>
                                         {/* Backdrop */}
-                                        <motion.div 
+                                        <motion.div
                                             initial={{ opacity: 0 }}
                                             animate={{ opacity: 1 }}
                                             exit={{ opacity: 0 }}
                                             className="fixed inset-0 bg-black/20 backdrop-blur-sm z-[998]"
                                             onClick={() => setIsCityDropdownOpen(false)}
                                         />
-                                        
+
                                         {/* Sidebar itself */}
                                         <motion.div
                                             initial={{ x: "-100%" }}
@@ -412,14 +417,14 @@ const Navbar = () => {
 
                                                 <div className="grid grid-cols-4 gap-x-2 gap-y-4">
                                                     {[
-                                                        { name: "Delhi",     img: "https://images.unsplash.com/photo-1587474260584-136574528ed5?w=200&q=80" },
-                                                        { name: "Noida",     img: "https://images.unsplash.com/photo-1680374657222-df1b21f26a6e?w=200&q=80" },
-                                                        { name: "Mumbai",    img: "https://images.unsplash.com/photo-1529253355930-ddbe423a2ac7?w=200&q=80" },
-                                                        { name: "Pune",      img: "https://images.unsplash.com/photo-1570168007204-dfb528c6958f?w=200&q=80" },
+                                                        { name: "Delhi", img: "https://images.unsplash.com/photo-1587474260584-136574528ed5?w=200&q=80" },
+                                                        { name: "Noida", img: "https://images.unsplash.com/photo-1680374657222-df1b21f26a6e?w=200&q=80" },
+                                                        { name: "Mumbai", img: "https://images.unsplash.com/photo-1529253355930-ddbe423a2ac7?w=200&q=80" },
+                                                        { name: "Pune", img: "https://images.unsplash.com/photo-1570168007204-dfb528c6958f?w=200&q=80" },
                                                         { name: "Bangalore", img: "https://images.unsplash.com/photo-1596176530529-78163a4f7af2?w=200&q=80" },
                                                         { name: "Hyderabad", img: "https://images.unsplash.com/photo-1558431382-27e303142255?w=200&q=80" },
-                                                        { name: "Kolkata",   img: "https://images.unsplash.com/photo-1558431382-27e303142255?w=200&q=80" },
-                                                        { name: "Chennai",   img: "https://images.unsplash.com/photo-1582510003544-4d00b7f74220?w=200&q=80" },
+                                                        { name: "Kolkata", img: "https://images.unsplash.com/photo-1558431382-27e303142255?w=200&q=80" },
+                                                        { name: "Chennai", img: "https://images.unsplash.com/photo-1582510003544-4d00b7f74220?w=200&q=80" },
                                                     ].map((city) => (
                                                         <div
                                                             key={city.name}
@@ -484,22 +489,22 @@ const Navbar = () => {
                                     </div>
                                 </button>
 
-                                 {/* Profile Dropdown */}
+                                {/* Profile Dropdown */}
                                 <AnimatePresence>
                                     {isProfileDropdownOpen && (
                                         <>
                                             {/* Backdrop to close on click outside */}
-                                            <div 
-                                                className="fixed inset-0 z-40" 
+                                            <div
+                                                className="fixed inset-0 z-40"
                                                 onClick={() => setIsProfileDropdownOpen(false)}
                                             />
-                                             <motion.div
+                                            <motion.div
                                                 initial={{ opacity: 0, y: 5, scale: 0.98 }}
                                                 animate={{ opacity: 1, y: 0, scale: 1 }}
                                                 exit={{ opacity: 0, y: 5, scale: 0.98 }}
                                                 transition={{ duration: 0.15 }}
                                                 className="absolute top-full right-0 mt-2 bg-white z-50 overflow-hidden"
-                                                style={{ 
+                                                style={{
                                                     width: "173px",
                                                     height: "202px",
                                                     padding: "16px",
@@ -512,14 +517,14 @@ const Navbar = () => {
                                             >
                                                 {/* Header */}
                                                 <div className="mb-2">
-                                                     <div className="flex items-center gap-1.5 mb-1">
-                                                        <span 
-                                                            style={{ 
-                                                                width: "52px", 
-                                                                height: "16px", 
-                                                                fontFamily: "'Mona Sans', sans-serif", 
-                                                                fontWeight: 600, 
-                                                                fontSize: "11px", 
+                                                    <div className="flex items-center gap-1.5 mb-1">
+                                                        <span
+                                                            style={{
+                                                                width: "52px",
+                                                                height: "16px",
+                                                                fontFamily: "'Mona Sans', sans-serif",
+                                                                fontWeight: 600,
+                                                                fontSize: "11px",
                                                                 color: "hsla(0, 0%, 46%, 1)",
                                                                 lineHeight: "16px",
                                                                 letterSpacing: "0.2px", // approximation of spacing/8
@@ -531,13 +536,13 @@ const Navbar = () => {
                                                         </span>
                                                         <span className="text-[11px] leading-[16px]">👋</span>
                                                     </div>
-                                                     <p 
-                                                        style={{ 
-                                                            width: "141px", 
-                                                            height: "16px", 
-                                                            fontFamily: "'Mona Sans', sans-serif", 
-                                                            fontWeight: 600, 
-                                                            fontSize: "11px", 
+                                                    <p
+                                                        style={{
+                                                            width: "141px",
+                                                            height: "16px",
+                                                            fontFamily: "'Mona Sans', sans-serif",
+                                                            fontWeight: 600,
+                                                            fontSize: "11px",
                                                             color: "hsla(0, 0%, 33%, 1)",
                                                             lineHeight: "16px",
                                                             letterSpacing: "0.2px",
@@ -550,18 +555,18 @@ const Navbar = () => {
                                                     </p>
                                                 </div>
 
-                                                 {/* Divider - Exact Specs: 141px width, centered, grey-200 color */}
+                                                {/* Divider - Exact Specs: 141px width, centered, grey-200 color */}
                                                 <div className="flex justify-center w-full mb-3">
-                                                    <div 
-                                                        style={{ 
-                                                            width: "141px", 
-                                                            height: "0px", 
-                                                            borderTop: "1px solid hsla(0, 0%, 89%, 1)" 
-                                                        }} 
+                                                    <div
+                                                        style={{
+                                                            width: "141px",
+                                                            height: "0px",
+                                                            borderTop: "1px solid hsla(0, 0%, 89%, 1)"
+                                                        }}
                                                     />
                                                 </div>
 
-                                                 {/* Menu Items */}
+                                                {/* Menu Items */}
                                                 <div className="flex flex-col gap-[10px]">
                                                     {[
                                                         { label: "Profile Settings", href: "/profile" },
@@ -569,15 +574,15 @@ const Navbar = () => {
                                                         { label: "KYC Documentation", href: "/kyc" },
                                                         { label: "My Invoices", href: "/profile/invoices" }
                                                     ].map((item) => (
-                                                        <Link 
+                                                        <Link
                                                             key={item.label}
-                                                            href={item.href} 
-                                                            style={{ 
-                                                                width: "141px", 
-                                                                height: "20px", 
-                                                                fontFamily: "'Mona Sans', sans-serif", 
-                                                                fontWeight: 600, 
-                                                                fontSize: "13px", 
+                                                            href={item.href}
+                                                            style={{
+                                                                width: "141px",
+                                                                height: "20px",
+                                                                fontFamily: "'Mona Sans', sans-serif",
+                                                                fontWeight: 600,
+                                                                fontSize: "13px",
                                                                 color: "hsla(0, 0%, 20%, 1)",
                                                                 lineHeight: "20px",
                                                                 letterSpacing: "0.15px",
@@ -613,9 +618,9 @@ const Navbar = () => {
 
                         {/* Cart */}
                         <Link href="/cart" className="relative flex items-center justify-center hover:opacity-80 transition-opacity shrink-0" style={{ width: "30px", height: "30px" }}>
-                            <ShoppingCart size={26.25} color="#000000" weight="regular" />
+                            <ShoppingCartSimple size={26.25} color="#000000" weight="regular" />
                             {totalQuantity > 0 && (
-                                <span 
+                                <span
                                     className="absolute bg-red-500 text-white text-[10px] font-bold w-[16px] h-[16px] flex items-center justify-center rounded-full"
                                     style={{ top: "-2px", right: "-4px" }}
                                 >
@@ -626,35 +631,46 @@ const Navbar = () => {
 
                         {/* Menu Hamburger */}
                         <button className="flex items-center justify-center hover:opacity-80 transition-opacity shrink-0" style={{ width: "30px", height: "30px" }}>
-                            <List size={26.25} color="#000000" weight="regular" />
+                            <List size={26.25} color="#000000" />
                         </button>
                     </div>
 
 
                     {/* Tablet/Mobile Controls (Right: Location + Cart) */}
-                    <div className="lg:hidden flex items-center gap-3">
+                    <div className="lg:hidden flex items-center gap-2">
                         {/* Mobile Location Pill */}
                         <button
                             onClick={() => setIsCityDropdownOpen(!isCityDropdownOpen)}
                             className="flex items-center gap-1.5 focus:outline-none"
                             style={{
                                 height: "35px",
-                                border: "0.7px solid #D1D1D1",
+                                border: "1px solid #D1D1D1",
                                 borderRadius: "9999px",
                                 paddingLeft: "10px",
                                 paddingRight: "10px",
                                 backgroundColor: "#FFFFFF"
                             }}
                         >
-                            <MapPin size={18} weight="fill" className="text-gray-500 shrink-0" />
-                            <span className="text-sm font-medium truncate max-w-[80px] text-gray-700">{selectedCity || "Delhi"}</span>
+                            <MapPin size={18} weight="fill" color="#667085" className="shrink-0" />
+                            <span className="text-[13px] font-medium truncate max-w-[70px]" style={{ color: "#174378" }}>{selectedCity || "Bangalore"}</span>
                         </button>
 
                         {/* Mobile Cart */}
-                        <Link href="/cart" className="relative text-gray-700 hover:text-indigo-600 p-1">
-                            <ShoppingCart size={20} weight="fill" />
+                        <Link href="/cart" className="relative p-1">
+                            <ShoppingCartSimple size={32} weight="regular" color="#000000" />
                             {totalQuantity > 0 && (
-                                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[9px] font-bold w-3.5 h-3.5 flex items-center justify-center rounded-full border border-white">
+                                <span 
+                                    className="absolute flex items-center justify-center rounded-full font-bold"
+                                    style={{ 
+                                        top: "-2px", 
+                                        right: "-4px", 
+                                        backgroundColor: "hsla(353, 85%, 53%, 1)", 
+                                        color: "#FFFFFF", 
+                                        width: "16px", 
+                                        height: "16px", 
+                                        fontSize: "10px" 
+                                    }}
+                                >
                                     {totalQuantity}
                                 </span>
                             )}
@@ -704,7 +720,7 @@ const Navbar = () => {
                                     onChange={(e) => setSearchQuery(e.target.value)}
                                     onKeyDown={handleSearch}
                                 />
-                                <div 
+                                <div
                                     className="absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer"
                                     onClick={handleSearchClick}
                                 >

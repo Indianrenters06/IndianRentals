@@ -47,7 +47,7 @@ const FeatureSection = () => {
 
                 {/* Inner radial gradient container - 1140x339 Desktop, 390x390 Mobile */}
                 <div
-                    className="relative flex flex-col lg:flex-row items-center justify-between overflow-hidden"
+                    className="relative flex flex-col lg:flex-row items-center lg:items-start justify-between overflow-hidden"
                     style={{
                         background: 'radial-gradient(181.93% 64.7% at 50% 72.89%, #FFFFFF 0%, #D6F1FF 100%)',
                         width: isDesktop ? '1140px' : '390px',
@@ -58,8 +58,8 @@ const FeatureSection = () => {
                         justifyContent: 'space-between',
                         borderRadius: isDesktop ? '30px' : '0px',
                         overflow: 'hidden',
-                        paddingTop: isDesktop ? '48px' : '24px',
-                        paddingBottom: isDesktop ? '48px' : '24px',
+                        paddingTop: isDesktop ? '40px' : '24px',
+                        paddingBottom: isDesktop ? '40px' : '24px',
                         paddingLeft: isDesktop ? '30px' : '24px',
                         paddingRight: isDesktop ? '60px' : '24px',
                         gap: isDesktop ? '0' : '10px'
@@ -92,9 +92,8 @@ const FeatureSection = () => {
                                 initial={{ opacity: 0, y: 20 }}
                                 whileInView={{ opacity: 1, y: 0 }}
                                 viewport={{ once: true }}
-                                className="text-[36px] md:text-5xl lg:text-[42px]"
+                                className="font-manrope text-[36px] md:text-5xl lg:text-[42px]"
                                 style={{
-                                    fontFamily: "'Mona Sans', sans-serif",
                                     width: 'auto',
                                     height: 'auto',
                                     fontWeight: isDesktop ? '500' : 'bold',
@@ -104,8 +103,7 @@ const FeatureSection = () => {
                                     color: isDesktop ? 'transparent' : '#0F2239',
                                     letterSpacing: isDesktop ? '-0.02em' : '-0.01em',
                                     lineHeight: '1.1',
-                                    whiteSpace: isDesktop ? 'nowrap' : 'normal',
-                                    marginBottom: '16px'
+                                    whiteSpace: isDesktop ? 'nowrap' : 'normal'
                                 }}
                             >
                                 {cms.featureSectionTitle || "MacBook Air"}
@@ -116,9 +114,8 @@ const FeatureSection = () => {
                                 whileInView={{ opacity: 1, y: 0 }}
                                 viewport={{ once: true }}
                                 transition={{ delay: 0.1 }}
-                                className=""
+                                className="font-manrope"
                                 style={{
-                                    fontFamily: "'Mona Sans', sans-serif",
                                     width: isDesktop ? '235px' : '342px',
                                     height: isDesktop ? '115px' : 'auto',
                                     fontSize: isDesktop ? '14px' : '13px',
@@ -143,9 +140,8 @@ const FeatureSection = () => {
                         >
                             <Link
                                 href={cms.featureSectionCtaLink || "/store"}
-                                className="inline-flex items-center justify-center transition-all hover:bg-[#ffb50f] hover:translate-x-1 whitespace-nowrap"
+                                className="inline-flex items-center justify-center transition-all hover:bg-[#ffb50f] hover:scale-105 shadow-sm whitespace-nowrap"
                                 style={{
-                                    fontFamily: "'Mona Sans', sans-serif",
                                     width: isDesktop ? '130px' : '90px',
                                     height: isDesktop ? '35px' : '28px',
                                     padding: isDesktop ? '6px 20px' : '0 12px',
@@ -158,6 +154,7 @@ const FeatureSection = () => {
                                 }}
                             >
                                 {cms.featureSectionCtaText || "Rent Now"}
+                                <FaArrowRight size={isDesktop ? 12 : 9} className="ml-1" />
                             </Link>
                         </motion.div>
                     </div>
@@ -181,7 +178,6 @@ const FeatureSection = () => {
                             <span
                                 className="font-extrabold select-none whitespace-nowrap"
                                 style={{
-                                    fontFamily: "'Mona Sans', sans-serif",
                                     fontSize: isDesktop ? '292px' : '180px',
                                     fontWeight: '500',
                                     lineHeight: isDesktop ? '240px' : '160px',
@@ -217,14 +213,14 @@ const FeatureSection = () => {
                     <div
                         className="w-full flex-row lg:flex-col items-center justify-between lg:items-start z-10 order-3 lg:mt-0 flex"
                         style={{
-                            width: isDesktop ? '142px' : '358px',
-                            height: isDesktop ? 'auto' : '113px',
-                            gap: isDesktop ? '29px' : '10px',
-                            minHeight: isDesktop ? 'auto' : '113px',
+                            width: isDesktop ? '142px' : '350px',
+                            height: isDesktop ? '339px' : 'auto',
+                            gap: isDesktop ? '29px' : '16px',
+                            minHeight: isDesktop ? '339px' : '92px',
                             paddingTop: isDesktop ? '0' : '0px',
-                            justifyContent: isDesktop ? 'center' : 'space-between',
+                            justifyContent: isDesktop ? 'flex-start' : 'space-between',
                             margin: isDesktop ? '0' : '0 auto',
-                            opacity: 1
+                            paddingBottom: isDesktop ? '0' : '12px'
                         }}
                     >
                         {stats.slice(0, 3).map((stat, idx) => {
@@ -259,8 +255,8 @@ const FeatureSection = () => {
                                         }}
                                     >
                                         <p
+                                            className="font-manrope"
                                             style={{
-                                                fontFamily: "'Mona Sans', sans-serif",
                                                 fontSize: isDesktop ? '13px' : '9px',
                                                 fontWeight: isDesktop ? '600' : '500',
                                                 width: isDesktop ? '51px' : 'auto',
@@ -275,8 +271,8 @@ const FeatureSection = () => {
                                             {stat.label}
                                         </p>
                                         <h4
+                                            className="font-manrope"
                                             style={{
-                                                fontFamily: "'Mona Sans', sans-serif",
                                                 fontSize: isDesktop ? '32px' : '24px',
                                                 fontWeight: isDesktop ? '500' : 'bold',
                                                 width: isDesktop ? '76px' : 'auto',
@@ -296,8 +292,8 @@ const FeatureSection = () => {
                                         </h4>
                                     </div>
                                     <p
+                                        className="font-manrope"
                                         style={{
-                                            fontFamily: "'Mona Sans', sans-serif",
                                             fontSize: isDesktop ? '12px' : '9px',
                                             fontWeight: isDesktop ? '600' : '500',
                                             width: isDesktop ? (idx === 0 ? '142px' : '107px') : '90px',
@@ -323,7 +319,7 @@ const FeatureSection = () => {
                         transition={{ delay: 0.5 }}
                         className={isDesktop ? "w-full text-center relative z-10 order-4 pt-4 lg:absolute lg:bottom-[2px] lg:left-1/2 lg:-translate-x-1/2 pointer-events-none" : "w-full text-center relative z-20 order-4 mt-auto"}
                     >
-                        <h3 className="text-[14px] md:text-xl font-bold tracking-tight pb-2" style={{ fontFamily: "'Mona Sans', sans-serif" }}>
+                        <h3 className="font-manrope text-[14px] md:text-xl font-bold tracking-tight pb-2">
                             <span className="text-[#3b82f6]">Built for </span>
                             <span className="bg-clip-text text-transparent bg-gradient-to-r from-purple-500 via-pink-500 to-orange-500">
                                 Apple Intelligence.

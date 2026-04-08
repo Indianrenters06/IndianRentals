@@ -91,8 +91,6 @@ const RentalProcess = () => {
                 }}
             >
                 <div style={{ maxWidth: '708px', margin: '0 auto', display: 'flex', flexDirection: 'column', gap: '32px' }}>
-
-                    {/* Header Row */}
                     <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between' }}>
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', maxWidth: '380px' }}>
                             <h2 style={{
@@ -135,7 +133,6 @@ const RentalProcess = () => {
                         </div>
                     </div>
 
-                    {/* 2×2 Grid of Step Cards */}
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
                         {cms.steps.slice(0, 4).map((step, index) => {
                             const isActive = activeStep === index;
@@ -160,16 +157,11 @@ const RentalProcess = () => {
                                             : '0px 1px 3px 0px rgba(0,0,0,0.04)',
                                         display: 'flex',
                                         flexDirection: 'column',
-                                        justifyContent: 'center', /* Vertically center the entire content block */
+                                        justifyContent: 'center',
                                         height: '199px'
                                     }}
                                 >
-                                    {/* No step badge on tablet view */}
-
-                                    {/* Inner Text Container (314x122 exact match) */}
                                     <div style={{ display: 'flex', flexDirection: 'column', gap: '5px', width: '314px', height: '122px', justifyContent: 'center' }}>
-
-                                        {/* Icon + Title */}
                                         <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                                             <div style={{ color: isActive ? '#6B4B18' : '#1D1D1F', flexShrink: 0, lineHeight: 0 }}>
                                                 <DynamicIcon name={step.icon} size={20} weight={isActive ? "regular" : "bold"} />
@@ -186,8 +178,6 @@ const RentalProcess = () => {
                                                 {step.title}
                                             </h3>
                                         </div>
-
-                                        {/* Description */}
                                         <p style={{
                                             fontFamily: "'Mona Sans', sans-serif",
                                             fontSize: '15px',
@@ -205,73 +195,55 @@ const RentalProcess = () => {
                             );
                         })}
                     </div>
-
                 </div>
             </section>
         );
     }
 
-
-    // ─── MOBILE VIEW ────────────────────────────────────────────────────────
     if (viewType === 'mobile') {
         return (
             <section
                 className="w-full overflow-hidden bg-white"
                 style={{
-                    width: '390px',
-                    margin: '0 auto',
-                    minHeight: '734px',
+                    width: '100%',
+                    minHeight: 'auto',
                     paddingTop: '48px',
                     paddingBottom: '48px',
-                    background: '#FFFFFF',
+                    background: 'linear-gradient(180deg, #FFFFFF 0%, rgba(255, 228, 133, 0.63) 100%)'
                 }}
             >
-                <div className="flex flex-col gap-[32px]" style={{ paddingLeft: '20px', paddingRight: '20px' }}>
-
-                    {/* Mobile Header */}
-                    <div className="flex flex-col" style={{ gap: '10px' }}>
-                        <div className="flex flex-col" style={{ gap: '2px' }}>
-                            <h2 className="text-[32px] font-bold text-[#1D1D1F] leading-[1.1] tracking-tight">{cms.title}</h2>
-                            <p className="text-[#1D1D1F] text-[11.5px] leading-tight font-medium max-w-[340px] opacity-80">{cms.subtitle}</p>
-                        </div>
-                        <div className="flex items-center" style={{ height: '30px', gap: '10px' }}>
-                            <Link href="/rental-process" className="inline-flex items-center justify-center rounded-full bg-[#FFCF46] shadow-sm font-sans" style={{ width: '100px', height: '30px', color: 'hsla(0, 0%, 12%, 1)', fontWeight: '500', fontSize: '11px' }}>
-                                Rental Process
-                            </Link>
-                            <Link href="/contact" className="inline-flex items-center justify-center font-sans text-black" style={{ width: '69px', height: '30px', padding: '6px 12px', background: '#FFFFFF', borderRadius: '32px', border: '1.5px solid #8B5CF6', fontWeight: '500', fontSize: '11px' }}>Contact</Link>
-                        </div>
+                <div
+                    className="max-w-[1200px] mx-auto flex flex-col gap-[20px]"
+                    style={{ paddingLeft: '16px', paddingRight: '16px' }}
+                >
+                    <div className="flex flex-col gap-[8px]">
+                        <h2 className="text-[32px] font-bold text-[#1D1D1F] tracking-tight leading-none">{cms.title}</h2>
+                        <p className="text-[#1D1D1F]/60 text-[14px] leading-[1.3] tracking-tight">{cms.subtitle}</p>
                     </div>
 
-                    {/* Mobile Step Cards */}
-                    <div className="flex flex-col" style={{ gap: '12px' }}>
+                    <div className="flex flex-col gap-[12px] relative">
                         {cms.steps.map((step, index) => {
                             const isActive = activeStep === index;
                             return (
                                 <div
                                     key={`mobile-step-${index}`}
                                     onClick={() => setActiveStep(index)}
-                                    className={`relative cursor-pointer transition-all duration-300 rounded-2xl overflow-hidden flex flex-col justify-center ${isActive ? "" : "bg-white border border-[#E5E5E7]"}`}
+                                    className={`relative cursor-pointer transition-all duration-300 rounded-[1.2rem] overflow-hidden flex-1 flex flex-col justify-center ${isActive ? "" : "bg-white border border-[#E5E5E7]"}`}
                                     style={{
-                                        width: '350px',
                                         height: isActive ? '118px' : 'auto',
-                                        minHeight: isActive ? '118px' : '92px',
                                         padding: '20px 16px',
-                                        background: isActive ? 'linear-gradient(125.34deg, rgba(255, 207, 70, 0.5) 1.25%, rgba(255, 185, 27, 0.9) 98.94%)' : undefined,
+                                        background: isActive ? 'linear-gradient(125.34deg, rgba(255,207,70,0.5) 1.25%, rgba(255,185,27,0.9) 98.94%)' : undefined,
                                         boxShadow: isActive ? '-3px -3px 15px -2px hsla(29, 100%, 44%, 0.26) inset' : undefined,
                                     }}
                                 >
-                                    <div className="flex flex-col" style={{ gap: '5px' }}>
-                                        <div className="flex items-center gap-3" style={{ height: '19px' }}>
-                                            <div className={isActive ? 'text-[#6B4B18]' : 'text-[#1D1D1F]'}><DynamicIcon name={step.icon} size={32} /></div>
+                                    <div className="flex flex-col">
+                                        <div className="flex items-center gap-3 mb-1">
+                                            <div className={isActive ? 'text-[#6B4B18]' : 'text-[#1D1D1F]'}><DynamicIcon name={step.icon} size={22} /></div>
                                             <h3 className={`text-[15px] font-bold ${isActive ? 'text-[#6B4B18]' : 'text-[#1D1D1F]'} leading-tight tracking-tight`}>{step.title}</h3>
                                         </div>
-                                        <p className="font-sans" style={{ fontSize: '11px', fontWeight: '500', color: isActive ? 'hsla(19, 84%, 26%, 0.7)' : 'rgba(29, 29, 31, 0.6)', lineHeight: '18px', letterSpacing: '-0.01em', overflow: 'hidden', whiteSpace: 'pre-line' }}>
-                                            {step.description}
-                                        </p>
+                                        <p className={`${isActive ? 'text-[#6B4B18]/90' : 'text-[#1D1D1F]/60'} text-[11px] leading-snug font-medium`}>{step.description}</p>
                                     </div>
-                                    <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none select-none font-sans" style={{ fontWeight: '800', fontSize: '45px', lineHeight: '45px', color: isActive ? 'hsla(19, 84%, 26%, 0.2)' : 'rgba(255,255,255,1)' }}>
-                                        {index + 1}
-                                    </div>
+                                    <div className={`absolute -right-2 top-1/2 -translate-y-1/2 text-[80px] font-black pointer-events-none select-none ${isActive ? 'text-[#6B4B18]/10' : 'text-black/[0.03]'}`}>{index + 1}</div>
                                 </div>
                             );
                         })}
@@ -286,7 +258,6 @@ const RentalProcess = () => {
         );
     }
 
-    // ─── DESKTOP VIEW ───────────────────────────────────────────────────────
     return (
         <section
             className="w-full overflow-hidden bg-white"
@@ -301,7 +272,6 @@ const RentalProcess = () => {
                 className="max-w-[1200px] mx-auto flex flex-col gap-[32px]"
                 style={{ paddingLeft: '24px', paddingRight: '24px' }}
             >
-                {/* Desktop Header Row */}
                 <div className="w-full flex flex-row items-center justify-between mx-auto font-sans max-w-[1165px] h-[94px]">
                     <div className="flex flex-col h-full gap-[10px] justify-center">
                         <h2 className="text-[36px] font-bold text-[#1D1D1F] tracking-tight leading-none">{cms.title}</h2>
@@ -313,7 +283,6 @@ const RentalProcess = () => {
                     </div>
                 </div>
 
-                {/* Desktop Main: Step Accordion + Image */}
                 <div className="w-full flex flex-row items-stretch mx-auto font-sans gap-[20px] max-w-[1200px]">
                     <div className="flex flex-col" style={{ width: '590px', height: '500px', gap: '12px' }}>
                         {cms.steps.map((step, index) => {
@@ -362,7 +331,6 @@ const RentalProcess = () => {
                         })}
                     </div>
 
-                    {/* Image Panel */}
                     <div className="relative flex flex-1 rounded-[2rem] overflow-hidden bg-white shadow-sm" style={{ height: '500px' }}>
                         {cms.steps[activeStep] && <Image key={activeStep} src={cms.steps[activeStep].image || STEP_IMAGES[activeStep] || STEP_IMAGES[0]} alt={cms.steps[activeStep].title} fill className="object-cover animate-fadeIn" priority />}
                     </div>

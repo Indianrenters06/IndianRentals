@@ -7,13 +7,13 @@ import { useDispatch } from 'react-redux';
 import { addToCart } from '../redux/features/cartSlice';
 import { useRouter } from 'next/navigation';
 
-import { API } from '@/services/apiConfig';
+const API = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
 
 const FALLBACK_BANNERS = [
     {
         title: "Apple Products",
         subtitle: "MacBooks | iPads | iPhones | Mac Studio | Mac Mini",
-        image: "https://res.cloudinary.com/dpu9ikeqe/image/upload/v1775219840/f6540bc8c3d4a91dfd954f6fe1cf8d3803b81b4a_1_bosgoq.png",
+        image: "/images/banner-apple.png",
         href: "/products",
         bg: "linear-gradient(to bottom, #8E2DE2, #4A00E0)",
         category: "MacBook"
@@ -38,7 +38,7 @@ const BannerCarousel = ({ banners, current, setCurrent, height = "387px" }) => {
     }, [banners.length, setCurrent]);
 
     useEffect(() => {
-        const t = setInterval(() => go(1), 5000);
+        const t = setInterval(() => go(1), 8000);
         return () => clearInterval(t);
     }, [go]);
 
@@ -46,12 +46,12 @@ const BannerCarousel = ({ banners, current, setCurrent, height = "387px" }) => {
 
     return (
         <div
-            className="relative overflow-hidden shadow-xl rounded-2xl"
+            className="relative overflow-hidden shadow-xl"
             style={{
                 height,
                 width: "100%",
-                maxWidth: "100%",
-                background: "#000"
+                borderRadius: "30px",
+                maxWidth: "100%"
             }}
         >
             <AnimatePresence initial={false} custom={direction}>
@@ -67,66 +67,57 @@ const BannerCarousel = ({ banners, current, setCurrent, height = "387px" }) => {
                     animate="center"
                     exit="exit"
                     transition={{ duration: 0.45, ease: "easeInOut" }}
-                    className="absolute inset-0 flex flex-col items-center justify-end"
+                    className="absolute inset-0 flex flex-col items-center justify-end pb-8"
+                    style={{ background: slide.bg || "#F5F5F7" }}
                 >
-                    {/* Background Image */}
-                    <div className="absolute inset-0 z-0">
-                        <Image
-                            src={slide.image}
-                            alt={slide.title}
-                            fill
-                            unoptimized
-                            className="object-cover"
-                        />
-                        {/* Gradient Overlay */}
-                        <div
-                            className="absolute inset-0"
-                            style={{
-                                background: "linear-gradient(180.66deg, rgba(0, 0, 0, 0) 52.71%, rgba(0, 0, 0, 0.8) 86.37%)"
-                            }}
-                        />
+                    <div className="absolute inset-x-0 top-0 h-[65%] flex items-center justify-center p-8">
+                        <div className="w-full h-full bg-white/20 rounded-2xl backdrop-blur-xl flex items-center justify-center border border-white/10">
+                            <span className="text-white/50 text-sm">Product Visual</span>
+                        </div>
                     </div>
 
-                    {/* Content Layer */}
-                    <div className="relative z-10 text-center w-full" style={{ padding: "20px 24px" }}>
+                    <div className="relative z-10 text-center px-6">
                         <div className="flex items-center justify-center gap-4 mb-1">
-                            <button onClick={() => go(-1)} className="w-[30px] h-[30px] rounded-full bg-white shadow-sm flex items-center justify-center text-gray-900 hover:bg-gray-100 transition-colors"><CaretLeft size={16} weight="bold" /></button>
-                            <h3
-                                className="text-white leading-tight"
+                            <button
+                                onClick={() => go(-1)}
+                                className="flex items-center justify-center rounded-full hover:scale-110 transition-all duration-200"
                                 style={{
-                                    fontFamily: "'Mona Sans', sans-serif",
-                                    fontSize: "32px",
-                                    fontWeight: 600,
-                                    height: "35px",
-                                    letterSpacing: "-0.04em",
-                                    lineHeight: "35px"
+                                    width: "24px",
+                                    height: "24px",
+                                    backgroundColor: "hsla(0, 0%, 96%, 1)",
+                                    padding: "2.25px",
+                                    flexShrink: 0
                                 }}
                             >
+                                <CaretLeft size={19.5} weight="bold" color="#1D1D1F" />
+                            </button>
+                            <h3 className="text-white text-[24px] font-bold tracking-tight" style={{ fontFamily: "'Mona Sans', sans-serif" }}>
                                 {slide.title}
                             </h3>
-                            <button onClick={() => go(1)} className="w-[30px] h-[30px] rounded-full bg-white shadow-sm flex items-center justify-center text-gray-900 hover:bg-gray-100 transition-colors"><CaretRight size={16} weight="bold" /></button>
+                            <button
+                                onClick={() => go(1)}
+                                className="flex items-center justify-center rounded-full hover:scale-110 transition-all duration-200"
+                                style={{
+                                    width: "24px",
+                                    height: "24px",
+                                    backgroundColor: "hsla(0, 0%, 96%, 1)",
+                                    padding: "2.25px",
+                                    flexShrink: 0
+                                }}
+                            >
+                                <CaretRight size={19.5} weight="bold" color="#1D1D1F" />
+                            </button>
                         </div>
-                        <p
-                            className="text-white/90 leading-tight mb-4 mx-auto"
-                            style={{
-                                fontFamily: "'Mona Sans', sans-serif",
-                                fontSize: "16px",
-                                fontWeight: 400,
-                                height: "28px",
-                                maxWidth: "526px",
-                                textAlign: "center",
-                                letterSpacing: "-0.01em"
-                            }}
-                        >
+                        <p className="text-white/80 text-[14px] font-medium opacity-80 leading-tight mb-4">
                             {slide.subtitle}
                         </p>
 
-                        <div className="flex justify-center gap-2">
+                        <div className="flex justify-center gap-1.5">
                             {banners.map((_, i) => (
                                 <button
                                     key={i}
                                     onClick={() => { setDirection(i > current ? 1 : -1); setCurrent(i); }}
-                                    className={`transition-all duration-300 rounded-full h-2 ${i === current ? "w-10 bg-white" : "w-1.5 bg-white/40"}`}
+                                    className={`transition-all duration-300 rounded-full h-1.5 ${i === current ? "w-6 bg-white" : "w-1.5 bg-white/40"}`}
                                 />
                             ))}
                         </div>
@@ -138,11 +129,9 @@ const BannerCarousel = ({ banners, current, setCurrent, height = "387px" }) => {
 };
 
 // ─── Product Card Component ──────────────────────────────────────────────────
-const ShowcaseProductCard = ({ product, index, viewType = 'desktop', handleAddToCart }) => {
+const ShowcaseProductCard = ({ product, index, isDesktop, handleAddToCart }) => {
     const [isHovered, setIsHovered] = useState(false);
     const router = useRouter();
-    const isDesktop = viewType === 'desktop';
-    const isTablet = viewType === 'tablet';
 
     return (
         <div
@@ -155,84 +144,88 @@ const ShowcaseProductCard = ({ product, index, viewType = 'desktop', handleAddTo
             <motion.div
                 animate={isHovered ? "hover" : "initial"}
                 initial="initial"
-                className="bg-white flex flex-col overflow-hidden relative mx-auto w-full"
+                className="bg-white flex flex-col overflow-hidden relative mx-auto w-full rounded-[16px]"
                 style={{
-                    height: isDesktop ? '387px' : (isTablet ? '387px' : '256px'),
-                    width: isDesktop ? '285px' : (isTablet ? '223px' : '170px'),
-                    border: isTablet ? '0.84px solid hsla(0, 0%, 89%, 1)' : '1px solid hsla(0, 0%, 89%, 1)',
-                    boxShadow: isTablet ? '0px 0.84px 1.68px 0px hsla(0, 0%, 0%, 0.05)' : '0px 1px 2px 0px hsla(0, 0%, 0%, 0.05)',
+                    height: isDesktop ? '387px' : '256px',
+                    width: isDesktop ? '285px' : '170px',
+                    border: "1px solid hsla(0, 0%, 89%, 1)",
                     willChange: "transform, height",
                     cursor: "pointer",
                     backgroundColor: "hsla(0, 0%, 100%, 1)",
-                    borderRadius: isDesktop ? '20px' : (isTablet ? '17px' : '8px'),
+                    borderRadius: isDesktop ? "16px" : "8px",
                     opacity: 1
                 }}
                 variants={{
-                    initial: { height: isDesktop ? 387 : (isTablet ? 387 : 256), y: 0, boxShadow: "0px 2px 4px 0px hsla(0, 0%, 0%, 0.04)" },
+                    initial: { 
+                        height: isDesktop ? 387 : 256,
+                        y: 0,
+                        scale: 1,
+                        boxShadow: "0px 1px 2px 0px hsla(0, 0%, 0%, 0.05)"
+                    },
                     hover: {
-                        height: isDesktop ? 440 : (isTablet ? 440 : 330),
-                        y: isDesktop ? -10 : -8,
-                        boxShadow: "0px 25px 50px -12px hsla(0, 0%, 0%, 0.15)",
-                        transition: { duration: 0.3, ease: [0.45, 1.45, 0.8, 1] }
+                        height: isDesktop ? 440 : 330,
+                        y: -12,
+                        scale: 1.01,
+                        boxShadow: "0px 10px 20px -4px hsla(0, 0%, 0%, 0.08)",
+                        transition: { duration: 0.35, ease: [0.33, 1, 0.68, 1] }
                     }
                 }}
             >
                 {/* Image Section */}
                 <div
-                    className="relative bg-white group-hover:bg-[#F9F9F9] transition-colors duration-500 flex items-center justify-center overflow-hidden shrink-0"
+                    className="relative bg-white group-hover:bg-[#F9F9F9] transition-colors duration-500 flex items-center justify-center overflow-hidden shrink-0 h-[184px] md:h-[282px]"
                     style={{
-                        width: isDesktop ? '285px' : (isTablet ? '223px' : '170px'),
-                        height: isDesktop ? '282px' : (isTablet ? '302px' : '184px'),
-                        borderRadius: isDesktop ? '20px' : (isTablet ? '17px' : '8px'),
-                        borderWidth: isTablet ? '0px 0.84px 0.84px 0.84px' : '0px 1px 1px 1px',
+                        width: isDesktop ? '285px' : '170px',
+                        borderRadius: isDesktop ? "16px" : "8px",
+                        borderWidth: "0px 1px 1px 1px",
                         borderStyle: "solid",
                         borderColor: "hsla(0, 0%, 93%, 1)",
                         backgroundColor: "hsla(0, 0%, 100%, 1)",
                         opacity: 1,
-                        boxShadow: isTablet
-                            ? "0px 3.35px 6.71px 0px hsla(0, 0%, 87%, 0.1), 0px 12.58px 12.58px 0px hsla(0, 0%, 87%, 0.09), 0px 27.67px 16.77px 0px hsla(0, 0%, 87%, 0.05), 0px 49.48px 19.29px 0px hsla(0, 0%, 87%, 0.01), 0px 76.31px 21.8px 0px hsla(0, 0%, 87%, 0)"
-                            : "0px 4px 8px 0px hsla(0, 0%, 87%, 0.1), 0px 15px 15px 0px hsla(0, 0%, 87%, 0.09), 0px 33px 20px 0px hsla(0, 0%, 87%, 0.05), 0px 59px 23px 0px hsla(0, 0%, 87%, 0.01), 0px 91px 26px 0px hsla(0, 0%, 87%, 0)"
+                        boxShadow: "0px 4px 8px 0px hsla(0, 0%, 87%, 0.1), 0px 15px 15px 0px hsla(0, 0%, 87%, 0.09), 0px 33px 20px 0px hsla(0, 0%, 87%, 0.05), 0px 59px 23px 0px hsla(0, 0%, 87%, 0.01), 0px 91px 26px 0px hsla(0, 0%, 87%, 0)"
                     }}
                 >
                     <div
                         className="absolute z-20 flex items-center"
                         style={{
-                            top: "20px",
-                            left: "20px",
-                            gap: "6px"
+                            top: isDesktop ? "14.57px" : "12.57px",
+                            left: isDesktop ? "14.49px" : "13.49px",
+                            gap: "4px",
+                            width: isDesktop ? "114px" : "92px",
+                            height: isDesktop ? "24px" : "28px"
                         }}
                     >
-                        <span className="text-[10.5px] leading-none flex items-center justify-center whitespace-nowrap"
+                        <span className="text-white text-[10px] font-bold rounded-full flex items-center justify-center shrink-0"
                             style={{
-                                height: "24px",
-                                opacity: 1,
-                                borderRadius: "27px",
-                                paddingTop: "4px",
-                                paddingRight: "10px",
-                                paddingBottom: "4px",
-                                paddingLeft: "10px",
+                                width: isDesktop ? "auto" : "65px",
+                                height: isDesktop ? "100%" : "24px",
                                 background: "hsla(3, 86%, 51%, 1)",
-                                boxShadow: "0px 0px 1px 0px hsla(0, 0%, 47%, 0.1), 0px 1px 1px 0px hsla(0, 0%, 47%, 0.09), 0px 3px 2px 0px hsla(0, 0%, 47%, 0.05), 0px 5px 2px 0px hsla(0, 0%, 47%, 0.01), 0px 9px 2px 0px hsla(0, 0%, 47%, 0)",
-                                color: "hsla(4, 100%, 97%, 1)",
                                 fontFamily: "'Mona Sans', sans-serif",
+                                fontSize: "10px",
                                 fontWeight: 600,
-                                letterSpacing: "0.02em"
+                                letterSpacing: "-0.01em",
+                                paddingLeft: "10px",
+                                paddingRight: "10px",
+                                borderRadius: "27px",
+                                boxShadow: "0px 0px 1px 0px hsla(0, 0%, 47%, 0.1), 0px 1px 1px 0px hsla(0, 0%, 47%, 0.09), 0px 3px 2px 0px hsla(0, 0%, 47%, 0.05), 0px 5px 2px 0px hsla(0, 0%, 47%, 0.01), 0px 9px 2px 0px hsla(0, 0%, 47%, 0)"
                             }}
                         >
                             -20% off
                         </span>
-                        {product.isNew && (
+                        {(isDesktop || product.isNew) && (
                             <span
-                                className="text-white text-[10px] font-bold shadow-sm leading-none flex items-center justify-center translate-x-1.5"
+                                className="text-white text-[10px] font-bold rounded-full flex items-center justify-center shrink-0"
                                 style={{
-                                    width: "45px",
-                                    height: "24px",
-                                    paddingTop: "4px",
-                                    paddingRight: "10px",
-                                    paddingBottom: "4px",
-                                    paddingLeft: "10px",
-                                    borderRadius: "27px",
+                                    width: isDesktop ? "auto" : "45px",
+                                    height: isDesktop ? "100%" : "24px",
+                                    paddingLeft: isDesktop ? "10px" : "0",
+                                    paddingRight: isDesktop ? "10px" : "0",
                                     backgroundColor: "hsla(122, 100%, 35%, 1)",
+                                    fontFamily: "'Mona Sans', sans-serif",
+                                    fontSize: "10px",
+                                    fontWeight: 600,
+                                    letterSpacing: "-0.01em",
+                                    borderRadius: "27px",
                                     boxShadow: "0px 0px 1px 0px hsla(0, 0%, 47%, 0.1), 0px 1px 1px 0px hsla(0, 0%, 47%, 0.09), 0px 3px 2px 0px hsla(0, 0%, 47%, 0.05), 0px 5px 2px 0px hsla(0, 0%, 47%, 0.01), 0px 9px 2px 0px hsla(0, 0%, 47%, 0)"
                                 }}
                             >
@@ -244,17 +237,18 @@ const ShowcaseProductCard = ({ product, index, viewType = 'desktop', handleAddTo
                     <button
                         className="absolute z-20 flex items-center justify-center rounded-full shadow-sm hover:scale-110 transition-all duration-300"
                         style={{
-                            width: "33px",
-                            height: "33px",
+                            width: "24px",
+                            height: "24px",
                             top: "10.57px",
-                            right: "16.51px",
-                            backgroundColor: "hsla(0, 0%, 93%, 1)",
+                            right: "12.51px",
+                            backgroundColor: "hsla(0, 0%, 96%, 1)",
                             border: "0.2px solid hsla(0, 0%, 80%, 1)",
-                            borderRadius: "9999px"
+                            borderRadius: "100%",
+                            padding: "2.25px"
                         }}
                         onClick={(e) => { e.preventDefault(); e.stopPropagation(); }}
                     >
-                        <Heart size={18} color="#000000" weight="regular" />
+                        <Heart size={19.5} color="#000000" weight="thin" />
                     </button>
 
                     <div className="relative w-full h-full p-4 flex items-center justify-center">
@@ -269,28 +263,28 @@ const ShowcaseProductCard = ({ product, index, viewType = 'desktop', handleAddTo
 
                 {/* Text Section */}
                 <div
-                    className="flex flex-col relative font-sans bg-white"
+                    className="flex flex-col relative font-manrope bg-white"
                     style={{
-                        width: isDesktop ? '285px' : (isTablet ? '223px' : '100%'),
-                        height: isDesktop ? (isHovered ? '158px' : '105px') : (isTablet ? (isHovered ? '130px' : '85px') : '72px'),
-                        paddingTop: isDesktop ? '8px' : (isTablet ? '6.71px' : '4px'),
-                        paddingRight: isDesktop ? '12px' : (isTablet ? '10.06px' : '8px'),
-                        paddingBottom: isDesktop ? '12px' : (isTablet ? '10.06px' : '8px'),
-                        paddingLeft: isDesktop ? '12px' : (isTablet ? '10.06px' : '8px'),
-                        gap: isDesktop ? '8px' : (isTablet ? '6.71px' : '4px'),
+                        width: isDesktop ? '285px' : '100%',
+                        height: isDesktop ? (isHovered ? '158px' : '105px') : '72px',
+                        paddingTop: isDesktop ? '8px' : '4px',
+                        paddingRight: isDesktop ? '12px' : '8px',
+                        paddingBottom: isDesktop ? '12px' : '8px',
+                        paddingLeft: isDesktop ? '12px' : '8px',
+                        gap: isDesktop ? '8px' : '4px',
                         opacity: 1,
                         transition: 'height 0.3s ease'
                     }}
                 >
                     <h3
-                        className="font-sans line-clamp-1 group-hover:text-[#FF3B30] transition-colors duration-300 shrink-0"
+                        className="font-manrope line-clamp-1 group-hover:text-[#FF3B30] transition-colors duration-300 shrink-0"
                         style={{
                             width: isDesktop ? "261px" : "100%",
-                            height: isDesktop ? "25px" : "20px",
-                            fontSize: isDesktop ? "18px" : (isTablet ? "14px" : "15px"),
+                            height: isDesktop ? "25px" : "22px",
+                            fontSize: isDesktop ? "18px" : "15px",
                             fontWeight: 600,
-                            lineHeight: isDesktop ? "25px" : "20px",
-                            letterSpacing: isDesktop ? "-0.4px" : (isTablet ? "-0.3px" : "normal"),
+                            lineHeight: isDesktop ? "25px" : "22px",
+                            letterSpacing: isDesktop ? "-0.4px" : "normal",
                             color: "hsla(0, 0%, 16%, 1)"
                         }}
                     >
@@ -300,15 +294,19 @@ const ShowcaseProductCard = ({ product, index, viewType = 'desktop', handleAddTo
                     <div
                         className="flex items-center justify-between shrink-0"
                         style={{
-                            width: isDesktop ? "261px" : (isTablet ? "203px" : "154px"),
+                            width: isDesktop ? "261px" : "154px",
                             height: "16px"
                         }}
                     >
                         <div className="flex items-center gap-1">
                             <div className="flex text-[#FF9500]">
-                                {[1, 2, 3, 4, 5].map((s) => (
-                                    <Star key={s} size={isDesktop ? 14 : (isTablet ? 13 : 12)} weight="fill" className={s <= Math.round(product.rating || 4) ? "" : "opacity-20"} />
-                                ))}
+                                {isDesktop ? (
+                                    [1, 2, 3, 4, 5].map((s) => (
+                                        <Star key={s} size={14} weight="fill" className={s <= Math.round(product.rating || 4) ? "" : "opacity-20"} />
+                                    ))
+                                ) : (
+                                    <Star size={12} weight="fill" />
+                                )}
                             </div>
                             <span
                                 className="ml-1"
@@ -323,41 +321,60 @@ const ShowcaseProductCard = ({ product, index, viewType = 'desktop', handleAddTo
                                 {product.rating || "4.5"} ({product.reviews || 12})
                             </span>
                         </div>
-                        <div className="flex items-center gap-1.5" style={{ color: "hsla(0, 0%, 46%, 1)" }}>
-                            <Truck size={isDesktop ? 16 : 14} weight="regular" />
+                        <div 
+                            className="flex items-center flex-nowrap shrink-0" 
+                            style={{ 
+                                color: "hsla(0, 0%, 46%, 1)",
+                                gap: isDesktop ? "6px" : "2px",
+                                width: isDesktop ? "auto" : "57px",
+                                height: isDesktop ? "auto" : "14px"
+                            }} 
+                        >
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={isDesktop ? 1.5 : 0.63} stroke={isDesktop ? "currentColor" : "hsla(0, 0%, 69%, 1)"} className={isDesktop ? "w-[16px] h-[16px]" : "w-[8.11px] h-[6.25px] mt-[2.19px] ml-[0.94px]"}>
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 18.75a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 0 1-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m3 0h1.125c.621 0 1.129-.504 1.09-1.124a17.902 17.902 0 0 0-3.213-9.193 2.056 2.056 0 0 0-1.58-.86H14.25M16.5 18.75h-2.25m0-11.177v-.958c0-.568-.422-1.048-.987-1.106a48.554 48.554 0 0 0-10.026 0 1.106 1.106 0 0 0-.987 1.106v7.635m12-6.677v6.677m0 4.5v-4.5m0 0h-12" />
+                            </svg>
                             <span
-                                className="font-sans"
+                                className="whitespace-nowrap"
                                 style={{
-                                    fontSize: "12px",
+                                    fontFamily: isDesktop ? "'Manrope', sans-serif" : "'Mona Sans', sans-serif",
+                                    fontSize: isDesktop ? "12px" : "10px",
                                     fontWeight: 500,
-                                    lineHeight: "120%",
-                                    letterSpacing: "-0.04em"
+                                    lineHeight: isDesktop ? "120%" : "14px",
+                                    letterSpacing: isDesktop ? "-0.04em" : "-0.01em",
+                                    color: isDesktop ? "hsla(0, 0%, 46%, 1)" : "hsla(0, 0%, 69%, 1)",
+                                    display: "inline-block",
+                                    width: isDesktop ? "auto" : "31px",
+                                    height: isDesktop ? "auto" : "14px"
                                 }}
                             >
                                 2-4 days
                             </span>
-                            <Info size={12} weight="regular" className="ml-0.5 opacity-80 hidden md:block" />
+
                         </div>
                     </div>
 
                     <div
                         className="flex items-center shrink-0"
                         style={{
-                            width: isDesktop ? "209px" : "100%",
-                            height: isDesktop ? "28px" : "auto",
-                            gap: isDesktop ? "3px" : (isTablet ? "4px" : "6px"),
+                            width: isDesktop ? "209px" : "145px",
+                            height: isDesktop ? "28px" : "20px",
+                            gap: isDesktop ? "3px" : "3px",
                             opacity: 1,
-                            marginTop: "-2px"
+                            marginTop: "-4px"
                         }}
                     >
                         <span
                             className="lowercase"
                             style={{
                                 fontFamily: "'Mona Sans', sans-serif",
-                                fontSize: "11px",
+                                fontSize: isDesktop ? "11px" : "10px",
                                 fontWeight: 500,
-                                color: "hsla(0, 0%, 0%, 1)",
-                                letterSpacing: "-0.01em"
+                                color: "hsla(0, 0%, 33%, 1)",
+                                letterSpacing: "-0.01em",
+                                display: "inline-block",
+                                width: isDesktop ? "auto" : "25px",
+                                height: isDesktop ? "auto" : "14px",
+                                lineHeight: isDesktop ? "normal" : "14px"
                             }}
                         >
                             from
@@ -367,23 +384,28 @@ const ShowcaseProductCard = ({ product, index, viewType = 'desktop', handleAddTo
                                 className="line-through decoration-[1.5px]"
                                 style={{
                                     fontFamily: "'Mona Sans', sans-serif",
-                                    fontSize: isDesktop ? "16px" : (isTablet ? "14px" : "13px"),
+                                    fontSize: isDesktop ? "16px" : "12px",
                                     fontWeight: 600,
                                     color: "hsla(0, 0%, 46%, 1)",
-                                    letterSpacing: "-0.04em"
+                                    letterSpacing: "-0.04em",
+                                    display: "inline-block",
+                                    width: isDesktop ? "auto" : "45px",
+                                    height: isDesktop ? "auto" : "16px",
+                                    lineHeight: isDesktop ? "normal" : "16px"
                                 }}
                             >
                                 ₹{product.originalPrice}
                             </span>
                         )}
                         <span
-                            className="font-bold tracking-tight ml-1 leading-none"
+                            className="font-bold tracking-tight ml-1"
                             style={{
                                 fontFamily: "'Mona Sans', sans-serif",
-                                fontSize: isDesktop ? "26px" : (isTablet ? "22px" : "20px"),
+                                fontSize: isDesktop ? "26px" : "16px",
                                 fontWeight: 600,
                                 color: "hsla(3, 100%, 56%, 1)",
-                                letterSpacing: "-0.04em"
+                                letterSpacing: isDesktop ? "-0.04em" : "-0.06em",
+                                lineHeight: isDesktop ? "normal" : "20px"
                             }}
                         >
                             ₹{product.rentPrice}
@@ -392,10 +414,14 @@ const ShowcaseProductCard = ({ product, index, viewType = 'desktop', handleAddTo
                             className="lowercase"
                             style={{
                                 fontFamily: "'Mona Sans', sans-serif",
-                                fontSize: "11px",
+                                fontSize: isDesktop ? "11px" : "10px",
                                 fontWeight: 500,
-                                color: "hsla(0, 0%, 24%, 1)",
+                                color: "hsla(0, 0%, 46%, 1)",
                                 letterSpacing: "-0.01em",
+                                display: "inline-block",
+                                width: isDesktop ? "auto" : "46px",
+                                height: isDesktop ? "auto" : "14px",
+                                lineHeight: isDesktop ? "normal" : "14px",
                                 marginLeft: "2px"
                             }}
                         >
@@ -431,17 +457,12 @@ const FeaturedShowcase = () => {
     const [cms, setCms] = useState({ enabled: true, banners: FALLBACK_BANNERS });
     const [products, setProducts] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [isDesktop, setIsDesktop] = useState(false);
     const [currentBanner, setCurrentBanner] = useState(0);
     const [fetchingProducts, setFetchingProducts] = useState(false);
-    const [viewType, setViewType] = useState('mobile');
 
     useEffect(() => {
-        const checkRes = () => {
-            const w = window.innerWidth;
-            if (w >= 1024) setViewType('desktop');
-            else if (w >= 768) setViewType('tablet');
-            else setViewType('mobile');
-        };
+        const checkRes = () => setIsDesktop(window.innerWidth >= 1024);
         checkRes();
         window.addEventListener('resize', checkRes);
         return () => window.removeEventListener('resize', checkRes);
@@ -463,36 +484,28 @@ const FeaturedShowcase = () => {
 
     // Sync products when banner changes
     useEffect(() => {
-        if (!cms?.banners || !cms.banners[currentBanner]) return;
-
         const activeCategory = cms.banners[currentBanner]?.category;
-
-        const safeFetch = async (url) => {
-            try {
-                const res = await fetch(url);
-                if (!res.ok) return { products: [] };
-                return await res.json();
-            } catch {
-                return { products: [] };
-            }
-        };
 
         const loadProducts = async () => {
             setFetchingProducts(true);
             try {
                 // 1. Try fetching products filtered by category
-                const url = activeCategory
-                    ? `${API}/api/products?category=${encodeURIComponent(activeCategory)}&limit=2`
+                let url = activeCategory
+                    ? `${API}/api/products?category=${activeCategory}&limit=2`
                     : `${API}/api/products?limit=2`;
 
-                let data = await safeFetch(url);
+                let res = await fetch(url).catch(() => ({ ok: false }));
+                let data = res.ok ? await res.json() : { products: [] };
 
-                // 2. Fallback: If no products found for category, fetch general products
-                if ((!data.products || data.products.length === 0) && activeCategory) {
-                    data = await safeFetch(`${API}/api/products?limit=2`);
+                // 2. Fallback: If no products found for category, fetch general 'Best Rented' products
+                if (data.products.length === 0 && activeCategory) {
+                    const fallbackRes = await fetch(`${API}/api/products?limit=2`).catch(() => ({ ok: false }));
+                    if (fallbackRes.ok) {
+                        data = await fallbackRes.json();
+                    }
                 }
 
-                if (data.products && data.products.length > 0) {
+                if (data.products) {
                     setProducts(data.products.map(p => ({
                         id: p._id,
                         name: p.name,
@@ -501,8 +514,11 @@ const FeaturedShowcase = () => {
                         reviews: p.numReviews || 12,
                         originalPrice: p.rentalPrice ? Math.round(p.rentalPrice * 1.5) : 8999,
                         rentPrice: p.rentalPrice || 5000,
+                        isNew: p.isNew || false
                     })));
                 }
+            } catch (err) {
+                console.error("Showcase fetch error:", err);
             } finally {
                 setFetchingProducts(false);
                 setLoading(false);
@@ -515,50 +531,35 @@ const FeaturedShowcase = () => {
     if (loading) return null;
 
     return (
-        <section className="bg-white py-12 md:py-16">
-            <div className={viewType === 'tablet' ? "w-full mx-auto px-[30px]" : "max-w-[1224px] mx-auto px-4 sm:px-6"}>
+        <section className="bg-white py-12 lg:py-[96px] overflow-hidden">
+            <div className="max-w-[1200px] mx-auto px-4 md:px-6">
                 <div
-                    className="flex items-stretch justify-center"
-                    style={{
-                        flexDirection: viewType === 'mobile' ? 'column' : 'row',
-                        gap: viewType === 'desktop' ? "24px" : (viewType === 'tablet' ? "35px" : "20px"),
-                        width: viewType === 'tablet' ? '708px' : 'auto',
-                        height: viewType === 'tablet' ? '387px' : 'auto',
-                        margin: viewType === 'tablet' ? '0 auto' : undefined
-                    }}
+                    className="flex flex-col lg:flex-row items-stretch"
+                    style={{ gap: isDesktop ? "56px" : "20px" }}
                 >
-                    {/* Left: Product Card — 1 on tablet, 2 on desktop */}
+                    {/* Left: Product Cards */}
                     <div
-                        className="flex flex-col md:flex-row items-stretch gap-4 md:gap-[18px] transition-all duration-500"
+                        className="flex flex-col md:flex-row items-stretch gap-4 md:gap-6 transition-all duration-500"
                         style={{
-                            width: viewType === 'desktop' ? "588px" : (viewType === 'tablet' ? '223px' : '100%'),
-                            height: viewType === 'tablet' ? '387px' : 'auto',
-                            flexShrink: 0,
                             opacity: fetchingProducts ? 0.6 : 1,
                             transform: fetchingProducts ? 'translateX(-10px)' : 'translateX(0)',
                             filter: fetchingProducts ? 'blur(1px)' : 'none'
                         }}
                     >
                         {products[0] ? (
-                            <ShowcaseProductCard product={products[0]} viewType={viewType} handleAddToCart={handleAddToCart} />
+                            <ShowcaseProductCard product={products[0]} isDesktop={isDesktop} handleAddToCart={handleAddToCart} />
                         ) : (
-                            <div className="w-[285px] h-[387px] bg-gray-50 rounded-xl border border-gray-100 flex items-center justify-center text-gray-300 italic text-sm">No products found</div>
+                            /* Placeholder if no products found for category */
+                            <div className="w-[285px] h-[387px] bg-gray-50 rounded-[16px] border border-gray-100 flex items-center justify-center text-gray-300 italic text-sm">No products found</div>
                         )}
 
-                        {/* Only show 2nd card on desktop */}
-                        {viewType === 'desktop' && products[1] && (
-                            <ShowcaseProductCard product={products[1]} viewType={viewType} handleAddToCart={handleAddToCart} />
+                        {products[1] && (
+                            <ShowcaseProductCard product={products[1]} isDesktop={isDesktop} handleAddToCart={handleAddToCart} />
                         )}
                     </div>
 
                     {/* Right: Banner Carousel */}
-                    <div
-                        style={{
-                            width: viewType === 'tablet' ? '450px' : (viewType === 'desktop' ? '540px' : '100%'),
-                            height: viewType === 'tablet' ? '387px' : 'auto',
-                            flexShrink: 0
-                        }}
-                    >
+                    <div className="w-full lg:flex-1 shrink-0">
                         <BannerCarousel
                             banners={cms.banners}
                             current={currentBanner}

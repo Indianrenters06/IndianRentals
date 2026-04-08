@@ -81,7 +81,7 @@ const Testimonials = () => {
 
     const TestimonialCard = ({ review }) => (
         <div
-            className="rounded-[2rem] p-7 md:p-8 flex flex-col transition-all hover:scale-[1.01] duration-300 shadow-sm font-sans"
+            className="rounded-2xl md:rounded-[2rem] p-[20px] md:p-8 flex flex-col transition-all hover:scale-[1.01] duration-300 shadow-sm font-sans"
             style={{
                 backgroundColor: review.bgColor || '#FFFFFF',
                 width: '100%'
@@ -92,7 +92,7 @@ const Testimonials = () => {
                 <span className={`text-[13px] ${review.textColor || "text-[#86868B]"} opacity-80`}>{review.role || "Verified User"}</span>
             </div>
 
-            <p 
+            <p
                 className={`grow mb-auto ${review.textColor || "text-[#1D1D1F]"}`}
                 style={{
                     fontFamily: "'Mona Sans', sans-serif",
@@ -143,8 +143,8 @@ const Testimonials = () => {
             className="w-full flex flex-col items-center"
             style={{
                 background: viewType === 'desktop' ? '#F5F5F5' : (viewType === 'tablet' ? '#FFFFFF' : 'hsla(0, 0%, 96%, 1)'),
-                width: viewType === 'mobile' ? '390px' : '100%',
-                height: viewType === 'mobile' ? '404px' : 'auto',
+                width: '100%',
+                height: 'auto',
                 margin: '0 auto',
                 overflow: 'hidden'
             }}
@@ -169,33 +169,38 @@ const Testimonials = () => {
                     }}
                 >
                     <div
-                        className="flex flex-col"
+                        className="flex flex-col mx-auto"
                         style={{
-                            width: viewType === 'desktop' ? '600px' : '100%',
-                            height: 'auto',
+                            width: viewType === 'mobile' ? '100%' : (viewType === 'desktop' ? '600px' : '100%'),
+                            maxWidth: viewType === 'mobile' ? '350px' : undefined,
+                            height: viewType === 'mobile' ? '81px' : 'auto',
                             justifyContent: 'flex-start',
-                            gap: viewType === 'desktop' ? '8px' : '8px'
+                            gap: viewType === 'mobile' ? '5px' : '8px'
                         }}
                     >
                         <h2
-                            className="font-sans font-bold"
+                            className="text-[24px] md:text-[36px] leading-[32px] md:leading-[45px]"
                             style={{
-                                width: '100%',
-                                fontSize: viewType === 'desktop' ? '38px' : '34px',
-                                color: viewType === 'desktop' ? '#1D1D1F' : '#333333',
-                                lineHeight: '1.2'
+                                fontFamily: '"Mona Sans", sans-serif',
+                                fontWeight: 600,
+                                letterSpacing: '-0.02em',
+                                color: 'hsla(0, 0%, 20%, 1)',
+                                margin: 0
                             }}
                         >
                             What Our Customers Say
                         </h2>
                         <p
-                            className="font-sans leading-normal"
                             style={{
                                 width: '100%',
-                                maxWidth: '600px',
-                                fontSize: viewType === 'desktop' ? '16px' : '15px',
-                                fontWeight: '500',
-                                color: '#86868B'
+                                height: viewType === 'mobile' ? '36px' : 'auto',
+                                fontFamily: '"Mona Sans", sans-serif',
+                                fontSize: viewType === 'mobile' ? '14px' : '16px',
+                                fontWeight: 500,
+                                lineHeight: viewType === 'mobile' ? '18px' : '1.5',
+                                letterSpacing: '0.01em',
+                                color: viewType === 'mobile' ? 'hsla(0, 0%, 33%, 1)' : '#86868B',
+                                margin: 0
                             }}
                         >
                             Real experiences from innovators, businesses, and creators powering their ambitions with IndianRenters.
@@ -218,22 +223,25 @@ const Testimonials = () => {
 
                 {/* Grid Container */}
                 <div
-                    className={`${viewType === 'desktop' ? 'grid grid-cols-3' : (viewType === 'tablet' ? 'grid grid-cols-2' : 'hidden')} w-full`}
+                    className={`${viewType === 'desktop' ? 'grid-cols-3' : (viewType === 'tablet' ? 'grid-cols-2' : 'grid-cols-1')} grid w-full`}
                     style={{
                         minHeight: viewType === 'desktop' ? '1005px' : 'auto',
+                        width: viewType === 'mobile' ? '100%' : '100%',
+                        maxWidth: viewType === 'mobile' ? '350px' : undefined,
+                        margin: viewType === 'mobile' ? '0 auto' : undefined,
                         gap: '24px',
                         opacity: 1
                     }}
                 >
                     {/* Column 1 */}
-                    <div className="flex flex-col" style={{ gap: viewType === 'desktop' ? '24px' : '20px' }}>
+                    <div className="flex flex-col" style={{ gap: viewType === 'mobile' ? '10px' : (viewType === 'desktop' ? '24px' : '20px') }}>
                         <TestimonialCard review={reviewsData[0] || staticReviews[0]} />
                         <TestimonialCard review={reviewsData[1] || staticReviews[1]} />
                         <TestimonialCard review={reviewsData[2] || staticReviews[2]} />
                     </div>
 
                     {/* Column 2 */}
-                    <div className="flex flex-col" style={{ gap: viewType === 'desktop' ? '24px' : '20px' }}>
+                    <div className={`${viewType === 'mobile' ? 'hidden' : 'flex'} flex-col`} style={{ gap: viewType === 'desktop' ? '24px' : '20px' }}>
                         <TestimonialCard review={reviewsData[3] || staticReviews[3]} />
                         <TestimonialCard review={reviewsData[4] || staticReviews[4]} />
                         <TestimonialCard review={reviewsData[5] || staticReviews[5]} />
@@ -249,61 +257,9 @@ const Testimonials = () => {
                     )}
                 </div>
 
-                {/* Mobile: Original Horizontal Scroll Snap Carousel */}
-                <div
-                    className={`${viewType === 'mobile' ? 'block' : 'hidden'} w-full overflow-x-auto snap-x snap-mandatory scrollbar-hide`}
-                    style={{ width: '350px', height: '203px' }}
-                >
-                    <div className="flex gap-4 w-max px-2 h-full">
-                        {reviewsData.map((review, i) => (
-                            <div
-                                key={`mobile-rev-${i}`}
-                                className="snap-start rounded-xl flex flex-col shadow-sm transition-all duration-300 font-sans"
-                                style={{
-                                    backgroundColor: review.bgColor || '#FFFFFF',
-                                    minWidth: '229px',
-                                    height: '156px',
-                                    padding: '8px 12px',
-                                    gap: '20px'
-                                }}
-                            >
-                                <div className="flex flex-col">
-                                    <h3 className={`text-[15px] font-bold ${review.textColor || "text-[#1D1D1F]"} leading-none mb-0.5`}>{review.name}</h3>
-                                    <p className={`text-[11px] ${review.textColor || "text-[#86868B]"} opacity-80`}>{review.role || "Verified User"}</p>
-                                </div>
-                                <p
-                                    className="font-sans"
-                                    style={{
-                                        width: '205px',
-                                        height: '56px',
-                                        fontSize: '11px',
-                                        fontWeight: '500',
-                                        color: 'hsla(23, 98%, 37%, 1)',
-                                        lineHeight: '18px',
-                                        overflow: 'hidden',
-                                        display: '-webkit-box',
-                                        WebkitLineClamp: 3,
-                                        WebkitBoxOrient: 'vertical'
-                                    }}
-                                >
-                                    {review.message || review.text}
-                                </p>
-                                <div className="flex items-center justify-between mt-auto">
-                                    <div className="scale-75 origin-left">
-                                        <GoogleLogo />
-                                    </div>
-                                    <div className="flex text-[#FFB323] gap-0.5 scale-75 origin-right">
-                                        {[...Array(5)].map((_, j) => (
-                                            <PiStarFill key={`s-${i}-${j}`} size={16} />
-                                        ))}
-                                    </div>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-                </div>
 
-                <div className="hidden md:flex mt-8 md:mt-12 w-full justify-center z-10">
+
+                <div className="flex mt-8 md:mt-12 w-full justify-center z-10">
                     <Link
                         href="/reviews"
                         className="inline-flex items-center justify-center rounded-full transition-all hover:brightness-110 shadow-md active:scale-95"
