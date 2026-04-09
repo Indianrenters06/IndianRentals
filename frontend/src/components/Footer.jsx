@@ -143,7 +143,7 @@ const Footer = () => {
                 style={{ 
                     background: 'hsla(0, 0%, 96%, 1)', 
                     borderTop: '1px solid hsla(0, 0%, 89%, 1)',
-                    paddingTop: '32px',
+                    paddingTop: '36px',
                     paddingBottom: '24px',
                     minHeight: '575px'
                 }}

@@ -95,18 +95,18 @@ const ClientSection = () => {
                     <div className="client-pagination absolute bottom-0 left-0 right-0 flex justify-center z-10" />
 
                     <button
-                        className="client-prev absolute left-0 top-[140px] -translate-y-1/2 -translate-x-1/2 z-10 w-[26px] h-[40px] rounded-[9px] flex items-center justify-center hover:scale-110 active:scale-95 shadow-sm hover:shadow-md transition-all"
+                        className="client-prev absolute left-0 top-[140px] -translate-y-1/2 -translate-x-[calc(100%+12px)] z-10 w-[26px] h-[40px] rounded-[9px] flex items-center justify-center hover:scale-110 active:scale-95 shadow-sm hover:shadow-md transition-all"
                         style={{ background: 'var(--color-grey-grey-100, hsla(0, 0%, 93%, 1))', opacity: 1 }}
                         ref={prevRef}
                     >
-                        <CaretLeft size={20} weight="regular" className="text-gray-800" />
+                        <CaretLeft size={18} weight="bold" className="text-gray-800 mr-[2px]" />
                     </button>
                     <button
-                        className="client-next absolute right-0 top-[140px] -translate-y-1/2 translate-x-1/2 z-10 w-[26px] h-[40px] rounded-[9px] flex items-center justify-center hover:scale-110 active:scale-95 shadow-sm hover:shadow-md transition-all"
+                        className="client-next absolute right-0 top-[140px] -translate-y-1/2 translate-x-[calc(100%+12px)] z-10 w-[26px] h-[40px] rounded-[9px] flex items-center justify-center hover:scale-110 active:scale-95 shadow-sm hover:shadow-md transition-all"
                         style={{ background: 'var(--color-grey-grey-100, hsla(0, 0%, 93%, 1))', opacity: 1 }}
                         ref={nextRef}
                     >
-                        <CaretRight size={20} weight="regular" className="text-gray-800" />
+                        <CaretRight size={18} weight="bold" className="text-gray-800 ml-[2px]" />
                     </button>
                 </div>
             </div>

@@ -151,12 +151,12 @@ const RentByCategory = () => {
         <section
             className="py-6 md:py-16 relative overflow-hidden"
             style={{
-                background: '#FFFFFF'
+                background: 'var(--color-grey-grey-50, hsla(0, 0%, 96%, 1))'
             }}
         >
             <div className="max-w-[1200px] mx-auto px-4 sm:px-6">
                 <div className="flex items-center justify-between mb-4 md:mb-12">
-                    <h2 
+                    <h2
                         className="text-[24px] md:text-[36px] leading-[32px] md:leading-[45px]"
                         style={{
                             fontFamily: '"Mona Sans", sans-serif',
@@ -233,58 +233,58 @@ const RentByCategory = () => {
                         margin: viewType === 'tablet' ? '0 auto' : undefined,
                         overflow: 'hidden'
                     }}>
-                    <Swiper
-                        modules={[Navigation, Autoplay, Scrollbar]}
-                        spaceBetween={viewType === 'tablet' ? 15 : 24}
-                        slidesPerView={'auto'}
-                        navigation={{
-                            nextEl: '.swiper-next-cat',
-                            prevEl: '.swiper-prev-cat',
-                        }}
-                        scrollbar={{
-                            el: '.swiper-scrollbar-cat',
-                            draggable: true,
-                            hide: false,
-                        }}
-                        autoplay={{
-                            delay: 3000,
-                            disableOnInteraction: false,
-                        }}
-                        className="!pb-0"
-                    >
-                        {displayCategories.map((cat, index) => (
-                            <SwiperSlide key={cat._id || index} style={{ width: viewType === 'tablet' ? '165px' : '177px' }}>
-                                <Link href={getCategoryRoute(cat)} className="group flex flex-col items-center cursor-pointer">
-                                    <div
-                                        className="flex items-center justify-center mb-2 relative bg-white border border-gray-200 rounded-xl group-hover:border-orange-300/20 group-hover:shadow-lg transition-all duration-300 overflow-hidden shadow-md"
-                                        style={{
-                                            width: viewType === 'tablet' ? '165px' : '177px',
-                                            height: viewType === 'tablet' ? '158px' : '173px'
-                                        }}
-                                    >
-                                        {cat.image ? (
-                                            <Image
-                                                src={cat.image}
-                                                alt={cat.name}
-                                                fill
-                                                className="object-contain mix-blend-multiply brightness-[1.05] contrast-[1.05]"
-                                            />
-                                        ) : (
-                                            <div className="text-gray-400 group-hover:text-orange-300 transition-colors">
-                                                {getIconForCategory(cat.name)}
-                                            </div>
-                                        )}
-                                    </div>
-                                    <h3
-                                        className="font-semibold font-sans text-gray-600 text-center group-hover:text-gray-700 transition-colors"
-                                        style={{ fontSize: viewType === 'tablet' ? '12px' : '15px' }}
-                                    >
-                                        {cat.name}
-                                    </h3>
-                                </Link>
-                            </SwiperSlide>
-                        ))}
-                    </Swiper>
+                        <Swiper
+                            modules={[Navigation, Autoplay, Scrollbar]}
+                            spaceBetween={viewType === 'tablet' ? 15 : 24}
+                            slidesPerView={'auto'}
+                            navigation={{
+                                nextEl: '.swiper-next-cat',
+                                prevEl: '.swiper-prev-cat',
+                            }}
+                            scrollbar={{
+                                el: '.swiper-scrollbar-cat',
+                                draggable: true,
+                                hide: false,
+                            }}
+                            autoplay={{
+                                delay: 3000,
+                                disableOnInteraction: false,
+                            }}
+                            className="!pb-0"
+                        >
+                            {displayCategories.map((cat, index) => (
+                                <SwiperSlide key={cat._id || index} style={{ width: viewType === 'tablet' ? '165px' : '177px' }}>
+                                    <Link href={getCategoryRoute(cat)} className="group flex flex-col items-center cursor-pointer">
+                                        <div
+                                            className="flex items-center justify-center mb-2 relative bg-white border border-gray-200 rounded-xl group-hover:border-orange-300/20 group-hover:shadow-lg transition-all duration-300 overflow-hidden shadow-md"
+                                            style={{
+                                                width: viewType === 'tablet' ? '165px' : '177px',
+                                                height: viewType === 'tablet' ? '158px' : '173px'
+                                            }}
+                                        >
+                                            {cat.image ? (
+                                                <Image
+                                                    src={cat.image}
+                                                    alt={cat.name}
+                                                    fill
+                                                    className="object-contain mix-blend-multiply brightness-[1.05] contrast-[1.05]"
+                                                />
+                                            ) : (
+                                                <div className="text-gray-400 group-hover:text-orange-300 transition-colors">
+                                                    {getIconForCategory(cat.name)}
+                                                </div>
+                                            )}
+                                        </div>
+                                        <h3
+                                            className="font-semibold font-sans text-gray-600 text-center group-hover:text-gray-700 transition-colors"
+                                            style={{ fontSize: viewType === 'tablet' ? '12px' : '15px' }}
+                                        >
+                                            {cat.name}
+                                        </h3>
+                                    </Link>
+                                </SwiperSlide>
+                            ))}
+                        </Swiper>
                     </div>
 
                     {/* Figma: scrollbar row — width 1164, height 34, gap 24px from cards */}

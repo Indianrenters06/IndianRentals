@@ -294,30 +294,28 @@ const RentalProcess = () => {
                                     className={`relative cursor-pointer transition-all duration-300 rounded-2xl overflow-hidden ${isActive ? "" : "bg-white border-[1.2px] border-[hsla(0,0%,93%,1)]"}`}
                                     style={{
                                         width: '590px',
-                                        height: isActive ? '213px' : '92px',
+                                        height: isActive ? (index === 3 ? '236px' : '213px') : '92px',
                                         background: isActive ? 'linear-gradient(125.34deg, rgba(255, 207, 70, 0.5) 1.25%, rgba(255, 185, 27, 0.9) 98.94%)' : 'hsla(0,0%,100%,1)',
                                         boxShadow: isActive ? '-3px -3px 15px -2px hsla(29, 100%, 44%, 0.26) inset' : undefined,
                                         border: isActive ? 'none' : undefined,
                                     }}
                                 >
                                     <div className={`flex flex-col h-full ${isActive ? 'justify-between' : 'justify-center'}`}>
-                                        <div className={`flex flex-col px-5 ${isActive ? 'pt-5' : ''}`} style={{ gap: isActive ? '12px' : '9px' }}>
-                                            <div className="flex items-start justify-between">
-                                                <div style={{ width: '170px', height: '62px', display: 'flex', flexDirection: 'column', gap: '9px' }}>
-                                                    <div className={isActive ? 'text-[#6B4B18]' : 'text-[#1D1D1F]'}><DynamicIcon name={step.icon} size={32} /></div>
-                                                    <h3 style={{ color: isActive ? 'hsla(19, 84%, 26%, 1)' : 'hsla(0, 0%, 20%, 1)', fontFamily: '"Mona Sans", sans-serif', fontWeight: 600, fontSize: '20px', lineHeight: '28px', whiteSpace: 'nowrap', letterSpacing: '-0.02em' }}>
-                                                        {step.title}
-                                                    </h3>
-                                                </div>
-                                                <div style={{ width: '56px', height: '26px', borderRadius: '6px', border: isActive ? '1px solid hsla(19, 84%, 26%, 1)' : '1px solid #E5E5E7', background: isActive ? 'hsla(46, 100%, 89%, 1)' : '#F5F5F7', color: isActive ? 'hsla(19, 84%, 26%, 1)' : '#86868B', fontSize: '13px', fontWeight: 600, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0px', marginTop: '0px', paddingRight: '4px' }}>
-                                                    <Dot size={32} weight="bold" style={{ marginLeft: '-11px' }} />
-                                                    <span style={{ letterSpacing: '-0.01em', lineHeight: 1, marginLeft: '-10px' }}>{'Step ' + (index + 1)}</span>
-                                                </div>
+                                        <div style={{ width: '590px', height: '94px', padding: '16px', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', opacity: 1, boxSizing: 'border-box' }}>
+                                            <div style={{ width: '170px', height: '62px', display: 'flex', flexDirection: 'column', gap: '9px' }}>
+                                                <div className={isActive ? 'text-[#6B4B18]' : 'text-[#1D1D1F]'}><DynamicIcon name={step.icon} size={32} /></div>
+                                                <h3 style={{ color: isActive ? 'hsla(19, 84%, 26%, 1)' : 'hsla(0, 0%, 20%, 1)', fontFamily: '"Mona Sans", sans-serif', fontWeight: 600, fontSize: '20px', lineHeight: '28px', whiteSpace: 'nowrap', letterSpacing: '-0.02em' }}>
+                                                    {step.title}
+                                                </h3>
+                                            </div>
+                                            <div style={{ width: '56px', height: '26px', borderRadius: '6px', border: isActive ? '1px solid hsla(19, 84%, 26%, 1)' : '1px solid #E5E5E7', background: isActive ? 'hsla(46, 100%, 89%, 1)' : '#F5F5F7', color: isActive ? 'hsla(19, 84%, 26%, 1)' : '#86868B', fontSize: '13px', fontWeight: 600, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0px', paddingRight: '4px' }}>
+                                                <Dot size={32} weight="bold" style={{ marginLeft: '-11px' }} />
+                                                <span style={{ letterSpacing: '-0.01em', lineHeight: 1, marginLeft: '-10px' }}>{'Step ' + (index + 1)}</span>
                                             </div>
                                         </div>
                                         {isActive && (
-                                            <div className="w-full bg-[#FFF3C9] border-t border-[#6B4B18]/10 animate-fadeIn" style={{ height: '78px', padding: '16px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                                                <p className="text-[#6B4B18]/90 text-[13px] leading-[1.3] font-medium">{step.description}</p>
+                                            <div className="animate-fadeIn" style={{ width: '590px', height: index === 3 ? '101px' : '78px', padding: '16px', display: 'flex', flexDirection: 'column', gap: '10px', opacity: 1, background: 'hsla(46, 100%, 89%, 1)' }}>
+                                                <p style={{ width: '558px', height: index === 3 ? '69px' : '46px', opacity: 0.8, fontFamily: '"Mona Sans", sans-serif', fontWeight: 400, fontSize: '16px', lineHeight: '23px', letterSpacing: '-0.04em', color: 'hsla(21, 89%, 15%, 1)', margin: 0, whiteSpace: 'pre-line' }}>{step.description}</p>
                                                 {step.link && (
                                                     <Link href={step.link} className="inline-flex items-center gap-1 text-[12px] font-bold text-[#6B4B18] hover:underline mt-1">
                                                         Learn More <DynamicIcon name="Arrow" size={12} />
