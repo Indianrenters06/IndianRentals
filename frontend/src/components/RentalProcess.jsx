@@ -263,8 +263,8 @@ const RentalProcess = () => {
             className="w-full overflow-hidden bg-white"
             style={{
                 width: '100%',
-                paddingTop: '80px',
-                paddingBottom: '80px',
+                paddingTop: '96px',
+                paddingBottom: '96px',
                 background: '#FFFFFF',
             }}
         >
@@ -283,7 +283,7 @@ const RentalProcess = () => {
                     </div>
                 </div>
 
-                <div className="w-full flex flex-row items-stretch mx-auto font-sans gap-[20px] max-w-[1200px]">
+                <div className="w-full flex flex-row items-stretch mx-auto font-sans gap-[32px] max-w-[1200px]">
                     <div className="flex flex-col" style={{ width: '590px', height: '500px', gap: '12px' }}>
                         {cms.steps.map((step, index) => {
                             const isActive = activeStep === index;

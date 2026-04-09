@@ -21,7 +21,7 @@ const ClientSection = () => {
     const nextRef = useRef(null);
 
     return (
-        <section className="py-20 bg-white">
+        <section className="py-24 bg-white">
             <style jsx global>{`
                 .client-pagination .swiper-pagination-bullet {
                     width: 7px;

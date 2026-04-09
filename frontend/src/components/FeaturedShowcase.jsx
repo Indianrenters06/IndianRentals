@@ -156,7 +156,7 @@ const ShowcaseProductCard = ({ product, index, isDesktop, handleAddToCart }) => 
                     opacity: 1
                 }}
                 variants={{
-                    initial: { 
+                    initial: {
                         height: isDesktop ? 387 : 256,
                         y: 0,
                         scale: 1,
@@ -321,14 +321,14 @@ const ShowcaseProductCard = ({ product, index, isDesktop, handleAddToCart }) => 
                                 {product.rating || "4.5"} ({product.reviews || 12})
                             </span>
                         </div>
-                        <div 
-                            className="flex items-center flex-nowrap shrink-0" 
-                            style={{ 
+                        <div
+                            className="flex items-center flex-nowrap shrink-0"
+                            style={{
                                 color: "hsla(0, 0%, 46%, 1)",
                                 gap: isDesktop ? "6px" : "2px",
                                 width: isDesktop ? "auto" : "57px",
                                 height: isDesktop ? "auto" : "14px"
-                            }} 
+                            }}
                         >
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={isDesktop ? 1.5 : 0.63} stroke={isDesktop ? "currentColor" : "hsla(0, 0%, 69%, 1)"} className={isDesktop ? "w-[16px] h-[16px]" : "w-[8.11px] h-[6.25px] mt-[2.19px] ml-[0.94px]"}>
                                 <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 18.75a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 0 1-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m3 0h1.125c.621 0 1.129-.504 1.09-1.124a17.902 17.902 0 0 0-3.213-9.193 2.056 2.056 0 0 0-1.58-.86H14.25M16.5 18.75h-2.25m0-11.177v-.958c0-.568-.422-1.048-.987-1.106a48.554 48.554 0 0 0-10.026 0 1.106 1.106 0 0 0-.987 1.106v7.635m12-6.677v6.677m0 4.5v-4.5m0 0h-12" />
@@ -531,34 +531,35 @@ const FeaturedShowcase = () => {
     if (loading) return null;
 
     return (
-        <section className="bg-white py-12 lg:py-[96px] overflow-hidden">
-            <div className="max-w-[1200px] mx-auto px-4 md:px-6">
+        <section className="bg-white py-24 overflow-hidden">
+
+            <div className="max-w-[1200px] mx-auto px-4 sm:px-6">
+
                 <div
                     className="flex flex-col lg:flex-row items-stretch"
                     style={{ gap: isDesktop ? "56px" : "20px" }}
                 >
-                    {/* Left: Product Cards */}
-                    <div
-                        className="flex flex-col md:flex-row items-stretch gap-4 md:gap-6 transition-all duration-500"
-                        style={{
-                            opacity: fetchingProducts ? 0.6 : 1,
-                            transform: fetchingProducts ? 'translateX(-10px)' : 'translateX(0)',
-                            filter: fetchingProducts ? 'blur(1px)' : 'none'
-                        }}
-                    >
-                        {products[0] ? (
-                            <ShowcaseProductCard product={products[0]} isDesktop={isDesktop} handleAddToCart={handleAddToCart} />
-                        ) : (
-                            /* Placeholder if no products found for category */
-                            <div className="w-[285px] h-[387px] bg-gray-50 rounded-[16px] border border-gray-100 flex items-center justify-center text-gray-300 italic text-sm">No products found</div>
+
+                    {/* Left */}
+                    <div className="flex flex-col md:flex-row items-stretch gap-6 transition-all duration-500">
+                        {products[0] && (
+                            <ShowcaseProductCard
+                                product={products[0]}
+                                isDesktop={isDesktop}
+                                handleAddToCart={handleAddToCart}
+                            />
                         )}
 
                         {products[1] && (
-                            <ShowcaseProductCard product={products[1]} isDesktop={isDesktop} handleAddToCart={handleAddToCart} />
+                            <ShowcaseProductCard
+                                product={products[1]}
+                                isDesktop={isDesktop}
+                                handleAddToCart={handleAddToCart}
+                            />
                         )}
                     </div>
 
-                    {/* Right: Banner Carousel */}
+                    {/* Right */}
                     <div className="w-full lg:flex-1 shrink-0">
                         <BannerCarousel
                             banners={cms.banners}
@@ -567,10 +568,11 @@ const FeaturedShowcase = () => {
                             height="387px"
                         />
                     </div>
+
                 </div>
+
             </div>
         </section>
     );
 };
-
 export default FeaturedShowcase;

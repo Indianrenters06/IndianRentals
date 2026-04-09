@@ -42,7 +42,7 @@ const FeatureSection = () => {
     const stats = cms.featureSectionStats || [];
 
     return (
-        <section className="bg-white overflow-hidden relative pb-6 md:py-16 text-black">
+        <section className="bg-white overflow-hidden max-w-[1440px] mx-auto flex flex-col gap-[10px] min-h-[400px] text-black">
             <div className="w-full max-w-[1200px] mx-auto px-0 md:px-4">
 
                 {/* Inner radial gradient container - 1140x339 Desktop, 390x390 Mobile */}

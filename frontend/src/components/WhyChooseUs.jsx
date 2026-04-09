@@ -42,14 +42,14 @@ const WhyChooseUs = () => {
         <section
             className="overflow-hidden"
             style={{
-                paddingTop: viewType !== 'mobile' ? '96px' : '48px',
-                paddingBottom: viewType !== 'mobile' ? '96px' : '48px',
+                paddingTop: viewType !== 'mobile' ? '80px' : '48px',
+                paddingBottom: viewType !== 'mobile' ? '80px' : '48px',
                 background: viewType !== 'mobile' ? 'var(--color-orange-orange-50, hsla(44, 100%, 96%, 1))' : '#FFFDF7',
                 borderBottom: viewType !== 'mobile' ? '1px solid var(--color-grey-grey-200, hsla(0, 0%, 89%, 1))' : 'none'
             }}
         >
             <div className={`max-w-[1200px] mx-auto ${viewType === 'tablet' ? 'px-8' : 'px-4 sm:px-6'}`}>
-                <div className={`grid ${viewType === 'desktop' ? 'grid-cols-2' : 'grid-cols-1'} gap-10 md:gap-14 items-center`}>
+                <div className={`grid ${viewType === 'desktop' ? 'grid-cols-2' : 'grid-cols-1'} gap-[10px] items-center`}>
 
                     {/* Text Content - always first on mobile */}
                     <div
