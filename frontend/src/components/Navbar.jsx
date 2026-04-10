@@ -659,16 +659,16 @@ const Navbar = () => {
                         <Link href="/cart" className="relative p-1">
                             <ShoppingCartSimple size={32} weight="regular" color="#000000" />
                             {totalQuantity > 0 && (
-                                <span 
+                                <span
                                     className="absolute flex items-center justify-center rounded-full font-bold"
-                                    style={{ 
-                                        top: "-2px", 
-                                        right: "-4px", 
-                                        backgroundColor: "hsla(353, 85%, 53%, 1)", 
-                                        color: "#FFFFFF", 
-                                        width: "16px", 
-                                        height: "16px", 
-                                        fontSize: "10px" 
+                                    style={{
+                                        top: "-2px",
+                                        right: "-4px",
+                                        backgroundColor: "hsla(353, 85%, 53%, 1)",
+                                        color: "#FFFFFF",
+                                        width: "16px",
+                                        height: "16px",
+                                        fontSize: "10px"
                                     }}
                                 >
                                     {totalQuantity}
