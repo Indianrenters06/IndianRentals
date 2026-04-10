@@ -9,6 +9,15 @@ import { BsTruck, BsBoxSeam, BsCreditCard } from 'react-icons/bs';
 import { useDispatch } from 'react-redux';
 import { addToCart } from '../../../redux/features/cartSlice';
 import { getProductById } from '../../../services/productService';
+import BestRentedProducts from '../../../components/BestRentedProducts';
+import FaqSection from '../../../components/FaqSection';
+
+import { Swiper, SwiperSlide } from 'swiper/react';
+import { Navigation, Thumbs, FreeMode } from 'swiper/modules';
+import 'swiper/css';
+import 'swiper/css/navigation';
+import 'swiper/css/thumbs';
+import 'swiper/css/free-mode';
 
 export default function ProductDetailPage() {
     const router = useRouter();
@@ -25,6 +34,7 @@ export default function ProductDetailPage() {
     const [quantity, setQuantity] = useState(1);
     const [activeTab, setActiveTab] = useState('Product Details');
     const [openFaq, setOpenFaq] = useState(0);
+    const [thumbsSwiper, setThumbsSwiper] = useState(null);
 
     // Fetch Product Data
     useEffect(() => {
@@ -115,8 +125,8 @@ export default function ProductDetailPage() {
                     {/* Left Column - Images & Details */}
                     <div className="flex flex-col gap-5">
                         
-                        {/* Main Image Area */}
-                        <div className="relative w-full h-[523px] bg-white border border-[#EDEDED] rounded-xl flex items-center justify-center p-10 group overflow-hidden shrink-0">
+                        {/* Main Image Slider */}
+                        <div className="relative w-full bg-white border border-[#EDEDED] rounded-xl flex items-center justify-center p-6 group overflow-hidden shrink-0 h-[350px] md:h-[523px]">
                             <span className="absolute top-6 left-6 z-10 bg-[#FF3B30] text-white text-[12px] font-bold px-3 py-1 rounded-[6px] tracking-wide">20% off</span>
 
                             <div className="absolute top-6 right-6 z-10 flex flex-col gap-3">
@@ -128,36 +138,65 @@ export default function ProductDetailPage() {
                                 </button>
                             </div>
                             
-                            <Image
-                                src={mainImage}
-                                alt={product.name}
-                                fill
-                                className="object-contain mix-blend-darken brightness-[1.08] contrast-[1.04] p-8 group-hover:scale-105 transition-transform duration-700 ease-out"
-                                priority
-                            />
-                            
-                            {/* Nav Arrows */}
-                            <button className="absolute left-6 top-1/2 -translate-y-1/2 w-10 h-10 flex items-center justify-center rounded-full bg-[#f6f6f6] text-[#666] hover:bg-gray-200 transition-colors">
-                                <span className="text-[22px] leading-none -mt-[3px]">{"‹"}</span>
-                            </button>
-                            <button className="absolute right-6 top-1/2 -translate-y-1/2 w-10 h-10 flex items-center justify-center rounded-full bg-[#f6f6f6] text-[#666] hover:bg-gray-200 transition-colors">
-                                <span className="text-[22px] leading-none -mt-[3px]">{"›"}</span>
-                            </button>
+                            <Swiper
+                                style={{
+                                    "--swiper-navigation-color": "#555",
+                                    "--swiper-navigation-size": "20px",
+                                    width: "100%",
+                                    height: "100%"
+                                }}
+                                loop={true}
+                                spaceBetween={10}
+                                navigation={true}
+                                thumbs={{ swiper: thumbsSwiper && !thumbsSwiper.destroyed ? thumbsSwiper : null }}
+                                modules={[FreeMode, Navigation, Thumbs]}
+                                className="main-image-swiper"
+                            >
+                                {(product.images && product.images.length > 0 ? product.images : [mainImage, mainImage, mainImage, mainImage]).map((img, index) => (
+                                    <SwiperSlide key={index} className="flex items-center justify-center">
+                                        <div className="relative w-full h-full flex items-center justify-center object-contain mix-blend-darken brightness-[1.08] contrast-[1.04] p-4 group-hover:scale-105 transition-transform duration-700 ease-out">
+                                            <Image
+                                                src={img}
+                                                alt={`${product.name} - ${index}`}
+                                                fill
+                                                className="object-contain"
+                                                sizes="(max-width: 768px) 100vw, 50vw"
+                                                priority={index === 0}
+                                            />
+                                        </div>
+                                    </SwiperSlide>
+                                ))}
+                            </Swiper>
                         </div>
 
-                        {/* Thumbnails */}
-                        <div className="flex items-center gap-4 w-full">
-                            {[mainImage, mainImage, mainImage, mainImage].map((img, i) => (
-                                <button key={i} className={`w-[110px] h-[110px] flex-shrink-0 bg-white border ${i === 0 ? 'border-[#0F172A] border-[2px]' : 'border-[#EDEDED]'} rounded-xl p-3 flex items-center justify-center transition-all shadow-sm hover:border-gray-400`}>
-                                    <div className="w-full h-full relative">
-                                        <Image src={img} alt={`Thumb ${i}`} fill className="object-contain mix-blend-darken brightness-[1.08] contrast-[1.04]" />
-                                    </div>
-                                </button>
-                            ))}
+                        {/* Thumbnails Slider */}
+                        <div className="w-full h-[80px] md:h-[110px]">
+                            <Swiper
+                                onSwiper={setThumbsSwiper}
+                                loop={true}
+                                spaceBetween={12}
+                                slidesPerView={4}
+                                freeMode={true}
+                                watchSlidesProgress={true}
+                                modules={[FreeMode, Navigation, Thumbs]}
+                                className="thumbs-swiper h-full"
+                                breakpoints={{
+                                    320: { slidesPerView: 3, spaceBetween: 10 },
+                                    768: { slidesPerView: 4, spaceBetween: 12 }
+                                }}
+                            >
+                                {(product.images && product.images.length > 0 ? product.images : [mainImage, mainImage, mainImage, mainImage]).map((img, i) => (
+                                    <SwiperSlide key={i}>
+                                        <div className="w-full h-full bg-white border border-[#EDEDED] rounded-xl p-2 flex items-center justify-center cursor-pointer transition-all hover:border-gray-400 overflow-hidden relative">
+                                            <Image src={img} alt={`Thumb ${i}`} fill className="object-contain mix-blend-darken brightness-[1.08] contrast-[1.04]" />
+                                        </div>
+                                    </SwiperSlide>
+                                ))}
+                            </Swiper>
                         </div>
 
                         {/* Tabs + Table Details */}
-                        <div className="w-full mb-10">
+                        <div className="w-full mb-10 mt-2">
                             <div className="border border-gray-200 rounded-[28px] overflow-hidden bg-white shadow-sm">
                                 {/* Tabs Header */}
                                 <div className="flex items-center gap-4 px-6 pt-5 pb-5 border-b border-gray-100">
@@ -204,171 +243,218 @@ export default function ProductDetailPage() {
                     </div>
 
                     {/* Right Column - Product Purchase Details */}
-                    <div className="flex flex-col gap-[32px]">
-                        <div className="flex flex-col gap-[8px] mx-2 shrink-0">
-                            <h1 className="text-[24px] xl:text-[26px] font-bold text-[#1D1D1F] leading-[1.2]">
+                    {/* Right Column - Product Purchase Details */}
+                    <div className="flex flex-col gap-5">
+                        
+                        {/* Main White Card (Title, Rating, Slider, Price) */}
+                        <div className="bg-white rounded-[20px] p-6 shadow-[0_2px_12px_max(0,rgba(0,0,0,0.04))] border border-[#EDEDED] flex flex-col pt-7 pb-6">
+                            {/* Title */}
+                            <h1 className="text-[22px] font-bold text-[#1D1D1F] leading-[1.3] tracking-tight pr-4">
                                 {product.name}
                             </h1>
-                            <div className="flex items-center gap-2">
-                                <div className="flex text-[#FF9500]">
-                                    {[1, 2, 3, 4, 5].map(s => (
-                                        <FaStar key={s} size={15} className={s <= Math.round(product.rating || 0) ? "" : "text-gray-200"} />
-                                    ))}
-                                </div>
-                                <span className="text-[13px] font-medium text-gray-500">{product.rating || "4.5"} ({product.numReviews || 12})</span>
-                            </div>
-                        </div>
-
-                        {/* Rental Configuration Card */}
-                        <div className="flex flex-col bg-white border border-[#EDEDED] rounded-lg shrink-0 h-[333px] justify-between px-6 pt-6 pb-5 shadow-[0_2px_12px_rgba(0,0,0,0.02)]">
                             
-                            {/* Header */}
-                            <div>
-                                <h3 className="text-[14px] font-medium text-[#1D1D1F] mb-6">
-                                    Select your <span className="underline decoration-gray-400 underline-offset-4 decoration-[1.5px]">minimum rental period</span>
-                                </h3>
+                            {/* Rating & Stock */}
+                            <div className="flex items-center gap-3 mt-3 mb-6">
+                                <div className="flex items-center gap-1">
+                                    <div className="flex text-[#FF9500]">
+                                        {[1, 2, 3, 4, 5].map(s => (
+                                            <FaStar key={s} size={14} className={s <= Math.round(product.rating || 0) ? "" : "text-gray-200"} />
+                                        ))}
+                                    </div>
+                                    <span className="text-[13px] font-medium text-gray-500 ml-1">{product.rating || "4.5"} ({product.numReviews || 12})</span>
+                                </div>
+                                <div className="bg-green-500 text-white text-[11px] font-bold px-2.5 py-0.5 rounded-[4px] tracking-wide flex items-center gap-1">
+                                    <span className="w-1.5 h-1.5 bg-white rounded-full block"></span> In Stock
+                                </div>
+                            </div>
 
-                                {/* Tenure Slider */}
-                                <div className="relative mb-0 mt-4">
-                                    {/* Track */}
-                                    <div className="relative h-[8px] bg-[#FDE68A] rounded-full flex items-center">
-                                        {[1, 2, 3, 4, 5].map(step => {
-                                            const pct = ((step - 1) / 4) * 100;
-                                            return (
-                                                <div 
-                                                    key={step} 
-                                                    className="absolute w-[16px] h-[16px] rounded-full bg-white transition-colors duration-300 z-10 shadow-sm border border-gray-100" 
-                                                    style={{ left: `calc(${pct}% - 8px)` }} 
-                                                />
-                                            );
-                                        })}
-                                        <input
-                                            type="range"
-                                            min="1"
-                                            max="5"
-                                            step="1"
-                                            value={duration <= 1 ? 1 : duration <= 3 ? 2 : duration <= 6 ? 3 : duration <= 9 ? 4 : 5}
-                                            onChange={(e) => {
-                                                const step = parseInt(e.target.value);
-                                                const months = [1, 3, 6, 9, 12];
-                                                setDuration(months[step - 1]);
-                                            }}
-                                            className="absolute w-full h-full opacity-0 cursor-pointer z-20"
-                                        />
-                                    </div>
-                                    
-                                    {/* Labels Below */}
-                                    <div className="flex justify-between mt-[16px] text-[13px] text-gray-500 font-medium">
-                                        <span className="text-center w-6">1+</span>
-                                        <span className="text-center w-6">3+</span>
-                                        <span className="text-center w-6">6+</span>
-                                        <span className="text-center w-6">9+</span>
-                                        <span className="text-center w-8">12+</span>
-                                    </div>
+                            {/* Rental Period Selection */}
+                            <div className="flex justify-between items-center mt-2 mb-1">
+                                <h3 className="text-[13px] font-medium text-gray-800">
+                                    Select your <span className="underline decoration-blue-500 underline-offset-4 decoration-[1.5px] decoration-dashed text-[#007AFF]">minimum rental period</span>
+                                </h3>
+                                <span className="text-[14px] font-bold text-[#1D1D1F]">{duration === 1 ? '1 Month' : `${duration} Months`}</span>
+                            </div>
+
+                            {/* Tenure Slider */}
+                            <div className="relative mb-2 mt-4 ml-1 mr-1">
+                                {/* Track */}
+                                {(()=>{
+                                    const currentStep = duration <= 1 ? 1 : duration <= 3 ? 2 : duration <= 6 ? 3 : duration <= 9 ? 4 : 5;
+                                    const activePct = ((currentStep - 1) / 4) * 100;
+                                    return (
+                                        <div 
+                                            className="relative h-[6px] rounded-full flex items-center" 
+                                            style={{ background: `linear-gradient(to right, #EA580C ${activePct}%, #E5E7EB ${activePct}%)` }}
+                                        >
+                                            {[1, 2, 3, 4, 5].map(step => {
+                                                const pct = ((step - 1) / 4) * 100;
+                                                const isActive = step <= currentStep;
+                                                return (
+                                                    <div 
+                                                        key={step} 
+                                                        className={`absolute w-[16px] h-[16px] rounded-full bg-white transition-colors duration-300 z-10 border-[3px] ${isActive ? 'border-[#EA580C]' : 'border-gray-300'}`} 
+                                                        style={{ left: `calc(${pct}% - 8px)` }} 
+                                                    />
+                                                );
+                                            })}
+                                            <input
+                                                type="range"
+                                                min="1"
+                                                max="5"
+                                                step="1"
+                                                value={currentStep}
+                                                onChange={(e) => {
+                                                    const step = parseInt(e.target.value);
+                                                    const months = [1, 3, 6, 9, 12];
+                                                    setDuration(months[step - 1]);
+                                                }}
+                                                className="absolute w-full h-full opacity-0 cursor-pointer z-20"
+                                            />
+                                        </div>
+                                    );
+                                })()}
+                                
+                                {/* Labels Below */}
+                                <div className="flex justify-between mt-[14px] text-[12px] text-gray-500 font-medium">
+                                    <span className="text-left w-6">1+</span>
+                                    <span className="text-center w-6">3+</span>
+                                    <span className="text-center w-6">6+</span>
+                                    <span className="text-center w-6">9+</span>
+                                    <span className="text-right w-6">12+</span>
                                 </div>
                             </div>
 
                             {/* Links */}
-                            <div className="flex justify-between items-center text-[13px] font-medium text-[#EA580C] underline decoration-orange-200 underline-offset-4 mb-1">
+                            <div className="flex justify-between items-center text-[12px] font-bold text-[#EA580C] underline decoration-orange-200 underline-offset-4 mt-2">
                                 <Link href="#" className="hover:text-orange-700 transition">price breakdown</Link>
                                 <Link href="#" className="hover:text-orange-700 transition">compare all tenures</Link>
                             </div>
 
-                            {/* Price Line (Full Width Borders) */}
-                            <div className="border-t border-b border-[#EDEDED] py-5 flex justify-between items-center bg-white -mx-6 px-6">
-                                <div className="flex items-end gap-[6px]">
-                                    <span className="text-[34px] font-bold text-[#FF3B30] leading-[0.8] tracking-tight">₹{currentPlan.price}</span>
-                                    <span className="text-[14px] font-medium text-gray-500 opacity-90 leading-[1.2]">/month</span>
-                                    <span className="text-[14px] font-medium text-gray-400 line-through leading-[1.2] ml-1">₹{Math.round(currentPlan.price * 1.5)}</span>
+                            <div className="w-full h-[1px] bg-gray-100 my-5"></div>
+
+                            {/* Price and Quantity */}
+                            <div className="flex justify-between items-center">
+                                <div className="flex items-center gap-[8px]">
+                                    <span className="text-[26px] font-bold text-[#FF3B30] tracking-tight leading-none">₹{currentPlan.price * quantity}</span>
+                                    <span className="text-[13px] font-medium text-gray-500 self-end mb-0.5">/month</span>
+                                    <div className="flex items-center gap-2 ml-2 self-end mb-0.5">
+                                        <span className="text-[13px] font-medium text-gray-400 line-through">₹{Math.round(currentPlan.price * 1.5) * quantity}</span>
+                                        <span className="bg-[#FF3B30] text-white text-[10px] font-bold px-1.5 py-0.5 rounded-[4px]">20% off</span>
+                                    </div>
                                 </div>
 
-                                <div className="flex items-center gap-4">
-                                    <span className="text-[13px] text-[#1D1D1F] font-bold">Quantity</span>
-                                    <div className="flex items-center gap-4 border border-[#EDEDED] rounded-lg px-3 py-1.5 bg-white shadow-sm">
+                                <div className="flex items-center gap-3">
+                                    <span className="text-[12px] text-[#1D1D1F] font-bold">Quantity</span>
+                                    <div className="flex items-center gap-3 border border-gray-200 rounded-md px-2 py-1 bg-white">
                                         <button onClick={() => setQuantity(Math.max(1, quantity - 1))} className="text-gray-400 hover:text-black w-4 h-4 flex items-center justify-center">
-                                            <FaMinus size={10} />
+                                            <FaMinus size={9} />
                                         </button>
-                                        <span className="text-[14px] font-medium w-3 text-center text-[#1D1D1F]">{quantity}</span>
+                                        <span className="text-[13px] font-medium w-3 text-center text-[#1D1D1F]">{quantity}</span>
                                         <button onClick={() => setQuantity(quantity + 1)} className="text-gray-400 hover:text-black w-4 h-4 flex items-center justify-center">
-                                            <FaPlus size={10} />
+                                            <FaPlus size={9} />
                                         </button>
                                     </div>
                                 </div>
                             </div>
 
-                            <button className="w-full pt-1 text-[12px] font-bold text-black bg-transparent hover:text-gray-700 transition-colors uppercase tracking-[0.08em] text-center">
+                            <button className="w-full pt-5 text-[11px] font-bold text-black uppercase tracking-widest text-center">
                                 VIEW ALL BENEFITS
                             </button>
                         </div>
 
-                        {/* Refundable Deposit & Value Props Stack */}
-                        <div className="flex flex-col gap-5 shrink-0 px-2 mt-[-6px]">
-                            {/* Refundable Deposit Line */}
-                            <div className="flex justify-between items-center px-1">
-                                <span className="text-[12.5px] font-medium text-gray-600 tracking-tight">
-                                    100% Refundable Deposit <span className="text-[13px] text-gray-400 line-through mx-[3px] decoration-gray-400">₹{product.securityDeposit ? product.securityDeposit + 4999 : '24,999'}</span> <span className="font-bold text-[#1D1D1F] text-[16px]">₹{product.securityDeposit || '20,000'}</span>
-                                </span>
-                                <div className="w-[15px] h-[15px] rounded-full border border-[#FF3B30] flex items-center justify-center text-[#FF3B30] text-[10px] font-bold font-serif leading-none opacity-80 cursor-pointer hover:opacity-100 transition-opacity">
-                                    i
+                        {/* What's included in your plan */}
+                        <div>
+                            <h4 className="text-[13px] font-bold text-gray-800 mb-3 px-1">What's included in your plan</h4>
+                            <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 shrink-0">
+                                <div className="bg-[#007AFF] text-white rounded-[8px] flex items-center gap-2 px-3 py-2.5 shadow-sm">
+                                    <div className="shrink-0"><FaStar size={12}/></div>
+                                    <span className="text-[11px] font-bold leading-tight">Fully Functional</span>
                                 </div>
-                            </div>
-
-                            {/* Value Props */}
-                            <div className="flex flex-col gap-[8px]">
-                                {[
-                                    { icon: <FaStar size={13}/>, text: 'Fully Functional (100% Tested)' },
-                                    { icon: <BsBoxSeam size={13}/>, text: 'Original Accessories Included' },
-                                    { icon: <BsTruck size={13}/>, text: 'Free Repairs & Maintenance' },
-                                    { icon: <BsBoxSeam size={13}/>, text: 'Professionally sanitized' }
-                                ].map((item, i) => (
-                                    <div key={i} className="flex items-center gap-4 bg-[#F8F8F8] rounded-[10px] px-4 py-3.5">
-                                        <div className="text-gray-500 opacity-90">
-                                            {item.icon}
-                                        </div>
-                                        <span className="text-[12.5px] font-semibold text-gray-700 tracking-tight">{item.text}</span>
-                                    </div>
-                                ))}
+                                <div className="bg-[#007AFF] text-white rounded-[8px] flex items-center gap-2 px-3 py-2.5 shadow-sm">
+                                    <div className="shrink-0"><BsBoxSeam size={12}/></div>
+                                    <span className="text-[11px] font-bold leading-tight">Accessories Included</span>
+                                </div>
+                                <div className="bg-[#007AFF] text-white rounded-[8px] flex items-center gap-2 px-3 py-2.5 shadow-sm">
+                                    <div className="shrink-0"><BsTruck size={12}/></div>
+                                    <span className="text-[11px] font-bold leading-tight">Free Repairs & Maintenance</span>
+                                </div>
+                                <div className="bg-[#007AFF] text-white rounded-[8px] flex items-center gap-2 px-3 py-2.5 shadow-sm">
+                                    <div className="shrink-0"><BsBoxSeam size={12}/></div>
+                                    <span className="text-[11px] font-bold leading-tight">Professionally sanitized</span>
+                                </div>
                             </div>
                         </div>
 
-                        {/* Secondary Info Cards */}
-                        <div className="grid grid-cols-2 gap-4 shrink-0">
-                            <div className="border border-[#FDE68A] bg-[#FFF8E1] px-5 py-6 rounded-2xl flex flex-col gap-2 cursor-pointer hover:shadow-sm transition-shadow opacity-90 hover:opacity-100">
-                                <div className="flex items-center gap-2 mb-2">
-                                    <BsTruck className="text-gray-700" size={18} />
-                                    <span className="text-[12px] font-bold text-gray-900 leading-snug">What if I cancel or return before 6 months?</span>
-                                </div>
-                                <span className="text-[12px] font-bold text-[#EA580C] self-end mt-auto xl:mr-1">View Details</span>
+                        {/* Deposit & KYC Banner */}
+                        <div className="bg-[#EBF3FF] rounded-[10px] flex overflow-hidden border border-blue-100 shadow-sm mt-1">
+                            {/* Left part */}
+                            <div className="bg-[#DEF8FA] flex flex-col justify-center px-4 py-3 min-w-[35%] shrink-0 border-r border-blue-100">
+                                <span className="text-[12px] font-bold text-[#007AFF] mb-0.5">100% Refundable Deposit</span>
+                                <span className="text-[16px] font-bold text-[#007AFF]">₹{product.securityDeposit || '20,000'}</span>
                             </div>
-                            <div className="border border-[#FDE68A] bg-[#FFF8E1] px-5 py-6 rounded-2xl flex flex-col gap-2 cursor-pointer hover:shadow-sm transition-shadow opacity-90 hover:opacity-100">
-                                <div className="flex items-center gap-2 mb-2">
-                                    <FaStar className="text-gray-700" size={18} />
-                                    <span className="text-[12px] font-bold text-gray-900 leading-snug">How do I extend tenure after 6 months?</span>
+                            {/* Right part */}
+                            <div className="flex items-center justify-between px-4 py-3 flex-1 bg-[#E8F0FE]">
+                                <p className="text-[11px] font-bold text-[#0066CC] leading-tight pr-2">
+                                    Place Order & complete KYC anytime<br/>to get your item delivered fast
+                                </p>
+                                <div className="bg-white/80 p-1.5 rounded text-[#0066CC] shrink-0">
+                                    <FaShareAlt size={12}/>
                                 </div>
-                                <span className="text-[12px] font-bold text-[#EA580C] self-end mt-auto xl:mr-1">View Details</span>
                             </div>
                         </div>
 
                         {/* Primary CTA */}
                         <button
                             onClick={handleAddToCart}
-                            className="w-full bg-[#FFCC00] hover:bg-[#F5C200] active:scale-[0.99] text-[#1D1D1F] font-bold py-[18px] rounded-2xl text-[16px] transition-all flex items-center justify-center shrink-0 mt-2 shadow-[0_2px_12px_rgba(255,204,0,0.25)]"
+                            className="w-full bg-[#FFCC00] hover:bg-[#F5C200] active:scale-[0.99] text-[#1D1D1F] font-bold py-[16px] rounded-[12px] text-[15px] transition-all flex items-center justify-center shrink-0 mt-2 shadow-sm"
                         >
                             Rent Now
                         </button>
 
-                        {/* Delivery Details */}
-                        <div className="flex justify-between items-start pt-[2px] shrink-0">
-                            <div className="flex flex-col relative pl-3">
-                                <div className="absolute left-0 top-[6px] w-[5px] h-[5px] bg-green-500 rounded-full" />
-                                <span className="text-[12px] font-bold text-gray-900 leading-tight mb-[2px]">Delivery</span>
-                                <span className="text-[11px] text-gray-500">Deliver to: <span className="text-gray-900 font-medium">[110001]</span></span>
+                        {/* Secondary Info Cards */}
+                        <div className="grid grid-cols-2 gap-3 shrink-0 mt-1">
+                            <div className="border border-[#FDE68A] bg-[#FFF9E6] px-4 py-4 rounded-[12px] flex flex-col gap-1.5 cursor-pointer hover:shadow-sm transition-shadow">
+                                <div className="flex items-start gap-2 mb-1">
+                                    <div className="mt-0.5 text-[#EA580C] shrink-0"><BsTruck size={14}/></div>
+                                    <span className="text-[11px] font-bold text-gray-800 leading-snug">What if I cancel or return before 6 months?</span>
+                                </div>
+                                <span className="text-[11px] font-bold text-[#EA580C] self-end mt-auto underline underline-offset-2">View Details</span>
                             </div>
-                            <span className="text-[11.5px] font-bold text-[#EA580C] max-w-[130px] text-right font-sans">Check availability in your state</span>
+                            <div className="border border-[#FDE68A] bg-[#FFF9E6] px-4 py-4 rounded-[12px] flex flex-col gap-1.5 cursor-pointer hover:shadow-sm transition-shadow">
+                                <div className="flex items-start gap-2 mb-1">
+                                    <div className="mt-0.5 text-[#EA580C] shrink-0"><FaStar size={14}/></div>
+                                    <span className="text-[11px] font-bold text-gray-800 leading-snug">How do I extend tenure after 6 months?</span>
+                                </div>
+                                <span className="text-[11px] font-bold text-[#EA580C] self-end mt-auto underline underline-offset-2">View Details</span>
+                            </div>
+                        </div>
+
+                        {/* Delivery Details */}
+                        <div className="flex items-center gap-3 pt-1 shrink-0 border border-gray-200 rounded-[12px] p-3 bg-white mt-1 shadow-sm">
+                            <div className="flex items-center gap-1.5 min-w-max">
+                                <div className="w-1.5 h-1.5 bg-green-500 rounded-full" />
+                                <span className="text-[12px] font-bold text-gray-700">Delivery</span>
+                            </div>
+                            
+                            <div className="w-[1px] h-6 bg-gray-200"></div>
+
+                            <input 
+                                type="text" 
+                                placeholder="Enter your pincode" 
+                                className="border border-gray-200 rounded-md px-2.5 py-1.5 text-[12px] flex-1 outline-none focus:border-blue-300 w-full"
+                            />
+                            
+                            <button className="text-[10px] font-medium text-gray-500 text-center leading-tight max-w-[100px] hover:text-gray-800">
+                                Check availability in your state
+                            </button>
                         </div>
                     </div>
                 </div>
             </main>
+            
+            <BestRentedProducts />
+            <FaqSection />
         </div>
     );
 }

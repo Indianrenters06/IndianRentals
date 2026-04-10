@@ -420,7 +420,7 @@ const SlideItem = ({ slide, isActive, width, viewType, slideHeight }) => {
         return (
             <Link
                 href={slide.slideLink}
-                className="shrink-0 relative rounded-[32px] overflow-hidden transition-all duration-700 ease-[cubic-bezier(0.25,1,0.5,1)] cursor-pointer"
+                className="shrink-0 relative rounded-[24px] overflow-hidden transition-all duration-700 ease-[cubic-bezier(0.25,1,0.5,1)] cursor-pointer"
                 style={containerStyle}
             >
                 {content}
@@ -430,7 +430,7 @@ const SlideItem = ({ slide, isActive, width, viewType, slideHeight }) => {
 
     return (
         <div
-            className="shrink-0 relative rounded-[32px] overflow-hidden transition-all duration-700 ease-[cubic-bezier(0.25,1,0.5,1)]"
+            className="shrink-0 relative rounded-[24px] overflow-hidden transition-all duration-700 ease-[cubic-bezier(0.25,1,0.5,1)]"
             style={containerStyle}
         >
             {content}
