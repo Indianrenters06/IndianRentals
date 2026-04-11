@@ -79,7 +79,7 @@ const CategoryPageTemplate = ({ productNamePrefix, productDescription, basePrice
     const processedProducts = React.useMemo(() => {
         let results = [...products];
         const multiplier = getDurationMultiplier(selectedDuration);
-        
+
         results = results.map(p => ({
             ...p,
             rentPrice: Math.round(p.baseRentPrice * multiplier),

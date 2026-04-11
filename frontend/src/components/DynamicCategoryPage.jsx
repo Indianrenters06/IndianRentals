@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { FaArrowLeft } from 'react-icons/fa';
 import { FiPackage } from 'react-icons/fi';
+import { ArrowRight } from '@phosphor-icons/react';
 import { getSubcategoriesByParentName } from '../services/categoryService';
 
 /**
@@ -89,49 +90,144 @@ export default function DynamicCategoryPage({
 
     return (
         <div className="min-h-screen bg-white font-sans">
-            <main className="px-4 pt-5 pb-10 max-w-7xl mx-auto sm:px-6 lg:px-8">
 
-                {/* Filter Grid */}
-                {filterChips.length > 0 && (
-                    <div className="grid grid-cols-4 gap-2 mb-6">
-                        {filterChips.map((chip) => {
-                            const isActive = activeFilter === chip.label;
+            {/* ── Figma Category Nav Bar: full-width outer, 1200px inner ── */}
+            <div
+                style={{
+                    width: '100%',
+                    background: 'hsla(0, 0%, 96%, 1)',
+                    height: '62px',
+                }}
+            >
+                {/* Inner container: 1200px, space-between */}
+                <div
+                    style={{
+                        maxWidth: '1200px',
+                        width: '100%',
+                        height: '62px',
+                        margin: '0 auto',
+                        padding: '0 32px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        gap: '10px',
+                        boxSizing: 'border-box',
+                        opacity: 1,
+                    }}
+                >
+                    {/* Breadcrumb */}
+                    <div className="flex items-center gap-2 text-[12px] font-medium text-[#64748B] whitespace-nowrap">
+                        <Link href="/" className="hover:text-black transition-colors">Homepage</Link>
+                        <span className="text-gray-400">›</span>
+                        <Link href="/categories" className="hover:text-black transition-colors">All Categories</Link>
+                        <span className="text-gray-400">›</span>
+                        <span className="text-[#1D1D1F] font-semibold">{displayTitle}</span>
+                    </div>
+
+                    {/* Category filter pills — Figma: 666×62, gap:8, pt:12 pb:12, border-bottom 1px solid hsla(0,0%,93%,1) */}
+                    <div
+                        style={{
+                            width: '666px',
+                            height: '62px',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '8px',
+                            paddingTop: '12px',
+                            paddingBottom: '12px',
+                            borderBottom: '1px solid hsla(0, 0%, 93%, 1)',
+                            opacity: 1,
+                            boxSizing: 'border-box',
+                            flexShrink: 0,
+                        }}
+                    >
+                        {[
+                            { label: 'Apple Products', slug: 'apple' },
+                            { label: 'IT Products', slug: 'it-products' },
+                            { label: 'AV Products', slug: 'av-products' },
+                            { label: 'Office Equipment', slug: 'office-equipment' },
+                            { label: 'DSLR Cameras', slug: 'dslr' },
+                        ].map((cat) => {
+                            const isActive = categorySlug === cat.slug;
                             return (
-                                <button
-                                    key={chip.label}
-                                    onClick={() => setActiveFilter(isActive ? null : chip.label)}
-                                    className={`flex flex-col items-center justify-center gap-2 p-3 rounded-2xl border transition-all duration-200 ${isActive
-                                        ? 'border-gray-700 bg-gray-50 shadow-sm'
-                                        : 'border-gray-200 bg-white hover:border-gray-400'
-                                        }`}
+                                <Link
+                                    key={cat.slug}
+                                    href={`/category/${cat.slug}`}
+                                    style={{
+                                        height: '38px',
+                                        padding: '8px 16px',
+                                        borderRadius: isActive ? '68px' : '38px',
+                                        border: isActive
+                                            ? '1px solid hsla(44, 100%, 64%, 1)'
+                                            : '1px solid hsla(0, 0%, 89%, 1)',
+                                        background: isActive
+                                            ? 'hsla(43, 100%, 95%, 1)'
+                                            : 'hsla(0, 0%, 100%, 1)',
+                                        textDecoration: 'none',
+                                        whiteSpace: 'nowrap',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        opacity: 1,
+                                        transition: 'all 0.15s',
+                                        boxSizing: 'border-box',
+                                    }}
                                 >
-                                    <chip.Icon size={38} strokeWidth={1.2} className="text-gray-900" />
-                                    <span className="text-[10px] font-medium text-gray-700 text-center leading-tight">
-                                        {chip.label}
+                                    {/* Figma text: Mona Sans SemiBold 14px / 20px lh / -0.01em ls / center / hsla(0,0%,12%,1) */}
+                                    <span style={{
+                                        fontFamily: "'Mona Sans', sans-serif",
+                                        fontWeight: 600,
+                                        fontSize: '14px',
+                                        lineHeight: '20px',
+                                        letterSpacing: '-0.01em',
+                                        textAlign: 'center',
+                                        color: 'hsla(0, 0%, 0%, 1)',
+                                    }}>
+                                        {cat.label}
                                     </span>
-                                </button>
+                                </Link>
                             );
                         })}
                     </div>
-                )}
-
-                {/* Back + Title */}
-                <div className="flex items-center gap-3 mb-5">
-                    <button
-                        onClick={() => router.back()}
-                        className="p-1 hover:bg-gray-100 rounded-full transition-colors"
-                    >
-                        <FaArrowLeft size={18} className="text-gray-800" />
-                    </button>
-                    <h1 className="text-xl md:text-3xl font-bold text-gray-900">{displayTitle}</h1>
                 </div>
+            </div>
+
+            <main 
+                style={{
+                    maxWidth: '1200px',
+                    width: '100%',
+                    margin: '0 auto',
+                    padding: '40px 32px',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '24px',
+                    minHeight: '662px',
+                    boxSizing: 'border-box'
+                }}
+            >
+                {/* Title */}
+                <h1 style={{
+                    fontFamily: "'Mona Sans', sans-serif",
+                    fontWeight: 600,
+                    fontSize: "44px",
+                    lineHeight: "58px",
+                    letterSpacing: "-0.01em",
+                    color: "hsla(0, 0%, 12%, 1)",
+                    margin: 0,
+                    height: '58px',
+                    width: '1200px'
+                }}>
+                    {displayTitle}
+                </h1>
 
                 {/* Loading skeleton */}
                 {loading && (
-                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-6">
-                        {[1, 2, 3, 4, 5, 6].map((n) => (
+                    <div 
+                        className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5"
+                        style={{ gap: '30px' }}
+                    >
+                        {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((n) => (
                             <div key={n} className="animate-pulse">
-                                <div className="bg-gray-100 rounded-2xl aspect-4/3 mb-2" />
+                                <div className="bg-gray-100 rounded-lg aspect-[4/3] mb-2" />
                                 <div className="h-3 bg-gray-100 rounded w-3/4 mx-auto" />
                             </div>
                         ))}
@@ -141,34 +237,33 @@ export default function DynamicCategoryPage({
                 {/* Subcategory grid */}
                 {!loading && filtered.length > 0 && (
                     <>
-                        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
+                        <div 
+                            className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5"
+                            style={{ gap: '30px' }}
+                        >
                             {filtered.map((sub) => (
-                                <Link key={sub.href} href={sub.href} className="group block" style={{ width: "220.8px" }}>
-                                    {/* Image Container */}
-                                    <div
-                                        className="rounded-lg border border-gray-200 bg-[#F5F5F7] overflow-hidden flex items-center justify-center group-hover:shadow-md group-hover:border-gray-300 transition-all duration-300"
-                                        style={{ width: "220.8px", height: "173px" }}
-                                    >
-                                        <div className="w-full h-full relative transform group-hover:scale-105 transition-transform duration-400">
+                                <Link key={sub.href} href={sub.href} className="group block">
+                                    {/* Image Container — matches Figma: white bg, light border, rounded */}
+                                    <div className="rounded-lg border border-gray-200 bg-white overflow-hidden flex items-center justify-center group-hover:shadow-md group-hover:border-gray-300 transition-all duration-300" style={{ height: "140px" }}>
+                                        <div className="w-full h-full relative transform group-hover:scale-105 transition-transform duration-500">
                                             {sub.image ? (
                                                 <Image
                                                     src={sub.image}
                                                     alt={sub.name}
                                                     fill
-                                                    className="object-contain p-4 mix-blend-multiply"
-                                                    sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
+                                                    className="object-contain p-3"
+                                                    sizes="(max-width: 640px) 50vw, (max-width: 1024px) 25vw, 20vw"
                                                 />
                                             ) : (
                                                 <div className="w-full h-full flex items-center justify-center">
-                                                    <FiPackage size={36} className="text-gray-300" />
+                                                    <FiPackage size={32} className="text-gray-300" />
                                                 </div>
                                             )}
                                         </div>
                                     </div>
-                                    {/* Label */}
+                                    {/* Label — centered, no arrow */}
                                     <p
-                                        className="text-[14px] font-semibold text-[#1D1D1F] text-center leading-snug group-hover:text-[#FF3B30] transition-colors duration-300"
-                                        style={{ marginTop: "7px" }}
+                                        className="text-[13px] font-semibold text-[#1D1D1F] text-center leading-snug mt-2 group-hover:text-[#FF3B30] transition-colors duration-300"
                                     >
                                         {sub.name}
                                     </p>

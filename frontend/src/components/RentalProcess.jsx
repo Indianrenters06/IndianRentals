@@ -274,7 +274,7 @@ const RentalProcess = () => {
             >
                 <div className="w-full flex flex-row items-center justify-between mx-auto font-sans max-w-[1165px] h-[94px]">
                     <div className="flex flex-col h-full gap-[10px] justify-center">
-                        <h2 className="text-[36px] font-bold text-[#1D1D1F] tracking-tight leading-none">{cms.title}</h2>
+                        <h2 className="text-[36px] font-semibold text-[#1D1D1F] tracking-tight leading-none">{cms.title}</h2>
                         <p className="text-[#1D1D1F] text-[16px] leading-[1.3] tracking-tight max-w-md opacity-80">{cms.subtitle}</p>
                     </div>
                     <div className="flex items-center gap-3 self-end mb-1">

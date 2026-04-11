@@ -147,7 +147,7 @@ const CategoriesPage = () => {
                                     style={{
                                         width: "100%",
                                         height: "276px",
-                                        borderRadius: "8px",
+                                        borderRadius: "12px",
                                         border: "1px solid hsla(0, 0%, 89%, 1)",
                                         backgroundColor: "hsla(0, 0%, 100%, 1)",
                                         boxShadow: "0px 1px 3px 0px hsla(0, 0%, 87%, 0.08), 0px 6px 6px 0px hsla(0, 0%, 87%, 0.07), 0px 13px 8px 0px hsla(0, 0%, 87%, 0.04), 0px 23px 9px 0px hsla(0, 0%, 87%, 0.01), 0px 36px 10px 0px hsla(0, 0%, 87%, 0)"
@@ -187,7 +187,15 @@ const CategoriesPage = () => {
                                         <h3 className="font-semibold text-[17px] tracking-tight text-[#1E293B] group-hover:text-black transition-colors">
                                             {category.title}
                                         </h3>
-                                        <ArrowRight size={32} weight="regular" className="text-[#1E293B] opacity-70 group-hover:opacity-100 transition-opacity" />
+                                        <ArrowRight
+                                            weight="regular"
+                                            className="text-[#000000] flex-shrink-0"
+                                            style={{
+                                                width: "24px",
+                                                height: "24px",
+                                                opacity: 1,
+                                            }}
+                                        />
                                     </div>
                                 </div>
                             </Link>

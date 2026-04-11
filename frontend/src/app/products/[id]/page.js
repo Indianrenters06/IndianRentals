@@ -124,7 +124,7 @@ export default function ProductDetailPage() {
 
                     {/* Left Column - Images & Details */}
                     <div className="flex flex-col gap-5">
-                        
+
                         {/* Main Image Slider */}
                         <div className="relative w-full bg-white border border-[#EDEDED] rounded-xl flex items-center justify-center p-6 group overflow-hidden shrink-0 h-[350px] md:h-[523px]">
                             <span className="absolute top-6 left-6 z-10 bg-[#FF3B30] text-white text-[12px] font-bold px-3 py-1 rounded-[6px] tracking-wide">20% off</span>
@@ -137,7 +137,7 @@ export default function ProductDetailPage() {
                                     <FaShareAlt size={15} />
                                 </button>
                             </div>
-                            
+
                             <Swiper
                                 style={{
                                     "--swiper-navigation-color": "#555",
@@ -245,14 +245,14 @@ export default function ProductDetailPage() {
                     {/* Right Column - Product Purchase Details */}
                     {/* Right Column - Product Purchase Details */}
                     <div className="flex flex-col gap-5">
-                        
+
                         {/* Main White Card (Title, Rating, Slider, Price) */}
                         <div className="bg-white rounded-[20px] p-6 shadow-[0_2px_12px_max(0,rgba(0,0,0,0.04))] border border-[#EDEDED] flex flex-col pt-7 pb-6">
                             {/* Title */}
                             <h1 className="text-[22px] font-bold text-[#1D1D1F] leading-[1.3] tracking-tight pr-4">
                                 {product.name}
                             </h1>
-                            
+
                             {/* Rating & Stock */}
                             <div className="flex items-center gap-3 mt-3 mb-6">
                                 <div className="flex items-center gap-1">
@@ -279,22 +279,22 @@ export default function ProductDetailPage() {
                             {/* Tenure Slider */}
                             <div className="relative mb-2 mt-4 ml-1 mr-1">
                                 {/* Track */}
-                                {(()=>{
+                                {(() => {
                                     const currentStep = duration <= 1 ? 1 : duration <= 3 ? 2 : duration <= 6 ? 3 : duration <= 9 ? 4 : 5;
                                     const activePct = ((currentStep - 1) / 4) * 100;
                                     return (
-                                        <div 
-                                            className="relative h-[6px] rounded-full flex items-center" 
+                                        <div
+                                            className="relative h-[6px] rounded-full flex items-center"
                                             style={{ background: `linear-gradient(to right, #EA580C ${activePct}%, #E5E7EB ${activePct}%)` }}
                                         >
                                             {[1, 2, 3, 4, 5].map(step => {
                                                 const pct = ((step - 1) / 4) * 100;
                                                 const isActive = step <= currentStep;
                                                 return (
-                                                    <div 
-                                                        key={step} 
-                                                        className={`absolute w-[16px] h-[16px] rounded-full bg-white transition-colors duration-300 z-10 border-[3px] ${isActive ? 'border-[#EA580C]' : 'border-gray-300'}`} 
-                                                        style={{ left: `calc(${pct}% - 8px)` }} 
+                                                    <div
+                                                        key={step}
+                                                        className={`absolute w-[16px] h-[16px] rounded-full bg-white transition-colors duration-300 z-10 border-[3px] ${isActive ? 'border-[#EA580C]' : 'border-gray-300'}`}
+                                                        style={{ left: `calc(${pct}% - 8px)` }}
                                                     />
                                                 );
                                             })}
@@ -314,7 +314,7 @@ export default function ProductDetailPage() {
                                         </div>
                                     );
                                 })()}
-                                
+
                                 {/* Labels Below */}
                                 <div className="flex justify-between mt-[14px] text-[12px] text-gray-500 font-medium">
                                     <span className="text-left w-6">1+</span>
@@ -368,19 +368,19 @@ export default function ProductDetailPage() {
                             <h4 className="text-[13px] font-bold text-gray-800 mb-3 px-1">What's included in your plan</h4>
                             <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 shrink-0">
                                 <div className="bg-[#007AFF] text-white rounded-[8px] flex items-center gap-2 px-3 py-2.5 shadow-sm">
-                                    <div className="shrink-0"><FaStar size={12}/></div>
+                                    <div className="shrink-0"><FaStar size={12} /></div>
                                     <span className="text-[11px] font-bold leading-tight">Fully Functional</span>
                                 </div>
                                 <div className="bg-[#007AFF] text-white rounded-[8px] flex items-center gap-2 px-3 py-2.5 shadow-sm">
-                                    <div className="shrink-0"><BsBoxSeam size={12}/></div>
+                                    <div className="shrink-0"><BsBoxSeam size={12} /></div>
                                     <span className="text-[11px] font-bold leading-tight">Accessories Included</span>
                                 </div>
                                 <div className="bg-[#007AFF] text-white rounded-[8px] flex items-center gap-2 px-3 py-2.5 shadow-sm">
-                                    <div className="shrink-0"><BsTruck size={12}/></div>
+                                    <div className="shrink-0"><BsTruck size={12} /></div>
                                     <span className="text-[11px] font-bold leading-tight">Free Repairs & Maintenance</span>
                                 </div>
                                 <div className="bg-[#007AFF] text-white rounded-[8px] flex items-center gap-2 px-3 py-2.5 shadow-sm">
-                                    <div className="shrink-0"><BsBoxSeam size={12}/></div>
+                                    <div className="shrink-0"><BsBoxSeam size={12} /></div>
                                     <span className="text-[11px] font-bold leading-tight">Professionally sanitized</span>
                                 </div>
                             </div>
@@ -396,10 +396,10 @@ export default function ProductDetailPage() {
                             {/* Right part */}
                             <div className="flex items-center justify-between px-4 py-3 flex-1 bg-[#E8F0FE]">
                                 <p className="text-[11px] font-bold text-[#0066CC] leading-tight pr-2">
-                                    Place Order & complete KYC anytime<br/>to get your item delivered fast
+                                    Place Order & complete KYC anytime<br />to get your item delivered fast
                                 </p>
                                 <div className="bg-white/80 p-1.5 rounded text-[#0066CC] shrink-0">
-                                    <FaShareAlt size={12}/>
+                                    <FaShareAlt size={12} />
                                 </div>
                             </div>
                         </div>
@@ -416,14 +416,14 @@ export default function ProductDetailPage() {
                         <div className="grid grid-cols-2 gap-3 shrink-0 mt-1">
                             <div className="border border-[#FDE68A] bg-[#FFF9E6] px-4 py-4 rounded-[12px] flex flex-col gap-1.5 cursor-pointer hover:shadow-sm transition-shadow">
                                 <div className="flex items-start gap-2 mb-1">
-                                    <div className="mt-0.5 text-[#EA580C] shrink-0"><BsTruck size={14}/></div>
+                                    <div className="mt-0.5 text-[#EA580C] shrink-0"><BsTruck size={14} /></div>
                                     <span className="text-[11px] font-bold text-gray-800 leading-snug">What if I cancel or return before 6 months?</span>
                                 </div>
                                 <span className="text-[11px] font-bold text-[#EA580C] self-end mt-auto underline underline-offset-2">View Details</span>
                             </div>
                             <div className="border border-[#FDE68A] bg-[#FFF9E6] px-4 py-4 rounded-[12px] flex flex-col gap-1.5 cursor-pointer hover:shadow-sm transition-shadow">
                                 <div className="flex items-start gap-2 mb-1">
-                                    <div className="mt-0.5 text-[#EA580C] shrink-0"><FaStar size={14}/></div>
+                                    <div className="mt-0.5 text-[#EA580C] shrink-0"><FaStar size={14} /></div>
                                     <span className="text-[11px] font-bold text-gray-800 leading-snug">How do I extend tenure after 6 months?</span>
                                 </div>
                                 <span className="text-[11px] font-bold text-[#EA580C] self-end mt-auto underline underline-offset-2">View Details</span>
@@ -436,15 +436,15 @@ export default function ProductDetailPage() {
                                 <div className="w-1.5 h-1.5 bg-green-500 rounded-full" />
                                 <span className="text-[12px] font-bold text-gray-700">Delivery</span>
                             </div>
-                            
+
                             <div className="w-[1px] h-6 bg-gray-200"></div>
 
-                            <input 
-                                type="text" 
-                                placeholder="Enter your pincode" 
+                            <input
+                                type="text"
+                                placeholder="Enter your pincode"
                                 className="border border-gray-200 rounded-md px-2.5 py-1.5 text-[12px] flex-1 outline-none focus:border-blue-300 w-full"
                             />
-                            
+
                             <button className="text-[10px] font-medium text-gray-500 text-center leading-tight max-w-[100px] hover:text-gray-800">
                                 Check availability in your state
                             </button>
@@ -452,7 +452,7 @@ export default function ProductDetailPage() {
                     </div>
                 </div>
             </main>
-            
+
             <BestRentedProducts />
             <FaqSection />
         </div>

@@ -70,8 +70,8 @@ const WhyChooseUs = () => {
                                 className={viewType !== 'mobile' ? "text-4xl font-semibold font-sans text-gray-900" : ""}
                                 style={viewType === 'mobile' ? {
                                     fontFamily: "'Mona Sans', sans-serif",
-                                    fontWeight: 600,
-                                    fontSize: '24px',
+                                    fontWeight: 500,
+                                    fontSize: '36px',
                                     lineHeight: '31px',
                                     letterSpacing: '-0.02em',
                                     color: 'hsla(0, 0%, 20%, 1)',

@@ -20,6 +20,7 @@ const Navbar = () => {
     const [isCityDropdownOpen, setIsCityDropdownOpen] = useState(false);
     const [userInfo, setUserInfo] = useState(null);
     const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
+    const [isHamburgerDropdownOpen, setIsHamburgerDropdownOpen] = useState(false);
     const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
     const [searchQuery, setSearchQuery] = useState("");
     const [pincodeLoading, setPincodeLoading] = useState(false);
@@ -630,9 +631,160 @@ const Navbar = () => {
                         </Link>
 
                         {/* Menu Hamburger */}
-                        <button className="flex items-center justify-center hover:opacity-80 transition-opacity shrink-0" style={{ width: "30px", height: "30px" }}>
-                            <List size={26.25} color="#000000" />
-                        </button>
+                        <div className="relative flex items-center shrink-0">
+                            <button
+                                className="flex items-center justify-center hover:opacity-80 transition-opacity shrink-0"
+                                style={{ width: "30px", height: "30px" }}
+                                onClick={() => setIsHamburgerDropdownOpen(!isHamburgerDropdownOpen)}
+                            >
+                                <List size={26.25} color="#000000" />
+                            </button>
+
+                            {/* Hamburger Dropdown */}
+                            <AnimatePresence>
+                                {isHamburgerDropdownOpen && (
+                                    <>
+                                        {/* Backdrop */}
+                                        <div
+                                            className="fixed inset-0 z-40"
+                                            onClick={() => setIsHamburgerDropdownOpen(false)}
+                                        />
+                                        <motion.div
+                                            initial={{ opacity: 0, y: 5, scale: 0.98 }}
+                                            animate={{ opacity: 1, y: 0, scale: 1 }}
+                                            exit={{ opacity: 0, y: 5, scale: 0.98 }}
+                                            transition={{ duration: 0.15 }}
+                                            className="absolute top-full right-0 mt-2 bg-white z-50 overflow-hidden"
+                                            style={{
+                                                width: "173px",
+                                                height: "212px",
+                                                gap: "16px",
+                                                padding: "16px",
+                                                borderRadius: "12px",
+                                                background: "hsla(0, 0%, 100%, 1)",
+                                                boxShadow: "0px 0px 6px 0px hsla(0, 0%, 60%, 0.25)",
+                                                fontFamily: "'Mona Sans', sans-serif",
+                                                display: "flex",
+                                                flexDirection: "column",
+                                                opacity: 1
+                                            }}
+                                        >
+                                            <Link
+                                                href="/how-it-works"
+                                                style={{
+                                                    width: "141px",
+                                                    height: "20px",
+                                                    fontFamily: "'Mona Sans', sans-serif",
+                                                    fontWeight: 600,
+                                                    fontSize: "14px",
+                                                    color: "hsla(0, 0%, 20%, 1)",
+                                                    lineHeight: "20px",
+                                                    letterSpacing: "0.15px",
+                                                    display: "flex",
+                                                    alignItems: "center"
+                                                }}
+                                                className="hover:text-[#007AFF] transition-colors whitespace-nowrap"
+                                                onClick={() => setIsHamburgerDropdownOpen(false)}
+                                            >
+                                                How It Works
+                                            </Link>
+
+                                            <div className="flex justify-center w-full">
+                                                <div style={{ width: "141px", height: "0px", borderTop: "1px solid hsla(0, 0%, 89%, 1)" }} />
+                                            </div>
+
+                                            <div style={{ width: "141px", height: "48px", display: "flex", flexDirection: "column", gap: "8px", opacity: 1 }}>
+                                                <Link
+                                                    href="/rental-policy"
+                                                    style={{
+                                                        width: "141px",
+                                                        height: "20px",
+                                                        fontFamily: "'Mona Sans', sans-serif",
+                                                        fontWeight: 600,
+                                                        fontSize: "14px",
+                                                        color: "hsla(0, 0%, 20%, 1)",
+                                                        lineHeight: "20px",
+                                                        letterSpacing: "0.15px",
+                                                        display: "flex",
+                                                        alignItems: "center"
+                                                    }}
+                                                    className="hover:text-[#007AFF] transition-colors whitespace-nowrap"
+                                                    onClick={() => setIsHamburgerDropdownOpen(false)}
+                                                >
+                                                    Rental Policy
+                                                </Link>
+
+                                                <Link
+                                                    href="/delivery-policy"
+                                                    style={{
+                                                        width: "141px",
+                                                        height: "20px",
+                                                        fontFamily: "'Mona Sans', sans-serif",
+                                                        fontWeight: 600,
+                                                        fontSize: "14px",
+                                                        color: "hsla(0, 0%, 20%, 1)",
+                                                        lineHeight: "20px",
+                                                        letterSpacing: "0.15px",
+                                                        display: "flex",
+                                                        alignItems: "center"
+                                                    }}
+                                                    className="hover:text-[#007AFF] transition-colors whitespace-nowrap"
+                                                    onClick={() => setIsHamburgerDropdownOpen(false)}
+                                                >
+                                                    Delivery Policy
+                                                </Link>
+                                            </div>
+
+                                            <div className="flex justify-center w-full">
+                                                <div style={{ width: "141px", height: "0px", borderTop: "1px solid hsla(0, 0%, 89%, 1)" }} />
+                                            </div>
+
+                                            <div style={{ width: "141px", height: "48px", display: "flex", flexDirection: "column", gap: "8px", opacity: 1 }}>
+                                                <Link
+                                                    href="/faqs"
+                                                    style={{
+                                                        width: "141px",
+                                                        height: "20px",
+                                                        fontFamily: "'Mona Sans', sans-serif",
+                                                        fontWeight: 600,
+                                                        fontSize: "14px",
+                                                        color: "hsla(0, 0%, 20%, 1)",
+                                                        lineHeight: "20px",
+                                                        letterSpacing: "0.15px",
+                                                        display: "flex",
+                                                        alignItems: "center"
+                                                    }}
+                                                    className="hover:text-[#007AFF] transition-colors whitespace-nowrap"
+                                                    onClick={() => setIsHamburgerDropdownOpen(false)}
+                                                >
+                                                    FAQs
+                                                </Link>
+
+                                                <Link
+                                                    href="/contact"
+                                                    style={{
+                                                        width: "141px",
+                                                        height: "20px",
+                                                        fontFamily: "'Mona Sans', sans-serif",
+                                                        fontWeight: 600,
+                                                        fontSize: "14px",
+                                                        color: "hsla(0, 0%, 20%, 1)",
+                                                        lineHeight: "20px",
+                                                        letterSpacing: "0.15px",
+                                                        display: "flex",
+                                                        alignItems: "center"
+                                                    }}
+                                                    className="hover:text-[#007AFF] transition-colors whitespace-nowrap"
+                                                    onClick={() => setIsHamburgerDropdownOpen(false)}
+                                                >
+                                                    Get In Touch
+                                                </Link>
+                                            </div>
+                                        </motion.div>
+                                    </>
+                                )}
+                            </AnimatePresence>
+                        </div>
                     </div>
 
 
