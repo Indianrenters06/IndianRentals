@@ -89,7 +89,7 @@ export default function DynamicCategoryPage({
         : subcategories;
 
     return (
-        <div className="min-h-screen bg-white font-sans">
+        <div className="bg-white font-sans">
 
             {/* ── Figma Category Nav Bar: full-width outer, 1200px inner ── */}
             <div
@@ -196,11 +196,10 @@ export default function DynamicCategoryPage({
                     maxWidth: '1200px',
                     width: '100%',
                     margin: '0 auto',
-                    padding: '40px 32px',
+                    padding: '40px 32px 60px 32px',
                     display: 'flex',
                     flexDirection: 'column',
                     gap: '24px',
-                    minHeight: '662px',
                     boxSizing: 'border-box'
                 }}
             >
