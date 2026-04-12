@@ -25,7 +25,7 @@ const ProductCard = ({ product, index, isDesktop, handleAddToCart }) => {
             <motion.div
                 animate={isHovered ? "hover" : "initial"}
                 initial="initial"
-                className="bg-white flex flex-col overflow-hidden relative mx-auto w-full rounded-[16px]"
+                className="bg-white flex flex-col overflow-hidden relative mx-auto w-full rounded-[20px]"
                 style={{
                     height: isDesktop ? '387px' : '256px',
                     width: isDesktop ? '285px' : '170px',
@@ -33,7 +33,7 @@ const ProductCard = ({ product, index, isDesktop, handleAddToCart }) => {
                     willChange: "transform, height",
                     cursor: "pointer",
                     backgroundColor: "hsla(0, 0%, 100%, 1)",
-                    borderRadius: isDesktop ? "16px" : "8px",
+                    borderRadius: "20px",
                     opacity: 1
                 }}
                 variants={{
@@ -57,7 +57,7 @@ const ProductCard = ({ product, index, isDesktop, handleAddToCart }) => {
                     className="relative bg-white group-hover:bg-[#F9F9F9] transition-colors duration-500 flex items-center justify-center overflow-hidden shrink-0 h-[184px] md:h-[282px]"
                     style={{
                         width: isDesktop ? '285px' : '170px',
-                        borderRadius: isDesktop ? "16px" : "8px",
+                        borderRadius: "20px",
                         borderWidth: "0px 1px 1px 1px",
                         borderStyle: "solid",
                         borderColor: "hsla(0, 0%, 93%, 1)",
@@ -320,7 +320,7 @@ const ProductCard = ({ product, index, isDesktop, handleAddToCart }) => {
                     >
                         <button
                             onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleAddToCart(e, product); }}
-                            className="w-full h-full rounded-full bg-[#FFCF46] text-[#1D1D1F] font-bold text-[14px] shadow-sm transform transition-all duration-300 ease-out active:scale-95 hover:brightness-105"
+                            className="btn-primary w-full !h-full text-[14px] transform ease-out active:scale-95"
                             style={{ transform: isHovered ? 'translateY(0)' : 'translateY(15px)' }}
                         >
                             Rent Now
@@ -466,7 +466,7 @@ const BestRentedProducts = ({ type = "bestRented", defaultTitle = "Curated Produ
                         </h2>
                         <Link
                             href="/products"
-                            className="hidden md:inline-flex items-center justify-center gap-[2px] text-gray-900 group hover:brightness-105 transition-all text-[14px] font-semibold bg-[#FBC02D] px-5 py-2 rounded-full"
+                            className="btn-primary hidden md:inline-flex gap-[2px] text-[14px]"
                         >
                             View All
                         </Link>
@@ -548,7 +548,7 @@ const BestRentedProducts = ({ type = "bestRented", defaultTitle = "Curated Produ
                 <div className="mt-8 flex justify-center md:hidden">
                     <Link
                         href="/products"
-                        className="bg-[#FBC02D] px-5 py-2 rounded-full text-[12px] font-bold text-[#1D1D1F] whitespace-nowrap shadow-sm"
+                        className="btn-primary text-[12px]"
                     >
                         View All Products
                     </Link>

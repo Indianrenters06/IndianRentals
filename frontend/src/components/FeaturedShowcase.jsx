@@ -144,7 +144,7 @@ const ShowcaseProductCard = ({ product, index, isDesktop, handleAddToCart }) => 
             <motion.div
                 animate={isHovered ? "hover" : "initial"}
                 initial="initial"
-                className="bg-white flex flex-col overflow-hidden relative mx-auto w-full rounded-[16px]"
+                className="bg-white flex flex-col overflow-hidden relative mx-auto w-full rounded-[20px]"
                 style={{
                     height: isDesktop ? '387px' : '256px',
                     width: isDesktop ? '285px' : '170px',
@@ -152,7 +152,7 @@ const ShowcaseProductCard = ({ product, index, isDesktop, handleAddToCart }) => 
                     willChange: "transform, height",
                     cursor: "pointer",
                     backgroundColor: "hsla(0, 0%, 100%, 1)",
-                    borderRadius: isDesktop ? "16px" : "8px",
+                    borderRadius: "20px",
                     opacity: 1
                 }}
                 variants={{
@@ -176,7 +176,7 @@ const ShowcaseProductCard = ({ product, index, isDesktop, handleAddToCart }) => 
                     className="relative bg-white group-hover:bg-[#F9F9F9] transition-colors duration-500 flex items-center justify-center overflow-hidden shrink-0 h-[184px] md:h-[282px]"
                     style={{
                         width: isDesktop ? '285px' : '170px',
-                        borderRadius: isDesktop ? "16px" : "8px",
+                        borderRadius: "20px",
                         borderWidth: "0px 1px 1px 1px",
                         borderStyle: "solid",
                         borderColor: "hsla(0, 0%, 93%, 1)",
@@ -439,7 +439,7 @@ const ShowcaseProductCard = ({ product, index, isDesktop, handleAddToCart }) => 
                     >
                         <button
                             onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleAddToCart(e, product); }}
-                            className="w-full h-full rounded-full bg-[#FFCF46] text-[#1D1D1F] font-bold text-[14px] shadow-sm transform transition-all duration-300 ease-out active:scale-95 hover:brightness-105"
+                            className="btn-primary w-full !h-full text-[14px] transform ease-out active:scale-95"
                             style={{ transform: isHovered ? 'translateY(0)' : 'translateY(15px)' }}
                         >
                             Rent Now

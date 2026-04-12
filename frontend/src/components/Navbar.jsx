@@ -281,12 +281,9 @@ const Navbar = () => {
                                 onClick={handleSearchClick}
                             >
                                 <div style={{ width: "24px", height: "24px", position: "relative" }}>
-                                    <MagnifyingGlass
-                                        className="text-gray-400"
-                                        size={19.5}
-                                        weight="fill"
-                                        style={{ position: "absolute", top: "2.23px", left: "2.23px" }}
-                                    />
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="text-gray-400" style={{ width: "19.5px", height: "19.5px", position: "absolute", top: "2.23px", left: "2.23px" }}>
+                                        <path strokeLinecap="round" strokeLinejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
+                                    </svg>
                                 </div>
                             </div>
                         </div>
@@ -876,7 +873,9 @@ const Navbar = () => {
                                     className="absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer"
                                     onClick={handleSearchClick}
                                 >
-                                    <MagnifyingGlass size={18} weight="bold" className="text-gray-400" />
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-[18px] h-[18px] text-gray-400">
+                                        <path strokeLinecap="round" strokeLinejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
+                                    </svg>
                                 </div>
                             </div>
 

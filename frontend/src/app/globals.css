@@ -118,12 +118,12 @@
 @layer components {
   .btn-primary {
     @apply px-7 h-[42px] rounded-pill font-bold shadow-sm transition-all duration-300 flex items-center justify-center whitespace-nowrap;
-    background-color: var(--color-orange-200); color: #1D1D1F;
+    background-color: var(--color-orange-300); color: #1D1D1F;
   }
-  .btn-primary:hover { background-color: var(--color-orange-300); }
-  .btn-primary:active { background-color: var(--color-orange-400); }
-  .btn-primary:focus { outline: none; border: 2px solid var(--color-orange-600); }
-  .btn-primary:disabled { opacity: 0.4; background-color: #f6f6f6; color: #afafaf; cursor: not-allowed; }
+  .btn-primary:hover { background-color: var(--color-orange-400); }
+  .btn-primary:active { background-color: var(--color-orange-500); }
+  .btn-primary:focus { outline: none; box-shadow: inset 0 0 0 2px var(--color-orange-600); background-color: var(--color-orange-300); }
+  .btn-primary:disabled { opacity: 1; background-color: var(--color-orange-50); color: var(--color-grey-400); cursor: not-allowed; box-shadow: none; }
 
   .btn-secondary {
     @apply px-7 h-[42px] rounded-pill font-bold border border-[#1D1D1F] transition-all duration-300 flex items-center justify-center whitespace-nowrap;

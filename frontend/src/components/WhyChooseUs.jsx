@@ -67,20 +67,21 @@ const WhyChooseUs = () => {
                             style={viewType === 'mobile' ? { overflow: 'hidden' } : {}}
                         >
                             <h2
-                                className={viewType !== 'mobile' ? "text-4xl font-semibold font-sans text-gray-900" : ""}
-                                style={viewType === 'mobile' ? {
+                                className={viewType !== 'mobile' ? "font-sans" : ""}
+                                style={{
                                     fontFamily: "'Mona Sans', sans-serif",
-                                    fontWeight: 500,
-                                    fontSize: '36px',
-                                    lineHeight: '31px',
+                                    fontWeight: 600,
+                                    fontSize: viewType === 'mobile' ? '36px' : '36px',
+                                    lineHeight: viewType === 'mobile' ? '31px' : '40px',
                                     letterSpacing: '-0.02em',
                                     color: 'hsla(0, 0%, 20%, 1)',
-                                    width: '192px',
-                                    height: '31px',
-                                    opacity: 1,
-                                    whiteSpace: 'nowrap',
-                                    overflow: 'hidden'
-                                } : {}}
+                                    ...(viewType === 'mobile' ? {
+                                        width: '192px',
+                                        height: '31px',
+                                        whiteSpace: 'nowrap',
+                                        overflow: 'hidden'
+                                    } : {})
+                                }}
                             >
                                 {title}
                             </h2>

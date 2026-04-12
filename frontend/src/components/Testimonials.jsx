@@ -81,7 +81,7 @@ const Testimonials = () => {
 
     const TestimonialCard = ({ review }) => (
         <div
-            className="rounded-2xl md:rounded-[2rem] p-[20px] md:p-8 flex flex-col transition-all hover:scale-[1.01] duration-300 shadow-sm font-sans"
+            className="rounded-2xl p-[20px] flex flex-col transition-all hover:scale-[1.01] duration-300 shadow-sm font-sans"
             style={{
                 backgroundColor: review.bgColor || '#FFFFFF',
                 width: '100%'
@@ -226,23 +226,23 @@ const Testimonials = () => {
                 <div
                     className={`${viewType === 'desktop' ? 'grid-cols-3' : (viewType === 'tablet' ? 'grid-cols-2' : 'grid-cols-1')} grid w-full`}
                     style={{
-                        minHeight: viewType === 'desktop' ? '1005px' : 'auto',
+                        minHeight: viewType === 'desktop' ? '869.95px' : 'auto',
                         width: viewType === 'mobile' ? '100%' : '100%',
                         maxWidth: viewType === 'mobile' ? '350px' : undefined,
                         margin: viewType === 'mobile' ? '0 auto' : undefined,
-                        gap: '20px',
+                        gap: viewType === 'desktop' ? '24px' : '20px',
                         opacity: 1
                     }}
                 >
                     {/* Column 1 */}
-                    <div className="flex flex-col" style={{ gap: viewType === 'mobile' ? '10px' : '20px' }}>
+                    <div className="flex flex-col" style={{ gap: viewType === 'desktop' ? '24px' : (viewType === 'mobile' ? '10px' : '24px') }}>
                         <TestimonialCard review={reviewsData[0] || staticReviews[0]} />
                         <TestimonialCard review={reviewsData[1] || staticReviews[1]} />
                         <TestimonialCard review={reviewsData[2] || staticReviews[2]} />
                     </div>
 
                     {/* Column 2 */}
-                    <div className={`${viewType === 'mobile' ? 'hidden' : 'flex'} flex-col`} style={{ gap: '20px' }}>
+                    <div className={`${viewType === 'mobile' ? 'hidden' : 'flex'} flex-col`} style={{ gap: viewType === 'desktop' ? '24px' : '20px' }}>
                         <TestimonialCard review={reviewsData[3] || staticReviews[3]} />
                         <TestimonialCard review={reviewsData[4] || staticReviews[4]} />
                         <TestimonialCard review={reviewsData[5] || staticReviews[5]} />
@@ -250,7 +250,7 @@ const Testimonials = () => {
 
                     {/* Column 3 - Desktop Only */}
                     {viewType === 'desktop' && (
-                        <div className="flex flex-col" style={{ gap: '20px' }}>
+                        <div className="flex flex-col" style={{ gap: '24px' }}>
                             <TestimonialCard review={reviewsData[6] || staticReviews[6]} />
                             <TestimonialCard review={reviewsData[7] || staticReviews[7]} />
                             <TestimonialCard review={reviewsData[8] || staticReviews[8]} />
