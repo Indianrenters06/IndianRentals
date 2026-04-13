@@ -297,18 +297,18 @@ const RentByCategory = () => {
                         {/* Nav arrows */}
                         <div className="flex items-center gap-3 shrink-0">
                             <button
-                                className="swiper-prev-cat w-[34px] h-[34px] rounded-[69px] flex items-center justify-center hover:opacity-80 transition-all"
-                                style={{ background: 'var(--color-grey-grey-100, hsla(0, 0%, 93%, 1))', opacity: 1 }}
+                                className="swiper-prev-cat group w-[34px] h-[34px] rounded-[69px] flex items-center justify-center bg-[hsla(0,0%,93%,1)] hover:bg-[hsla(0,0%,20%,1)] transition-all"
+                                style={{ opacity: 1 }}
                                 aria-label="Previous"
                             >
-                                <CaretLeft size={18} weight="regular" className="text-gray-800" />
+                                <CaretLeft size={18} weight="regular" className="text-gray-800 group-hover:text-white transition-colors duration-200" />
                             </button>
                             <button
-                                className="swiper-next-cat w-[34px] h-[34px] rounded-[69px] flex items-center justify-center hover:opacity-80 transition-all"
-                                style={{ background: 'var(--color-grey-grey-100, hsla(0, 0%, 93%, 1))', opacity: 1 }}
+                                className="swiper-next-cat group w-[34px] h-[34px] rounded-[69px] flex items-center justify-center bg-[hsla(0,0%,93%,1)] hover:bg-[hsla(0,0%,20%,1)] transition-all"
+                                style={{ opacity: 1 }}
                                 aria-label="Next"
                             >
-                                <CaretRight size={18} weight="regular" className="text-gray-800" />
+                                <CaretRight size={18} weight="regular" className="text-gray-800 group-hover:text-white transition-colors duration-200" />
                             </button>
                         </div>
                     </div>

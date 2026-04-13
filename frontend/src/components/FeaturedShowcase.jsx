@@ -13,7 +13,7 @@ const FALLBACK_BANNERS = [
     {
         title: "Apple Products",
         subtitle: "MacBooks | iPads | iPhones | Mac Studio | Mac Mini",
-        image: "/images/banner-apple.png",
+        image: "https://res.cloudinary.com/dpu9ikeqe/image/upload/v1775219840/f6540bc8c3d4a91dfd954f6fe1cf8d3803b81b4a_1_bosgoq.png",
         href: "/products",
         bg: "linear-gradient(to bottom, #8E2DE2, #4A00E0)",
         category: "MacBook"
@@ -21,7 +21,7 @@ const FALLBACK_BANNERS = [
     {
         title: "Smart Devices",
         subtitle: "Everything you need for your smart home.",
-        image: "/images/banner-smart.png",
+        image: null,
         href: "/products",
         bg: "linear-gradient(to bottom, #2D6A4F, #1B4332)",
         category: "SmartPhone"
@@ -29,8 +29,9 @@ const FALLBACK_BANNERS = [
 ];
 
 // ─── Banner Carousel ──────────────────────────────────────────────────────────
-const BannerCarousel = ({ banners, current, setCurrent, height = "387px" }) => {
+const BannerCarousel = ({ banners, current, setCurrent, height = "387px", productImage }) => {
     const [direction, setDirection] = useState(1);
+    const [failedImages, setFailedImages] = useState(new Set());
 
     const go = useCallback((dir) => {
         setDirection(dir);
@@ -43,6 +44,7 @@ const BannerCarousel = ({ banners, current, setCurrent, height = "387px" }) => {
     }, [go]);
 
     const slide = banners[current];
+    const displayImage = slide.image || productImage;
 
     return (
         <div
@@ -70,42 +72,54 @@ const BannerCarousel = ({ banners, current, setCurrent, height = "387px" }) => {
                     className="absolute inset-0 flex flex-col items-center justify-end pb-8"
                     style={{ background: slide.bg || "#F5F5F7" }}
                 >
-                    <div className="absolute inset-x-0 top-0 h-[65%] flex items-center justify-center p-8">
-                        <div className="w-full h-full bg-white/20 rounded-2xl backdrop-blur-xl flex items-center justify-center border border-white/10">
-                            <span className="text-white/50 text-sm">Product Visual</span>
-                        </div>
+                    <div className="absolute inset-x-0 top-0 h-[65%] flex items-center justify-center p-8 pt-12 z-20 pointer-events-none">
+                        {displayImage ? (
+                            <div className="relative w-full h-full flex items-center justify-center">
+                                <motion.img
+                                    key={displayImage}
+                                    initial={{ opacity: 0, scale: 0.9, y: 10 }}
+                                    animate={{ opacity: 1, scale: 1, y: 0 }}
+                                    transition={{ duration: 0.5, ease: "easeOut" }}
+                                    src={displayImage}
+                                    alt="Featured"
+                                    className="max-w-full max-h-full object-contain filter drop-shadow-2xl"
+                                />
+                            </div>
+                        ) : (
+                            <div className="w-full h-full bg-white/20 rounded-2xl backdrop-blur-xl flex items-center justify-center border border-white/10">
+                                <span className="text-white/50 text-sm">Product Visual</span>
+                            </div>
+                        )}
                     </div>
 
                     <div className="relative z-10 text-center px-6">
                         <div className="flex items-center justify-center gap-4 mb-1">
                             <button
                                 onClick={() => go(-1)}
-                                className="flex items-center justify-center rounded-full hover:scale-110 transition-all duration-200"
+                                className="group flex items-center justify-center rounded-full bg-[hsla(0,0%,96%,1)] hover:bg-[hsla(0,0%,20%,1)] hover:scale-110 transition-all duration-200"
                                 style={{
                                     width: "24px",
                                     height: "24px",
-                                    backgroundColor: "hsla(0, 0%, 96%, 1)",
                                     padding: "2.25px",
                                     flexShrink: 0
                                 }}
                             >
-                                <CaretLeft size={19.5} weight="bold" color="#1D1D1F" />
+                                <CaretLeft size={19.5} weight="bold" className="text-[#1D1D1F] group-hover:text-white transition-colors duration-200" />
                             </button>
                             <h3 className="text-white text-[24px] font-bold tracking-tight" style={{ fontFamily: "'Mona Sans', sans-serif" }}>
                                 {slide.title}
                             </h3>
                             <button
                                 onClick={() => go(1)}
-                                className="flex items-center justify-center rounded-full hover:scale-110 transition-all duration-200"
+                                className="group flex items-center justify-center rounded-full bg-[hsla(0,0%,96%,1)] hover:bg-[hsla(0,0%,20%,1)] hover:scale-110 transition-all duration-200"
                                 style={{
                                     width: "24px",
                                     height: "24px",
-                                    backgroundColor: "hsla(0, 0%, 96%, 1)",
                                     padding: "2.25px",
                                     flexShrink: 0
                                 }}
                             >
-                                <CaretRight size={19.5} weight="bold" color="#1D1D1F" />
+                                <CaretRight size={19.5} weight="bold" className="text-[#1D1D1F] group-hover:text-white transition-colors duration-200" />
                             </button>
                         </div>
                         <p className="text-white/80 text-[14px] font-medium opacity-80 leading-tight mb-4">
@@ -336,15 +350,16 @@ const ShowcaseProductCard = ({ product, index, isDesktop, handleAddToCart }) => 
                             <span
                                 className="whitespace-nowrap"
                                 style={{
-                                    fontFamily: isDesktop ? "'Manrope', sans-serif" : "'Mona Sans', sans-serif",
-                                    fontSize: isDesktop ? "12px" : "10px",
+                                    fontFamily: "'Manrope', sans-serif",
+                                    fontSize: "12px",
                                     fontWeight: 500,
-                                    lineHeight: isDesktop ? "120%" : "14px",
-                                    letterSpacing: isDesktop ? "-0.04em" : "-0.01em",
-                                    color: isDesktop ? "hsla(0, 0%, 46%, 1)" : "hsla(0, 0%, 69%, 1)",
-                                    display: "inline-block",
-                                    width: isDesktop ? "auto" : "31px",
-                                    height: isDesktop ? "auto" : "14px"
+                                    lineHeight: "120%",
+                                    letterSpacing: "-0.04em",
+                                    color: "hsla(0, 0%, 69%, 1)",
+                                    opacity: 1,
+                                    width: "45px",
+                                    height: "14px",
+                                    display: "inline-block"
                                 }}
                             >
                                 2-4 days
@@ -566,6 +581,7 @@ const FeaturedShowcase = () => {
                             current={currentBanner}
                             setCurrent={setCurrentBanner}
                             height="387px"
+                            productImage={products[0]?.image || products[1]?.image}
                         />
                     </div>
 

@@ -95,20 +95,20 @@ const ClientSection = () => {
                     <div className="client-pagination absolute bottom-0 left-0 right-0 flex justify-center z-10" />
 
                     <button
-                        className="client-prev absolute left-0 top-[140px] -translate-y-1/2 -translate-x-[calc(100%+12px)] z-10 w-[26px] h-[40px] rounded-[9px] flex items-center justify-center hover:scale-110 active:scale-95 shadow-sm hover:shadow-md transition-all"
-                        style={{ background: 'var(--color-grey-grey-100, hsla(0, 0%, 93%, 1))', opacity: 1 }}
+                        className="client-prev group absolute left-0 top-[140px] -translate-y-1/2 -translate-x-[calc(100%+12px)] z-10 w-[26px] h-[40px] rounded-[9px] flex items-center justify-center bg-[hsla(0,0%,93%,1)] hover:bg-[hsla(0,0%,20%,1)] hover:scale-110 active:scale-95 shadow-sm hover:shadow-md transition-all"
+                        style={{ opacity: 1 }}
                         ref={prevRef}
                     >
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-5 text-gray-800 mr-[2px] transform rotate-180">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-5 text-gray-800 group-hover:text-white transition-colors duration-200 mr-[2px] transform rotate-180">
                             <path strokeLinecap="round" strokeLinejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" />
                         </svg>
                     </button>
                     <button
-                        className="client-next absolute right-0 top-[140px] -translate-y-1/2 translate-x-[calc(100%+12px)] z-10 w-[26px] h-[40px] rounded-[9px] flex items-center justify-center hover:scale-110 active:scale-95 shadow-sm hover:shadow-md transition-all"
-                        style={{ background: 'var(--color-grey-grey-100, hsla(0, 0%, 93%, 1))', opacity: 1 }}
+                        className="client-next group absolute right-0 top-[140px] -translate-y-1/2 translate-x-[calc(100%+12px)] z-10 w-[26px] h-[40px] rounded-[9px] flex items-center justify-center bg-[hsla(0,0%,93%,1)] hover:bg-[hsla(0,0%,20%,1)] hover:scale-110 active:scale-95 shadow-sm hover:shadow-md transition-all"
+                        style={{ opacity: 1 }}
                         ref={nextRef}
                     >
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-5 text-gray-800 ml-[2px]">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-5 text-gray-800 group-hover:text-white transition-colors duration-200 ml-[2px]">
                             <path strokeLinecap="round" strokeLinejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" />
                         </svg>
                     </button>
