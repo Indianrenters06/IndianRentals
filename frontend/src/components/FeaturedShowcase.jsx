@@ -13,9 +13,9 @@ const FALLBACK_BANNERS = [
     {
         title: "Apple Products",
         subtitle: "MacBooks | iPads | iPhones | Mac Studio | Mac Mini",
-        image: "https://res.cloudinary.com/dpu9ikeqe/image/upload/v1775219840/f6540bc8c3d4a91dfd954f6fe1cf8d3803b81b4a_1_bosgoq.png",
+        image: "https://res.cloudinary.com/dgkckcdk8/image/upload/v1776108199/f6540bc8c3d4a91dfd954f6fe1cf8d3803b81b4a_3_optlwp.png",
         href: "/products",
-        bg: "linear-gradient(to bottom, #8E2DE2, #4A00E0)",
+        bg: "linear-gradient(180deg, #4A3B9C 0%, #5B4AB5 100%)",
         category: "MacBook"
     },
     {
@@ -48,12 +48,10 @@ const BannerCarousel = ({ banners, current, setCurrent, height = "387px", produc
 
     return (
         <div
-            className="relative overflow-hidden shadow-xl"
+            className="relative overflow-hidden shadow-xl w-full"
             style={{
-                height,
-                width: "100%",
-                borderRadius: "30px",
-                maxWidth: "100%"
+                height: '387px',
+                borderRadius: '16px'
             }}
         >
             <AnimatePresence initial={false} custom={direction}>
@@ -69,63 +67,67 @@ const BannerCarousel = ({ banners, current, setCurrent, height = "387px", produc
                     animate="center"
                     exit="exit"
                     transition={{ duration: 0.45, ease: "easeInOut" }}
-                    className="absolute inset-0 flex flex-col items-center justify-end pb-8"
+                    className="absolute inset-0"
                     style={{ background: slide.bg || "#F5F5F7" }}
                 >
-                    <div className="absolute inset-x-0 top-0 h-[65%] flex items-center justify-center p-8 pt-12 z-20 pointer-events-none">
-                        {displayImage ? (
-                            <div className="relative w-full h-full flex items-center justify-center">
-                                <motion.img
-                                    key={displayImage}
-                                    initial={{ opacity: 0, scale: 0.9, y: 10 }}
-                                    animate={{ opacity: 1, scale: 1, y: 0 }}
-                                    transition={{ duration: 0.5, ease: "easeOut" }}
-                                    src={displayImage}
-                                    alt="Featured"
-                                    className="max-w-full max-h-full object-contain filter drop-shadow-2xl"
-                                />
-                            </div>
-                        ) : (
-                            <div className="w-full h-full bg-white/20 rounded-2xl backdrop-blur-xl flex items-center justify-center border border-white/10">
-                                <span className="text-white/50 text-sm">Product Visual</span>
-                            </div>
-                        )}
-                    </div>
+                    {/* Full-bleed image — covers entire banner, no gaps */}
+                    {displayImage && (
+                        <motion.img
+                            key={displayImage}
+                            initial={{ opacity: 0, scale: 1.02 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            transition={{ duration: 0.5, ease: "easeOut" }}
+                            src={displayImage}
+                            alt="Featured"
+                            className="absolute inset-0 w-full h-full object-cover object-center z-0"
+                            style={{ pointerEvents: 'none', transform: 'scale(0.85)', transformOrigin: 'center center' }}
+                        />
+                    )}
 
-                    <div className="relative z-10 text-center px-6">
-                        <div className="flex items-center justify-center gap-4 mb-1">
+                    {/* Figma exact gradient overlay */}
+                    <div
+                        className="absolute inset-0 z-10"
+                        style={{
+                            background: 'linear-gradient(180.66deg, rgba(0, 0, 0, 0) 52.71%, rgba(0, 0, 0, 0.8) 86.37%)'
+                        }}
+                    />
+
+                    {/* Content: pinned to bottom with Figma padding */}
+                    <div
+                        className="absolute inset-0 z-20 flex flex-col justify-end"
+                        style={{
+                            paddingTop: '30px',
+                            paddingRight: '31px',
+                            paddingBottom: '30px',
+                            paddingLeft: '31px',
+                            gap: '10px',
+                            display: 'flex',
+                            flexDirection: 'column',
+                            justifyContent: 'flex-end'
+                        }}
+                    >
+                        <div className="flex items-center justify-center gap-4">
                             <button
                                 onClick={() => go(-1)}
-                                className="group flex items-center justify-center rounded-full bg-[hsla(0,0%,96%,1)] hover:bg-[hsla(0,0%,20%,1)] hover:scale-110 transition-all duration-200"
-                                style={{
-                                    width: "24px",
-                                    height: "24px",
-                                    padding: "2.25px",
-                                    flexShrink: 0
-                                }}
+                                className="group flex items-center justify-center rounded-full bg-[hsla(0,0%,96%,1)] hover:bg-[hsla(0,0%,20%,1)] hover:scale-110 transition-all duration-200 shrink-0"
+                                style={{ width: "24px", height: "24px", padding: "2.25px" }}
                             >
                                 <CaretLeft size={19.5} weight="bold" className="text-[#1D1D1F] group-hover:text-white transition-colors duration-200" />
                             </button>
-                            <h3 className="text-white text-[24px] font-bold tracking-tight" style={{ fontFamily: "'Mona Sans', sans-serif" }}>
+                            <h3 className="text-white text-[24px] font-bold tracking-tight text-center" style={{ fontFamily: "'Mona Sans', sans-serif" }}>
                                 {slide.title}
                             </h3>
                             <button
                                 onClick={() => go(1)}
-                                className="group flex items-center justify-center rounded-full bg-[hsla(0,0%,96%,1)] hover:bg-[hsla(0,0%,20%,1)] hover:scale-110 transition-all duration-200"
-                                style={{
-                                    width: "24px",
-                                    height: "24px",
-                                    padding: "2.25px",
-                                    flexShrink: 0
-                                }}
+                                className="group flex items-center justify-center rounded-full bg-[hsla(0,0%,96%,1)] hover:bg-[hsla(0,0%,20%,1)] hover:scale-110 transition-all duration-200 shrink-0"
+                                style={{ width: "24px", height: "24px", padding: "2.25px" }}
                             >
                                 <CaretRight size={19.5} weight="bold" className="text-[#1D1D1F] group-hover:text-white transition-colors duration-200" />
                             </button>
                         </div>
-                        <p className="text-white/80 text-[14px] font-medium opacity-80 leading-tight mb-4">
+                        <p className="text-white/80 text-[14px] font-medium leading-tight text-center">
                             {slide.subtitle}
                         </p>
-
                         <div className="flex justify-center gap-1.5">
                             {banners.map((_, i) => (
                                 <button
@@ -575,7 +577,7 @@ const FeaturedShowcase = () => {
                     </div>
 
                     {/* Right */}
-                    <div className="w-full lg:flex-1 shrink-0">
+                    <div className="w-full lg:flex-1 min-w-0 overflow-hidden">
                         <BannerCarousel
                             banners={cms.banners}
                             current={currentBanner}

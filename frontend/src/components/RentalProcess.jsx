@@ -18,7 +18,7 @@ const FALLBACK_STEPS = [
     { title: "Choose Your Tech", description: "Browse our curated selection of premium, performance\ntested devices. Use the search or categories to find the\nperfect tool for your needs.", icon: "Dot", highlight: true },
     { title: "Complete KYC", description: "Pick a flexible rental tenure from 1 to 12 months. Then, complete our KYC process online with your basic documents (PAN and Address Proof).", icon: "IdentificationCard", highlight: false },
     { title: "Secure Your Order", description: "Confirm your rental and complete the payment online. This includes the first month's rent and a fully refundable security deposit.", icon: "ShoppingCart", highlight: false },
-    { title: "Receive & Create", description: "We deliver your tech right to your doorstep, typically within 2-3 business days. It arrives fully charged, sanitized, and ready to use straight out of the box. Now, go build something amazing!", icon: "Package", highlight: false }
+    { title: "Receive & Create", description: "We deliver your tech right to your doorstep, typically within 2-3 business days. It arrives fully charged, sanitized, and ready to use straight out of the box. Now, go build something amazing!", icon: "https://res.cloudinary.com/dgkckcdk8/image/upload/v1776112294/package_snga2a.svg", highlight: false }
 ];
 
 const ICON_MAP = {
@@ -31,6 +31,13 @@ const ICON_MAP = {
 };
 
 const DynamicIcon = ({ name, size = 32, className = "", weight = "bold" }) => {
+    if (name && name.startsWith('http')) {
+        return (
+            <div className={className} style={{ width: size, height: size, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <img src={name} alt="" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+            </div>
+        );
+    }
     const IconComponent = ICON_MAP[name] || CheckCircle;
     return <IconComponent size={size} className={className} weight={weight} />;
 };

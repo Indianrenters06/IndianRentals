@@ -139,7 +139,7 @@ const Hero = () => {
     const trackHeight = viewType === 'tablet' ? 332 : 510;
 
     return (
-        <section className="max-w-[1440px] w-full pt-8 pb-8 px-4 mx-auto gap-[10px] overflow-x-clip" style={{ background: 'var(--color-grey-grey-50, hsla(0, 0%, 96%, 1))' }}>
+        <section className="w-full pt-8 pb-8 px-4 mx-auto gap-[10px] overflow-x-clip" style={{ background: 'var(--color-grey-grey-50, hsla(0, 0%, 96%, 1))' }}>
             {/* ── Mobile (Restored from March 28) ────────────────────── */}
             <div
                 className="block md:hidden flex overflow-x-auto snap-x snap-mandatory"

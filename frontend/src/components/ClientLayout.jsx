@@ -11,12 +11,12 @@ export default function ClientLayout({ children }) {
     const isCheckoutFlow = pathname === "/cart" || pathname.startsWith("/checkout");
 
     return (
-        <>
+        <div className="flex flex-col min-h-screen">
             {isCheckoutFlow ? <CartHeader /> : <Navbar />}
-            <main>
+            <main className="flex-grow">
                 {children}
             </main>
             {!isCheckoutFlow && !pathname.startsWith('/profile') && <Footer />}
-        </>
+        </div>
     );
 }

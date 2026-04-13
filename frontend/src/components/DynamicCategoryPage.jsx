@@ -191,97 +191,135 @@ export default function DynamicCategoryPage({
                 </div>
             </div>
 
-            <main 
+            <main
                 style={{
                     maxWidth: '1200px',
                     width: '100%',
                     margin: '0 auto',
-                    padding: '40px 32px 60px 32px',
+                    padding: '20px 32px 20px 32px',
                     display: 'flex',
                     flexDirection: 'column',
-                    gap: '24px',
                     boxSizing: 'border-box'
                 }}
             >
-                {/* Title */}
-                <h1 style={{
-                    fontFamily: "'Mona Sans', sans-serif",
-                    fontWeight: 600,
-                    fontSize: "44px",
-                    lineHeight: "58px",
-                    letterSpacing: "-0.01em",
-                    color: "hsla(0, 0%, 12%, 1)",
-                    margin: 0,
-                    height: '58px',
-                    width: '1200px'
-                }}>
-                    {displayTitle}
-                </h1>
+                {/* Inner Container */}
+                <div
+                    style={{
+                        width: '100%',
+                        paddingTop: '40px',
+                        paddingBottom: '20px',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: '30px',
+                        boxSizing: 'border-box'
+                    }}
+                >
+                    {/* Title */}
+                    <h1 style={{
+                        fontFamily: "'Mona Sans', sans-serif",
+                        fontWeight: 600,
+                        fontSize: "44px",
+                        lineHeight: "58px",
+                        letterSpacing: "-0.01em",
+                        color: "hsla(0, 0%, 12%, 1)",
+                        margin: 0,
+                        height: '58px',
+                        width: '1200px'
+                    }}>
+                        {displayTitle}
+                    </h1>
 
-                {/* Loading skeleton */}
-                {loading && (
-                    <div 
-                        className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5"
-                        style={{ gap: '30px' }}
-                    >
-                        {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((n) => (
-                            <div key={n} className="animate-pulse">
-                                <div className="bg-gray-100 rounded-lg aspect-[4/3] mb-2" />
-                                <div className="h-3 bg-gray-100 rounded w-3/4 mx-auto" />
-                            </div>
-                        ))}
-                    </div>
-                )}
-
-                {/* Subcategory grid */}
-                {!loading && filtered.length > 0 && (
-                    <>
-                        <div 
+                    {/* Loading skeleton */}
+                    {loading && (
+                        <div
                             className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5"
-                            style={{ gap: '30px' }}
+                            style={{ gap: '24px' }}
                         >
-                            {filtered.map((sub) => (
-                                <Link key={sub.href} href={sub.href} className="group block">
-                                    {/* Image Container — matches Figma: white bg, light border, rounded */}
-                                    <div className="rounded-lg border border-gray-200 bg-white overflow-hidden flex items-center justify-center group-hover:shadow-md group-hover:border-gray-300 transition-all duration-300" style={{ height: "140px" }}>
-                                        <div className="w-full h-full relative transform group-hover:scale-105 transition-transform duration-500">
-                                            {sub.image ? (
-                                                <Image
-                                                    src={sub.image}
-                                                    alt={sub.name}
-                                                    fill
-                                                    className="object-contain p-3"
-                                                    sizes="(max-width: 640px) 50vw, (max-width: 1024px) 25vw, 20vw"
-                                                />
-                                            ) : (
-                                                <div className="w-full h-full flex items-center justify-center">
-                                                    <FiPackage size={32} className="text-gray-300" />
-                                                </div>
-                                            )}
-                                        </div>
-                                    </div>
-                                    {/* Label — centered, no arrow */}
-                                    <p
-                                        className="text-[13px] font-semibold text-[#1D1D1F] text-center leading-snug mt-2 group-hover:text-[#FF3B30] transition-colors duration-300"
-                                    >
-                                        {sub.name}
-                                    </p>
-                                </Link>
+                            {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((n) => (
+                                <div
+                                    key={n}
+                                    className="animate-pulse flex flex-col"
+                                    style={{ height: '208px', gap: '7px' }}
+                                >
+                                    <div
+                                        className="w-full bg-gray-50 border border-gray-100 rounded-[8px]"
+                                        style={{ height: '173px' }}
+                                    />
+                                    <div className="h-4 bg-gray-200 rounded w-1/2 mx-auto mt-1" />
+                                </div>
                             ))}
                         </div>
-                    </>
-                )}
+                    )}
 
-                {/* Empty state */}
-                {!loading && filtered.length === 0 && (
-                    <div className="text-center py-20">
-                        <FiPackage size={48} className="mx-auto text-gray-300 mb-4" />
-                        <h2 className="text-lg font-semibold text-gray-700">No subcategories found</h2>
-                        <p className="text-sm text-gray-400 mt-1">
-                            Add subcategories under &quot;{categoryName}&quot; from the admin panel.
-                        </p>
-                    </div>
-                )}
+                    {/* Subcategory grid */}
+                    {!loading && filtered.length > 0 && (
+                        <>
+                            <div
+                                className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5"
+                                style={{ gap: '24px', width: '100%' }}
+                            >
+                                {filtered.map((sub) => (
+                                    <Link
+                                        key={sub.href}
+                                        href={sub.href}
+                                        className="group flex flex-col outline-none"
+                                        style={{
+                                            height: '208px',
+                                            boxSizing: 'border-box',
+                                            gap: '7px',
+                                            textDecoration: 'none'
+                                        }}
+                                    >
+                                        <div
+                                            className="bg-white border border-[hsla(0,0%,93%,1)] rounded-lg flex items-center justify-center overflow-hidden group-hover:shadow-md group-hover:border-gray-300 transition-all duration-300"
+                                            style={{ height: '173px', width: '100%', boxSizing: 'border-box' }}
+                                        >
+                                            <div className="w-[140px] h-[140px] relative transform group-hover:scale-105 transition-transform duration-500">
+                                                {sub.image ? (
+                                                    <Image
+                                                        src={sub.image}
+                                                        alt={sub.name}
+                                                        fill
+                                                        className="object-contain"
+                                                        sizes="(max-width: 640px) 50vw, (max-width: 1024px) 25vw, 20vw"
+                                                    />
+                                                ) : (
+                                                    <div className="w-full h-full flex items-center justify-center">
+                                                        <FiPackage size={32} className="text-gray-300" />
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </div>
+                                        <p
+                                            style={{
+                                                fontFamily: "'Mona Sans', sans-serif",
+                                                fontWeight: 600,
+                                                fontSize: '14px',
+                                                lineHeight: '20px',
+                                                letterSpacing: '-0.01em',
+                                                color: '#1D1D1F',
+                                            }}
+                                            className="text-center transition-colors duration-300 w-full"
+                                        >
+                                            {sub.name}
+                                        </p>
+                                    </Link>
+                                ))}
+                            </div>
+                        </>
+                    )}
+
+                    {/* Empty state */}
+                    {!loading && filtered.length === 0 && (
+                        <div className="text-center py-20">
+                            <FiPackage size={48} className="mx-auto text-gray-300 mb-4" />
+                            <h2 className="text-lg font-semibold text-gray-700">No subcategories found</h2>
+                            <p className="text-sm text-gray-400 mt-1">
+                                Add subcategories under &quot;{categoryName}&quot; from the admin panel.
+                            </p>
+                        </div>
+                    )}
+                </div>
             </main>
         </div>
     );

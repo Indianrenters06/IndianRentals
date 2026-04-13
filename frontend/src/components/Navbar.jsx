@@ -834,7 +834,15 @@ const Navbar = () => {
                         {navLinks.map((link, index) => (
                             <React.Fragment key={link.name}>
                                 {link.separator && (
-                                    <div className="w-[1px] h-3.5 bg-gray-300" />
+                                    <div
+                                        style={{
+                                            width: "1px",
+                                            height: "19px",
+                                            backgroundColor: "hsla(0, 0%, 60%, 1)",
+                                            opacity: 1,
+                                            flexShrink: 0
+                                        }}
+                                    />
                                 )}
                                 <Link
                                     href={link.href}
