@@ -80,6 +80,15 @@ const RentalProcess = () => {
         return () => window.removeEventListener('resize', checkRes);
     }, []);
 
+    // Auto-advance step every 5 seconds
+    useEffect(() => {
+        if (!cms.enabled || cms.steps.length <= 1) return;
+        const interval = setInterval(() => {
+            setActiveStep((prev) => (prev + 1) % cms.steps.length);
+        }, 5000);
+        return () => clearInterval(interval);
+    }, [cms.enabled, cms.steps.length, activeStep]);
+
     if (!cms.enabled) return null;
 
     // ─── TABLET VIEW ────────────────────────────────────────────────────────
@@ -123,16 +132,12 @@ const RentalProcess = () => {
                             </p>
                         </div>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexShrink: 0, marginTop: '4px' }}>
-                            <Link href="/rental-process" className="btn-primary flex items-center justify-center !w-[124px] !h-[35px] !px-0 text-[13px]" style={{
-                                textDecoration: 'none', border: 'none'
-                            }}>Rental Process</Link>
-                            <Link href="/contact" style={{
-                                display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-                                width: '90px', height: '35px', borderRadius: '9999px',
-                                background: '#fff', color: '#1D1D1F',
-                                fontSize: '13px', fontWeight: 600,
-                                textDecoration: 'none', border: '2px solid #1D1D1F'
-                            }}>Contact</Link>
+                            <Link href="/rental-process" className="btn-secondary text-[13px]" style={{ textDecoration: 'none' }}>
+                                Rental Process
+                            </Link>
+                            <Link href="/contact" className="btn-primary text-[13px]" style={{ textDecoration: 'none' }}>
+                                Contact
+                            </Link>
                         </div>
                     </div>
 
@@ -281,8 +286,8 @@ const RentalProcess = () => {
                         <p className="text-[#1D1D1F] text-[16px] leading-[1.3] tracking-tight max-w-md opacity-80">{cms.subtitle}</p>
                     </div>
                     <div className="flex items-center gap-3 self-end mb-1">
-                        <Link href="/rental-process" className="btn-primary !w-[124px] !h-[35px] !px-0 text-[13px] border-b border-black/10">Rental Process</Link>
-                        <Link href="/contact" className="inline-flex items-center justify-center hover:bg-gray-50 transition-all text-black font-semibold text-[13px] w-[124px] h-[35px] rounded-full bg-white border-2 border-black">Contact</Link>
+                        <Link href="/rental-process" className="btn-secondary text-[13px]">Rental Process</Link>
+                        <Link href="/contact" className="btn-primary text-[13px]">Contact</Link>
                     </div>
                 </div>
 
