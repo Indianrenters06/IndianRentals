@@ -22,7 +22,7 @@ export default function iMacPage() {
             productDescription="The all-in-one desktop with a 24-inch 4.5K Retina display."
             basePrice={9000}
             image="https://images.unsplash.com/photo-1527443224154-c4a3942dca76?q=80&w=800&auto=format&fit=crop"
-            title="iMac Products"
+            title="iMac"
         />
     );
 }

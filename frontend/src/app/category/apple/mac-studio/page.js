@@ -22,7 +22,7 @@ export default function MacStudioPage() {
             productDescription="M2 Max, 32GB Unified Memory, 512GB SSD"
             basePrice={12000}
             image="/mac-studio.jpg"
-            title="Mac Studio Products"
+            title="Mac Studio"
         />
     );
 }

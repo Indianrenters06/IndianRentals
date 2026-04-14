@@ -41,7 +41,7 @@ const ProductCard = ({ product }) => {
     const CARD_W = isMobile ? 170 : 285;
     const CARD_H = isMobile ? 250 : 387;
     const HOVER_H = isMobile ? 250 : 440;  // grows downward to reveal Rent Now
-    const LIFT    = isMobile ? 0   : 12;   // lifts upward
+    const LIFT = isMobile ? 0 : 12;   // lifts upward
 
     return (
         /*
@@ -145,14 +145,14 @@ const ProductCard = ({ product }) => {
                             <div className="flex text-[#FF9500]">
                                 {isMobile
                                     ? <Star size={12} weight="fill" />
-                                    : [1,2,3,4,5].map(s => <Star key={s} size={14} weight="fill" className={s <= Math.round(product.rating || 4) ? '' : 'opacity-20'} />)
+                                    : [1, 2, 3, 4, 5].map(s => <Star key={s} size={14} weight="fill" className={s <= Math.round(product.rating || 4) ? '' : 'opacity-20'} />)
                                 }
                             </div>
                             <span style={{ fontFamily: "'Mona Sans',sans-serif", fontSize: '11px', fontWeight: 500, color: 'hsla(0,0%,33%,1)', letterSpacing: '-0.01em', marginLeft: '4px' }}>
                                 {product.rating || '4.5'} ({product.reviewCount || 12})
                             </span>
                         </div>
-                        <div className="flex items-center gap-1.5" style={{ color: 'hsla(0,0%,46%,1)' }}>
+                        <div className="flex items-center gap-1.5" style={{ color: 'hsla(0,0%,69%,1)' }}>
                             <Truck size={isMobile ? 14 : 16} weight="regular" />
                             <span style={{ fontSize: '12px', fontWeight: 500, letterSpacing: '-0.04em' }}>2-4 days</span>
                         </div>

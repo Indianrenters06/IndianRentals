@@ -22,7 +22,7 @@ export default function MacBookProPage() {
             productDescription="M2 Pro or M2 Max chip for next-level performance."
             basePrice={8000}
             image="https://images.unsplash.com/photo-1517336714731-489689fd1ca8?q=80&w=800&auto=format&fit=crop"
-            title="MacBook Pro Products"
+            title="MacBook Pro"
         />
     );
 }

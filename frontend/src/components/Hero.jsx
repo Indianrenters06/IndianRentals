@@ -307,17 +307,15 @@ const Hero = () => {
                     >
                         <button
                             onClick={prev}
-                            className="pointer-events-auto w-[26px] h-[40px] rounded-[9px] flex items-center justify-center hover:scale-110 active:scale-95 transition-all shadow-sm opacity-100"
-                            style={{ background: "var(--color-grey-grey-100, hsla(0, 0%, 93%, 1))" }}
+                            className="pointer-events-auto w-[26px] h-[40px] rounded-[9px] flex items-center justify-center bg-[hsla(0,0%,93%,1)] hover:bg-[hsla(0,0%,20%,1)] active:scale-95 transition-all shadow-sm opacity-100 group/btn"
                         >
-                            <CaretLeft size={20} weight="regular" className="text-gray-800" />
+                            <CaretLeft size={20} weight="regular" className="text-gray-800 group-hover/btn:text-white transition-colors" />
                         </button>
                         <button
                             onClick={next}
-                            className="pointer-events-auto w-[26px] h-[40px] rounded-[9px] flex items-center justify-center hover:scale-110 active:scale-95 transition-all shadow-sm opacity-100"
-                            style={{ background: "var(--color-grey-grey-100, hsla(0, 0%, 93%, 1))" }}
+                            className="pointer-events-auto w-[26px] h-[40px] rounded-[9px] flex items-center justify-center bg-[hsla(0,0%,93%,1)] hover:bg-[hsla(0,0%,20%,1)] active:scale-95 transition-all shadow-sm opacity-100 group/btn"
                         >
-                            <CaretRight size={20} weight="regular" className="text-gray-800" />
+                            <CaretRight size={20} weight="regular" className="text-gray-800 group-hover/btn:text-white transition-colors" />
                         </button>
                     </div>
 

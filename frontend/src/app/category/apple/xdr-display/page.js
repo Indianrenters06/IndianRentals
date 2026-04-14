@@ -22,7 +22,7 @@ export default function ProDisplayXDRPage() {
             productDescription="32-inch 6K Retina display, up to 1600 nits brightness."
             basePrice={15000}
             image="/xdr.jpg"
-            title="Pro Display XDR Products"
+            title="Pro Display XDR"
         />
     );
 }

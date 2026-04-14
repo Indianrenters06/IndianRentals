@@ -170,23 +170,7 @@ const RentByCategory = () => {
                     </h2>
                     <Link
                         href="/categories"
-                        className="hidden md:inline-flex items-center justify-center text-gray-900 hover:brightness-105 transition-all"
-                        style={{
-                            width: '95px',
-                            height: '35px',
-                            paddingTop: '6px',
-                            paddingBottom: '6px',
-                            paddingLeft: '10px',
-                            paddingRight: '10px',
-                            borderRadius: '9999px',
-                            background: 'hsla(44, 100%, 64%, 1)',
-                            borderBottom: '1px solid rgba(0,0,0,0.10)',
-                            fontFamily: '"Mona Sans", sans-serif',
-                            fontWeight: 500,
-                            fontSize: '14px',
-                            lineHeight: '23px',
-                            letterSpacing: '-0.01em',
-                        }}
+                        className="btn-primary hidden md:inline-flex text-[14px]"
                     >
                         Explore
                     </Link>

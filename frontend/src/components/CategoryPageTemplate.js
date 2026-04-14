@@ -3,7 +3,10 @@ import React, { useState, useEffect } from 'react';
 import { FaChevronDown, FaArrowLeft } from 'react-icons/fa';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import Image from 'next/image';
 import { getProducts } from '@/services/productService';
+import { getSubcategoriesByParentName } from '@/services/categoryService';
+import { FiPackage } from 'react-icons/fi';
 import Sidebar from './Sidebar';
 import ProductCard from './ProductCard';
 
@@ -36,6 +39,7 @@ const CategoryPageTemplate = ({ productNamePrefix, productDescription, basePrice
     const router = useRouter();
     const [currentPage, setCurrentPage] = useState(1);
     const [products, setProducts] = useState([]);
+    const [subcategories, setSubcategories] = useState([]);
     const [loading, setLoading] = useState(true);
     const [isClient, setIsClient] = useState(false);
     const itemsPerPage = 10;
@@ -87,6 +91,49 @@ const CategoryPageTemplate = ({ productNamePrefix, productDescription, basePrice
 
         fetchAndFilterProducts();
     }, [isClient, productNamePrefix, productDescription, basePrice, image]);
+
+    useEffect(() => {
+        if (!isClient || !activeCatSlug) return;
+        const fetchSubs = async () => {
+            try {
+                // Find the parent name from pills, default to capitalizing slug
+                const parentNav = CATEGORY_PILLS.find(p => p.slug === activeCatSlug);
+                const parentNameStr = parentNav ? parentNav.label : activeCatSlug;
+
+                // Usually the DB stores subcategories associated with the explicit category name (e.g. 'Apple Products')
+                // Depending on the DB state, it might just be 'Apple'. Try 'Apple Products' or 'Apple'.
+                const parentSearch = parentNameStr === 'Apple' ? 'Apple Products' : (parentNameStr.includes('Products') ? parentNameStr : `${parentNameStr} Products`);
+                const subs = await getSubcategoriesByParentName(parentSearch) || [];
+
+                // We fallback to a hardcoded list if DB is empty to match the main category page UI
+                if (subs.length === 0 && activeCatSlug === 'apple') {
+                    setSubcategories([
+                        { name: "MacBook Pro", slug: "macbook-pro", image: "/macbook-pro-new.jpg" },
+                        { name: "iPhone", slug: "iphone", image: "/macbook-pro-new.jpg" },
+                        { name: "MacBook Air", slug: "macbook-air", image: "/macbook-pro-new.jpg" },
+                        { name: "iPad", slug: "ipad", image: "/ipad-new.jpg" },
+                        { name: "Apple Studio Display", slug: "studio-display", image: "/apple-xdr-display-new.jpg" },
+                        { name: "Apple XDR Display", slug: "xdr-display", image: "/apple-xdr-display-new.jpg" },
+                        { name: "Mac Pro", slug: "mac-pro", image: "/mac-pro-new.jpg" },
+                        { name: "iMac", slug: "imac", image: "/apple-xdr-display-new.jpg" },
+                        { name: "Mac Studio", slug: "mac-studio", image: "/mac-studio-new.jpg" },
+                        { name: "Mac Mini", slug: "mac-mini", image: "/mac-mini-new.jpg" },
+                    ].map(f => ({ ...f, href: `/category/${activeCatSlug}/${f.slug}` })));
+                } else {
+                    setSubcategories(subs.map(s => ({
+                        _id: s._id,
+                        name: s.name,
+                        image: s.image || null,
+                        slug: s.slug || s.name.toLowerCase().replace(/\s+/g, '-'),
+                        href: `/category/${activeCatSlug}/${s.slug || s.name.toLowerCase().replace(/\s+/g, '-')}?subId=${s._id}`,
+                    })));
+                }
+            } catch (err) {
+                console.error('Error fetching subcategories:', err);
+            }
+        };
+        fetchSubs();
+    }, [isClient, activeCatSlug]);
 
     if (!isClient && typeof window === 'undefined') {
         return <div className="min-h-screen bg-white" />;
@@ -236,6 +283,111 @@ const CategoryPageTemplate = ({ productNamePrefix, productDescription, basePrice
                     </div>
                 </div>
             </div>
+
+            {/* Subcategory Slider Block */}
+            {subcategories.length > 0 && (
+                <div className="bg-white border-b border-[hsla(0,0%,93%,1)] pb-8 mb-8 shadow-sm relative z-10 w-full overflow-hidden flex justify-center">
+                    {/* Outer Container */}
+                    <div 
+                        className="relative mx-auto group/subslider flex items-center"
+                        style={{
+                            width: '1200px',
+                            height: '167px',
+                            paddingTop: '20px',
+                            gap: '24px'
+                        }}
+                    >
+                        {/* Inner Container */}
+                        <div
+                            id="subcat-slider-template"
+                            className="flex overflow-x-auto scrollbar-hide snap-x snap-mandatory scroll-smooth"
+                            style={{
+                                width: '1200px',
+                                height: '147px',
+                                gap: '16px',
+                                msOverflowStyle: 'none',
+                                scrollbarWidth: 'none',
+                            }}
+                        >
+                            <style dangerouslySetInnerHTML={{
+                                __html: `
+                                #subcat-slider-template::-webkit-scrollbar { display: none; }
+                            `}} />
+                            {subcategories.map((sub) => {
+                                const isSubActive = title === sub.name;
+                                return (
+                                    <Link
+                                        key={sub.href}
+                                        href={sub.href}
+                                        className="group flex flex-col outline-none shrink-0 snap-start"
+                                        style={{
+                                            height: '147.09px',
+                                            width: '157.71px',
+                                            boxSizing: 'border-box',
+                                            gap: '7px',
+                                            textDecoration: 'none'
+                                        }}
+                                    >
+                                        <div
+                                            className="bg-white border rounded-lg flex items-center justify-center overflow-hidden transition-all duration-300"
+                                            style={{
+                                                height: '120px',
+                                                width: '100%',
+                                                boxSizing: 'border-box',
+                                                borderColor: isSubActive ? 'hsla(44,100%,64%,1)' : 'hsla(0,0%,93%,1)',
+                                                backgroundColor: isSubActive ? 'hsla(43,100%,95%,1)' : 'white'
+                                            }}
+                                        >
+                                            <div className={`w-[100px] h-[100px] relative transform transition-transform duration-500 ${isSubActive ? 'scale-105' : 'group-hover:scale-105'}`}>
+                                                {sub.image ? (
+                                                    <Image
+                                                        src={sub.image}
+                                                        alt={sub.name}
+                                                        fill
+                                                        className="object-contain"
+                                                        sizes="100px"
+                                                    />
+                                                ) : (
+                                                    <div className="w-full h-full flex items-center justify-center">
+                                                        <FiPackage size={24} className="text-gray-300" />
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </div>
+                                        <p
+                                            style={{
+                                                fontFamily: "'Mona Sans', sans-serif",
+                                                fontWeight: 600,
+                                                fontSize: '12px',
+                                                lineHeight: '20px',
+                                                letterSpacing: '-0.01em',
+                                                color: '#1D1D1F',
+                                            }}
+                                            className="text-center transition-colors duration-300 w-full truncate"
+                                        >
+                                            {sub.name}
+                                        </p>
+                                    </Link>
+                                );
+                            })}
+                        </div>
+
+                        {subcategories.length > 8 && (
+                            <button
+                                onClick={() => {
+                                    const slider = document.getElementById('subcat-slider-template');
+                                    if (slider) slider.scrollBy({ left: 300, behavior: 'smooth' });
+                                }}
+                                className="absolute right-[24px] top-[50%] translate-x-[50%] w-[32px] h-[32px] rounded-lg bg-[hsla(0,0%,93%,1)] flex items-center justify-center shadow-md hover:bg-[hsla(0,0%,20%,1)] group/caret transition-all z-10 hidden md:flex"
+                            >
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-gray-600 group-hover/caret:text-white transition-colors">
+                                    <polyline points="9 18 15 12 9 6"></polyline>
+                                </svg>
+                            </button>
+                        )}
+                    </div>
+                </div>
+            )}
 
             {/* Page body */}
             <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-8">

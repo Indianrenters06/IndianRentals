@@ -7,24 +7,16 @@ import { FaArrowLeft } from 'react-icons/fa';
 import { FiPackage } from 'react-icons/fi';
 import { getProductsBySubcategory, getProducts } from '../services/productService';
 import ProductCard from './ProductCard';
+import Sidebar from './Sidebar';
 
-/**
- * SubcategoryProductsPage
- * 
- * Reusable page that lists all products in a given subcategory.
- * 
- * Props:
- *  - subcategoryId   (string)  MongoDB ObjectId of the subcategory — used to filter products
- *  - subcategoryName (string)  Display name, e.g. "MacBook Pro"
- *  - parentName      (string)  Parent category name, e.g. "Apple"
- *  - parentHref      (string)  Back-link href, e.g. "/category/apple"
- */
 export default function SubcategoryProductsPage({ subcategoryId, subcategoryName, parentName, parentHref }) {
     const router = useRouter();
     const [products, setProducts] = useState([]);
+    const [subcategories, setSubcategories] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    const [sortBy, setSortBy] = useState('default');
+    const [selectedDuration, setSelectedDuration] = useState("3 months");
+    const [selectedSort, setSelectedSort] = useState("Most Popular");
 
     useEffect(() => {
         const fetchProducts = async () => {
@@ -33,10 +25,8 @@ export default function SubcategoryProductsPage({ subcategoryId, subcategoryName
                 setError(null);
                 let data;
                 if (subcategoryId) {
-                    // Fetch by subcategory ObjectId (precise DB filter)
                     data = await getProductsBySubcategory(subcategoryId);
                 } else {
-                    // Fallback: filter by category name
                     data = await getProducts({ category: parentName });
                 }
                 const list = Array.isArray(data) ? data : (data.products || []);
@@ -48,116 +38,267 @@ export default function SubcategoryProductsPage({ subcategoryId, subcategoryName
                 setLoading(false);
             }
         };
+
+        const fetchSubcategories = async () => {
+            try {
+                const parentSearch = parentName === 'Apple' ? 'Apple Products' : (parentName?.includes('Products') ? parentName : `${parentName} Products`);
+                const { getSubcategoriesByParentName } = await import('../services/categoryService');
+                const subs = await getSubcategoriesByParentName(parentSearch) || [];
+
+                if (subs.length === 0 && parentName?.toLowerCase() === 'apple') {
+                    setSubcategories([
+                        { name: "MacBook Pro", slug: "macbook-pro", image: "/macbook-pro-new.jpg" },
+                        { name: "iPhone", slug: "iphone", image: "/macbook-pro-new.jpg" },
+                        { name: "MacBook Air", slug: "macbook-air", image: "/macbook-pro-new.jpg" },
+                        { name: "iPad", slug: "ipad", image: "/ipad-new.jpg" },
+                        { name: "Apple Studio Display", slug: "studio-display", image: "/apple-xdr-display-new.jpg" },
+                        { name: "Apple XDR Display", slug: "xdr-display", image: "/apple-xdr-display-new.jpg" },
+                        { name: "Mac Pro", slug: "mac-pro", image: "/mac-pro-new.jpg" },
+                        { name: "iMac", slug: "imac", image: "/apple-xdr-display-new.jpg" },
+                        { name: "Mac Studio", slug: "mac-studio", image: "/mac-studio-new.jpg" },
+                        { name: "Mac Mini", slug: "mac-mini", image: "/mac-mini-new.jpg" },
+                    ].map(f => ({ ...f, href: `/category/${parentName.toLowerCase().replace(/\s+/g, '-')}/${f.slug}` })));
+                } else {
+                    const activeCatSlug = parentName?.toLowerCase().replace(/\s+/g, '-') || 'all';
+                    setSubcategories(subs.map(s => ({
+                        _id: s._id,
+                        name: s.name,
+                        image: s.image || null,
+                        slug: s.slug || s.name.toLowerCase().replace(/\s+/g, '-'),
+                        href: `/category/${activeCatSlug}/${s.slug || s.name.toLowerCase().replace(/\s+/g, '-')}?subId=${s._id}`,
+                    })));
+                }
+            } catch (err) {
+                console.error('Failed to load sibling subcategories:', err);
+            }
+        };
+
         fetchProducts();
+        fetchSubcategories();
     }, [subcategoryId, parentName]);
 
-    const sortedProducts = [...products].sort((a, b) => {
-        if (sortBy === 'price-asc') return a.rentalPrice - b.rentalPrice;
-        if (sortBy === 'price-desc') return b.rentalPrice - a.rentalPrice;
-        if (sortBy === 'name') return a.name.localeCompare(b.name);
-        return 0;
-    });
+    const getDurationMultiplier = (duration) => {
+        switch (duration) {
+            case "1 month": return 1.2;
+            case "3 months": return 1.0;
+            case "6 months": return 0.85;
+            case "9 months": return 0.75;
+            case "18 months": return 0.65;
+            case "24 months": return 0.55;
+            default: return 1.0;
+        }
+    };
+
+    const processedProducts = React.useMemo(() => {
+        let results = products.map(p => {
+            const baseOrigin = Math.round((p.rentalPrice || 8999) * 1.5);
+            const baseRent = p.rentalPrice || 0;
+            return {
+                id: p._id,
+                name: p.name,
+                description: p.description,
+                baseOriginalPrice: baseOrigin,
+                baseRentPrice: baseRent,
+                originalPrice: baseOrigin,
+                rentPrice: baseRent,
+                discount: "20% off",
+                image: (p.images && p.images.length > 0) ? p.images[0] : "/images/placeholder.png",
+                isNew: p.condition === 'New',
+                rentalPrice: p.rentalPrice
+            };
+        });
+
+        const multiplier = getDurationMultiplier(selectedDuration);
+        results = results.map(p => ({
+            ...p,
+            rentPrice: Math.round(p.baseRentPrice * multiplier),
+            originalPrice: Math.round(p.baseOriginalPrice * multiplier)
+        }));
+
+        if (selectedSort === "Price (low to high)") {
+            results.sort((a, b) => a.rentPrice - b.rentPrice);
+        } else if (selectedSort === "Price (high to low)") {
+            results.sort((a, b) => b.rentPrice - a.rentPrice);
+        } else if (selectedSort === "New Arrivals") {
+            results.reverse();
+        }
+
+        return results;
+    }, [products, selectedDuration, selectedSort]);
 
     return (
         <div className="min-h-screen bg-white">
-            <main className="px-4 pt-5 pb-10 max-w-7xl mx-auto sm:px-6 lg:px-8">
-
-                {/* Top bar: Back + Title + Sort */}
-                <div className="flex items-center justify-between gap-3 mb-6">
-                    <div className="flex items-center gap-3">
-                        <button
-                            onClick={() => router.back()}
-                            className="p-1 hover:bg-gray-100 rounded-full transition-colors"
-                        >
-                            <FaArrowLeft size={18} className="text-gray-800" />
-                        </button>
-                        <div>
-                            <p className="text-xs text-gray-500">
-                                <Link href="/" className="hover:underline">Home</Link>
-                                {' › '}
-                                <Link href={parentHref || '#'} className="hover:underline">{parentName}</Link>
-                                {' › '}
-                                <span className="text-gray-800">{subcategoryName}</span>
-                            </p>
-                            <h1 className="text-xl md:text-2xl font-bold text-gray-900">{subcategoryName}</h1>
-                        </div>
-                    </div>
-                    <select
-                        value={sortBy}
-                        onChange={(e) => setSortBy(e.target.value)}
-                        className="text-sm px-3 py-1.5 border border-gray-200 rounded-lg text-gray-700 bg-white focus:outline-none focus:ring-2 focus:ring-gray-300"
-                    >
-                        <option value="default">Sort: Default</option>
-                        <option value="price-asc">Price: Low to High</option>
-                        <option value="price-desc">Price: High to Low</option>
-                        <option value="name">Name: A-Z</option>
-                    </select>
+            {/* Breadcrumbs Bar */}
+            <div className="px-4 py-4 max-w-[1248px] mx-auto sm:px-6 lg:px-8">
+                <div className="flex items-center gap-3">
+                    <button onClick={() => router.back()} className="p-1 hover:bg-gray-100 rounded-full transition-colors">
+                        <FaArrowLeft size={18} className="text-gray-800" />
+                    </button>
+                    <p className="text-xs text-gray-500">
+                        <Link href="/" className="hover:underline">Home</Link>
+                        {' › '}
+                        <Link href={parentHref || '#'} className="hover:underline">{parentName}</Link>
+                        {' › '}
+                        <span className="text-gray-800">{subcategoryName}</span>
+                    </p>
                 </div>
+            </div>
 
-                {/* Loading */}
-                {loading && (
-                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                        {[1, 2, 3, 4, 5, 6].map((n) => (
-                            <div key={n} className="animate-pulse">
-                                <div className="bg-gray-100 rounded-2xl aspect-4/3 mb-2" />
-                                <div className="h-4 bg-gray-100 rounded w-3/4 mx-auto" />
-                                <div className="h-3 bg-gray-100 rounded w-1/2 mx-auto mt-1" />
-                            </div>
-                        ))}
-                    </div>
-                )}
-
-                {/* Error */}
-                {!loading && error && (
-                    <div className="text-center py-16">
-                        <p className="text-gray-500 text-sm">{error}</p>
-                        <button
-                            onClick={() => window.location.reload()}
-                            className="mt-4 px-4 py-2 bg-gray-900 text-white rounded-lg text-sm hover:bg-gray-800"
+            {/* Subcategory Slider Navigation (Top Level of Page Layout) */}
+            {subcategories.length > 0 && (
+                <div className="bg-white border-b border-[hsla(0,0%,93%,1)] pb-8 mb-4 shadow-sm relative z-10 w-full overflow-hidden flex justify-center">
+                    {/* Outer Container for Slider */}
+                    <div 
+                        className="relative mx-auto group/subslider flex items-center"
+                        style={{
+                            width: '1200px',
+                            height: '167px',
+                            paddingTop: '20px',
+                            gap: '24px'
+                        }}
+                    >
+                        {/* Inner Container for Slider */}
+                        <div
+                            id="subcat-slider-dynamic"
+                            className="flex overflow-x-auto scrollbar-hide snap-x snap-mandatory scroll-smooth"
+                            style={{
+                                width: '1200px',
+                                height: '147px',
+                                gap: '16px',
+                                msOverflowStyle: 'none',
+                                scrollbarWidth: 'none',
+                            }}
                         >
-                            Retry
-                        </button>
+                            <style dangerouslySetInnerHTML={{ __html: `#subcat-slider-dynamic::-webkit-scrollbar { display: none; }` }} />
+                            {subcategories.map((sub) => {
+                                const isSubActive = subcategoryName === sub.name;
+                                return (
+                                    <Link
+                                        key={sub.href}
+                                        href={sub.href}
+                                        className="group flex flex-col outline-none shrink-0 snap-start"
+                                        style={{
+                                            height: '147.09px',
+                                            width: '157.71px',
+                                            boxSizing: 'border-box',
+                                            gap: '7px',
+                                            textDecoration: 'none'
+                                        }}
+                                    >
+                                        <div
+                                            className="bg-white border rounded-lg flex items-center justify-center overflow-hidden transition-all duration-300"
+                                            style={{
+                                                height: '120px',
+                                                width: '100%',
+                                                boxSizing: 'border-box',
+                                                borderColor: isSubActive ? 'hsla(44,100%,64%,1)' : 'hsla(0,0%,93%,1)',
+                                                backgroundColor: isSubActive ? 'hsla(43,100%,95%,1)' : 'white'
+                                            }}
+                                        >
+                                            <div className={`w-[100px] h-[100px] relative transform transition-transform duration-500 ${isSubActive ? 'scale-105' : 'group-hover:scale-105'}`}>
+                                                {sub.image ? (
+                                                    <Image src={sub.image} alt={sub.name} fill className="object-contain" sizes="100px" />
+                                                ) : (
+                                                    <div className="w-full h-full flex items-center justify-center">
+                                                        <FiPackage size={24} className="text-gray-300" />
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </div>
+                                        <p style={{ fontFamily: "'Mona Sans', sans-serif", fontWeight: 600, fontSize: '12px', lineHeight: '20px', letterSpacing: '-0.01em', color: '#1D1D1F' }} className="text-center transition-colors duration-300 w-full truncate">
+                                            {sub.name}
+                                        </p>
+                                    </Link>
+                                );
+                            })}
+                        </div>
+                        {subcategories.length > 7 && (
+                            <button
+                                onClick={() => {
+                                    const slider = document.getElementById('subcat-slider-dynamic');
+                                    if (slider) slider.scrollBy({ left: 300, behavior: 'smooth' });
+                                }}
+                                className="absolute right-[-16px] top-[50%] translate-y-[-50%] w-[32px] h-[32px] rounded-lg bg-[hsla(0,0%,93%,1)] flex items-center justify-center shadow-md hover:bg-[hsla(0,0%,20%,1)] group/caret transition-all z-10 hidden md:flex"
+                            >
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-gray-600 group-hover/caret:text-white transition-colors">
+                                    <polyline points="9 18 15 12 9 6"></polyline>
+                                </svg>
+                            </button>
+                        )}
                     </div>
-                )}
+                </div>
+            )}
 
-                {/* Empty state */}
-                {!loading && !error && sortedProducts.length === 0 && (
-                    <div className="text-center py-20">
-                        <FiPackage size={48} className="mx-auto text-gray-300 mb-4" />
-                        <h2 className="text-lg font-semibold text-gray-700">No products available yet</h2>
-                        <p className="text-sm text-gray-400 mt-1">
-                            The admin hasn&apos;t added any {subcategoryName} products yet. Check back soon!
-                        </p>
-                        <Link
-                            href={parentHref || '/'}
-                            className="inline-block mt-6 px-6 py-2.5 bg-gray-900 text-white rounded-full text-sm hover:bg-gray-800 transition-colors"
-                        >
-                            ← Back to {parentName}
-                        </Link>
-                    </div>
-                )}
+            {/* Main Content Area */}
+            <div 
+                className="mx-auto flex" 
+                style={{ 
+                    maxWidth: '1200px', 
+                    paddingTop: '40px', 
+                    paddingBottom: '40px',
+                    gap: '30px',
+                    minHeight: '2091px'
+                }}
+            >
+                <Sidebar 
+                    selectedDuration={selectedDuration}
+                    setSelectedDuration={setSelectedDuration}
+                    selectedSort={selectedSort}
+                    setSelectedSort={setSelectedSort}
+                />
 
-                {/* Product Grid */}
-                {!loading && !error && sortedProducts.length > 0 && (
-                    <>
-                        <p className="text-xs text-gray-400 mb-4">{sortedProducts.length} product{sortedProducts.length !== 1 ? 's' : ''} found</p>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
-                            {sortedProducts.map((product) => (
-                                <ProductCard 
-                                    key={product._id} 
-                                    product={{
-                                        ...product,
-                                        id: product._id,
-                                        image: product.images?.[0] || "/images/placeholder.png",
-                                        rentPrice: product.rentalPrice,
-                                        originalPrice: product.rentalPrice ? Math.round(product.rentalPrice * 1.5) : 8999
-                                    }} 
-                                />
+                <div className="flex-1">
+                    <h1 
+                        className="text-[48px] font-bold text-[#1D1D1F] mb-10"
+                        style={{ 
+                            fontFamily: "'Mona Sans', sans-serif",
+                            lineHeight: '58px',
+                            letterSpacing: '-0.02em'
+                        }}
+                    >
+                        {subcategoryName} (Sub-category name)
+                    </h1>
+
+                    {/* Loading */}
+                    {loading && (
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-[24px]">
+                            {[1, 2, 3, 4, 5, 6].map((n) => (
+                                <div key={n} className="animate-pulse">
+                                    <div className="bg-gray-100 rounded-2xl aspect-4/3 mb-2" />
+                                    <div className="h-4 bg-gray-100 rounded w-3/4 mx-auto" />
+                                </div>
                             ))}
                         </div>
-                    </>
-                )}
-            </main>
+                    )}
+
+                    {/* Error */}
+                    {!loading && error && (
+                        <div className="text-center py-16">
+                            <p className="text-gray-500 text-sm">{error}</p>
+                            <button onClick={() => window.location.reload()} className="mt-4 px-4 py-2 bg-gray-900 text-white rounded-lg text-sm hover:bg-gray-800">Retry</button>
+                        </div>
+                    )}
+
+                    {/* Empty or Results */}
+                    {!loading && !error && processedProducts.length === 0 ? (
+                        <div className="text-center py-20">
+                            <FiPackage size={48} className="mx-auto text-gray-300 mb-4" />
+                            <h2 className="text-lg font-semibold text-gray-700">No products available</h2>
+                        </div>
+                    ) : (
+                        !loading && !error && (
+                            <>
+                                <p className="text-xs text-gray-400 mb-6 font-sans uppercase tracking-widest">{processedProducts.length} PRODUCTS FOUND</p>
+                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-[30px]">
+                                    {processedProducts.map((product) => (
+                                        <ProductCard key={product.id} product={product} />
+                                    ))}
+                                </div>
+                            </>
+                        )
+                    )}
+                </div>
+            </div>
         </div>
     );
 }

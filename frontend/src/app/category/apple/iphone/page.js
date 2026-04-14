@@ -22,7 +22,7 @@ export default function iPhonePage() {
             productDescription="Experience the power of iPhone with advanced camera systems."
             basePrice={4000}
             image="/iphone.jpg"
-            title="iPhone Products"
+            title="iPhone"
         />
     );
 }

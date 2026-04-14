@@ -22,7 +22,7 @@ export default function MacMiniPage() {
             productDescription="M2 Pro chip, 16GB Unified Memory, 512GB SSD"
             basePrice={5999}
             image="/mac-mini-new.jpg"
-            title="Mac Mini Products"
+            title="Mac Mini"
         />
     );
 }

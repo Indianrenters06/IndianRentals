@@ -22,7 +22,7 @@ export default function StudioDisplayPage() {
             productDescription="27-inch 5K Retina display, 12MP Ultra Wide camera."
             basePrice={5000}
             image="https://images.unsplash.com/photo-1547119957-630f9c475d34?q=80&w=800&auto=format&fit=crop"
-            title="Studio Display Products"
+            title="Studio Display"
         />
     );
 }

@@ -22,7 +22,7 @@ export default function MacBookAirPage() {
             productDescription="Supercharged by M2, 13-inch Liquid Retina display."
             basePrice={6000}
             image="https://images.unsplash.com/photo-1611186871348-b1ec696e52c9?q=80&w=800&auto=format&fit=crop"
-            title="MacBook Air Products"
+            title="MacBook Air"
         />
     );
 }
