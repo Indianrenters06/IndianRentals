@@ -2,9 +2,35 @@
 import React, { useState, useEffect } from 'react';
 import { FaChevronDown, FaArrowLeft } from 'react-icons/fa';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { getProducts } from '@/services/productService';
 import Sidebar from './Sidebar';
 import ProductCard from './ProductCard';
+
+// Derive which category pill to highlight based on the page title
+const TITLE_KEYWORDS = [
+    { keywords: ['apple', 'macbook', 'iphone', 'ipad', 'imac', 'mac'], slug: 'apple' },
+    { keywords: ['it product', 'laptop', 'desktop', 'monitor', 'keyboard', 'mouse', 'server'], slug: 'it-products' },
+    { keywords: ['av product', 'projector', 'speaker', 'display', 'television', 'tv', 'audio'], slug: 'av-products' },
+    { keywords: ['office', 'printer', 'scanner', 'copier', 'shredder', 'telephone'], slug: 'office-equipment' },
+    { keywords: ['dslr', 'camera', 'lens', 'mirrorless', 'gopro', 'drone'], slug: 'dslr' },
+];
+
+function getActiveSlug(title = '') {
+    const lower = title.toLowerCase();
+    for (const group of TITLE_KEYWORDS) {
+        if (group.keywords.some((kw) => lower.includes(kw))) return group.slug;
+    }
+    return '';
+}
+
+const CATEGORY_PILLS = [
+    { label: 'Apple Products', slug: 'apple' },
+    { label: 'IT Products', slug: 'it-products' },
+    { label: 'AV Products', slug: 'av-products' },
+    { label: 'Office Equipment', slug: 'office-equipment' },
+    { label: 'DSLR Cameras', slug: 'dslr' },
+];
 
 const CategoryPageTemplate = ({ productNamePrefix, productDescription, basePrice, image, title }) => {
     const router = useRouter();
@@ -16,6 +42,8 @@ const CategoryPageTemplate = ({ productNamePrefix, productDescription, basePrice
 
     const [selectedDuration, setSelectedDuration] = useState("3 months");
     const [selectedSort, setSelectedSort] = useState("Most Popular");
+
+    const activeCatSlug = getActiveSlug(title);
 
     useEffect(() => {
         setIsClient(true);
@@ -100,6 +128,116 @@ const CategoryPageTemplate = ({ productNamePrefix, productDescription, basePrice
 
     return (
         <div className="min-h-screen bg-white">
+
+            {/* ── Figma Nav Bar: full-width grey-50, 62px, breadcrumb + category pills ── */}
+            <div style={{ width: '100%', background: 'hsla(0, 0%, 96%, 1)', height: '62px' }}>
+                <div
+                    style={{
+                        maxWidth: '1200px',
+                        width: '100%',
+                        height: '62px',
+                        margin: '0 auto',
+                        padding: '0 32px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        gap: '10px',
+                        boxSizing: 'border-box',
+                    }}
+                >
+                    {/* Breadcrumb */}
+                    <div style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '8px',
+                        fontSize: '12px',
+                        fontWeight: 500,
+                        color: '#64748B',
+                        whiteSpace: 'nowrap',
+                        overflow: 'hidden',
+                    }}>
+                        <Link href="/" style={{ color: 'inherit', textDecoration: 'none' }} className="hover:text-black transition-colors">
+                            Homepage
+                        </Link>
+                        <span style={{ color: '#9CA3AF' }}>›</span>
+                        <Link href="/categories" style={{ color: 'inherit', textDecoration: 'none' }} className="hover:text-black transition-colors">
+                            All Categories
+                        </Link>
+                        <span style={{ color: '#9CA3AF' }}>›</span>
+                        {activeCatSlug && (
+                            <>
+                                <Link
+                                    href={`/category/${activeCatSlug}`}
+                                    style={{ color: 'inherit', textDecoration: 'none' }}
+                                    className="hover:text-black transition-colors"
+                                >
+                                    {CATEGORY_PILLS.find(p => p.slug === activeCatSlug)?.label || activeCatSlug}
+                                </Link>
+                                <span style={{ color: '#9CA3AF' }}>›</span>
+                            </>
+                        )}
+                        <span style={{ color: '#1D1D1F', fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '220px' }}>
+                            {title}
+                        </span>
+                    </div>
+
+                    {/* Category filter pills */}
+                    <div
+                        style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '8px',
+                            height: '62px',
+                            paddingTop: '12px',
+                            paddingBottom: '12px',
+                            borderBottom: '1px solid hsla(0, 0%, 93%, 1)',
+                            flexShrink: 0,
+                            boxSizing: 'border-box',
+                        }}
+                    >
+                        {CATEGORY_PILLS.map((cat) => {
+                            const isActive = activeCatSlug === cat.slug;
+                            return (
+                                <Link
+                                    key={cat.slug}
+                                    href={`/category/${cat.slug}`}
+                                    style={{
+                                        height: '38px',
+                                        padding: '8px 16px',
+                                        borderRadius: '68px',
+                                        border: isActive
+                                            ? '1px solid hsla(44, 100%, 64%, 1)'
+                                            : '1px solid hsla(0, 0%, 89%, 1)',
+                                        background: isActive
+                                            ? 'hsla(43, 100%, 95%, 1)'
+                                            : 'hsla(0, 0%, 100%, 1)',
+                                        textDecoration: 'none',
+                                        whiteSpace: 'nowrap',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        transition: 'all 0.15s',
+                                        boxSizing: 'border-box',
+                                    }}
+                                >
+                                    <span style={{
+                                        fontFamily: "'Mona Sans', sans-serif",
+                                        fontWeight: 600,
+                                        fontSize: '14px',
+                                        lineHeight: '20px',
+                                        letterSpacing: '-0.01em',
+                                        color: 'hsla(0, 0%, 0%, 1)',
+                                    }}>
+                                        {cat.label}
+                                    </span>
+                                </Link>
+                            );
+                        })}
+                    </div>
+                </div>
+            </div>
+
+            {/* Page body */}
             <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-8">
                 <div className="flex items-center gap-4 mb-8">
                     <button onClick={() => router.back()} className="p-2 hover:bg-gray-100 rounded-full transition-colors"><FaArrowLeft size={24} className="text-gray-900" /></button>

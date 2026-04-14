@@ -14,9 +14,26 @@ const ProductCard = ({ product, index, isDesktop, handleAddToCart }) => {
     const [isHovered, setIsHovered] = useState(false);
     const router = useRouter();
 
+    const CARD_W  = isDesktop ? 285 : 170;
+    const CARD_H  = isDesktop ? 387 : 256;
+    const HOVER_H = isDesktop ? 440 : 256;
+    const LIFT    = isDesktop ? 12  : 0;
+
     return (
+        /*
+         * Outer shell: FIXED size in Swiper — grid never changes.
+         * overflow:visible lets card grow beyond it without layout impact.
+         * Card lifts UP (y:-12) AND grows DOWN to reveal Rent Now.
+         */
         <div
-            className="relative group h-full flex-1"
+            style={{
+                width: `${CARD_W}px`,
+                height: `${CARD_H}px`,
+                position: 'relative',
+                flexShrink: 0,
+                cursor: 'pointer',
+                overflow: 'visible',
+            }}
             onMouseEnter={() => setIsHovered(true)}
             onMouseLeave={() => setIsHovered(false)}
             onTouchStart={() => setIsHovered(true)}
@@ -25,108 +42,57 @@ const ProductCard = ({ product, index, isDesktop, handleAddToCart }) => {
             <motion.div
                 animate={isHovered ? "hover" : "initial"}
                 initial="initial"
-                className="bg-white flex flex-col overflow-hidden relative mx-auto w-full rounded-[20px]"
+                className="absolute left-0 right-0 bg-white flex flex-col overflow-hidden"
                 style={{
-                    height: isDesktop ? '387px' : '256px',
-                    width: isDesktop ? '285px' : '170px',
+                    top: 0,
                     border: "1px solid hsla(0, 0%, 89%, 1)",
-                    willChange: "transform, height",
-                    cursor: "pointer",
-                    backgroundColor: "hsla(0, 0%, 100%, 1)",
                     borderRadius: "20px",
-                    opacity: 1
+                    backgroundColor: "hsla(0, 0%, 100%, 1)",
+                    willChange: "height, transform, box-shadow",
                 }}
                 variants={{
                     initial: {
-                        height: isDesktop ? 387 : 256,
+                        height: CARD_H,
                         y: 0,
-                        scale: 1,
                         boxShadow: "0px 1px 2px 0px hsla(0, 0%, 0%, 0.05)"
                     },
                     hover: {
-                        height: isDesktop ? 440 : 330,
-                        y: -12,
-                        scale: 1.01,
-                        boxShadow: "0px 10px 20px -4px hsla(0, 0%, 0%, 0.08)",
-                        transition: { duration: 0.35, ease: [0.33, 1, 0.68, 1] }
+                        height: HOVER_H,
+                        y: -LIFT,
+                        boxShadow: "0px 16px 32px -8px hsla(0, 0%, 0%, 0.14)",
+                        transition: { duration: 0.3, ease: [0.33, 1, 0.68, 1] }
                     }
                 }}
             >
                 {/* Image Section */}
                 <div
-                    className="relative bg-white group-hover:bg-[#F9F9F9] transition-colors duration-500 flex items-center justify-center overflow-hidden shrink-0 h-[184px] md:h-[282px]"
+                    className="relative bg-white flex items-center justify-center overflow-hidden shrink-0"
                     style={{
-                        width: isDesktop ? '285px' : '170px',
+                        width: `${CARD_W}px`,
+                        height: isDesktop ? 282 : 184,
                         borderRadius: "20px",
-                        borderWidth: "0px 1px 1px 1px",
-                        borderStyle: "solid",
-                        borderColor: "hsla(0, 0%, 93%, 1)",
-                        backgroundColor: "hsla(0, 0%, 100%, 1)",
-                        opacity: 1,
-                        boxShadow: "0px 4px 8px 0px hsla(0, 0%, 87%, 0.1), 0px 15px 15px 0px hsla(0, 0%, 87%, 0.09), 0px 33px 20px 0px hsla(0, 0%, 87%, 0.05), 0px 59px 23px 0px hsla(0, 0%, 87%, 0.01), 0px 91px 26px 0px hsla(0, 0%, 87%, 0)"
+                        borderBottom: "1px solid hsla(0, 0%, 93%, 1)",
+                        backgroundColor: isHovered ? "hsla(0,0%,98%,1)" : "hsla(0, 0%, 100%, 1)",
+                        transition: "background-color 0.4s",
+                        boxShadow: "0px 4px 8px 0px hsla(0, 0%, 87%, 0.1)",
                     }}
                 >
-                    <div
-                        className="absolute z-20 flex items-center"
-                        style={{
-                            top: isDesktop ? "14.57px" : "12.57px",
-                            left: isDesktop ? "14.49px" : "13.49px",
-                            gap: "4px",
-                            width: isDesktop ? "114px" : "92px",
-                            height: isDesktop ? "24px" : "28px"
-                        }}
-                    >
+                    <div className="absolute z-20 flex items-center" style={{ top: isDesktop ? "14.57px" : "12.57px", left: isDesktop ? "14.49px" : "13.49px", gap: "4px" }}>
                         <span className="text-white text-[10px] font-bold rounded-full flex items-center justify-center shrink-0"
-                            style={{
-                                width: isDesktop ? "auto" : "65px",
-                                height: isDesktop ? "100%" : "24px",
-                                background: "hsla(3, 86%, 51%, 1)",
-                                fontFamily: "'Mona Sans', sans-serif",
-                                fontSize: "10px",
-                                fontWeight: 600,
-                                letterSpacing: "-0.01em",
-                                paddingLeft: "10px",
-                                paddingRight: "10px",
-                                borderRadius: "27px",
-                                boxShadow: "0px 0px 1px 0px hsla(0, 0%, 47%, 0.1), 0px 1px 1px 0px hsla(0, 0%, 47%, 0.09), 0px 3px 2px 0px hsla(0, 0%, 47%, 0.05), 0px 5px 2px 0px hsla(0, 0%, 47%, 0.01), 0px 9px 2px 0px hsla(0, 0%, 47%, 0)"
-                            }}
-                        >
+                            style={{ height: "24px", background: "hsla(3, 86%, 51%, 1)", fontFamily: "'Mona Sans', sans-serif", fontSize: "10px", fontWeight: 600, paddingLeft: "10px", paddingRight: "10px", borderRadius: "27px" }}>
                             -20% off
                         </span>
                         {(isDesktop || product.isNew) && (
-                            <span
-                                className="text-white text-[10px] font-bold rounded-full flex items-center justify-center shrink-0"
-                                style={{
-                                    width: isDesktop ? "auto" : "45px",
-                                    height: isDesktop ? "100%" : "24px",
-                                    paddingLeft: isDesktop ? "10px" : "0",
-                                    paddingRight: isDesktop ? "10px" : "0",
-                                    backgroundColor: "hsla(122, 100%, 35%, 1)",
-                                    fontFamily: "'Mona Sans', sans-serif",
-                                    fontSize: "10px",
-                                    fontWeight: 600,
-                                    letterSpacing: "-0.01em",
-                                    borderRadius: "27px",
-                                    boxShadow: "0px 0px 1px 0px hsla(0, 0%, 47%, 0.1), 0px 1px 1px 0px hsla(0, 0%, 47%, 0.09), 0px 3px 2px 0px hsla(0, 0%, 47%, 0.05), 0px 5px 2px 0px hsla(0, 0%, 47%, 0.01), 0px 9px 2px 0px hsla(0, 0%, 47%, 0)"
-                                }}
-                            >
+                            <span className="text-white text-[10px] font-bold rounded-full flex items-center justify-center shrink-0"
+                                style={{ height: "24px", paddingLeft: "10px", paddingRight: "10px", backgroundColor: "hsla(122, 100%, 35%, 1)", fontFamily: "'Mona Sans', sans-serif", fontSize: "10px", fontWeight: 600, borderRadius: "27px" }}>
                                 New
                             </span>
                         )}
                     </div>
 
                     <button
-                        className="absolute z-20 flex items-center justify-center rounded-full shadow-sm hover:scale-110 transition-all duration-300"
-                        style={{
-                            width: "24px",
-                            height: "24px",
-                            top: "10.57px",
-                            right: "12.51px",
-                            backgroundColor: "hsla(0, 0%, 96%, 1)",
-                            border: "0.2px solid hsla(0, 0%, 80%, 1)",
-                            borderRadius: "100%",
-                            padding: "2.25px"
-                        }}
+                        className="absolute z-20 flex items-center justify-center rounded-full hover:scale-110 transition-all duration-300"
+                        style={{ width: "24px", height: "24px", top: "10.57px", right: "12.51px", backgroundColor: "hsla(0, 0%, 96%, 1)", border: "0.2px solid hsla(0, 0%, 80%, 1)", borderRadius: "100%", padding: "2.25px" }}
                         onClick={(e) => { e.preventDefault(); e.stopPropagation(); }}
                     >
                         <Heart size={19.5} color="#000000" weight="thin" />
@@ -147,190 +113,59 @@ const ProductCard = ({ product, index, isDesktop, handleAddToCart }) => {
                     className="flex flex-col relative font-manrope bg-white"
                     style={{
                         width: isDesktop ? '285px' : '100%',
-                        height: isDesktop ? (isHovered ? '158px' : '105px') : '72px',
-                        paddingTop: isDesktop ? '8px' : '4px',
-                        paddingRight: isDesktop ? '12px' : '8px',
-                        paddingBottom: isDesktop ? '12px' : '8px',
-                        paddingLeft: isDesktop ? '12px' : '8px',
+                        padding: isDesktop ? '8px 12px 12px' : '4px 8px 8px',
                         gap: isDesktop ? '8px' : '4px',
-                        opacity: 1,
-                        transition: 'height 0.3s ease'
                     }}
                 >
-                    <h3
-                        className="font-manrope line-clamp-1 group-hover:text-[#FF3B30] transition-colors duration-300 shrink-0"
-                        style={{
-                            width: isDesktop ? "261px" : "100%",
-                            height: isDesktop ? "25px" : "22px",
-                            fontSize: isDesktop ? "18px" : "15px",
-                            fontWeight: 600,
-                            lineHeight: isDesktop ? "25px" : "22px",
-                            letterSpacing: isDesktop ? "-0.4px" : "normal",
-                            color: "hsla(0, 0%, 16%, 1)"
-                        }}
-                    >
+                    <h3 className="font-manrope line-clamp-1 shrink-0"
+                        style={{ fontSize: isDesktop ? "18px" : "15px", fontWeight: 600, lineHeight: isDesktop ? "25px" : "22px", letterSpacing: isDesktop ? "-0.4px" : "normal", color: isHovered ? 'hsla(3, 100%, 56%, 1)' : "hsla(0, 0%, 16%, 1)", transition: 'color 0.3s' }}>
                         {product.name}
                     </h3>
 
-                    <div
-                        className="flex items-center justify-between shrink-0"
-                        style={{
-                            width: isDesktop ? "261px" : "154px",
-                            height: "16px"
-                        }}
-                    >
+                    <div className="flex items-center justify-between shrink-0" style={{ height: "16px" }}>
                         <div className="flex items-center gap-1">
                             <div className="flex text-[#FF9500]">
-                                {isDesktop ? (
-                                    [1, 2, 3, 4, 5].map((s) => (
-                                        <Star key={s} size={14} weight="fill" className={s <= Math.round(product.rating || 4) ? "" : "opacity-20"} />
-                                    ))
-                                ) : (
-                                    <Star size={12} weight="fill" />
-                                )}
+                                {isDesktop ? ([1,2,3,4,5].map(s => <Star key={s} size={14} weight="fill" className={s <= Math.round(product.rating || 4) ? "" : "opacity-20"} />)) : (<Star size={12} weight="fill" />)}
                             </div>
-                            <span
-                                className="ml-1"
-                                style={{
-                                    fontFamily: "'Mona Sans', sans-serif",
-                                    fontSize: "11px",
-                                    fontWeight: 500,
-                                    color: "hsla(0, 0%, 33%, 1)",
-                                    letterSpacing: "-0.01em"
-                                }}
-                            >
+                            <span className="ml-1" style={{ fontFamily: "'Mona Sans', sans-serif", fontSize: "11px", fontWeight: 500, color: "hsla(0, 0%, 33%, 1)", letterSpacing: "-0.01em" }}>
                                 {product.rating || "4.5"} ({product.reviews || 12})
                             </span>
                         </div>
-                        <div
-                            className="flex items-center flex-nowrap shrink-0"
-                            style={{
-                                color: "hsla(0, 0%, 46%, 1)",
-                                gap: isDesktop ? "6px" : "2px",
-                                width: isDesktop ? "auto" : "57px",
-                                height: isDesktop ? "auto" : "14px"
-                            }}
-                        >
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={isDesktop ? 1.5 : 0.63} stroke={isDesktop ? "currentColor" : "hsla(0, 0%, 69%, 1)"} className={isDesktop ? "w-[16px] h-[16px]" : "w-[8.11px] h-[6.25px] mt-[2.19px] ml-[0.94px]"}>
+                        <div className="flex items-center gap-1.5" style={{ color: "hsla(0, 0%, 46%, 1)" }}>
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-[16px] h-[16px]">
                                 <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 18.75a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 0 1-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m3 0h1.125c.621 0 1.129-.504 1.09-1.124a17.902 17.902 0 0 0-3.213-9.193 2.056 2.056 0 0 0-1.58-.86H14.25M16.5 18.75h-2.25m0-11.177v-.958c0-.568-.422-1.048-.987-1.106a48.554 48.554 0 0 0-10.026 0 1.106 1.106 0 0 0-.987 1.106v7.635m12-6.677v6.677m0 4.5v-4.5m0 0h-12" />
                             </svg>
-                            <span
-                                className="whitespace-nowrap"
-                                style={{
-                                    fontFamily: isDesktop ? "'Manrope', sans-serif" : "'Mona Sans', sans-serif",
-                                    fontSize: isDesktop ? "12px" : "10px",
-                                    fontWeight: 500,
-                                    lineHeight: isDesktop ? "120%" : "14px",
-                                    letterSpacing: isDesktop ? "-0.04em" : "-0.01em",
-                                    color: isDesktop ? "hsla(0, 0%, 46%, 1)" : "hsla(0, 0%, 69%, 1)",
-                                    display: "inline-block",
-                                    width: isDesktop ? "auto" : "31px",
-                                    height: isDesktop ? "auto" : "14px"
-                                }}
-                            >
-                                2-4 days
-                            </span>
+                            <span style={{ fontSize: "12px", fontWeight: 500, letterSpacing: "-0.04em" }}>2-4 days</span>
                         </div>
                     </div>
 
-                    <div
-                        className="flex items-center shrink-0"
-                        style={{
-                            width: isDesktop ? "209px" : "145px",
-                            height: isDesktop ? "28px" : "20px",
-                            gap: isDesktop ? "3px" : "3px",
-                            opacity: 1,
-                            marginTop: "-4px"
-                        }}
-                    >
-                        <span
-                            className="lowercase"
-                            style={{
-                                fontFamily: "'Mona Sans', sans-serif",
-                                fontSize: isDesktop ? "11px" : "10px",
-                                fontWeight: 500,
-                                color: "hsla(0, 0%, 33%, 1)",
-                                letterSpacing: "-0.01em",
-                                display: "inline-block",
-                                width: isDesktop ? "auto" : "25px",
-                                height: isDesktop ? "auto" : "14px",
-                                lineHeight: isDesktop ? "normal" : "14px"
-                            }}
-                        >
-                            from
-                        </span>
+                    <div className="flex items-center shrink-0" style={{ gap: "3px", marginTop: "-4px" }}>
+                        <span style={{ fontFamily: "'Mona Sans', sans-serif", fontSize: isDesktop ? "11px" : "10px", fontWeight: 500, color: "hsla(0, 0%, 33%, 1)", letterSpacing: "-0.01em" }}>from</span>
                         {product.originalPrice && (
-                            <span
-                                className="line-through decoration-[1.5px]"
-                                style={{
-                                    fontFamily: "'Mona Sans', sans-serif",
-                                    fontSize: isDesktop ? "16px" : "12px",
-                                    fontWeight: 600,
-                                    color: "hsla(0, 0%, 46%, 1)",
-                                    letterSpacing: "-0.04em",
-                                    display: "inline-block",
-                                    width: isDesktop ? "auto" : "45px",
-                                    height: isDesktop ? "auto" : "16px",
-                                    lineHeight: isDesktop ? "normal" : "16px"
-                                }}
-                            >
-                                ₹{product.originalPrice}
-                            </span>
+                            <span className="line-through decoration-[1.5px]" style={{ fontFamily: "'Mona Sans', sans-serif", fontSize: isDesktop ? "16px" : "12px", fontWeight: 600, color: "hsla(0, 0%, 46%, 1)", letterSpacing: "-0.04em" }}>₹{product.originalPrice}</span>
                         )}
-                        <span
-                            className="font-bold tracking-tight ml-1"
-                            style={{
-                                fontFamily: "'Mona Sans', sans-serif",
-                                fontSize: isDesktop ? "26px" : "16px",
-                                fontWeight: 600,
-                                color: "hsla(3, 100%, 56%, 1)",
-                                letterSpacing: isDesktop ? "-0.04em" : "-0.06em",
-                                lineHeight: isDesktop ? "normal" : "20px"
-                            }}
-                        >
-                            ₹{product.rentPrice}
-                        </span>
-                        <span
-                            className="lowercase"
-                            style={{
-                                fontFamily: "'Mona Sans', sans-serif",
-                                fontSize: isDesktop ? "11px" : "10px",
-                                fontWeight: 500,
-                                color: "hsla(0, 0%, 46%, 1)",
-                                letterSpacing: "-0.01em",
-                                display: "inline-block",
-                                width: isDesktop ? "auto" : "46px",
-                                height: isDesktop ? "auto" : "14px",
-                                lineHeight: isDesktop ? "normal" : "14px",
-                                marginLeft: "2px"
-                            }}
-                        >
-                            /month
-                        </span>
+                        <span className="font-bold tracking-tight ml-1" style={{ fontFamily: "'Mona Sans', sans-serif", fontSize: isDesktop ? "26px" : "16px", fontWeight: 600, color: "hsla(3, 100%, 56%, 1)", letterSpacing: isDesktop ? "-0.04em" : "-0.06em" }}>₹{product.rentPrice}</span>
+                        <span style={{ fontFamily: "'Mona Sans', sans-serif", fontSize: isDesktop ? "11px" : "10px", fontWeight: 500, color: "hsla(0, 0%, 46%, 1)", letterSpacing: "-0.01em", marginLeft: "2px" }}>/month</span>
                     </div>
 
-                    {/* Rent Now Button Entrance */}
-                    <div
-                        className="relative w-full z-30 overflow-hidden flex items-center transition-all duration-300 ease-out"
-                        style={{
-                            height: isHovered ? (isDesktop ? '50px' : '44px') : '0px',
-                            opacity: isHovered ? 1 : 0,
-                            paddingTop: isHovered ? '8px' : '0px'
-                        }}
-                    >
-                        <button
-                            onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleAddToCart(e, product); }}
-                            className="btn-primary w-full !h-full text-[14px] transform ease-out active:scale-95"
-                            style={{ transform: isHovered ? 'translateY(0)' : 'translateY(15px)' }}
-                        >
-                            Rent Now
-                        </button>
-                    </div>
+                    {/* Rent Now — slides in as card grows downward */}
+                    {isDesktop && (
+                        <div style={{ overflow: 'hidden', height: isHovered ? '43px' : '0px', opacity: isHovered ? 1 : 0, transition: 'height 0.28s ease, opacity 0.2s ease', display: 'flex', alignItems: 'flex-end' }}>
+                            <button
+                                onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleAddToCart(e, product); }}
+                                className="btn-primary w-full text-[14px] active:scale-95"
+                                style={{ height: '38px', borderRadius: '100px', flexShrink: 0 }}
+                            >
+                                Rent Now
+                            </button>
+                        </div>
+                    )}
                 </div>
             </motion.div>
         </div>
     );
 };
+
 
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation, Autoplay, Scrollbar } from 'swiper/modules';

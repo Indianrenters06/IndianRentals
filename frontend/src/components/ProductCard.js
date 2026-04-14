@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import { useRouter } from 'next/navigation';
 import { useDispatch } from 'react-redux';
 import { addToCart } from '../redux/features/cartSlice';
-import { Heart, Star, Truck, Info } from '@phosphor-icons/react';
+import { Heart, Star, Truck } from '@phosphor-icons/react';
 import Image from 'next/image';
 
 const ProductCard = ({ product }) => {
@@ -38,307 +38,172 @@ const ProductCard = ({ product }) => {
         setTimeout(() => setAdded(false), 2000);
     };
 
-    const handleQuickView = (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        router.push(`/products/${product.id}`);
-    };
+    const CARD_W = isMobile ? 170 : 285;
+    const CARD_H = isMobile ? 250 : 387;
+    const HOVER_H = isMobile ? 250 : 440;  // grows downward to reveal Rent Now
+    const LIFT    = isMobile ? 0   : 12;   // lifts upward
 
     return (
-        /* Card shell: fixed width, animated height */
+        /*
+         * Outer shell: FIXED size — grid/Swiper only sees this.
+         * overflow:visible so the card can grow beyond it without layout impact.
+         * The card overflows visually (up from lift, down from growth) but the
+         * shell's reserved space never changes → nothing below moves.
+         */
         <div
-            className={`group block relative mx-auto transition-transform duration-300 ease-out ${isHovered ? '-translate-y-4' : 'translate-y-0'}`}
+            style={{
+                width: `${CARD_W}px`,
+                height: `${CARD_H}px`,
+                position: 'relative',
+                flexShrink: 0,
+                cursor: 'pointer',
+                overflow: 'visible',    // ← lets card overflow without layout shift
+            }}
             onMouseEnter={() => setIsHovered(true)}
             onMouseLeave={() => setIsHovered(false)}
             onTouchStart={() => setIsHovered(true)}
-            style={{ width: isMobile ? "170px" : "285px" }}
+            onClick={() => router.push(`/products/${product.id}`)}
         >
+            {/* Card: lifts UP + grows DOWN to reveal Rent Now */}
             <motion.div
-                animate={isHovered ? "hover" : "initial"}
+                animate={isHovered ? 'hover' : 'initial'}
                 initial="initial"
-                className="bg-white flex flex-col overflow-hidden relative w-full"
+                className="absolute left-0 right-0 bg-white flex flex-col overflow-hidden rounded-[20px]"
                 style={{
-                    border: "1px solid hsla(0, 0%, 89%, 1)",
-                    borderRadius: "20px",
-                    backgroundColor: "hsla(0, 0%, 100%, 1)",
-                    cursor: "pointer",
-                    willChange: "transform, height"
+                    top: 0,
+                    border: '1px solid hsla(0, 0%, 89%, 1)',
+                    borderRadius: '20px',
+                    willChange: 'height, transform, box-shadow',
                 }}
                 variants={{
-                    initial: { 
-                        height: isMobile ? 250 : 387, 
-                        boxShadow: "0px 1px 2px 0px hsla(0, 0%, 0%, 0.05)"
+                    initial: {
+                        height: CARD_H,
+                        y: 0,
+                        boxShadow: '0px 1px 2px 0px hsla(0, 0%, 0%, 0.05)',
                     },
                     hover: {
-                        height: isMobile ? 250 : 440,
-                        boxShadow: "0px 10px 20px -4px hsla(0, 0%, 0%, 0.08)",
-                        transition: { duration: 0.3, ease: [0.45, 1.45, 0.8, 1] }
-                    }
+                        height: HOVER_H,           // grows to show Rent Now
+                        y: -LIFT,                  // lifts up
+                        boxShadow: '0px 16px 32px -8px hsla(0, 0%, 0%, 0.14)',
+                        transition: { duration: 0.3, ease: [0.33, 1, 0.68, 1] },
+                    },
                 }}
-                onClick={() => router.push(`/products/${product.id}`)}
             >
+                {/* ── Image area ── */}
                 <div
-                    className="relative bg-white group-hover:bg-[#F9F9F9] transition-colors duration-500 flex items-center justify-center overflow-hidden flex-shrink-0"
+                    className="relative flex items-center justify-center overflow-hidden flex-shrink-0"
                     style={{
-                        width: isMobile ? "170px" : "285px",
-                        height: isMobile ? "184px" : "282px",
-                        borderRadius: "20px",
-                        borderWidth: "0px 1px 1px 1px",
-                        borderStyle: "solid",
-                        borderColor: "hsla(0, 0%, 93%, 1)",
-                        backgroundColor: "hsla(0, 0%, 100%, 1)",
-                        opacity: 1,
-                        boxShadow: "0px 4px 8px 0px hsla(0, 0%, 87%, 0.1), 0px 15px 15px 0px hsla(0, 0%, 87%, 0.09), 0px 33px 20px 0px hsla(0, 0%, 87%, 0.05), 0px 59px 23px 0px hsla(0, 0%, 87%, 0.01), 0px 91px 26px 0px hsla(0, 0%, 87%, 0)"
+                        width: `${CARD_W}px`,
+                        height: isMobile ? 184 : 282,
+                        borderRadius: '20px',
+                        backgroundColor: isHovered ? 'hsla(0,0%,98%,1)' : 'hsla(0,0%,100%,1)',
+                        transition: 'background-color 0.4s',
+                        borderBottom: '1px solid hsla(0,0%,93%,1)',
                     }}
                 >
-                    <div
-                        className="absolute z-20 flex items-center"
-                        style={{
-                            top: !isMobile ? "14.57px" : "12.57px",
-                            left: !isMobile ? "14.49px" : "13.49px",
-                            gap: "4px",
-                            width: !isMobile ? "114px" : "92px",
-                            height: !isMobile ? "24px" : "28px"
-                        }}
-                    >
-                        <span className="text-xs leading-none flex items-center justify-center whitespace-nowrap"
-                            style={{
-                                width: "auto",
-                                minWidth: "45px",
-                                height: "24px",
-                                opacity: 1,
-                                borderRadius: "27px",
-                                paddingTop: "4px",
-                                paddingRight: "10px",
-                                paddingBottom: "4px",
-                                paddingLeft: "10px",
-                                background: "hsla(3, 86%, 51%, 1)",
-                                boxShadow: "0px 0px 1px 0px hsla(0, 0%, 47%, 0.1), 0px 1px 1px 0px hsla(0, 0%, 47%, 0.09), 0px 3px 2px 0px hsla(0, 0%, 47%, 0.05), 0px 5px 2px 0px hsla(0, 0%, 47%, 0.01), 0px 9px 2px 0px hsla(0, 0%, 47%, 0)",
-                                color: "hsla(4, 100%, 97%, 1)",
-                                fontFamily: "'Mona Sans', sans-serif",
-                                fontWeight: 600,
-                                letterSpacing: "0.02em"
-                            }}
-                        >
-                            {product.discount || "-20% off"}
+                    {/* Badges */}
+                    <div className="absolute z-20 flex items-center" style={{ top: isMobile ? '12px' : '14px', left: isMobile ? '13px' : '14px', gap: '4px' }}>
+                        <span style={{ minWidth: '45px', height: '24px', borderRadius: '27px', padding: '4px 10px', background: 'hsla(3, 86%, 51%, 1)', color: 'hsla(4,100%,97%,1)', fontFamily: "'Mona Sans', sans-serif", fontWeight: 600, fontSize: '10px', letterSpacing: '0.02em', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                            {product.discount || '−20% off'}
                         </span>
                         {(product.isNew || product.condition === 'New') && (
-                            <span
-                                className="text-white text-[10px] font-bold shadow-sm leading-none flex items-center justify-center h-full translate-x-1.5"
-                                style={{
-                                    width: "45px",
-                                    height: "24px",
-                                    paddingTop: "4px",
-                                    paddingRight: "10px",
-                                    paddingBottom: "4px",
-                                    paddingLeft: "10px",
-                                    borderRadius: "27px",
-                                    backgroundColor: "hsla(122, 100%, 35%, 1)",
-                                    boxShadow: "0px 0px 1px 0px hsla(0, 0%, 47%, 0.1), 0px 1px 1px 0px hsla(0, 0%, 47%, 0.09), 0px 3px 2px 0px hsla(0, 0%, 47%, 0.05), 0px 5px 2px 0px hsla(0, 0%, 47%, 0.01), 0px 9px 2px 0px hsla(0, 0%, 47%, 0)"
-                                }}
-                            >
+                            <span style={{ width: '45px', height: '24px', borderRadius: '27px', padding: '4px 10px', backgroundColor: 'hsla(122,100%,35%,1)', color: '#fff', fontWeight: 600, fontSize: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                                 New
                             </span>
                         )}
                     </div>
 
-                    {/* Heart Button — top-right */}
+                    {/* Heart */}
                     <button
-                        className="absolute z-20 flex items-center justify-center rounded-full shadow-sm hover:scale-110 transition-all duration-300"
-                        style={{
-                            width: "28px",
-                            height: "28px",
-                            top: isMobile ? "11px" : "10.57px",
-                            right: "12px",
-                            backgroundColor: "hsla(0,0%,100%,0.9)",
-                            border: "1px solid hsla(0, 0%, 89%, 1)",
-                            borderRadius: "9999px",
-                            boxShadow: "0px 2px 4px rgba(0,0,0,0.05)"
-                        }}
+                        className="absolute z-20 flex items-center justify-center rounded-full hover:scale-110 transition-all duration-300"
+                        style={{ width: '28px', height: '28px', top: '11px', right: '12px', backgroundColor: 'hsla(0,0%,100%,0.9)', border: '1px solid hsla(0,0%,89%,1)', boxShadow: '0 2px 4px rgba(0,0,0,0.05)' }}
                         onClick={(e) => { e.preventDefault(); e.stopPropagation(); }}
                     >
-                        <Heart size={15} color="#000000" weight="regular" />
+                        <Heart size={15} color="#000" weight="regular" />
                     </button>
 
-                    <div
-                        className="flex items-center justify-center w-full h-full"
-                    >
-                        <div
-                            className="relative transition-transform duration-700 ease-out group-hover:scale-105"
-                            style={{
-                                width: isMobile ? "140px" : "240px",
-                                height: isMobile ? "140px" : "220px"
-                            }}
-                        >
-                            <Image
-                                src={product.image}
-                                alt={product.name}
-                                fill
-                                className="object-contain mix-blend-multiply"
-                            />
-                        </div>
+                    {/* Product image */}
+                    <div style={{ width: isMobile ? 140 : 240, height: isMobile ? 140 : 220, position: 'relative', transform: isHovered ? 'scale(1.05)' : 'scale(1)', transition: 'transform 0.5s ease' }}>
+                        <Image src={product.image} alt={product.name} fill className="object-contain mix-blend-multiply" />
                     </div>
                 </div>
 
-                {/* ── Text Section ──────────────────────────────────────── */}
+                {/* ── Text area ── */}
                 <div
-                    className="flex flex-col font-sans bg-white shrink-0"
-                    style={{
-                        width: isMobile ? "170px" : "285px",
-                        height: isMobile ? 'auto' : (isHovered ? '158px' : '105px'),
-                        gap: isMobile ? "4px" : "8px",
-                        paddingTop: isMobile ? "4px" : "8px",
-                        paddingRight: isMobile ? "8px" : "12px",
-                        paddingBottom: isMobile ? "8px" : "12px",
-                        paddingLeft: isMobile ? "8px" : "12px",
-                        transition: 'height 0.3s ease'
-                    }}
+                    className="flex flex-col font-sans bg-white"
+                    style={{ padding: isMobile ? '4px 8px 8px' : '8px 12px 12px', gap: isMobile ? '4px' : '8px' }}
                 >
-                    {/* Product Name */}
                     <h3
-                        className="line-clamp-1 group-hover:text-[#FF3B30] transition-colors duration-300 shrink-0 font-sans"
-                        style={{
-                            width: isMobile ? "261px" : "261px",
-                            height: isMobile ? "23px" : "25px",
-                            fontSize: isMobile ? "16px" : "18px",
-                            fontWeight: 600,
-                            lineHeight: isMobile ? "23px" : "25px",
-                            letterSpacing: isMobile ? "-0.4px" : "-0.4px",
-                            color: "hsla(0, 0%, 16%, 1)"
-                        }}
+                        className="line-clamp-1"
+                        style={{ fontSize: isMobile ? '16px' : '18px', fontWeight: 600, lineHeight: isMobile ? '23px' : '25px', letterSpacing: '-0.4px', color: isHovered ? 'hsla(3,100%,56%,1)' : 'hsla(0,0%,16%,1)', transition: 'color 0.3s' }}
                     >
                         {product.name}
                     </h3>
 
-                    {/* Rating + Delivery */}
-                    <div
-                        className="flex items-center justify-between shrink-0"
-                        style={{ width: isMobile ? "154px" : "261px", height: "16px" }}
-                    >
+                    <div className="flex items-center justify-between" style={{ height: '16px' }}>
                         <div className="flex items-center gap-1">
                             <div className="flex text-[#FF9500]">
-                                {isMobile ? (
-                                    <Star size={12} weight="fill" />
-                                ) : (
-                                    [1, 2, 3, 4, 5].map((s) => (
-                                        <Star key={s} size={14} weight="fill" className={s <= Math.round(product.rating || 4) ? "" : "opacity-20"} />
-                                    ))
-                                )}
+                                {isMobile
+                                    ? <Star size={12} weight="fill" />
+                                    : [1,2,3,4,5].map(s => <Star key={s} size={14} weight="fill" className={s <= Math.round(product.rating || 4) ? '' : 'opacity-20'} />)
+                                }
                             </div>
-                            <span
-                                className="ml-1"
-                                style={{
-                                    fontFamily: "'Mona Sans', sans-serif",
-                                    fontSize: "11px",
-                                    fontWeight: 500,
-                                    color: "hsla(0, 0%, 33%, 1)",
-                                    letterSpacing: "-0.01em"
-                                }}
-                            >
-                                {product.rating || "4.5"} ({product.reviewCount || 12})
+                            <span style={{ fontFamily: "'Mona Sans',sans-serif", fontSize: '11px', fontWeight: 500, color: 'hsla(0,0%,33%,1)', letterSpacing: '-0.01em', marginLeft: '4px' }}>
+                                {product.rating || '4.5'} ({product.reviewCount || 12})
                             </span>
                         </div>
-                        <div className="flex items-center gap-1.5" style={{ color: "hsla(0, 0%, 46%, 1)" }}>
+                        <div className="flex items-center gap-1.5" style={{ color: 'hsla(0,0%,46%,1)' }}>
                             <Truck size={isMobile ? 14 : 16} weight="regular" />
-                            <span
-                                className="'Mona Sans', sans-serif"
-                                style={{
-                                    fontSize: "12px",
-                                    fontWeight: 500,
-                                    lineHeight: "120%",
-                                    letterSpacing: "-0.04em"
-                                }}
-                            >
-                                2-4 days
-                            </span>
-
+                            <span style={{ fontSize: '12px', fontWeight: 500, letterSpacing: '-0.04em' }}>2-4 days</span>
                         </div>
                     </div>
 
-                    {/* Price row */}
-                    <div
-                        className="flex items-center shrink-0"
-                        style={{
-                            width: isMobile ? "261px" : "209px",
-                            height: isMobile ? "24px" : "28px",
-                            gap: isMobile ? "8px" : "3px",
-                            marginTop: "-4px"
-                        }}
-                    >
-                        <span
-                            className="lowercase"
-                            style={{
-                                fontFamily: "'Mona Sans', sans-serif",
-                                fontSize: "11px",
-                                fontWeight: 500,
-                                color: "hsla(0, 0%, 0%, 1)",
-                                letterSpacing: "-0.01em"
-                            }}
-                        >
-                            from
-                        </span>
+                    <div className="flex items-center" style={{ gap: isMobile ? '8px' : '3px', marginTop: '-4px' }}>
+                        <span style={{ fontFamily: "'Mona Sans',sans-serif", fontSize: '11px', fontWeight: 500, color: 'hsla(0,0%,0%,1)', letterSpacing: '-0.01em' }}>from</span>
                         {product.originalPrice && (
-                            <span
-                                className="line-through decoration-[1.5px]"
-                                style={{
-                                    fontFamily: "'Mona Sans', sans-serif",
-                                    fontSize: isMobile ? "13px" : "16px",
-                                    fontWeight: 600,
-                                    color: "hsla(0, 0%, 46%, 1)",
-                                    letterSpacing: "-0.04em"
-                                }}
-                            >
+                            <span className="line-through decoration-[1.5px]" style={{ fontFamily: "'Mona Sans',sans-serif", fontSize: isMobile ? '13px' : '16px', fontWeight: 600, color: 'hsla(0,0%,46%,1)', letterSpacing: '-0.04em' }}>
                                 ₹{product.originalPrice}
                             </span>
                         )}
-                        <span
-                            className="font-bold tracking-tight ml-1 leading-none"
-                            style={{
-                                fontFamily: "'Mona Sans', sans-serif",
-                                fontSize: isMobile ? "20px" : "26px",
-                                fontWeight: 600,
-                                color: "hsla(3, 100%, 56%, 1)",
-                                letterSpacing: "-0.04em"
-                            }}
-                        >
+                        <span style={{ fontFamily: "'Mona Sans',sans-serif", fontSize: isMobile ? '20px' : '26px', fontWeight: 600, color: 'hsla(3,100%,56%,1)', letterSpacing: '-0.04em', marginLeft: '4px' }}>
                             ₹{product.rentPrice}
                         </span>
-                        <span
-                            className="lowercase"
-                            style={{
-                                fontFamily: "'Mona Sans', sans-serif",
-                                fontSize: "11px",
-                                fontWeight: 500,
-                                color: "hsla(0, 0%, 24%, 1)",
-                                letterSpacing: "-0.01em",
-                                marginLeft: "2px"
-                            }}
-                        >
-                            /month
-                        </span>
+                        <span style={{ fontFamily: "'Mona Sans',sans-serif", fontSize: '11px', fontWeight: 500, color: 'hsla(0,0%,24%,1)', letterSpacing: '-0.01em', marginLeft: '2px' }}>/month</span>
                     </div>
 
-                    {/* Rent Now Button Entrance */}
-                    <div
-                        className="relative w-full z-30 overflow-hidden flex items-center justify-center transition-all duration-300 ease-out"
-                        style={{
-                            height: isHovered ? '43px' : '0px',
-                            opacity: isHovered ? 1 : 0,
-                            paddingTop: isHovered ? '8px' : '0px'
-                        }}
-                    >
-                        <button
-                            onClick={handleAddToCart}
-                            className="inline-flex items-center justify-center gap-0.5 rounded-full border-b border-black/5 bg-[hsla(44,100%,64%,1)] text-[#1D1D1F] font-medium text-sm py-[6px] px-5 opacity-100 shadow-sm active:scale-95 hover:border-b-2 hover:rounded-4xl hover:bg-[hsla(42,100%,55%,1)] transition-all duration-300 ease-out"
+                    {/* Rent Now — slides in as card grows downward */}
+                    {!isMobile && (
+                        <div
                             style={{
-                                width: isMobile ? '100%' : '111px',
-                                height: '35px',
-                                transform: isHovered ? 'translateY(0)' : 'translateY(15px)'
+                                overflow: 'hidden',
+                                height: isHovered ? '43px' : '0px',
+                                opacity: isHovered ? 1 : 0,
+                                transition: 'height 0.28s ease, opacity 0.2s ease',
+                                display: 'flex',
+                                alignItems: 'flex-end',
                             }}
                         >
-                            {added ? 'Added!' : 'Rent Now'}
-                        </button>
-                    </div>
+                            <button
+                                onClick={handleAddToCart}
+                                className="w-full active:scale-95 transition-transform"
+                                style={{
+                                    height: '38px',
+                                    borderRadius: '100px',
+                                    background: 'hsla(44,100%,64%,1)',
+                                    border: '1px solid rgba(0,0,0,0.07)',
+                                    fontFamily: "'Mona Sans',sans-serif",
+                                    fontWeight: 600,
+                                    fontSize: '14px',
+                                    color: '#1D1D1F',
+                                    cursor: 'pointer',
+                                    boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
+                                    flexShrink: 0,
+                                }}
+                            >
+                                {added ? 'Added!' : 'Rent Now'}
+                            </button>
+                        </div>
+                    )}
                 </div>
             </motion.div>
         </div>
@@ -346,4 +211,3 @@ const ProductCard = ({ product }) => {
 };
 
 export default ProductCard;
-
