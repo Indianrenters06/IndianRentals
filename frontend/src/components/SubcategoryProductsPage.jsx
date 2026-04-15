@@ -129,7 +129,7 @@ export default function SubcategoryProductsPage({ subcategoryId, subcategoryName
     return (
         <div className="min-h-screen bg-white">
             {/* Breadcrumbs Bar */}
-            <div className="px-4 py-4 max-w-[1248px] mx-auto sm:px-6 lg:px-8">
+            <div className="px-4 md:px-8 max-w-[1200px] mx-auto py-4">
                 <div className="flex items-center gap-3">
                     <button onClick={() => router.back()} className="p-1 hover:bg-gray-100 rounded-full transition-colors">
                         <FaArrowLeft size={18} className="text-gray-800" />
@@ -148,10 +148,9 @@ export default function SubcategoryProductsPage({ subcategoryId, subcategoryName
             {subcategories.length > 0 && (
                 <div className="bg-white border-b border-[hsla(0,0%,93%,1)] pb-8 mb-4 shadow-sm relative z-10 w-full overflow-hidden flex justify-center">
                     {/* Outer Container for Slider */}
-                    <div 
-                        className="relative mx-auto group/subslider flex items-center"
+                    <div
+                        className="relative mx-auto group/subslider flex items-center max-w-[1200px] w-full px-4 md:px-8"
                         style={{
-                            width: '1200px',
                             height: '167px',
                             paddingTop: '20px',
                             gap: '24px'
@@ -160,9 +159,8 @@ export default function SubcategoryProductsPage({ subcategoryId, subcategoryName
                         {/* Inner Container for Slider */}
                         <div
                             id="subcat-slider-dynamic"
-                            className="flex overflow-x-auto scrollbar-hide snap-x snap-mandatory scroll-smooth"
+                            className="flex overflow-x-auto scrollbar-hide snap-x snap-mandatory scroll-smooth w-full"
                             style={{
-                                width: '1200px',
                                 height: '147px',
                                 gap: '16px',
                                 msOverflowStyle: 'none',
@@ -178,8 +176,8 @@ export default function SubcategoryProductsPage({ subcategoryId, subcategoryName
                                         href={sub.href}
                                         className="group flex flex-col outline-none shrink-0 snap-start"
                                         style={{
-                                            height: '147.09px',
-                                            width: '157.71px',
+                                            height: '147px',
+                                            width: '176px', // 6 items * 176px + 5 gaps * 16px = 1136px
                                             boxSizing: 'border-box',
                                             gap: '7px',
                                             textDecoration: 'none'
@@ -230,17 +228,16 @@ export default function SubcategoryProductsPage({ subcategoryId, subcategoryName
             )}
 
             {/* Main Content Area */}
-            <div 
-                className="mx-auto flex" 
-                style={{ 
-                    maxWidth: '1200px', 
-                    paddingTop: '40px', 
+            <div
+                className="mx-auto flex max-w-[1200px] w-full px-4 md:px-8"
+                style={{
+                    paddingTop: '40px',
                     paddingBottom: '40px',
                     gap: '30px',
                     minHeight: '2091px'
                 }}
             >
-                <Sidebar 
+                <Sidebar
                     selectedDuration={selectedDuration}
                     setSelectedDuration={setSelectedDuration}
                     selectedSort={selectedSort}
@@ -248,9 +245,9 @@ export default function SubcategoryProductsPage({ subcategoryId, subcategoryName
                 />
 
                 <div className="flex-1">
-                    <h1 
+                    <h1
                         className="text-[48px] font-bold text-[#1D1D1F] mb-10"
-                        style={{ 
+                        style={{
                             fontFamily: "'Mona Sans', sans-serif",
                             lineHeight: '58px',
                             letterSpacing: '-0.02em'

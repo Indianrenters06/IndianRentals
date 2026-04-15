@@ -117,7 +117,7 @@
 /* Button Design System (from configuration) */
 @layer components {
   .btn-primary {
-    @apply px-[20px] py-[6px] rounded-full border-b border-black/10 font-medium transition-all duration-300 flex items-center justify-center whitespace-nowrap;
+    @apply px-[20px] py-[6px] rounded-full font-medium transition-all duration-300 flex items-center justify-center whitespace-nowrap;
     background-color: var(--color-orange-300);
     color: #1D1D1F;
   }
@@ -178,7 +178,7 @@
   }
 
   .btn-accent {
-    @apply px-[20px] py-[6px] rounded-full border-b border-black/20 font-medium transition-all duration-300 flex items-center justify-center whitespace-nowrap;
+    @apply px-[20px] py-[6px] rounded-full font-medium transition-all duration-300 flex items-center justify-center whitespace-nowrap;
     background-color: var(--color-blue-500);
     color: white;
   }

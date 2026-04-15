@@ -3,7 +3,7 @@ import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { Heart, Star, Lightning, Truck, Info } from "@phosphor-icons/react";
 import { motion } from "framer-motion";
-import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/outline";
+import { ChevronLeftIcon, ChevronRightIcon, HeartIcon } from "@heroicons/react/24/outline";
 
 import { API } from "@/services/apiConfig";
 
@@ -15,10 +15,10 @@ const ProductCard = ({ product, index, isDesktop, handleAddToCart }) => {
     const [isHovered, setIsHovered] = useState(false);
     const router = useRouter();
 
-    const CARD_W  = isDesktop ? 285 : 170;
-    const CARD_H  = isDesktop ? 387 : 256;
+    const CARD_W = isDesktop ? 285 : 170;
+    const CARD_H = isDesktop ? 387 : 256;
     const HOVER_H = isDesktop ? 440 : 256;
-    const LIFT    = isDesktop ? 12  : 0;
+    const LIFT = isDesktop ? 12 : 0;
 
     return (
         /*
@@ -93,10 +93,10 @@ const ProductCard = ({ product, index, isDesktop, handleAddToCart }) => {
 
                     <button
                         className="absolute z-20 flex items-center justify-center rounded-full hover:scale-110 transition-all duration-300"
-                        style={{ width: "24px", height: "24px", top: "10.57px", right: "12.51px", backgroundColor: "hsla(0, 0%, 96%, 1)", border: "0.2px solid hsla(0, 0%, 80%, 1)", borderRadius: "100%", padding: "2.25px" }}
+                        style={{ width: "36px", height: "36px", top: "10.57px", right: "12.51px", backgroundColor: "hsla(0, 0%, 96%, 1)", border: "0.2px solid hsla(0, 0%, 80%, 1)", borderRadius: "100%", padding: "4px" }}
                         onClick={(e) => { e.preventDefault(); e.stopPropagation(); }}
                     >
-                        <Heart size={19.5} color="#000000" weight="thin" />
+                        <HeartIcon className="w-[32px] h-[32px] text-black" strokeWidth={1} />
                     </button>
 
                     <div className="relative w-full h-full p-4 flex items-center justify-center">
@@ -126,17 +126,17 @@ const ProductCard = ({ product, index, isDesktop, handleAddToCart }) => {
                     <div className="flex items-center justify-between shrink-0" style={{ height: "16px" }}>
                         <div className="flex items-center gap-1">
                             <div className="flex text-[#FF9500]">
-                                {isDesktop ? ([1,2,3,4,5].map(s => <Star key={s} size={14} weight="fill" className={s <= Math.round(product.rating || 4) ? "" : "opacity-20"} />)) : (<Star size={12} weight="fill" />)}
+                                {isDesktop ? ([1, 2, 3, 4, 5].map(s => <Star key={s} size={14} weight="fill" className={s <= Math.round(product.rating || 4) ? "" : "opacity-20"} />)) : (<Star size={12} weight="fill" />)}
                             </div>
                             <span className="ml-1" style={{ fontFamily: "'Mona Sans', sans-serif", fontSize: "11px", fontWeight: 500, color: "hsla(0, 0%, 33%, 1)", letterSpacing: "-0.01em" }}>
                                 {product.rating || "4.5"} ({product.reviews || 12})
                             </span>
                         </div>
-                        <div className="flex items-center gap-1.5" style={{ color: "hsla(0, 0%, 46%, 1)" }}>
+                        <div className="flex items-center gap-1.5" style={{ color: "hsla(0, 0%, 65%, 1)" }}>
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-[16px] h-[16px]">
                                 <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 18.75a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 0 1-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m3 0h1.125c.621 0 1.129-.504 1.09-1.124a17.902 17.902 0 0 0-3.213-9.193 2.056 2.056 0 0 0-1.58-.86H14.25M16.5 18.75h-2.25m0-11.177v-.958c0-.568-.422-1.048-.987-1.106a48.554 48.554 0 0 0-10.026 0 1.106 1.106 0 0 0-.987 1.106v7.635m12-6.677v6.677m0 4.5v-4.5m0 0h-12" />
                             </svg>
-                            <span style={{ fontSize: "12px", fontWeight: 500, letterSpacing: "-0.04em" }}>2-4 days</span>
+                            <span style={{ fontSize: "12px", fontWeight: 400, letterSpacing: "-0.04em" }}>2-4 days</span>
                         </div>
                     </div>
 

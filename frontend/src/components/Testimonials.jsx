@@ -157,12 +157,12 @@ const Testimonials = () => {
                     paddingBottom: viewType === 'desktop' ? '96px' : (viewType === 'tablet' ? '96px' : '48px'),
                     paddingLeft: viewType === 'desktop' ? '24px' : (viewType === 'tablet' ? '30px' : '20px'),
                     paddingRight: viewType === 'desktop' ? '24px' : (viewType === 'tablet' ? '30px' : '20px'),
-                    gap: viewType === 'desktop' ? '32px' : (viewType === 'tablet' ? '24px' : '10px')
+                    gap: viewType === 'desktop' ? '24px' : (viewType === 'tablet' ? '16px' : '10px')
                 }}
             >
 
                 <div
-                    className="w-full flex font-sans mb-10 gap-6"
+                    className="w-full flex font-sans mb-2 gap-6"
                     style={{
                         flexDirection: viewType === 'desktop' ? 'row' : 'column',
                         alignItems: viewType === 'desktop' ? 'flex-end' : 'flex-start',

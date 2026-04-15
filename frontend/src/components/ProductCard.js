@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation';
 import { useDispatch } from 'react-redux';
 import { addToCart } from '../redux/features/cartSlice';
 import { Heart, Star, Truck } from '@phosphor-icons/react';
+import { HeartIcon } from '@heroicons/react/24/outline';
 import Image from 'next/image';
 
 const ProductCard = ({ product }) => {
@@ -116,10 +117,10 @@ const ProductCard = ({ product }) => {
                     {/* Heart */}
                     <button
                         className="absolute z-20 flex items-center justify-center rounded-full hover:scale-110 transition-all duration-300"
-                        style={{ width: '28px', height: '28px', top: '11px', right: '12px', backgroundColor: 'hsla(0,0%,100%,0.9)', border: '1px solid hsla(0,0%,89%,1)', boxShadow: '0 2px 4px rgba(0,0,0,0.05)' }}
+                        style={{ width: '36px', height: '36px', top: '11px', right: '12px', backgroundColor: 'hsla(0,0%,96%,1)', border: '0.2px solid hsla(0,0%,80%,1)', borderRadius: '100%', padding: '4px' }}
                         onClick={(e) => { e.preventDefault(); e.stopPropagation(); }}
                     >
-                        <Heart size={15} color="#000" weight="regular" />
+                        <HeartIcon className="w-[32px] h-[32px] text-black" strokeWidth={1} />
                     </button>
 
                     {/* Product image */}
@@ -152,9 +153,9 @@ const ProductCard = ({ product }) => {
                                 {product.rating || '4.5'} ({product.reviewCount || 12})
                             </span>
                         </div>
-                        <div className="flex items-center gap-1.5" style={{ color: 'hsla(0,0%,69%,1)' }}>
+                        <div className="flex items-center gap-1.5" style={{ color: 'hsla(0,0%,65%,1)' }}>
                             <Truck size={isMobile ? 14 : 16} weight="regular" />
-                            <span style={{ fontSize: '12px', fontWeight: 500, letterSpacing: '-0.04em' }}>2-4 days</span>
+                            <span style={{ fontSize: '12px', fontWeight: 400, letterSpacing: '-0.04em' }}>2-4 days</span>
                         </div>
                     </div>
 

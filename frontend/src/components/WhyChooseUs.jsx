@@ -71,16 +71,10 @@ const WhyChooseUs = () => {
                                 style={{
                                     fontFamily: "'Mona Sans', sans-serif",
                                     fontWeight: 600,
-                                    fontSize: viewType === 'mobile' ? '36px' : '36px',
-                                    lineHeight: viewType === 'mobile' ? '31px' : '40px',
+                                    fontSize: '36px',
+                                    lineHeight: '48px',
                                     letterSpacing: '-0.02em',
                                     color: 'hsla(0, 0%, 20%, 1)',
-                                    ...(viewType === 'mobile' ? {
-                                        width: '192px',
-                                        height: '31px',
-                                        whiteSpace: 'nowrap',
-                                        overflow: 'hidden'
-                                    } : {})
                                 }}
                             >
                                 {title}
