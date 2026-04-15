@@ -4,7 +4,8 @@ import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation, Autoplay, Scrollbar } from 'swiper/modules';
 import Link from 'next/link';
 import Image from 'next/image';
-import { Laptop, Camera, Desktop, DeviceTablet, DeviceMobile, ArrowRight, CaretLeft, CaretRight } from '@phosphor-icons/react';
+import { Laptop, Camera, Desktop, DeviceTablet, DeviceMobile, ArrowRight } from '@phosphor-icons/react';
+import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/outline';
 import { getCategories } from '../services/categoryService';
 
 // Import Swiper styles
@@ -285,14 +286,14 @@ const RentByCategory = () => {
                                 style={{ opacity: 1 }}
                                 aria-label="Previous"
                             >
-                                <CaretLeft size={18} weight="regular" className="text-gray-800 group-hover:text-white transition-colors duration-200" />
+                                <ChevronLeftIcon className="w-[18px] h-[18px] text-gray-800 group-hover:text-white transition-colors duration-200" />
                             </button>
                             <button
                                 className="swiper-next-cat group w-[34px] h-[34px] rounded-[69px] flex items-center justify-center bg-[hsla(0,0%,93%,1)] hover:bg-[hsla(0,0%,20%,1)] transition-all"
                                 style={{ opacity: 1 }}
                                 aria-label="Next"
                             >
-                                <CaretRight size={18} weight="regular" className="text-gray-800 group-hover:text-white transition-colors duration-200" />
+                                <ChevronRightIcon className="w-[18px] h-[18px] text-gray-800 group-hover:text-white transition-colors duration-200" />
                             </button>
                         </div>
                     </div>

@@ -4,7 +4,8 @@ import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { User, MapPin, ArrowRight, CaretLeft, Heart, ShoppingCartSimple, List, MagnifyingGlass, X, CaretDown, SignOut, NavigationArrow } from "@phosphor-icons/react";
+import { User, MapPin, ArrowRight, Heart, ShoppingCartSimple, List, MagnifyingGlass, X, CaretDown, SignOut, NavigationArrow } from "@phosphor-icons/react";
+import { ChevronLeftIcon } from "@heroicons/react/24/outline";
 import { motion, AnimatePresence } from "framer-motion";
 import AuthModal from "./AuthModal";
 import { useSelector } from "react-redux";
@@ -356,7 +357,7 @@ const Navbar = () => {
                                                             fontWeight: 600,
                                                         }}
                                                     >
-                                                        <CaretLeft size={10} weight="bold" />
+                                                        <ChevronLeftIcon className="w-[10px] h-[10px]" strokeWidth={3} />
                                                         Back
                                                     </button>
                                                 </div>

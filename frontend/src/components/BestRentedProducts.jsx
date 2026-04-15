@@ -3,6 +3,7 @@ import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { Heart, Star, Lightning, Truck, Info } from "@phosphor-icons/react";
 import { motion } from "framer-motion";
+import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/outline";
 
 import { API } from "@/services/apiConfig";
 
@@ -351,17 +352,13 @@ const BestRentedProducts = ({ type = "bestRented", defaultTitle = "Curated Produ
                                 className={`swiper-prev-${sectionSuffix} w-10 h-10 rounded-full bg-white border border-gray-200 shadow-sm flex items-center justify-center hover:shadow-md hover:border-gray-300 transition-all group`}
                                 aria-label="Previous"
                             >
-                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" className="text-gray-400 group-hover:text-gray-800 transition-colors">
-                                    <path d="M15 18L9 12L15 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                                </svg>
+                                <ChevronLeftIcon className="w-5 h-5 text-gray-400 group-hover:text-gray-800 transition-colors" />
                             </button>
                             <button
                                 className={`swiper-next-${sectionSuffix} w-10 h-10 rounded-full bg-white border border-gray-200 shadow-sm flex items-center justify-center hover:shadow-md hover:border-gray-300 transition-all group`}
                                 aria-label="Next"
                             >
-                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" className="text-gray-400 group-hover:text-gray-800 transition-colors">
-                                    <path d="M9 18L15 12L9 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                                </svg>
+                                <ChevronRightIcon className="w-5 h-5 text-gray-400 group-hover:text-gray-800 transition-colors" />
                             </button>
                         </div>
                     </div>

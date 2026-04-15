@@ -2,7 +2,8 @@ import React, { useState, useEffect, useCallback } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
-import { CaretLeft, CaretRight, Heart, Star, Truck, Info } from '@phosphor-icons/react';
+import { Heart, Star, Truck, Info } from '@phosphor-icons/react';
+import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/outline';
 import { useDispatch } from 'react-redux';
 import { addToCart } from '../redux/features/cartSlice';
 import { useRouter } from 'next/navigation';
@@ -112,7 +113,7 @@ const BannerCarousel = ({ banners, current, setCurrent, height = "387px", produc
                                 className="group flex items-center justify-center rounded-full bg-[hsla(0,0%,96%,1)] hover:bg-[hsla(0,0%,20%,1)] hover:scale-110 transition-all duration-200 shrink-0"
                                 style={{ width: "24px", height: "24px", padding: "2.25px" }}
                             >
-                                <CaretLeft size={19.5} weight="bold" className="text-[#1D1D1F] group-hover:text-white transition-colors duration-200" />
+                                <ChevronLeftIcon className="w-[19.5px] h-[19.5px] text-[#1D1D1F] group-hover:text-white transition-colors duration-200" />
                             </button>
                             <h3 className="text-white text-[24px] font-bold tracking-tight text-center" style={{ fontFamily: "'Mona Sans', sans-serif" }}>
                                 {slide.title}
@@ -122,7 +123,7 @@ const BannerCarousel = ({ banners, current, setCurrent, height = "387px", produc
                                 className="group flex items-center justify-center rounded-full bg-[hsla(0,0%,96%,1)] hover:bg-[hsla(0,0%,20%,1)] hover:scale-110 transition-all duration-200 shrink-0"
                                 style={{ width: "24px", height: "24px", padding: "2.25px" }}
                             >
-                                <CaretRight size={19.5} weight="bold" className="text-[#1D1D1F] group-hover:text-white transition-colors duration-200" />
+                                <ChevronRightIcon className="w-[19.5px] h-[19.5px] text-[#1D1D1F] group-hover:text-white transition-colors duration-200" />
                             </button>
                         </div>
                         <p className="text-white/80 text-[14px] font-medium leading-tight text-center">

@@ -2,7 +2,7 @@
 import React, { useRef } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation, Autoplay, Pagination } from "swiper/modules";
-import { CaretRight, CaretLeft } from "@phosphor-icons/react";
+import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/outline";
 import "swiper/css";
 import "swiper/css/pagination";
 
@@ -99,18 +99,14 @@ const ClientSection = () => {
                         style={{ opacity: 1 }}
                         ref={prevRef}
                     >
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-5 text-gray-800 group-hover:text-white transition-colors duration-200 mr-[2px] transform rotate-180">
-                            <path strokeLinecap="round" strokeLinejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" />
-                        </svg>
+                        <ChevronLeftIcon className="w-5 h-5 text-gray-800 group-hover:text-white transition-colors duration-200" />
                     </button>
                     <button
                         className="client-next group absolute right-0 top-[140px] -translate-y-1/2 translate-x-[calc(100%+12px)] z-10 w-[26px] h-[40px] rounded-[9px] flex items-center justify-center bg-[hsla(0,0%,93%,1)] hover:bg-[hsla(0,0%,20%,1)] hover:scale-110 active:scale-95 shadow-sm hover:shadow-md transition-all"
                         style={{ opacity: 1 }}
                         ref={nextRef}
                     >
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-5 text-gray-800 group-hover:text-white transition-colors duration-200 ml-[2px]">
-                            <path strokeLinecap="round" strokeLinejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" />
-                        </svg>
+                        <ChevronRightIcon className="w-5 h-5 text-gray-800 group-hover:text-white transition-colors duration-200" />
                     </button>
                 </div>
             </div>
