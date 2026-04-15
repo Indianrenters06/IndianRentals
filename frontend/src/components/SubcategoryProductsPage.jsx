@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { FaArrowLeft } from 'react-icons/fa';
 import { FiPackage } from 'react-icons/fi';
+import { ChevronRightIcon } from '@heroicons/react/24/outline';
 import { getProductsBySubcategory, getProducts } from '../services/productService';
 import ProductCard from './ProductCard';
 import Sidebar from './Sidebar';
@@ -144,10 +145,9 @@ export default function SubcategoryProductsPage({ subcategoryId, subcategoryName
                 </div>
             </div>
 
-            {/* Subcategory Slider Navigation (Top Level of Page Layout) */}
+            {/* Subcategory Slider Navigation */}
             {subcategories.length > 0 && (
-                <div className="bg-white border-b border-[hsla(0,0%,93%,1)] pb-8 mb-4 shadow-sm relative z-10 w-full overflow-hidden flex justify-center">
-                    {/* Outer Container for Slider */}
+                <div className="bg-white relative z-10">
                     <div
                         className="relative mx-auto group/subslider flex items-center max-w-[1200px] w-full px-4 md:px-8"
                         style={{
@@ -156,10 +156,9 @@ export default function SubcategoryProductsPage({ subcategoryId, subcategoryName
                             gap: '24px'
                         }}
                     >
-                        {/* Inner Container for Slider */}
                         <div
                             id="subcat-slider-dynamic"
-                            className="flex overflow-x-auto scrollbar-hide snap-x snap-mandatory scroll-smooth w-full"
+                            className="flex overflow-x-auto snap-x snap-mandatory scroll-smooth w-full"
                             style={{
                                 height: '147px',
                                 gap: '16px',
@@ -176,21 +175,24 @@ export default function SubcategoryProductsPage({ subcategoryId, subcategoryName
                                         href={sub.href}
                                         className="group flex flex-col outline-none shrink-0 snap-start"
                                         style={{
-                                            height: '147px',
-                                            width: '176px', // 6 items * 176px + 5 gaps * 16px = 1136px
+                                            height: '147.09px',
+                                            width: '157.71px',
                                             boxSizing: 'border-box',
                                             gap: '7px',
                                             textDecoration: 'none'
                                         }}
                                     >
                                         <div
-                                            className="bg-white border rounded-lg flex items-center justify-center overflow-hidden transition-all duration-300"
+                                            className="rounded-lg flex items-center justify-center overflow-hidden transition-all duration-300"
                                             style={{
-                                                height: '120px',
+                                                height: '120.09px',
                                                 width: '100%',
                                                 boxSizing: 'border-box',
-                                                borderColor: isSubActive ? 'hsla(44,100%,64%,1)' : 'hsla(0,0%,93%,1)',
-                                                backgroundColor: isSubActive ? 'hsla(43,100%,95%,1)' : 'white'
+                                                border: isSubActive
+                                                    ? '2px solid hsla(47, 100%, 76%, 1)'
+                                                    : '2px solid hsla(0, 0%, 93%, 1)',
+                                                backgroundColor: isSubActive ? 'hsla(43,100%,95%,1)' : 'hsla(0, 0%, 100%, 1)',
+                                                boxShadow: '0px 1px 3px 0px hsla(0, 0%, 87%, 0.08), 0px 6px 6px 0px hsla(0, 0%, 87%, 0.07), 0px 13px 8px 0px hsla(0, 0%, 87%, 0.04), 0px 23px 9px 0px hsla(0, 0%, 87%, 0.01), 0px 36px 10px 0px hsla(0, 0%, 87%, 0)',
                                             }}
                                         >
                                             <div className={`w-[100px] h-[100px] relative transform transition-transform duration-500 ${isSubActive ? 'scale-105' : 'group-hover:scale-105'}`}>
@@ -216,11 +218,16 @@ export default function SubcategoryProductsPage({ subcategoryId, subcategoryName
                                     const slider = document.getElementById('subcat-slider-dynamic');
                                     if (slider) slider.scrollBy({ left: 300, behavior: 'smooth' });
                                 }}
-                                className="absolute right-[-16px] top-[50%] translate-y-[-50%] w-[32px] h-[32px] rounded-lg bg-[hsla(0,0%,93%,1)] flex items-center justify-center shadow-md hover:bg-[hsla(0,0%,20%,1)] group/caret transition-all z-10 hidden md:flex"
+                                className="absolute right-0 top-[50%] translate-y-[-50%] flex items-center justify-center group/caret transition-all z-10 hidden md:flex hover:brightness-95 active:scale-95"
+                                style={{
+                                    width: '26px',
+                                    height: '40px',
+                                    borderRadius: '9px',
+                                    background: 'hsla(0, 0%, 93%, 1)',
+                                    boxShadow: '0px 0px 1px 0px hsla(0, 0%, 58%, 0.31), 0px 0px 1px 0px hsla(0, 0%, 58%, 0.18), 0px 0px 1px 0px hsla(0, 0%, 58%, 0.05), 0px 0px 1px 0px hsla(0, 0%, 58%, 0.01)',
+                                }}
                             >
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-gray-600 group-hover/caret:text-white transition-colors">
-                                    <polyline points="9 18 15 12 9 6"></polyline>
-                                </svg>
+                                <ChevronRightIcon className="w-4 h-4 text-gray-600 transition-colors" strokeWidth={2} />
                             </button>
                         )}
                     </div>
@@ -229,7 +236,7 @@ export default function SubcategoryProductsPage({ subcategoryId, subcategoryName
 
             {/* Main Content Area */}
             <div
-                className="mx-auto flex max-w-[1200px] w-full px-4 md:px-8"
+                className="mx-auto flex flex-col max-w-[1200px] w-full px-4 md:px-8"
                 style={{
                     paddingTop: '40px',
                     paddingBottom: '40px',
@@ -237,25 +244,30 @@ export default function SubcategoryProductsPage({ subcategoryId, subcategoryName
                     minHeight: '2091px'
                 }}
             >
-                <Sidebar
-                    selectedDuration={selectedDuration}
-                    setSelectedDuration={setSelectedDuration}
-                    selectedSort={selectedSort}
-                    setSelectedSort={setSelectedSort}
-                />
+                <h1
+                    style={{
+                        fontFamily: "'Mona Sans', sans-serif",
+                        fontWeight: 600,
+                        fontSize: '44px',
+                        lineHeight: '58px',
+                        letterSpacing: '-0.01em',
+                        color: 'hsla(0, 0%, 12%, 1)',
+                        maxWidth: '589px',
+                        opacity: 1,
+                    }}
+                >
+                    {subcategoryName}
+                </h1>
+
+                <div className="flex w-full" style={{ gap: '30px' }}>
+                    <Sidebar
+                        selectedDuration={selectedDuration}
+                        setSelectedDuration={setSelectedDuration}
+                        selectedSort={selectedSort}
+                        setSelectedSort={setSelectedSort}
+                    />
 
                 <div className="flex-1">
-                    <h1
-                        className="text-[48px] font-bold text-[#1D1D1F] mb-10"
-                        style={{
-                            fontFamily: "'Mona Sans', sans-serif",
-                            lineHeight: '58px',
-                            letterSpacing: '-0.02em'
-                        }}
-                    >
-                        {subcategoryName} (Sub-category name)
-                    </h1>
-
                     {/* Loading */}
                     {loading && (
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-[24px]">
@@ -294,6 +306,7 @@ export default function SubcategoryProductsPage({ subcategoryId, subcategoryName
                             </>
                         )
                     )}
+                </div>
                 </div>
             </div>
         </div>

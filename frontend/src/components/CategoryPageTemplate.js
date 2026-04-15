@@ -1,6 +1,7 @@
 "use client";
 import React, { useState, useEffect } from 'react';
 import { FaChevronDown, FaArrowLeft } from 'react-icons/fa';
+import { ChevronRightIcon } from '@heroicons/react/24/outline';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -286,23 +287,19 @@ const CategoryPageTemplate = ({ productNamePrefix, productDescription, basePrice
 
             {/* Subcategory Slider Block */}
             {subcategories.length > 0 && (
-                <div className="bg-white border-b border-[hsla(0,0%,93%,1)] pb-8 mb-8 shadow-sm relative z-10 w-full overflow-hidden flex justify-center">
-                    {/* Outer Container */}
-                    <div 
-                        className="relative mx-auto group/subslider flex items-center"
+                <div className="bg-white relative z-10">
+                    <div
+                        className="relative mx-auto group/subslider flex items-center max-w-[1200px] w-full px-4 md:px-8"
                         style={{
-                            width: '1200px',
                             height: '167px',
                             paddingTop: '20px',
                             gap: '24px'
                         }}
                     >
-                        {/* Inner Container */}
                         <div
                             id="subcat-slider-template"
-                            className="flex overflow-x-auto scrollbar-hide snap-x snap-mandatory scroll-smooth"
+                            className="flex overflow-x-auto snap-x snap-mandatory scroll-smooth w-full"
                             style={{
-                                width: '1200px',
                                 height: '147px',
                                 gap: '16px',
                                 msOverflowStyle: 'none',
@@ -329,13 +326,16 @@ const CategoryPageTemplate = ({ productNamePrefix, productDescription, basePrice
                                         }}
                                     >
                                         <div
-                                            className="bg-white border rounded-lg flex items-center justify-center overflow-hidden transition-all duration-300"
+                                            className="rounded-lg flex items-center justify-center overflow-hidden transition-all duration-300"
                                             style={{
-                                                height: '120px',
+                                                height: '120.09px',
                                                 width: '100%',
                                                 boxSizing: 'border-box',
-                                                borderColor: isSubActive ? 'hsla(44,100%,64%,1)' : 'hsla(0,0%,93%,1)',
-                                                backgroundColor: isSubActive ? 'hsla(43,100%,95%,1)' : 'white'
+                                                border: isSubActive
+                                                    ? '2px solid hsla(47, 100%, 76%, 1)'
+                                                    : '2px solid hsla(0, 0%, 93%, 1)',
+                                                backgroundColor: isSubActive ? 'hsla(43,100%,95%,1)' : 'hsla(0, 0%, 100%, 1)',
+                                                boxShadow: '0px 1px 3px 0px hsla(0, 0%, 87%, 0.08), 0px 6px 6px 0px hsla(0, 0%, 87%, 0.07), 0px 13px 8px 0px hsla(0, 0%, 87%, 0.04), 0px 23px 9px 0px hsla(0, 0%, 87%, 0.01), 0px 36px 10px 0px hsla(0, 0%, 87%, 0)',
                                             }}
                                         >
                                             <div className={`w-[100px] h-[100px] relative transform transition-transform duration-500 ${isSubActive ? 'scale-105' : 'group-hover:scale-105'}`}>
@@ -372,17 +372,22 @@ const CategoryPageTemplate = ({ productNamePrefix, productDescription, basePrice
                             })}
                         </div>
 
-                        {subcategories.length > 8 && (
+                        {subcategories.length > 7 && (
                             <button
                                 onClick={() => {
                                     const slider = document.getElementById('subcat-slider-template');
                                     if (slider) slider.scrollBy({ left: 300, behavior: 'smooth' });
                                 }}
-                                className="absolute right-[24px] top-[50%] translate-x-[50%] w-[32px] h-[32px] rounded-lg bg-[hsla(0,0%,93%,1)] flex items-center justify-center shadow-md hover:bg-[hsla(0,0%,20%,1)] group/caret transition-all z-10 hidden md:flex"
+                                className="absolute right-0 top-[50%] translate-y-[-50%] flex items-center justify-center transition-all z-10 hidden md:flex hover:brightness-95 active:scale-95"
+                                style={{
+                                    width: '26px',
+                                    height: '40px',
+                                    borderRadius: '9px',
+                                    background: 'hsla(0, 0%, 93%, 1)',
+                                    boxShadow: '0px 0px 1px 0px hsla(0, 0%, 58%, 0.31), 0px 0px 1px 0px hsla(0, 0%, 58%, 0.18), 0px 0px 1px 0px hsla(0, 0%, 58%, 0.05), 0px 0px 1px 0px hsla(0, 0%, 58%, 0.01)',
+                                }}
                             >
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-gray-600 group-hover/caret:text-white transition-colors">
-                                    <polyline points="9 18 15 12 9 6"></polyline>
-                                </svg>
+                                <ChevronRightIcon className="w-4 h-4 text-gray-600" strokeWidth={2} />
                             </button>
                         )}
                     </div>
@@ -390,35 +395,55 @@ const CategoryPageTemplate = ({ productNamePrefix, productDescription, basePrice
             )}
 
             {/* Page body */}
-            <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-8">
-                <div className="flex items-center gap-4 mb-8">
-                    <button onClick={() => router.back()} className="p-2 hover:bg-gray-100 rounded-full transition-colors"><FaArrowLeft size={24} className="text-gray-900" /></button>
-                    <h1 className="text-3xl font-bold text-gray-900">{title}</h1>
-                </div>
-                <div className="flex gap-8">
+            <div
+                className="mx-auto flex flex-col max-w-[1200px] w-full px-4 md:px-8"
+                style={{
+                    paddingTop: '40px',
+                    paddingBottom: '40px',
+                    gap: '30px',
+                    minHeight: '2091px'
+                }}
+            >
+                <h1
+                    style={{
+                        fontFamily: "'Mona Sans', sans-serif",
+                        fontWeight: 600,
+                        fontSize: '44px',
+                        lineHeight: '58px',
+                        letterSpacing: '-0.01em',
+                        color: 'hsla(0, 0%, 12%, 1)',
+                        maxWidth: '589px',
+                        opacity: 1,
+                    }}
+                >
+                    {title}
+                </h1>
+
+                <div className="flex w-full" style={{ gap: '30px' }}>
                     <Sidebar
                         selectedDuration={selectedDuration}
                         setSelectedDuration={setSelectedDuration}
                         selectedSort={selectedSort}
                         setSelectedSort={setSelectedSort}
                     />
-                    <main className="flex-1">
-                        <div className="flex items-center justify-end mb-6"><span className="text-sm text-gray-500">{processedProducts.length} products</span></div>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
-                            {processedProducts.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage).map((product) => (
-                                <ProductCard key={product.id} product={product} />
+                    <div className="flex-1">
+
+                    <div className="flex items-center justify-end mb-6"><span className="text-sm text-gray-500">{processedProducts.length} products</span></div>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-[30px]">
+                        {processedProducts.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage).map((product) => (
+                            <ProductCard key={product.id} product={product} />
+                        ))}
+                    </div>
+                    {processedProducts.length > itemsPerPage && (
+                        <div className="flex justify-center items-center gap-2 mt-10">
+                            <button onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))} disabled={currentPage === 1} className="p-2 rounded-lg hover:bg-gray-100 disabled:opacity-30 disabled:hover:bg-transparent transition-colors"><FaChevronDown className="rotate-90" size={14} /></button>
+                            {Array.from({ length: Math.ceil(processedProducts.length / itemsPerPage) }).map((_, i) => (
+                                <button key={i} onClick={() => setCurrentPage(i + 1)} className={`w-8 h-8 rounded-lg text-sm font-medium transition-colors ${currentPage === i + 1 ? "bg-black text-white shadow-md" : "text-gray-500 hover:bg-gray-50"}`}>{i + 1}</button>
                             ))}
+                            <button onClick={() => setCurrentPage(prev => Math.min(prev + 1, Math.ceil(processedProducts.length / itemsPerPage)))} disabled={currentPage === Math.ceil(processedProducts.length / itemsPerPage)} className="p-2 rounded-lg hover:bg-gray-100 disabled:opacity-30 disabled:hover:bg-transparent transition-colors"><FaChevronDown className="-rotate-90" size={14} /></button>
                         </div>
-                        {processedProducts.length > itemsPerPage && (
-                            <div className="flex justify-center items-center gap-2">
-                                <button onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))} disabled={currentPage === 1} className="p-2 rounded-lg hover:bg-gray-100 disabled:opacity-30 disabled:hover:bg-transparent transition-colors"><FaChevronDown className="rotate-90" size={14} /></button>
-                                {Array.from({ length: Math.ceil(processedProducts.length / itemsPerPage) }).map((_, i) => (
-                                    <button key={i} onClick={() => setCurrentPage(i + 1)} className={`w-8 h-8 rounded-lg text-sm font-medium transition-colors ${currentPage === i + 1 ? "bg-black text-white shadow-md" : "text-gray-500 hover:bg-gray-50"}`}>{i + 1}</button>
-                                ))}
-                                <button onClick={() => setCurrentPage(prev => Math.min(prev + 1, Math.ceil(processedProducts.length / itemsPerPage)))} disabled={currentPage === Math.ceil(processedProducts.length / itemsPerPage)} className="p-2 rounded-lg hover:bg-gray-100 disabled:opacity-30 disabled:hover:bg-transparent transition-colors"><FaChevronDown className="-rotate-90" size={14} /></button>
-                            </div>
-                        )}
-                    </main>
+                    )}
+                </div>
                 </div>
             </div>
         </div>

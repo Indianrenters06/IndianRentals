@@ -91,7 +91,7 @@ export default function DynamicCategoryPage({
     return (
         <div className="bg-white font-sans">
 
-            {/* ── Figma Category Nav Bar: full-width outer, 1200px inner ── */}
+            {/* ── Category Nav Bar: full-width outer, 1200px inner ── */}
             <div
                 style={{
                     width: '100%',
@@ -99,7 +99,7 @@ export default function DynamicCategoryPage({
                     height: '62px',
                 }}
             >
-                {/* Inner container: 1200px, space-between */}
+                {/* Inner container: max 1200px, space-between */}
                 <div
                     style={{
                         maxWidth: '1200px',
@@ -112,7 +112,6 @@ export default function DynamicCategoryPage({
                         justifyContent: 'space-between',
                         gap: '10px',
                         boxSizing: 'border-box',
-                        opacity: 1,
                     }}
                 >
                     {/* Breadcrumb */}
@@ -124,20 +123,17 @@ export default function DynamicCategoryPage({
                         <span className="text-[#1D1D1F] font-semibold">{displayTitle}</span>
                     </div>
 
-                    {/* Category filter pills — Figma: 666×62, gap:8, pt:12 pb:12, border-bottom 1px solid hsla(0,0%,93%,1) */}
+                    {/* Category filter chips */}
                     <div
                         style={{
-                            width: '666px',
                             height: '62px',
                             display: 'flex',
                             alignItems: 'center',
                             gap: '8px',
                             paddingTop: '12px',
                             paddingBottom: '12px',
-                            borderBottom: '1px solid hsla(0, 0%, 93%, 1)',
-                            opacity: 1,
-                            boxSizing: 'border-box',
                             flexShrink: 0,
+                            boxSizing: 'border-box',
                         }}
                     >
                         {[
