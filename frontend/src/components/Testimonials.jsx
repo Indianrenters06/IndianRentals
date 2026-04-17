@@ -84,7 +84,11 @@ const Testimonials = () => {
             className="rounded-2xl p-[20px] flex flex-col transition-all hover:scale-[1.01] duration-300 shadow-sm font-sans"
             style={{
                 backgroundColor: review.bgColor || '#FFFFFF',
-                width: '100%'
+                width: '100%',
+                willChange: 'transform',
+                backfaceVisibility: 'hidden',
+                WebkitFontSmoothing: 'antialiased',
+                transform: 'translateZ(0)'
             }}
         >
             <div className="flex flex-col mb-4">
@@ -146,18 +150,18 @@ const Testimonials = () => {
                 width: '100%',
                 height: 'auto',
                 margin: '0 auto',
-                overflow: 'hidden'
+                overflow: 'visible'
             }}
         >
             <div
-                className="w-full h-full mx-auto flex flex-col items-center"
+                className="w-full h-full mx-auto flex flex-col items-center px-4 md:px-8"
                 style={{
-                    maxWidth: viewType === 'desktop' ? '1200px' : (viewType === 'tablet' ? '768px' : '100%'),
+                    maxWidth: '1200px',
                     paddingTop: viewType === 'desktop' ? '96px' : (viewType === 'tablet' ? '96px' : '48px'),
                     paddingBottom: viewType === 'desktop' ? '96px' : (viewType === 'tablet' ? '96px' : '48px'),
-                    paddingLeft: viewType === 'desktop' ? '24px' : (viewType === 'tablet' ? '30px' : '20px'),
-                    paddingRight: viewType === 'desktop' ? '24px' : (viewType === 'tablet' ? '30px' : '20px'),
-                    gap: viewType === 'desktop' ? '24px' : (viewType === 'tablet' ? '16px' : '10px')
+                    gap: viewType === 'desktop' ? '24px' : (viewType === 'tablet' ? '16px' : '10px'),
+                    position: 'relative',
+                    zIndex: 1
                 }}
             >
 

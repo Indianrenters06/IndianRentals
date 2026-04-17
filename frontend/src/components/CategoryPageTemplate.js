@@ -419,16 +419,15 @@ const CategoryPageTemplate = ({ productNamePrefix, productDescription, basePrice
                     {title}
                 </h1>
 
-                <div className="flex w-full" style={{ gap: '30px' }}>
+                <div className="flex w-full relative" style={{ gap: '30px' }}>
                     <Sidebar
                         selectedDuration={selectedDuration}
                         setSelectedDuration={setSelectedDuration}
                         selectedSort={selectedSort}
                         setSelectedSort={setSelectedSort}
                     />
-                    <div className="flex-1">
+                    <div className="flex-1 mt-0">
 
-                    <div className="flex items-center justify-end mb-6"><span className="text-sm text-gray-500">{processedProducts.length} products</span></div>
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-[30px]">
                         {processedProducts.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage).map((product) => (
                             <ProductCard key={product.id} product={product} />

@@ -11,6 +11,13 @@ import { addToCart } from '../../../redux/features/cartSlice';
 import { getProductById } from '../../../services/productService';
 import BestRentedProducts from '../../../components/BestRentedProducts';
 import FaqSection from '../../../components/FaqSection';
+import Testimonials from '../../../components/Testimonials';
+import CompareTenures from '../../../components/CompareTenures';
+import CancellationSidebar from '../../../components/CancellationSidebar';
+
+import { Heart, Export as ExportIcon, Sparkle, Package, Truck, CalendarDots, UserCircle, Bank, MapPin } from '@phosphor-icons/react';
+import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/outline';
+import { StarIcon } from '@heroicons/react/24/solid';
 
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation, Thumbs, FreeMode } from 'swiper/modules';
@@ -35,6 +42,9 @@ export default function ProductDetailPage() {
     const [activeTab, setActiveTab] = useState('Product Details');
     const [openFaq, setOpenFaq] = useState(0);
     const [thumbsSwiper, setThumbsSwiper] = useState(null);
+    const [isRentHovered, setIsRentHovered] = useState(false);
+    const [isCompareOpen, setIsCompareOpen] = useState(false);
+    const [isCancellationOpen, setIsCancellationOpen] = useState(false);
 
     // Fetch Product Data
     useEffect(() => {
@@ -107,356 +117,1415 @@ export default function ProductDetailPage() {
     ];
 
     return (
-        <div className="min-h-screen bg-[#F7F7F7] font-sans text-[#1D1D1F] tracking-tight antialiased pt-10 pb-10">
-            {/* Breadcrumb */}
-            <div className="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8 py-3 text-[14px] font-medium text-[#586A84]">
-                <div className="flex items-center gap-2">
-                    <Link href="/" className="hover:text-black transition-colors">Shop all</Link>
-                    <span className="text-gray-300 text-[16px] leading-none mb-0.5">›</span>
-                    <Link href={`/category/${product.category?.toLowerCase() || 'all'}`} className="hover:text-black transition-colors">{product.category || 'Category'}</Link>
-                    <span className="text-gray-300 text-[16px] leading-none mb-0.5">›</span>
-                    <span className="text-[#1D1D1F] font-bold truncate max-w-[300px]">{product.name}</span>
+        <div className="w-full flex flex-col items-center bg-white font-sans text-[#1D1D1F] tracking-tight antialiased">
+            <div
+                style={{
+                    maxWidth: '1440px',
+                    width: '100%',
+                    minHeight: '1415.73px',
+                    paddingTop: '40px',
+                    paddingBottom: '40px',
+                    margin: '0 auto',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '24px',
+                    background: 'hsla(0, 0%, 97%, 1)',
+                    opacity: 1,
+                    boxSizing: 'border-box'
+                }}
+            >
+                {/* Breadcrumb */}
+                <div className="w-full max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8 text-[14px] font-medium text-[#586A84]">
+                    <div className="flex items-center gap-2">
+                        <Link href="/" className="hover:text-black transition-colors">Shop all</Link>
+                        <span className="text-gray-300 text-[16px] leading-none mb-0.5">›</span>
+                        <Link href={`/category/${product.category?.toLowerCase() || 'all'}`} className="hover:text-black transition-colors">{product.category || 'Category'}</Link>
+                        <span className="text-gray-300 text-[16px] leading-none mb-0.5">›</span>
+                        <span className="text-[#1D1D1F] font-bold truncate max-w-[300px]">{product.name}</span>
+                    </div>
                 </div>
-            </div>
 
-            <main className="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8 pt-4 pb-10">
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-x-5 gap-y-12 items-start">
+                <main className="w-full max-w-[1200px] mx-auto px-4 md:px-8">
+                    <div
+                        className="grid grid-cols-1 lg:grid-cols-2 items-start"
+                        style={{
+                            width: '100%',
+                            minHeight: '809.73px',
+                            gap: '16px',
+                            opacity: 1
+                        }}
+                    >
 
-                    {/* Left Column - Images & Details */}
-                    <div className="flex flex-col gap-5">
+                        {/* Left Column - Images Gallery */}
+                        <div
+                            className="flex flex-col"
+                            style={{
+                                width: '100%',
+                                maxWidth: '611px',
+                                minHeight: '801.64px',
+                                gap: '10px',
+                                opacity: 1
+                            }}
+                        >
 
-                        {/* Main Image Slider */}
-                        <div className="relative w-full bg-white border border-[#EDEDED] rounded-xl flex items-center justify-center p-6 group overflow-hidden shrink-0 h-[350px] md:h-[523px]">
-                            <span className="absolute top-6 left-6 z-10 bg-[#FF3B30] text-white text-[12px] font-bold px-3 py-1 rounded-[6px] tracking-wide">20% off</span>
+                            {/* Main Image Slider */}
+                            <div
+                                className="relative w-full bg-white rounded-xl flex items-center justify-center p-6 group overflow-hidden shrink-0"
+                                style={{
+                                    maxWidth: '611px',
+                                    height: '611px',
+                                    border: '1px solid hsla(0, 0%, 93%, 1)',
+                                    opacity: 1
+                                }}
+                            >
+                                <span className="absolute top-6 left-6 z-10 bg-[#FF3B30] text-white text-[12px] font-bold px-3 py-1 rounded-[6px] tracking-wide">20% off</span>
 
-                            <div className="absolute top-6 right-6 z-10 flex flex-col gap-3">
-                                <button className="w-10 h-10 flex items-center justify-center rounded-full bg-[#f6f6f6] text-[#555] hover:text-[#FF3B30] hover:bg-white transition-colors border border-transparent hover:border-gray-200">
-                                    <FaHeart size={15} />
-                                </button>
-                                <button className="w-10 h-10 flex items-center justify-center rounded-full bg-[#f6f6f6] text-[#555] hover:text-black hover:bg-white transition-colors border border-transparent hover:border-gray-200">
-                                    <FaShareAlt size={15} />
-                                </button>
+                                <div
+                                    className="absolute z-10 flex flex-col"
+                                    style={{
+                                        width: '34px',
+                                        height: '76px',
+                                        gap: '8px',
+                                        top: '24px',
+                                        right: '12px',
+                                        opacity: 1
+                                    }}
+                                >
+                                    <button className="flex items-center justify-center rounded-full transition-colors border border-transparent hover:border-gray-200"
+                                        style={{ width: '34px', height: '34px', background: 'hsla(0, 0%, 93%, 1)', color: 'hsla(0, 0%, 16%, 1)' }}>
+                                        <Heart size={20} weight="regular" />
+                                    </button>
+                                    <button className="flex items-center justify-center rounded-full transition-colors border border-transparent hover:border-gray-200"
+                                        style={{ width: '34px', height: '34px', background: 'hsla(0, 0%, 93%, 1)', color: 'hsla(0, 0%, 16%, 1)' }}>
+                                        <ExportIcon size={20} />
+                                    </button>
+                                </div>
+
+                                <Swiper
+                                    navigation={{
+                                        nextEl: '.swiper-button-next-custom',
+                                        prevEl: '.swiper-button-prev-custom',
+                                    }}
+                                    style={{
+                                        width: "100%",
+                                        height: "100%"
+                                    }}
+                                    loop={true}
+                                    spaceBetween={10}
+                                    thumbs={{ swiper: thumbsSwiper && !thumbsSwiper.destroyed ? thumbsSwiper : null }}
+                                    modules={[FreeMode, Navigation, Thumbs]}
+                                    className="main-image-swiper"
+                                >
+                                    {(product.images && product.images.length > 0 ? product.images : [mainImage, mainImage, mainImage, mainImage]).map((img, index) => (
+                                        <SwiperSlide key={index} className="flex items-center justify-center">
+                                            <div
+                                                className="relative flex items-center justify-center object-contain mix-blend-darken brightness-[1.08] contrast-[1.04] group-hover:scale-105 transition-transform duration-700 ease-out"
+                                                style={{
+                                                    width: '100%',
+                                                    maxWidth: '516px',
+                                                    height: '397px',
+                                                    opacity: 1
+                                                }}
+                                            >
+                                                <Image
+                                                    src={img}
+                                                    alt={`${product.name} - ${index}`}
+                                                    fill
+                                                    className="object-contain"
+                                                    sizes="(max-width: 768px) 100vw, 50vw"
+                                                    priority={index === 0}
+                                                />
+                                            </div>
+                                        </SwiperSlide>
+                                    ))}
+
+                                </Swiper>
+
+                                {/* Custom Heroicon Caret Navigation */}
+                                <div
+                                    className="swiper-button-prev-custom absolute z-10 cursor-pointer hidden md:flex items-center justify-center hover:opacity-80 transition-opacity"
+                                    style={{
+                                        width: '34px',
+                                        height: '34px',
+                                        borderRadius: '69px',
+                                        top: '305px',
+                                        left: '12px',
+                                        background: 'hsla(0, 0%, 93%, 1)',
+                                        boxShadow: '0px 0px 1px 0px hsla(0, 0%, 52%, 0.1), 0px 1px 1px 0px hsla(0, 0%, 52%, 0.09), 0px 3px 2px 0px hsla(0, 0%, 52%, 0.05), 0px 5px 2px 0px hsla(0, 0%, 52%, 0.01), 0px 8px 2px 0px hsla(0, 0%, 52%, 0)'
+                                    }}
+                                >
+                                    <ChevronLeftIcon className="w-[18px] h-[18px] text-gray-800" strokeWidth={2.5} />
+                                </div>
+                                <div
+                                    className="swiper-button-next-custom absolute z-10 cursor-pointer flex items-center justify-center hover:opacity-80 transition-opacity"
+                                    style={{
+                                        width: '34px',
+                                        height: '34px',
+                                        borderRadius: '69px',
+                                        top: '305px',
+                                        right: '12px',
+                                        background: 'hsla(0, 0%, 93%, 1)',
+                                        boxShadow: '0px 0px 1px 0px hsla(0, 0%, 52%, 0.1), 0px 1px 1px 0px hsla(0, 0%, 52%, 0.09), 0px 3px 2px 0px hsla(0, 0%, 52%, 0.05), 0px 5px 2px 0px hsla(0, 0%, 52%, 0.01), 0px 8px 2px 0px hsla(0, 0%, 52%, 0)'
+                                    }}
+                                >
+                                    <ChevronRightIcon className="w-[18px] h-[18px] text-gray-800" strokeWidth={2.5} />
+                                </div>
                             </div>
 
-                            <Swiper
+                            {/* Thumbnails Slider */}
+                            <div className="w-full h-[80px] md:h-[110px]">
+                                <Swiper
+                                    onSwiper={setThumbsSwiper}
+                                    loop={true}
+                                    spaceBetween={12}
+                                    slidesPerView={4}
+                                    freeMode={true}
+                                    watchSlidesProgress={true}
+                                    modules={[FreeMode, Navigation, Thumbs]}
+                                    className="thumbs-swiper h-full"
+                                    breakpoints={{
+                                        320: { slidesPerView: 3, spaceBetween: 10 },
+                                        768: { slidesPerView: 4, spaceBetween: 12 }
+                                    }}
+                                >
+                                    {(product.images && product.images.length > 0 ? product.images : [mainImage, mainImage, mainImage, mainImage]).map((img, i) => (
+                                        <SwiperSlide key={i}>
+                                            <div className="w-full h-full bg-white border border-[#EDEDED] rounded-xl p-2 flex items-center justify-center cursor-pointer transition-all hover:border-gray-400 overflow-hidden relative">
+                                                <Image src={img} alt={`Thumb ${i}`} fill className="object-contain mix-blend-darken brightness-[1.08] contrast-[1.04]" />
+                                            </div>
+                                        </SwiperSlide>
+                                    ))}
+                                </Swiper>
+                            </div>
+                            </div>
+
+                        {/* Right Column - Product Purchase Details */}
+                        <div
+                            className="flex flex-col"
+                            style={{
+                                width: '100%',
+                                maxWidth: '536.36px',
+                                minHeight: '809.73px',
+                                gap: '32px',
+                                opacity: 1,
+                                gridColumnStart: 'auto',
+                                gridRowStart: 'auto'
+                            }}
+                        >
+
+                            {/* Main White Card (Title, Rating, Slider, Price) */}
+                            <div
+                                className="bg-white rounded-xl flex flex-col overflow-hidden"
                                 style={{
-                                    "--swiper-navigation-color": "#555",
-                                    "--swiper-navigation-size": "20px",
-                                    width: "100%",
-                                    height: "100%"
+                                    width: '536.36px',
+                                    height: '333.73px',
+                                    border: '1px solid var(--color-grey-grey-100, hsla(0, 0%, 93%, 1))',
+                                    background: 'var(--color-grey-white, hsla(0, 0%, 100%, 1))',
+                                    opacity: 1
                                 }}
-                                loop={true}
-                                spaceBetween={10}
-                                navigation={true}
-                                thumbs={{ swiper: thumbsSwiper && !thumbsSwiper.destroyed ? thumbsSwiper : null }}
-                                modules={[FreeMode, Navigation, Thumbs]}
-                                className="main-image-swiper"
                             >
-                                {(product.images && product.images.length > 0 ? product.images : [mainImage, mainImage, mainImage, mainImage]).map((img, index) => (
-                                    <SwiperSlide key={index} className="flex items-center justify-center">
-                                        <div className="relative w-full h-full flex items-center justify-center object-contain mix-blend-darken brightness-[1.08] contrast-[1.04] p-4 group-hover:scale-105 transition-transform duration-700 ease-out">
-                                            <Image
-                                                src={img}
-                                                alt={`${product.name} - ${index}`}
-                                                fill
-                                                className="object-contain"
-                                                sizes="(max-width: 768px) 100vw, 50vw"
-                                                priority={index === 0}
+                                {/* Header Section (Title & Ratings) */}
+                                <div
+                                    className="flex flex-col"
+                                    style={{
+                                        width: '100%',
+                                        height: '122px',
+                                        borderBottom: '1px solid hsla(0, 0%, 93%, 1)',
+                                        paddingTop: '20px',
+                                        paddingRight: '20px',
+                                        paddingBottom: '12px',
+                                        paddingLeft: '20px',
+                                        gap: '10px',
+                                        opacity: 1
+                                    }}
+                                >
+                                    {/* Title */}
+                                    <h1 className="text-[22px] font-bold text-[#1D1D1F] leading-[1.3] tracking-tight pr-4">
+                                        {product.name}
+                                    </h1>
+
+                                    {/* Rating & Stock */}
+                                    <div
+                                        className="flex items-center"
+                                        style={{
+                                            maxWidth: '227px',
+                                            height: '24px',
+                                            gap: '10px',
+                                            opacity: 1
+                                        }}
+                                    >
+                                        <div
+                                            className="flex items-center"
+                                            style={{
+                                                width: '140px',
+                                                height: '24px',
+                                                borderRadius: '8px',
+                                                padding: '4px 6px 4px 6px',
+                                                gap: '4px',
+                                                opacity: 1,
+                                                background: 'hsla(44, 100%, 91%, 1)',
+                                                border: '1px solid hsla(47, 100%, 76%, 1)'
+                                            }}
+                                        >
+                                            <div className="flex gap-[2px]">
+                                                {[1, 2, 3, 4, 5].map(s => (
+                                                    <StarIcon
+                                                        key={s}
+                                                        style={{
+                                                            width: '13.21px',
+                                                            height: '12.65px',
+                                                            color: 'var(--color-orange-orange-500, hsla(33, 100%, 52%, 1))',
+                                                            opacity: s <= Math.round(product.rating || 4.5) ? 1 : 0.3
+                                                        }}
+                                                    />
+                                                ))}
+                                            </div>
+                                            <span className="text-[11px] font-medium text-[#1D1D1F]">{product.rating || "4.5"} ({product.numReviews || 12})</span>
+                                        </div>
+                                        <div className="bg-[#00B200] text-white text-[11px] font-medium px-2 py-0.5 rounded-[6px] flex items-center justify-center gap-1.5 h-full whitespace-nowrap">
+                                            <BsTruck size={13} className="stroke-[0.5]" />
+                                            <span className="mt-[1px]">2-4 days</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Interactive Slider Section */}
+                                <div
+                                    className="flex flex-col"
+                                    style={{
+                                        width: '100%',
+                                        maxWidth: '509px',
+                                        height: '132.73px',
+                                        padding: '16px 12px 16px 12px',
+                                        gap: '12px',
+                                        background: 'hsla(0, 0%, 100%, 1)',
+                                        opacity: 1
+                                    }}
+                                >
+                                    {/* Rental Period Selection */}
+                                    <div
+                                        className="flex items-center"
+                                        style={{
+                                            width: '100%',
+                                            height: '20px',
+                                            justifyContent: 'space-between',
+                                            opacity: 1
+                                        }}
+                                    >
+                                        <h3
+                                            style={{
+                                                width: '216px',
+                                                height: '20px',
+                                                fontFamily: '"Mona Sans", sans-serif',
+                                                fontWeight: 500,
+                                                fontSize: 'var(--font-size-2, 14px)',
+                                                lineHeight: 'var(--font-line-height-2, 20px)',
+                                                letterSpacing: 'var(--font-letter-spacing-7, normal)',
+                                                color: 'var(--color-grey-grey-800, hsla(0, 0%, 12%, 1))',
+                                                opacity: 1,
+                                                margin: 0,
+                                                whiteSpace: 'nowrap'
+                                            }}
+                                        >
+                                            Select your <span
+                                                style={{
+                                                    textDecoration: 'underline',
+                                                    textDecorationStyle: 'solid',
+                                                    textUnderlineOffset: '10%',
+                                                    textDecorationThickness: '8%',
+                                                    textDecorationSkipInk: 'auto'
+                                                }}
+                                            >
+                                                minimum rental period
+                                            </span>
+                                        </h3>
+                                        <span className="text-[14px] font-bold text-[#1D1D1F]">{duration === 1 ? '1 Month' : `${duration} Months`}</span>
+                                    </div>
+
+                                    {/* Tenure Slider */}
+                                    <div className="relative ml-1 mr-1">
+                                        {/* Track */}
+                                        {(() => {
+                                            const currentStep = duration <= 1 ? 1 : duration <= 3 ? 2 : duration <= 6 ? 3 : duration <= 9 ? 4 : 5;
+                                            const activePct = ((currentStep - 1) / 4) * 100;
+                                            return (
+                                                <div
+                                                    className="relative h-[6px] rounded-full flex items-center"
+                                                    style={{ background: `linear-gradient(to right, #EA580C ${activePct}%, #E5E7EB ${activePct}%)` }}
+                                                >
+                                                    {[1, 2, 3, 4, 5].map(step => {
+                                                        const pct = ((step - 1) / 4) * 100;
+                                                        const isActive = step <= currentStep;
+                                                        return (
+                                                            <div
+                                                                key={step}
+                                                                className={`absolute w-[16px] h-[16px] rounded-full bg-white transition-colors duration-300 z-10 border-[3px] ${isActive ? 'border-[#EA580C]' : 'border-gray-300'}`}
+                                                                style={{ left: `calc(${pct}% - 8px)` }}
+                                                            />
+                                                        );
+                                                    })}
+                                                    <input
+                                                        type="range"
+                                                        min="1"
+                                                        max="5"
+                                                        step="1"
+                                                        value={currentStep}
+                                                        onChange={(e) => {
+                                                            const step = parseInt(e.target.value);
+                                                            const months = [1, 3, 6, 9, 12];
+                                                            setDuration(months[step - 1]);
+                                                        }}
+                                                        className="absolute w-full h-full opacity-0 cursor-pointer z-20"
+                                                    />
+                                                </div>
+                                            );
+                                        })()}
+
+                                        {/* Labels Below */}
+                                        <div className="flex justify-between mt-[14px] text-[12px] text-gray-500 font-medium">
+                                            <span className="text-left w-6">1+</span>
+                                            <span className="text-center w-6">3+</span>
+                                            <span className="text-center w-6">6+</span>
+                                            <span className="text-center w-6">9+</span>
+                                            <span className="text-right w-6">12+</span>
+                                        </div>
+                                    </div>
+
+                                    {/* Links */}
+                                    <div className="flex justify-between items-center">
+                                        <Link
+                                            href="#"
+                                            style={{
+                                                width: '89px',
+                                                height: '16px',
+                                                fontFamily: '"Mona Sans", sans-serif',
+                                                fontWeight: 500,
+                                                fontSize: 'var(--font-size-1, 12px)',
+                                                lineHeight: 'var(--font-line-height-1, 16px)',
+                                                letterSpacing: 'var(--font-letter-spacing-8, normal)',
+                                                color: 'var(--color-orange-orange-600, hsla(29, 100%, 50%, 1))',
+                                                textDecoration: 'underline',
+                                                textDecorationStyle: 'solid',
+                                                textUnderlineOffset: '8.5%',
+                                                textDecorationThickness: '11%',
+                                                opacity: 1,
+                                                whiteSpace: 'nowrap'
+                                            }}
+                                        >
+                                            price breakdown
+                                        </Link>
+                                        <button
+                                            onClick={() => setIsCompareOpen(true)}
+                                            style={{
+                                                fontSize: 'var(--font-size-1, 12px)',
+                                                lineHeight: 'var(--font-line-height-1, 16px)',
+                                                letterSpacing: 'var(--font-letter-spacing-8, normal)',
+                                                color: 'var(--color-orange-orange-600, hsla(29, 100%, 50%, 1))',
+                                                textDecoration: 'underline',
+                                                textDecorationStyle: 'solid',
+                                                textUnderlineOffset: '8.5%',
+                                                textDecorationThickness: '11%',
+                                                opacity: 1,
+                                                whiteSpace: 'nowrap',
+                                                background: 'none',
+                                                border: 'none',
+                                                cursor: 'pointer',
+                                                padding: 0
+                                            }}
+                                        >
+                                            compare all tenures
+                                        </button>
+                                    </div>
+                                </div>
+
+                                {/* Price & Quantity Footer Card */}
+                                <div
+                                    className="flex flex-col"
+                                    style={{
+                                        width: '509px',
+                                        height: '79px',
+                                        opacity: 1,
+                                        borderTopLeftRadius: '0px',
+                                        borderTopRightRadius: '0px',
+                                        borderBottomRightRadius: '6px',
+                                        borderBottomLeftRadius: '6px',
+                                        borderTop: '1px solid hsla(0, 0%, 93%, 1)'
+                                    }}
+                                >
+                                    {/* Price and Quantity Row */}
+                                    <div
+                                        className="flex justify-between items-center"
+                                        style={{
+                                            width: '509px',
+                                            height: '55px',
+                                            opacity: 1
+                                        }}
+                                    >
+                                        <div
+                                            className="flex items-center"
+                                            style={{
+                                                width: '302px',
+                                                height: '55px',
+                                                paddingRight: '20px',
+                                                paddingLeft: '20px',
+                                                gap: '18px',
+                                                opacity: 1,
+                                                borderRight: '1px solid hsla(0, 0%, 93%, 1)'
+                                            }}
+                                        >
+                                            <div
+                                                className="flex items-center gap-1"
+                                                style={{
+                                                    height: '23px',
+                                                    opacity: 1
+                                                }}
+                                            >
+                                                <span
+                                                    className="shrink-0"
+                                                    style={{
+                                                        fontFamily: '"Mona Sans", sans-serif',
+                                                        fontWeight: 600,
+                                                        fontSize: 'var(--font-size-6, 24px)',
+                                                        lineHeight: 1,
+                                                        letterSpacing: 'var(--font-letter-spacing-4, -0.8px)',
+                                                        color: 'var(--color-red-red-600, hsla(3, 86%, 51%, 1))',
+                                                        opacity: 1
+                                                    }}
+                                                >
+                                                    ₹{currentPlan.price * quantity}
+                                                </span>
+                                                <span
+                                                    className="shrink-0"
+                                                    style={{
+                                                        fontFamily: 'Manrope, sans-serif',
+                                                        fontWeight: 400,
+                                                        fontSize: '16px',
+                                                        lineHeight: 1,
+                                                        letterSpacing: '-0.04em',
+                                                        color: 'var(--color-grey-grey-500, hsla(0, 0%, 46%, 1))',
+                                                        opacity: 1
+                                                    }}
+                                                >
+                                                    /month
+                                                </span>
+                                            </div>
+
+                                            <div
+                                                className="flex items-center"
+                                                style={{
+                                                    height: '22px',
+                                                    gap: '4px',
+                                                    opacity: 1
+                                                }}
+                                            >
+                                                <span className="text-[13px] font-medium text-gray-400 line-through shrink-0">₹{Math.round(currentPlan.price * 1.5) * quantity}</span>
+                                                <span
+                                                    className="text-white text-[10px] font-bold flex items-center justify-center whitespace-nowrap shrink-0"
+                                                    style={{
+                                                        width: '59px',
+                                                        height: '22px',
+                                                        borderRadius: '27px',
+                                                        padding: '4px 10px',
+                                                        gap: '10px',
+                                                        opacity: 1,
+                                                        background: 'var(--color-red-red-600, hsla(3, 86%, 51%, 1))',
+                                                        boxShadow: '0px 0px 1px 0px hsla(0, 0%, 47%, 0.1), 0px 1px 1px 0px hsla(0, 0%, 47%, 0.09), 0px 3px 2px 0px hsla(0, 0%, 47%, 0.05), 0px 5px 2px 0px hsla(0, 0%, 47%, 0.01), 0px 9px 2px 0px hsla(0, 0%, 47%, 0)'
+                                                    }}
+                                                >
+                                                    20% off
+                                                </span>
+                                            </div>
+                                        </div>
+
+                                        <div
+                                            className="flex items-center justify-end"
+                                            style={{
+                                                width: '234.36px',
+                                                height: '55px',
+                                                paddingRight: '20px',
+                                                paddingLeft: '20px',
+                                                gap: '15px',
+                                                opacity: 1
+                                            }}
+                                        >
+                                            <span className="text-[13.5px] text-[#1D1D1F] font-medium">Quantity</span>
+                                            <div className="flex items-center gap-4">
+                                                <button onClick={() => setQuantity(Math.max(1, quantity - 1))} className="text-gray-400 hover:text-black transition-colors">
+                                                    <FaMinus size={10} />
+                                                </button>
+                                                <div className="w-[38px] h-[34px] bg-white border border-gray-100 rounded-[8px] flex items-center justify-center shadow-[0_1px_2px_rgba(0,0,0,0.05)]">
+                                                    <span className="text-[14px] font-bold text-[#1D1D1F]">{quantity}</span>
+                                                </div>
+                                                <button onClick={() => setQuantity(quantity + 1)} className="text-gray-400 hover:text-black transition-colors">
+                                                    <FaPlus size={10} />
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {/* View All Benefits Row */}
+                                    <div
+                                        className="flex items-center justify-center w-full grow"
+                                        style={{ borderTop: '1px solid hsla(0, 0%, 93%, 1)' }}
+                                    >
+                                        <button
+                                            className="hover:opacity-80 transition-opacity"
+                                            style={{
+                                                fontFamily: '"Mona Sans", sans-serif',
+                                                fontWeight: 700,
+                                                fontSize: '11px',
+                                                lineHeight: '16px',
+                                                color: 'hsla(29, 100%, 44%, 1)',
+                                                textDecoration: 'underline',
+                                                textDecorationStyle: 'solid',
+                                                textUnderlineOffset: '6%',
+                                                background: 'none',
+                                                border: 'none',
+                                                padding: 0,
+                                                cursor: 'pointer'
+                                            }}
+                                        >
+                                            View All Benefits
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* What's included in your plan Section */}
+                            <div
+                                className="flex flex-col mt-[-18px]"
+                                style={{
+                                    width: '536.36px',
+                                    height: '68px',
+                                    opacity: 1,
+                                    gap: '6px'
+                                }}
+                            >
+                                <div style={{ height: '16px', display: 'flex', alignItems: 'center' }}>
+                                    <h4
+                                        className="px-1"
+                                        style={{
+                                            fontFamily: '"Mona Sans", sans-serif',
+                                            fontWeight: 600,
+                                            fontSize: '13px',
+                                            lineHeight: '16px',
+                                            letterSpacing: '-0.02em',
+                                            color: 'hsla(0, 0%, 12%, 1)',
+                                            opacity: 1
+                                        }}
+                                    >
+                                        What’s included in your plan
+                                    </h4>
+                                </div>
+
+                                <div
+                                    className="flex gap-[4px] w-full"
+                                    style={{ height: '48px' }}
+                                >
+                                    {/* Fully Functional */}
+                                    <div
+                                        className="rounded-lg flex items-center gap-[8px] p-[8px] overflow-hidden shrink-0"
+                                        style={{
+                                            width: '131.09px',
+                                            background: 'linear-gradient(89.92deg, #0689FF -1.19%, #0075FF 100.13%)',
+                                            border: '1px solid hsla(198, 100%, 85%, 1)'
+                                        }}
+                                    >
+                                        <div className="shrink-0 text-white"><Sparkle size={18} weight="bold" /></div>
+                                        <span
+                                            style={{
+                                                fontFamily: '"Mona Sans", sans-serif',
+                                                fontWeight: 600,
+                                                fontSize: '11px',
+                                                lineHeight: '16px',
+                                                letterSpacing: '-0.02em',
+                                                color: 'white'
+                                            }}
+                                        >
+                                            Fully<br />Functional
+                                        </span>
+                                    </div>
+
+                                    {/* Accessories Included */}
+                                    <div
+                                        className="rounded-lg flex items-center gap-[8px] p-[8px] overflow-hidden shrink-0"
+                                        style={{
+                                            width: '131.09px',
+                                            background: 'linear-gradient(89.92deg, #0689FF -1.19%, #0075FF 100.13%)',
+                                            border: '1px solid hsla(198, 100%, 85%, 1)'
+                                        }}
+                                    >
+                                        <div className="shrink-0 text-white"><Package size={18} weight="bold" /></div>
+                                        <span
+                                            style={{
+                                                fontFamily: '"Mona Sans", sans-serif',
+                                                fontWeight: 600,
+                                                fontSize: '11px',
+                                                lineHeight: '16px',
+                                                letterSpacing: '-0.02em',
+                                                color: 'white'
+                                            }}
+                                        >
+                                            Accessories<br />Included
+                                        </span>
+                                    </div>
+
+                                    {/* Free Repairs & Maintenance */}
+                                    <div
+                                        className="rounded-lg flex items-center gap-[8px] p-[8px] overflow-hidden shrink-0"
+                                        style={{
+                                            width: '131.09px',
+                                            background: 'linear-gradient(89.92deg, #0689FF -1.19%, #0075FF 100.13%)',
+                                            border: '1px solid hsla(198, 100%, 85%, 1)'
+                                        }}
+                                    >
+                                        <div className="shrink-0 text-white"><UserCircle size={18} weight="bold" /></div>
+                                        <span
+                                            style={{
+                                                fontFamily: '"Mona Sans", sans-serif',
+                                                fontWeight: 600,
+                                                fontSize: '11px',
+                                                lineHeight: '16px',
+                                                letterSpacing: '-0.02em',
+                                                color: 'white'
+                                            }}
+                                        >
+                                            Free Repairs &<br />Maintenance
+                                        </span>
+                                    </div>
+
+                                    {/* Professionally sanitized */}
+                                    <div
+                                        className="rounded-lg flex items-center gap-[8px] p-[8px] overflow-hidden shrink-0"
+                                        style={{
+                                            width: '131.09px',
+                                            background: 'linear-gradient(89.92deg, #0689FF -1.19%, #0075FF 100.13%)',
+                                            border: '1px solid hsla(198, 100%, 85%, 1)'
+                                        }}
+                                    >
+                                        <div className="shrink-0 text-white"><Bank size={18} weight="bold" /></div>
+                                        <span
+                                            style={{
+                                                fontFamily: '"Mona Sans", sans-serif',
+                                                fontWeight: 600,
+                                                fontSize: '11px',
+                                                lineHeight: '16px',
+                                                letterSpacing: '-0.02em',
+                                                color: 'white'
+                                            }}
+                                        >
+                                            Professionally<br />sanitized
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Deposit & KYC Information Row */}
+                            <div
+                                className="flex gap-[6px] items-center mt-[-24px]"
+                                style={{
+                                    width: '536.36px',
+                                    height: '56px',
+                                }}
+                            >
+                                {/* Refundable Deposit Card */}
+                                <div
+                                    className="h-full rounded-[12px] flex items-center justify-between px-[8px] py-[2px] shrink-0"
+                                    style={{
+                                        width: '264.18px',
+                                        background: 'hsla(200, 100%, 92%, 1)',
+                                        border: '1px solid hsla(198, 100%, 85%, 1)'
+                                    }}
+                                >
+                                    <div className="flex items-center justify-between w-full" style={{ height: '23px' }}>
+                                        <span
+                                            style={{
+                                                width: '139px',
+                                                height: '16px',
+                                                fontFamily: '"Mona Sans", sans-serif',
+                                                fontWeight: 600,
+                                                fontSize: '11px',
+                                                lineHeight: '16px',
+                                                letterSpacing: '-0.02em',
+                                                color: 'hsla(214, 92%, 40%, 1)'
+                                            }}
+                                        >
+                                            100% Refundable Deposit
+                                        </span>
+                                        <span
+                                            style={{
+                                                width: '61px',
+                                                height: '23px',
+                                                fontFamily: '"Mona Sans", sans-serif',
+                                                fontWeight: 600,
+                                                fontSize: '16px',
+                                                lineHeight: '23px',
+                                                letterSpacing: '-0.015em',
+                                                color: 'hsla(214, 92%, 40%, 1)'
+                                            }}
+                                        >
+                                            ₹{product.securityDeposit || '20,000'}
+                                        </span>
+                                    </div>
+                                </div>
+
+                                {/* KYC & Delivery Card */}
+                                <div
+                                    className="h-full flex items-center justify-between shrink-0"
+                                    style={{
+                                        width: '264.18px',
+                                        height: '56px',
+                                        background: 'var(--color-purple-purple-100, hsla(269, 100%, 95%, 1))',
+                                        border: '1px solid hsla(272, 72%, 47%, 0.3)',
+                                        borderRadius: '12px',
+                                        paddingLeft: '12px',
+                                        paddingTop: '4px',
+                                        paddingBottom: '4px',
+                                        paddingRight: '0px',
+                                        opacity: 1,
+                                        overflow: 'hidden'
+                                    }}
+                                >
+                                    <div
+                                        className="flex flex-col justify-center"
+                                        style={{
+                                            width: '207px',
+                                            height: '32px',
+                                            gap: '0px'
+                                        }}
+                                    >
+                                        <div
+                                            style={{
+                                                fontFamily: '"Mona Sans", sans-serif',
+                                                fontWeight: 600,
+                                                fontSize: '11px',
+                                                lineHeight: '16px',
+                                                letterSpacing: '-0.02em',
+                                                color: 'hsla(272, 72%, 47%, 1)',
+                                                whiteSpace: 'nowrap'
+                                            }}
+                                        >
+                                            Place Order & complete KYC anytime
+                                        </div>
+                                        <div
+                                            style={{
+                                                fontFamily: '"Mona Sans", sans-serif',
+                                                fontWeight: 500,
+                                                fontSize: '11px',
+                                                lineHeight: '16px',
+                                                letterSpacing: '-0.02em',
+                                                color: 'hsla(272, 72%, 47%, 1)',
+                                                whiteSpace: 'nowrap'
+                                            }}
+                                        >
+                                            to get your items the next day
+                                        </div>
+                                    </div>
+                                    <div
+                                        style={{
+                                            width: '51px',
+                                            height: '56px',
+                                            background: 'hsla(0, 0%, 89%, 1)',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            justifyContent: 'center',
+                                            flexShrink: 0,
+                                            position: 'relative'
+                                        }}
+                                    >
+                                        <span
+                                            style={{
+                                                position: 'absolute',
+                                                top: '22px',
+                                                left: '19px',
+                                                fontFamily: '"Mona Sans", sans-serif',
+                                                fontWeight: 600,
+                                                fontSize: '11px',
+                                                lineHeight: '16px',
+                                                letterSpacing: '-0.02em',
+                                                color: '#000000',
+                                                width: '14px',
+                                                height: '16px'
+                                            }}
+                                        >
+                                            gif
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Primary CTA */}
+                            <button
+                                onClick={handleAddToCart}
+                                onMouseEnter={() => setIsRentHovered(true)}
+                                onMouseLeave={() => setIsRentHovered(false)}
+                                style={{
+                                    width: '536.36px',
+                                    height: '45px',
+                                    paddingLeft: '20px',
+                                    paddingRight: '20px',
+                                    paddingTop: '6px',
+                                    paddingBottom: '6px',
+                                    background: isRentHovered ? 'hsla(44, 100%, 60%, 1)' : 'hsla(44, 100%, 64%, 1)',
+                                    borderRadius: '9999px',
+                                    boxShadow: isRentHovered ? 'none' : '0px 3px 7px 0px hsla(0, 0%, 55%, 0.05), 0px 13px 13px 0px hsla(0, 0%, 55%, 0.04), 0px 28px 17px 0px hsla(0, 0%, 55%, 0.02), 0px 50px 20px 0px hsla(0, 0%, 55%, 0.01), 0px 78px 22px 0px hsla(0, 0%, 55%, 0)',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    gap: '2px',
+                                    marginTop: '-24px',
+                                    border: 'none',
+                                    borderBottom: isRentHovered ? 'none' : '1px solid hsla(44, 100%, 54%, 1)',
+                                    cursor: 'pointer',
+                                    transform: isRentHovered ? 'translateY(1px)' : 'none',
+                                    transition: 'all 0.1s ease-out'
+                                }}
+                                className="active:scale-[0.98]"
+                            >
+                                <span style={{
+                                    fontFamily: '"Mona Sans", sans-serif',
+                                    fontWeight: 700,
+                                    fontSize: '15px',
+                                    color: '#1D1D1F'
+                                }}>
+                                    Rent Now
+                                </span>
+                            </button>
+
+                            {/* High-Fidelity Info Row (Replaced Secondary Cards) */}
+                            <div
+                                className="flex gap-[10px] items-center"
+                                style={{
+                                    width: '536.36px',
+                                    height: '56px',
+                                    opacity: 1,
+                                    marginTop: '-24px'
+                                }}
+                            >
+                                {/* Cancel/Return Card */}
+                                <div
+                                    className="h-full flex items-center shrink-0"
+                                    style={{
+                                        width: '263.18px',
+                                        height: '56px',
+                                        paddingTop: '12px',
+                                        paddingRight: '8px',
+                                        paddingBottom: '12px',
+                                        paddingLeft: '8px',
+                                        borderRadius: '16px',
+                                        background: 'var(--color-orange-orange-50, hsla(44, 100%, 96%, 1))',
+                                        border: '1px solid hsla(47, 100%, 76%, 1)',
+                                        opacity: 1
+                                    }}
+                                >
+                                    <div
+                                        className="flex items-center"
+                                        style={{
+                                            width: '247.18px',
+                                            height: '32px',
+                                            gap: '8px'
+                                        }}
+                                    >
+                                        <div
+                                            className="rounded-full flex items-center justify-center shrink-0"
+                                            style={{
+                                                width: '28px',
+                                                height: '28px',
+                                                background: 'hsla(44, 100%, 91%, 1)',
+                                                position: 'relative',
+                                                borderRadius: '33px'
+                                            }}
+                                        >
+                                            <Truck
+                                                style={{
+                                                    position: 'absolute',
+                                                    top: '4.27px',
+                                                    left: '4.5px',
+                                                    width: '20px',
+                                                    height: '20px',
+                                                    color: 'hsla(29, 100%, 44%, 1)'
+                                                }}
                                             />
                                         </div>
-                                    </SwiperSlide>
-                                ))}
-                            </Swiper>
-                        </div>
+                                        <div
+                                            className="flex items-center justify-between shrink-0 h-full"
+                                            style={{
+                                                width: '211.18px',
+                                                gap: '4px'
+                                            }}
+                                        >
+                                            <div
+                                                className="flex flex-col justify-center h-full"
+                                                style={{ width: '140.18px' }}
+                                            >
+                                                <span
+                                                    style={{
+                                                        fontFamily: '"Mona Sans", sans-serif',
+                                                        fontWeight: 600,
+                                                        fontSize: '11px',
+                                                        lineHeight: '13px',
+                                                        color: 'hsla(29, 100%, 44%, 1)',
+                                                        display: 'block'
+                                                    }}
+                                                >
+                                                    What if I cancel or return
+                                                </span>
+                                                <span
+                                                    style={{
+                                                        fontFamily: '"Mona Sans", sans-serif',
+                                                        fontWeight: 600,
+                                                        fontSize: '11px',
+                                                        lineHeight: '13px',
+                                                        color: 'hsla(29, 100%, 44%, 1)',
+                                                        display: 'block'
+                                                    }}
+                                                >
+                                                    before 6 months?
+                                                </span>
+                                            </div>
+                                            <button
+                                                onClick={() => setIsCancellationOpen(true)}
+                                                style={{
+                                                    fontSize: '11px',
+                                                    fontWeight: 600,
+                                                    color: 'hsla(3, 86%, 51%, 1)',
+                                                    textDecoration: 'underline',
+                                                    background: 'none',
+                                                    border: 'none',
+                                                    cursor: 'pointer',
+                                                    padding: 0
+                                                }}
+                                            >
+                                                View Details
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
 
-                        {/* Thumbnails Slider */}
-                        <div className="w-full h-[80px] md:h-[110px]">
-                            <Swiper
-                                onSwiper={setThumbsSwiper}
-                                loop={true}
-                                spaceBetween={12}
-                                slidesPerView={4}
-                                freeMode={true}
-                                watchSlidesProgress={true}
-                                modules={[FreeMode, Navigation, Thumbs]}
-                                className="thumbs-swiper h-full"
-                                breakpoints={{
-                                    320: { slidesPerView: 3, spaceBetween: 10 },
-                                    768: { slidesPerView: 4, spaceBetween: 12 }
+                                {/* Tenure Expansion Card */}
+                                <div
+                                    className="h-full flex items-center shrink-0"
+                                    style={{
+                                        width: '263.18px',
+                                        height: '56px',
+                                        paddingTop: '12px',
+                                        paddingRight: '8px',
+                                        paddingBottom: '12px',
+                                        paddingLeft: '8px',
+                                        borderRadius: '16px',
+                                        background: 'var(--color-orange-orange-50, hsla(44, 100%, 96%, 1))',
+                                        border: '1px solid hsla(47, 100%, 76%, 1)',
+                                        opacity: 1
+                                    }}
+                                >
+                                    <div
+                                        className="flex items-center"
+                                        style={{
+                                            width: '247.18px',
+                                            height: '32px',
+                                            gap: '8px'
+                                        }}
+                                    >
+                                        <div
+                                            className="rounded-full flex items-center justify-center shrink-0"
+                                            style={{
+                                                width: '28px',
+                                                height: '28px',
+                                                background: 'hsla(44, 100%, 91%, 1)',
+                                                position: 'relative',
+                                                borderRadius: '33px'
+                                            }}
+                                        >
+                                            <CalendarDots
+                                                style={{
+                                                    position: 'absolute',
+                                                    top: '4.27px',
+                                                    left: '4.5px',
+                                                    width: '20px',
+                                                    height: '20px',
+                                                    color: 'hsla(29, 100%, 44%, 1)'
+                                                }}
+                                            />
+                                        </div>
+                                        <div
+                                            className="flex items-center justify-between shrink-0 h-full"
+                                            style={{
+                                                width: '211.18px',
+                                                gap: '4px'
+                                            }}
+                                        >
+                                            <div
+                                                className="flex flex-col justify-center h-full"
+                                                style={{ width: '140.18px' }}
+                                            >
+                                                <span
+                                                    style={{
+                                                        fontFamily: '"Mona Sans", sans-serif',
+                                                        fontWeight: 600,
+                                                        fontSize: '11px',
+                                                        lineHeight: '13px',
+                                                        color: 'hsla(29, 100%, 44%, 1)',
+                                                        display: 'block'
+                                                    }}
+                                                >
+                                                    How do I extend tenure
+                                                </span>
+                                                <span
+                                                    style={{
+                                                        fontFamily: '"Mona Sans", sans-serif',
+                                                        fontWeight: 600,
+                                                        fontSize: '11px',
+                                                        lineHeight: '13px',
+                                                        color: 'hsla(29, 100%, 44%, 1)',
+                                                        display: 'block'
+                                                    }}
+                                                >
+                                                    after 6 months?
+                                                </span>
+                                            </div>
+                                            <Link
+                                                href="#"
+                                                style={{
+                                                    width: '67px',
+                                                    height: '16px',
+                                                    fontFamily: '"Mona Sans", sans-serif',
+                                                    fontWeight: 600,
+                                                    fontSize: '11px',
+                                                    lineHeight: '13px',
+                                                    color: 'hsla(3, 86%, 51%, 1)',
+                                                    textDecoration: 'underline',
+                                                    textDecorationStyle: 'solid',
+                                                    textUnderlineOffset: '12.5%',
+                                                    textDecorationThickness: '12%',
+                                                    whiteSpace: 'nowrap',
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    justifyContent: 'flex-end'
+                                                }}
+                                            >
+                                                View Details
+                                            </Link>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Delivery Details */}
+                            <div 
+                                style={{
+                                    width: '536.36px',
+                                    height: '59px',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'space-between',
+                                    padding: '10px',
+                                    borderRadius: '12px',
+                                    background: 'hsla(0, 0%, 100%, 1)',
+                                    border: '1px solid hsla(0, 0%, 89%, 1)',
+                                    marginTop: '-24px',
+                                    opacity: 1
                                 }}
                             >
-                                {(product.images && product.images.length > 0 ? product.images : [mainImage, mainImage, mainImage, mainImage]).map((img, i) => (
-                                    <SwiperSlide key={i}>
-                                        <div className="w-full h-full bg-white border border-[#EDEDED] rounded-xl p-2 flex items-center justify-center cursor-pointer transition-all hover:border-gray-400 overflow-hidden relative">
-                                            <Image src={img} alt={`Thumb ${i}`} fill className="object-contain mix-blend-darken brightness-[1.08] contrast-[1.04]" />
-                                        </div>
-                                    </SwiperSlide>
-                                ))}
-                            </Swiper>
-                        </div>
+                                <div 
+                                    className="flex items-center" 
+                                    style={{ 
+                                        width: '356px', 
+                                        height: '39px', 
+                                        gap: '4px' 
+                                    }}
+                                >
+                                    <div 
+                                        className="rounded-full flex items-center justify-center shrink-0"
+                                        style={{ 
+                                            width: '32px', 
+                                            height: '32px', 
+                                            background: 'hsla(120, 100%, 95%, 1)' 
+                                        }}
+                                    >
+                                        <MapPin weight="fill" size={18} color="hsla(120, 100%, 35%, 1)" />
+                                    </div>
+                                    
+                                    <span 
+                                        style={{
+                                            fontFamily: '"Mona Sans", sans-serif',
+                                            fontWeight: 600,
+                                            fontSize: '14px',
+                                            color: '#1D1D1F',
+                                            paddingLeft: '4px'
+                                        }}
+                                    >
+                                        Delivery
+                                    </span>
 
-                        {/* Tabs + Table Details */}
-                        <div className="w-full mb-10 mt-2">
-                            <div className="border border-gray-200 rounded-[28px] overflow-hidden bg-white shadow-sm">
-                                {/* Tabs Header */}
-                                <div className="flex items-center gap-4 px-6 pt-5 pb-5 border-b border-gray-100">
-                                    {['Product Details', 'Return Policy', 'Shipping Policy'].map((tab) => (
-                                        <button
-                                            key={tab}
-                                            onClick={() => setActiveTab(tab)}
-                                            className={`text-[15px] font-bold transition-all px-[20px] py-[10px] rounded-[24px] ${activeTab === tab ? 'bg-[#333333] text-white shadow-sm' : 'text-gray-800 hover:bg-gray-50 bg-transparent'}`}
-                                        >
-                                            {tab}
-                                        </button>
-                                    ))}
+                                    <div 
+                                        className="h-full flex items-center px-4 ml-2"
+                                        style={{
+                                            border: '1.5px solid hsla(0, 0%, 85%, 1)',
+                                            borderRadius: '10px',
+                                            flex: 1
+                                        }}
+                                    >
+                                        <input
+                                            type="text"
+                                            placeholder="Enter your pincode"
+                                            style={{
+                                                border: 'none',
+                                                outline: 'none',
+                                                fontSize: '14px',
+                                                fontFamily: '"Mona Sans", sans-serif',
+                                                width: '100%',
+                                                background: 'transparent',
+                                                color: '#1D1D1F'
+                                            }}
+                                        />
+                                    </div>
                                 </div>
 
-                                {/* Tab Content */}
-                                <div className="px-10 py-10 min-h-[300px]">
-                                    {activeTab === 'Product Details' && (
-                                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-y-10 gap-x-8">
-                                            {specs.map((item, i) => (
-                                                <div key={i} className="flex flex-col gap-2">
-                                                    <span className="text-[13px] font-black text-[#1D1D1F] uppercase">{item.label}</span>
-                                                    <span className="text-[15px] font-medium text-gray-600 whitespace-pre-line">{item.value}</span>
-                                                </div>
-                                            ))}
-                                        </div>
-                                    )}
-                                    {activeTab === 'Return Policy' && (
-                                        <div className="prose max-w-none">
-                                            <p className="text-[#1D1D1F] whitespace-pre-line leading-relaxed font-medium">
-                                                {product.returnPolicy || "Standard return policy applies. Please contact support for details."}
-                                            </p>
-                                        </div>
-                                    )}
-                                    {activeTab === 'Shipping Policy' && (
-                                        <div className="prose max-w-none">
-                                            <p className="text-[#1D1D1F] whitespace-pre-line leading-relaxed font-medium">
-                                                {product.shippingPolicy || "Standard shipping policy applies. Delivery usually takes 2-5 business days."}
-                                            </p>
-                                        </div>
-                                    )}
-                                </div>
+                                <button 
+                                    style={{
+                                        width: '125px',
+                                        height: '32px',
+                                        fontFamily: '"Mona Sans", sans-serif',
+                                        fontWeight: 700,
+                                        fontSize: '11px',
+                                        lineHeight: '13px',
+                                        letterSpacing: '0.08em',
+                                        color: 'hsla(0, 0%, 46%, 1)',
+                                        textAlign: 'left',
+                                        background: 'none',
+                                        border: 'none',
+                                        cursor: 'pointer',
+                                        display: 'flex',
+                                        flexDirection: 'column',
+                                        alignItems: 'flex-start',
+                                        justifyContent: 'center',
+                                        padding: 0
+                                    }}
+                                >
+                                    <span>Check availability</span>
+                                    <span>in your state</span>
+                                </button>
                             </div>
                         </div>
                     </div>
 
-                    {/* Right Column - Product Purchase Details */}
-                    {/* Right Column - Product Purchase Details */}
-                    <div className="flex flex-col gap-5">
+                    {/* High-Fidelity Details Tabs Section */}
+                    <div
+                        style={{
+                            width: '100%',
+                            height: '462.0000915527344px',
+                            marginTop: '24px',
+                            background: 'hsla(0, 0%, 100%, 1)',
+                            border: '1px solid var(--color-grey-grey-200, hsla(0, 0%, 89%, 1))',
+                            borderRadius: '24px',
+                            padding: '20px',
+                            display: 'flex',
+                            flexDirection: 'column',
+                            gap: '16px',
+                            opacity: 1,
+                            boxSizing: 'border-box'
+                        }}
+                    >
+                        {/* Tabs Header */}
+                        <div 
+                            className="flex items-center" 
+                            style={{ 
+                                width: '1160px', 
+                                height: '41px', 
+                                gap: '10px',
+                                opacity: 1 
+                            }}
+                        >
+                            {['Product Details', 'Return Policy', 'Shipping Policy'].map((tab) => {
+                                const isActive = activeTab === tab;
+                                return (
+                                    <button
+                                        key={tab}
+                                        onClick={() => setActiveTab(tab)}
+                                        style={{
+                                            width: isActive && tab === 'Product Details' ? '194px' : 'auto',
+                                            height: '41px',
+                                            padding: isActive ? '8px 35px' : '8px 24px',
+                                            borderRadius: '59px',
+                                            fontFamily: '"Mona Sans", sans-serif',
+                                            fontWeight: 600,
+                                            fontStyle: 'normal',
+                                            fontSize: '14px',
+                                            lineHeight: '25px',
+                                            letterSpacing: '-0.01em',
+                                            transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
+                                            background: isActive ? 'hsla(0, 0%, 20%, 1)' : 'hsla(0, 0%, 100%, 1)',
+                                            color: isActive ? 'white' : '#1D1D1F',
+                                            border: isActive ? 'none' : '1px solid hsla(0, 0%, 89%, 1)',
+                                            cursor: 'pointer',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            justifyContent: 'center'
+                                        }}
+                                    >
+                                        {tab}
+                                    </button>
+                                );
+                            })}
+                        </div>
 
-                        {/* Main White Card (Title, Rating, Slider, Price) */}
-                        <div className="bg-white rounded-[20px] p-6 shadow-[0_2px_12px_max(0,rgba(0,0,0,0.04))] border border-[#EDEDED] flex flex-col pt-7 pb-6">
-                            {/* Title */}
-                            <h1 className="text-[22px] font-bold text-[#1D1D1F] leading-[1.3] tracking-tight pr-4">
-                                {product.name}
-                            </h1>
+                        {/* Divider */}
+                        <div style={{ width: '100%', height: '1px', background: 'hsla(0, 0%, 95%, 1)' }} />
 
-                            {/* Rating & Stock */}
-                            <div className="flex items-center gap-3 mt-3 mb-6">
-                                <div className="flex items-center gap-1">
-                                    <div className="flex text-[#FF9500]">
-                                        {[1, 2, 3, 4, 5].map(s => (
-                                            <FaStar key={s} size={14} className={s <= Math.round(product.rating || 0) ? "" : "text-gray-200"} />
+                        {/* Content Area */}
+                        <div className="flex-1 overflow-hidden" style={{ width: '100%' }}>
+                            {activeTab === 'Product Details' && (
+                                <div className="grid grid-cols-3 pt-4" style={{ width: '1160px', height: '299px' }}>
+                                    {/* Column 1: 4 Items */}
+                                    <div className="flex flex-col" style={{ width: '386.67px', height: '299px', gap: '29px' }}>
+                                        {[
+                                            { label: 'MODEL', value: product.name, w: '144px', h: '78px' },
+                                            { label: 'DISPLAY', value: '16.2 inches (3024 x 1964)', w: '189px', h: '53px' },
+                                            { label: 'GRAPHICS', value: 'Apple Integrated 16-core GPU', w: '386.67px', h: '78px' },
+                                            { label: 'DIMENSIONS', value: '35.57 x 35.57 x 1.68 cm * 2.14 kg', w: '386.67px', h: '53px' }
+                                        ].map((item, idx) => (
+                                            <div key={idx} style={{ height: item.h, width: item.w, display: 'flex', flexDirection: 'column', gap: '5px' }}>
+                                                <h4 
+                                                    style={{ 
+                                                        width: '144px',
+                                                        height: '23px',
+                                                        fontFamily: '"Mona Sans", sans-serif',
+                                                        fontWeight: 600,
+                                                        fontSize: '13px',
+                                                        lineHeight: '18px',
+                                                        letterSpacing: '0.02em',
+                                                        color: '#000000',
+                                                        textTransform: 'uppercase'
+                                                    }}
+                                                >
+                                                    {item.label}
+                                                </h4>
+                                                <p 
+                                                    style={{ 
+                                                        fontFamily: '"Mona Sans", sans-serif',
+                                                        fontWeight: 400,
+                                                        fontSize: '14px',
+                                                        lineHeight: '25px',
+                                                        letterSpacing: '-0.01em',
+                                                        color: 'hsla(0, 0%, 12%, 1)'
+                                                    }}
+                                                >
+                                                    {item.value}
+                                                </p>
+                                            </div>
                                         ))}
                                     </div>
-                                    <span className="text-[13px] font-medium text-gray-500 ml-1">{product.rating || "4.5"} ({product.numReviews || 12})</span>
-                                </div>
-                                <div className="bg-green-500 text-white text-[11px] font-bold px-2.5 py-0.5 rounded-[4px] tracking-wide flex items-center gap-1">
-                                    <span className="w-1.5 h-1.5 bg-white rounded-full block"></span> In Stock
-                                </div>
-                            </div>
 
-                            {/* Rental Period Selection */}
-                            <div className="flex justify-between items-center mt-2 mb-1">
-                                <h3 className="text-[13px] font-medium text-gray-800">
-                                    Select your <span className="underline decoration-blue-500 underline-offset-4 decoration-[1.5px] decoration-dashed text-[#007AFF]">minimum rental period</span>
-                                </h3>
-                                <span className="text-[14px] font-bold text-[#1D1D1F]">{duration === 1 ? '1 Month' : `${duration} Months`}</span>
-                            </div>
+                                    {/* Column 2: 4 Items */}
+                                    <div className="flex flex-col" style={{ width: '386.67px', height: '299px', gap: '29px' }}>
+                                        {[
+                                            { label: 'OPERATING SYSTEM', value: 'Mac OS', w: '386.67px', h: '53px' },
+                                            { label: 'MEMORY', value: '24GB', w: '386.67px', h: '53px' },
+                                            { label: 'PROCESSOR', value: 'Apple M4 Pro', w: '386.67px', h: '53px' },
+                                            { label: 'STORAGE', value: '512GB SSD', w: '386.67px', h: '53px' }
+                                        ].map((item, idx) => (
+                                            <div key={idx} style={{ height: item.h, width: item.w, display: 'flex', flexDirection: 'column', gap: '5px' }}>
+                                                <h4 
+                                                    style={{ 
+                                                        width: '144px',
+                                                        height: '23px',
+                                                        fontFamily: '"Mona Sans", sans-serif',
+                                                        fontWeight: 600,
+                                                        fontSize: '13px',
+                                                        lineHeight: '18px',
+                                                        letterSpacing: '0.02em',
+                                                        color: '#000000',
+                                                        textTransform: 'uppercase'
+                                                    }}
+                                                >
+                                                    {item.label}
+                                                </h4>
+                                                <p 
+                                                    style={{ 
+                                                        fontFamily: '"Mona Sans", sans-serif',
+                                                        fontWeight: 400,
+                                                        fontSize: '14px',
+                                                        lineHeight: '25px',
+                                                        letterSpacing: '-0.01em',
+                                                        color: 'hsla(0, 0%, 12%, 1)'
+                                                    }}
+                                                >
+                                                    {item.value}
+                                                </p>
+                                            </div>
+                                        ))}
+                                    </div>
 
-                            {/* Tenure Slider */}
-                            <div className="relative mb-2 mt-4 ml-1 mr-1">
-                                {/* Track */}
-                                {(() => {
-                                    const currentStep = duration <= 1 ? 1 : duration <= 3 ? 2 : duration <= 6 ? 3 : duration <= 9 ? 4 : 5;
-                                    const activePct = ((currentStep - 1) / 4) * 100;
-                                    return (
-                                        <div
-                                            className="relative h-[6px] rounded-full flex items-center"
-                                            style={{ background: `linear-gradient(to right, #EA580C ${activePct}%, #E5E7EB ${activePct}%)` }}
-                                        >
-                                            {[1, 2, 3, 4, 5].map(step => {
-                                                const pct = ((step - 1) / 4) * 100;
-                                                const isActive = step <= currentStep;
-                                                return (
-                                                    <div
-                                                        key={step}
-                                                        className={`absolute w-[16px] h-[16px] rounded-full bg-white transition-colors duration-300 z-10 border-[3px] ${isActive ? 'border-[#EA580C]' : 'border-gray-300'}`}
-                                                        style={{ left: `calc(${pct}% - 8px)` }}
-                                                    />
-                                                );
-                                            })}
-                                            <input
-                                                type="range"
-                                                min="1"
-                                                max="5"
-                                                step="1"
-                                                value={currentStep}
-                                                onChange={(e) => {
-                                                    const step = parseInt(e.target.value);
-                                                    const months = [1, 3, 6, 9, 12];
-                                                    setDuration(months[step - 1]);
+                                    {/* Column 3: 1 Item */}
+                                    <div className="flex flex-col" style={{ width: '386.67px', height: '299px', gap: '29px' }}>
+                                        <div key="keyboard" style={{ height: '53px', display: 'flex', flexDirection: 'column', gap: '5px' }}>
+                                            <h4 
+                                                style={{ 
+                                                    width: '386.67px',
+                                                    height: '23px',
+                                                    fontFamily: '"Mona Sans", sans-serif',
+                                                    fontWeight: 600,
+                                                    fontSize: '13px',
+                                                    lineHeight: '18px',
+                                                    letterSpacing: '0.02em',
+                                                    color: '#000000',
+                                                    textTransform: 'uppercase'
                                                 }}
-                                                className="absolute w-full h-full opacity-0 cursor-pointer z-20"
-                                            />
+                                            >
+                                                KEYBOARD LANGUAGE
+                                            </h4>
+                                            <p 
+                                                style={{ 
+                                                    fontFamily: '"Mona Sans", sans-serif',
+                                                    fontWeight: 400,
+                                                    fontSize: '14px',
+                                                    lineHeight: '25px',
+                                                    letterSpacing: '-0.01em',
+                                                    color: 'hsla(0, 0%, 12%, 1)'
+                                                }}
+                                            >
+                                                English (Qwerty)
+                                            </p>
                                         </div>
-                                    );
-                                })()}
-
-                                {/* Labels Below */}
-                                <div className="flex justify-between mt-[14px] text-[12px] text-gray-500 font-medium">
-                                    <span className="text-left w-6">1+</span>
-                                    <span className="text-center w-6">3+</span>
-                                    <span className="text-center w-6">6+</span>
-                                    <span className="text-center w-6">9+</span>
-                                    <span className="text-right w-6">12+</span>
-                                </div>
-                            </div>
-
-                            {/* Links */}
-                            <div className="flex justify-between items-center text-[12px] font-bold text-[#EA580C] underline decoration-orange-200 underline-offset-4 mt-2">
-                                <Link href="#" className="hover:text-orange-700 transition">price breakdown</Link>
-                                <Link href="#" className="hover:text-orange-700 transition">compare all tenures</Link>
-                            </div>
-
-                            <div className="w-full h-[1px] bg-gray-100 my-5"></div>
-
-                            {/* Price and Quantity */}
-                            <div className="flex justify-between items-center">
-                                <div className="flex items-center gap-[8px]">
-                                    <span className="text-[26px] font-bold text-[#FF3B30] tracking-tight leading-none">₹{currentPlan.price * quantity}</span>
-                                    <span className="text-[13px] font-medium text-gray-500 self-end mb-0.5">/month</span>
-                                    <div className="flex items-center gap-2 ml-2 self-end mb-0.5">
-                                        <span className="text-[13px] font-medium text-gray-400 line-through">₹{Math.round(currentPlan.price * 1.5) * quantity}</span>
-                                        <span className="bg-[#FF3B30] text-white text-[10px] font-bold px-1.5 py-0.5 rounded-[4px]">20% off</span>
                                     </div>
                                 </div>
-
-                                <div className="flex items-center gap-3">
-                                    <span className="text-[12px] text-[#1D1D1F] font-bold">Quantity</span>
-                                    <div className="flex items-center gap-3 border border-gray-200 rounded-md px-2 py-1 bg-white">
-                                        <button onClick={() => setQuantity(Math.max(1, quantity - 1))} className="text-gray-400 hover:text-black w-4 h-4 flex items-center justify-center">
-                                            <FaMinus size={9} />
-                                        </button>
-                                        <span className="text-[13px] font-medium w-3 text-center text-[#1D1D1F]">{quantity}</span>
-                                        <button onClick={() => setQuantity(quantity + 1)} className="text-gray-400 hover:text-black w-4 h-4 flex items-center justify-center">
-                                            <FaPlus size={9} />
-                                        </button>
-                                    </div>
+                            )}
+                            
+                            {activeTab === 'Return Policy' && (
+                                <div className="pt-4" style={{ fontFamily: '"Mona Sans", sans-serif', fontSize: '15px', color: '#4B4B4B', lineHeight: '1.6' }}>
+                                    {product.returnPolicy || "Standard return policy applies. Please contact support for details."}
                                 </div>
-                            </div>
+                            )}
 
-                            <button className="w-full pt-5 text-[11px] font-bold text-black uppercase tracking-widest text-center">
-                                VIEW ALL BENEFITS
-                            </button>
-                        </div>
-
-                        {/* What's included in your plan */}
-                        <div>
-                            <h4 className="text-[13px] font-bold text-gray-800 mb-3 px-1">What's included in your plan</h4>
-                            <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 shrink-0">
-                                <div className="bg-[#007AFF] text-white rounded-[8px] flex items-center gap-2 px-3 py-2.5 shadow-sm">
-                                    <div className="shrink-0"><FaStar size={12} /></div>
-                                    <span className="text-[11px] font-bold leading-tight">Fully Functional</span>
+                            {activeTab === 'Shipping Policy' && (
+                                <div className="pt-4" style={{ fontFamily: '"Mona Sans", sans-serif', fontSize: '15px', color: '#4B4B4B', lineHeight: '1.6' }}>
+                                    {product.shippingPolicy || "Standard shipping policy applies. Delivery usually takes 2-5 business days."}
                                 </div>
-                                <div className="bg-[#007AFF] text-white rounded-[8px] flex items-center gap-2 px-3 py-2.5 shadow-sm">
-                                    <div className="shrink-0"><BsBoxSeam size={12} /></div>
-                                    <span className="text-[11px] font-bold leading-tight">Accessories Included</span>
-                                </div>
-                                <div className="bg-[#007AFF] text-white rounded-[8px] flex items-center gap-2 px-3 py-2.5 shadow-sm">
-                                    <div className="shrink-0"><BsTruck size={12} /></div>
-                                    <span className="text-[11px] font-bold leading-tight">Free Repairs & Maintenance</span>
-                                </div>
-                                <div className="bg-[#007AFF] text-white rounded-[8px] flex items-center gap-2 px-3 py-2.5 shadow-sm">
-                                    <div className="shrink-0"><BsBoxSeam size={12} /></div>
-                                    <span className="text-[11px] font-bold leading-tight">Professionally sanitized</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* Deposit & KYC Banner */}
-                        <div className="bg-[#EBF3FF] rounded-[10px] flex overflow-hidden border border-blue-100 shadow-sm mt-1">
-                            {/* Left part */}
-                            <div className="bg-[#DEF8FA] flex flex-col justify-center px-4 py-3 min-w-[35%] shrink-0 border-r border-blue-100">
-                                <span className="text-[12px] font-bold text-[#007AFF] mb-0.5">100% Refundable Deposit</span>
-                                <span className="text-[16px] font-bold text-[#007AFF]">₹{product.securityDeposit || '20,000'}</span>
-                            </div>
-                            {/* Right part */}
-                            <div className="flex items-center justify-between px-4 py-3 flex-1 bg-[#E8F0FE]">
-                                <p className="text-[11px] font-bold text-[#0066CC] leading-tight pr-2">
-                                    Place Order & complete KYC anytime<br />to get your item delivered fast
-                                </p>
-                                <div className="bg-white/80 p-1.5 rounded text-[#0066CC] shrink-0">
-                                    <FaShareAlt size={12} />
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* Primary CTA */}
-                        <button
-                            onClick={handleAddToCart}
-                            className="w-full bg-[#FFCC00] hover:bg-[#F5C200] active:scale-[0.99] text-[#1D1D1F] font-bold py-[16px] rounded-[12px] text-[15px] transition-all flex items-center justify-center shrink-0 mt-2 shadow-sm"
-                        >
-                            Rent Now
-                        </button>
-
-                        {/* Secondary Info Cards */}
-                        <div className="grid grid-cols-2 gap-3 shrink-0 mt-1">
-                            <div className="border border-[#FDE68A] bg-[#FFF9E6] px-4 py-4 rounded-[12px] flex flex-col gap-1.5 cursor-pointer hover:shadow-sm transition-shadow">
-                                <div className="flex items-start gap-2 mb-1">
-                                    <div className="mt-0.5 text-[#EA580C] shrink-0"><BsTruck size={14} /></div>
-                                    <span className="text-[11px] font-bold text-gray-800 leading-snug">What if I cancel or return before 6 months?</span>
-                                </div>
-                                <span className="text-[11px] font-bold text-[#EA580C] self-end mt-auto underline underline-offset-2">View Details</span>
-                            </div>
-                            <div className="border border-[#FDE68A] bg-[#FFF9E6] px-4 py-4 rounded-[12px] flex flex-col gap-1.5 cursor-pointer hover:shadow-sm transition-shadow">
-                                <div className="flex items-start gap-2 mb-1">
-                                    <div className="mt-0.5 text-[#EA580C] shrink-0"><FaStar size={14} /></div>
-                                    <span className="text-[11px] font-bold text-gray-800 leading-snug">How do I extend tenure after 6 months?</span>
-                                </div>
-                                <span className="text-[11px] font-bold text-[#EA580C] self-end mt-auto underline underline-offset-2">View Details</span>
-                            </div>
-                        </div>
-
-                        {/* Delivery Details */}
-                        <div className="flex items-center gap-3 pt-1 shrink-0 border border-gray-200 rounded-[12px] p-3 bg-white mt-1 shadow-sm">
-                            <div className="flex items-center gap-1.5 min-w-max">
-                                <div className="w-1.5 h-1.5 bg-green-500 rounded-full" />
-                                <span className="text-[12px] font-bold text-gray-700">Delivery</span>
-                            </div>
-
-                            <div className="w-[1px] h-6 bg-gray-200"></div>
-
-                            <input
-                                type="text"
-                                placeholder="Enter your pincode"
-                                className="border border-gray-200 rounded-md px-2.5 py-1.5 text-[12px] flex-1 outline-none focus:border-blue-300 w-full"
-                            />
-
-                            <button className="text-[10px] font-medium text-gray-500 text-center leading-tight max-w-[100px] hover:text-gray-800">
-                                Check availability in your state
-                            </button>
+                            )}
                         </div>
                     </div>
-                </div>
-            </main>
+                </main>
+            </div>
 
-            <BestRentedProducts />
+            <Testimonials />
             <FaqSection />
+            <BestRentedProducts />
+
+            {/* Side Drawers */}
+            <CompareTenures 
+                isOpen={isCompareOpen} 
+                onClose={() => setIsCompareOpen(false)}
+                selectedTenure={duration}
+                onSelect={(val) => {
+                    setDuration(val);
+                }}
+                tenures={tenures}
+            />
+
+            <CancellationSidebar 
+                isOpen={isCancellationOpen} 
+                onClose={() => setIsCancellationOpen(false)} 
+            />
         </div>
     );
 }
-
-// Force Next.js Fast Refresh

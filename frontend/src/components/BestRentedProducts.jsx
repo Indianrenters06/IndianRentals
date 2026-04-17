@@ -287,14 +287,14 @@ const BestRentedProducts = ({ type = "bestRented", defaultTitle = "Curated Produ
 
     return (
         <section
-            className="w-full overflow-hidden bg-white"
+            className="w-full overflow-visible bg-white"
             style={{
                 paddingTop: '96px',
                 paddingBottom: '96px',
                 background: '#FFFFFF'
             }}
         >
-            <div className="max-w-[1200px] mx-auto px-4 sm:px-6">
+            <div className="max-w-[1200px] mx-auto px-4 md:px-8">
                 <div className="flex flex-col mb-[40px] max-w-[350px] md:max-w-none w-full mx-auto md:mx-0">
                     <div className="flex items-center justify-between">
                         <h2 className="font-manrope tracking-tight whitespace-nowrap text-[24px] md:text-[36px] font-semibold text-[#333] leading-tight md:leading-[48px]">

@@ -24,11 +24,12 @@ const Sidebar = ({ selectedDuration, setSelectedDuration, selectedSort, setSelec
 
     return (
         <aside
-            className="shrink-0 hidden lg:flex flex-col font-sans bg-white"
+            className="shrink-0 hidden lg:flex flex-col bg-white"
             style={{
+                fontFamily: "'Mona Sans', sans-serif",
                 width: '260px',
                 minHeight: '754.02px',
-                borderRadius: '20px', // rounded-2xl
+                borderRadius: '20px',
                 border: '1px solid hsla(0, 0%, 89%, 1)',
                 gap: '10px',
                 opacity: 1,
@@ -180,15 +181,72 @@ const Sidebar = ({ selectedDuration, setSelectedDuration, selectedSort, setSelec
             {/* Separator */}
             <div className="border-t border-gray-100 my-2"></div>
 
-            <div className="mb-2">
-                <h3 className="text-[12px] font-bold text-orange-500 uppercase tracking-wider mb-4">Sort By</h3>
-                <div className="space-y-4">
+            <div
+                className="flex flex-col"
+                style={{
+                    width: '208px',
+                    height: '164px',
+                    gap: '12px',
+                    opacity: 1
+                }}
+            >
+                <h3
+                    style={{
+                        fontFamily: "'Mona Sans', sans-serif",
+                        fontWeight: 700,
+                        fontSize: '12px',
+                        lineHeight: '16px',
+                        letterSpacing: '0.08em',
+                        verticalAlign: 'middle',
+                        color: 'hsla(35, 100%, 47%, 1)',
+                        textTransform: 'uppercase',
+                        width: '208px',
+                        height: '16px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        margin: 0,
+                        opacity: 1
+                    }}
+                >Sort By</h3>
+                <div
+                    className="flex flex-col"
+                    style={{
+                        width: '208px',
+                        height: '136px',
+                        gap: '8px',
+                        opacity: 1
+                    }}
+                >
                     {["Most Popular", "Price (high to low)", "Price (low to high)", "New Arrivals"].map((option) => (
-                        <label key={option} className="flex items-center gap-3 cursor-pointer group" onClick={() => setSelectedSort(option)}>
-                            <div className={`w-4 h-4 rounded-full border transition-all duration-200 flex items-center justify-center ${selectedSort === option ? "border-black" : "border-gray-300 group-hover:border-gray-400"}`}>
+                        <label
+                            key={option}
+                            className="flex items-center cursor-pointer group transition-all duration-200"
+                            onClick={() => setSelectedSort(option)}
+                            style={{
+                                width: '208px',
+                                height: '28px',
+                                borderRadius: '6px',
+                                gap: '8px',
+                                padding: '4px',
+                                opacity: 1
+                            }}
+                        >
+                            <div className={`w-4 h-4 rounded-full border transition-all duration-200 flex items-center justify-center shrink-0 ${selectedSort === option ? "border-black" : "border-gray-300 group-hover:border-gray-400"}`}>
                                 {selectedSort === option && <div className="w-2 h-2 rounded-full bg-black" />}
                             </div>
-                            <span className={`text-[13px] transition-colors duration-200 ${selectedSort === option ? "text-black font-medium" : "text-gray-500 group-hover:text-gray-800"}`}>{option}</span>
+                            <span style={{
+                                fontFamily: "'Mona Sans', sans-serif",
+                                fontWeight: selectedSort === option ? 700 : 600,
+                                fontSize: '12px',
+                                lineHeight: '16px',
+                                letterSpacing: '0.08em',
+                                verticalAlign: 'middle',
+                                color: selectedSort === option ? 'hsla(0, 0%, 0%, 1)' : 'hsla(0, 0%, 20%, 1)',
+                                display: 'inline-block',
+                                height: '16px',
+                                opacity: 1,
+                                transition: 'color 0.2s'
+                            }}>{option}</span>
                         </label>
                     ))}
                 </div>
@@ -197,8 +255,16 @@ const Sidebar = ({ selectedDuration, setSelectedDuration, selectedSort, setSelec
             {/* Separator */}
             <div className="border-t border-gray-100 my-2"></div>
 
-            <div>
-                <h3 className="text-[12px] font-bold text-orange-500 uppercase tracking-wider mb-4">Deals</h3>
+            <div
+                className="flex flex-col"
+                style={{
+                    width: '208px',
+                    height: '52px',
+                    gap: '12px',
+                    opacity: 1
+                }}
+            >
+                <h3 className="text-[12px] font-bold text-orange-500 uppercase tracking-wider m-0">Deals</h3>
                 <label className="flex items-center gap-3 cursor-pointer group">
                     <div className="w-4 h-4 rounded border transition-all duration-200 flex items-center justify-center border-gray-300 group-hover:border-gray-400">
                     </div>

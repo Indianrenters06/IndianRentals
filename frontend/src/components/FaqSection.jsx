@@ -22,37 +22,116 @@ const faqs = [
 ];
 
 const FaqSection = () => {
-    const [activeIndex, setActiveIndex] = useState(0);
+    const [activeIndices, setActiveIndices] = useState([0, 1, 2, 3]);
 
     const toggleFaq = (index) => {
-        setActiveIndex(activeIndex === index ? null : index);
+        if (activeIndices.includes(index)) {
+            setActiveIndices(activeIndices.filter(i => i !== index));
+        } else {
+            setActiveIndices([...activeIndices, index]);
+        }
     };
 
     return (
-        <div className="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8 py-24 border-t border-gray-100">
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-24">
+        <section 
+            className="w-full border-t border-gray-100 bg-white"
+            style={{
+                minHeight: '568px',
+                paddingTop: '48px',
+                paddingBottom: '48px',
+                display: 'flex',
+                alignItems: 'center'
+            }}
+        >
+            <div 
+                className="max-w-[1200px] mx-auto px-4 md:px-8 w-full flex flex-col lg:flex-row justify-between items-start gap-[100px]"
+            >
                 {/* Left Column */}
-                <div className="lg:col-span-5">
-                    <span className="text-gray-600 font-medium text-lg mb-4 block font-sans">Welcome to FAQ!</span>
-                    <h2 className="text-4xl md:text-5xl font-bold text-gray-900 leading-tight font-sans">
+                <div 
+                    className="w-full lg:max-w-[442px] flex flex-col gap-[20px]"
+                    style={{
+                        minHeight: '190px'
+                    }}
+                >
+                    <span 
+                        className="block"
+                        style={{
+                            width: 'auto',
+                            height: '35px',
+                            fontFamily: "'Mona Sans', sans-serif",
+                            fontWeight: 500,
+                            fontSize: '16px',
+                            lineHeight: '24px',
+                            letterSpacing: '0.01em',
+                            color: 'hsla(0, 0%, 20%, 1)'
+                        }}
+                    >
+                        Welcome to FAQ!
+                    </span>
+                    <h2 
+                        style={{
+                            width: 'auto',
+                            maxWidth: '442px',
+                            height: '135px',
+                            fontFamily: "'Mona Sans', sans-serif",
+                            fontWeight: 600,
+                            fontSize: '36px',
+                            lineHeight: '45px',
+                            letterSpacing: '-0.02em',
+                            color: 'hsla(0, 0%, 20%, 1)',
+                            margin: 0
+                        }}
+                    >
                         Everything you need to know about renting with IndianRenters.com
                     </h2>
                 </div>
 
                 {/* Right Column - Accordion */}
-                <div className="lg:col-span-7">
+                <div 
+                    className="w-full lg:flex-1 lg:max-w-[758px]"
+                    style={{
+                        height: '568px',
+                        borderBottom: '1px solid hsla(0, 0%, 69%, 1)'
+                    }}
+                >
                     <div className="space-y-0">
                         {faqs.map((faq, index) => (
-                            <div key={index} className="border-b border-gray-200 last:border-0">
+                            <div 
+                                key={index} 
+                                className="w-full"
+                                style={{
+                                    borderTop: '1px solid hsla(0, 0%, 69%, 1)',
+                                    height: activeIndices.includes(index) ? '142px' : '72px',
+                                    overflow: 'hidden'
+                                }}
+                            >
                                 <button
-                                    className="w-full flex items-center justify-between py-6 text-left focus:outline-none group"
+                                    className="w-full flex items-center justify-between text-left focus:outline-none group gap-[24px]"
+                                    style={{
+                                        height: '72px',
+                                        paddingTop: '20px',
+                                        paddingBottom: '20px'
+                                    }}
                                     onClick={() => toggleFaq(index)}
                                 >
-                                    <span className="text-lg md:text-xl font-bold text-gray-900 font-sans pr-8 group-hover:text-blue-600 transition-colors">
+                                    <span 
+                                        className="group-hover:text-blue-600 transition-colors"
+                                        style={{
+                                            width: 'auto',
+                                            maxWidth: '702px',
+                                            height: '25px',
+                                            fontFamily: "'Mona Sans', sans-serif",
+                                            fontWeight: 700,
+                                            fontSize: '18px',
+                                            lineHeight: '25px',
+                                            letterSpacing: '0.01em',
+                                            color: 'hsla(0, 0%, 20%, 1)'
+                                        }}
+                                    >
                                         {faq.question}
                                     </span>
                                     <span className="flex-shrink-0 text-gray-400 group-hover:text-blue-600 transition-colors">
-                                        {activeIndex === index ? (
+                                        {activeIndices.includes(index) ? (
                                             <PiCaretUp size={24} />
                                         ) : (
                                             <PiCaretDown size={24} />
@@ -60,10 +139,26 @@ const FaqSection = () => {
                                     </span>
                                 </button>
                                 <div
-                                    className={`overflow-hidden transition-all duration-300 ease-in-out ${activeIndex === index ? 'max-h-96 opacity-100 mb-6' : 'max-h-0 opacity-0'
+                                    className={`overflow-hidden transition-all duration-300 ease-in-out ${activeIndices.includes(index) ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'
                                         }`}
+                                    style={{
+                                        paddingBottom: activeIndices.includes(index) ? '24px' : '0'
+                                    }}
                                 >
-                                    <p className="text-gray-600 leading-relaxed font-sans text-base">
+                                    <p 
+                                        style={{
+                                            width: 'auto',
+                                            maxWidth: '758px',
+                                            height: '46px',
+                                            fontFamily: "'Mona Sans', sans-serif",
+                                            fontWeight: 400,
+                                            fontSize: '14px',
+                                            lineHeight: '23px',
+                                            letterSpacing: '0.01em',
+                                            color: 'hsla(0, 0%, 33%, 1)',
+                                            margin: 0
+                                        }}
+                                    >
                                         {faq.answer}
                                     </p>
                                 </div>
@@ -72,7 +167,7 @@ const FaqSection = () => {
                     </div>
                 </div>
             </div>
-        </div>
+        </section>
     );
 };
 

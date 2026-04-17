@@ -72,11 +72,37 @@ const CategoriesPage = () => {
     }, []);
 
     return (
-        <div className="min-h-screen bg-white">
-            <main className="max-w-[1200px] w-full mx-auto px-4 md:px-8 pt-[40px] pb-[40px] flex flex-col gap-[30px]">
-
+        <div className="min-h-screen bg-white w-full flex flex-col items-center">
+            <main
+                style={{
+                    maxWidth: '1440px',
+                    width: '100%',
+                    minHeight: '882px',
+                    margin: '0 auto',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    opacity: 1,
+                    boxSizing: 'border-box'
+                }}
+            >
+                <div
+                    style={{
+                        width: '1200px',
+                        height: '882px',
+                        paddingTop: '40px',
+                        paddingBottom: '80px',
+                        paddingLeft: '32px',
+                        paddingRight: '32px',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: '30px',
+                        boxSizing: 'border-box',
+                        opacity: 1
+                    }}
+                >
                 {/* Header Section */}
-                <div className="flex flex-col gap-[12px] w-full max-w-[1200px]">
+                <div className="flex flex-col gap-[12px] w-full">
                     {/* Breadcrumb */}
                     <div className="flex items-center gap-[8px] w-full max-w-[1200px] h-[16px] text-[12px] font-medium text-[#64748B]">
                         <span style={{
@@ -201,6 +227,7 @@ const CategoriesPage = () => {
                             </Link>
                         </motion.div>
                     ))}
+                </div>
                 </div>
             </main>
         </div>

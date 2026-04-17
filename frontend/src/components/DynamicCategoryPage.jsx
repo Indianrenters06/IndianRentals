@@ -189,21 +189,28 @@ export default function DynamicCategoryPage({
 
             <main
                 style={{
-                    maxWidth: '1200px',
+                    maxWidth: '1440px',
                     width: '100%',
+                    height: '722px',
                     margin: '0 auto',
-                    padding: '20px 32px 20px 32px',
+                    paddingTop: '20px',
                     display: 'flex',
                     flexDirection: 'column',
-                    boxSizing: 'border-box'
+                    alignItems: 'center',
+                    background: 'hsla(0, 0%, 100%, 1)',
+                    boxSizing: 'border-box',
+                    opacity: 1
                 }}
             >
                 {/* Inner Container */}
                 <div
                     style={{
+                        maxWidth: '1200px',
                         width: '100%',
                         paddingTop: '40px',
-                        paddingBottom: '20px',
+                        paddingBottom: '80px',
+                        paddingLeft: '32px',
+                        paddingRight: '32px',
                         display: 'flex',
                         flexDirection: 'column',
                         gap: '30px',
