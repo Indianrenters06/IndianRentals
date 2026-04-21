@@ -33,8 +33,10 @@ const FALLBACK_BANNERS = [
 const BannerCarousel = ({ banners, current, setCurrent, height = "387px", productImage }) => {
     const [direction, setDirection] = useState(1);
     const [failedImages, setFailedImages] = useState(new Set());
+    const router = useRouter();
 
-    const go = useCallback((dir) => {
+    const go = useCallback((dir, event) => {
+        if (event) { event.preventDefault(); event.stopPropagation(); }
         setDirection(dir);
         setCurrent(prev => (prev + dir + banners.length) % banners.length);
     }, [banners.length, setCurrent]);
@@ -68,8 +70,9 @@ const BannerCarousel = ({ banners, current, setCurrent, height = "387px", produc
                     animate="center"
                     exit="exit"
                     transition={{ duration: 0.45, ease: "easeInOut" }}
-                    className="absolute inset-0"
+                    className="absolute inset-0 cursor-pointer"
                     style={{ background: slide.bg || "#F5F5F7" }}
+                    onClick={() => router.push(slide.href || "/products")}
                 >
                     {/* Full-bleed image — covers entire banner, no gaps */}
                     {displayImage && (
@@ -109,7 +112,7 @@ const BannerCarousel = ({ banners, current, setCurrent, height = "387px", produc
                     >
                         <div className="flex items-center justify-center gap-4">
                             <button
-                                onClick={() => go(-1)}
+                                onClick={(e) => go(-1, e)}
                                 className="group flex items-center justify-center rounded-full bg-[hsla(0,0%,96%,1)] hover:bg-[hsla(0,0%,20%,1)] hover:scale-110 transition-all duration-200 shrink-0"
                                 style={{ width: "24px", height: "24px", padding: "2.25px" }}
                             >
@@ -119,7 +122,7 @@ const BannerCarousel = ({ banners, current, setCurrent, height = "387px", produc
                                 {slide.title}
                             </h3>
                             <button
-                                onClick={() => go(1)}
+                                onClick={(e) => go(1, e)}
                                 className="group flex items-center justify-center rounded-full bg-[hsla(0,0%,96%,1)] hover:bg-[hsla(0,0%,20%,1)] hover:scale-110 transition-all duration-200 shrink-0"
                                 style={{ width: "24px", height: "24px", padding: "2.25px" }}
                             >
@@ -133,7 +136,7 @@ const BannerCarousel = ({ banners, current, setCurrent, height = "387px", produc
                             {banners.map((_, i) => (
                                 <button
                                     key={i}
-                                    onClick={() => { setDirection(i > current ? 1 : -1); setCurrent(i); }}
+                                    onClick={(e) => { e.preventDefault(); e.stopPropagation(); setDirection(i > current ? 1 : -1); setCurrent(i); }}
                                     className={`transition-all duration-300 rounded-full h-1.5 ${i === current ? "w-6 bg-white" : "w-1.5 bg-white/40"}`}
                                 />
                             ))}

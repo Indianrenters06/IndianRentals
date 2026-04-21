@@ -41,7 +41,7 @@ const ProductCard = ({ product }) => {
 
     const CARD_W = isMobile ? 170 : 285;
     const CARD_H = isMobile ? 250 : 387;
-    const HOVER_H = isMobile ? 250 : 440;  // grows downward to reveal Rent Now
+    const HOVER_H = isMobile ? 250 : 446;  // exact bounding necessary to render full 12px bottom padding + gap
     const LIFT = isMobile ? 0 : 12;   // lifts upward
 
     return (
@@ -59,6 +59,7 @@ const ProductCard = ({ product }) => {
                 flexShrink: 0,
                 cursor: 'pointer',
                 overflow: 'visible',    // ← lets card overflow without layout shift
+                zIndex: isHovered ? 50 : 1, // Elevates card above siblings on hover
             }}
             onMouseEnter={() => setIsHovered(true)}
             onMouseLeave={() => setIsHovered(false)}
@@ -136,7 +137,7 @@ const ProductCard = ({ product }) => {
                 >
                     <h3
                         className="line-clamp-1"
-                        style={{ fontSize: isMobile ? '16px' : '18px', fontWeight: 600, lineHeight: isMobile ? '23px' : '25px', letterSpacing: '-0.4px', color: isHovered ? 'hsla(3,100%,56%,1)' : 'hsla(0,0%,16%,1)', transition: 'color 0.3s' }}
+                        style={{ fontSize: isMobile ? '16px' : '18px', fontWeight: 600, lineHeight: isMobile ? '23px' : '25px', letterSpacing: '-0.4px', color: 'hsla(0,0%,16%,1)' }}
                     >
                         {product.name}
                     </h3>
@@ -193,9 +194,9 @@ const ProductCard = ({ product }) => {
                                     background: 'hsla(44,100%,64%,1)',
                                     border: '1px solid rgba(0,0,0,0.07)',
                                     fontFamily: "'Mona Sans',sans-serif",
-                                    fontWeight: 600,
+                                    fontWeight: 500,
                                     fontSize: '14px',
-                                    color: '#1D1D1F',
+                                    color: 'hsla(0, 0%, 12%, 1)',
                                     cursor: 'pointer',
                                     boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
                                     flexShrink: 0,

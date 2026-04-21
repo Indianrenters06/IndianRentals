@@ -144,13 +144,15 @@ const Hero = () => {
             <div
                 className="block md:hidden flex overflow-x-auto snap-x snap-mandatory"
                 style={{
-                    width: "100%",
+                    width: "390px",
+                    maxWidth: "100%",
                     height: "369px",
                     paddingTop: "12px",
                     paddingBottom: "12px",
                     paddingLeft: "16px",
                     paddingRight: "16px",
                     gap: "10px",
+                    opacity: 1,
                     backgroundColor: "transparent",
                     scrollbarWidth: "none",
                     msOverflowStyle: "none"
@@ -158,12 +160,14 @@ const Hero = () => {
             >
                 <div className="hide-scrollbar overflow-auto"></div>
                 {slides.map((s, i) => (
-                    <div
+                    <Link
+                        href={s.slideLink || s.ctaLink || "/store"}
                         key={i}
                         className="snap-center shrink-0 rounded-lg relative h-full flex flex-col p-[14px] overflow-hidden z-0"
                         style={{
                             width: "216px",
-                            background: s.bgGradient || s.bgColor
+                            background: s.bgGradient || s.bgColor,
+                            display: "block"
                         }}
                     >
                         {/* Image at TOP */}
@@ -224,35 +228,28 @@ const Hero = () => {
                             </p>
 
                             <div className="pt-2">
-                                <Button
-                                    href={s.ctaLink || "/store"}
-                                    className="flex items-center justify-center active:scale-95 transition-transform"
+                                <div
+                                    className="flex items-center justify-center active:scale-95 transition-transform shrink-0"
                                     style={{
-                                        width: "60.42px",
-                                        height: "16.95px",
-                                        paddingTop: "3.63px",
-                                        paddingBottom: "3.63px",
-                                        paddingLeft: "7.26px",
-                                        paddingRight: "7.26px",
-                                        gap: "1.21px",
-                                        borderRadius: "17.41px",
+                                        padding: "4px 10px",
+                                        borderRadius: "100px",
                                         borderBottom: "0.61px solid rgba(0,0,0,0.1)",
                                         background: "hsla(44, 100%, 64%, 1)",
                                         minWidth: "0",
                                         minHeight: "0"
                                     }}
                                 >
-                                    <span className="text-black font-bold whitespace-nowrap" style={{ fontSize: "7.5px", lineHeight: "1" }}>
+                                    <span className="whitespace-nowrap flex items-center gap-1" style={{ fontFamily: "'Mona Sans', sans-serif", fontWeight: 500, color: "hsla(0, 0%, 20%, 1)", fontSize: "10px", lineHeight: "1" }}>
                                         {s.ctaText || "Rent Now"}
+                                        <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
+                                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                                            <polyline points="12 5 19 12 12 19"></polyline>
+                                        </svg>
                                     </span>
-                                    <svg width="6" height="6" viewBox="0 0 24 24" fill="none" stroke="black" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
-                                        <line x1="5" y1="12" x2="19" y2="12"></line>
-                                        <polyline points="12 5 19 12 12 19"></polyline>
-                                    </svg>
-                                </Button>
+                                </div>
                             </div>
                         </div>
-                    </div>
+                    </Link>
                 ))}
             </div>
 
@@ -373,14 +370,20 @@ const SlideItem = ({ slide, isActive, width, viewType, slideHeight }) => {
                     {slide.subtitle}
                 </p>
                 <div>
-                    <Button
-                        href={slide.ctaLink || "/store"}
-                        variant="yellow"
-                        size="md"
-                        className={`w-auto! rounded-full! font-bold inline-flex shadow-lg hover:scale-105 transition-transform ${isTablet ? 'px-8 py-2' : 'px-10 py-4'}`}
+                    <div
+                        className={`inline-flex items-center justify-center shadow-lg active:scale-95 transition-transform ${isTablet ? 'px-8 py-2' : 'px-10 py-3'}`}
+                        style={{
+                            background: "hsla(44, 100%, 64%, 1)",
+                            borderRadius: "100px",
+                            fontFamily: "'Mona Sans', sans-serif",
+                            fontWeight: 500,
+                            color: "hsla(0, 0%, 20%, 1)",
+                            fontSize: "14px",
+                            lineHeight: "20px"
+                        }}
                     >
                         {(slide.ctaText || "Rent Now").replace(/ [^\w\s]+.*$| [→➔➜]|^.*[→➔➜]$| \->/g, "").trim()}
-                    </Button>
+                    </div>
                 </div>
             </div>
 
@@ -410,25 +413,14 @@ const SlideItem = ({ slide, isActive, width, viewType, slideHeight }) => {
         zIndex: isActive ? 20 : 10
     };
 
-    if (slide.slideLink) {
-        return (
-            <Link
-                href={slide.slideLink}
-                className="shrink-0 relative rounded-[24px] overflow-hidden transition-all duration-700 ease-[cubic-bezier(0.25,1,0.5,1)] cursor-pointer"
-                style={containerStyle}
-            >
-                {content}
-            </Link>
-        );
-    }
-
     return (
-        <div
-            className="shrink-0 relative rounded-[24px] overflow-hidden transition-all duration-700 ease-[cubic-bezier(0.25,1,0.5,1)]"
+        <Link
+            href={slide.slideLink || slide.ctaLink || "/store"}
+            className="shrink-0 relative rounded-[24px] overflow-hidden transition-all duration-700 ease-[cubic-bezier(0.25,1,0.5,1)] cursor-pointer block"
             style={containerStyle}
         >
             {content}
-        </div>
+        </Link>
     );
 };
 

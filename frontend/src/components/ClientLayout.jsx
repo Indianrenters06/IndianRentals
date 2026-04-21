@@ -3,7 +3,7 @@
 import { usePathname } from "next/navigation";
 import Navbar from "./Navbar";
 import Footer from "./Footer";
-import CartHeader from "./CartHeader";
+import CheckoutHeader from "./CheckoutHeader";
 
 export default function ClientLayout({ children }) {
     const pathname = usePathname();
@@ -12,7 +12,7 @@ export default function ClientLayout({ children }) {
 
     return (
         <div className="flex flex-col min-h-screen">
-            {isCheckoutFlow ? <CartHeader /> : <Navbar />}
+            {isCheckoutFlow ? <CheckoutHeader /> : <Navbar />}
             <main className="flex-grow">
                 {children}
             </main>

@@ -39,7 +39,7 @@ const staticReviews = [
     { id: 9, name: "John Doe", role: "AI Engineer", text: "Lorem ipsum nunc tortor viverra condimentum faucibus pharetra nunc turpis consequat gravida suspendisse ullamcorper elit ut dignissim mattis egestas odio facilisi sagittis integer morbi dignissim quam risus tellus cras ut ac ornare felis duis et donec et sed tincidunt.", bgColor: "hsla(46, 100%, 89%, 1)", textColor: "text-[#995D00]", stars: 5 },
 ];
 
-const Testimonials = () => {
+const Testimonials = ({ overrideBg, overridePadding, overrideHeight }) => {
     const [viewType, setViewType] = useState('mobile');
     const [reviewsData, setReviewsData] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -144,11 +144,12 @@ const Testimonials = () => {
 
     return (
         <section
-            className="w-full flex flex-col items-center"
+            className="w-full flex flex-col items-center mx-auto"
             style={{
-                background: viewType === 'desktop' ? '#F5F5F5' : (viewType === 'tablet' ? '#FFFFFF' : 'hsla(0, 0%, 96%, 1)'),
+                background: overrideBg || (viewType === 'desktop' ? '#F5F5F5' : (viewType === 'tablet' ? '#FFFFFF' : 'hsla(0, 0%, 96%, 1)')),
                 width: '100%',
-                height: 'auto',
+                maxWidth: '1440px',
+                minHeight: overrideHeight || 'auto',
                 margin: '0 auto',
                 overflow: 'visible'
             }}
@@ -157,8 +158,8 @@ const Testimonials = () => {
                 className="w-full h-full mx-auto flex flex-col items-center px-4 md:px-8"
                 style={{
                     maxWidth: '1200px',
-                    paddingTop: viewType === 'desktop' ? '96px' : (viewType === 'tablet' ? '96px' : '48px'),
-                    paddingBottom: viewType === 'desktop' ? '96px' : (viewType === 'tablet' ? '96px' : '48px'),
+                    paddingTop: overridePadding || (viewType === 'desktop' ? '96px' : (viewType === 'tablet' ? '96px' : '48px')),
+                    paddingBottom: overridePadding || (viewType === 'desktop' ? '96px' : (viewType === 'tablet' ? '96px' : '48px')),
                     gap: viewType === 'desktop' ? '24px' : (viewType === 'tablet' ? '16px' : '10px'),
                     position: 'relative',
                     zIndex: 1

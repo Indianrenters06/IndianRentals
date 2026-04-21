@@ -297,13 +297,12 @@ export default function ProductDetailPage() {
                                     ))}
                                 </Swiper>
                             </div>
-                            </div>
+                        </div>
 
                         {/* Right Column - Product Purchase Details */}
                         <div
-                            className="flex flex-col"
+                            className="flex flex-col w-full lg:justify-self-end"
                             style={{
-                                width: '100%',
                                 maxWidth: '536.36px',
                                 minHeight: '809.73px',
                                 gap: '32px',
@@ -315,10 +314,10 @@ export default function ProductDetailPage() {
 
                             {/* Main White Card (Title, Rating, Slider, Price) */}
                             <div
-                                className="bg-white rounded-xl flex flex-col overflow-hidden"
+                                className="bg-white rounded-xl flex flex-col overflow-hidden w-full"
                                 style={{
-                                    width: '536.36px',
-                                    height: '333.73px',
+                                    height: 'auto',
+                                    minHeight: '333.73px',
                                     border: '1px solid var(--color-grey-grey-100, hsla(0, 0%, 93%, 1))',
                                     background: 'var(--color-grey-white, hsla(0, 0%, 100%, 1))',
                                     opacity: 1
@@ -443,52 +442,92 @@ export default function ProductDetailPage() {
                                     </div>
 
                                     {/* Tenure Slider */}
-                                    <div className="relative ml-1 mr-1">
-                                        {/* Track */}
+                                    <div
+                                        className="relative flex flex-col"
+                                        style={{
+                                            width: '100%',
+                                            height: '37.73px',
+                                            gap: '11px',
+                                            opacity: 1
+                                        }}
+                                    >
                                         {(() => {
                                             const currentStep = duration <= 1 ? 1 : duration <= 3 ? 2 : duration <= 6 ? 3 : duration <= 9 ? 4 : 5;
                                             const activePct = ((currentStep - 1) / 4) * 100;
+                                            const labels = ["1+", "3+", "6+", "9+", "12+"];
+                                            
                                             return (
-                                                <div
-                                                    className="relative h-[6px] rounded-full flex items-center"
-                                                    style={{ background: `linear-gradient(to right, #EA580C ${activePct}%, #E5E7EB ${activePct}%)` }}
-                                                >
-                                                    {[1, 2, 3, 4, 5].map(step => {
-                                                        const pct = ((step - 1) / 4) * 100;
-                                                        const isActive = step <= currentStep;
-                                                        return (
-                                                            <div
-                                                                key={step}
-                                                                className={`absolute w-[16px] h-[16px] rounded-full bg-white transition-colors duration-300 z-10 border-[3px] ${isActive ? 'border-[#EA580C]' : 'border-gray-300'}`}
-                                                                style={{ left: `calc(${pct}% - 8px)` }}
-                                                            />
-                                                        );
-                                                    })}
-                                                    <input
-                                                        type="range"
-                                                        min="1"
-                                                        max="5"
-                                                        step="1"
-                                                        value={currentStep}
-                                                        onChange={(e) => {
-                                                            const step = parseInt(e.target.value);
-                                                            const months = [1, 3, 6, 9, 12];
-                                                            setDuration(months[step - 1]);
-                                                        }}
-                                                        className="absolute w-full h-full opacity-0 cursor-pointer z-20"
-                                                    />
-                                                </div>
+                                                <>
+                                                    {/* Track */}
+                                                    <div className="relative w-full flex items-center" style={{ height: '4px' }}>
+                                                        <div
+                                                            className="absolute w-full rounded-none"
+                                                            style={{
+                                                                height: '3.73px',
+                                                                background: `linear-gradient(to right, hsla(24, 91%, 48%, 1) ${activePct}%, hsla(0, 0%, 93%, 1) ${activePct}%)`
+                                                            }}
+                                                        />
+                                                        
+                                                        {/* Single Active Thumb */}
+                                                        <div
+                                                            className="absolute rounded-full bg-white transition-all duration-300 z-10"
+                                                            style={{
+                                                                width: '18px',
+                                                                height: '18px',
+                                                                border: '4px solid hsla(24, 91%, 48%, 1)',
+                                                                left: `calc(${activePct}% - 9px)`
+                                                            }}
+                                                        />
+                                                        
+                                                        <input
+                                                            type="range"
+                                                            min="1"
+                                                            max="5"
+                                                            step="1"
+                                                            value={currentStep}
+                                                            onChange={(e) => {
+                                                                const step = parseInt(e.target.value);
+                                                                const months = [1, 3, 6, 9, 12];
+                                                                setDuration(months[step - 1]);
+                                                            }}
+                                                            className="absolute w-full opacity-0 cursor-pointer z-20"
+                                                            style={{ height: '24px', top: '-9px' }}
+                                                        />
+                                                    </div>
+
+                                                    {/* Labels and Ticks */}
+                                                    <div className="relative w-full" style={{ height: '20px' }}>
+                                                        {[1, 2, 3, 4, 5].map(step => {
+                                                            const pct = ((step - 1) / 4) * 100;
+                                                            return (
+                                                                <div
+                                                                    key={step}
+                                                                    className="absolute flex flex-col items-center pointer-events-none"
+                                                                    style={{
+                                                                        left: `calc(${pct}%)`,
+                                                                        transform: 'translateX(-50%)',
+                                                                        top: '0px'
+                                                                    }}
+                                                                >
+                                                                    <div style={{ width: '1px', height: '6px', background: 'hsla(0, 0%, 75%, 1)', marginBottom: '5px' }} />
+                                                                    <span
+                                                                        style={{
+                                                                            fontFamily: '"Mona Sans", sans-serif',
+                                                                            fontSize: '13px',
+                                                                            fontWeight: 400,
+                                                                            color: 'hsla(0, 0%, 12%, 1)',
+                                                                            lineHeight: '1'
+                                                                        }}
+                                                                    >
+                                                                        {labels[step - 1]}
+                                                                    </span>
+                                                                </div>
+                                                            );
+                                                        })}
+                                                    </div>
+                                                </>
                                             );
                                         })()}
-
-                                        {/* Labels Below */}
-                                        <div className="flex justify-between mt-[14px] text-[12px] text-gray-500 font-medium">
-                                            <span className="text-left w-6">1+</span>
-                                            <span className="text-center w-6">3+</span>
-                                            <span className="text-center w-6">6+</span>
-                                            <span className="text-center w-6">9+</span>
-                                            <span className="text-right w-6">12+</span>
-                                        </div>
                                     </div>
 
                                     {/* Links */}
@@ -1211,7 +1250,7 @@ export default function ProductDetailPage() {
                             </div>
 
                             {/* Delivery Details */}
-                            <div 
+                            <div
                                 style={{
                                     width: '536.36px',
                                     height: '59px',
@@ -1226,26 +1265,26 @@ export default function ProductDetailPage() {
                                     opacity: 1
                                 }}
                             >
-                                <div 
-                                    className="flex items-center" 
-                                    style={{ 
-                                        width: '356px', 
-                                        height: '39px', 
-                                        gap: '4px' 
+                                <div
+                                    className="flex items-center"
+                                    style={{
+                                        width: '356px',
+                                        height: '39px',
+                                        gap: '4px'
                                     }}
                                 >
-                                    <div 
+                                    <div
                                         className="rounded-full flex items-center justify-center shrink-0"
-                                        style={{ 
-                                            width: '32px', 
-                                            height: '32px', 
-                                            background: 'hsla(120, 100%, 95%, 1)' 
+                                        style={{
+                                            width: '32px',
+                                            height: '32px',
+                                            background: 'hsla(120, 100%, 95%, 1)'
                                         }}
                                     >
                                         <MapPin weight="fill" size={18} color="hsla(120, 100%, 35%, 1)" />
                                     </div>
-                                    
-                                    <span 
+
+                                    <span
                                         style={{
                                             fontFamily: '"Mona Sans", sans-serif',
                                             fontWeight: 600,
@@ -1257,7 +1296,7 @@ export default function ProductDetailPage() {
                                         Delivery
                                     </span>
 
-                                    <div 
+                                    <div
                                         className="h-full flex items-center px-4 ml-2"
                                         style={{
                                             border: '1.5px solid hsla(0, 0%, 85%, 1)',
@@ -1281,7 +1320,7 @@ export default function ProductDetailPage() {
                                     </div>
                                 </div>
 
-                                <button 
+                                <button
                                     style={{
                                         width: '125px',
                                         height: '32px',
@@ -1327,13 +1366,13 @@ export default function ProductDetailPage() {
                         }}
                     >
                         {/* Tabs Header */}
-                        <div 
-                            className="flex items-center" 
-                            style={{ 
-                                width: '1160px', 
-                                height: '41px', 
+                        <div
+                            className="flex items-center"
+                            style={{
+                                width: '1160px',
+                                height: '41px',
                                 gap: '10px',
-                                opacity: 1 
+                                opacity: 1
                             }}
                         >
                             {['Product Details', 'Return Policy', 'Shipping Policy'].map((tab) => {
@@ -1385,8 +1424,8 @@ export default function ProductDetailPage() {
                                             { label: 'DIMENSIONS', value: '35.57 x 35.57 x 1.68 cm * 2.14 kg', w: '386.67px', h: '53px' }
                                         ].map((item, idx) => (
                                             <div key={idx} style={{ height: item.h, width: item.w, display: 'flex', flexDirection: 'column', gap: '5px' }}>
-                                                <h4 
-                                                    style={{ 
+                                                <h4
+                                                    style={{
                                                         width: '144px',
                                                         height: '23px',
                                                         fontFamily: '"Mona Sans", sans-serif',
@@ -1400,8 +1439,8 @@ export default function ProductDetailPage() {
                                                 >
                                                     {item.label}
                                                 </h4>
-                                                <p 
-                                                    style={{ 
+                                                <p
+                                                    style={{
                                                         fontFamily: '"Mona Sans", sans-serif',
                                                         fontWeight: 400,
                                                         fontSize: '14px',
@@ -1425,8 +1464,8 @@ export default function ProductDetailPage() {
                                             { label: 'STORAGE', value: '512GB SSD', w: '386.67px', h: '53px' }
                                         ].map((item, idx) => (
                                             <div key={idx} style={{ height: item.h, width: item.w, display: 'flex', flexDirection: 'column', gap: '5px' }}>
-                                                <h4 
-                                                    style={{ 
+                                                <h4
+                                                    style={{
                                                         width: '144px',
                                                         height: '23px',
                                                         fontFamily: '"Mona Sans", sans-serif',
@@ -1440,8 +1479,8 @@ export default function ProductDetailPage() {
                                                 >
                                                     {item.label}
                                                 </h4>
-                                                <p 
-                                                    style={{ 
+                                                <p
+                                                    style={{
                                                         fontFamily: '"Mona Sans", sans-serif',
                                                         fontWeight: 400,
                                                         fontSize: '14px',
@@ -1459,8 +1498,8 @@ export default function ProductDetailPage() {
                                     {/* Column 3: 1 Item */}
                                     <div className="flex flex-col" style={{ width: '386.67px', height: '299px', gap: '29px' }}>
                                         <div key="keyboard" style={{ height: '53px', display: 'flex', flexDirection: 'column', gap: '5px' }}>
-                                            <h4 
-                                                style={{ 
+                                            <h4
+                                                style={{
                                                     width: '386.67px',
                                                     height: '23px',
                                                     fontFamily: '"Mona Sans", sans-serif',
@@ -1474,8 +1513,8 @@ export default function ProductDetailPage() {
                                             >
                                                 KEYBOARD LANGUAGE
                                             </h4>
-                                            <p 
-                                                style={{ 
+                                            <p
+                                                style={{
                                                     fontFamily: '"Mona Sans", sans-serif',
                                                     fontWeight: 400,
                                                     fontSize: '14px',
@@ -1490,7 +1529,7 @@ export default function ProductDetailPage() {
                                     </div>
                                 </div>
                             )}
-                            
+
                             {activeTab === 'Return Policy' && (
                                 <div className="pt-4" style={{ fontFamily: '"Mona Sans", sans-serif', fontSize: '15px', color: '#4B4B4B', lineHeight: '1.6' }}>
                                     {product.returnPolicy || "Standard return policy applies. Please contact support for details."}
@@ -1512,8 +1551,8 @@ export default function ProductDetailPage() {
             <BestRentedProducts />
 
             {/* Side Drawers */}
-            <CompareTenures 
-                isOpen={isCompareOpen} 
+            <CompareTenures
+                isOpen={isCompareOpen}
                 onClose={() => setIsCompareOpen(false)}
                 selectedTenure={duration}
                 onSelect={(val) => {
@@ -1522,9 +1561,9 @@ export default function ProductDetailPage() {
                 tenures={tenures}
             />
 
-            <CancellationSidebar 
-                isOpen={isCancellationOpen} 
-                onClose={() => setIsCancellationOpen(false)} 
+            <CancellationSidebar
+                isOpen={isCancellationOpen}
+                onClose={() => setIsCancellationOpen(false)}
             />
         </div>
     );

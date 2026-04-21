@@ -20,7 +20,7 @@ const CartItem = ({ item, onUpdate, onRemove }) => {
     const tenureOptions = [1, 3, 6, 9, 12];
 
     return (
-        <div className="bg-white p-2 rounded-2xl border border-gray-200 shadow-sm relative">
+        <div className="bg-white p-5 rounded-[12px] border border-[#E3E3E3] shadow-[0px_2px_4px_rgba(0,0,0,0.02)] relative transition-all hover:shadow-md">
             {/* Top Section: Image and Details */}
             <div className="flex items-start gap-4 mb-4">
                 {/* Image */}
@@ -181,88 +181,101 @@ export default function CartPage() {
             </div>
         );
     }
-
     return (
-        <div className="min-h-screen bg-gray-50 py-4 px-4 font-sans">
-            <div className="max-w-7xl mx-auto">
-                <div className="flex flex-col lg:flex-row gap-8">
-                    {/* Left Column: Cart Items */}
-                    <div className="lg:w-2/3">
-                        <h1 className="text-3xl font-bold text-gray-800 flex items-center gap-3 mb-6">
-                            Your Cart <FaShoppingCart className="text-gray-600 text-3xl" />
-                        </h1>
+        <div className="w-full bg-[#F5F5F5] min-h-screen font-sans" style={{ opacity: 1 }}>
+            <div className="max-w-[1440px] mx-auto pt-[48px] pb-[48px]" style={{ height: '935px' }}>
+                <div 
+                    className="mx-auto flex flex-col gap-[16px] md:pr-[20px]" 
+                    style={{ width: '1200px', height: '813px' }}
+                >
+                    {/* Breadcrumb */}
+                    <nav
+                        className="text-[12px] text-[#808080] flex items-center gap-[8px]"
+                        style={{ width: '1200px', height: '16px' }}
+                    >
+                        <span>$[Product-Page]</span>
+                        <Image src="/chevron-right.svg" width={12} height={12} alt=">" className="opacity-60" />
+                        <span className="font-semibold text-[#1A1A1A] uppercase tracking-wider">Cart</span>
+                    </nav>
 
-                        {/* Dashed Box Container */}
-                        <div className="border-2 border-dashed border-gray-300 rounded-[30px] p-6 lg:p-8">
-                            <div className="space-y-4">
-                                {cartItems.map(item => (
-                                    <CartItem
-                                        key={item.id}
-                                        item={item}
-                                        onUpdate={updateItem}
-                                        onRemove={removeItem}
-                                    />
-                                ))}
-                            </div>
-                        </div>
-                    </div>
+                    <h1 className="text-[32px] font-bold text-gray-900 flex items-center gap-3 mb-4">
+                        Your Cart <FaShoppingCart className="text-gray-600 pb-1" size={32} />
+                    </h1>
 
-                    {/* Right Column: Sidebar */}
-                    <div className="lg:w-1/3 flex flex-col gap-6 mt-14.5">
-
-                        {/* Coupon Section */}
-                        <div className="bg-white p-4 rounded-2xl border border-gray-200 shadow-sm">
-                            <div className="flex gap-3 mb-4">
-                                <input
-                                    type="text"
-                                    placeholder="Enter Your Coupon Code"
-                                    className="flex-1 bg-white border border-gray-300 rounded-lg px-3 py-1 text-l font-med outline-none focus:border-black transition-colors text-gray-900"
-                                    value={couponCode}
-                                    onChange={(e) => setCouponCode(e.target.value)}
+                    <div className="flex flex-col lg:flex-row gap-[32px] items-start">
+                        {/* Left Column: Cart Items */}
+                        <div
+                            className="flex-col gap-[12px] flex p-[20px] bg-white rounded-[12px] border border-[#F0F0F0] shadow-sm"
+                            style={{ width: '746px', height: '632px' }}
+                        >
+                            {cartItems.map(item => (
+                                <CartItem
+                                    key={item.id}
+                                    item={item}
+                                    onUpdate={updateItem}
+                                    onRemove={removeItem}
                                 />
-                                <button
-                                    onClick={handleApplyCoupon}
-                                    className="bg-[#2D2D2D] text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-black transition-colors shadow-sm"
-                                >
-                                    Apply
-                                </button>
-                            </div>
-                            <button className="w-full bg-[#FFC72C] text-black font-semibold py-2 rounded-full flex items-center justify-center gap-2 hover:bg-[#FFD740] transition-colors text-sm shadow-sm">
-                                View All Coupons <FaArrowRight size={14} className="mt-0.5" />
-                            </button>
+                            ))}
                         </div>
 
-                        {/* Coupon Activated Message */}
-                        {isCouponApplied && (
-                            <div className="bg-[#E8F8F0] border border-[#d0f0e0] rounded-l p-3 flex items-center justify-between">
-                                <div className="flex items-center gap-2 text-black font-bold">
-                                    <HiOutlineSparkles className="text-lg text-[#007F5F]" />
-                                    <span>“{couponCode}” Activated</span>
-                                </div>
-                                <div className="flex items-center gap-2">
-                                    <span className="text-[#007F5F] font-medium text-sm">Applied</span>
+                        {/* Right Column: Sidebar */}
+                        <div
+                            className="flex flex-col gap-[20px]"
+                            style={{ width: '402px', height: '813px' }}
+                        >
+                            {/* Coupon Section */}
+                            <div className="bg-white p-5 rounded-2xl border border-[#E3E3E3] shadow-sm">
+                                <div className="flex gap-2 mb-4">
+                                    <input
+                                        type="text"
+                                        placeholder="Enter Your Coupon Code"
+                                        className="flex-1 bg-white border border-[#D3D3D3] rounded-lg px-4 py-2 text-sm outline-none focus:border-black transition-colors text-gray-900 font-sans"
+                                        value={couponCode}
+                                        onChange={(e) => setCouponCode(e.target.value)}
+                                    />
                                     <button
-                                        onClick={handleRemoveCoupon}
-                                        className="text-gray-400 hover:text-gray-600"
+                                        onClick={handleApplyCoupon}
+                                        className="bg-[#2D2D2D] text-white px-5 py-2 rounded-lg text-sm font-semibold hover:bg-black transition-colors"
                                     >
-                                        <AiOutlineClose />
+                                        Apply
                                     </button>
                                 </div>
+                                <button className="w-full bg-[#FFC72C] text-black font-bold py-2.5 rounded-full flex items-center justify-center gap-2 hover:bg-[#FFD740] transition-colors text-sm shadow-sm font-sans tracking-tight">
+                                    View All Coupons
+                                </button>
                             </div>
-                        )}
 
-                        {/* Order Summary */}
-                        <OrderSummary
-                            securityAmount={securityAmount}
-                            deliveryCharges={deliveryCharges}
-                            monthlyRentTotal={monthlyRentTotal}
-                            totalGST={totalGST}
-                            totalOneTime={totalOneTime}
-                            payToday={payToday}
-                            savedAmount={savedAmount}
-                            onCheckout={() => router.push('/checkout/address')}
-                        />
+                            {/* Coupon Activated Message */}
+                            {isCouponApplied && (
+                                <div className="bg-[#E8F8F0] border border-[#C6EDD8] rounded-[10px] py-1 px-4 flex items-center justify-between">
+                                    <div className="flex items-center gap-2 text-gray-900 font-bold text-[15px] font-sans">
+                                        <HiOutlineSparkles className="text-lg text-[#007F5F]" />
+                                        <span>“{couponCode}” Activated</span>
+                                    </div>
+                                    <div className="flex items-center gap-3">
+                                        <span className="text-[#00C853] font-bold text-sm font-sans">Applied</span>
+                                        <button
+                                            onClick={handleRemoveCoupon}
+                                            className="text-gray-400 hover:text-gray-600 p-1"
+                                        >
+                                            <AiOutlineClose size={16} />
+                                        </button>
+                                    </div>
+                                </div>
+                            )}
 
+                            {/* Order Summary */}
+                            <OrderSummary
+                                securityAmount={securityAmount}
+                                deliveryCharges={deliveryCharges}
+                                monthlyRentTotal={monthlyRentTotal}
+                                totalGST={totalGST}
+                                totalOneTime={totalOneTime}
+                                payToday={payToday}
+                                savedAmount={savedAmount}
+                                onCheckout={() => router.push('/checkout/address')}
+                            />
+                        </div>
                     </div>
                 </div>
             </div>

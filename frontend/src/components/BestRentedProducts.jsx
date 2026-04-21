@@ -17,7 +17,7 @@ const ProductCard = ({ product, index, isDesktop, handleAddToCart }) => {
 
     const CARD_W = isDesktop ? 285 : 170;
     const CARD_H = isDesktop ? 387 : 256;
-    const HOVER_H = isDesktop ? 440 : 256;
+    const HOVER_H = isDesktop ? 446 : 256;
     const LIFT = isDesktop ? 12 : 0;
 
     return (
@@ -34,6 +34,7 @@ const ProductCard = ({ product, index, isDesktop, handleAddToCart }) => {
                 flexShrink: 0,
                 cursor: 'pointer',
                 overflow: 'visible',
+                zIndex: isHovered ? 50 : 1, // Elevates card above siblings on hover
             }}
             onMouseEnter={() => setIsHovered(true)}
             onMouseLeave={() => setIsHovered(false)}
@@ -119,7 +120,7 @@ const ProductCard = ({ product, index, isDesktop, handleAddToCart }) => {
                     }}
                 >
                     <h3 className="font-manrope line-clamp-1 shrink-0"
-                        style={{ fontSize: isDesktop ? "18px" : "15px", fontWeight: 600, lineHeight: isDesktop ? "25px" : "22px", letterSpacing: isDesktop ? "-0.4px" : "normal", color: isHovered ? 'hsla(3, 100%, 56%, 1)' : "hsla(0, 0%, 16%, 1)", transition: 'color 0.3s' }}>
+                        style={{ fontSize: isDesktop ? "18px" : "15px", fontWeight: 600, lineHeight: isDesktop ? "25px" : "22px", letterSpacing: isDesktop ? "-0.4px" : "normal", color: "hsla(0, 0%, 16%, 1)" }}>
                         {product.name}
                     </h3>
 
@@ -155,7 +156,14 @@ const ProductCard = ({ product, index, isDesktop, handleAddToCart }) => {
                             <button
                                 onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleAddToCart(e, product); }}
                                 className="btn-primary w-full text-[14px] active:scale-95"
-                                style={{ height: '38px', borderRadius: '100px', flexShrink: 0 }}
+                                style={{
+                                    height: '38px',
+                                    borderRadius: '100px',
+                                    flexShrink: 0,
+                                    fontFamily: "'Mona Sans', sans-serif",
+                                    fontWeight: 500,
+                                    color: 'hsla(0, 0%, 12%, 1)',
+                                }}
                             >
                                 Rent Now
                             </button>

@@ -3,17 +3,18 @@ import React, { useRef } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation, Autoplay, Pagination } from "swiper/modules";
 import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/outline";
+import Link from "next/link";
 import "swiper/css";
 import "swiper/css/pagination";
 
 // Placeholder client logos — replace with real logos/images as needed
 const clients = [
-    { id: 1, name: "Reliance", logo: "RELIANCE" },
-    { id: 2, name: "Tata", logo: "TATA" },
-    { id: 3, name: "Adani", logo: "ADANI" },
-    { id: 4, name: "Mahindra", logo: "MAHINDRA" },
-    { id: 5, name: "Infosys", logo: "INFOSYS" },
-    { id: 6, name: "Wipro", logo: "WIPRO" },
+    { id: 1, name: "Reliance", logo: "RELIANCE", link: "/products" },
+    { id: 2, name: "Tata", logo: "TATA", link: "/products" },
+    { id: 3, name: "Adani", logo: "ADANI", link: "/products" },
+    { id: 4, name: "Mahindra", logo: "MAHINDRA", link: "/products" },
+    { id: 5, name: "Infosys", logo: "INFOSYS", link: "/products" },
+    { id: 6, name: "Wipro", logo: "WIPRO", link: "/products" },
 ];
 
 const ClientSection = () => {
@@ -69,13 +70,15 @@ const ClientSection = () => {
                     >
                         {clients.map((client) => (
                             <SwiperSlide key={client.id}>
-                                <div
-                                    className="flex items-center justify-center select-none transition-all hover:scale-[1.01] duration-300 shadow-sm"
+                                <Link
+                                    href={client.link}
+                                    className="flex items-center justify-center select-none transition-all hover:scale-[1.01] duration-300 shadow-sm block"
                                     style={{ 
                                         height: "280px",
                                         borderRadius: "24px",
                                         background: "hsla(44, 100%, 64%, 1)",
-                                        opacity: 1
+                                        opacity: 1,
+                                        textDecoration: 'none'
                                     }}
                                 >
                                     <div className="flex flex-col items-center gap-4">
@@ -86,7 +89,7 @@ const ClientSection = () => {
                                             {client.name}
                                         </span>
                                     </div>
-                                </div>
+                                </Link>
                             </SwiperSlide>
                         ))}
                     </Swiper>

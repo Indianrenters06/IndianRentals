@@ -30,6 +30,7 @@ export default function DashboardLayout({ children }) {
   const [adminInfo, setAdminInfo] = useState({ name: 'Admin', role: 'admin' });
   const [notifications, setNotifications] = useState([]);
   const [unreadCount, setUnreadCount] = useState(0);
+  const [isMobile, setIsMobile] = useState(false);
 
   const pathname = usePathname();
   const router = useRouter();
@@ -98,16 +99,30 @@ export default function DashboardLayout({ children }) {
           console.error("Failed to parse admin data", err);
         }
       }
-    }
 
-    fetchNotifications();
+      const checkMobile = () => {
+        setIsMobile(window.innerWidth < 768);
+        if (window.innerWidth < 768) {
+          setIsSidebarOpen(false);
+        } else {
+          setIsSidebarOpen(true);
+        }
+      };
+      
+      checkMobile();
+      window.addEventListener('resize', checkMobile);
 
-    // Setup basic polling to fake realtime updates for dashboard
-    const interval = setInterval(() => {
       fetchNotifications();
-    }, 30000);
 
-    return () => clearInterval(interval);
+      const interval = setInterval(() => {
+        fetchNotifications();
+      }, 30000);
+
+      return () => {
+        clearInterval(interval);
+        window.removeEventListener('resize', checkMobile);
+      };
+    }
   }, []);
 
   const toggleMenu = (menuName) => {
@@ -252,10 +267,23 @@ export default function DashboardLayout({ children }) {
 
   return (
     <div className="flex bg-slate-50 dark:bg-slate-900 border-none m-0 p-0 text-slate-800 dark:text-slate-100 h-screen overflow-hidden relative z-10 w-full transition-colors duration-300">
+      {/* Mobile Backdrop */}
+      {isMobile && isSidebarOpen && (
+        <div 
+          className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-40 transition-opacity" 
+          onClick={() => setIsSidebarOpen(false)}
+        />
+      )}
+
       {/* Sidebar */}
       <aside
-        className={`${isSidebarOpen ? "w-72" : "w-0"
-          } transition-all duration-300 border-r border-slate-200 dark:border-slate-800/60 bg-white dark:bg-slate-950 flex flex-col overflow-hidden h-screen sticky top-0`}
+        className={`${
+          isMobile ? "fixed h-full z-50 left-0" : "sticky top-0 h-screen"
+        } ${
+          isSidebarOpen 
+            ? (isMobile ? "translate-x-0 w-72" : "w-72") 
+            : (isMobile ? "-translate-x-full w-72" : "w-0")
+        } transition-all duration-300 border-r border-slate-200 dark:border-slate-800/60 bg-white dark:bg-slate-950 flex flex-col overflow-hidden`}
       >
         <div className="h-16 flex items-center px-6 border-b border-slate-200 dark:border-slate-800/60 shrink-0 bg-transparent">
           <img
@@ -294,6 +322,7 @@ export default function DashboardLayout({ children }) {
                   ) : (
                     <Link
                       href={item.path}
+                      onClick={() => { if (isMobile) setIsSidebarOpen(false); }}
                       className={`w-full flex items-center justify-between px-4 py-3 rounded-xl transition-all duration-200 group ${isActive
                         ? 'bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-500/20 shadow-inner'
                         : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800/50 hover:text-slate-900 dark:hover:text-slate-200'
@@ -315,6 +344,7 @@ export default function DashboardLayout({ children }) {
                           <Link
                             key={subItem.path}
                             href={subItem.path}
+                            onClick={() => { if (isMobile) setIsSidebarOpen(false); }}
                             className={`block px-4 py-2 text-sm rounded-lg transition-all duration-200 w-full text-left ${isSubActive
                               ? 'bg-indigo-50 dark:bg-indigo-500/10 text-indigo-700 dark:text-indigo-300 font-medium tracking-wide'
                               : 'text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800/40 hover:text-slate-800 dark:hover:text-slate-300'
@@ -347,7 +377,7 @@ export default function DashboardLayout({ children }) {
       {/* Main Content */}
       <main className="flex-1 flex flex-col h-screen overflow-y-auto w-full relative bg-slate-50 dark:bg-slate-900 transition-colors duration-300">
         {/* Header */}
-        <header className="h-16 border-b border-slate-200 dark:border-slate-800/60 bg-white/80 dark:bg-slate-950/50 backdrop-blur-2xl flex items-center justify-between px-8 sticky top-0 z-40 shrink-0 transition-colors duration-300">
+        <header className="h-16 border-b border-slate-200 dark:border-slate-800/60 bg-white/80 dark:bg-slate-950/50 backdrop-blur-2xl flex items-center justify-between px-4 md:px-8 sticky top-0 z-40 shrink-0 transition-colors duration-300">
           <div className="flex items-center gap-4">
             <button
               onClick={() => setIsSidebarOpen(!isSidebarOpen)}

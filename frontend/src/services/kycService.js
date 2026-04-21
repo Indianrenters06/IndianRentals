@@ -41,13 +41,27 @@ export const uploadKYCFiles = async (formData) => {
 
 export const getKYCStatus = async () => {
     const token = getToken();
+    if (!token) {
+        return { status: 'Not Submitted' };
+    }
+
     const config = {
         headers: {
             'Authorization': `Bearer ${token}`
         }
     };
-    const response = await axios.get(API_URL, config);
-    return response.data;
+
+    try {
+        const response = await axios.get(API_URL, config);
+        return response.data;
+    } catch (error) {
+        if (error.response && error.response.status === 401) {
+            // If token is invalid or expired, treat as not submitted
+            return { status: 'Not Submitted' };
+        }
+        console.error("KYC status fetch error:", error);
+        return { status: 'Not Submitted' };
+    }
 };
 
 // Admin: Get all KYC requests

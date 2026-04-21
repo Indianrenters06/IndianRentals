@@ -91,7 +91,7 @@ const Footer = () => {
                             {/* Column 1 */}
                             <ul className="flex flex-col gap-[18px] text-[hsla(0,0%,0%,1)] font-sans font-medium text-[13px] tracking-tight leading-none">
                                 <li><Link href="/about" className="hover:opacity-70 transition-opacity">About Us</Link></li>
-                                <li><Link href="/how-it-works" className="hover:opacity-70 transition-opacity">How It Works</Link></li>
+                                <li><Link href="/rental-process" className="hover:opacity-70 transition-opacity">How It Works</Link></li>
                                 <li><Link href="/careers" className="hover:opacity-70 transition-opacity">Jobs &amp; Careers</Link></li>
                                 <li><Link href="/contact" className="hover:opacity-70 transition-opacity">Contact</Link></li>
                                 <li><Link href="/b2b" className="hover:opacity-70 transition-opacity">IndianRenters (B2B Link)</Link></li>
@@ -161,7 +161,7 @@ const Footer = () => {
                     {/* Primary Links */}
                     <div className="flex flex-col mb-8" style={{ gap: '8px' }}>
                         <Link href="/about" className="text-black font-semibold text-[14px] leading-tight transition-opacity hover:opacity-70">About Us</Link>
-                        <Link href="/how-it-works" className="text-black font-semibold text-[14px] leading-tight transition-opacity hover:opacity-70">How It Works</Link>
+                        <Link href="/rental-process" className="text-black font-semibold text-[14px] leading-tight transition-opacity hover:opacity-70">How It Works</Link>
                         <Link href="/careers" className="text-black font-semibold text-[14px] leading-tight transition-opacity hover:opacity-70">Jobs &amp; Careers</Link>
                         <Link href="/contact" className="text-black font-semibold text-[14px] leading-tight transition-opacity hover:opacity-70">Contact</Link>
                         <Link href="/b2b" className="text-black font-semibold text-[14px] leading-tight transition-opacity hover:opacity-70">IndianRenters (B2B Link)</Link>

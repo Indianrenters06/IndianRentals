@@ -24,8 +24,11 @@ export default function AboutPage() {
     return (
         <div className="text-gray-800 pb-20">
             {/* 1. Header Image/Banner */}
-            <div className="max-w-[1200px] mx-auto  sm:px-16 lg:px-3 mt-8 mb-16">
-                <div className="w-[1200px] h-[500px] relative bg-gray-200 overflow-hidden rounded-3xl opacity-100">
+            <section className="w-full max-w-[1440px] mx-auto mt-8 mb-16">
+                <div 
+                    className="max-w-[1200px] mx-auto px-4 md:px-8"
+                >
+                    <div className="w-full h-[500px] relative bg-gray-200 overflow-hidden rounded-3xl">
                     <Image
                         src={cmsBanner.image || "https://res.cloudinary.com/dpu9ikeqe/image/upload/v1770800853/91c997360fd8d0ad44588aaaed2a31db6de1b8db_dck9cz.jpg"}
                         alt="About Us Banner"
@@ -34,28 +37,29 @@ export default function AboutPage() {
                     />
                     {/* Overlay Text */}
                     <div className="absolute inset-0 flex items-center justify-center">
-                        <h1 className="text-white text-4xl md:text-6xl font-semibold drop-shadow-lg">
+                        <h1 className="text-white text-4xl md:text-6xl font-semibold drop-shadow-lg font-sans">
                             {cmsBanner.title || "About Us"}
                         </h1>
                     </div>
                 </div>
             </div>
+        </section>
 
             {/* 2. Our Story Section */}
-            <div className="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-3 mb-24">
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-[57px] items-center h-[625px] opacity-100">
+            <section className="w-full max-w-[1440px] mx-auto mb-24">
+                <div className="max-w-[1200px] mx-auto px-4 md:px-8 grid grid-cols-1 lg:grid-cols-2 gap-[57px] items-center">
                     {/* Left Content */}
-                    <div className="w-[562px] h-[429px] flex flex-col gap-[27px] opacity-100">
-                        <h2 className="w-[492px] h-[58px] text-4xl md:text-5xl font-medium leading-tight font-sans text-gray-900 opacity-100">Our Story</h2>
+                    <div className="flex flex-col gap-[27px] opacity-100">
+                        <h2 className="text-4xl md:text-5xl font-semibold leading-tight font-sans text-gray-900">Our Story</h2>
 
-                        <div className="w-[587px] h-[344px] text-gray-900 font-sans font-normal flex flex-col opacity-100">
-                            <p className="w-[596px] h-[178px] leading-tight  opacity-100">
+                        <div className="text-gray-900 font-sans font-normal flex flex-col gap-6">
+                            <p className="leading-relaxed opacity-100 text-[16px]">
                                 From a small computer training room in 1992 to India&apos;s go-to rental partner, this
                                 journey has been about making access smarter than ownership. The promise stays
                                 simple: rent anything needed, when it&apos;s needed, anywhere it&apos;s needed—without
                                 friction.
                             </p>
-                            <p className="w-[596px] h-[178px] leading-tight opacity-100 -mt-20">
+                            <p className="leading-relaxed opacity-100 text-[16px]">
                                 Today, a 100+ product catalog powers startups, enterprises, and events across
                                 major cities, backed by fast delivery, clean gear, and dependable support. The
                                 focus is outcomes setups that just work, terms that fit, and service that shows up.
@@ -63,14 +67,14 @@ export default function AboutPage() {
                         </div>
 
                         {/* Stats with Icons */}
-                        <div className="flex flex-wrap gap-8 md:gap-12 -mt-25">
+                        <div className="flex flex-wrap gap-8 md:gap-12 mt-4">
                             {/* Stat 1 */}
                             <div className="flex flex-col">
                                 <div className="w-[76px] h-[76px] bg-[#FF8A00] rounded-xl flex items-center justify-center text-white mb-3 shadow-sm">
                                     <PiGauge size={50} weight="bold" />
                                 </div>
                                 <h3 className="text-3xl font-bold font-sans text-gray-900">4.8/5.0</h3>
-                                <p className="text-sm font-medium text-gray-500 font-sans mt-1">Customer Satisfaction Rate</p>
+                                <p className="text-sm font-medium text-gray-500 font-sans mt-1">Customer Satisfaction</p>
                             </div>
 
                             {/* Stat 2 */}
@@ -85,8 +89,7 @@ export default function AboutPage() {
                     </div>
 
                     {/* Right Image */}
-                    <div className="relative w-[581px] h-[625px] rounded-3xl overflow-hidden bg-gray-100 shadow-sm opacity-100">
-                        {/* Placeholder for Story Image */}
+                    <div className="relative w-full aspect-[581/625] max-h-[625px] rounded-3xl overflow-hidden bg-gray-100 shadow-sm">
                         <Image
                             src="https://res.cloudinary.com/dpu9ikeqe/image/upload/v1770800851/d271e76a95431ea60b52889370f378908ea28e43_qiucu1.jpg"
                             alt="Our Story"
@@ -95,27 +98,27 @@ export default function AboutPage() {
                         />
                     </div>
                 </div>
-            </div>
-
+            </section>
             {/* 3. Vision/Mission Section */}
-            <div className="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-3 mb-24">
-                <div className="bg-[#FDE68A] rounded-4xl w-[1200px] min-h-[280px] pt-8 pb-12 pl-8 pr-8 flex flex-row gap-[96px] items-start relative overflow-visible opacity-100">
+            <section className="w-full max-w-[1440px] mx-auto mb-24">
+                <div className="max-w-[1200px] mx-auto px-4 md:px-8">
+                    <div className="w-full bg-[#FDE68A] rounded-3xl pt-10 pb-14 px-10 flex flex-col lg:flex-row gap-12 items-start opacity-100 transition-all">
                     {/* Left Side: Buttons */}
-                    <div className="flex gap-4 w-[350px] shrink-0 opacity-100">
+                    <div className="flex gap-4 w-full lg:w-[350px] shrink-0">
                         <button
                             onClick={() => setActiveTab('vision')}
-                            className={`h-[42px] px-6 rounded-full font-normal font-sans text-xl transition-transform hover:scale-105 text-center whitespace-nowrap ${activeTab === 'vision'
-                                ? 'bg-[#333] text-white shadow-md'
-                                : 'border border-gray-800 text-gray-800 hover:bg-black/5'
+                            className={`h-[45px] px-8 rounded-full font-medium font-sans text-lg transition-all hover:scale-[1.02] active:scale-95 ${activeTab === 'vision'
+                                ? 'bg-black text-white shadow-lg'
+                                : 'border-2 border-black/10 text-gray-800 hover:bg-black/5'
                                 }`}
                         >
                             Our Vision
                         </button>
                         <button
                             onClick={() => setActiveTab('mission')}
-                            className={`h-[42px] px-6 rounded-full font-normal font-sans text-xl transition-transform hover:scale-105 text-center whitespace-nowrap ${activeTab === 'mission'
-                                ? 'bg-[#333] text-white shadow-md'
-                                : 'border border-gray-800 text-gray-800 hover:bg-black/5'
+                            className={`h-[45px] px-8 rounded-full font-medium font-sans text-lg transition-all hover:scale-[1.02] active:scale-95 ${activeTab === 'mission'
+                                ? 'bg-black text-white shadow-lg'
+                                : 'border-2 border-black/10 text-gray-800 hover:bg-black/5'
                                 }`}
                         >
                             Our Mission
@@ -123,51 +126,45 @@ export default function AboutPage() {
                     </div>
 
                     {/* Right Side: Content List */}
-                    <div className="flex-1 h-[250px] flex flex-col justify-between opacity-100">
+                    <div className="flex-1 flex flex-col gap-8 opacity-100">
                         {activeTab === 'vision' ? (
                             <>
-                                {/* Vision Content */}
-                                <div className="flex flex-row items-start border-b border-black/10 pb-4">
-                                    <h3 className="text-lg font-semibold text-gray-900 font-sans w-[200px] shrink-0">Rent Anything</h3>
-                                    <p className="text-gray-800 font-sans leading-relaxed text-md">
+                                <div className="flex flex-col md:flex-row items-start gap-4 border-b border-black/10 pb-6">
+                                    <h3 className="text-[20px] font-bold text-gray-900 font-sans md:w-[220px] shrink-0">Rent Anything</h3>
+                                    <p className="text-gray-800 font-sans leading-relaxed text-[15px]">
                                         Laptops, Macs, mobiles, AV, cameras, medical and more—if it&apos;s not listed, it&apos;s sourced on request.
                                     </p>
                                 </div>
-
-                                <div className="flex flex-row items-start border-b border-black/10 pb-4">
-                                    <h3 className="text-lg font-semibold text-gray-900 font-sans w-[200px] shrink-0">Rent Anytime</h3>
-                                    <p className="text-gray-800 font-sans leading-relaxed text-md">
+                                <div className="flex flex-col md:flex-row items-start gap-4 border-b border-black/10 pb-6">
+                                    <h3 className="text-[20px] font-bold text-gray-900 font-sans md:w-[220px] shrink-0">Rent Anytime</h3>
+                                    <p className="text-gray-800 font-sans leading-relaxed text-[15px]">
                                         Tenures that fit the job: 1, 3, 6, or 12 months, with easy extensions and mid-term upgrades.
                                     </p>
                                 </div>
-
-                                <div className="flex flex-row items-start">
-                                    <h3 className="text-lg font-semibold text-gray-900 font-sans w-[200px] shrink-0">Rent Anywhere</h3>
-                                    <p className="text-gray-800 font-sans leading-relaxed text-md">
+                                <div className="flex flex-col md:flex-row items-start gap-4">
+                                    <h3 className="text-[20px] font-bold text-gray-900 font-sans md:w-[220px] shrink-0">Rent Anywhere</h3>
+                                    <p className="text-gray-800 font-sans leading-relaxed text-[15px]">
                                         Rapid delivery and support across major Indian cities through a reliable partner network.
                                     </p>
                                 </div>
                             </>
                         ) : (
                             <>
-                                {/* Mission Content */}
-                                <div className="flex flex-row items-start border-b border-black/10 pb-4">
-                                    <h3 className="text-lg font-semibold text-gray-900 font-sans w-[200px] shrink-0">Awesome Service</h3>
-                                    <p className="text-gray-800 font-sans leading-relaxed text-md ml-8">
+                                <div className="flex flex-col md:flex-row items-start gap-4 border-b border-black/10 pb-6">
+                                    <h3 className="text-[20px] font-bold text-gray-900 font-sans md:w-[220px] shrink-0">Awesome Service</h3>
+                                    <p className="text-gray-800 font-sans leading-relaxed text-[15px]">
                                         Laptops, Macs, mobiles, AV, cameras, medical and more—if it&apos;s not listed, it&apos;s sourced on request.
                                     </p>
                                 </div>
-
-                                <div className="flex flex-row items-start border-b border-black/10 pb-4">
-                                    <h3 className="text-lg font-semibold text-gray-900 font-sans w-[200px] shrink-0">Awesome Quality</h3>
-                                    <p className="text-gray-800 font-sans leading-relaxed text-md ml-8">
+                                <div className="flex flex-col md:flex-row items-start gap-4 border-b border-black/10 pb-6">
+                                    <h3 className="text-[20px] font-bold text-gray-900 font-sans md:w-[220px] shrink-0">Awesome Quality</h3>
+                                    <p className="text-gray-800 font-sans leading-relaxed text-[15px]">
                                         Tenures that fit the job: 1, 3, 6, or 12 months, with easy extensions and mid-term upgrades.
                                     </p>
                                 </div>
-
-                                <div className="flex flex-row items-start">
-                                    <h3 className="text-lg font-semibold text-gray-900 font-sans w-[200px] shrink-0">Always Happy Customer</h3>
-                                    <p className="text-gray-800 font-sans leading-relaxed text-md ml-8">
+                                <div className="flex flex-col md:flex-row items-start gap-4">
+                                    <h3 className="text-[20px] font-bold text-gray-900 font-sans md:w-[220px] shrink-0">Happy Customers</h3>
+                                    <p className="text-gray-800 font-sans leading-relaxed text-[15px]">
                                         Rapid delivery and support across major Indian cities through a reliable partner network.
                                     </p>
                                 </div>
@@ -176,39 +173,39 @@ export default function AboutPage() {
                     </div>
                 </div>
             </div>
+        </section>
 
             {/* 4. Why Choose Us Section */}
-            <div className="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-3">
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-50 items-center">
+            <section className="w-full max-w-[1440px] mx-auto mb-24">
+                <div className="max-w-[1200px] mx-auto px-4 md:px-8 grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
                     {/* Left Content (Text + Stats) */}
-                    <div className="lg:order-1"> {/* Wait, screenshot has text on LEFT? Yes. */}
-                        <h2 className="w-[540px] h-[45px] text-[40px] font-semibold mb-6 font-poppins text-gray-800 leading-tight tracking-tight opacity-100">Why Choose Us?</h2>
-                        <p className="w-[540px] h-[68px] text-base font-normal mb-5 leading-tight text-gray-800 tracking-wide opacity-100 font-poppins">
+                    <div>
+                        <h2 className="text-[40px] font-semibold mb-6 font-sans text-gray-900 leading-tight tracking-tight">Why Choose Us?</h2>
+                        <p className="text-[16px] font-normal mb-8 leading-relaxed text-gray-600 font-sans">
                             Join thousands who&apos;ve switched to the flexible, affordable way to access
                             high-end tech. IndianRenters delivers AI-ready workstations, laptops, and IT
                             gear with zero ownership hassle and instant support.
                         </p>
 
                         {/* Stats Row */}
-                        <div className="w-[540px] h-[79px] grid grid-cols-3 gap-[96px] pt-4 border-t border-gray-300 opacity-100">
-                            <div className="w-[111px] h-[79px] opacity-100">
-                                <h3 className="w-[106px] h-[58px] text-[48px] font-medium font-sans text-gray-700 mb-1 ml-1 opacity-100">90k+</h3>
-                                <p className="text-sm text-gray-500 font-sans">Devices in Stock</p>
+                        <div className="grid grid-cols-3 gap-8 pt-8 border-t border-gray-200">
+                            <div>
+                                <h3 className="text-[32px] md:text-[40px] font-bold font-sans text-gray-900 mb-1">90k+</h3>
+                                <p className="text-sm font-medium text-gray-500 font-sans">Devices in Stock</p>
                             </div>
-                            <div className="w-[123px] h-[79px] opacity-100">
-                                <h3 className="w-[103px] h-[58px] text-[48px] font-medium font-sans text-gray-700 mb-1 opacity-100">30k+</h3>
-                                <p className="text-sm text-gray-500 font-sans">Happy Customers</p> {/* Using 30k from screenshot */}
+                            <div>
+                                <h3 className="text-[32px] md:text-[40px] font-bold font-sans text-gray-900 mb-1">30k+</h3>
+                                <p className="text-sm font-medium text-gray-500 font-sans">Happy Customers</p>
                             </div>
-                            <div className="w-[102px] h-[79px] opacity-100">
-                                <h3 className="w-[100px] h-[58px] text-[48px] font-medium font-sans text-gray-700 mb-1 opacity-100">401+</h3>
-                                <p className="text-sm text-gray-500 font-sans">Cities Covered</p>
+                            <div>
+                                <h3 className="text-[32px] md:text-[40px] font-bold font-sans text-gray-900 mb-1">401+</h3>
+                                <p className="text-sm font-medium text-gray-500 font-sans">Cities Covered</p>
                             </div>
                         </div>
                     </div>
 
                     {/* Right Image */}
-                    <div className="relative w-[508px] h-[336px] rounded-3xl overflow-hidden bg-gray-100 shadow-sm lg:order-2 opacity-100">
-                        {/* Placeholder for Why Us Image */}
+                    <div className="relative w-full aspect-[508/336] rounded-3xl overflow-hidden bg-gray-100 shadow-sm">
                         <Image
                             src="https://res.cloudinary.com/dpu9ikeqe/image/upload/v1770800855/fe78b663b8ebf91f8e21a43e75ce3b0ac6a6b6b9_lvbsuv.png"
                             alt="Why Choose Us"
@@ -217,7 +214,7 @@ export default function AboutPage() {
                         />
                     </div>
                 </div>
-            </div>
+            </section>
 
             {/* 5. FAQ Section */}
             <FaqSection />

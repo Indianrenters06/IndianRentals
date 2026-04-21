@@ -42,26 +42,25 @@ const FeatureSection = () => {
     const stats = cms.featureSectionStats || [];
 
     return (
-        <section className="bg-white overflow-hidden w-full mx-auto flex flex-col gap-[10px] min-h-[400px] text-black">
-            <div className="w-full max-w-[1200px] mx-auto px-0 md:px-4">
-
-                {/* Inner radial gradient container - 1140x339 Desktop, 390x390 Mobile */}
+        <section className="w-full bg-white overflow-hidden text-black py-16 lg:py-24">
+            <div className="w-full max-w-[1200px] mx-auto px-4 md:px-8">
+                {/* Inner radial gradient container */}
                 <div
-                    className="relative flex flex-col lg:flex-row items-center justify-between overflow-hidden"
+                    className="w-full relative flex flex-col lg:flex-row items-center justify-between overflow-hidden"
                     style={{
                         background: 'radial-gradient(181.93% 64.7% at 50% 72.89%, #FFFFFF 0%, #D6F1FF 100%)',
-                        width: isDesktop ? '1140px' : '390px',
-                        minHeight: isDesktop ? '339px' : '390px',
-                        height: isDesktop ? '339px' : 'auto',
-                        margin: isDesktop ? '0 auto' : '0',
+                        width: '100%',
+                        maxWidth: isDesktop ? '1200px' : '100%',
+                        height: isDesktop ? '400px' : 'auto',
+                        opacity: 1,
+                        margin: '0 auto',
                         display: 'flex',
                         justifyContent: 'space-between',
                         borderRadius: isDesktop ? '30px' : '0px',
-                        overflow: 'hidden',
                         paddingTop: isDesktop ? '48px' : '24px',
                         paddingBottom: isDesktop ? '48px' : '24px',
                         paddingLeft: isDesktop ? '30px' : '24px',
-                        paddingRight: isDesktop ? '60px' : '24px',
+                        paddingRight: isDesktop ? '30px' : '24px',
                         gap: isDesktop ? '0' : '10px'
                     }}
                 >
