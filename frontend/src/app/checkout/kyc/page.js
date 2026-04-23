@@ -12,211 +12,41 @@ import OrderSummary from '../../../components/OrderSummary';
 import Swal from 'sweetalert2';
 
 const STATE_CITY_MAP = {
-    "Andhra Pradesh": [
-        "Adoni", "Amalapuram", "Anakapalle", "Anantapur", "Bapatla", "Bhimavaram", "Chirala", "Chittoor",
-        "Dharmavaram", "Eluru", "Gudivada", "Gudur", "Guntakal", "Guntur", "Hindupur", "Kadapa", "Kakinada",
-        "Kavali", "Kurnool", "Machilipatnam", "Madanapalle", "Nandyal", "Narasaraopet", "Nellore", "Ongole",
-        "Proddatur", "Rajahmundry", "Srikakulam", "Tadepalligudem", "Tadpatri", "Tenali", "Tirupati", "Vijayawada",
-        "Visakhapatnam", "Vizianagaram"
-    ],
-    "Arunachal Pradesh": [
-        "Aalo", "Anini", "Basar", "Bomdila", "Changlang", "Daporijo", "Hawai", "Itanagar", "Jairampur",
-        "Khonsa", "Koloriang", "Longding", "Miao", "Naharlagun", "Namsai", "Pasighat", "Roing", "Seppa",
-        "Tawang", "Tezu", "Yingkiong", "Ziro"
-    ],
-    "Assam": [
-        "Barpeta", "Bongaigaon", "Dhemaji", "Dhubri", "Dibrugarh", "Diphu", "Goalpara", "Golaghat", "Guwahati",
-        "Haflong", "Hailakandi", "Hojai", "Jorhat", "Karimganj", "Kokrajhar", "Lanka", "Lumding", "Mangaldoi",
-        "Mankachar", "Margherita", "Mariani", "Nagaon", "Nalbari", "North Lakhimpur", "Rangia", "Sibsagar",
-        "Silapathar", "Silchar", "Tezpur", "Tinsukia", "Udalguri"
-    ],
-    "Bihar": [
-        "Araria", "Arrah", "Aurangabad", "Bagaha", "Begusarai", "Bettiah", "Bhabua", "Bhagalpur", "Bihar Sharif",
-        "Buxar", "Chhapra", "Darbhanga", "Dehri", "Gaya", "Gopalganj", "Hajipur", "Jamalpur", "Jamui",
-        "Jehanabad", "Katihar", "Kishanganj", "Lakhisarai", "Madhepura", "Madhubani", "Motihari", "Munger",
-        "Muzaffarpur", "Nawada", "Patna", "Purnia", "Saharsa", "Samastipur", "Sasaram", "Sheikhpura",
-        "Sitamarhi", "Siwan", "Supaul"
-    ],
-    "Chhattisgarh": [
-        "Ambikapur", "Bhatapara", "Bhilai", "Bilaspur", "Chirmiri", "Dalli-Rajhara", "Dhamtari", "Durg",
-        "Jagdalpur", "Kanker", "Kawardha", "Korba", "Mahasamund", "Manendragarh", "Mungeli", "Naila Janjgir",
-        "Raigarh", "Raipur", "Rajnandgaon", "Sakti", "Tilda Newra"
-    ],
-    "Goa": [
-        "Bicholim", "Canacona", "Curchorem", "Cuncolim", "Mapusa", "Margao", "Mormugao", "Panaji", "Pernem",
-        "Ponda", "Quepem", "Sanguem", "Sanquelim", "Valpoi", "Vasco da Gama"
-    ],
-    "Gujarat": [
-        "Ahmedabad", "Amreli", "Anand", "Anjar", "Ankleshwar", "Bardoli", "Bharuch", "Bhavnagar", "Bhuj",
-        "Botad", "Dahod", "Deesa", "Dhoraji", "Gandhidham", "Gandhinagar", "Godhra", "Gondal", "Himmatnagar",
-        "Jamnagar", "Jetpur", "Junagadh", "Kalol", "Keshod", "Khambhat", "Mahesana", "Modasa", "Morbi",
-        "Nadiad", "Navsari", "Palanpur", "Patan", "Porbandar", "Rajkot", "Savarkundla", "Sidhpur", "Surat",
-        "Surendranagar", "Una", "Unjha", "Upleta", "Vadodara", "Valsad", "Vapi", "Veraval", "Visnagar", "Wankaner"
-    ],
-    "Haryana": [
-        "Ambala", "Ambala Cantt", "Bahadurgarh", "Bhiwani", "Charkhi Dadri", "Faridabad", "Fatehabad", "Gohana",
-        "Gurgaon", "Hansi", "Hisar", "Jind", "Kaithal", "Karnal", "Kurukshetra", "Mandi Dabwali", "Narnaul",
-        "Narwana", "Palwal", "Panchkula", "Panipat", "Rewari", "Rohtak", "Sirsa", "Sonipat", "Thanesar",
-        "Tohana", "Yamunanagar"
-    ],
-    "Himachal Pradesh": [
-        "Baddi", "Bilaspur", "Chamba", "Dalhousie", "Dharamshala", "Hamirpur", "Kangra", "Kullu", "Mandi",
-        "Manali", "Nahan", "Nalagarh", "Palampur", "Paonta Sahib", "Parwanoo", "Shimla", "Solan", "Sundarnagar", "Una"
-    ],
-    "Jharkhand": [
-        "Adityapur", "Bokaro", "Chaibasa", "Chakradharpur", "Chatra", "Daltonganj", "Deoghar", "Dhanbad",
-        "Dumka", "Giridih", "Gumia", "Hazaribagh", "Jamshedpur", "Jhumri Tilaiya", "Lohardaga", "Madhupur",
-        "Medininagar", "Pakur", "Phusro", "Ramgarh", "Ranchi", "Sahibganj", "Saunda", "Simdega"
-    ],
-    "Karnataka": [
-        "Bagalkot", "Bangalore", "Belgaum", "Bellary", "Bhadravati", "Bidar", "Bijapur", "Chikmagalur",
-        "Chikutir", "Chintamani", "Chitradurga", "Davangere", "Dharwad", "Gadag-Betigeri", "Gangawati",
-        "Gokak", "Gulbarga", "Hassan", "Haveri", "Hospet", "Hubli", "Karwar", "Kolar", "Koppal", "Mandya",
-        "Mangalore", "Mysore", "Nipani", "Raichur", "Ramanagaram", "Ranibennur", "Robertson Pet", "Sagar",
-        "Shimoga", "Sirsi", "Tumkur", "Udupi", "Yadgir"
-    ],
-    "Kerala": [
-        "Adoor", "Alappuzha", "Aluva", "Angamaly", "Attingal", "Chalakudy", "Changanassery", "Chengannur",
-        "Cherthala", "Chittur-Thathamangalam", "Guruvayoor", "Irinjalakuda", "Kalamassery", "Kanhangad",
-        "Kannur", "Kasaragod", "Kayamkulam", "Kochi", "Kodungallur", "Kollam", "Kottayam", "Koyilandy",
-        "Kozhikode", "Kunnamkulam", "Malappuram", "Manjeri", "Mattannur", "Mavelikkara", "Muvattupuzha",
-        "Nedumangad", "Neyyattinkara", "Nilambur", "Ottappalam", "Palai", "Palakkad", "Ponnani", "Punalur",
-        "Shoranur", "Taliparamba", "Thiruvalla", "Thiruvananthapuram", "Thodupuzha", "Thrissur", "Tirur",
-        "Varkala", "Vadakara"
-    ],
-    "Madhya Pradesh": [
-        "Ashoknagar", "Balaghat", "Betul", "Bhind", "Bhopal", "Burhanpur", "Chhatarpur", "Chhindwara",
-        "Damoh", "Datia", "Dewas", "Dhar", "Guna", "Gwalior", "Harda", "Hoshangabad", "Indore", "Itarsi",
-        "Jabalpur", "Khandwa", "Khargone", "Mandsaur", "Morena", "Murwara", "Nagda", "Neemuch", "Pithampur",
-        "Ratlam", "Rewa", "Sagar", "Satna", "Sehore", "Seoni", "Shahdol", "Shajapur", "Sheopur", "Shivpuri",
-        "Singrauli", "Tikamgarh", "Ujjain", "Vidisha"
-    ],
-    "Maharashtra": [
-        "Achalpur", "Ahmednagar", "Akola", "Amravati", "Aurangabad", "Baramati", "Beed", "Bhandara",
-        "Bhiwandi", "Bhusawal", "Bid", "Buldana", "Chandrapur", "Dhule", "Gondia", "Hinganghat", "Ichalkaranji",
-        "Jalgaon", "Jalna", "Kalyan-Dombivli", "Karad", "Kolhapur", "Latur", "Malegaon", "Mira-Bhayandar",
-        "Mumbai", "Nagpur", "Nanded", "Nandurbar", "Nashik", "Navi Mumbai", "Osmanabad", "Palghar", "Panvel",
-        "Parbhani", "Phaltan", "Pimpri-Chinchwad", "Pune", "Ratnagiri", "Sangli", "Satara", "Solapur", "Thane",
-        "Udgir", "Ulhasnagar", "Vasai-Virar", "Wardha", "Yavatmal"
-    ],
-    "Manipur": [
-        "Bishnupur", "Churachandpur", "Imphal", "Jiribam", "Kakching", "Lilong", "Mayang Imphal", "Nambol",
-        "Thoubal", "Ukhrul", "Wangjing", "Yairipok"
-    ],
-    "Meghalaya": [
-        "Baghmara", "Jowai", "Nongpoh", "Nongstoin", "Resubelpara", "Shillong", "Tura", "Williamnagar"
-    ],
-    "Mizoram": [
-        "Aizawl", "Champhai", "Kolasib", "Lawngtlai", "Lunglei", "Mamit", "Saiha", "Serchhip"
-    ],
-    "Nagaland": [
-        "Chumukedima", "Dimapur", "Kohima", "Mokokchung", "Mon", "Phek", "Tuensang", "Wokha", "Zunheboto"
-    ],
-    "Odisha": [
-        "Angul", "Balangir", "Balasore", "Bargarh", "Baripada", "Berhampur", "Bhadrak", "Bhawanipatna",
-        "Bhubaneswar", "Brahmapur", "Brajarajnagar", "Byasanagar", "Cuttack", "Dhenkanal", "Jeypore",
-        "Jharsuguda", "Kendujhar", "Paradip", "Puri", "Rayagada", "Rourkela", "Sambalpur", "Sunabeda"
-    ],
-    "Punjab": [
-        "Abohar", "Amritsar", "Barnala", "Batala", "Bathinda", "Dhuri", "Faridkot", "Fazilka", "Firozpur",
-        "Firozpur Cantt", "Gurdaspur", "Hoshiarpur", "Jagraon", "Jalandhar", "Kapurthala", "Khanna",
-        "Kot Kapura", "Ludhiana", "Malerkotla", "Malout", "Mansa", "Moga", "Mohali", "Muktsar", "Nabha",
-        "Pathankot", "Patiala", "Phagwara", "Rajpura", "Rupnagar", "Sangrur", "Sunam", "Tarn Taran"
-    ],
-    "Rajasthan": [
-        "Ajmer", "Alwar", "Amarsar", "Balotra", "Banswara", "Baran", "Barmer", "Beawar", "Bharatpur", "Bhilwara",
-        "Bhiwadi", "Bikaner", "Bundi", "Chittorgarh", "Churu", "Dausa", "Dholpur", "Dungarpur", "Hanumangarh",
-        "Hindaun", "Jaipur", "Jaisalmer", "Jalore", "Jhalawar", "Jhunjhunu", "Jodhpur", "Karauli", "Kishangarh",
-        "Kota", "Kuchaman City", "Ladnun", "Madanganj", "Makrana", "Nagaur", "Nawalgarh", "Nimbahera", "Nohar",
-        "Pali", "Phalodi", "Pilani", "Pratapgarh", "Pushkar", "Rajsamand", "Ratangarh", "Sardarshahar", "Sawai Madhopur",
-        "Sikar", "Sirohi", "Sri Ganganagar", "Sujangarh", "Suratgarh", "Tonk", "Udaipur"
-    ],
-    "Sikkim": [
-        "Gangtok", "Geyzing", "Jorethang", "Mangan", "Namchi", "Nayabazar", "Rangpo", "Singtam"
-    ],
-    "Tamil Nadu": [
-        "Alandur", "Ambur", "Arakkonam", "Arcot", "Avadi", "Chennai", "Chidambaram", "Coimbatore", "Cuddalore",
-        "Dharmapuri", "Dindigul", "Erode", "Gobichettipalayam", "Gudiyatham", "Hosur", "Kancheepuram",
-        "Karaikudi", "Karur", "Kumbakonam", "Madurai", "Nagapattinam", "Nagercoil", "Namakkal", "Neyveli",
-        "Ooty", "Pallavaram", "Panihati", "Paramakudi", "Pollachi", "Pudukkottai", "Rajapalayam",
-        "Ramanathapuram", "Salem", "Sivakasi", "Tambaram", "Thanjavur", "Theni Allinagaram", "Thoothukudi",
-        "Tiruchirappalli", "Tirunelveli", "Tiruppur", "Tiruvannamalai", "Vellore", "Viluppuram", "Virudhunagar"
-    ],
-    "Telangana": [
-        "Adilabad", "Bellampalle", "Bhadrachalam", "Bhongir", "Bodhan", "Gadwal", "Hyderabad", "Jagtial",
-        "Jangaon", "Kamareddy", "Karimnagar", "Khammam", "Koratla", "Kothagudem", "Kottagudem", "Mahbubnagar",
-        "Mancherial", "Mandamarri", "Manuguru", "Miryalaguda", "Nalgonda", "Nirmal", "Nizamabad", "Palwancha",
-        "Ramagundam", "Sangareddy", "Sircilla", "Suryapet", "Tandur", "Vikarabad", "Wanaparthy", "Warangal",
-        "Yellandu", "Zahirabad"
-    ],
-    "Tripura": [
-        "Agartala", "Ambassa", "Belonia", "Dharmanagar", "Kailasahar", "Khowai", "Kumarghat", "Ranirbazar",
-        "Santirbazar", "Teliamura", "Udaipur"
-    ],
-    "Uttar Pradesh": [
-        "Agra", "Aligarh", "Allahabad", "Amroha", "Ayodhya", "Azamgarh", "Bahraich", "Ballia", "Banda",
-        "Barabanki", "Bareilly", "Basti", "Bijnor", "Budaun", "Bulandshahr", "Chandausi", "Deoria", "Etah",
-        "Etawah", "Faizabad", "Farrukhabad", "Fatehpur", "Firozabad", "Ghaziabad", "Ghazipur", "Gonda",
-        "Gorakhpur", "Hapur", "Hardoi", "Hathras", "Jaunpur", "Jhansi", "Kanpur", "Kasganj", "Khushinagar",
-        "Lakhimpur", "Lalitpur", "Lucknow", "Mainpuri", "Mathura", "Maunath Bhanjan", "Meerut", "Mirzapur",
-        "Modinagar", "Moradabad", "Muzaffarnagar", "Noida", "Orai", "Pilibhit", "Raebareli", "Rampur",
-        "Saharanpur", "Sambhal", "Shahjahanpur", "Shamli", "Shikohabad", "Sitapur", "Sultanpur", "Unnao", "Varanasi"
-    ],
-    "Uttarakhand": [
-        "Almora", "Bageshwar", "Dehradun", "Haldwani", "Haridwar", "Kashipur", "Kotdwar", "Manglaur",
-        "Mussoorie", "Nainital", "Pauri", "Pithoragarh", "Ramnagar", "Rishikesh", "Roorkee", "Rudrapur",
-        "Srinagar", "Tehri", "Uttarkashi"
-    ],
-    "West Bengal": [
-        "Alipurduar", "Arambag", "Asansol", "Baharampur", "Bally", "Balurghat", "Bankura", "Barasat",
-        "Bardhaman", "Barasat", "Barrackpore", "Basirhat", "Bhatpara", "Bidhannagar", "Bongaon", "Burnpur",
-        "Cooch Behar", "Darjeeling", "Durgapur", "English Bazar", "Haldia", "Howrah", "Hugli-Chinsurah",
-        "Jalpaiguri", "Kalyani", "Kamarhati", "Kanchrapara", "Kharagpur", "Kolkata", "Krishnanagar",
-        "Madhyamgram", "Malda", "Medinipur", "Nabadwip", "Naihati", "North Barrackpore", "North Dumdum",
-        "Panihati", "Purulia", "Raiganj", "Rajarhat", "Ranaghat", "Rishra", "Santipur", "Serampore",
-        "Siliguri", "South Dumdum", "Titagarh", "Uluberia"
-    ],
-    "Delhi": [
-        "Adarsh Nagar", "Alipur", "Anand Vihar", "Ashok Vihar", "Badarpur", "Bawana", "Chanakyapuri", "Chandni Chowk",
-        "Chhatarpur", "Civil Lines", "Connaught Place", "Daryaganj", "Defence Colony", "Delhi Cantonment", "Dwarka",
-        "East of Kailash", "Gandhi Nagar", "Geeta Colony", "Greater Kailash", "Green Park", "Hauz Khas", "Inderlok",
-        "Janakpuri", "Jangpura", "Kalkaji", "Karol Bagh", "Kashmere Gate", "Khan Market", "Kirti Nagar", "Lajpat Nagar",
-        "Laxmi Nagar", "Lodhi Colony", "Malviya Nagar", "Mayur Vihar", "Mehrauli", "Model Town", "Moti Nagar",
-        "Mukherjee Nagar", "Najafgarh", "Narela", "Nehru Place", "New Friends Colony", "Okhla", "Paharganj",
-        "Palam", "Paschim Vihar", "Patel Nagar", "Pitampura", "Preet Vihar", "Punjabi Bagh", "R.K. Puram",
-        "Rajendra Nagar", "Rajouri Garden", "Rohini", "Saket", "Sarita Vihar", "Sarojini Nagar", "Shahdara",
-        "Shalimar Bagh", "South Extension", "Tilak Nagar", "Vasant Kunj", "Vasant Vihar", "Vikaspuri"
-    ],
-    "Jammu and Kashmir": [
-        "Anantnag", "Baramulla", "Jammu", "Kathua", "Pulwama", "Sopore", "Srinagar", "Udhampur"
-    ],
-    "Ladakh": [
-        "Kargil", "Leh"
-    ],
-    "Puducherry": [
-        "Karaikal", "Mahe", "Puducherry", "Yanam", "Ozhukarai"
-    ]
+    "Andhra Pradesh": ["Adoni", "Amalapuram", "Anakapalle", "Anantapur", "Bapatla", "Bhimavaram", "Chirala", "Chittoor", "Dharmavaram", "Eluru", "Gudivada", "Gudur", "Guntakal", "Guntur", "Hindupur", "Kadapa", "Kakinada", "Kavali", "Kurnool", "Machilipatnam", "Madanapalle", "Nandyal", "Narasaraopet", "Nellore", "Ongole", "Proddatur", "Rajahmundry", "Srikakulam", "Tadepalligudem", "Tadpatri", "Tenali", "Tirupati", "Vijayawada", "Visakhapatnam", "Vizianagaram"],
+    "Arunachal Pradesh": ["Aalo", "Anini", "Basar", "Bomdila", "Changlang", "Daporijo", "Hawai", "Itanagar", "Jairampur", "Khonsa", "Koloriang", "Longding", "Miao", "Naharlagun", "Namsai", "Pasighat", "Roing", "Seppa", "Tawang", "Tezu", "Yingkiong", "Ziro"],
+    "Assam": ["Barpeta", "Bongaigaon", "Dhemaji", "Dhubri", "Dibrugarh", "Diphu", "Goalpara", "Golaghat", "Guwahati", "Haflong", "Hailakandi", "Hojai", "Jorhat", "Karimganj", "Kokrajhar", "Lanka", "Lumding", "Mangaldoi", "Mankachar", "Margherita", "Mariani", "Nagaon", "Nalbari", "North Lakhimpur", "Rangia", "Sibsagar", "Silapathar", "Silchar", "Tezpur", "Tinsukia", "Udalguri"],
+    "Bihar": ["Araria", "Arrah", "Aurangabad", "Bagaha", "Begusarai", "Bettiah", "Bhabua", "Bhagalpur", "Bihar Sharif", "Buxar", "Chhapra", "Darbhanga", "Dehri", "Gaya", "Gopalganj", "Hajipur", "Jamalpur", "Jamui", "Jehanabad", "Katihar", "Kishanganj", "Lakhisarai", "Madhepura", "Madhubani", "Motihari", "Munger", "Muzaffarpur", "Nawada", "Patna", "Purnia", "Saharsa", "Samastipur", "Sasaram", "Sheikhpura", "Sitamarhi", "Siwan", "Supaul"],
+    "Chhattisgarh": ["Ambikapur", "Bhatapara", "Bhilai", "Bilaspur", "Chirmiri", "Dalli-Rajhara", "Dhamtari", "Durg", "Jagdalpur", "Kanker", "Kawardha", "Korba", "Mahasamund", "Manendragarh", "Mungeli", "Naila Janjgir", "Raigarh", "Raipur", "Rajnandgaon", "Sakti", "Tilda Newra"],
+    "Goa": ["Bicholim", "Canacona", "Curchorem", "Cuncolim", "Mapusa", "Margao", "Mormugao", "Panaji", "Pernem", "Ponda", "Quepem", "Sanguem", "Sanquelim", "Valpoi", "Vasco da Gama"],
+    "Gujarat": ["Ahmedabad", "Amreli", "Anand", "Anjar", "Ankleshwar", "Bardoli", "Bharuch", "Bhavnagar", "Bhuj", "Botad", "Dahod", "Deesa", "Dhoraji", "Gandhidham", "Gandhinagar", "Godhra", "Gondal", "Himmatnagar", "Jamnagar", "Jetpur", "Junagadh", "Kalol", "Keshod", "Khambhat", "Mahesana", "Modasa", "Morbi", "Nadiad", "Navsari", "Palanpur", "Patan", "Porbandar", "Rajkot", "Savarkundla", "Sidhpur", "Surat", "Surendranagar", "Una", "Unjha", "Upleta", "Vadodara", "Valsad", "Vapi", "Veraval", "Visnagar", "Wankaner"],
+    "Haryana": ["Ambala", "Ambala Cantt", "Bahadurgarh", "Bhiwani", "Charkhi Dadri", "Faridabad", "Fatehabad", "Gohana", "Gurgaon", "Hansi", "Hisar", "Jind", "Kaithal", "Karnal", "Kurukshetra", "Mandi Dabwali", "Narnaul", "Narwana", "Palwal", "Panchkula", "Panipat", "Rewari", "Rohtak", "Sirsa", "Sonipat", "Thanesar", "Tohana", "Yamunanagar"],
+    "Himachal Pradesh": ["Baddi", "Bilaspur", "Chamba", "Dalhousie", "Dharamshala", "Hamirpur", "Kangra", "Kullu", "Mandi", "Manali", "Nahan", "Nalagarh", "Palampur", "Paonta Sahib", "Parwanoo", "Shimla", "Solan", "Sundarnagar", "Una"],
+    "Jharkhand": ["Adityapur", "Bokaro", "Chaibasa", "Chakradharpur", "Chatra", "Daltonganj", "Deoghar", "Dhanbad", "Dumka", "Giridih", "Gumia", "Hazaribagh", "Jamshedpur", "Jhumri Tilaiya", "Lohardaga", "Madhupur", "Medininagar", "Pakur", "Phusro", "Ramgarh", "Ranchi", "Sahibganj", "Saunda", "Simdega"],
+    "Karnataka": ["Bagalkot", "Bangalore", "Belgaum", "Bellary", "Bhadravati", "Bidar", "Bijapur", "Chikmagalur", "Chikutir", "Chintamani", "Chitradurga", "Davangere", "Dharwad", "Gadag-Betigeri", "Gangawati", "Gokak", "Gulbarga", "Hassan", "Haveri", "Hospet", "Hubli", "Karwar", "Kolar", "Koppal", "Mandya", "Mangalore", "Mysore", "Nipani", "Raichur", "Ramanagaram", "Ranibennur", "Robertson Pet", "Sagar", "Shimoga", "Sirsi", "Tumkur", "Udupi", "Yadgir"],
+    "Kerala": ["Adoor", "Alappuzha", "Aluva", "Angamaly", "Attingal", "Chalakudy", "Changanassery", "Chengannur", "Cherthala", "Chittur-Thathamangalam", "Guruvayoor", "Irinjalakuda", "Kalamassery", "Kanhangad", "Kannur", "Kasaragod", "Kayamkulam", "Kochi", "Kodungallur", "Kollam", "Kottayam", "Koyilandy", "Kozhikode", "Kunnamkulam", "Malappuram", "Manjeri", "Mattannur", "Mavelikkara", "Muvattupuzha", "Nedumangad", "Neyyattinkara", "Nilambur", "Ottappalam", "Palai", "Palakkad", "Ponnani", "Punalur", "Shoranur", "Taliparamba", "Thiruvalla", "Thiruvananthapuram", "Thodupuzha", "Thrissur", "Tirur", "Varkala", "Vadakara"],
+    "Madhya Pradesh": ["Ashoknagar", "Balaghat", "Betul", "Bhind", "Bhopal", "Burhanpur", "Chhatarpur", "Chhindwara", "Damoh", "Datia", "Dewas", "Dhar", "Guna", "Gwalior", "Harda", "Hoshangabad", "Indore", "Itarsi", "Jabalpur", "Khandwa", "Khargone", "Mandsaur", "Morena", "Murwara", "Nagda", "Neemuch", "Pithampur", "Ratlam", "Rewa", "Sagar", "Satna", "Sehore", "Seoni", "Shahdol", "Shajapur", "Sheopur", "Shivpuri", "Singrauli", "Tikamgarh", "Ujjain", "Vidisha"],
+    "Maharashtra": ["Achalpur", "Ahmednagar", "Akola", "Amravati", "Aurangabad", "Baramati", "Beed", "Bhandara", "Bhiwandi", "Bhusawal", "Bid", "Buldana", "Chandrapur", "Dhule", "Gondia", "Hinganghat", "Ichalkaranji", "Jalgaon", "Jalna", "Kalyan-Dombivli", "Karad", "Kolhapur", "Latur", "Malegaon", "Mira-Bhayandar", "Mumbai", "Nagpur", "Nanded", "Nandurbar", "Nashik", "Navi Mumbai", "Osmanabad", "Palghar", "Panvel", "Parbhani", "Phaltan", "Pimpri-Chinchwad", "Pune", "Ratnagiri", "Sangli", "Satara", "Solapur", "Thane", "Udgir", "Ulhasnagar", "Vasai-Virar", "Wardha", "Yavatmal"],
+    "Manipur": ["Bishnupur", "Churachandpur", "Imphal", "Jiribam", "Kakching", "Lilong", "Mayang Imphal", "Nambol", "Thoubal", "Ukhrul", "Wangjing", "Yairipok"],
+    "Meghalaya": ["Baghmara", "Jowai", "Nongpoh", "Nongstoin", "Resubelpara", "Shillong", "Tura", "Williamnagar"],
+    "Mizoram": ["Aizawl", "Champhai", "Kolasib", "Lawngtlai", "Lunglei", "Mamit", "Saiha", "Serchhip"],
+    "Nagaland": ["Chumukedima", "Dimapur", "Kohima", "Mokokchung", "Mon", "Phek", "Tuensang", "Wokha", "Zunheboto"],
+    "Odisha": ["Angul", "Balangir", "Balasore", "Bargarh", "Baripada", "Berhampur", "Bhadrak", "Bhawanipatna", "Bhubaneswar", "Brahmapur", "Brajarajnagar", "Byasanagar", "Cuttack", "Dhenkanal", "Jeypore", "Jharsuguda", "Kendujhar", "Paradip", "Puri", "Rayagada", "Rourkela", "Sambalpur", "Sunabeda"],
+    "Punjab": ["Abohar", "Amritsar", "Barnala", "Batala", "Bathinda", "Dhuri", "Faridkot", "Fazilka", "Firozpur", "Firozpur Cantt", "Gurdaspur", "Hoshiarpur", "Jagraon", "Jalandhar", "Kapurthala", "Khanna", "Kot Kapura", "Ludhiana", "Malerkotla", "Malout", "Mansa", "Moga", "Mohali", "Muktsar", "Nabha", "Pathankot", "Patiala", "Phagwara", "Rajpura", "Rupnagar", "Sangrur", "Sunam", "Tarn Taran"],
+    "Rajasthan": ["Ajmer", "Alwar", "Amarsar", "Balotra", "Banswara", "Baran", "Barmer", "Beawar", "Bharatpur", "Bhilwara", "Bhiwadi", "Bikaner", "Bundi", "Chittorgarh", "Churu", "Dausa", "Dholpur", "Dungarpur", "Hanumangarh", "Hindaun", "Jaipur", "Jaisalmer", "Jalore", "Jhalawar", "Jhunjhunu", "Jodhpur", "Karauli", "Kishangarh", "Kota", "Kuchaman City", "Ladnun", "Madanganj", "Makrana", "Nagaur", "Nawalgarh", "Nimbahera", "Nohar", "Pali", "Phalodi", "Pilani", "Pratapgarh", "Pushkar", "Rajsamand", "Ratangarh", "Sardarshahar", "Sawai Madhopur", "Sikar", "Sirohi", "Sri Ganganagar", "Sujangarh", "Suratgarh", "Tonk", "Udaipur"],
+    "Sikkim": ["Gangtok", "Geyzing", "Jorethang", "Mangan", "Namchi", "Nayabazar", "Rangpo", "Singtam"],
+    "Tamil Nadu": ["Alandur", "Ambur", "Arakkonam", "Arcot", "Avadi", "Chennai", "Chidambaram", "Coimbatore", "Cuddalore", "Dharmapuri", "Dindigul", "Erode", "Gobichettipalayam", "Gudiyatham", "Hosur", "Kancheepuram", "Karaikudi", "Karur", "Kumbakonam", "Madurai", "Nagapattinam", "Nagercoil", "Namakkal", "Neyveli", "Ooty", "Pallavaram", "Panihati", "Paramakudi", "Pollachi", "Pudukkottai", "Rajapalayam", "Ramanathapuram", "Salem", "Sivakasi", "Tambaram", "Thanjavur", "Theni Allinagaram", "Thoothukudi", "Tiruchirappalli", "Tirunelveli", "Tiruppur", "Tiruvannamalai", "Vellore", "Viluppuram", "Virudhunagar"],
+    "Telangana": ["Adilabad", "Bellampalle", "Bhadrachalam", "Bhongir", "Bodhan", "Gadwal", "Hyderabad", "Jagtial", "Jangaon", "Kamareddy", "Karimnagar", "Khammam", "Koratla", "Kothagudem", "Kottagudem", "Mahbubnagar", "Mancherial", "Mandamarri", "Manuguru", "Miryalaguda", "Nalgonda", "Nirmal", "Nizamabad", "Palwancha", "Ramagundam", "Sangareddy", "Sircilla", "Suryapet", "Tandur", "Vikarabad", "Wanaparthy", "Warangal", "Yellandu", "Zahirabad"],
+    "Tripura": ["Agartala", "Ambassa", "Belonia", "Dharmanagar", "Kailasahar", "Khowai", "Kumarghat", "Ranirbazar", "Santirbazar", "Teliamura", "Udaipur"],
+    "Uttar Pradesh": ["Agra", "Aligarh", "Allahabad", "Amroha", "Ayodhya", "Azamgarh", "Bahraich", "Ballia", "Banda", "Barabanki", "Bareilly", "Basti", "Bijnor", "Budaun", "Bulandshahr", "Chandausi", "Deoria", "Etah", "Etawah", "Faizabad", "Farrukhabad", "Fatehpur", "Firozabad", "Ghaziabad", "Ghazipur", "Gonda", "Gorakhpur", "Hapur", "Hardoi", "Hathras", "Jaunpur", "Jhansi", "Kanpur", "Kasganj", "Khushinagar", "Lakhimpur", "Lalitpur", "Lucknow", "Mainpuri", "Mathura", "Maunath Bhanjan", "Meerut", "Mirzapur", "Modinagar", "Moradabad", "Muzaffarnagar", "Noida", "Orai", "Pilibhit", "Raebareli", "Rampur", "Saharanpur", "Sambhal", "Shahjahanpur", "Shamli", "Shikohabad", "Sitapur", "Sultanpur", "Unnao", "Varanasi"],
+    "Uttarakhand": ["Almora", "Bageshwar", "Dehradun", "Haldwani", "Haridwar", "Kashipur", "Kotdwar", "Manglaur", "Mussoorie", "Nainital", "Pauri", "Pithoragarh", "Ramnagar", "Rishikesh", "Roorkee", "Rudrapur", "Srinagar", "Tehri", "Uttarkashi"],
+    "West Bengal": ["Alipurduar", "Arambag", "Asansol", "Baharampur", "Bally", "Balurghat", "Bankura", "Barasat", "Bardhaman", "Barasat", "Barrackpore", "Basirhat", "Bhatpara", "Bidhannagar", "Bongaon", "Burnpur", "Cooch Behar", "Darjeeling", "Durgapur", "English Bazar", "Haldia", "Howrah", "Hugli-Chinsurah", "Jalpaiguri", "Kalyani", "Kamarhati", "Kanchrapara", "Kharagpur", "Kolkata", "Krishnanagar", "Madhyamgram", "Malda", "Medinipur", "Nabadwip", "Naihati", "North Barrackpore", "North Dumdum", "Panihati", "Purulia", "Raiganj", "Rajarhat", "Ranaghat", "Rishra", "Santipur", "Serampore", "Siliguri", "South Dumdum", "Titagarh", "Uluberia"],
+    "Delhi": ["Adarsh Nagar", "Alipur", "Anand Vihar", "Ashok Vihar", "Badarpur", "Bawana", "Chanakyapuri", "Chandni Chowk", "Chhatarpur", "Civil Lines", "Connaught Place", "Daryaganj", "Defence Colony", "Delhi Cantonment", "Dwarka", "East of Kailash", "Gandhi Nagar", "Geeta Colony", "Greater Kailash", "Green Park", "Hauz Khas", "Inderlok", "Janakpuri", "Jangpura", "Kalkaji", "Karol Bagh", "Kashmere Gate", "Khan Market", "Kirti Nagar", "Lajpat Nagar", "Laxmi Nagar", "Lodhi Colony", "Malviya Nagar", "Mayur Vihar", "Mehrauli", "Model Town", "Moti Nagar", "Mukherjee Nagar", "Najafgarh", "Narela", "Nehru Place", "New Friends Colony", "Okhla", "Paharganj", "Palam", "Paschim Vihar", "Patel Nagar", "Pitampura", "Preet Vihar", "Punjabi Bagh", "R.K. Puram", "Rajendra Nagar", "Rajouri Garden", "Rohini", "Saket", "Sarita Vihar", "Sarojini Nagar", "Shahdara", "Shalimar Bagh", "South Extension", "Tilak Nagar", "Vasant Kunj", "Vasant Vihar", "Vikaspuri"],
+    "Jammu and Kashmir": ["Anantnag", "Baramulla", "Jammu", "Kathua", "Pulwama", "Sopore", "Srinagar", "Udhampur"],
+    "Ladakh": ["Kargil", "Leh"],
+    "Puducherry": ["Karaikal", "Mahe", "Puducherry", "Yanam", "Ozhukarai"]
 };
 
 const INDIAN_STATES = Object.keys(STATE_CITY_MAP).sort();
-
-const IDENTITY_PROOFS = [
-    "Aadhar Card",
-    "Voter ID",
-    "Passport",
-    "Driving License",
-    "PAN Card"
-];
-
-const ADDRESS_PROOFS = [
-    "Rental Agreement",
-    "House Electricity Bill",
-    "Water Bill",
-    "Gas Company Bill",
-    "Internet / WiFi Bill",
-    "Bank Statement",
-    "Passport"
-];
 
 export default function KYCPage() {
     const router = useRouter();
@@ -323,15 +153,12 @@ export default function KYCPage() {
     };
 
     const handleNext = async () => {
-        console.log('Next clicked. Step:', currentStep);
         if (currentStep === 1) {
-            if (!validateStep1()) { console.log('Step 1 invalid', errors); return; }
+            if (!validateStep1()) return;
         }
-
         if (currentStep === 2 && customerType === 'Company') {
             if (!validateStep2()) return;
         }
-
         if (currentStep === 4) {
             if (!isDocumentsChecked) {
                 Swal.fire({ icon: 'warning', title: 'Action Required', text: 'Please check the confirmation box.' });
@@ -385,205 +212,386 @@ export default function KYCPage() {
         window.scrollTo(0, 0);
     };
 
-
     return (
-        <div className="min-h-screen bg-gray-50 font-sans mt-8">
-            <div className="max-w-6xl mx-auto px-8 py-4">
+        <div
+            className="min-h-screen font-sans"
+            style={{
+                background: 'var(--color-grey-grey-50, hsla(0, 0%, 96%, 1))',
+                width: '100%',
+                paddingTop: '48px',
+                paddingBottom: '48px',
+                minHeight: '1327px',
+                opacity: 1
+            }}
+        >
+            <div className="max-w-[1200px] mx-auto px-4">
                 {/* Breadcrumb */}
                 {currentStep !== 5 && (
                     <div className="text-xs text-gray-500 mb-6 flex items-center gap-2">
-                        <Link href="/" className="hover:text-black font-medium font-sans">Product-Page</Link>
+                        <Link href="/" className="hover:text-black font-medium">Product-Page</Link>
                         <span>›</span>
-                        <Link href="/cart" className="hover:text-black font-medium font-sans">Cart</Link>
+                        <Link href="/cart" className="hover:text-black font-medium">Cart</Link>
                         <span>›</span>
-                        <Link href="/checkout/address" className="hover:text-black font-medium font-sans">Address</Link>
+                        <Link href="/checkout/address" className="hover:text-black font-medium">Address</Link>
                         <span>›</span>
-                        <span className="text-black font-medium font-sans">Verification</span>
+                        <span className="text-black font-bold">Verification</span>
                     </div>
                 )}
 
                 {currentStep === 5 ? (
                     <div className="flex justify-center items-center min-h-[60vh] px-4">
                         <div className="relative w-full max-w-lg bg-white rounded-2xl shadow-lg px-8 py-12 text-center">
-
-                            {/* Back Button */}
-                            <button
-                                onClick={() => setCurrentStep(1)}
-                                className="absolute top-6 left-6 flex items-center gap-2 text-red-500 border border-red-500 rounded-full px-4 py-1.5 text-sm font-medium hover:bg-red-50 transition"
-                            >
-                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7" /></svg>
-                                Back
-                            </button>
-
-                            {/* Illustration */}
-                            <div className="flex justify-center mb-10 mt-4">
-                                <div className="relative w-56 h-56 flex items-center justify-center">
-                                    <div className="absolute inset-6 rounded-full bg-blue-500/10 blur-2xl"></div>
-                                    <svg viewBox="0 0 200 200" className="relative z-10 w-full h-full" fill="none">
-                                        <circle cx="100" cy="100" r="80" stroke="#E5E7EB" strokeWidth="10" />
-                                        <path d="M 100 20 A 80 80 0 0 0 43.4 156.6" stroke="#0B5ED7" strokeWidth="10" strokeLinecap="round" fill="none" />
-                                        <circle cx="100" cy="100" r="58" fill="#F8FAFF" />
-                                        <g transform="translate(40, 84)">
-                                            <circle cx="12" cy="12" r="14" fill="#0B5ED7" stroke="white" strokeWidth="3" />
-                                            <path d="M7 12 L11 16 L17 8" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
-                                        </g>
-                                    </svg>
-                                </div>
-                            </div>
-
                             <h2 className="text-4xl font-semibold text-[#0B5ED7] mb-4">KYC in Progress</h2>
-                            <p className="text-gray-900 text-[15px] font-medium max-w-xl mx-auto mb-6">
-                                We are now reviewing your documents. This typically takes 24–48 hours.
-                                We will notify you via email as soon as it’s complete.
-                            </p>
-
-                            <div className="flex justify-center gap-6">
-                                <Link href="/profile/orders" className="bg-[#3B82F6] hover:bg-[#2563EB] text-white px-6 py-2 rounded-3xl font-normal shadow-lg transition">Go To My Orders</Link>
-                                <button className="bg-[#4B5563] hover:bg-[#374151] text-white px-6 py-2 rounded-3xl font-normal shadow-lg transition">KYC Documentation</button>
-                            </div>
+                            <p className="text-gray-900 text-[15px] font-medium mb-6">Reviewing your documents typically takes 24–48 hours.</p>
+                            <Link href="/profile/orders" className="bg-[#3B82F6] text-white px-6 py-2 rounded-3xl font-normal shadow-lg">Go To My Orders</Link>
                         </div>
                     </div>
                 ) : (
-                    <div className="flex flex-col lg:flex-row gap-8">
-                        <div className="lg:w-2/3">
-                            <div className="relative rounded-2xl p-6 bg-gray-50/50">
-                                <div className="flex items-center gap-4 mb-6">
-                                    <h1 className="text-3xl font-semibold text-gray-900">KYC & Documentation</h1>
+                    <div
+                        className="flex flex-row items-start"
+                        style={{
+                            width: '1200px',
+                            minHeight: '1205px',
+                            gap: '32px',
+                            opacity: 1
+                        }}
+                    >
+                        {/* Left Column: KYC Verification Form */}
+                        <div
+                            className="flex flex-col"
+                            style={{
+                                width: '726px',
+                                minHeight: '1165px',
+                                gap: '20px'
+                            }}
+                        >
+                            <div
+                                className="flex flex-col"
+                                style={{
+                                    width: '726px',
+                                    height: '86px',
+                                    gap: '12px'
+                                }}
+                            >
+                                <div
+                                    className="flex flex-col"
+                                    style={{
+                                        width: '372px',
+                                        height: '86px',
+                                        gap: '12px'
+                                    }}
+                                >
+                                    <h1
+                                        style={{
+                                            width: '372px',
+                                            height: '35px',
+                                            fontFamily: 'Mona Sans, sans-serif',
+                                            fontWeight: '600',
+                                            fontSize: '24px', // mapping font/size/6
+                                            color: 'hsla(0, 0%, 20%, 1)',
+                                            display: 'flex',
+                                            alignItems: 'center'
+                                        }}
+                                    >
+                                        KYC & Documentation
+                                    </h1>
+
+                                    <div
+                                        className="flex"
+                                        style={{
+                                            width: '372px',
+                                            height: '39px',
+                                            gap: '12px'
+                                        }}
+                                    >
+                                        <button
+                                            onClick={() => setCustomerType('Customer')}
+                                            className="transition-all"
+                                            style={{
+                                                width: '180px',
+                                                height: '39px',
+                                                borderRadius: '59px',
+                                                padding: '7px 40px',
+                                                background: customerType === 'Customer' ? 'hsla(0, 0%, 20%, 1)' : 'hsla(0, 0%, 93%, 1)',
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                justifyContent: 'center',
+                                                gap: '10px'
+                                            }}
+                                        >
+                                            <span
+                                                style={{
+                                                    width: '79px',
+                                                    height: '25px',
+                                                    fontFamily: 'Mona Sans, sans-serif',
+                                                    fontWeight: '400',
+                                                    fontSize: '16px',
+                                                    color: customerType === 'Customer' ? 'hsla(0, 0%, 93%, 1)' : 'hsla(0, 0%, 20%, 1)',
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    justifyContent: 'center'
+                                                }}
+                                            >
+                                                Customer
+                                            </span>
+                                        </button>
+                                        <button
+                                            onClick={() => setCustomerType('Company')}
+                                            className="transition-all"
+                                            style={{
+                                                width: '180px',
+                                                height: '39px',
+                                                borderRadius: '59px',
+                                                padding: '7px 40px',
+                                                background: customerType === 'Company' ? 'hsla(0, 0%, 20%, 1)' : 'hsla(0, 0%, 93%, 1)',
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                justifyContent: 'center',
+                                                gap: '10px'
+                                            }}
+                                        >
+                                            <span
+                                                style={{
+                                                    width: '79px',
+                                                    height: '25px',
+                                                    fontFamily: 'Mona Sans, sans-serif',
+                                                    fontWeight: '400',
+                                                    fontSize: '16px',
+                                                    color: customerType === 'Company' ? 'hsla(0, 0%, 93%, 1)' : 'hsla(0, 0%, 20%, 1)',
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    justifyContent: 'center'
+                                                }}
+                                            >
+                                                Company
+                                            </span>
+                                        </button>
+                                    </div>
                                 </div>
+                            </div>
 
-                                {/* Customer Type Toggle */}
-                                <div className="flex gap-4 mb-6">
-                                    <button onClick={() => { setCustomerType('Customer'); setCurrentStep(1); setErrors({}); }} className={`px-12 py-2.5 rounded-full text-lg font-medium transition-all ${customerType === 'Customer' ? 'bg-[#1D1D1F] text-white shadow-md' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}>Customer</button>
-                                    <button onClick={() => { setCustomerType('Company'); setCurrentStep(1); setErrors({}); }} className={`px-12 py-2.5 rounded-full text-lg font-medium transition-all ${customerType === 'Company' ? 'bg-[#1D1D1F] text-white shadow-md' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}>Company</button>
-                                </div>
+                            <div className="bg-[#E8F5E9] border border-[#4CAF50] rounded-md p-3 flex items-center gap-3">
+                                <div className="w-5 h-5 rounded-full bg-[#C8E6C9] flex items-center justify-center text-[#2E7D32]"><FaFingerprint size={14} /></div>
+                                <span className="text-[#1B5E20] font-medium text-sm">Complete KYC to complete your order</span>
+                            </div>
 
-                                <div className="bg-[#E8F5E9] border border-[#4CAF50] rounded-xl p-4 mb-5 flex items-center gap-3">
-                                    <div className="w-5 h-5 rounded-full bg-[#C8E6C9] flex items-center justify-center text-[#2E7D32]"><FaFingerprint size={14} /></div>
-                                    <span className="text-[#1B5E20] font-medium text-sm">Complete KYC to complete your order</span>
-                                </div>
+                            <div
+                                className="flex flex-col"
+                                style={{
+                                    width: '726px',
+                                    height: '112px',
+                                    borderRadius: '12px',
+                                    padding: '12px 18px',
+                                    background: 'hsla(44, 100%, 96%, 1)',
+                                    border: '1px solid hsla(33, 100%, 52%, 1)',
+                                    gap: '10px'
+                                }}
+                            >
+                                <h3
+                                    style={{
+                                        width: '350px',
+                                        height: '20px',
+                                        fontFamily: 'Mona Sans, sans-serif',
+                                        fontWeight: '600',
+                                        fontSize: '14px',
+                                        color: 'hsla(0, 0%, 33%, 1)',
+                                        display: 'flex',
+                                        alignItems: 'center'
+                                    }}
+                                >
+                                    Keep your documents handy (physical or digital)
+                                </h3>
+                                <ol
+                                    className="list-decimal"
+                                    style={{
+                                        width: '232px',
+                                        height: '58px',
+                                        display: 'flex',
+                                        flexDirection: 'column',
+                                        gap: '5px',
+                                        paddingLeft: '18px'
+                                    }}
+                                >
+                                    {[
+                                        'Aadhar Card / Voter ID / Passport',
+                                        'Rental Agreement / House Electricity Bill',
+                                        'Bank Statement - last 3 Months'
+                                    ].map((text, i) => (
+                                        <li
+                                            key={i}
+                                            style={{
+                                                width: '232px',
+                                                height: '16px',
+                                                fontFamily: 'Mona Sans, sans-serif',
+                                                fontWeight: '500',
+                                                fontSize: '12px',
+                                                color: 'hsla(0, 0%, 33%, 1)',
+                                                display: 'list-item'
+                                            }}
+                                        >
+                                            {text}
+                                        </li>
+                                    ))}
+                                </ol>
+                            </div>
 
-                                <div className="bg-white rounded-3xl p-8 shadow-sm border border-gray-100">
-                                    {/* Stepper */}
-                                    <div className="w-full max-w-3xl mx-auto mb-12 mt-4 px-4">
-                                        <div className="flex items-center justify-between w-full">
-                                            {[{ id: 1, label: 'Personal Details' }, { id: 2, label: 'Company Details' }, { id: 3, label: 'Reference Only' }, { id: 4, label: 'Documents Upload' }].map((step, index, arr) => {
-                                                const isLast = index === arr.length - 1;
-                                                const isCompleted = step.id < currentStep;
-                                                const isActive = step.id === currentStep;
-                                                const isLineActive = currentStep > step.id;
+                            <div
+                                style={{
+                                    width: '726px',
+                                    height: '0px',
+                                    borderTop: '1px solid hsla(0, 0%, 69%, 1)'
+                                }}
+                            />
 
-                                                return (
-                                                    <React.Fragment key={step.id}>
-                                                        <div className="flex flex-col items-center relative">
-                                                            <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold transition-all duration-300 z-10 border-[1.5px] ${isCompleted ? 'bg-[#00c853] border-[#00c853] text-white' : isActive ? 'bg-white border-[#00c853] text-[#00c853] ring-4 ring-green-50' : 'bg-white border-gray-200 text-gray-300'}`}>
-                                                                {isCompleted ? <PiCheckCircleFill size={16} /> : step.id}
-                                                            </div>
-                                                            <div className={`absolute top-10 w-32 text-center text-[10px] uppercase font-semibold tracking-wide transition-colors duration-300 ${isActive || isCompleted ? 'text-black' : 'text-gray-300'}`}>{step.label}</div>
-                                                        </div>
-                                                        {!isLast && (
-                                                            <div className="flex-1 h-[2px] mx-2 bg-gray-100 rounded-full overflow-hidden">
-                                                                <div className={`h-full bg-[#00c853] transition-all duration-500 ease-out`} style={{ width: isLineActive ? '100%' : '0%' }}></div>
-                                                            </div>
-                                                        )}
-                                                    </React.Fragment>
-                                                );
-                                            })}
-                                        </div>
+                            <div
+                                className="bg-white flex flex-col"
+                                style={{
+                                    width: '726px',
+                                    height: '920px',
+                                    borderRadius: '8px',
+                                    border: '2px solid hsla(0, 0%, 93%, 1)',
+                                    padding: '20px',
+                                    gap: '21px',
+                                    boxShadow: '0px 1px 2px 0px hsla(0, 0%, 0%, 0.05)',
+                                    background: 'hsla(0, 0%, 100%, 1)'
+                                }}
+                            >
+                                <div
+                                    className="flex flex-col"
+                                    style={{
+                                        width: '686px',
+                                        gap: '21px'
+                                    }}
+                                >
+                                    {/* Progress Stepper */}
+                                    <div
+                                        className="flex items-center justify-center bg-white"
+                                        style={{
+                                            width: '686px',
+                                            height: '72px',
+                                            padding: '20px 0',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            justifyContent: 'center'
+                                        }}
+                                    >
+                                        {[1, 2, 3, 4].map((step) => (
+                                            <React.Fragment key={step}>
+                                                <div
+                                                    className={`rounded-full flex items-center justify-center border transition-all`}
+                                                    style={{
+                                                        width: '32px',
+                                                        height: '32px',
+                                                        borderRadius: '72px',
+                                                        border: currentStep >= step ? '1px solid #1D1D1F' : '1px solid hsla(0, 0%, 46%, 1)',
+                                                        background: currentStep >= step ? '#1D1D1F' : '#FFFFFF',
+                                                        color: currentStep >= step ? '#FFFFFF' : 'hsla(0, 0%, 46%, 1)'
+                                                    }}
+                                                >
+                                                    {currentStep > step ? <PiCheckCircleFill size={20} /> : <span className="font-semibold text-xs">{step}</span>}
+                                                </div>
+                                                {step < 4 && <div className={`w-20 h-0.5 transition-all ${currentStep > step ? 'bg-[#1D1D1F]' : 'bg-gray-300'}`} />}
+                                            </React.Fragment>
+                                        ))}
                                     </div>
 
+
+                                    {/* Step 1: Personal Details */}
                                     {currentStep === 1 && (
-                                        <>
-                                            <h2 className="text-xl font-medium text-gray-700 mb-2">Personal Details</h2>
-                                            <div className="h-px bg-gray-600 w-full mb-4"></div>
-                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
-                                                <div className="md:col-span-2"><TextInput label="Name" required error={errors.name} value={formData.personal.name} onChange={(e) => handleTextChange('personal', 'name', e.target.value)} /></div>
-                                                <TextInput label="Father's / Mother's Name" required error={errors.fatherName} value={formData.personal.fatherName} onChange={(e) => handleTextChange('personal', 'fatherName', e.target.value)} />
-                                                <TextInput label="Father's / Mother's Number" required error={errors.fatherPhone} value={formData.personal.fatherPhone} onChange={(e) => handleTextChange('personal', 'fatherPhone', e.target.value)} />
-                                                <div className="md:col-span-2"><TextInput label="Personal Email" required error={errors.email} value={formData.personal.email} onChange={(e) => handleTextChange('personal', 'email', e.target.value)} /></div>
-                                                <div className="md:col-span-2"><TextInput label="Mobile Number" required error={errors.phone} value={formData.personal.phone} onChange={(e) => handleTextChange('personal', 'phone', e.target.value)} /></div>
-                                                <div className="md:col-span-2"><TextInput label="Permanent Address" required error={errors.address} value={formData.personal.address} onChange={(e) => handleTextChange('personal', 'address', e.target.value)} /></div>
-                                                <TextInput label="City" required error={errors.city} value={formData.personal.city} onChange={(e) => handleCityChange('personal', e.target.value)} />
-                                                <TextInput label="State" required isSelect options={INDIAN_STATES} error={errors.state} value={formData.personal.state} onChange={(e) => handleStateChange('personal', e.target.value)} />
-                                                <TextInput label="Pincode" required error={errors.pincode} value={formData.personal.pincode} onChange={(e) => handlePincodeChange('personal', e.target.value)} />
-                                                <TextInput label="Country" required isSelect options={["India"]} value="India" readOnly />
+                                        <div
+                                            className="flex flex-col pr-2"
+                                            style={{
+                                                width: '100%',
+                                            }}
+                                        >
+                                            <h2
+                                                style={{
+                                                    width: '686px',
+                                                    height: '36px',
+                                                    fontFamily: 'Mona Sans, sans-serif',
+                                                    fontWeight: '600',
+                                                    fontSize: '20px',
+                                                    color: 'hsla(0, 0%, 20%, 1)',
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    paddingBottom: '8px',
+                                                    marginBottom: '12px',
+                                                    borderBottom: '1px solid hsla(0, 0%, 93%, 1)',
+                                                    gap: '8px'
+                                                }}
+                                            >
+                                                Personal Details
+                                            </h2>
+                                            <div className="flex flex-col gap-[21px]">
+                                                <TextInput label="Name" required error={errors.name} placeholder="Enter Your Full Name" value={formData.personal.name} onChange={(e) => handleTextChange('personal', 'name', e.target.value)} />
+                                                <div className="grid grid-cols-2 gap-[21px]">
+                                                    <TextInput label="Father's / Mother's Name" required placeholder="Placeholder" value={formData.personal.fatherName} onChange={(e) => handleTextChange('personal', 'fatherName', e.target.value)} />
+                                                    <TextInput label="Father's / Mother's Number" required isSelect options={['Father', 'Mother']} placeholder="Placeholder" value={formData.personal.fatherPhone} onChange={(e) => handleTextChange('personal', 'fatherPhone', e.target.value)} />
+                                                </div>
+                                                <TextInput label="Personal Email" required placeholder="Placeholder" value={formData.personal.email} onChange={(e) => handleTextChange('personal', 'email', e.target.value)} />
+                                                <TextInput label="Mobile Number" required placeholder="Placeholder" value={formData.personal.phone} onChange={(e) => handleTextChange('personal', 'phone', e.target.value)} />
+                                                <TextInput label="Permanent Address" required placeholder="Placeholder" value={formData.personal.address} onChange={(e) => handleTextChange('personal', 'address', e.target.value)} />
+                                                <div className="grid grid-cols-2 gap-[21px]">
+                                                    <TextInput label="City" required placeholder="Placeholder" value={formData.personal.city} onChange={(e) => handleCityChange('personal', e.target.value)} />
+                                                    <TextInput label="State" required isSelect options={INDIAN_STATES} value={formData.personal.state} onChange={(e) => handleStateChange('personal', e.target.value)} />
+                                                </div>
+                                                <div className="grid grid-cols-2 gap-[21px]">
+                                                    <TextInput label="Pincode" required placeholder="Placeholder" value={formData.personal.pincode} onChange={(e) => handlePincodeChange('personal', e.target.value)} />
+                                                    <TextInput label="Country" required value="India" readOnly />
+                                                </div>
+                                                <button
+                                                    onClick={handleNext}
+                                                    className="mt-4 transition-colors flex items-center justify-center shrink-0 mb-6"
+                                                    style={{
+                                                        width: '100%',
+                                                        height: '35px',
+                                                        borderRadius: '9999px',
+                                                        background: 'hsla(44, 100%, 64%, 1)',
+                                                        padding: '6px 20px',
+                                                        border: 'none'
+                                                    }}
+                                                >
+                                                    <span
+                                                        style={{
+                                                            width: '200px',
+                                                            height: '23px',
+                                                            fontFamily: 'Mona Sans, sans-serif',
+                                                            fontWeight: '500',
+                                                            fontSize: '16px',
+                                                            color: 'hsla(0, 0%, 12%, 1)',
+                                                            display: 'flex',
+                                                            alignItems: 'center',
+                                                            justifyContent: 'center',
+                                                            lineHeight: '23px',
+                                                            letterSpacing: '0px'
+                                                        }}
+                                                    >
+                                                        Start my KYC process
+                                                    </span>
+                                                </button>
                                             </div>
-                                            <button onClick={handleNext} className="w-full bg-[#333] hover:bg-black text-white font-medium py-3 rounded-full transition-all text-lg">{customerType === 'Customer' ? 'Proceed to Reference' : 'Proceed to Company Details'}</button>
-                                        </>
+                                        </div>
                                     )}
 
-                                    {currentStep === 2 && (
-                                        <>
-                                            <h2 className="text-xl font-medium text-gray-700 mb-2">Company Details</h2>
-                                            <div className="h-px bg-gray-600 w-full mb-4"></div>
-                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
-                                                <div className="md:col-span-2"><TextInput label="Company Name" required error={errors.companyName} value={formData.company.companyName} onChange={(e) => handleTextChange('company', 'companyName', e.target.value)} /></div>
-                                                <TextInput label="Type of Company" required error={errors.companyType} value={formData.company.companyType} onChange={(e) => handleTextChange('company', 'companyType', e.target.value)} />
-                                                <TextInput label="No. of Employees" required error={errors.employees} value={formData.company.employees} onChange={(e) => handleTextChange('company', 'employees', e.target.value)} />
-                                                <div className="md:col-span-2"><TextInput label="Designation" required error={errors.designation} value={formData.company.designation} onChange={(e) => handleTextChange('company', 'designation', e.target.value)} /></div>
-                                                <TextInput label="Duration" required error={errors.duration} value={formData.company.duration} onChange={(e) => handleTextChange('company', 'duration', e.target.value)} />
-                                                <TextInput label="Company Email" required error={errors.email} value={formData.company.email} onChange={(e) => handleTextChange('company', 'email', e.target.value)} />
+                                    {/* Other Steps Placeholder */}
+                                    {currentStep > 1 && (
+                                        <div className="text-center py-10">
+                                            <p className="text-gray-500 mb-4">Step {currentStep} Content</p>
+                                            <div className="flex gap-4 justify-center">
+                                                <button onClick={handleBack} className="px-8 py-2 border rounded-full">Back</button>
+                                                <button onClick={handleNext} className="px-8 py-2 bg-black text-white rounded-full">Next</button>
                                             </div>
-                                            <div className="flex gap-4">
-                                                <button onClick={handleBack} className="w-1/2 bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium py-2 rounded-full transition-all text-lg">Back</button>
-                                                <button onClick={handleNext} className="w-1/2 bg-[#333] hover:bg-black text-white font-medium py-2 rounded-full transition-all text-lg">Next</button>
-                                            </div>
-                                        </>
-                                    )}
-
-                                    {currentStep === 3 && (
-                                        <>
-                                            <h2 className="text-xl font-medium text-gray-700 mb-2">Reference Details</h2>
-                                            <div className="h-px bg-gray-600 w-full mb-4"></div>
-                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
-                                                <div className="md:col-span-2"><TextInput label="Reference Name" value={formData.reference.name} onChange={(e) => handleTextChange('reference', 'name', e.target.value)} /></div>
-                                                <TextInput label="Relation" value={formData.reference.relation} onChange={(e) => handleTextChange('reference', 'relation', e.target.value)} />
-                                                <TextInput label="Phone" value={formData.reference.phone} onChange={(e) => handleTextChange('reference', 'phone', e.target.value)} />
-                                                <div className="md:col-span-2"><TextInput label="Address" value={formData.reference.address} onChange={(e) => handleTextChange('reference', 'address', e.target.value)} /></div>
-                                                <TextInput label="City" value={formData.reference.city} onChange={(e) => handleCityChange('reference', e.target.value)} />
-                                                <TextInput label="State" isSelect options={INDIAN_STATES} value={formData.reference.state} onChange={(e) => handleStateChange('reference', e.target.value)} />
-                                                <TextInput label="Pincode" value={formData.reference.pincode} onChange={(e) => handlePincodeChange('reference', e.target.value)} />
-                                            </div>
-                                            <div className="flex gap-4">
-                                                <button onClick={handleBack} className="w-1/2 bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium py-2 rounded-full transition-all text-lg">Back</button>
-                                                <button onClick={handleNext} className="w-1/2 bg-[#333] hover:bg-black text-white font-medium py-2 rounded-full transition-all text-lg">Proceed to Documents</button>
-                                            </div>
-                                        </>
-                                    )}
-
-                                    {currentStep === 4 && (
-                                        <>
-                                            <h2 className="text-xl font-medium text-gray-700 mb-2">Document Upload</h2>
-                                            <div className="h-px bg-gray-600 w-full mb-4"></div>
-                                            <div className="space-y-6 mb-8">
-                                                <div>
-                                                    <TextInput label="Identity Proof" isSelect options={["Aadhar Card", "Voter ID", "Passport", "Driving License", "PAN Card"]} value={formData.documents.identityProof} onChange={(e) => handleTextChange('documents', 'identityProof', e.target.value)} />
-                                                    <input type="file" ref={identityProofRef} accept="image/*,.pdf" className="mt-2 text-sm" />
-                                                </div>
-                                                <div>
-                                                    <TextInput label="Address Proof" isSelect options={["Rental Agreement", "House Electricity Bill", "Water Bill", "Gas Company Bill"]} value={formData.documents.addressProof} onChange={(e) => handleTextChange('documents', 'addressProof', e.target.value)} />
-                                                    <input type="file" ref={addressProofRef} accept="image/*,.pdf" className="mt-2 text-sm" />
-                                                </div>
-                                                <div>
-                                                    <label className="block text-xs font-medium text-gray-700 mb-1.5">Bank Statement (Last 3 months)</label>
-                                                    <input type="file" ref={bankStatementRef} accept="image/*,.pdf" className="text-sm" />
-                                                </div>
-                                                <div className="flex items-center gap-2 mt-4 bg-yellow-50 p-3 rounded-lg border border-yellow-200">
-                                                    <input type="checkbox" checked={isDocumentsChecked} onChange={(e) => setIsDocumentsChecked(e.target.checked)} className="w-5 h-5 rounded border-gray-300" />
-                                                    <label className="text-sm text-gray-800">I confirm that the uploaded documents are valid and belong to me.</label>
-                                                </div>
-                                            </div>
-                                            <div className="flex gap-4">
-                                                <button onClick={handleBack} className="w-1/2 bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium py-2 rounded-full transition-all text-lg">Back</button>
-                                                <button onClick={handleNext} disabled={loading} className="w-1/2 bg-green-600 hover:bg-green-700 text-white font-medium py-2 rounded-full transition-all text-lg">{loading ? 'Submitting...' : 'Submit Application'}</button>
-                                            </div>
-                                        </>
+                                        </div>
                                     )}
                                 </div>
                             </div>
                         </div>
 
-                        <div className="lg:w-1/3">
+                        {/* Right Column */}
+                        <div className="w-[402px] shrink-0">
                             <OrderSummary
+                                securityAmount={securityAmount}
+                                deliveryCharges={deliveryCharges}
                                 monthlyRentTotal={monthlyRentTotal}
                                 totalGST={totalGST}
                                 totalOneTime={totalOneTime}
@@ -601,23 +609,70 @@ export default function KYCPage() {
 }
 
 const TextInput = ({ label, required, placeholder, isSelect, options, value, onChange, error, readOnly }) => (
-    <div className="w-full">
-        <label className="block text-xs font-medium text-gray-700 mb-1.5">{label} {required && <span className="text-red-500">*</span>}</label>
-        <div className="relative">
-            {isSelect ? (
-                <div className="relative">
-                    <select className={`w-full appearance-none border rounded-lg px-2 py-2 bg-white text-gray-700 text-sm focus:outline-none transition-colors font-sans cursor-pointer ${error ? 'border-red-500 bg-red-50' : 'border-gray-200 focus:border-black'}`} value={value} onChange={onChange} disabled={readOnly}>
-                        <option value="" disabled>{placeholder || 'Select'}</option>
-                        {options && options.map((opt, idx) => <option key={idx} value={opt}>{opt}</option>)}
-                    </select>
-                    <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-500">
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg>
-                    </div>
-                </div>
-            ) : (
-                <input type="text" className={`w-full border rounded-lg px-2 py-2 text-sm focus:outline-none transition-colors placeholder-gray-300 font-sans ${error ? 'border-red-500 bg-red-50' : 'border-gray-200 focus:border-black'}`} placeholder={placeholder} value={value} onChange={onChange} readOnly={readOnly} />
-            )}
-        </div>
-        {error && <p className="text-red-500 text-[10px] mt-1 font-medium">{error}</p>}
+    <div
+        className="flex flex-col"
+        style={{
+            width: '100%',
+            height: '77px',
+            gap: '4px'
+        }}
+    >
+        <label
+            style={{
+                fontFamily: 'Mona Sans, sans-serif',
+                fontWeight: '600',
+                fontSize: '12px',
+                color: 'hsla(0, 0%, 20%, 1)',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '2px'
+            }}
+        >
+            {label} {required && <span style={{ color: 'hsla(0, 72%, 51%, 1)' }}>*</span>}
+        </label>
+        {isSelect ? (
+            <select
+                className="w-full border rounded-md px-3 py-2 text-sm bg-white focus:outline-none transition-all"
+                value={value}
+                onChange={onChange}
+                style={{
+                    height: '39px',
+                    borderRadius: '6px',
+                    background: 'hsla(0, 0%, 100%, 1)',
+                    borderColor: error ? 'hsla(0, 72%, 51%, 1)' : 'hsla(0, 0%, 89%, 1)'
+                }}
+            >
+                <option value="">Select</option>
+                {options?.map((opt, idx) => <option key={idx} value={opt}>{opt}</option>)}
+            </select>
+        ) : (
+            <input
+                type="text"
+                className={`w-full border rounded-md px-3 py-2 text-sm transition-all ${readOnly ? 'bg-gray-50' : 'bg-white'} focus:outline-none`}
+                placeholder={placeholder}
+                value={value}
+                onChange={onChange}
+                readOnly={readOnly}
+                style={{
+                    height: '39px',
+                    borderRadius: '6px',
+                    background: 'hsla(0, 0%, 100%, 1)',
+                    borderColor: error ? 'hsla(0, 72%, 51%, 1)' : 'hsla(0, 0%, 89%, 1)'
+                }}
+            />
+        )}
+        <p
+            style={{
+                fontFamily: 'Mona Sans, sans-serif',
+                fontWeight: '400',
+                fontSize: '10px',
+                color: error ? 'hsla(0, 72%, 51%, 1)' : 'hsla(0, 0%, 46%, 1)',
+                height: '13px',
+                display: 'flex',
+                alignItems: 'center'
+            }}
+        >
+            {error || 'Message'}
+        </p>
     </div>
 );

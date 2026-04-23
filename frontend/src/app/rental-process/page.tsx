@@ -1,13 +1,25 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import Testimonials from '@/components/Testimonials';
 import WhyChooseUs from '@/components/WhyChooseUs';
 import RentalProcess from '@/components/RentalProcess';
 
+const API = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+
 export default function RentalProcessPage() {
+    const [cms, setCms] = useState<{ bannerImage?: string; bannerTitle?: string } | null>(null);
+    useEffect(() => {
+        fetch(`${API}/api/cms/rental-process`)
+            .then(r => r.ok ? r.json() : null)
+            .then(d => { if (d) setCms(d); })
+            .catch(() => {});
+    }, []);
+
+    const bannerImage = cms?.bannerImage || 'https://res.cloudinary.com/dgkckcdk8/image/upload/v1776714078/9f8d4d5a95b5ff564196928771ca74a7229121d9_1_ru5asw.png';
+    const bannerTitle = cms?.bannerTitle || 'Rental Process';
 
     return (
         <div className="font-sans text-gray-800">
@@ -15,13 +27,13 @@ export default function RentalProcessPage() {
             <div className="max-w-[1200px] mx-auto px-4 mt-8 mb-16">
                 <div className="w-full h-[300px] md:h-[400px] relative bg-gray-900 overflow-hidden rounded-3xl">
                     <Image
-                        src="https://res.cloudinary.com/dgkckcdk8/image/upload/v1776714078/9f8d4d5a95b5ff564196928771ca74a7229121d9_1_ru5asw.png"
-                        alt="Rental Process Banner"
+                        src={bannerImage}
+                        alt={bannerTitle}
                         fill
                         className="object-cover object-center opacity-60"
                     />
                     <div className="absolute inset-0 flex items-center justify-center">
-                        <h1 className="text-white text-5xl md:text-7xl font-semibold drop-shadow-lg font-sans">Rental Process</h1>
+                        <h1 className="text-white text-5xl md:text-7xl font-semibold drop-shadow-lg font-sans">{bannerTitle}</h1>
                     </div>
                 </div>
             </div>

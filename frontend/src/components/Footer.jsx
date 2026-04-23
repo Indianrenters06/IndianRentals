@@ -14,7 +14,7 @@ const paymentLogos = [
 
 const Footer = () => {
     const { settings } = useSettings();
-    const siteLogo = settings?.siteLogo || "https://res.cloudinary.com/dpu9ikeqe/image/upload/v1771271177/1d1f7c4e3c0490bcddb69ceb328c67be2f7cf361_cf3y9m.png";
+    const siteLogo = settings?.siteLogo || "https://res.cloudinary.com/dgkckcdk8/image/upload/v1776892240/1d1f7c4e3c0490bcddb69ceb328c67be2f7cf361_6_kufcee.png";
     const siteName = settings?.siteName || "Indian Renters";
     const sitePhone = settings?.contactPhone || "+91 9999999999";
     const currentYear = new Date().getFullYear();

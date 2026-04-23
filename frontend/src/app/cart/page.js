@@ -6,9 +6,10 @@ import Link from 'next/link';
 import { RiDeleteBin6Line } from 'react-icons/ri';
 import { HiOutlineSparkles } from 'react-icons/hi';
 import { BsCheckCircleFill, BsCreditCard } from 'react-icons/bs';
-import { FaArrowRight, FaShoppingCart } from 'react-icons/fa';
+import { FaArrowRight } from 'react-icons/fa';
 import { IoIosArrowDown } from "react-icons/io";
 import { AiOutlineClose } from "react-icons/ai";
+import { ShoppingCartSimple } from '@phosphor-icons/react';
 
 import { useRouter } from 'next/navigation';
 import { useSelector, useDispatch } from 'react-redux';
@@ -163,7 +164,7 @@ export default function CartPage() {
             <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center p-4 font-sans">
                 <div className="bg-white p-10 rounded-3xl shadow-lg text-center max-w-md w-full border border-gray-100">
                     <div className="w-20 h-20 bg-blue-50 rounded-full flex items-center justify-center mx-auto mb-6">
-                        <FaShoppingCart className="text-[#3B82F6] text-3xl" />
+                        <ShoppingCartSimple className="text-[#3B82F6]" size={36} weight="bold" />
                     </div>
                     <h2 className="text-2xl font-bold text-gray-900 mb-3">Your Cart is Empty</h2>
                     <p className="text-gray-500 mb-8 leading-relaxed">
@@ -183,32 +184,35 @@ export default function CartPage() {
     }
     return (
         <div className="w-full bg-[#F5F5F5] min-h-screen font-sans" style={{ opacity: 1 }}>
-            <div className="max-w-[1440px] mx-auto pt-[48px] pb-[48px]" style={{ height: '935px' }}>
-                <div 
-                    className="mx-auto flex flex-col gap-[16px] md:pr-[20px]" 
-                    style={{ width: '1200px', height: '813px' }}
+            <div className="max-w-[1200px] mx-auto px-4 md:px-8 pt-[48px] pb-[48px]">
+                <div
+                    className="flex flex-col gap-[16px]"
                 >
                     {/* Breadcrumb */}
                     <nav
-                        className="text-[12px] text-[#808080] flex items-center gap-[8px]"
-                        style={{ width: '1200px', height: '16px' }}
+                        className="text-[12px] text-[#808080] flex items-center gap-[8px] mb-[16px]"
                     >
                         <span>$[Product-Page]</span>
-                        <Image src="/chevron-right.svg" width={12} height={12} alt=">" className="opacity-60" />
-                        <span className="font-semibold text-[#1A1A1A] uppercase tracking-wider">Cart</span>
+                        <span className="text-[#808080] text-[12px]">›</span>
+                        <span style={{
+                            fontFamily: "'Mona Sans', sans-serif",
+                            fontWeight: 600,
+                            fontSize: '12px',
+                            lineHeight: '16px',
+                            color: '#000000',
+                        }}>Cart</span>
                     </nav>
-
-                    <h1 className="text-[32px] font-bold text-gray-900 flex items-center gap-3 mb-4">
-                        Your Cart <FaShoppingCart className="text-gray-600 pb-1" size={32} />
-                    </h1>
 
                     <div className="flex flex-col lg:flex-row gap-[32px] items-start">
                         {/* Left Column: Cart Items */}
                         <div
-                            className="flex-col gap-[12px] flex p-[20px] bg-white rounded-[12px] border border-[#F0F0F0] shadow-sm"
-                            style={{ width: '746px', height: '632px' }}
+                            className="flex-1 flex flex-col w-full"
                         >
-                            {cartItems.map(item => (
+                            <h1 className="text-[32px] font-bold text-gray-900 flex items-center gap-3 mb-4">
+                                Your Cart <ShoppingCartSimple className="text-[#333C4E]" size={32} weight="fill" />
+                            </h1>
+                            <div className="flex flex-col gap-[12px] p-[20px] bg-white rounded-[12px] border border-[#F0F0F0] shadow-sm">
+                                {cartItems.map(item => (
                                 <CartItem
                                     key={item.id}
                                     item={item}
@@ -216,31 +220,65 @@ export default function CartPage() {
                                     onRemove={removeItem}
                                 />
                             ))}
+                            </div>
                         </div>
 
                         {/* Right Column: Sidebar */}
                         <div
-                            className="flex flex-col gap-[20px]"
-                            style={{ width: '402px', height: '813px' }}
+                            className="flex flex-col gap-[20px] w-full lg:w-[402px] shrink-0"
                         >
                             {/* Coupon Section */}
                             <div className="bg-white p-5 rounded-2xl border border-[#E3E3E3] shadow-sm">
-                                <div className="flex gap-2 mb-4">
+                                <div 
+                                    className="flex mb-4"
+                                    style={{ width: '362px', height: '39px', gap: '11px' }}
+                                >
                                     <input
                                         type="text"
                                         placeholder="Enter Your Coupon Code"
-                                        className="flex-1 bg-white border border-[#D3D3D3] rounded-lg px-4 py-2 text-sm outline-none focus:border-black transition-colors text-gray-900 font-sans"
+                                        className="flex-1 bg-white border border-[#D3D3D3] rounded-lg px-4 text-sm outline-none focus:border-black transition-colors text-gray-900 font-sans"
+                                        style={{ height: '39px' }}
                                         value={couponCode}
                                         onChange={(e) => setCouponCode(e.target.value)}
                                     />
                                     <button
                                         onClick={handleApplyCoupon}
-                                        className="bg-[#2D2D2D] text-white px-5 py-2 rounded-lg text-sm font-semibold hover:bg-black transition-colors"
+                                        className="transition-all rounded-xl flex items-center justify-center font-semibold"
+                                        style={{
+                                            width: '83px',
+                                            height: '39px',
+                                            backgroundColor: 'hsla(0, 0%, 20%, 1)',
+                                            color: '#FFFFFF',
+                                            padding: '6px 20px',
+                                            gap: '2px',
+                                            opacity: 1,
+                                            borderRadius: '12px', // rounded-4xl is very round, image looks more like rounded-xl/2xl
+                                            borderBottom: '1px solid rgba(255,255,255,0.1)',
+                                            boxShadow: '0px 1px 2px 0px hsla(0, 0%, 55%, 0.1), 0px 3px 3px 0px hsla(0, 0%, 55%, 0.09), 0px 8px 5px 0px hsla(0, 0%, 55%, 0.05), 0px 14px 5px 0px hsla(0, 0%, 55%, 0.01)',
+                                            fontFamily: "'Mona Sans', sans-serif",
+                                            fontWeight: 500,
+                                            fontSize: '16px',
+                                            lineHeight: '23px'
+                                        }}
                                     >
                                         Apply
                                     </button>
                                 </div>
-                                <button className="w-full bg-[#FFC72C] text-black font-bold py-2.5 rounded-full flex items-center justify-center gap-2 hover:bg-[#FFD740] transition-colors text-sm shadow-sm font-sans tracking-tight">
+                                <button 
+                                    className="w-full rounded-full flex items-center justify-center transition-colors shadow-sm tracking-tight"
+                                    style={{ 
+                                        height: '40px',
+                                        backgroundColor: 'hsla(44, 100%, 64%, 1)',
+                                        padding: '6px 20px',
+                                        gap: '2px',
+                                        opacity: 1,
+                                        fontFamily: "'Mona Sans', sans-serif",
+                                        fontWeight: 500,
+                                        fontSize: '16px',
+                                        lineHeight: '23px',
+                                        color: 'hsla(0, 0%, 12%, 1)'
+                                    }}
+                                >
                                     View All Coupons
                                 </button>
                             </div>

@@ -113,7 +113,7 @@ const RentByCategory = () => {
                 setDisplayCategories(sortedCategories);
 
                 // Fetch CMS Config for the section title/visibility
-                const cmsRes = await fetch(`${API}/api/cms/homepage`, { cache: 'no-store' });
+                const cmsRes = await fetch(`${API}/api/cms/homepage`);
                 if (cmsRes.ok) {
                     const cmsData = await cmsRes.json();
                     setCmsConfig({

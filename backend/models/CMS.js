@@ -115,10 +115,53 @@ const cmsSchema = new mongoose.Schema({
         ]
     },
 
-    // ── Generic rich page content ─────────────────────────────────────────────
-    pageContent: { type: String, default: '' },
+    // ── About Us — Banner ────────────────────────────────────────────────────
     bannerImage: { type: String, default: '' },
     bannerTitle: { type: String, default: '' },
+
+    // ── About Us — Our Story ──────────────────────────────────────────────────
+    aboutStoryTitle:    { type: String, default: 'Our Story' },
+    aboutStoryPara1:    { type: String, default: "From a small computer training room in 1992 to India's go-to rental partner, this journey has been about making access smarter than ownership. The promise stays simple: rent anything needed, when it's needed, anywhere it's needed—without friction." },
+    aboutStoryPara2:    { type: String, default: "Today, a 100+ product catalog powers startups, enterprises, and events across major cities, backed by fast delivery, clean gear, and dependable support." },
+    aboutStoryImage:    { type: String, default: 'https://res.cloudinary.com/dgkckcdk8/image/upload/v1769946716/indian-rentals/fj8ptqbhppbstdd0hs4i.png' },
+
+    // ── About Us — Story Stats ────────────────────────────────────────────────
+    aboutStat1Value:    { type: String, default: '4.8/5.0' },
+    aboutStat1Label:    { type: String, default: 'Customer Satisfaction' },
+    aboutStat2Value:    { type: String, default: '10,000+' },
+    aboutStat2Label:    { type: String, default: 'Happy Clients' },
+
+    // ── About Us — Vision Tab ─────────────────────────────────────────────────
+    aboutVisionTabLabel: { type: String, default: 'Our Vision' },
+    aboutVision1Title:   { type: String, default: 'Rent Anything' },
+    aboutVision1Text:    { type: String, default: "Laptops, Macs, mobiles, AV, cameras, medical and more—if it's not listed, it's sourced on request." },
+    aboutVision2Title:   { type: String, default: 'Rent Anytime' },
+    aboutVision2Text:    { type: String, default: 'Tenures that fit the job: 1, 3, 6, or 12 months, with easy extensions and mid-term upgrades.' },
+    aboutVision3Title:   { type: String, default: 'Rent Anywhere' },
+    aboutVision3Text:    { type: String, default: 'Rapid delivery and support across major Indian cities through a reliable partner network.' },
+
+    // ── About Us — Mission Tab ────────────────────────────────────────────────
+    aboutMissionTabLabel: { type: String, default: 'Our Mission' },
+    aboutMission1Title:   { type: String, default: 'Awesome Service' },
+    aboutMission1Text:    { type: String, default: "Laptops, Macs, mobiles, AV, cameras, medical and more—if it's not listed, it's sourced on request." },
+    aboutMission2Title:   { type: String, default: 'Awesome Quality' },
+    aboutMission2Text:    { type: String, default: 'Tenures that fit the job: 1, 3, 6, or 12 months, with easy extensions and mid-term upgrades.' },
+    aboutMission3Title:   { type: String, default: 'Happy Customers' },
+    aboutMission3Text:    { type: String, default: 'Rapid delivery and support across major Indian cities through a reliable partner network.' },
+
+    // ── About Us — Why Choose Us ──────────────────────────────────────────────
+    aboutWhyTitle:      { type: String, default: 'Why Choose Us?' },
+    aboutWhyText:       { type: String, default: "Join thousands who've switched to the flexible, affordable way to access high-end tech. IndianRenters delivers AI-ready workstations, laptops, and IT gear with zero ownership hassle and instant support." },
+    aboutWhyImage:      { type: String, default: 'https://res.cloudinary.com/dgkckcdk8/image/upload/v1769961565/indian-rentals/anmpufdlxxxblkxqxpds.jpg' },
+    aboutWhyStat1Value: { type: String, default: '90k+' },
+    aboutWhyStat1Label: { type: String, default: 'Devices in Stock' },
+    aboutWhyStat2Value: { type: String, default: '30k+' },
+    aboutWhyStat2Label: { type: String, default: 'Happy Customers' },
+    aboutWhyStat3Value: { type: String, default: '401+' },
+    aboutWhyStat3Label: { type: String, default: 'Cities Covered' },
+
+    // ── Generic rich page content ─────────────────────────────────────────────
+    pageContent: { type: String, default: '' },
 
     // ── SEO ──────────────────────────────────────────────────────────────────
     metaTitle: { type: String, default: '' },

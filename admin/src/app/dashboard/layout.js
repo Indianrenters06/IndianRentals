@@ -137,9 +137,10 @@ export default function DashboardLayout({ children }) {
     {
       name: 'CMS', icon: Layout, path: '/dashboard/cms',
       submenu: [
-        { name: 'Homepage', path: '/dashboard/cms/homepage' },
-        { name: 'Blog', path: '/dashboard/cms/blog' },
-        { name: 'Static Pages', path: '/dashboard/cms/pages' },
+        { name: 'Homepage',    path: '/dashboard/cms/homepage' },
+        { name: 'About Us',    path: '/dashboard/cms/about' },
+        { name: 'Blog',        path: '/dashboard/cms/blog' },
+        { name: 'Static Pages',path: '/dashboard/cms/pages' },
       ]
     },
     {
@@ -287,7 +288,7 @@ export default function DashboardLayout({ children }) {
       >
         <div className="h-16 flex items-center px-6 border-b border-slate-200 dark:border-slate-800/60 shrink-0 bg-transparent">
           <img
-            src="https://res.cloudinary.com/dpu9ikeqe/image/upload/v1771271177/1d1f7c4e3c0490bcddb69ceb328c67be2f7cf361_cf3y9m.png"
+            src="https://res.cloudinary.com/dgkckcdk8/image/upload/v1776892240/1d1f7c4e3c0490bcddb69ceb328c67be2f7cf361_6_kufcee.png"
             alt="Logo"
             className="h-10 w-auto object-contain"
           />

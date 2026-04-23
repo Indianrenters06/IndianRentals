@@ -11,7 +11,7 @@ import { usePathname } from 'next/navigation';
 const CartHeader = () => {
     const pathname = usePathname();
     const { settings } = useSettings();
-    const siteLogo = settings?.siteLogo || "/logo-v2.png";
+    const siteLogo = settings?.siteLogo || "https://res.cloudinary.com/dgkckcdk8/image/upload/v1776892240/1d1f7c4e3c0490bcddb69ceb328c67be2f7cf361_6_kufcee.png";
     const siteName = settings?.siteName || "Indian Renters";
 
     const steps = [

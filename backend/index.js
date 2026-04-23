@@ -18,23 +18,35 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 // CORS — allow local dev + deployed frontends
 const allowedOrigins = [
+  // Local dev (hardcoded + from .env)
   'http://localhost:3000',
   'http://127.0.0.1:3000',
   'http://localhost:3001',
   'http://127.0.0.1:3001',
-  process.env.FRONTEND_URL,  // e.g. https://indian-rentals.vercel.app
-  process.env.ADMIN_URL,     // e.g. https://indian-rentals-admin.vercel.app
-].filter(Boolean); // remove undefined entries
+  process.env.LOCAL_FRONTEND_URL,   // http://localhost:3000
+  process.env.LOCAL_ADMIN_URL,      // http://localhost:3001
+  // Live deployed
+  process.env.FRONTEND_URL,         // https://indian-rentals.vercel.app
+  process.env.ADMIN_URL,            // https://indian-rentals-yy8s.vercel.app
+].filter(Boolean);
+
+// Regex for Vercel preview deployments
+const VERCEL_PATTERN = /^https:\/\/indian-rent(als|ers)(-[a-z0-9]+)?\.vercel\.app$/;
 
 app.use(cors({
   origin: (origin, callback) => {
-    // Allow requests with no origin (mobile apps, curl, Postman)
-    if (!origin) return callback(null, true);
+    if (!origin) return callback(null, true); // curl, Postman, mobile
     if (allowedOrigins.includes(origin)) return callback(null, true);
+    if (VERCEL_PATTERN.test(origin)) return callback(null, true);
+    console.warn(`[CORS] Blocked: ${origin}`);
     callback(new Error(`CORS: Origin ${origin} not allowed`));
   },
   credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
 }));
+// Handle preflight for every route (use regex — bare '*' breaks newer path-to-regexp)
+app.options(/.*/, cors());
 app.use(cookieParser());
 app.use(morgan('combined'));
 
@@ -57,18 +69,45 @@ if (process.env.NODE_ENV !== 'production') {
   }));
 }
 
-// Database Connection
+// Database Connection — with keepalive & auto-reconnect
+const MONGO_OPTIONS = {
+  serverSelectionTimeoutMS: 10000,
+  heartbeatFrequencyMS: 30000,   // ping Atlas every 30s to stay connected
+  maxIdleTimeMS: 60000,
+  connectTimeoutMS: 15000,
+  socketTimeoutMS: 45000,
+};
+
 const connectDB = async () => {
   try {
-    await mongoose.connect(process.env.MONGO_URI || 'mongodb://localhost:27017/indian_rentals');
-    console.log('MongoDB Connected');
+    await mongoose.connect(process.env.MONGO_URI || 'mongodb://localhost:27017/indian_rentals', MONGO_OPTIONS);
+    console.log('✅ MongoDB Connected');
   } catch (err) {
-    console.error('Database connection error:', err);
-    process.exit(1);
+    console.error('❌ MongoDB connection error:', err.message);
+    console.log('⏳ Retrying in 5s...');
+    setTimeout(connectDB, 5000); // retry instead of crashing
   }
 };
 
+// Auto-reconnect on unexpected disconnect
+mongoose.connection.on('disconnected', () => {
+  console.warn('⚠️  MongoDB disconnected — reconnecting...');
+  setTimeout(connectDB, 3000);
+});
+mongoose.connection.on('reconnected', () => console.log('✅ MongoDB reconnected'));
+
 connectDB();
+
+// ── Health check endpoint ─────────────────────────────────────────────────────
+app.get('/api/health', (req, res) => {
+  const states = ['disconnected', 'connected', 'connecting', 'disconnecting'];
+  res.json({
+    status: 'ok',
+    db: states[mongoose.connection.readyState] || 'unknown',
+    uptime: Math.floor(process.uptime()) + 's',
+    env: process.env.NODE_ENV || 'development',
+  });
+});
 
 // Routes
 const authRoutes = require('./routes/authRoutes');

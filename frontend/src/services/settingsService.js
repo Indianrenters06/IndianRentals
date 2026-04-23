@@ -9,7 +9,7 @@ export const getSettings = async () => {
         const response = await axios.get(API_URL);
         return response.data;
     } catch (error) {
-        console.error('Error fetching settings:', error);
+        console.warn('[settings] Backend unreachable, using defaults:', error?.message);
         return null;
     }
 };

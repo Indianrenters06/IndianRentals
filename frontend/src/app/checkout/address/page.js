@@ -4,9 +4,11 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useSelector } from 'react-redux';
-import { FaUserCircle, FaTrashAlt, FaPlus, FaArrowRight, FaCheck } from 'react-icons/fa';
+import { FaTrashAlt, FaArrowRight, FaCheck } from 'react-icons/fa';
+import { Plus } from '@phosphor-icons/react';
 import { BsCheckCircleFill } from 'react-icons/bs';
 import { FiEdit2 } from 'react-icons/fi';
+import { UserCircleIcon } from '@heroicons/react/24/outline';
 import { selectCartTotals } from '../../../redux/features/cartSlice';
 import OrderSummary from '../../../components/OrderSummary';
 import AddressModal from '../../../components/AddressModal';
@@ -76,12 +78,12 @@ export default function AddressPage() {
 
 
     return (
-        <div className="min-h-screen bg-gray-50 font-sans">
+        <div className="min-h-screen bg-[hsla(0,0%,96%,1)] font-sans" style={{ opacity: 1 }}>
             {/* Header Section would be here or in layout */}
             {/* For now, we assume layout handles the main nav, but we might need the Steps Header */}
 
             {/* Main Content */}
-            <div className="max-w-7xl mx-auto px-8 py-4">
+            <div className="max-w-[1200px] mx-auto px-4 md:px-8 py-[48px]">
                 {/* Breadcrumb - Mocked based on image */}
                 <div className="text-xs text-gray-500 mb-6 flex items-center gap-2">
                     <Link href="/" className="hover:text-black font-medium font-sans">Product-Page</Link>
@@ -91,92 +93,195 @@ export default function AddressPage() {
                     <span className="text-black font-medium font-sans">Address</span>
                 </div>
 
-                <div className="flex flex-col lg:flex-row gap-8">
+                <div className="flex flex-col lg:flex-row items-start w-full min-h-[535px]" style={{ gap: '20px' }}>
                     {/* Left Column: Addresses */}
-                    <div className="lg:w-2/3">
-                        <div className="relative rounded-2xl p-8 bg-gray-50/50">
-                            <svg className="absolute inset-0 w-full h-full pointer-events-none" style={{ overflow: 'visible' }}>
-                                <rect x="1" y="1" width="calc(100% - 2px)" height="calc(100% - 2px)" rx="16" ry="16" fill="none" stroke="#D1D5DB" strokeWidth="2" strokeDasharray="12 8" />
-                            </svg>
-                            <h1 className="text-2xl font-normal text-gray-900 mb-2">Your Addresses</h1>
+                    <div
+                        className="relative bg-gray-50/50 flex flex-col transition-all duration-300"
+                        style={{
+                            width: '746px',
+                            minHeight: addresses.length > 0 ? '487px' : '200px',
+                            borderRadius: '8px', // rounded-md
+                            border: '1px dashed hsla(0, 0%, 80%, 1)',
+                            borderStyle: 'dashed',
+                            padding: '30px 20px',
+                            gap: '12px',
+                            position: 'relative'
+                        }}
+                    >
+                        <h1
+                            className="mb-2"
+                            style={{
+                                fontFamily: "'Mona Sans', sans-serif",
+                                fontWeight: 600,
+                                fontSize: '24px',
+                                lineHeight: '35px',
+                                color: 'hsla(0, 0%, 20%, 1)',
+                                width: '193px',
+                                height: '35px'
+                            }}
+                        >
+                            Your Addresses
+                        </h1>
 
-                            {/* Divider */}
-                            <div className="h-px bg-gray-300 w-full mb-6"></div>
+                        {/* Divider */}
+                        <div
+                            className="mb-6 font-sans"
+                            style={{
+                                width: '100%',
+                                height: '0px',
+                                borderTop: '1px solid hsla(0, 0%, 89%, 1)'
+                            }}
+                        ></div>
 
-                            {/* Add Address Button */}
-                            <button
-                                onClick={handleAddClick}
-                                className="bg-[#2D2D2D] text-white px-4 py-2 rounded-full flex items-center gap-2 text-sm font-medium hover:bg-black transition-colors mb-3"
-                            >
-                                <FaPlus /> Add New Address
-                            </button>
+                        {/* Add Address Button */}
+                        <button
+                            onClick={handleAddClick}
+                            className="flex items-center justify-center transition-all active:scale-95 mb-4 group"
+                            style={{
+                                width: '194px',
+                                height: '35px',
+                                opacity: 1,
+                                borderRadius: '28px', // rounded-4xl
+                                paddingTop: '6px',
+                                paddingRight: '20px',
+                                paddingBottom: '6px',
+                                paddingLeft: '20px',
+                                gap: '5px',
+                                background: 'var(--color-grey-700, hsla(0, 0%, 20%, 1))',
+                                border: 'none',
+                                borderBottom: '1px solid hsla(0, 0%, 20%, 1)',
+                                boxShadow: `
+                                    0px 1px 2px 0px hsla(0, 0%, 55%, 0.1),
+                                    0px 3px 3px 0px hsla(0, 0%, 55%, 0.09),
+                                    0px 8px 5px 0px hsla(0, 0%, 55%, 0.05),
+                                    0px 14px 5px 0px hsla(0, 0%, 55%, 0.01),
+                                    0px 21px 6px 0px hsla(0, 0%, 55%, 0)
+                                `,
+                                color: '#FFFFFF',
+                                fontSize: '14px',
+                                fontWeight: '500',
+                                fontFamily: "'Mona Sans', sans-serif",
+                                cursor: 'pointer'
+                            }}
+                        >
+                            <Plus size={18} weight="bold" />
+                            <span>Add New Address</span>
+                        </button>
 
-                            {/* Address List */}
-                            <div className="flex flex-col gap-4">
-                                {addresses.map((addr) => (
-                                    <div
-                                        key={addr.id}
-                                        className={`bg-white border-2 overflow-hidden ${selectedAddressId === addr.id ? 'border-[#007AFF]' : 'border-gray-200'} rounded-2xl p-2 relative cursor-pointer hover:shadow-sm transition-all`}
-                                        onClick={() => setSelectedAddressId(addr.id)}
-                                    >
-                                        {selectedAddressId === addr.id && (
-                                            <div className="absolute top-0 right-0 bg-[#007AFF] w-7 h-6 rounded-bl-[1rem] flex items-center-safe justify-center">
-                                                <FaCheck className="text-white text-l translate-x-1.5 -translate-y-1.5" />
-                                            </div>
-                                        )}
-                                        <div className="flex items-start gap-4">
-                                            <div className="mt-1 text-gray-800">
-                                                <FaUserCircle size={40} className="text-gray-600" />
-                                            </div>
-                                            <div className="flex-1">
-                                                <h3 className="text-l font-medium text-gray-700">{addr.name}</h3>
-                                                <p className="text-gray-800 mt-1 text-[15px] leading-relaxed font-medium">
-                                                    {addr.addressLine} <span className="text-gray-600 mx-1">|</span>
-                                                    {addr.city} <span className="text-gray-600 mx-1">|</span>
-                                                    {addr.pincode} <span className="text-gray-600 mx-1">|</span>
-                                                    {addr.state}
-                                                </p>
-                                                <p className="text-gray-500 mt-2 text-sm font-semibold">{addr.phone}</p>
-                                            </div>
+                        {/* Address List Container */}
+                        <div className="flex-1 flex flex-col gap-[12px] overflow-y-auto pr-1">
+                            {addresses.map((addr) => (
+                                <div
+                                    key={addr.id}
+                                    onClick={() => setSelectedAddressId(addr.id)}
+                                    className="relative flex items-center justify-between transition-all cursor-pointer hover:shadow-md shrink-0 mb-1"
+                                    style={{
+                                        width: '700px',
+                                        height: '121px',
+                                        background: 'hsla(0, 0%, 100%, 1)',
+                                        borderRadius: '12px',
+                                        border: selectedAddressId === addr.id
+                                            ? '1.5px solid hsla(212, 100%, 50%, 1)'
+                                            : '1.5px solid hsla(0, 0%, 89%, 1)',
+                                        padding: '20px 16px',
+                                        opacity: 1
+                                    }}
+                                >
+                                    {/* Selection Mark */}
+                                    {selectedAddressId === addr.id && (
+                                        <div
+                                            className="absolute top-0 right-0 flex items-center justify-center"
+                                            style={{
+                                                width: '35px',
+                                                height: '25px',
+                                                background: 'hsla(212, 100%, 50%, 1)',
+                                                borderBottomLeftRadius: '12px',
+                                                zIndex: 10
+                                            }}
+                                        >
+                                            <FaCheck className="text-white text-[10px]" />
+                                        </div>
+                                    )}
 
-                                            {/* Actions */}
-                                            <div className="flex flex-col items-center gap-4 ml-4">
-                                                <button
-                                                    onClick={(e) => handleDeleteClick(e, addr.id)}
-                                                    className="flex flex-col items-center gap-1 text-gray-400 hover:text-red-500 group transition-colors"
-                                                >
-                                                    <div className="w-8 h-8 rounded-full bg-gray-50 flex items-center justify-center group-hover:bg-red-50">
-                                                        <FaTrashAlt size={14} />
-                                                    </div>
-                                                </button>
-                                                <button
-                                                    onClick={(e) => handleEditClick(e, addr)}
-                                                    className="flex flex-col items-center gap-1 text-gray-800 hover:text-black group"
-                                                >
-                                                    <div className="w-8 h-8 rounded-full bg-gray-50 flex items-center justify-center group-hover:bg-gray-100">
-                                                        <FiEdit2 size={14} />
-                                                    </div>
-                                                    <span className="text-[10px] font-medium underline decoration-1">Click to Edit</span>
-                                                </button>
+                                    <div className="flex items-start gap-4">
+                                        <div className="flex-shrink-0">
+                                            <UserCircleIcon className="w-8 h-8 text-gray-800" />
+                                        </div>
+                                        <div className="flex flex-col" style={{ width: '487px', height: '81px', gap: '6px' }}>
+                                            <h3 className="text-[17px] font-semibold text-gray-800 leading-tight">{addr.name}</h3>
+                                            <div className="flex items-center text-[14px] text-gray-700 font-medium overflow-hidden text-ellipsis whitespace-nowrap">
+                                                <span>{addr.addressLine}</span>
+                                                <span className="mx-2 text-gray-300">|</span>
+                                                <span>{addr.city}</span>
+                                                <span className="mx-2 text-gray-300">|</span>
+                                                <span>{addr.pincode}</span>
+                                                <span className="mx-2 text-gray-300">|</span>
+                                                <span>{addr.country || 'India'}</span>
                                             </div>
+                                            <p className="text-gray-500 text-[14px] font-medium">{addr.phone}</p>
                                         </div>
                                     </div>
-                                ))}
-                            </div>
 
-                            {/* Continue Button */}
+                                    {/* Actions Container */}
+                                    <div
+                                        className="flex flex-col items-center justify-center shrink-0"
+                                        style={{
+                                            width: '66px',
+                                            height: '56.5px',
+                                            gap: '5px'
+                                        }}
+                                    >
+                                        <button
+                                            onClick={(e) => handleDeleteClick(e, addr.id)}
+                                            className="text-gray-400 hover:text-red-500 transition-colors"
+                                            title="Delete address"
+                                        >
+                                            <FaTrashAlt size={18} />
+                                        </button>
+                                        <button
+                                            onClick={(e) => handleEditClick(e, addr)}
+                                            className="flex flex-col items-center"
+                                        >
+                                            <span
+                                                className="text-gray-800 font-bold text-center leading-tight hover:underline cursor-pointer"
+                                                style={{
+                                                    fontSize: '11px',
+                                                    fontFamily: 'sans-serif'
+                                                }}
+                                            >
+                                                Click to Edit
+                                            </span>
+                                        </button>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+
+                        <div className="mt-auto pt-4">
                             <button
                                 onClick={handleContinue}
-                                className="mt-8 bg-[#FFD740] hover:bg-[#FFC400] text-[#1D1D1F] px-8 py-3.5 rounded-full text-base font-medium flex items-center gap-2 transition-colors shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                                className="hover:opacity-90 text-[#1D1D1F] transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+                                style={{
+                                    width: '227px',
+                                    height: '35px',
+                                    background: 'hsla(44, 100%, 64%, 1)',
+                                    borderRadius: '9999px',
+                                    padding: '6px 20px',
+                                    gap: '2px',
+                                    fontSize: '14px',
+                                    fontWeight: '500',
+                                    fontFamily: 'sans-serif',
+                                    border: 'none'
+                                }}
                                 disabled={!selectedAddressId}
                             >
-                                Continue for KYC process <FaArrowRight className="text-sm" />
+                                Continue for KYC process
                             </button>
                         </div>
                     </div>
 
-                    {/* Right Column: Order Summary */}
-                    <div className="lg:w-1/3 ">
+                    {/* Right Column: Order Summary (Fixed Width: 402px) */}
+                    <div className="w-[402px] shrink-0 min-h-[535px]">
                         <OrderSummary
                             securityAmount={securityAmount}
                             deliveryCharges={deliveryCharges}
@@ -185,30 +290,18 @@ export default function AddressPage() {
                             totalOneTime={totalOneTime}
                             payToday={payToday}
                             savedAmount={savedAmount}
-                            onCheckout={() => { }} // Already on checkout flow
+                            onCheckout={handleContinue}
                             btnText="Continue for KYC process"
                             showButton={false}
                         />
-                        {/* Note: The OrderSummary component has "Continue to checkout" button by default, 
-                             but here the button is actually on the LEFT side according to the screenshot?
-                             Wait, the screenshot has "Continue to checkout" hidden or different in the summary card?
-                             
-                             Looking at the screenshot:
-                             Right side card has "Total Amount to Pay Today", Yellow Disclaimer, "You saved..." box.
-                             It DOES NOT have the "Continue to checkout" button inside the card at the bottom.
-                             Instead, the main CTA "Continue for KYC process" is on the LEFT side below addresses.
-                             
-                             So `OrderSummary` needs to optionally HIDE the button.
-                         */}
                     </div>
+                    <AddressModal
+                        isOpen={isModalOpen}
+                        onClose={() => setIsModalOpen(false)}
+                        onSave={handleSaveAddress}
+                        initialData={editingAddress}
+                    />
                 </div>
-
-                <AddressModal
-                    isOpen={isModalOpen}
-                    onClose={() => setIsModalOpen(false)}
-                    onSave={handleSaveAddress}
-                    initialData={editingAddress}
-                />
             </div>
         </div>
     );

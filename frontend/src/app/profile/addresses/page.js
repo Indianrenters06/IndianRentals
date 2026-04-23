@@ -1,8 +1,8 @@
 'use client';
 
 import React, { useState } from 'react';
-import { FaPlus, FaCheck } from 'react-icons/fa';
-import { PiTrash, PiUserCircle, PiPencilSimple } from 'react-icons/pi';
+import { FaCheck } from 'react-icons/fa';
+import { PiTrash, PiUserCircle, PiPencilSimple, PiPlus } from 'react-icons/pi';
 
 export default function AddressesPage() {
     const [addresses, setAddresses] = useState([]);
@@ -49,9 +49,36 @@ export default function AddressesPage() {
 
             <button
                 onClick={openAdd}
-                className="flex items-center gap-2 bg-[#333] hover:bg-black text-white px-6 py-2.5 rounded-full text-sm font-medium mb-8 shadow-sm transition-colors"
+                className="flex items-center justify-center transition-all active:scale-95 mb-8 group"
+                style={{
+                    width: '194px',
+                    height: '35px',
+                    opacity: 1,
+                    borderRadius: '28px', // rounded-4xl
+                    paddingTop: '6px',
+                    paddingRight: '20px',
+                    paddingBottom: '6px',
+                    paddingLeft: '20px',
+                    gap: '5px',
+                    background: 'var(--color-grey-700, hsla(0, 0%, 20%, 1))',
+                    border: 'none',
+                    borderBottom: '1px solid hsla(0, 0%, 20%, 1)',
+                    boxShadow: `
+                        0px 1px 2px 0px hsla(0, 0%, 55%, 0.1),
+                        0px 3px 3px 0px hsla(0, 0%, 55%, 0.09),
+                        0px 8px 5px 0px hsla(0, 0%, 55%, 0.05),
+                        0px 14px 5px 0px hsla(0, 0%, 55%, 0.01),
+                        0px 21px 6px 0px hsla(0, 0%, 55%, 0)
+                    `,
+                    color: '#FFFFFF',
+                    fontSize: '14px',
+                    fontWeight: '500',
+                    fontFamily: "'Mona Sans', sans-serif",
+                    cursor: 'pointer'
+                }}
             >
-                <FaPlus size={12} /> Add New Address
+                <PiPlus size={18} weight="bold" /> 
+                <span>Add New Address</span>
             </button>
 
             {/* Inline form */}
