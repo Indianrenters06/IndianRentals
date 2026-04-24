@@ -29,6 +29,17 @@ const heroSlideSchema = new mongoose.Schema({
     slideLink: { type: String, default: '' },
 }, { _id: false });
 
+const faqItemSchema = new mongoose.Schema({
+    question: { type: String, default: '' },
+    answer: { type: String, default: '' },
+}, { _id: false });
+
+const featureItemSchema = new mongoose.Schema({
+    title: { type: String, default: '' },
+    description: { type: String, default: '' },
+    image: { type: String, default: '' },
+}, { _id: false });
+
 const cmsSchema = new mongoose.Schema({
     pageName: {
         type: String,
@@ -77,6 +88,11 @@ const cmsSchema = new mongoose.Schema({
     whyChooseUsTitle: { type: String, default: 'Why Choose Us?' },
     whyChooseUsSubtitle: { type: String, default: "Join thousands who've switched to the flexible, affordable way to access high-end tech. IndianRenters delivers AI-ready workstations, laptops, and IT gear with zero ownership hassle and instant support." },
     whyChooseUsImage: { type: String, default: 'https://res.cloudinary.com/dgkckcdk8/image/upload/v1769961565/indian-rentals/anmpufdlxxxblkxqxpds.jpg' },
+
+    // ── Client Section (homepage) ─────────────────────────────────────────────
+    clientSectionEnabled: { type: Boolean, default: true },
+    clientSectionTitle: { type: String, default: 'Trusted By' },
+    clientLogos: { type: [String], default: [] },
 
     // ── Metrics/Stats (homepage) ─────────────────────────────────────────────
     statsDevices: { type: String, default: '90k+' },
@@ -162,6 +178,25 @@ const cmsSchema = new mongoose.Schema({
 
     // ── Generic rich page content ─────────────────────────────────────────────
     pageContent: { type: String, default: '' },
+    
+    // ── FAQ Page ──────────────────────────────────────────────────────────────
+    faqTitle: { type: String, default: 'FAQs' },
+    faqSubtitle: { type: String, default: 'Everything you need to know about renting with IndianRenters.com' },
+    faqItems: { type: [faqItemSchema], default: [] },
+
+    // ── Rental Process Page Features ──────────────────────────────────────────
+    rentalFeaturesTitle: { type: String, default: 'Features' },
+    rentalFeaturesSubtitle: { type: String, default: 'Rent with confidence. Every product comes with transparent pricing, flexible terms, and reliable support.' },
+    rentalFeatures: { type: [featureItemSchema], default: [] },
+
+    // ── Contact Page ──────────────────────────────────────────────────────────
+    contactTitle: { type: String, default: 'Contact Us' },
+    contactSubtitle: { type: String, default: 'Have questions? We are here to help.' },
+    contactEmail: { type: String, default: '' },
+    contactPhone: { type: String, default: '' },
+    contactAddress: { type: String, default: '' },
+    contactMapUrl: { type: String, default: '' },
+    contactWhatsApp: { type: String, default: '' },
 
     // ── SEO ──────────────────────────────────────────────────────────────────
     metaTitle: { type: String, default: '' },

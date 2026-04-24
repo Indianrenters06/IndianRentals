@@ -9,14 +9,19 @@ const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
 
 export default function ContactPage() {
     const [selectedCity, setSelectedCity] = React.useState('Delhi');
-    const [cmsBanner, setCmsBanner] = useState({ image: null, title: null });
+    const [cms, setCms] = useState(null);
 
     useEffect(() => {
-        fetch(`${API}/api/cms/contact`)
+        window.fetch(`${API}/api/cms/contact?t=${Date.now()}`)
             .then(r => r.ok ? r.json() : null)
-            .then(d => { if (d) setCmsBanner({ image: d.bannerImage || null, title: d.bannerTitle || null }); })
+            .then(d => { if (d) setCms(d); })
             .catch(() => { });
     }, []);
+
+    const bannerImage = cms?.bannerImage || "https://res.cloudinary.com/dgkckcdk8/image/upload/v1770615662/indian-rentals/ythxavcpd8hd4yerh8y0.jpg";
+    const bannerTitle = cms?.bannerTitle || "Contact Us";
+    const contactTitle = cms?.contactTitle || "We are here to help";
+    const contactSubtitle = cms?.contactSubtitle || "Want us to Call you back, Please fill in the form Below and our Executive will reach you as soon as possible.";
 
 
     const cityDetails = {
@@ -87,8 +92,8 @@ export default function ContactPage() {
                         }}
                     >
                         <Image
-                            src={cmsBanner.image || "https://res.cloudinary.com/dgkckcdk8/image/upload/v1770615662/indian-rentals/ythxavcpd8hd4yerh8y0.jpg"}
-                            alt="Contact Us"
+                            src={bannerImage}
+                            alt={bannerTitle}
                             fill
                             className="object-cover object-top"
                         />
@@ -102,7 +107,7 @@ export default function ContactPage() {
                                     lineHeight: '1.2'
                                 }}
                             >
-                                {cmsBanner.title || "Contact Us"}
+                                {bannerTitle}
                             </h1>
                         </div>
                     </div>
@@ -202,7 +207,7 @@ export default function ContactPage() {
                                         <div style={{ width: '511px', height: '46px', opacity: 1 }}>
                                             <h3 className="font-sans" style={{ width: '511px', height: '20px', fontSize: '12px', lineHeight: '16px', fontWeight: 600, color: 'hsla(0, 0%, 20%, 1)', marginBottom: '4px' }}>Address</h3>
                                             <p className="font-sans" style={{ fontSize: '14px', lineHeight: '20px', color: 'hsla(213, 85%, 33%, 1)', fontWeight: 400 }}>
-                                                {cityDetails[selectedCity].address}
+                                                {cms?.contactAddress || cityDetails[selectedCity].address}
                                             </p>
                                         </div>
                                     </div>
@@ -227,7 +232,7 @@ export default function ContactPage() {
                                         <div style={{ width: '511px', height: '46px', opacity: 1 }}>
                                             <h3 className="font-sans" style={{ width: '511px', height: '20px', fontSize: '12px', lineHeight: '16px', fontWeight: 600, color: 'hsla(0, 0%, 20%, 1)', marginBottom: '6px' }}>Phone</h3>
                                             <p className="font-sans" style={{ fontSize: '14px', lineHeight: '20px', color: 'hsla(213, 85%, 33%, 1)', fontWeight: 400 }}>
-                                                {cityDetails[selectedCity].phone} (Support)
+                                                {cms?.contactPhone || cityDetails[selectedCity].phone} (Support)
                                             </p>
                                         </div>
                                     </div>
@@ -251,8 +256,8 @@ export default function ContactPage() {
                                         </div>
                                         <div style={{ width: '511px', height: '46px', opacity: 1 }}>
                                             <h3 className="font-sans" style={{ width: '511px', height: '20px', fontSize: '12px', lineHeight: '16px', fontWeight: 600, color: 'hsla(0, 0%, 20%, 1)', marginBottom: '4px' }}>Email</h3>
-                                            <a href={`mailto:${cityDetails[selectedCity].email}`} className="font-sans hover:underline" style={{ fontSize: '14px', lineHeight: '20px', color: 'hsla(213, 85%, 33%, 1)', fontWeight: 400, display: 'block' }}>
-                                                {cityDetails[selectedCity].email}
+                                            <a href={`mailto:${cms?.contactEmail || cityDetails[selectedCity].email}`} className="font-sans hover:underline" style={{ fontSize: '14px', lineHeight: '20px', color: 'hsla(213, 85%, 33%, 1)', fontWeight: 400, display: 'block' }}>
+                                                {cms?.contactEmail || cityDetails[selectedCity].email}
                                             </a>
                                         </div>
                                     </div>
@@ -300,7 +305,7 @@ export default function ContactPage() {
                                     }}
                                 >
                                     <span className="text-gray-600 font-medium">Follow Us</span>
-                                    <a href="#" className="w-10 h-10 rounded-full bg-white shadow border border-gray-100 flex items-center justify-center text-green-500 hover:scale-110 transition-transform">
+                                    <a href={`https://wa.me/${cms?.contactWhatsApp || '911234567890'}`} className="w-10 h-10 rounded-full bg-white shadow border border-gray-100 flex items-center justify-center text-green-500 hover:scale-110 transition-transform">
                                         <FaWhatsapp size={20} />
                                     </a>
                                     <a href="#" className="w-10 h-10 rounded-full bg-white shadow border border-gray-100 flex items-center justify-center text-blue-600 hover:scale-110 transition-transform">
@@ -338,10 +343,10 @@ export default function ContactPage() {
                                     }}
                                 >
                                     <h1 className="text-[40px] leading-[48px] font-semibold text-[#1A1A1A] tracking-[-0.02em] font-sans">
-                                        We are here to help
+                                        {contactTitle}
                                     </h1>
                                     <p className="text-[#4D4D4D] text-[16px] leading-[24px] max-w-[500px] font-sans font-normal">
-                                        Want us to Call you back, Please fill in the form Below and our Executive will reach you as soon as possible.
+                                        {contactSubtitle}
                                     </p>
                                 </div>
 

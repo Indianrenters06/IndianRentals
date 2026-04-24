@@ -1,5 +1,5 @@
 "use client";
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation, Autoplay, Scrollbar } from 'swiper/modules';
 import Link from 'next/link';
@@ -27,15 +27,15 @@ const CATEGORY_ROUTES = {
 };
 
 const RentByCategory = () => {
-    const [displayCategories, setDisplayCategories] = React.useState([]);
-    const [loading, setLoading] = React.useState(true);
-    const [cmsConfig, setCmsConfig] = React.useState({
+    const [displayCategories, setDisplayCategories] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [cmsConfig, setCmsConfig] = useState({
         enabled: true,
         title: "Rent by Category"
     });
-    const [viewType, setViewType] = React.useState('mobile');
+    const [viewType, setViewType] = useState('mobile');
 
-    React.useEffect(() => {
+    useEffect(() => {
         const checkRes = () => {
             const w = window.innerWidth;
             if (w >= 1024) setViewType('desktop');
@@ -55,7 +55,7 @@ const RentByCategory = () => {
         return `/category/${cat.slug || cat._id}`;
     };
 
-    React.useEffect(() => {
+    useEffect(() => {
         const fetchCategories = async () => {
             try {
                 const data = await getCategories();

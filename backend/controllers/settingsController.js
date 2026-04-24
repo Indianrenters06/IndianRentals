@@ -26,6 +26,7 @@ const updateSettings = asyncHandler(async (req, res) => {
 
     const {
         siteName, siteLogo, contactEmail, contactPhone, address,
+        navbarAnnouncements, navbarLinks, footerDescription, socialLinks, footerQuickLinks,
         maintenanceMode, allowRegistrations, requireKYC,
         paymentGatewaySecret, gstConfig, deliveryCharges, lateFeeRules
     } = req.body;
@@ -42,6 +43,12 @@ const updateSettings = asyncHandler(async (req, res) => {
     if (gstConfig !== undefined) settings.gstConfig = { ...settings.gstConfig, ...gstConfig };
     if (deliveryCharges !== undefined) settings.deliveryCharges = { ...settings.deliveryCharges, ...deliveryCharges };
     if (lateFeeRules !== undefined) settings.lateFeeRules = { ...settings.lateFeeRules, ...lateFeeRules };
+
+    if (navbarAnnouncements !== undefined) settings.navbarAnnouncements = navbarAnnouncements;
+    if (navbarLinks !== undefined) settings.navbarLinks = navbarLinks;
+    if (footerDescription !== undefined) settings.footerDescription = footerDescription;
+    if (socialLinks !== undefined) settings.socialLinks = { ...settings.socialLinks, ...socialLinks };
+    if (footerQuickLinks !== undefined) settings.footerQuickLinks = footerQuickLinks;
 
     const updatedSettings = await settings.save();
     res.json(updatedSettings);

@@ -1,14 +1,15 @@
 "use client";
-import React, { useRef } from "react";
+import React, { useRef, useEffect, useState } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation, Autoplay, Pagination } from "swiper/modules";
 import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/outline";
 import Link from "next/link";
 import "swiper/css";
 import "swiper/css/pagination";
+import { API } from '@/services/apiConfig';
 
 // Placeholder client logos — replace with real logos/images as needed
-const clients = [
+const defaultClients = [
     { id: 1, name: "Reliance", logo: "RELIANCE", link: "/products" },
     { id: 2, name: "Tata", logo: "TATA", link: "/products" },
     { id: 3, name: "Adani", logo: "ADANI", link: "/products" },
@@ -20,6 +21,21 @@ const clients = [
 const ClientSection = () => {
     const prevRef = useRef(null);
     const nextRef = useRef(null);
+    const [cms, setCms] = useState(null);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        fetch(`${API}/api/cms/homepage?t=${Date.now()}`)
+            .then(res => res.ok ? res.json() : null)
+            .then(data => { setCms(data); setLoading(false); })
+            .catch(() => setLoading(false));
+    }, []);
+
+    if (loading) return null;
+    if (cms && cms.clientSectionEnabled === false) return null;
+
+    const useDynamic = cms?.clientLogos && cms.clientLogos.length > 0;
+    const clients = useDynamic ? cms.clientLogos.map((url, i) => ({ id: i, image: url })) : defaultClients;
 
     return (
         <section className="py-24 bg-white">
@@ -70,26 +86,40 @@ const ClientSection = () => {
                     >
                         {clients.map((client) => (
                             <SwiperSlide key={client.id}>
-                                <Link
-                                    href={client.link}
-                                    className="flex items-center justify-center select-none transition-all hover:scale-[1.01] duration-300 shadow-sm block"
-                                    style={{ 
-                                        height: "280px",
-                                        borderRadius: "24px",
-                                        background: "hsla(44, 100%, 64%, 1)",
-                                        opacity: 1,
-                                        textDecoration: 'none'
-                                    }}
-                                >
-                                    <div className="flex flex-col items-center gap-4">
-                                        <div className="w-16 h-16 rounded-full bg-black/10 flex items-center justify-center text-black font-black text-2xl border border-black/5">
-                                            {client.logo[0]}
-                                        </div>
-                                        <span className="text-black font-sans font-extrabold text-[28px] tracking-tight">
-                                            {client.name}
-                                        </span>
+                                {useDynamic ? (
+                                    <div
+                                        className="flex items-center justify-center select-none shadow-sm block bg-white"
+                                        style={{ 
+                                            height: "280px",
+                                            borderRadius: "24px",
+                                            border: "1px solid hsla(0, 0%, 93%, 1)",
+                                            padding: "32px"
+                                        }}
+                                    >
+                                        <img src={client.image} alt="Client Logo" className="w-full h-full object-contain grayscale hover:grayscale-0 transition-all duration-300" />
                                     </div>
-                                </Link>
+                                ) : (
+                                    <Link
+                                        href={client.link || "/products"}
+                                        className="flex items-center justify-center select-none transition-all hover:scale-[1.01] duration-300 shadow-sm block"
+                                        style={{ 
+                                            height: "280px",
+                                            borderRadius: "24px",
+                                            background: "hsla(44, 100%, 64%, 1)",
+                                            opacity: 1,
+                                            textDecoration: 'none'
+                                        }}
+                                    >
+                                        <div className="flex flex-col items-center gap-4">
+                                            <div className="w-16 h-16 rounded-full bg-black/10 flex items-center justify-center text-black font-black text-2xl border border-black/5">
+                                                {client.logo[0]}
+                                            </div>
+                                            <span className="text-black font-sans font-extrabold text-[28px] tracking-tight">
+                                                {client.name}
+                                            </span>
+                                        </div>
+                                    </Link>
+                                )}
                             </SwiperSlide>
                         ))}
                     </Swiper>

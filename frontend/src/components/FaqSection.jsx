@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { PiCaretDown, PiCaretUp } from 'react-icons/pi';
 
 const faqs = [
@@ -21,8 +21,34 @@ const faqs = [
     }
 ];
 
-const FaqSection = () => {
-    const [activeIndices, setActiveIndices] = useState([0, 1, 2, 3]);
+import { API } from '@/services/apiConfig';
+
+const FaqSection = ({ cmsData }) => {
+    const [cms, setCms] = useState(cmsData || null);
+    const [loading, setLoading] = useState(!cmsData);
+
+    useEffect(() => {
+        if (cmsData) {
+            setCms(cmsData);
+            setLoading(false);
+            return;
+        }
+        window.fetch(`${API}/api/cms/faq?t=${Date.now()}`)
+            .then(res => res.ok ? res.json() : null)
+            .then(data => { setCms(data); setLoading(false); })
+            .catch(() => setLoading(false));
+    }, [cmsData]);
+
+    const displayFaqs = cms?.faqItems && cms.faqItems.length > 0 ? cms.faqItems : faqs;
+    const [activeIndices, setActiveIndices] = useState(faqs.map((_, i) => i)); // Default to static length initially or handle dynamic
+
+    useEffect(() => {
+        // Update active indices when displayFaqs changes
+        setActiveIndices(displayFaqs.map((_, i) => i));
+    }, [displayFaqs.length]);
+
+    const title = cms?.faqTitle || "Everything you need to know about renting with IndianRenters.com";
+    const subtitle = cms?.faqSubtitle || "Welcome to FAQ!";
 
     const toggleFaq = (index) => {
         if (activeIndices.includes(index)) {
@@ -31,6 +57,8 @@ const FaqSection = () => {
             setActiveIndices([...activeIndices, index]);
         }
     };
+
+    if (loading) return <div className="h-96 w-full animate-pulse bg-slate-50 rounded-3xl" />;
 
     return (
         <section 
@@ -53,55 +81,58 @@ const FaqSection = () => {
                         minHeight: '190px'
                     }}
                 >
-                    <span 
-                        className="block"
-                        style={{
-                            width: 'auto',
-                            height: '35px',
-                            fontFamily: "'Mona Sans', sans-serif",
-                            fontWeight: 500,
-                            fontSize: '16px',
-                            lineHeight: '24px',
-                            letterSpacing: '0.01em',
-                            color: 'hsla(0, 0%, 20%, 1)'
-                        }}
-                    >
-                        Welcome to FAQ!
-                    </span>
                     <h2 
                         style={{
                             width: 'auto',
                             maxWidth: '442px',
-                            height: '135px',
+                            height: 'auto',
                             fontFamily: "'Mona Sans', sans-serif",
                             fontWeight: 600,
                             fontSize: '36px',
                             lineHeight: '45px',
                             letterSpacing: '-0.02em',
                             color: 'hsla(0, 0%, 20%, 1)',
-                            margin: 0
+                            margin: 0,
+                            marginBottom: '12px'
                         }}
                     >
-                        Everything you need to know about renting with IndianRenters.com
+                        {title}
                     </h2>
+                    <span 
+                        className="block"
+                        style={{
+                            width: 'auto',
+                            maxWidth: '442px',
+                            height: 'auto',
+                            fontFamily: "'Mona Sans', sans-serif",
+                            fontWeight: 500,
+                            fontSize: '36px',
+                            lineHeight: '45px',
+                            letterSpacing: '-0.02em',
+                            color: 'hsla(0, 0%, 20%, 1)'
+                        }}
+                    >
+                        {subtitle}
+                    </span>
                 </div>
 
                 {/* Right Column - Accordion */}
                 <div 
                     className="w-full lg:flex-1 lg:max-w-[758px]"
                     style={{
-                        height: '568px',
+                        minHeight: '568px',
                         borderBottom: '1px solid hsla(0, 0%, 69%, 1)'
                     }}
                 >
                     <div className="space-y-0">
-                        {faqs.map((faq, index) => (
+                        {displayFaqs.map((faq, index) => (
                             <div 
                                 key={index} 
                                 className="w-full"
                                 style={{
                                     borderTop: '1px solid hsla(0, 0%, 69%, 1)',
-                                    height: activeIndices.includes(index) ? '142px' : '72px',
+                                    height: activeIndices.includes(index) ? 'auto' : '72px',
+                                    minHeight: activeIndices.includes(index) ? '142px' : '72px',
                                     overflow: 'hidden'
                                 }}
                             >
@@ -139,7 +170,7 @@ const FaqSection = () => {
                                     </span>
                                 </button>
                                 <div
-                                    className={`overflow-hidden transition-all duration-300 ease-in-out ${activeIndices.includes(index) ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'
+                                    className={`overflow-hidden transition-all duration-300 ease-in-out ${activeIndices.includes(index) ? 'max-h-[500px] opacity-100' : 'max-h-0 opacity-0'
                                         }`}
                                     style={{
                                         paddingBottom: activeIndices.includes(index) ? '24px' : '0'
@@ -149,7 +180,7 @@ const FaqSection = () => {
                                         style={{
                                             width: 'auto',
                                             maxWidth: '758px',
-                                            height: '46px',
+                                            height: 'auto',
                                             fontFamily: "'Mona Sans', sans-serif",
                                             fontWeight: 400,
                                             fontSize: '14px',

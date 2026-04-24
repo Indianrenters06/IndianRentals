@@ -1,5 +1,5 @@
 "use client";
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { FacebookLogo, InstagramLogo, LinkedinLogo, WhatsappLogo } from '@phosphor-icons/react';
@@ -20,9 +20,9 @@ const Footer = () => {
     const currentYear = new Date().getFullYear();
     const copyrightName = settings?.siteName || "AAA Rental LLP";
 
-    const [viewType, setViewType] = React.useState('mobile');
+    const [viewType, setViewType] = useState('mobile');
 
-    React.useEffect(() => {
+    useEffect(() => {
         const checkRes = () => {
             const w = window.innerWidth;
             if (w >= 1024) setViewType('desktop');
@@ -65,21 +65,32 @@ const Footer = () => {
                                 />
                             </Link>
                             <p className="text-[#1D1D1F] text-[13px] font-medium leading-[20px] max-w-[200px]">
-                                Rent Anything, Anytime,<br/>Anywhere
+                                {settings?.footerDescription || "Rent Anything, Anytime, Anywhere"}
                             </p>
                             <div className="flex items-center gap-[10px] pt-1">
                                 <a href={`https://wa.me/${sitePhone.replace(/[^\d]/g, '')}`} className="w-[36px] h-[36px] rounded-full bg-white flex items-center justify-center shadow-sm transition-opacity hover:opacity-70" target="_blank" rel="noopener noreferrer">
                                     <WhatsappLogo size={20} weight="fill" className="text-[#25D366]" />
                                 </a>
-                                <a href="#" className="w-[36px] h-[36px] rounded-full bg-white flex items-center justify-center shadow-sm transition-opacity hover:opacity-70">
-                                    <FacebookLogo size={20} weight="fill" className="text-[#1877F2]" />
-                                </a>
-                                <a href="#" className="w-[36px] h-[36px] rounded-full bg-white flex items-center justify-center shadow-sm transition-opacity hover:opacity-70">
-                                    <InstagramLogo size={20} weight="fill" className="text-[#E4405F]" />
-                                </a>
-                                <a href="#" className="w-[36px] h-[36px] rounded-full bg-white flex items-center justify-center shadow-sm transition-opacity hover:opacity-70">
-                                    <LinkedinLogo size={20} weight="fill" className="text-[#0A66C2]" />
-                                </a>
+                                {settings?.socialLinks?.facebook && (
+                                    <a href={settings.socialLinks.facebook} className="w-[36px] h-[36px] rounded-full bg-white flex items-center justify-center shadow-sm transition-opacity hover:opacity-70">
+                                        <FacebookLogo size={20} weight="fill" className="text-[#1877F2]" />
+                                    </a>
+                                )}
+                                {settings?.socialLinks?.instagram && (
+                                    <a href={settings.socialLinks.instagram} className="w-[36px] h-[36px] rounded-full bg-white flex items-center justify-center shadow-sm transition-opacity hover:opacity-70">
+                                        <InstagramLogo size={20} weight="fill" className="text-[#E4405F]" />
+                                    </a>
+                                )}
+                                {settings?.socialLinks?.linkedin && (
+                                    <a href={settings.socialLinks.linkedin} className="w-[36px] h-[36px] rounded-full bg-white flex items-center justify-center shadow-sm transition-opacity hover:opacity-70">
+                                        <LinkedinLogo size={20} weight="fill" className="text-[#0A66C2]" />
+                                    </a>
+                                )}
+                                {settings?.socialLinks?.twitter && (
+                                    <a href={settings.socialLinks.twitter} className="w-[36px] h-[36px] rounded-full bg-white flex items-center justify-center shadow-sm transition-opacity hover:opacity-70">
+                                        <span className="font-bold text-black text-[18px]">X</span>
+                                    </a>
+                                )}
                             </div>
                         </div>
 
@@ -154,8 +165,8 @@ const Footer = () => {
                         <Link href="/" className="inline-block">
                             <Image src={siteLogo} alt={siteName} width={137} height={40} className="h-[40px] w-auto object-contain" />
                         </Link>
-                        <p className="text-[#1D1D1F] text-[10px] font-medium leading-none tracking-tight whitespace-nowrap">
-                            Rent Anything, Anytime, Anywhere
+                        <p className="text-[#1D1D1F] text-[10px] font-medium leading-none tracking-tight">
+                            {settings?.footerDescription || "Rent Anything, Anytime, Anywhere"}
                         </p>
                     </div>
                     {/* Primary Links */}
@@ -193,10 +204,26 @@ const Footer = () => {
                         <a href={`https://wa.me/${sitePhone.replace(/[^\d]/g, '')}`} className="w-10 h-10 rounded-full bg-white flex items-center justify-center shadow-sm" target="_blank" rel="noopener noreferrer">
                             <WhatsappLogo size={20} weight="fill" className="text-[#25D366]" />
                         </a>
-                        {/* ... other social icons ... */}
-                        <a href="#" className="w-10 h-10 rounded-full bg-white flex items-center justify-center shadow-sm">
-                            <FacebookLogo size={20} weight="fill" className="text-[#1877F2]" />
-                        </a>
+                        {settings?.socialLinks?.facebook && (
+                            <a href={settings.socialLinks.facebook} className="w-10 h-10 rounded-full bg-white flex items-center justify-center shadow-sm transition-opacity hover:opacity-70">
+                                <FacebookLogo size={20} weight="fill" className="text-[#1877F2]" />
+                            </a>
+                        )}
+                        {settings?.socialLinks?.instagram && (
+                            <a href={settings.socialLinks.instagram} className="w-10 h-10 rounded-full bg-white flex items-center justify-center shadow-sm transition-opacity hover:opacity-70">
+                                <InstagramLogo size={20} weight="fill" className="text-[#E4405F]" />
+                            </a>
+                        )}
+                        {settings?.socialLinks?.linkedin && (
+                            <a href={settings.socialLinks.linkedin} className="w-10 h-10 rounded-full bg-white flex items-center justify-center shadow-sm transition-opacity hover:opacity-70">
+                                <LinkedinLogo size={20} weight="fill" className="text-[#0A66C2]" />
+                            </a>
+                        )}
+                        {settings?.socialLinks?.twitter && (
+                            <a href={settings.socialLinks.twitter} className="w-10 h-10 rounded-full bg-white flex items-center justify-center shadow-sm transition-opacity hover:opacity-70">
+                                <span className="font-bold text-black text-[18px]">X</span>
+                            </a>
+                        )}
                     </div>
 
                     <div className="flex flex-col gap-4 pt-4 border-t border-gray-100">

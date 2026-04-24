@@ -10,7 +10,7 @@ import RentalProcess from '@/components/RentalProcess';
 const API = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
 
 export default function RentalProcessPage() {
-    const [cms, setCms] = useState<{ bannerImage?: string; bannerTitle?: string } | null>(null);
+    const [cms, setCms] = useState<any>(null);
     useEffect(() => {
         fetch(`${API}/api/cms/rental-process`)
             .then(r => r.ok ? r.json() : null)
@@ -20,6 +20,15 @@ export default function RentalProcessPage() {
 
     const bannerImage = cms?.bannerImage || 'https://res.cloudinary.com/dgkckcdk8/image/upload/v1776714078/9f8d4d5a95b5ff564196928771ca74a7229121d9_1_ru5asw.png';
     const bannerTitle = cms?.bannerTitle || 'Rental Process';
+    const featuresTitle = cms?.rentalFeaturesTitle || 'Features';
+    const featuresSubtitle = cms?.rentalFeaturesSubtitle || 'Rent with confidence. Every product comes with transparent pricing, flexible terms, and reliable support—so you focus on your work, not equipment hassles.';
+    
+    const displayFeatures = cms?.rentalFeatures && cms.rentalFeatures.length > 0 ? cms.rentalFeatures : [
+        { title: 'Quick Support', description: 'Get expert help fast', image: 'https://res.cloudinary.com/dgkckcdk8/image/upload/v1776714078/64e2ed1925a146151a5bfc674829bb2b3e685b49_4_zpulqn.png' },
+        { title: 'Rental Flexibility', description: 'Choose your rental plan', image: 'https://res.cloudinary.com/dgkckcdk8/image/upload/v1776714078/53e0a0d956bf3d54d0997d047297f346d4908850_bhrpr9.png' },
+        { title: 'Fast Delivery', description: 'We deliver quickly across India within 48-72 hour', image: 'https://res.cloudinary.com/dgkckcdk8/image/upload/v1776714078/260aac3296a9280da7a16f16198d38259c3bae80_kpopdw.png' },
+        { title: 'No Hidden Charges', description: 'One transparent invoice', image: 'https://res.cloudinary.com/dgkckcdk8/image/upload/v1776714078/5a60bd00913e9a476e28e7fd1494a1dbaf0d6961_ffiy6e.png' },
+    ];
 
     return (
         <div className="font-sans text-gray-800">
@@ -39,14 +48,14 @@ export default function RentalProcessPage() {
             </div>
 
             {/* 2. Rental Process Steps Section */}
-            <RentalProcess />
+            <RentalProcess cmsData={cms} />
 
             {/* 3. Features Section (1440px Outer Wrapper) */}
             <section
                 className="w-full relative mx-auto"
                 style={{
                     maxWidth: '1440px',
-                    height: '568px',
+                    minHeight: '568px',
                     paddingTop: '98px',
                     paddingBottom: '98px',
                     background: 'hsla(0, 0%, 100%, 1)',
@@ -58,7 +67,7 @@ export default function RentalProcessPage() {
                     style={{
                         maxWidth: '1200px',
                         width: '100%',
-                        height: '372px',
+                        height: 'auto',
                         gap: '32px',
                         paddingLeft: '16px',
                         paddingRight: '16px',
@@ -75,161 +84,49 @@ export default function RentalProcessPage() {
                                 marginBottom: '16px'
                             }}
                         >
-                            Features
+                            {featuresTitle}
                         </h2>
                         <p className="text-gray-600 font-sans text-[16px] leading-[1.5]">
-                            Rent with confidence. Every product comes with transparent pricing, flexible terms, and reliable support—so you focus on your work, not equipment hassles.
+                            {featuresSubtitle}
                         </p>
                     </div>
 
                     <div 
-                        className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4"
+                        className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-0"
                         style={{
                             width: '100%',
                             maxWidth: '1200px',
-                            height: '236px',
                             opacity: 1,
                             margin: '0 auto'
                         }}
                     >
-                        <div 
-                            className="flex flex-col items-center justify-center text-center"
-                            style={{
-                                width: '300px',
-                                height: '236px',
-                                padding: '10px 45px',
-                                gap: '10px',
-                                borderStyle: 'solid',
-                                borderColor: 'hsla(0, 0%, 89%, 1)',
-                                borderWidth: '1px 0px 1px 1px',
-                                borderTopLeftRadius: '8px',
-                                borderBottomLeftRadius: '8px',
-                                borderTopRightRadius: '0px',
-                                borderBottomRightRadius: '0px',
-                                opacity: 1
-                            }}
-                        >
+                        {displayFeatures.map((f: any, i: number) => (
                             <div 
-                                className="flex flex-col items-center justify-center"
+                                key={i}
+                                className="flex flex-col items-center justify-center text-center p-[10px_45px] border-slate-200"
                                 style={{
-                                    width: '210px',
-                                    height: '186px',
-                                    gap: '9px'
+                                    height: '236px',
+                                    borderStyle: 'solid',
+                                    borderWidth: i === displayFeatures.length - 1 ? '1px' : '1px 0px 1px 1px',
+                                    borderTopLeftRadius: i === 0 ? '8px' : '0px',
+                                    borderBottomLeftRadius: i === 0 ? '8px' : '0px',
+                                    borderTopRightRadius: i === displayFeatures.length - 1 ? '8px' : '0px',
+                                    borderBottomRightRadius: i === displayFeatures.length - 1 ? '8px' : '0px',
                                 }}
                             >
-                                <div className="w-[120px] h-[120px] relative">
-                                    <img 
-                                        src="https://res.cloudinary.com/dgkckcdk8/image/upload/v1776714078/64e2ed1925a146151a5bfc674829bb2b3e685b49_4_zpulqn.png" 
-                                        alt="Quick Support"
-                                        className="w-full h-full object-contain"
-                                    />
+                                <div className="flex flex-col items-center justify-center gap-[9px]">
+                                    <div className="w-[120px] h-[120px] relative">
+                                        <img 
+                                            src={f.image || "https://res.cloudinary.com/dgkckcdk8/image/upload/v1776714078/64e2ed1925a146151a5bfc674829bb2b3e685b49_4_zpulqn.png"} 
+                                            alt={f.title}
+                                            className="w-full h-full object-contain"
+                                        />
+                                    </div>
+                                    <h3 className="text-xl font-bold text-gray-900 font-sans">{f.title}</h3>
+                                    <p className="text-gray-500 text-sm font-sans">{f.description}</p>
                                 </div>
-                                <h3 className="text-xl font-bold text-gray-900 font-sans">Quick Support</h3>
-                                <p className="text-gray-500 text-sm font-sans">Get expert help fast</p>
                             </div>
-                        </div>
-
-                        <div 
-                            className="flex flex-col items-center justify-center text-center"
-                            style={{
-                                width: '300px',
-                                height: '236px',
-                                padding: '10px 45px',
-                                borderStyle: 'solid',
-                                borderColor: 'hsla(0, 0%, 89%, 1)',
-                                borderWidth: '1px 0px 1px 1px',
-                                borderRadius: '0px',
-                                opacity: 1
-                            }}
-                        >
-                            <div 
-                                className="flex flex-col items-center justify-center"
-                                style={{
-                                    width: '210px',
-                                    height: '186px',
-                                    gap: '9px'
-                                }}
-                            >
-                                <div className="w-[120px] h-[120px] relative">
-                                    <img 
-                                        src="https://res.cloudinary.com/dgkckcdk8/image/upload/v1776714078/53e0a0d956bf3d54d0997d047297f346d4908850_bhrpr9.png" 
-                                        alt="Rental Flexibility"
-                                        className="w-full h-full object-contain"
-                                    />
-                                </div>
-                                <h3 className="text-xl font-bold text-gray-900 font-sans">Rental Flexibility</h3>
-                                <p className="text-gray-500 text-sm font-sans">Choose your rental plan</p>
-                            </div>
-                        </div>
-
-                        <div 
-                            className="flex flex-col items-center justify-center text-center"
-                            style={{
-                                width: '300px',
-                                height: '236px',
-                                padding: '10px 45px',
-                                borderStyle: 'solid',
-                                borderColor: 'hsla(0, 0%, 89%, 1)',
-                                borderWidth: '1px 0px 1px 1px',
-                                borderRadius: '0px',
-                                opacity: 1
-                            }}
-                        >
-                            <div 
-                                className="flex flex-col items-center justify-center"
-                                style={{
-                                    width: '210px',
-                                    height: '186px',
-                                    gap: '9px'
-                                }}
-                            >
-                                <div className="w-[120px] h-[120px] relative">
-                                    <img 
-                                        src="https://res.cloudinary.com/dgkckcdk8/image/upload/v1776714078/260aac3296a9280da7a16f16198d38259c3bae80_kpopdw.png"
-                                        alt="Fast Delivery"
-                                        className="w-full h-full object-contain"
-                                    />
-                                </div>
-                                <h3 className="text-xl font-bold text-gray-900 font-sans">Fast Delivery</h3>
-                                <p className="text-gray-500 text-sm font-sans">We deliver quickly across India within 48-72 hour</p>
-                            </div>
-                        </div>
-
-                        <div 
-                            className="flex flex-col items-center justify-center text-center"
-                            style={{
-                                width: '300px',
-                                height: '236px',
-                                padding: '10px 45px',
-                                borderStyle: 'solid',
-                                borderColor: 'hsla(0, 0%, 89%, 1)',
-                                borderWidth: '1px 1px 1px 1px',
-                                borderTopRightRadius: '8px',
-                                borderBottomRightRadius: '8px',
-                                borderTopLeftRadius: '0px',
-                                borderBottomLeftRadius: '0px',
-                                opacity: 1
-                            }}
-                        >
-                            <div 
-                                className="flex flex-col items-center justify-center"
-                                style={{
-                                    width: '210px',
-                                    height: '186px',
-                                    gap: '9px'
-                                }}
-                            >
-                                <div className="w-[120px] h-[120px] relative">
-                                    <img 
-                                        src="https://res.cloudinary.com/dgkckcdk8/image/upload/v1776714078/5a60bd00913e9a476e28e7fd1494a1dbaf0d6961_ffiy6e.png"
-                                        alt="No Hidden Charges"
-                                        className="w-full h-full object-contain"
-                                    />
-                                </div>
-                                <h3 className="text-xl font-bold text-gray-900 font-sans">No Hidden Charges</h3>
-                                <p className="text-gray-500 text-sm font-sans">One transparent invoice</p>
-                            </div>
-                        </div>
+                        ))}
                     </div>
                 </div>
             </section>
@@ -244,7 +141,7 @@ export default function RentalProcessPage() {
             {/* 5. Testimonials Section */}
             <Testimonials 
                 overrideBg="hsla(0, 0%, 100%, 1)"
-                overridePadding="80px 0px"
+                overridePadding="20px 0px"
                 overrideHeight="888px"
             />
         </div>

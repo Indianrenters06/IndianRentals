@@ -33,7 +33,7 @@ const allowedOrigins = [
 // Regex for Vercel preview deployments
 const VERCEL_PATTERN = /^https:\/\/indian-rent(als|ers)(-[a-z0-9]+)?\.vercel\.app$/;
 
-app.use(cors({
+const corsOptions = {
   origin: (origin, callback) => {
     if (!origin) return callback(null, true); // curl, Postman, mobile
     if (allowedOrigins.includes(origin)) return callback(null, true);
@@ -44,9 +44,11 @@ app.use(cors({
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
-}));
+};
+
+app.use(cors(corsOptions));
 // Handle preflight for every route (use regex — bare '*' breaks newer path-to-regexp)
-app.options(/.*/, cors());
+app.options(/.*/, cors(corsOptions));
 app.use(cookieParser());
 app.use(morgan('combined'));
 

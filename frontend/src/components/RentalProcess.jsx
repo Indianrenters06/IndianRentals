@@ -42,15 +42,21 @@ const DynamicIcon = ({ name, size = 32, className = "", weight = "bold" }) => {
     return <IconComponent size={size} className={className} weight={weight} />;
 };
 
+// Fallback images from the main Cloudinary account (dgkckcdk8)
 const STEP_IMAGES = [
-    "https://res.cloudinary.com/dpu9ikeqe/image/upload/v1769200258/WhatsApp_Image_2026-01-23_at_ahuj83.jpg",
-    "https://res.cloudinary.com/dpu9ikeqe/image/upload/v1773311179/f5d05a49c7a9e513697df5b39fc826c8e9635182_bau9ky.png",
-    "https://res.cloudinary.com/dpu9ikeqe/image/upload/v1773311180/c853e25515c331bf8956b228e04cd4b22e0b91d3_d7oqzx.png",
-    "https://res.cloudinary.com/dpu9ikeqe/image/upload/v1773311190/7376ef09ee50f329f3115a2bdec517818465c5a3_fzsfya.png",
+    "https://res.cloudinary.com/dgkckcdk8/image/upload/v1769946716/indian-rentals/fj8ptqbhppbstdd0hs4i.png",
+    "https://res.cloudinary.com/dgkckcdk8/image/upload/v1769961565/indian-rentals/anmpufdlxxxblkxqxpds.jpg",
+    "https://res.cloudinary.com/dgkckcdk8/image/upload/v1769961205/indian-rentals/gfjrzgp5llzcjap30wkt.png",
+    "https://res.cloudinary.com/dgkckcdk8/image/upload/v1769946716/indian-rentals/fj8ptqbhppbstdd0hs4i.png",
 ];
 
-const RentalProcess = () => {
-    const [cms, setCms] = useState({ enabled: true, title: "How It Works", subtitle: "Choose, secure, receive, and create with zero hassle. No installation, no configuration, no delay.", steps: FALLBACK_STEPS });
+const RentalProcess = ({ cmsData = null }) => {
+    const [cms, setCms] = useState({ 
+        enabled: true, 
+        title: "How It Works", 
+        subtitle: "Choose, secure, receive, and create with zero hassle. No installation, no configuration, no delay.", 
+        steps: FALLBACK_STEPS 
+    });
     const [activeStep, setActiveStep] = useState(0);
     const [viewType, setViewType] = useState('mobile');
 
@@ -64,21 +70,30 @@ const RentalProcess = () => {
         checkRes();
         window.addEventListener('resize', checkRes);
 
-        fetch(`${API}/api/cms/homepage`, { cache: 'no-store' })
-            .then(r => r.ok ? r.json() : null)
-            .then(data => {
-                if (!data) return;
-                setCms({
-                    enabled: data.rentalProcessEnabled !== false,
-                    title: data.rentalProcessTitle || "How It Works",
-                    subtitle: data.rentalProcessSubtitle || "Choose, secure, receive, and create with zero hassle. No installation, no configuration, no delay.",
-                    steps: data.rentalProcessSteps?.length > 0 ? data.rentalProcessSteps : FALLBACK_STEPS
-                });
-            })
-            .catch(console.error);
+        if (cmsData) {
+            setCms({
+                enabled: cmsData.rentalProcessEnabled !== false,
+                title: cmsData.rentalProcessTitle || "How It Works",
+                subtitle: cmsData.rentalProcessSubtitle || "Choose, secure, receive, and create with zero hassle. No installation, no configuration, no delay.",
+                steps: cmsData.rentalProcessSteps?.length > 0 ? cmsData.rentalProcessSteps : FALLBACK_STEPS
+            });
+        } else {
+            fetch(`${API}/api/cms/homepage`, { cache: 'no-store' })
+                .then(r => r.ok ? r.json() : null)
+                .then(data => {
+                    if (!data) return;
+                    setCms({
+                        enabled: data.rentalProcessEnabled !== false,
+                        title: data.rentalProcessTitle || "How It Works",
+                        subtitle: data.rentalProcessSubtitle || "Choose, secure, receive, and create with zero hassle. No installation, no configuration, no delay.",
+                        steps: data.rentalProcessSteps?.length > 0 ? data.rentalProcessSteps : FALLBACK_STEPS
+                    });
+                })
+                .catch(console.error);
+        }
 
         return () => window.removeEventListener('resize', checkRes);
-    }, []);
+    }, [cmsData]);
 
     // Auto-advance step every 5 seconds
     useEffect(() => {
@@ -292,7 +307,7 @@ const RentalProcess = () => {
                 </div>
 
                 <div className="w-full flex flex-row items-stretch mx-auto font-sans gap-[32px] max-w-[1200px]">
-                    <div className="flex flex-col" style={{ width: '590px', height: '500px', gap: '12px' }}>
+                    <div className="flex flex-col" style={{ width: '590px', height: 'auto', minHeight: '500px', gap: '12px' }}>
                         {cms.steps.map((step, index) => {
                             const isActive = activeStep === index;
                             return (
@@ -302,14 +317,14 @@ const RentalProcess = () => {
                                     className={`relative cursor-pointer transition-all duration-300 rounded-2xl overflow-hidden ${isActive ? "" : "bg-white border-[1.2px] border-[hsla(0,0%,93%,1)]"}`}
                                     style={{
                                         width: '590px',
-                                        height: isActive ? (index === 3 ? '236px' : '213px') : '92px',
+                                        height: isActive ? 'auto' : '92px',
                                         background: isActive ? 'linear-gradient(125.34deg, rgba(255, 207, 70, 0.5) 1.25%, rgba(255, 185, 27, 0.9) 98.94%)' : 'hsla(0,0%,100%,1)',
                                         boxShadow: isActive ? '-3px -3px 15px -2px hsla(29, 100%, 44%, 0.26) inset' : undefined,
                                         border: isActive ? 'none' : undefined,
                                     }}
                                 >
                                     <div className={`flex flex-col h-full ${isActive ? 'justify-between' : 'justify-center'}`}>
-                                        <div style={{ width: '590px', height: '94px', padding: '16px', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', opacity: 1, boxSizing: 'border-box' }}>
+                                        <div style={{ width: '590px', minHeight: '94px', padding: '16px', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', opacity: 1, boxSizing: 'border-box' }}>
                                             <div style={{ width: '170px', height: '62px', display: 'flex', flexDirection: 'column', gap: '9px' }}>
                                                 <div className={isActive ? 'text-[#6B4B18]' : 'text-[#1D1D1F]'}><DynamicIcon name={step.icon} size={32} /></div>
                                                 <h3 style={{ color: isActive ? 'hsla(19, 84%, 26%, 1)' : 'hsla(0, 0%, 20%, 1)', fontFamily: '"Mona Sans", sans-serif', fontWeight: 600, fontSize: '20px', lineHeight: '28px', whiteSpace: 'nowrap', letterSpacing: '-0.02em' }}>
@@ -322,8 +337,8 @@ const RentalProcess = () => {
                                             </div>
                                         </div>
                                         {isActive && (
-                                            <div className="animate-fadeIn" style={{ width: '590px', height: index === 3 ? '101px' : '78px', padding: '16px', display: 'flex', flexDirection: 'column', gap: '10px', opacity: 1, background: 'hsla(46, 100%, 89%, 1)' }}>
-                                                <p style={{ width: '558px', height: index === 3 ? '69px' : '46px', opacity: 0.8, fontFamily: '"Mona Sans", sans-serif', fontWeight: 400, fontSize: '16px', lineHeight: '23px', letterSpacing: '-0.04em', color: 'hsla(21, 89%, 15%, 1)', margin: 0, whiteSpace: 'pre-line' }}>{step.description}</p>
+                                            <div className="animate-fadeIn" style={{ width: '590px', height: 'auto', padding: '16px', display: 'flex', flexDirection: 'column', gap: '10px', opacity: 1, background: 'hsla(46, 100%, 89%, 1)' }}>
+                                                <p style={{ width: '558px', height: 'auto', opacity: 0.8, fontFamily: '"Mona Sans", sans-serif', fontWeight: 400, fontSize: '16px', lineHeight: '23px', letterSpacing: '-0.04em', color: 'hsla(21, 89%, 15%, 1)', margin: 0, whiteSpace: 'pre-line' }}>{step.description}</p>
                                                 {step.link && (
                                                     <Link href={step.link} className="inline-flex items-center gap-1 text-[12px] font-bold text-[#6B4B18] hover:underline mt-1">
                                                         Learn More <DynamicIcon name="Arrow" size={12} />
@@ -337,8 +352,8 @@ const RentalProcess = () => {
                         })}
                     </div>
 
-                    <div className="relative flex flex-1 rounded-[2rem] overflow-hidden bg-white shadow-sm" style={{ height: '500px' }}>
-                        {cms.steps[activeStep] && <Image key={activeStep} src={cms.steps[activeStep].image || STEP_IMAGES[activeStep] || STEP_IMAGES[0]} alt={cms.steps[activeStep].title} fill className="object-cover animate-fadeIn" priority />}
+                    <div className="relative flex flex-1 rounded-[2rem] overflow-hidden bg-white shadow-sm" style={{ height: 'auto', minHeight: '500px' }}>
+                        {cms.steps[activeStep] && <Image key={activeStep} src={cms.steps[activeStep].image || STEP_IMAGES[activeStep] || STEP_IMAGES[0]} alt={cms.steps[activeStep].title} fill className="object-cover animate-fadeIn" priority unoptimized />}
                     </div>
                 </div>
             </div>

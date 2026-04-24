@@ -250,10 +250,12 @@ const DEFAULTS = {
     testimonialSectionSubtitle: "Real experiences from innovators, businesses, and creators powering their ambitions with IndianRentals.",
     testimonialGoogleReviewCount: "5000+",
     testimonialGoogleRating: "4.9",
+    whyChooseUsEnabled: true,
     whyChooseUsTitle: "Why Choose Us?",
     whyChooseUsSubtitle: "",
     whyChooseUsImage: "",
     statsDevices: "90k+", statsCustomers: "30k+", statsCities: "401+",
+    clientSectionEnabled: true, clientSectionTitle: "Trusted By", clientLogos: [],
     featuredShowcaseEnabled: true,
     featuredShowcaseProductIds: [],
     featuredShowcaseBanners: [
@@ -306,6 +308,8 @@ export default function CMSHomepage() {
                 if (!d.rentalProcessSteps || d.rentalProcessSteps.length === 0) {
                     d.rentalProcessSteps = DEFAULTS.rentalProcessSteps;
                 }
+                if (d.whyChooseUsEnabled === undefined) d.whyChooseUsEnabled = true;
+                if (d.clientSectionEnabled === undefined) d.clientSectionEnabled = true;
                 setData({ ...DEFAULTS, ...d });
             }
         } catch (err) { console.error(err); }
@@ -727,7 +731,7 @@ export default function CMSHomepage() {
                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                             <div className="space-y-3">
                                                 <Field label="Title" value={step.title} onChange={v => { const n = [...data.rentalProcessSteps]; n[idx].title = v; set("rentalProcessSteps", n); }} />
-                                                <Field label="Icon Name (e.g. Laptop)" value={step.icon} onChange={v => { const n = [...data.rentalProcessSteps]; n[idx].icon = v; set("rentalProcessSteps", n); }} placeholder="Laptop" />
+                                                <Field label="Icon (e.g. Laptop, Package, ShoppingCart OR Image URL)" value={step.icon} onChange={v => { const n = [...data.rentalProcessSteps]; n[idx].icon = v; set("rentalProcessSteps", n); }} placeholder="Laptop" />
                                                 <Field label="Target Link (URL)" value={step.link || ""} onChange={v => { const n = [...data.rentalProcessSteps]; n[idx].link = v; set("rentalProcessSteps", n); }} placeholder="/categories/laptops" />
                                                 <ImageUploader label="Step Illustration" existingUrl={step.image} onUpload={url => { const n = [...data.rentalProcessSteps]; n[idx].image = url; set("rentalProcessSteps", n); }} />
                                             </div>
@@ -767,6 +771,9 @@ export default function CMSHomepage() {
                         <SectionRow
                             icon={<ShieldCheck weight="fill" className="text-blue-500" />}
                             title="Why Choose Us Block"
+                            desc="Show or hide the 'Why Choose Us' section on the homepage."
+                            toggle={data.whyChooseUsEnabled}
+                            onToggle={v => set("whyChooseUsEnabled", v)}
                         />
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                             <div className="space-y-4">
@@ -780,6 +787,38 @@ export default function CMSHomepage() {
                             </div>
                             <div>
                                 <ImageUploader label="Corporate Image" existingUrl={data.whyChooseUsImage} onUpload={url => set("whyChooseUsImage", url)} />
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Client Logos */}
+                    <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 shadow-sm space-y-6">
+                        <div className="flex justify-between items-center border-b border-slate-100 dark:border-slate-800 pb-4">
+                            <SectionRow
+                                icon={<Layout weight="fill" className="text-pink-500" />}
+                                title="Client Logos (Trusted By)"
+                                desc="Show or hide the infinite scrolling client logos section."
+                                toggle={data.clientSectionEnabled}
+                                onToggle={v => set("clientSectionEnabled", v)}
+                            />
+                        </div>
+                        <Field label="Section Title" value={data.clientSectionTitle} onChange={v => set("clientSectionTitle", v)} placeholder="e.g. Trusted By" />
+                        
+                        <div className="space-y-4">
+                            <label className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider block">Client Logos</label>
+                            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
+                                {(data.clientLogos || []).map((logo, idx) => (
+                                    <div key={idx} className="relative group rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 p-2 flex items-center justify-center aspect-video">
+                                        <img src={logo} className="max-w-full max-h-full object-contain grayscale opacity-60 hover:grayscale-0 hover:opacity-100 transition-all" alt="Client Logo" />
+                                        <button onClick={() => { const n = [...data.clientLogos]; n.splice(idx, 1); set("clientLogos", n); }}
+                                            className="absolute -top-2 -right-2 bg-red-500 text-white w-6 h-6 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                                            ×
+                                        </button>
+                                    </div>
+                                ))}
+                                <div className="col-span-2 md:col-span-2 lg:col-span-2">
+                                    <ImageUploader label="Upload New Logo" existingUrl="" onUpload={url => { if(url) set("clientLogos", [...(data.clientLogos || []), url]) }} />
+                                </div>
                             </div>
                         </div>
                     </div>

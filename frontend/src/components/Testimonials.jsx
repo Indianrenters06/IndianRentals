@@ -70,7 +70,7 @@ const Testimonials = ({ overrideBg, overridePadding, overrideHeight }) => {
                 });
                 setReviewsData(processed);
             } catch (error) {
-                console.error("Failed to fetch testimonials", error);
+                console.warn("Failed to fetch testimonials - using static data");
                 setReviewsData(staticReviews);
             } finally {
                 setLoading(false);

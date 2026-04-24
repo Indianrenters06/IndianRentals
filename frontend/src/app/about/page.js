@@ -49,7 +49,7 @@ export default function AboutPage() {
     const [c, setC] = useState(D); // c = merged CMS data
 
     useEffect(() => {
-        fetch(`${API}/api/cms/about`)
+        window.fetch(`${API}/api/cms/about?t=${Date.now()}`)
             .then(r => r.ok ? r.json() : null)
             .then(d => { if (d) setC(merge(d)); })
             .catch(() => { });
@@ -149,7 +149,7 @@ export default function AboutPage() {
             </section>
 
             {/* ── 4. Why Choose Us ──────────────────────────────────────────── */}
-            <WhyChooseUs />
+            <WhyChooseUs cmsData={c} />
 
             {/* ── 5. FAQ ────────────────────────────────────────────────────── */}
             <FaqSection />

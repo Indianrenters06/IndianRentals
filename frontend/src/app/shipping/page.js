@@ -17,7 +17,7 @@ export default function ShippingPage() {
     const [cms, setCms] = useState(null);
     const [loading, setLoading] = useState(true);
     useEffect(() => {
-        fetch(`${API}/api/cms/shipping`)
+        window.fetch(`${API}/api/cms/shipping?t=${Date.now()}`)
             .then(r => r.ok ? r.json() : null)
             .then(d => { setCms(d); setLoading(false); })
             .catch(() => setLoading(false));

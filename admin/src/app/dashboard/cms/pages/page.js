@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback, useRef } from 'react';
+import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Chip, Spinner } from '@heroui/react';
 import {
@@ -17,19 +18,21 @@ const API = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
 const getToken = () => typeof window !== 'undefined' ? localStorage.getItem('adminToken') : null;
 
 const PAGES = [
-    { key: 'about',          label: 'About Us',                   slug: '/about' },
-    { key: 'rental-process', label: 'Rental Process',             slug: '/rental-process' },
-    { key: 'terms',          label: 'Terms & Conditions',         slug: '/terms' },
+    { key: 'about',          label: 'About Us',                   slug: '/about',          specialized: true },
+    { key: 'rental-process', label: 'Rental Process',             slug: '/rental-process', specialized: true },
+    { key: 'terms',          label: 'Rental Terms',               slug: '/terms' },
     { key: 'privacy',        label: 'Privacy Policy',             slug: '/privacy' },
+    { key: 'kyc-policy',     label: 'KYC Policy',                 slug: '/kyc-policy' },
     { key: 'shipping',       label: 'Shipping & Delivery',        slug: '/shipping' },
-    { key: 'refund',         label: 'Cancellation & Refund',      slug: '/refund-policy' },
-    { key: 'faq',            label: 'FAQ / Help Center',          slug: '/faq' },
-    { key: 'contact',        label: 'Contact Us',                 slug: '/contact' },
+    { key: 'refund',         label: 'Return & Refund Policy',     slug: '/refund-policy' },
+    { key: 'faq',            label: 'FAQ / Help Center',          slug: '/faq',            specialized: true },
+    { key: 'contact',        label: 'Contact Us',                 slug: '/contact',        specialized: true },
 ];
 
 const PAGE_ICONS = {
     'about': '🏢', 'rental-process': '🔄', 'terms': '📋',
     'privacy': '🔒', 'shipping': '🚚', 'refund': '↩️', 'faq': '❓', 'contact': '📞',
+    'kyc-policy': '🆔',
 };
 
 const DEFAULTS = {
@@ -199,7 +202,7 @@ function PageEditor({ page, onBack }) {
     const fetch_ = useCallback(async () => {
         try {
             setLoading(true);
-            const res = await fetch(`${API}/api/cms/${page.key}`);
+            const res = await window.fetch(`${API}/api/cms/${page.key}?t=${Date.now()}`);
             if (res.ok) setData({ ...DEFAULTS, ...(await res.json()) });
         } catch (e) { console.error(e); }
         finally { setLoading(false); }
@@ -210,7 +213,7 @@ function PageEditor({ page, onBack }) {
     const save = async () => {
         try {
             setSaving(true);
-            const res = await fetch(`${API}/api/cms/${page.key}`, {
+            const res = await window.fetch(`${API}/api/cms/${page.key}`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${getToken()}` },
                 body: JSON.stringify(data),
@@ -348,6 +351,7 @@ function PageEditor({ page, onBack }) {
 
 // ── Pages List ─────────────────────────────────────────────────────────────────
 export default function StaticPages() {
+    const router = useRouter();
     const [selected, setSelected] = useState(null);
     const [statuses, setStatuses] = useState({});
     const [loading, setLoading] = useState(true);
@@ -355,16 +359,27 @@ export default function StaticPages() {
     const fetchStatuses = useCallback(async () => {
         try {
             setLoading(true);
-            const res = await fetch(`${API}/api/cms`, { headers: { Authorization: `Bearer ${getToken()}` } });
+            const token = getToken();
+            if (!token) {
+                router.replace('/login');
+                return;
+            }
+            const res = await window.fetch(`${API}/api/cms?t=${Date.now()}`, { headers: { Authorization: `Bearer ${token}` } });
+            if (res.status === 401) {
+                // Token expired — clear it and redirect to login
+                localStorage.removeItem('adminToken');
+                router.replace('/login');
+                return;
+            }
             if (res.ok) {
                 const list = await res.json();
                 const map = {};
                 list.forEach(p => { map[p.pageName] = p; });
                 setStatuses(map);
             }
-        } catch (e) { console.error(e); }
+        } catch (e) { console.error('CMS fetch error:', e); }
         finally { setLoading(false); }
-    }, []);
+    }, [router]);
 
     useEffect(() => { fetchStatuses(); }, [fetchStatuses]);
 
@@ -403,7 +418,13 @@ export default function StaticPages() {
                                     return (
                                         <motion.div key={page.key} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }}>
                                             <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:border-indigo-400/50 rounded-2xl transition-all duration-200 shadow-sm group cursor-pointer"
-                                                onClick={() => setSelected(page.key)}>
+                                                onClick={() => {
+                                                    if (page.specialized) {
+                                                        router.push(`/dashboard/cms/${page.key}`);
+                                                    } else {
+                                                        setSelected(page.key);
+                                                    }
+                                                }}>
                                                 <div className="p-5 flex flex-row items-center gap-4">
                                                     <div className="w-12 h-12 rounded-xl bg-indigo-50 dark:bg-indigo-500/10 flex items-center justify-center text-2xl shrink-0">
                                                         {PAGE_ICONS[page.key] || '📄'}

@@ -23,7 +23,7 @@ export default function PrivacyPage() {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        fetch(`${API}/api/cms/privacy`)
+        window.fetch(`${API}/api/cms/privacy?t=${Date.now()}`)
             .then(r => r.ok ? r.json() : null)
             .then(d => { setCms(d); setLoading(false); })
             .catch(() => setLoading(false));

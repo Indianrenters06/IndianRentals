@@ -1,7 +1,7 @@
 const asyncHandler = require('express-async-handler');
 const CMS = require('../models/CMS');
 
-const ALLOWED_PAGES = ['homepage', 'about', 'terms', 'privacy', 'contact', 'shipping', 'refund', 'faq', 'rental-process'];
+const ALLOWED_PAGES = ['homepage', 'about', 'terms', 'privacy', 'contact', 'shipping', 'refund', 'faq', 'rental-process', 'kyc-policy'];
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 const getOrCreatePage = async (pageName) => {
@@ -16,7 +16,9 @@ const getOrCreatePage = async (pageName) => {
 // ── @route  GET /api/cms
 // ── @access Public
 const getAllPages = asyncHandler(async (req, res) => {
+    console.log('GET /api/cms - Fetching all pages');
     const pages = await CMS.find({}).lean();
+    console.log(`Found ${pages.length} pages in DB`);
 
     // Ensure all known pages exist in the response
     const result = await Promise.all(
@@ -69,7 +71,7 @@ const updatePage = asyncHandler(async (req, res) => {
         'testimonialsEnabled', 'testimonialSectionTitle', 'testimonialSectionSubtitle', 'testimonialGoogleReviewCount', 'testimonialGoogleRating',
 
         // Why Choose Us
-        'whyChooseUsTitle', 'whyChooseUsSubtitle', 'whyChooseUsImage',
+        'whyChooseUsEnabled', 'whyChooseUsTitle', 'whyChooseUsSubtitle', 'whyChooseUsImage',
 
         // Stats
         'statsDevices', 'statsCustomers', 'statsCities',
@@ -86,6 +88,23 @@ const updatePage = asyncHandler(async (req, res) => {
 
         // Generic Info
         'pageContent', 'bannerImage', 'bannerTitle',
+
+        // About Us specific fields
+        'aboutStoryTitle', 'aboutStoryPara1', 'aboutStoryPara2', 'aboutStoryImage',
+        'aboutStat1Value', 'aboutStat1Label', 'aboutStat2Value', 'aboutStat2Label',
+        'aboutVisionTabLabel', 'aboutVision1Title', 'aboutVision1Text', 'aboutVision2Title', 'aboutVision2Text', 'aboutVision3Title', 'aboutVision3Text',
+        'aboutMissionTabLabel', 'aboutMission1Title', 'aboutMission1Text', 'aboutMission2Title', 'aboutMission2Text', 'aboutMission3Title', 'aboutMission3Text',
+        'aboutWhyTitle', 'aboutWhyText', 'aboutWhyImage',
+        'aboutWhyStat1Value', 'aboutWhyStat1Label', 'aboutWhyStat2Value', 'aboutWhyStat2Label', 'aboutWhyStat3Value', 'aboutWhyStat3Label',
+
+        // FAQ Page
+        'faqTitle', 'faqSubtitle', 'faqItems',
+
+        // Rental Process Page Features
+        'rentalFeaturesTitle', 'rentalFeaturesSubtitle', 'rentalFeatures',
+
+        // Contact Page
+        'contactTitle', 'contactSubtitle', 'contactEmail', 'contactPhone', 'contactAddress', 'contactMapUrl', 'contactWhatsApp',
 
         // SEO
         'metaTitle', 'metaDescription', 'publishStatus', 'scheduledPublishTime',

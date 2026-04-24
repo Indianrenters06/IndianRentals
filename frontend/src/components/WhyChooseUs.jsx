@@ -1,11 +1,12 @@
+"use client";
 import React, { useEffect, useState } from 'react';
 import Image from 'next/image';
 
 import { API } from '@/services/apiConfig';
 
-const WhyChooseUs = () => {
-    const [cms, setCms] = useState(null);
-    const [loading, setLoading] = useState(true);
+const WhyChooseUs = ({ cmsData = null, overrideBg, overridePaddingTop, hideBorder }) => {
+    const [cms, setCms] = useState(cmsData || null);
+    const [loading, setLoading] = useState(!cmsData);
     const [viewType, setViewType] = useState('mobile');
 
     useEffect(() => {
@@ -21,31 +22,40 @@ const WhyChooseUs = () => {
     }, []);
 
     useEffect(() => {
+        if (cmsData) {
+            setCms(cmsData);
+            setLoading(false);
+            return;
+        }
         fetch(`${API}/api/cms/homepage`)
             .then(res => res.ok ? res.json() : null)
             .then(data => { setCms(data); setLoading(false); })
             .catch(() => setLoading(false));
-    }, []);
+    }, [cmsData]);
 
-    const title = cms?.whyChooseUsTitle || "Why Choose Us?";
-    const subtitle = cms?.whyChooseUsSubtitle || "Join thousands who've switched to the flexible, affordable way to access high-end tech. IndianRenters delivers AI-ready workstations, laptops, and IT gear with zero ownership hassle and instant support.";
-    const image = cms?.whyChooseUsImage || "https://res.cloudinary.com/dgkckcdk8/image/upload/v1769961565/indian-rentals/anmpufdlxxxblkxqxpds.jpg";
+    // Handle both Homepage and About page field mappings
+    const title = cms?.aboutWhyTitle || cms?.whyChooseUsTitle || "Why Choose Us?";
+    const subtitle = cms?.aboutWhyText || cms?.whyChooseUsSubtitle || "Join thousands who've switched to the flexible, affordable way to access high-end tech. IndianRenters delivers AI-ready workstations, laptops, and IT gear with zero ownership hassle and instant support.";
+    const image = cms?.aboutWhyImage || cms?.whyChooseUsImage || "https://res.cloudinary.com/dgkckcdk8/image/upload/v1769961565/indian-rentals/anmpufdlxxxblkxqxpds.jpg";
+    
     const stats = [
-        { label: "Devices in Stock", value: cms?.statsDevices || "90k+" },
-        { label: "Happy Customers", value: cms?.statsCustomers || "30k+" },
-        { label: "Cities Covered", value: cms?.statsCities || "401+" },
+        { label: cms?.aboutWhyStat1Label || cms?.statsDevicesLabel || "Devices in Stock", value: cms?.aboutWhyStat1Value || cms?.statsDevices || "90k+" },
+        { label: cms?.aboutWhyStat2Label || cms?.statsCustomersLabel || "Happy Customers", value: cms?.aboutWhyStat2Value || cms?.statsCustomers || "30k+" },
+        { label: cms?.aboutWhyStat3Label || cms?.statsCitiesLabel || "Cities Covered", value: cms?.aboutWhyStat3Value || cms?.statsCities || "401+" },
     ];
 
     if (loading) return <div className="h-96 w-full animate-pulse bg-slate-50 rounded-3xl" />;
+
+    if (cms && cms.whyChooseUsEnabled === false) return null;
 
     return (
         <section
             className="overflow-hidden"
             style={{
-                paddingTop: viewType !== 'mobile' ? '80px' : '48px',
+                paddingTop: overridePaddingTop || (viewType !== 'mobile' ? '80px' : '48px'),
                 paddingBottom: viewType !== 'mobile' ? '80px' : '48px',
-                background: viewType !== 'mobile' ? 'var(--color-orange-orange-50, hsla(44, 100%, 96%, 1))' : '#FFFDF7',
-                borderBottom: viewType !== 'mobile' ? '1px solid var(--color-grey-grey-200, hsla(0, 0%, 89%, 1))' : 'none'
+                background: overrideBg || (viewType !== 'mobile' ? 'var(--color-orange-orange-50, hsla(44, 100%, 96%, 1))' : '#FFFDF7'),
+                borderBottom: hideBorder ? 'none' : (viewType !== 'mobile' ? '1px solid var(--color-grey-grey-200, hsla(0, 0%, 89%, 1))' : 'none')
             }}
         >
             <div className={`max-w-[1200px] mx-auto ${viewType === 'tablet' ? 'px-8' : 'px-4 sm:px-6'}`}>

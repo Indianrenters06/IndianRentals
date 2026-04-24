@@ -1,5 +1,5 @@
 "use client";
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
@@ -8,18 +8,18 @@ import { FaArrowRight } from 'react-icons/fa';
 const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
 
 const FeatureSection = () => {
-    const [isDesktop, setIsDesktop] = React.useState(false);
-    const [cms, setCms] = React.useState(null);
-    const [loading, setLoading] = React.useState(true);
+    const [isDesktop, setIsDesktop] = useState(false);
+    const [cms, setCms] = useState(null);
+    const [loading, setLoading] = useState(true);
 
-    React.useEffect(() => {
+    useEffect(() => {
         const checkRes = () => setIsDesktop(window.innerWidth >= 1024);
         checkRes();
         window.addEventListener('resize', checkRes);
         return () => window.removeEventListener('resize', checkRes);
     }, []);
 
-    React.useEffect(() => {
+    useEffect(() => {
         const fetchCMS = async () => {
             try {
                 const res = await fetch(`${API}/api/cms/homepage`, { cache: 'no-store' });

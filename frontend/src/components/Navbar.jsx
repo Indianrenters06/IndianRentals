@@ -154,7 +154,7 @@ const Navbar = () => {
         // Optionally dispatch a custom event if other components need to know
     };
 
-    const navLinks = [
+    const navLinks = settings?.navbarLinks?.length > 0 ? settings.navbarLinks : [
         { name: "Apple Products", href: "/category/apple" },
         { name: "IT Products", href: "/category/it-products" },
         { name: "AV Products", href: "/category/av-products" },
@@ -181,7 +181,7 @@ const Navbar = () => {
         }
     };
 
-    const announcements = [
+    const announcements = settings?.navbarAnnouncements?.length > 0 ? settings.navbarAnnouncements : [
         "♥ SAVE Extra 5% up to ₹100 on UPI Orders ♥",
         "♥ Free Delivery on orders above ₹500 ♥",
         "♥ Use code FIRSTRENT for 10% off your first month ♥"
