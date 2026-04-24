@@ -10,14 +10,17 @@ export const metadata = {
 };
 
 import ClientLayout from "@/components/ClientLayout";
+import Providers from "@/components/Providers";
 
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <body className={`font-sans bg-gray-50 flex flex-col min-h-screen antialiased overflow-x-hidden max-w-full`}>
-        <ClientLayout>
-          {children}
-        </ClientLayout>
+        <Providers>
+          <ClientLayout>
+            {children}
+          </ClientLayout>
+        </Providers>
       </body>
     </html>
   );
