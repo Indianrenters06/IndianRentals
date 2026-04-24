@@ -3,28 +3,14 @@
 import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import TestimonialsBase from '@/components/Testimonials';
-import WhyChooseUsBase from '@/components/WhyChooseUs';
+import Testimonials from '@/components/Testimonials';
+import WhyChooseUs from '@/components/WhyChooseUs';
 import RentalProcess from '@/components/RentalProcess';
-
-// Cast JSX components to accept custom override props in this TSX page
-const WhyChooseUs = WhyChooseUsBase as React.ComponentType<{
-    cmsData?: any;
-    overrideBg?: string;
-    overridePaddingTop?: string;
-    hideBorder?: boolean;
-}>;
-const Testimonials = TestimonialsBase as React.ComponentType<{
-    cmsData?: any;
-    overrideBg?: string;
-    overridePadding?: string;
-    overrideHeight?: string;
-}>;
 
 const API = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
 
 export default function RentalProcessPage() {
-    const [cms, setCms] = useState<any>(null);
+    const [cms, setCms] = useState(null);
     useEffect(() => {
         fetch(`${API}/api/cms/rental-process`)
             .then(r => r.ok ? r.json() : null)
@@ -114,7 +100,7 @@ export default function RentalProcessPage() {
                             margin: '0 auto'
                         }}
                     >
-                        {displayFeatures.map((f: any, i: number) => (
+                        {displayFeatures.map((f, i) => (
                             <div 
                                 key={i}
                                 className="flex flex-col items-center justify-center text-center p-[10px_45px] border-slate-200"
