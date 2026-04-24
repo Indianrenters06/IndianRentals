@@ -35,7 +35,7 @@ const categorySchema = new mongoose.Schema({
 });
 
 // Auto-generate slug from name before saving
-categorySchema.pre('save', function (next) {
+categorySchema.pre('save', async function () {
     if (this.isModified('name') || !this.slug) {
         this.slug = this.name
             .toLowerCase()
@@ -43,7 +43,6 @@ categorySchema.pre('save', function (next) {
             .replace(/[^a-z0-9\s-]/g, '')
             .replace(/\s+/g, '-');
     }
-    next();
 });
 
 // Compound unique index: name must be unique within the same parent
