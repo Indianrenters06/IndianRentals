@@ -3,9 +3,23 @@
 import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import Testimonials from '@/components/Testimonials';
-import WhyChooseUs from '@/components/WhyChooseUs';
+import TestimonialsBase from '@/components/Testimonials';
+import WhyChooseUsBase from '@/components/WhyChooseUs';
 import RentalProcess from '@/components/RentalProcess';
+
+// Cast JSX components to accept custom override props in this TSX page
+const WhyChooseUs = WhyChooseUsBase as React.ComponentType<{
+    cmsData?: any;
+    overrideBg?: string;
+    overridePaddingTop?: string;
+    hideBorder?: boolean;
+}>;
+const Testimonials = TestimonialsBase as React.ComponentType<{
+    cmsData?: any;
+    overrideBg?: string;
+    overridePadding?: string;
+    overrideHeight?: string;
+}>;
 
 const API = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
 
