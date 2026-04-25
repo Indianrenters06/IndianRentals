@@ -14,9 +14,8 @@ import {
     ArrowClockwise, FunnelSimple
 } from "@phosphor-icons/react";
 
-const ENV_API = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:5000";
-const API = ENV_API.replace('localhost', '127.0.0.1');
-const FRONTEND = process.env.NEXT_PUBLIC_FRONTEND_URL || "http://127.0.0.1:3001";
+const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+const FRONTEND = process.env.NEXT_PUBLIC_FRONTEND_URL || "http://localhost:3001";
 const getToken = () => localStorage.getItem("adminToken");
 
 const getImageUrl = (path) => {

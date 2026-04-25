@@ -179,6 +179,24 @@ const cmsSchema = new mongoose.Schema({
     // ── Generic rich page content ─────────────────────────────────────────────
     pageContent: { type: String, default: '' },
     
+    // ── Categories Page ───────────────────────────────────────────────────────
+    categoriesPageTitle: { type: String, default: 'All Categories' },
+    categoriesPageSubtitle: { type: String, default: 'Lorem ipsum dolor sit amet consectetur. Vel libero cras laoreet ut dignissim eget. Scelerisque mauris pharetra tristique cras sit malesuada. Egestas pulvinar interdum sapien et. Consequat neque at donec turpis leo. Quis at.' },
+    categoriesGrid: {
+        type: [{
+            title: String,
+            image: String,
+            href: String
+        }],
+        default: [
+            { title: "Apple Products", image: "/macbook-pro-new.jpg", href: "/category/apple" },
+            { title: "IT Products", image: "/it-products-new.jpg", href: "/category/it-products" },
+            { title: "AV Products", image: "/it-products-new.jpg", href: "/category/av-products" },
+            { title: "Office Equipment", image: "/office-equipment-new.jpg", href: "/category/office-equipment" },
+            { title: "DSLR Cameras", image: "https://res.cloudinary.com/dgkckcdk8/image/upload/v1769967871/indian-rentals/ea5ryxbvie8spmdb9slz.jpg", href: "/category/dslr" }
+        ]
+    },
+
     // ── FAQ Page ──────────────────────────────────────────────────────────────
     faqTitle: { type: String, default: 'FAQs' },
     faqSubtitle: { type: String, default: 'Everything you need to know about renting with IndianRenters.com' },

@@ -8,7 +8,8 @@ import {
     Modal, ModalContent, ModalHeader, ModalBody, ModalFooter,
     useDisclosure, Input, Textarea, Avatar
 } from "@heroui/react";
-import { Plus, SquaresFour, Trash, PencilSimple, Folder, Image } from "@phosphor-icons/react";
+import { Plus, SquaresFour, Trash, PencilSimple, Folder, Image, FloppyDisk } from "@phosphor-icons/react";
+import ImageUploader from "@/components/ImageUploader";
 
 export default function SubcategoriesManagement() {
     const { isOpen, onOpen, onOpenChange } = useDisclosure();
@@ -16,6 +17,8 @@ export default function SubcategoriesManagement() {
     const [subcategories, setSubcategories] = useState([]);
     const [loading, setLoading] = useState(true);
     const [selectedParent, setSelectedParent] = useState("");
+    const [isEdit, setIsEdit] = useState(false);
+    const [selectedSubId, setSelectedSubId] = useState(null);
     const [formData, setFormData] = useState({
         name: "",
         description: "",
@@ -25,7 +28,7 @@ export default function SubcategoriesManagement() {
 
     const fetchCategories = async () => {
         try {
-            const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000"}/api/categories`);
+            const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:5000"}/api/categories`);
             if (res.ok) {
                 const data = await res.json();
                 const cats = Array.isArray(data) ? data : data.categories || [];
@@ -43,7 +46,7 @@ export default function SubcategoriesManagement() {
         if (!parentId) return;
         try {
             setLoading(true);
-            const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000"}/api/categories/${parentId}/subcategories`);
+            const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:5000"}/api/categories/${parentId}/subcategories`);
             if (res.ok) {
                 const data = await res.json();
                 setSubcategories(Array.isArray(data) ? data : data.subcategories || []);
@@ -68,7 +71,7 @@ export default function SubcategoriesManagement() {
     const handleCreateSubcategory = async (onClose) => {
         try {
             const token = localStorage.getItem("adminToken");
-            const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000"}/api/categories/${formData.parentCategory}/subcategories`, {
+            const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:5000"}/api/categories/${formData.parentCategory}/subcategories`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -87,7 +90,7 @@ export default function SubcategoriesManagement() {
             }
 
             alert("Subcategory created successfully!");
-            setFormData({ name: "", description: "", image: "", parentCategory: "" });
+            resetForm();
             onClose();
             if (formData.parentCategory === selectedParent) {
                 fetchSubcategories(selectedParent);
@@ -97,6 +100,55 @@ export default function SubcategoriesManagement() {
         } catch (err) {
             alert(err.message);
         }
+    };
+
+    const handleUpdateSubcategory = async (onClose) => {
+        try {
+            const token = localStorage.getItem("adminToken");
+            const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:5000"}/api/categories/${selectedSubId}`, {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${token}`
+                },
+                body: JSON.stringify({
+                    name: formData.name,
+                    description: formData.description,
+                    image: formData.image
+                    // We don't change parent for now as the API might not support re-parenting easily without checking
+                })
+            });
+
+            if (!res.ok) {
+                const errData = await res.json();
+                throw new Error(errData.message || "Failed to update subcategory");
+            }
+
+            alert("Subcategory updated successfully!");
+            resetForm();
+            onClose();
+            fetchSubcategories(selectedParent);
+        } catch (err) {
+            alert(err.message);
+        }
+    };
+
+    const resetForm = () => {
+        setFormData({ name: "", description: "", image: "", parentCategory: "" });
+        setIsEdit(false);
+        setSelectedSubId(null);
+    };
+
+    const openEditModal = (sub) => {
+        setFormData({
+            name: sub.name,
+            description: sub.description || "",
+            image: sub.image || "",
+            parentCategory: selectedParent // Subcategories in the table are already under selectedParent
+        });
+        setSelectedSubId(sub._id);
+        setIsEdit(true);
+        onOpen();
     };
 
     const handleDelete = async (subId) => {
@@ -119,6 +171,7 @@ export default function SubcategoriesManagement() {
                 <button
                     type="button"
                     onClick={() => {
+                        resetForm();
                         setFormData(prev => ({ ...prev, parentCategory: selectedParent }));
                         onOpen();
                     }}
@@ -177,7 +230,7 @@ export default function SubcategoriesManagement() {
                                     </TableCell>
                                     <TableCell>
                                         <div className="flex justify-center gap-2">
-                                            <Button isIconOnly size="sm" variant="light"><PencilSimple /></Button>
+                                            <Button isIconOnly size="sm" variant="light" onPress={() => openEditModal(sub)}><PencilSimple /></Button>
                                             <Button isIconOnly size="sm" variant="light" color="danger" onPress={() => handleDelete(sub._id)}><Trash /></Button>
                                         </div>
                                     </TableCell>
@@ -192,7 +245,7 @@ export default function SubcategoriesManagement() {
                 <ModalContent>
                     {(onClose) => (
                         <>
-                            <ModalHeader className="flex flex-col gap-1">Add Subcategory</ModalHeader>
+                            <ModalHeader className="flex flex-col gap-1">{isEdit ? "Edit Subcategory" : "Add Subcategory"}</ModalHeader>
                             <ModalBody className="space-y-4">
                                 <Select
                                     label="Parent Category"
@@ -222,22 +275,22 @@ export default function SubcategoriesManagement() {
                                     onValueChange={(val) => setFormData(prev => ({ ...prev, description: val }))}
                                 />
                                 <div>
-                                    <label className="text-sm font-medium text-slate-700 dark:text-slate-300 block mb-1.5">Image URL</label>
-                                    <div className="relative">
-                                        <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"><Image size={15} /></span>
-                                        <input
-                                            type="url"
-                                            value={formData.image}
-                                            onChange={e => setFormData(prev => ({ ...prev, image: e.target.value }))}
-                                            placeholder="Cloudinary URL"
-                                            className="w-full h-10 pl-8 pr-3 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 transition-all"
-                                        />
-                                    </div>
+                                    <ImageUploader
+                                        label="Subcategory Icon / Image"
+                                        existingUrl={formData.image}
+                                        onUpload={(url) => setFormData(prev => ({ ...prev, image: url }))}
+                                    />
                                 </div>
                             </ModalBody>
                             <ModalFooter>
-                                <Button color="danger" variant="flat" onPress={onClose}>Cancel</Button>
-                                <Button color="primary" className="bg-indigo-600 font-bold" onPress={() => handleCreateSubcategory(onClose)}>Create</Button>
+                                <Button color="danger" variant="flat" onPress={() => { resetForm(); onClose(); }}>Cancel</Button>
+                                <Button
+                                    color="primary"
+                                    className="bg-indigo-600 font-bold"
+                                    onPress={() => isEdit ? handleUpdateSubcategory(onClose) : handleCreateSubcategory(onClose)}
+                                >
+                                    {isEdit ? "Update" : "Create"}
+                                </Button>
                             </ModalFooter>
                         </>
                     )}

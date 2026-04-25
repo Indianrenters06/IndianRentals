@@ -285,10 +285,20 @@ export default function EditProduct() {
                                         variant="bordered"
                                         selectedKeys={form.category ? [form.category] : []}
                                         onSelectionChange={keys => set("category", Array.from(keys)[0] || "")}
-                                        classNames={{ trigger: WRAPPER_CLS }}
+                                        classNames={{
+                                            trigger: WRAPPER_CLS,
+                                            value: "text-slate-900 dark:text-slate-100",
+                                        }}
+                                        popoverProps={{
+                                            classNames: {
+                                                content: "bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xl p-1",
+                                            }
+                                        }}
                                     >
                                         {categories.map(cat => (
-                                            <SelectItem key={cat._id} value={cat._id}>{cat.name}</SelectItem>
+                                            <SelectItem key={cat._id} textValue={cat.name} className="text-slate-900 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800">
+                                                {cat.name}
+                                            </SelectItem>
                                         ))}
                                     </Select>
                                 </div>
@@ -300,10 +310,20 @@ export default function EditProduct() {
                                         isDisabled={subcategories.length === 0}
                                         selectedKeys={form.subcategory ? [form.subcategory] : []}
                                         onSelectionChange={keys => set("subcategory", Array.from(keys)[0] || "")}
-                                        classNames={{ trigger: WRAPPER_CLS }}
+                                        classNames={{
+                                            trigger: WRAPPER_CLS,
+                                            value: "text-slate-900 dark:text-slate-100",
+                                        }}
+                                        popoverProps={{
+                                            classNames: {
+                                                content: "bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xl p-1",
+                                            }
+                                        }}
                                     >
                                         {subcategories.map(sub => (
-                                            <SelectItem key={sub._id} value={sub._id}>{sub.name}</SelectItem>
+                                            <SelectItem key={sub._id} textValue={sub.name} className="text-slate-900 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800">
+                                                {sub.name}
+                                            </SelectItem>
                                         ))}
                                     </Select>
                                 </div>
@@ -370,11 +390,19 @@ export default function EditProduct() {
                                         variant="bordered"
                                         selectedKeys={[form.condition]}
                                         onSelectionChange={keys => set("condition", Array.from(keys)[0] || "Good")}
-                                        classNames={{ trigger: WRAPPER_CLS }}
+                                        classNames={{
+                                            trigger: WRAPPER_CLS,
+                                            value: "text-slate-900 dark:text-slate-100",
+                                        }}
+                                        popoverProps={{
+                                            classNames: {
+                                                content: "bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xl p-1",
+                                            }
+                                        }}
                                     >
-                                        <SelectItem key="New">New</SelectItem>
-                                        <SelectItem key="Good">Good</SelectItem>
-                                        <SelectItem key="Fair">Fair</SelectItem>
+                                        <SelectItem key="New" textValue="New" className="text-slate-900 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800">New</SelectItem>
+                                        <SelectItem key="Good" textValue="Good" className="text-slate-900 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800">Good</SelectItem>
+                                        <SelectItem key="Fair" textValue="Fair" className="text-slate-900 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800">Fair</SelectItem>
                                     </Select>
                                 </div>
                             </div>

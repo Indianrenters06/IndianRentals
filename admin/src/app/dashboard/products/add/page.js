@@ -38,7 +38,8 @@ export default function AddProduct() {
     useEffect(() => {
         const fetchCategories = async () => {
             try {
-                const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000"}/api/categories`);
+                const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+                const res = await fetch(`${API}/api/categories`);
                 const data = await res.json();
                 setCategories(Array.isArray(data) ? data : data.categories || []);
             } catch (err) {
@@ -50,15 +51,16 @@ export default function AddProduct() {
 
     useEffect(() => {
         if (formData.category) {
-            const selectedCat = categories.find(c => c.name === formData.category || c._id === formData.category);
+            const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+            const selectedCat = categories.find(c => c._id === formData.category);
             if (selectedCat?._id) {
                 const fetchSubcats = async () => {
                     try {
-                        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000"}/api/categories/${selectedCat._id}/subcategories`);
+                        const res = await fetch(`${API}/api/categories/${selectedCat._id}/subcategories`);
                         const data = await res.json();
                         setSubcategories(Array.isArray(data) ? data : data.subcategories || []);
                     } catch (err) {
-                        console.error(err);
+                        console.error("Failed to fetch subcategories:", err);
                     }
                 };
                 fetchSubcats();
@@ -96,7 +98,8 @@ export default function AddProduct() {
                 isActive: formData.isActive,
             };
 
-            const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000"}/api/products`, {
+            const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+            const res = await fetch(`${API}/api/products`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token}` },
                 body: JSON.stringify(payload),

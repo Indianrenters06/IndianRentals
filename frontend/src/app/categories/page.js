@@ -6,69 +6,44 @@ import { motion } from "framer-motion";
 import { ArrowRight } from "@phosphor-icons/react";
 import { getCategories } from "../../services/categoryService";
 
-// Initial static structure — matches the design
-const initialCategories = [
-    {
-        id: 1,
-        title: "Apple Products",
-        defaultImage: "/macbook-pro-new.jpg",
-        href: "/category/apple"
-    },
-    {
-        id: 2,
-        title: "IT Products",
-        defaultImage: "/it-products-new.jpg",
-        href: "/category/it-products"
-    },
-    {
-        id: 3,
-        title: "AV Products",
-        defaultImage: "/it-products-new.jpg",
-        href: "/category/av-products"
-    },
-    {
-        id: 4,
-        title: "Office Equipment",
-        defaultImage: "/office-equipment-new.jpg",
-        href: "/category/office-equipment"
-    },
-    {
-        id: 5,
-        title: "DSLR Cameras",
-        defaultImage: "https://res.cloudinary.com/dgkckcdk8/image/upload/v1769967871/indian-rentals/ea5ryxbvie8spmdb9slz.jpg",
-        href: "/category/dslr"
-    }
-];
+// Initial static structure — fallback if CMS fails
+const defaultCMS = {
+    categoriesPageTitle: "All Categories",
+    categoriesPageSubtitle: "Lorem ipsum dolor sit amet consectetur. Vel libero cras laoreet ut dignissim eget. Scelerisque mauris pharetra tristique cras sit malesuada. Egestas pulvinar interdum sapien et. Consequat neque at donec turpis leo. Quis at.",
+    categoriesGrid: [
+        { id: 1, title: "Apple Products", image: "/macbook-pro-new.jpg", href: "/category/apple" },
+        { id: 2, title: "IT Products", image: "/it-products-new.jpg", href: "/category/it-products" },
+        { id: 3, title: "AV Products", image: "/it-products-new.jpg", href: "/category/av-products" },
+        { id: 4, title: "Office Equipment", image: "/office-equipment-new.jpg", href: "/category/office-equipment" },
+        { id: 5, title: "DSLR Cameras", image: "https://res.cloudinary.com/dgkckcdk8/image/upload/v1769967871/indian-rentals/ea5ryxbvie8spmdb9slz.jpg", href: "/category/dslr" }
+    ]
+};
 
 const CategoriesPage = () => {
-    const [categories, setCategories] = useState(
-        initialCategories.map(c => ({ ...c, image: c.defaultImage }))
-    );
+    const [cmsData, setCmsData] = useState(defaultCMS);
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        const fetchCategories = async () => {
+        const fetchCMS = async () => {
             try {
-                const backendCategories = await getCategories();
-
-                const merged = initialCategories.map(staticCat => {
-                    const found = backendCategories.find(bc =>
-                        bc.name.toLowerCase().includes(staticCat.title.toLowerCase().split(' ')[0]) ||
-                        (staticCat.title.includes('Camera') && bc.name.includes('Camera'))
-                    );
-                    if (found && found.image) {
-                        return { ...staticCat, image: found.image };
-                    }
-                    return { ...staticCat, image: staticCat.defaultImage };
-                });
-
-                setCategories(merged);
+                const API = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+                const res = await fetch(`${API}/api/cms/categories-page`);
+                if (res.ok) {
+                    const data = await res.json();
+                    setCmsData(prev => ({
+                        categoriesPageTitle: data.categoriesPageTitle || prev.categoriesPageTitle,
+                        categoriesPageSubtitle: data.categoriesPageSubtitle || prev.categoriesPageSubtitle,
+                        categoriesGrid: data.categoriesGrid && data.categoriesGrid.length > 0 ? data.categoriesGrid : prev.categoriesGrid,
+                    }));
+                }
             } catch (error) {
-                console.error("Failed to fetch categories", error);
-                setCategories(initialCategories.map(c => ({ ...c, image: c.defaultImage })));
+                console.error("Failed to fetch CMS categories page", error);
+            } finally {
+                setLoading(false);
             }
         };
 
-        fetchCategories();
+        fetchCMS();
     }, []);
 
     return (
@@ -136,7 +111,7 @@ const CategoriesPage = () => {
                             maxWidth: "1200px"
                         }}
                     >
-                        All Categories
+                        {cmsData.categoriesPageTitle}
                     </motion.h1>
 
                     <motion.p
@@ -153,15 +128,15 @@ const CategoriesPage = () => {
                             maxWidth: "1200px"
                         }}
                     >
-                        Lorem ipsum dolor sit amet consectetur. Vel libero cras laoreet ut dignissim eget. Scelerisque mauris pharetra tristique cras sit malesuada. Egestas pulvinar interdum sapien et. Consequat neque at donec turpis leo. Quis at.
+                        {cmsData.categoriesPageSubtitle}
                     </motion.p>
                 </div>
 
                 {/* Category Grid */}
                 <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-3 gap-[24px] w-full max-w-[1200px]">
-                    {categories.map((category, index) => (
+                    {cmsData.categoriesGrid.map((category, index) => (
                         <motion.div
-                            key={category.id}
+                            key={index}
                             initial={{ opacity: 0, y: 30 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: index * 0.08 + 0.1 }}
