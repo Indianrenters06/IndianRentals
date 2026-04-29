@@ -101,6 +101,13 @@ const createProduct = asyncHandler(async (req, res) => {
         condition,
         city,
         state,
+        returnPolicy,
+        shippingPolicy,
+        mrp,
+        deliveryTime,
+        benefits,
+        specifications,
+        faqs,
     } = req.body;
 
     // Check if category exists, if not create it
@@ -129,6 +136,13 @@ const createProduct = asyncHandler(async (req, res) => {
         condition,
         city,
         state,
+        returnPolicy,
+        shippingPolicy,
+        mrp,
+        deliveryTime,
+        benefits,
+        specifications,
+        faqs: Array.isArray(faqs) ? faqs : [],
     });
 
     const createdProduct = await product.save();
@@ -154,6 +168,13 @@ const updateProduct = asyncHandler(async (req, res) => {
         isActive,
         city,
         state,
+        returnPolicy,
+        shippingPolicy,
+        mrp,
+        deliveryTime,
+        benefits,
+        specifications,
+        faqs,
     } = req.body;
 
     const product = await Product.findById(req.params.id);
@@ -187,11 +208,20 @@ const updateProduct = asyncHandler(async (req, res) => {
 
         product.rentalPrice = rentalPrice || product.rentalPrice;
         product.securityDeposit = securityDeposit || product.securityDeposit;
-        product.stock = stock || product.stock;
+        product.stock = stock !== undefined ? stock : product.stock;
         product.condition = condition || product.condition;
         product.city = city || product.city;
         product.state = state || product.state;
         product.isActive = isActive !== undefined ? isActive : product.isActive;
+        product.returnPolicy = returnPolicy !== undefined ? returnPolicy : product.returnPolicy;
+        product.shippingPolicy = shippingPolicy !== undefined ? shippingPolicy : product.shippingPolicy;
+        product.mrp = mrp !== undefined ? mrp : product.mrp;
+        product.deliveryTime = deliveryTime !== undefined ? deliveryTime : product.deliveryTime;
+        product.benefits = benefits || product.benefits;
+        product.specifications = specifications || product.specifications;
+        if (faqs !== undefined) {
+            product.faqs = Array.isArray(faqs) ? faqs : [];
+        }
 
         const updatedProduct = await product.save();
         await updatedProduct.populate('subcategory', 'name slug');

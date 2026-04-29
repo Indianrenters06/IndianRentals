@@ -23,7 +23,7 @@ const faqs = [
 
 import { API } from '@/services/apiConfig';
 
-const FaqSection = ({ cmsData }) => {
+const FaqSection = ({ cmsData, limit }) => {
     const [cms, setCms] = useState(cmsData || null);
     const [loading, setLoading] = useState(!cmsData);
 
@@ -39,8 +39,11 @@ const FaqSection = ({ cmsData }) => {
             .catch(() => setLoading(false));
     }, [cmsData]);
 
-    const displayFaqs = cms?.faqItems && cms.faqItems.length > 0 ? cms.faqItems : faqs;
-    const [activeIndices, setActiveIndices] = useState(faqs.map((_, i) => i)); // Default to static length initially or handle dynamic
+    let displayFaqs = cms?.faqItems && cms.faqItems.length > 0 ? cms.faqItems : faqs;
+    if (limit) {
+        displayFaqs = displayFaqs.slice(0, limit);
+    }
+    const [activeIndices, setActiveIndices] = useState([]);
 
     useEffect(() => {
         // Update active indices when displayFaqs changes

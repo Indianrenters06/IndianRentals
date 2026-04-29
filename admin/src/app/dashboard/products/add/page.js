@@ -33,6 +33,11 @@ export default function AddProduct() {
         state: "",
         images: [""],
         isActive: true,
+        mrp: "",
+        deliveryTime: "2-4 days",
+        benefits: "Fully Functional\nAccessories Included\nFree Repairs & Maintenance\nProfessionally sanitized",
+        specifications: "MODEL: \nDISPLAY: \nGRAPHICS: \nDIMENSIONS: \nOPERATING SYSTEM: \nMEMORY: \nPROCESSOR: \nSTORAGE: \nKEYBOARD: ",
+        faqs: "",
     });
 
     useEffect(() => {
@@ -96,6 +101,24 @@ export default function AddProduct() {
                 state: formData.state,
                 images: formData.images.filter(Boolean),
                 isActive: formData.isActive,
+                mrp: Number(formData.mrp) || 0,
+                deliveryTime: formData.deliveryTime,
+                benefits: formData.benefits.split("\n").map(b => b.trim()).filter(Boolean),
+                specifications: formData.specifications.split("\n").filter(Boolean).map(line => {
+                    const [label, ...valArr] = line.split(":");
+                    return { label: label?.trim() || "", value: valArr.join(":").trim() || "" };
+                }),
+                faqs: (() => {
+                    const lines = formData.faqs.split("\n").filter(line => line.trim() !== "");
+                    const parsed = [];
+                    for (let i = 0; i < lines.length; i += 2) {
+                        parsed.push({ 
+                            question: lines[i]?.trim() || "", 
+                            answer: lines[i + 1]?.trim() || "" 
+                        });
+                    }
+                    return parsed;
+                })(),
             };
 
             const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
@@ -229,11 +252,22 @@ export default function AddProduct() {
                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-6">
                                 {/* Daily Rent */}
                                 <div>
-                                    <label className={labelCls}>Daily Rent (₹) <span className="text-rose-500">*</span></label>
+                                    <label className={labelCls}>Daily Rent / Monthly Rent (₹) <span className="text-rose-500">*</span></label>
                                     <div className="relative">
                                         <span className="absolute left-3 top-1/2 -translate-y-1/2 text-indigo-500 font-bold text-sm pointer-events-none">₹</span>
                                         <input required type="number" name="rentalPrice" value={formData.rentalPrice}
                                             onChange={e => set("rentalPrice", e.target.value)}
+                                            placeholder="0.00" className={prefixInputCls} />
+                                    </div>
+                                </div>
+
+                                {/* MRP */}
+                                <div>
+                                    <label className={labelCls}>MRP / Original Price (₹)</label>
+                                    <div className="relative">
+                                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-indigo-500 font-bold text-sm pointer-events-none">₹</span>
+                                        <input type="number" name="mrp" value={formData.mrp}
+                                            onChange={e => set("mrp", e.target.value)}
                                             placeholder="0.00" className={prefixInputCls} />
                                     </div>
                                 </div>
@@ -296,6 +330,52 @@ export default function AddProduct() {
                                     <label className={labelCls}>State <span className="text-rose-500">*</span></label>
                                     <input required name="state" value={formData.state} onChange={e => set("state", e.target.value)}
                                         placeholder="e.g. Karnataka" className={inputCls} />
+                                </div>
+                                <div>
+                                    <label className={labelCls}>Delivery Time</label>
+                                    <input name="deliveryTime" value={formData.deliveryTime} onChange={e => set("deliveryTime", e.target.value)}
+                                        placeholder="e.g. 2-4 days" className={inputCls} />
+                                </div>
+                            </div>
+
+                            <div className="space-y-6 mt-6">
+                                <div className="space-y-2">
+                                    <h3 className="text-lg font-semibold text-slate-900 dark:text-white flex items-center gap-2">
+                                        <Tag className="text-indigo-500" /> Additional Details
+                                    </h3>
+                                    <Divider className="bg-slate-100 dark:bg-slate-800" />
+                                </div>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
+                                    <div>
+                                        <label className={labelCls}>Benefits (One per line)</label>
+                                        <textarea
+                                            name="benefits"
+                                            value={formData.benefits}
+                                            onChange={e => set("benefits", e.target.value)}
+                                            placeholder="Fully Functional&#10;Accessories Included"
+                                            className={textareaCls}
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className={labelCls}>Specifications (Label: Value per line)</label>
+                                        <textarea
+                                            name="specifications"
+                                            value={formData.specifications}
+                                            onChange={e => set("specifications", e.target.value)}
+                                            placeholder="MODEL: MacBook Pro&#10;DISPLAY: 16 inches"
+                                            className={textareaCls}
+                                        />
+                                    </div>
+                                </div>
+                                <div className="mt-6">
+                                    <label className={labelCls}>Product FAQs (Alternating Lines)</label>
+                                    <textarea
+                                        name="faqs"
+                                        value={formData.faqs}
+                                        onChange={e => set("faqs", e.target.value)}
+                                        placeholder="Question 1...&#10;Answer 1...&#10;Question 2...&#10;Answer 2..."
+                                        className={textareaCls}
+                                    />
                                 </div>
                             </div>
 

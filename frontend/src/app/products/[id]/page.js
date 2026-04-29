@@ -383,7 +383,7 @@ export default function ProductDetailPage() {
                                         </div>
                                         <div className="bg-[#00B200] text-white text-[11px] font-medium px-2 py-0.5 rounded-[6px] flex items-center justify-center gap-1.5 h-full whitespace-nowrap">
                                             <BsTruck size={13} className="stroke-[0.5]" />
-                                            <span className="mt-[1px]">2-4 days</span>
+                                            <span className="mt-[1px]">{product.deliveryTime || "2-4 days"}</span>
                                         </div>
                                     </div>
                                 </div>
@@ -657,7 +657,9 @@ export default function ProductDetailPage() {
                                                     opacity: 1
                                                 }}
                                             >
-                                                <span className="text-[13px] font-medium text-gray-400 line-through shrink-0">₹{Math.round(currentPlan.price * 1.5) * quantity}</span>
+                                                <span className="text-[13px] font-medium text-gray-400 line-through shrink-0">
+                                                    ₹{product.mrp ? product.mrp * quantity : Math.round(currentPlan.price * 1.5) * quantity}
+                                                </span>
                                                 <span
                                                     className="text-white text-[10px] font-bold flex items-center justify-center whitespace-nowrap shrink-0"
                                                     style={{
@@ -671,7 +673,10 @@ export default function ProductDetailPage() {
                                                         boxShadow: '0px 0px 1px 0px hsla(0, 0%, 47%, 0.1), 0px 1px 1px 0px hsla(0, 0%, 47%, 0.09), 0px 3px 2px 0px hsla(0, 0%, 47%, 0.05), 0px 5px 2px 0px hsla(0, 0%, 47%, 0.01), 0px 9px 2px 0px hsla(0, 0%, 47%, 0)'
                                                     }}
                                                 >
-                                                    20% off
+                                                    {product.mrp 
+                                                        ? `${Math.round(((product.mrp - currentPlan.price) / product.mrp) * 100)}% off`
+                                                        : "20% off"
+                                                    }
                                                 </span>
                                             </div>
                                         </div>
@@ -735,9 +740,7 @@ export default function ProductDetailPage() {
                                 className="flex flex-col mt-[-18px]"
                                 style={{
                                     width: '536.36px',
-                                    height: '68px',
-                                    opacity: 1,
-                                    gap: '6px'
+                                    gap: '8px'
                                 }}
                             >
                                 <div style={{ height: '16px', display: 'flex', alignItems: 'center' }}>
@@ -758,104 +761,51 @@ export default function ProductDetailPage() {
                                 </div>
 
                                 <div
-                                    className="flex gap-[4px] w-full"
+                                    className="flex gap-[4px] w-full overflow-x-auto hide-scrollbar items-center"
                                     style={{ height: '48px' }}
                                 >
-                                    {/* Fully Functional */}
-                                    <div
-                                        className="rounded-lg flex items-center gap-[8px] p-[8px] overflow-hidden shrink-0"
-                                        style={{
-                                            width: '131.09px',
-                                            background: 'linear-gradient(89.92deg, #0689FF -1.19%, #0075FF 100.13%)',
-                                            border: '1px solid hsla(198, 100%, 85%, 1)'
-                                        }}
-                                    >
-                                        <div className="shrink-0 text-white"><Sparkle size={18} weight="bold" /></div>
-                                        <span
-                                            style={{
-                                                fontFamily: '"Mona Sans", sans-serif',
-                                                fontWeight: 600,
-                                                fontSize: '11px',
-                                                lineHeight: '16px',
-                                                letterSpacing: '-0.02em',
-                                                color: 'white'
-                                            }}
-                                        >
-                                            Fully<br />Functional
-                                        </span>
-                                    </div>
-
-                                    {/* Accessories Included */}
-                                    <div
-                                        className="rounded-lg flex items-center gap-[8px] p-[8px] overflow-hidden shrink-0"
-                                        style={{
-                                            width: '131.09px',
-                                            background: 'linear-gradient(89.92deg, #0689FF -1.19%, #0075FF 100.13%)',
-                                            border: '1px solid hsla(198, 100%, 85%, 1)'
-                                        }}
-                                    >
-                                        <div className="shrink-0 text-white"><Package size={18} weight="bold" /></div>
-                                        <span
-                                            style={{
-                                                fontFamily: '"Mona Sans", sans-serif',
-                                                fontWeight: 600,
-                                                fontSize: '11px',
-                                                lineHeight: '16px',
-                                                letterSpacing: '-0.02em',
-                                                color: 'white'
-                                            }}
-                                        >
-                                            Accessories<br />Included
-                                        </span>
-                                    </div>
-
-                                    {/* Free Repairs & Maintenance */}
-                                    <div
-                                        className="rounded-lg flex items-center gap-[8px] p-[8px] overflow-hidden shrink-0"
-                                        style={{
-                                            width: '131.09px',
-                                            background: 'linear-gradient(89.92deg, #0689FF -1.19%, #0075FF 100.13%)',
-                                            border: '1px solid hsla(198, 100%, 85%, 1)'
-                                        }}
-                                    >
-                                        <div className="shrink-0 text-white"><UserCircle size={18} weight="bold" /></div>
-                                        <span
-                                            style={{
-                                                fontFamily: '"Mona Sans", sans-serif',
-                                                fontWeight: 600,
-                                                fontSize: '11px',
-                                                lineHeight: '16px',
-                                                letterSpacing: '-0.02em',
-                                                color: 'white'
-                                            }}
-                                        >
-                                            Free Repairs &<br />Maintenance
-                                        </span>
-                                    </div>
-
-                                    {/* Professionally sanitized */}
-                                    <div
-                                        className="rounded-lg flex items-center gap-[8px] p-[8px] overflow-hidden shrink-0"
-                                        style={{
-                                            width: '131.09px',
-                                            background: 'linear-gradient(89.92deg, #0689FF -1.19%, #0075FF 100.13%)',
-                                            border: '1px solid hsla(198, 100%, 85%, 1)'
-                                        }}
-                                    >
-                                        <div className="shrink-0 text-white"><Bank size={18} weight="bold" /></div>
-                                        <span
-                                            style={{
-                                                fontFamily: '"Mona Sans", sans-serif',
-                                                fontWeight: 600,
-                                                fontSize: '11px',
-                                                lineHeight: '16px',
-                                                letterSpacing: '-0.02em',
-                                                color: 'white'
-                                            }}
-                                        >
-                                            Professionally<br />sanitized
-                                        </span>
-                                    </div>
+                                    {(product.benefits && product.benefits.length > 0 ? product.benefits : [
+                                        "Fully Functional", "Accessories Included", "Free Repairs & Maintenance", "Professionally sanitized"
+                                    ]).map((benefit, idx) => {
+                                        const benefitText = benefit.type || benefit;
+                                        const Icon = [Sparkle, Package, UserCircle, Bank][idx % 4];
+                                        return (
+                                            <div
+                                                key={idx}
+                                                className="rounded-lg flex items-center shrink-0"
+                                                style={{
+                                                    width: '131.09px',
+                                                    height: '48px',
+                                                    padding: '8px',
+                                                    gap: '10px',
+                                                    background: 'linear-gradient(89.92deg, #0689FF -1.19%, #0075FF 100.13%)',
+                                                    border: '1px solid hsla(198, 100%, 85%, 1)'
+                                                }}
+                                            >
+                                                <div className="shrink-0 text-white flex items-center justify-center"><Icon size={18} weight="bold" /></div>
+                                                <span
+                                                    style={{
+                                                        width: '87.09px',
+                                                        height: '32px',
+                                                        fontFamily: '"Mona Sans", sans-serif',
+                                                        fontWeight: 600,
+                                                        fontSize: 'var(--font-size-1, 12px)',
+                                                        lineHeight: 'var(--font-line-height-1, 16px)',
+                                                        letterSpacing: 'var(--font-letter-spacing-8, normal)',
+                                                        color: 'var(--color-grey-white, hsla(0, 0%, 100%, 1))',
+                                                        whiteSpace: 'normal',
+                                                        display: '-webkit-box',
+                                                        WebkitLineClamp: 2,
+                                                        WebkitBoxOrient: 'vertical',
+                                                        overflow: 'hidden',
+                                                        wordBreak: 'break-word'
+                                                    }}
+                                                >
+                                                    {benefitText}
+                                                </span>
+                                            </div>
+                                        );
+                                    })}
                                 </div>
                             </div>
 
@@ -1414,94 +1364,28 @@ export default function ProductDetailPage() {
                         {/* Content Area */}
                         <div className="flex-1 overflow-hidden" style={{ width: '100%' }}>
                             {activeTab === 'Product Details' && (
-                                <div className="grid grid-cols-3 pt-4" style={{ width: '1160px', height: '299px' }}>
-                                    {/* Column 1: 4 Items */}
-                                    <div className="flex flex-col" style={{ width: '386.67px', height: '299px', gap: '29px' }}>
-                                        {[
-                                            { label: 'MODEL', value: product.name, w: '144px', h: '78px' },
-                                            { label: 'DISPLAY', value: '16.2 inches (3024 x 1964)', w: '189px', h: '53px' },
-                                            { label: 'GRAPHICS', value: 'Apple Integrated 16-core GPU', w: '386.67px', h: '78px' },
-                                            { label: 'DIMENSIONS', value: '35.57 x 35.57 x 1.68 cm * 2.14 kg', w: '386.67px', h: '53px' }
-                                        ].map((item, idx) => (
-                                            <div key={idx} style={{ height: item.h, width: item.w, display: 'flex', flexDirection: 'column', gap: '5px' }}>
-                                                <h4
-                                                    style={{
-                                                        width: '144px',
-                                                        height: '23px',
-                                                        fontFamily: '"Mona Sans", sans-serif',
-                                                        fontWeight: 600,
-                                                        fontSize: '13px',
-                                                        lineHeight: '18px',
-                                                        letterSpacing: '0.02em',
-                                                        color: '#000000',
-                                                        textTransform: 'uppercase'
-                                                    }}
-                                                >
-                                                    {item.label}
-                                                </h4>
-                                                <p
-                                                    style={{
-                                                        fontFamily: '"Mona Sans", sans-serif',
-                                                        fontWeight: 400,
-                                                        fontSize: '14px',
-                                                        lineHeight: '25px',
-                                                        letterSpacing: '-0.01em',
-                                                        color: 'hsla(0, 0%, 12%, 1)'
-                                                    }}
-                                                >
-                                                    {item.value}
-                                                </p>
-                                            </div>
-                                        ))}
-                                    </div>
-
-                                    {/* Column 2: 4 Items */}
-                                    <div className="flex flex-col" style={{ width: '386.67px', height: '299px', gap: '29px' }}>
-                                        {[
-                                            { label: 'OPERATING SYSTEM', value: 'Mac OS', w: '386.67px', h: '53px' },
-                                            { label: 'MEMORY', value: '24GB', w: '386.67px', h: '53px' },
-                                            { label: 'PROCESSOR', value: 'Apple M4 Pro', w: '386.67px', h: '53px' },
-                                            { label: 'STORAGE', value: '512GB SSD', w: '386.67px', h: '53px' }
-                                        ].map((item, idx) => (
-                                            <div key={idx} style={{ height: item.h, width: item.w, display: 'flex', flexDirection: 'column', gap: '5px' }}>
-                                                <h4
-                                                    style={{
-                                                        width: '144px',
-                                                        height: '23px',
-                                                        fontFamily: '"Mona Sans", sans-serif',
-                                                        fontWeight: 600,
-                                                        fontSize: '13px',
-                                                        lineHeight: '18px',
-                                                        letterSpacing: '0.02em',
-                                                        color: '#000000',
-                                                        textTransform: 'uppercase'
-                                                    }}
-                                                >
-                                                    {item.label}
-                                                </h4>
-                                                <p
-                                                    style={{
-                                                        fontFamily: '"Mona Sans", sans-serif',
-                                                        fontWeight: 400,
-                                                        fontSize: '14px',
-                                                        lineHeight: '25px',
-                                                        letterSpacing: '-0.01em',
-                                                        color: 'hsla(0, 0%, 12%, 1)'
-                                                    }}
-                                                >
-                                                    {item.value}
-                                                </p>
-                                            </div>
-                                        ))}
-                                    </div>
-
-                                    {/* Column 3: 1 Item */}
-                                    <div className="flex flex-col" style={{ width: '386.67px', height: '299px', gap: '29px' }}>
-                                        <div key="keyboard" style={{ height: '53px', display: 'flex', flexDirection: 'column', gap: '5px' }}>
+                                <div
+                                    className="grid gap-y-8 gap-x-12 pt-4 overflow-x-auto overflow-y-hidden pr-2 no-scrollbar pb-4"
+                                    style={{
+                                        display: 'grid',
+                                        gridTemplateRows: 'repeat(4, auto)',
+                                        gridAutoFlow: 'column',
+                                        gridAutoColumns: 'minmax(250px, 1fr)'
+                                    }}
+                                >
+                                    {(product.specifications && product.specifications.length > 0 ? product.specifications : [
+                                        { label: 'MODEL', value: product.name },
+                                        { label: 'DISPLAY', value: '16.2 inches (3024 x 1964)' },
+                                        { label: 'GRAPHICS', value: 'Apple Integrated 16-core GPU' },
+                                        { label: 'DIMENSIONS', value: '35.57 x 35.57 x 1.68 cm * 2.14 kg' },
+                                        { label: 'OPERATING SYSTEM', value: 'Mac OS' },
+                                        { label: 'MEMORY', value: '24GB' },
+                                        { label: 'PROCESSOR', value: 'Apple M4 Pro' },
+                                        { label: 'STORAGE', value: '512GB SSD' }
+                                    ]).map((item, idx) => (
+                                        <div key={idx} style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
                                             <h4
                                                 style={{
-                                                    width: '386.67px',
-                                                    height: '23px',
                                                     fontFamily: '"Mona Sans", sans-serif',
                                                     fontWeight: 600,
                                                     fontSize: '13px',
@@ -1511,22 +1395,22 @@ export default function ProductDetailPage() {
                                                     textTransform: 'uppercase'
                                                 }}
                                             >
-                                                KEYBOARD LANGUAGE
+                                                {item.label}
                                             </h4>
                                             <p
                                                 style={{
                                                     fontFamily: '"Mona Sans", sans-serif',
                                                     fontWeight: 400,
                                                     fontSize: '14px',
-                                                    lineHeight: '25px',
+                                                    lineHeight: '1.4',
                                                     letterSpacing: '-0.01em',
                                                     color: 'hsla(0, 0%, 12%, 1)'
                                                 }}
                                             >
-                                                English (Qwerty)
+                                                {item.value}
                                             </p>
                                         </div>
-                                    </div>
+                                    ))}
                                 </div>
                             )}
 
@@ -1547,7 +1431,11 @@ export default function ProductDetailPage() {
             </div>
 
             <Testimonials />
-            <FaqSection />
+            {product.faqs && product.faqs.length > 0 ? (
+                <FaqSection cmsData={{ faqItems: product.faqs, faqTitle: "Product FAQs", faqSubtitle: "Specific questions about this product." }} />
+            ) : (
+                <FaqSection limit={5} />
+            )}
             <BestRentedProducts />
 
             {/* Side Drawers */}

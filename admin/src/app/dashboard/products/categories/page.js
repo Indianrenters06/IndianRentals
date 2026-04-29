@@ -34,7 +34,7 @@ import {
 } from "@phosphor-icons/react";
 import ImageUploader from "@/components/ImageUploader";
 
-const API = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:5000";
+const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
 
 function getToken() {
     return typeof window !== "undefined" ? localStorage.getItem("adminToken") : null;
@@ -51,7 +51,9 @@ function SubcategoryRow({ sub, onEdit, onDelete }) {
                     `https://ui-avatars.com/api/?name=${sub.name}&size=32&background=e0e7ff&color=6366f1`
                 }
                 size="sm"
-                className="w-7 h-7 shrink-0"
+                isBordered
+                className="w-10 h-10 shrink-0 border-white dark:border-slate-800 shadow-sm group-hover:scale-110 transition-transform cursor-pointer"
+                onClick={() => onEdit(sub)}
             />
             <div className="flex flex-col flex-1 min-w-0">
                 <span className="text-sm font-semibold text-slate-800 dark:text-slate-200 truncate">
@@ -72,29 +74,23 @@ function SubcategoryRow({ sub, onEdit, onDelete }) {
             >
                 {sub.isActive ? "Active" : "Off"}
             </Chip>
-            <div className="flex items-center opacity-0 group-hover:opacity-100 transition-all duration-200">
-                <Tooltip content="Edit subcategory" size="sm">
-                    <Button
-                        isIconOnly
-                        size="sm"
-                        variant="light"
-                        className="text-slate-400 hover:text-indigo-500"
-                        onPress={() => onEdit(sub)}
-                    >
-                        <PencilSimple size={14} />
-                    </Button>
-                </Tooltip>
-                <Tooltip content="Delete subcategory" color="danger" size="sm">
-                    <Button
-                        isIconOnly
-                        size="sm"
-                        variant="light"
-                        className="text-slate-400 hover:text-red-500"
-                        onPress={() => onDelete(sub._id)}
-                    >
-                        <Trash size={14} />
-                    </Button>
-                </Tooltip>
+            <div className="flex items-center gap-1">
+                <button
+                    type="button"
+                    title="Edit"
+                    onClick={() => onEdit(sub)}
+                    className="p-1.5 rounded-lg text-slate-400 hover:text-indigo-500 hover:bg-indigo-50 dark:hover:bg-indigo-500/10 transition-colors"
+                >
+                    <PencilSimple size={14} weight="bold" />
+                </button>
+                <button
+                    type="button"
+                    title="Delete"
+                    onClick={() => onDelete(sub._id.toString())}
+                    className="p-1.5 rounded-lg text-slate-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors"
+                >
+                    <Trash size={14} weight="bold" />
+                </button>
             </div>
         </div>
     );
@@ -116,9 +112,9 @@ export default function CategoriesCMS() {
     const [subForm, setSubForm] = useState({ name: "", description: "", image: "" });
     const [subSaving, setSubSaving] = useState(false);
     const [activeCat, setActiveCat] = useState(null); // parent for the sub modal
-    
+
     // Edit Form
-    const [editForm, setEditForm] = useState({ _id: null, name: "", description: "", image: "", isActive: true });
+    const [editForm, setEditForm] = useState({ _id: null, name: "", slug: "", description: "", image: "", isActive: true });
     const [editSaving, setEditSaving] = useState(false);
 
     // ── Fetch ─────────────────────────────────────────────────────────────────
@@ -159,9 +155,11 @@ export default function CategoriesCMS() {
     };
 
     const openEditModal = (item) => {
+        if (!item) return;
         setEditForm({
-            _id: item._id,
+            _id: item._id ? item._id.toString() : null,
             name: item.name || "",
+            slug: item.slug || "",
             description: item.description || "",
             image: item.image || "",
             isActive: item.isActive !== undefined ? item.isActive : true
@@ -272,6 +270,115 @@ export default function CategoriesCMS() {
     // ─────────────────────────────────────────────────────────────────────────
     return (
         <div className="w-full space-y-6 pb-12">
+            {/* ══ Modals ══════════════════════════════════════════════════════════════ */}
+            <Modal
+                isOpen={editModal.isOpen}
+                onOpenChange={editModal.onOpenChange}
+                placement="top-center"
+                scrollBehavior="inside"
+                size="3xl"
+                classNames={{
+                    base: "dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-2xl",
+                    backdrop: "bg-slate-900/50 backdrop-blur-md",
+                }}
+            >
+                <ModalContent>
+                    {(onClose) => (
+                        <>
+                            <ModalHeader className="flex items-center gap-2 text-slate-900 dark:text-white border-b border-slate-100 dark:border-slate-800/60 pb-4">
+                                <div className="p-2 rounded-lg bg-indigo-50 dark:bg-indigo-500/10 text-indigo-500">
+                                    <PencilSimple size={20} weight="bold" />
+                                </div>
+                                <div className="flex flex-col">
+                                    <span className="text-lg font-bold">Edit Category Details</span>
+                                    <span className="text-xs font-normal text-slate-400">Modify properties and cover image</span>
+                                </div>
+                            </ModalHeader>
+                            <ModalBody className="p-6 min-h-[400px]">
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <div className="space-y-6">
+                                        <div className="space-y-2">
+                                            <label className="text-xs font-bold text-slate-500 uppercase tracking-widest">Category Details</label>
+                                            <Input
+                                                label="Name"
+                                                placeholder="e.g. Photography"
+                                                variant="bordered"
+                                                value={editForm.name}
+                                                onValueChange={(v) => setEditForm(p => ({ ...p, name: v }))}
+                                                classNames={{
+                                                    inputWrapper: "bg-white dark:bg-slate-950 border-slate-200 dark:border-slate-800",
+                                                }}
+                                            />
+                                            <Input
+                                                label="Slug"
+                                                placeholder="e.g. photography"
+                                                variant="bordered"
+                                                value={editForm.slug}
+                                                onValueChange={(v) => setEditForm(p => ({ ...p, slug: v }))}
+                                                classNames={{
+                                                    inputWrapper: "bg-white dark:bg-slate-950 border-slate-200 dark:border-slate-800",
+                                                }}
+                                            />
+                                        </div>
+                                        <div className="space-y-2">
+                                            <Textarea
+                                                label="Description"
+                                                placeholder="Describe this category..."
+                                                variant="bordered"
+                                                minRows={3}
+                                                value={editForm.description}
+                                                onValueChange={(v) => setEditForm(p => ({ ...p, description: v }))}
+                                                classNames={{
+                                                    inputWrapper: "bg-white dark:bg-slate-950 border-slate-200 dark:border-slate-800",
+                                                }}
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className="text-sm text-slate-700 dark:text-slate-300 font-medium block mb-1.5">Status</label>
+                                            <div className="flex items-center gap-3">
+                                                <button
+                                                    type="button"
+                                                    onClick={() => setEditForm((p) => ({ ...p, isActive: true }))}
+                                                    className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors ${editForm.isActive ? 'bg-emerald-500 text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400'}`}
+                                                >
+                                                    Active
+                                                </button>
+                                                <button
+                                                    type="button"
+                                                    onClick={() => setEditForm((p) => ({ ...p, isActive: false }))}
+                                                    className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors ${!editForm.isActive ? 'bg-slate-700 text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400'}`}
+                                                >
+                                                    Disabled
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <label className="text-sm text-slate-700 dark:text-slate-300 font-medium block mb-1.5">Cover Image (Optional)</label>
+                                        <ImageUploader
+                                            key={`edit-${editModal.isOpen}-${editForm._id}`}
+                                            existingUrl={editForm.image}
+                                            onUpload={(url) => setEditForm((p) => ({ ...p, image: url }))}
+                                            label="Click or drag to update image"
+                                        />
+                                    </div>
+                                </div>
+                            </ModalBody>
+                            <ModalFooter className="border-t border-slate-100 dark:border-slate-800/60 p-4">
+                                <Button variant="flat" onPress={onClose} className="rounded-xl font-semibold bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 transition-colors">Cancel</Button>
+                                <Button
+                                    className="rounded-xl font-semibold bg-indigo-600 hover:bg-indigo-700 text-white shadow-lg shadow-indigo-500/30 transition-all font-medium"
+                                    isLoading={editSaving}
+                                    onPress={() => handleUpdateItem(onClose)}
+                                >
+                                    Save Changes
+                                </Button>
+                            </ModalFooter>
+                        </>
+                    )}
+                </ModalContent>
+            </Modal>
+
             {/* Header */}
             <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
                 <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }}>
@@ -378,9 +485,10 @@ export default function CategoriesCMS() {
                                             <div className="flex items-center gap-3 min-w-0">
                                                 <Avatar
                                                     src={cat.image || `https://ui-avatars.com/api/?name=${cat.name}`}
-                                                    size="sm"
+                                                    size="md"
                                                     isBordered
-                                                    className="ring-slate-200 dark:ring-slate-700 shrink-0"
+                                                    className="ring-slate-200 dark:ring-slate-700 shrink-0 w-12 h-12 shadow-sm group-hover:scale-110 transition-transform cursor-pointer"
+                                                    onClick={() => openEditModal(cat)}
                                                 />
                                                 <div className="flex flex-col min-w-0">
                                                     <span className="text-sm font-semibold text-slate-900 dark:text-slate-200 group-hover:text-indigo-500 transition-colors truncate">
@@ -412,42 +520,32 @@ export default function CategoriesCMS() {
                                             >
                                                 {cat.isActive ? "Active" : "Disabled"}
                                             </Chip>
-
                                             {/* Actions */}
                                             <div className="flex items-center gap-1">
-                                                <Tooltip content="Add subcategory" color="secondary" size="sm">
-                                                    <Button
-                                                        isIconOnly
-                                                        size="sm"
-                                                        variant="flat"
-                                                        className="text-indigo-500 bg-indigo-50 dark:bg-indigo-500/10 hover:bg-indigo-100 dark:hover:bg-indigo-500/20"
-                                                        onPress={() => openSubModal(cat)}
-                                                    >
-                                                        <Plus size={14} weight="bold" />
-                                                    </Button>
-                                                </Tooltip>
-                                                <Tooltip content="Edit" size="sm">
-                                                    <Button
-                                                        isIconOnly
-                                                        size="sm"
-                                                        variant="light"
-                                                        className="text-slate-400 hover:text-indigo-500"
-                                                        onPress={() => openEditModal(cat)}
-                                                    >
-                                                        <PencilSimple size={14} />
-                                                    </Button>
-                                                </Tooltip>
-                                                <Tooltip content="Delete" color="danger" size="sm">
-                                                    <Button
-                                                        isIconOnly
-                                                        size="sm"
-                                                        variant="light"
-                                                        className="text-slate-400 hover:text-red-500"
-                                                        onPress={() => handleDeleteCategory(cat._id)}
-                                                    >
-                                                        <Trash size={14} />
-                                                    </Button>
-                                                </Tooltip>
+                                                <button
+                                                    type="button"
+                                                    title="Add Subcategory"
+                                                    onClick={() => openSubModal(cat)}
+                                                    className="p-1.5 rounded-lg text-indigo-500 bg-indigo-50 hover:bg-indigo-100 dark:bg-indigo-500/10 dark:hover:bg-indigo-500/20 transition-colors"
+                                                >
+                                                    <Plus size={15} weight="bold" />
+                                                </button>
+                                                <button
+                                                    type="button"
+                                                    title="Edit Category"
+                                                    onClick={() => openEditModal(cat)}
+                                                    className="p-1.5 rounded-lg text-slate-400 hover:text-indigo-500 hover:bg-indigo-50 dark:hover:bg-indigo-500/10 transition-colors"
+                                                >
+                                                    <PencilSimple size={15} weight="bold" />
+                                                </button>
+                                                <button
+                                                    type="button"
+                                                    title="Delete Category"
+                                                    onClick={() => handleDeleteCategory(cat._id.toString())}
+                                                    className="p-1.5 rounded-lg text-slate-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors"
+                                                >
+                                                    <Trash size={15} weight="bold" />
+                                                </button>
                                             </div>
                                         </div>
 
@@ -663,87 +761,6 @@ export default function CategoriesCMS() {
                 </ModalContent>
             </Modal>
 
-            {/* ══ Modal: Edit Category/Subcategory ════════════════════════════════════ */}
-            <Modal
-                isOpen={editModal.isOpen}
-                onOpenChange={editModal.onOpenChange}
-                placement="center"
-                scrollBehavior="inside"
-                size="3xl"
-            >
-                <ModalContent>
-                    {(onClose) => (
-                        <>
-                            <ModalHeader className="flex items-center gap-2 text-slate-900 dark:text-white">
-                                <PencilSimple className="text-indigo-500" size={20} /> Edit Item
-                            </ModalHeader>
-                            <ModalBody className="p-6">
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                    <div className="space-y-4">
-                                        <div>
-                                            <label className="text-sm text-slate-700 dark:text-slate-300 font-medium block mb-1.5">Name <span className="text-red-500">*</span></label>
-                                            <input
-                                                autoFocus
-                                                required
-                                                value={editForm.name}
-                                                onChange={(e) => setEditForm((p) => ({ ...p, name: e.target.value }))}
-                                                className="w-full h-10 px-3 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 transition-all shadow-sm"
-                                            />
-                                        </div>
-                                        <div>
-                                            <label className="text-sm text-slate-700 dark:text-slate-300 font-medium block mb-1.5">Description</label>
-                                            <textarea
-                                                value={editForm.description}
-                                                onChange={(e) => setEditForm((p) => ({ ...p, description: e.target.value }))}
-                                                rows={5}
-                                                className="w-full p-3 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 transition-all shadow-sm resize-y"
-                                            />
-                                        </div>
-                                        <div>
-                                            <label className="text-sm text-slate-700 dark:text-slate-300 font-medium block mb-1.5">Status</label>
-                                            <div className="flex items-center gap-3">
-                                                <button
-                                                    type="button"
-                                                    onClick={() => setEditForm((p) => ({ ...p, isActive: true }))}
-                                                    className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors ${editForm.isActive ? 'bg-emerald-500 text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400'}`}
-                                                >
-                                                    Active
-                                                </button>
-                                                <button
-                                                    type="button"
-                                                    onClick={() => setEditForm((p) => ({ ...p, isActive: false }))}
-                                                    className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors ${!editForm.isActive ? 'bg-slate-700 text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400'}`}
-                                                >
-                                                    Disabled
-                                                </button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div>
-                                        <label className="text-sm text-slate-700 dark:text-slate-300 font-medium block mb-1.5">Cover Image (Optional)</label>
-                                        <ImageUploader
-                                            key={`edit-${editModal.isOpen}-${editForm._id}`}
-                                            existingUrl={editForm.image}
-                                            onUpload={(url) => setEditForm((p) => ({ ...p, image: url }))}
-                                            label="Click or drag to update image"
-                                        />
-                                    </div>
-                                </div>
-                            </ModalBody>
-                            <ModalFooter className="border-t border-slate-100 dark:border-slate-800/60 p-4">
-                                <Button variant="flat" onPress={onClose} className="rounded-xl font-semibold bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 transition-colors">Cancel</Button>
-                                <Button
-                                    className="rounded-xl font-semibold bg-indigo-600 hover:bg-indigo-700 text-white shadow-lg shadow-indigo-500/30 transition-all font-medium"
-                                    isLoading={editSaving}
-                                    onPress={() => handleUpdateItem(onClose)}
-                                >
-                                    Save Changes
-                                </Button>
-                            </ModalFooter>
-                        </>
-                    )}
-                </ModalContent>
-            </Modal>
         </div>
     );
 }

@@ -88,24 +88,22 @@ const RentByCategory = () => {
                 sortedCategories = Array.from(new Map(sortedCategories.map(item => [item._id, item])).values());
 
                 // Clean up dummy images and provide high-quality local fallbacks
-                const MACBOOK_IMAGE = "https://res.cloudinary.com/dpu9ikeqe/image/upload/v1769200258/WhatsApp_Image_2026-01-23_at_23.58._j7jcoq.jpg";
-
                 sortedCategories = sortedCategories.map(cat => {
                     const lowerName = cat.name.toLowerCase();
                     const hasDatabaseImage = cat.image && cat.image.length > 5 && !cat.image.includes('unsplash') && !cat.image.includes('placeholder');
 
-                    // If it's a MacBook, we ALWAYS want to use the preferred image provided by the user
-                    if (lowerName.includes('macbook')) {
-                        return { ...cat, image: MACBOOK_IMAGE };
+                    // If database has an image, use it! 
+                    // No more hardcoded overrides for MacBook etc.
+                    if (hasDatabaseImage) {
+                        return cat;
                     }
 
-                    // If NO valid image from DB for other categories, use our high-quality local assets as backup
-                    if (!hasDatabaseImage) {
-                        if (lowerName.includes('ipad')) return { ...cat, image: '/ipad-new.jpg' };
-                        if (lowerName.includes('desktop')) return { ...cat, image: '/mac-pro-new.jpg' };
-                        if (lowerName.includes('all in one')) return { ...cat, image: '/it-products-new.jpg' };
-                        if (lowerName.includes('dslr') || lowerName.includes('camera')) return { ...cat, image: '/office-equipment-new.jpg' };
-                    }
+                    // Fallbacks for empty database images
+                    if (lowerName.includes('macbook')) return { ...cat, image: "https://res.cloudinary.com/dpu9ikeqe/image/upload/v1769200258/WhatsApp_Image_2026-01-23_at_23.58._j7jcoq.jpg" };
+                    if (lowerName.includes('ipad')) return { ...cat, image: '/ipad-new.jpg' };
+                    if (lowerName.includes('desktop')) return { ...cat, image: '/mac-pro-new.jpg' };
+                    if (lowerName.includes('all in one')) return { ...cat, image: '/it-products-new.jpg' };
+                    if (lowerName.includes('dslr') || lowerName.includes('camera')) return { ...cat, image: '/office-equipment-new.jpg' };
 
                     return cat;
                 });

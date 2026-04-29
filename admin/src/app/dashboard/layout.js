@@ -142,6 +142,7 @@ export default function DashboardLayout({ children }) {
         { name: 'About Us',    path: '/dashboard/cms/about' },
         { name: 'Blog',        path: '/dashboard/cms/blog' },
         { name: 'Categories Page', path: '/dashboard/cms/categories-page' },
+        { name: '🖼️ Category Images', path: '/dashboard/cms/category-images' },
         { name: 'Static Pages',path: '/dashboard/cms/pages' },
       ]
     },

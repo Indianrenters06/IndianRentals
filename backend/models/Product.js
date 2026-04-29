@@ -65,7 +65,26 @@ const productSchema = new mongoose.Schema({
     shippingPolicy: {
         type: String,
         default: ""
-    }
+    },
+    mrp: {
+        type: Number,
+        default: 0
+    },
+    deliveryTime: {
+        type: String,
+        default: "2-4 days"
+    },
+    benefits: [{
+        type: String
+    }],
+    specifications: [{
+        label: String,
+        value: String
+    }],
+    faqs: [{
+        question: String,
+        answer: String
+    }]
 }, {
     timestamps: true
 });

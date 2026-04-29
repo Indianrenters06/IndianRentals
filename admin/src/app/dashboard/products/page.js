@@ -304,7 +304,7 @@ export default function AllProducts() {
                                         <button
                                             type="button"
                                             title="Edit Product"
-                                            onClick={() => router.push(`/dashboard/products/edit/${product._id}`)}
+                                            onClick={() => router.push(`/dashboard/products/edit/${product._id.toString()}`)}
                                             className="inline-flex items-center justify-center w-8 h-8 rounded-lg text-slate-400 hover:text-indigo-500 hover:bg-indigo-50 dark:hover:bg-indigo-500/10 transition-colors"
                                         >
                                             <PencilSimple size={15} />

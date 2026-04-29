@@ -26,6 +26,10 @@ const EMPTY = {
     isActive: true,
     returnPolicy: "",
     shippingPolicy: "",
+    mrp: "",
+    benefits: "",
+    specifications: "",
+    faqs: "",
 };
 
 export default function EditProduct() {
@@ -72,19 +76,17 @@ export default function EditProduct() {
 
     // ── Load existing product ──────────────────────────────────────────────────
     const fetchProduct = useCallback(async () => {
+        if (!id) return;
         try {
             setLoading(true);
             const res = await fetch(`${API}/api/products/${id}`);
             if (!res.ok) throw new Error("Product not found");
             const p = await res.json();
 
-            // Resolve the category id: stored as name string in product, match to category doc
-            const matchedCat = categories.find(c => c.name === p.category);
-
             setForm({
                 name: p.name || "",
                 description: p.description || "",
-                category: matchedCat ? matchedCat._id : p.category || "",
+                category: p.category || "", // Initially use the name/ID as-is
                 subcategory: p.subcategory?._id || p.subcategory || "",
                 brand: p.brand || "",
                 rentalPrice: String(p.rentalPrice ?? ""),
@@ -97,20 +99,35 @@ export default function EditProduct() {
                 isActive: p.isActive !== undefined ? p.isActive : true,
                 returnPolicy: p.returnPolicy || "",
                 shippingPolicy: p.shippingPolicy || "",
+                mrp: String(p.mrp ?? ""),
+                deliveryTime: p.deliveryTime || "2-4 days",
+                benefits: p.benefits?.map(b => b.type || b).join("\n") || "",
+                specifications: p.specifications?.map(s => `${s.label}: ${s.value}`).join("\n") || "",
+                faqs: p.faqs?.map(f => `${f.question}\n${f.answer}`).join("\n\n") || "",
             });
         } catch (err) {
+            console.error("Fetch Error:", err);
             alert(err.message);
             router.push("/dashboard/products");
         } finally {
             setLoading(false);
         }
-    }, [id, categories, router]);
+    }, [id, router]);
 
-    // Only fetch product once categories are loaded (so we can resolve category id)
+    // Load product once on mount
     useEffect(() => {
-        if (id && categories.length >= 0) fetchProduct();
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [id, categories.length]);
+        fetchProduct();
+    }, [fetchProduct]);
+
+    // Resolve category ID once categories are loaded
+    useEffect(() => {
+        if (!loading && categories.length > 0 && form.category) {
+            const matchedCat = categories.find(c => c.name === form.category || c._id === form.category);
+            if (matchedCat && matchedCat._id !== form.category) {
+                set("category", matchedCat._id);
+            }
+        }
+    }, [categories, loading, form.category]);
 
     // ── Save ──────────────────────────────────────────────────────────────────
     const handleSave = async () => {
@@ -141,6 +158,24 @@ export default function EditProduct() {
                 isActive: form.isActive,
                 returnPolicy: form.returnPolicy,
                 shippingPolicy: form.shippingPolicy,
+                mrp: Number(form.mrp) || 0,
+                deliveryTime: form.deliveryTime,
+                benefits: form.benefits.split("\n").map(b => b.trim()).filter(Boolean),
+                specifications: form.specifications.split("\n").filter(Boolean).map(line => {
+                    const [label, ...valArr] = line.split(":");
+                    return { label: label?.trim() || "", value: valArr.join(":").trim() || "" };
+                }),
+                faqs: (() => {
+                    const lines = form.faqs.split("\n").filter(line => line.trim() !== "");
+                    const parsed = [];
+                    for (let i = 0; i < lines.length; i += 2) {
+                        parsed.push({ 
+                            question: lines[i]?.trim() || "", 
+                            answer: lines[i + 1]?.trim() || "" 
+                        });
+                    }
+                    return parsed;
+                })(),
             };
 
             const res = await fetch(`${API}/api/products/${id}`, {
@@ -405,6 +440,20 @@ export default function EditProduct() {
                                         <SelectItem key="Fair" textValue="Fair" className="text-slate-900 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800">Fair</SelectItem>
                                     </Select>
                                 </div>
+                                <div className="flex flex-col gap-2">
+                                    <label className="text-xs font-bold text-slate-600 dark:text-slate-300 uppercase tracking-wider">
+                                        MRP / Original Price (₹)
+                                    </label>
+                                    <Input
+                                        type="number"
+                                        value={form.mrp}
+                                        onValueChange={v => set("mrp", v)}
+                                        placeholder="0"
+                                        variant="bordered"
+                                        startContent={<span className="text-indigo-500 font-bold text-sm">₹</span>}
+                                        classNames={{ inputWrapper: WRAPPER_CLS }}
+                                    />
+                                </div>
                             </div>
                         </section>
 
@@ -464,6 +513,48 @@ export default function EditProduct() {
                                     </label>
                                     <Input value={form.state} onValueChange={v => set("state", v)} placeholder="e.g. Karnataka" variant="bordered" classNames={{ inputWrapper: WRAPPER_CLS }} />
                                 </div>
+                                <div className="flex flex-col gap-2">
+                                    <label className="text-xs font-bold text-slate-600 dark:text-slate-300 uppercase tracking-wider">
+                                        Delivery Time
+                                    </label>
+                                    <Input value={form.deliveryTime} onValueChange={v => set("deliveryTime", v)} placeholder="e.g. 2-4 days" variant="bordered" classNames={{ inputWrapper: WRAPPER_CLS }} />
+                                </div>
+                            </div>
+
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+                                <div className="flex flex-col gap-2">
+                                    <label className="text-xs font-bold text-slate-600 dark:text-slate-300 uppercase tracking-wider">Benefits (One per line)</label>
+                                    <Textarea
+                                        value={form.benefits}
+                                        onValueChange={v => set("benefits", v)}
+                                        placeholder="Fully Functional&#10;Accessories Included"
+                                        variant="bordered"
+                                        minRows={5}
+                                        classNames={{ inputWrapper: "border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950/60" }}
+                                    />
+                                </div>
+                                <div className="flex flex-col gap-2">
+                                    <label className="text-xs font-bold text-slate-600 dark:text-slate-300 uppercase tracking-wider">Specifications (Label: Value per line)</label>
+                                    <Textarea
+                                        value={form.specifications}
+                                        onValueChange={v => set("specifications", v)}
+                                        placeholder="MODEL: MacBook Pro&#10;DISPLAY: 16 inches"
+                                        variant="bordered"
+                                        minRows={5}
+                                        classNames={{ inputWrapper: "border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950/60" }}
+                                    />
+                                </div>
+                            </div>
+                            <div className="flex flex-col gap-2 mt-6">
+                                <label className="text-xs font-bold text-slate-600 dark:text-slate-300 uppercase tracking-wider">Product FAQs (Alternating Lines)</label>
+                                <Textarea
+                                    value={form.faqs}
+                                    onValueChange={v => set("faqs", v)}
+                                    placeholder="Question 1...&#10;Answer 1...&#10;Question 2...&#10;Answer 2..."
+                                    variant="bordered"
+                                    minRows={4}
+                                    classNames={{ inputWrapper: "border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950/60" }}
+                                />
                             </div>
                         </section>
 
