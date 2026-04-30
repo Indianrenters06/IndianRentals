@@ -1,11 +1,13 @@
 'use client';
 import { useSearchParams } from 'next/navigation';
 import SubcategoryProductsPage from '../../../../components/SubcategoryProductsPage';
+import React from 'react';
 
 export default function ITSubcategoryPage({ params }) {
     const searchParams = useSearchParams();
     const subId = searchParams.get('subId');
-    const subSlug = params.sub;
+    const unwrappedParams = React.use(params);
+    const subSlug = unwrappedParams.sub;
 
     const displayName = subSlug
         .split('-')

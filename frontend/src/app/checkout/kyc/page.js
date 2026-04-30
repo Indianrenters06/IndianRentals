@@ -140,7 +140,7 @@ export default function KYCPage() {
     };
 
     const validateStep2 = () => {
-        const { companyName, companyType, employees, designation, duration, email } = formData.company;
+        const { companyName, companyType, employees, designation, duration, email, address, state, city, pincode } = formData.company;
         let newErrors = {};
         if (!companyName) newErrors.companyName = 'Required';
         if (!companyType) newErrors.companyType = 'Required';
@@ -148,6 +148,24 @@ export default function KYCPage() {
         if (!designation) newErrors.designation = 'Required';
         if (!duration) newErrors.duration = 'Required';
         if (!email) newErrors.email = 'Required';
+        if (!address) newErrors.address = 'Required';
+        if (!state) newErrors.state = 'Required';
+        if (!city) newErrors.city = 'Required';
+        if (!pincode) newErrors.pincode = 'Required';
+        setErrors(newErrors);
+        return Object.keys(newErrors).length === 0;
+    };
+
+    const validateStep3 = () => {
+        const { name, relation, phone, address, state, city, pincode } = formData.reference;
+        let newErrors = {};
+        if (!name) newErrors.name = 'Required';
+        if (!relation) newErrors.relation = 'Required';
+        if (!phone) newErrors.phone = 'Required';
+        if (!address) newErrors.address = 'Required';
+        if (!state) newErrors.state = 'Required';
+        if (!city) newErrors.city = 'Required';
+        if (!pincode) newErrors.pincode = 'Required';
         setErrors(newErrors);
         return Object.keys(newErrors).length === 0;
     };
@@ -158,6 +176,9 @@ export default function KYCPage() {
         }
         if (currentStep === 2 && customerType === 'Company') {
             if (!validateStep2()) return;
+        }
+        if (currentStep === 3) {
+            if (!validateStep3()) return;
         }
         if (currentStep === 4) {
             if (!isDocumentsChecked) {
@@ -186,10 +207,10 @@ export default function KYCPage() {
                         personalDetails: formData.personal,
                         companyDetails: customerType === 'Company' ? formData.company : {},
                         referenceDetails: formData.reference,
-                        documents: uploadedDocs
+                        documents: { ...uploadedDocs, identityProofType: formData.documents.identityProof, addressProofType: formData.documents.addressProof }
                     });
 
-                    setCurrentStep(5);
+                    router.push('/checkout/payment');
                 } catch (error) {
                     console.error(error);
                     Swal.fire({ icon: 'error', title: 'Error', text: 'Failed to submit KYC.' });
@@ -573,13 +594,258 @@ export default function KYCPage() {
                                         </div>
                                     )}
 
-                                    {/* Other Steps Placeholder */}
-                                    {currentStep > 1 && (
-                                        <div className="text-center py-10">
-                                            <p className="text-gray-500 mb-4">Step {currentStep} Content</p>
-                                            <div className="flex gap-4 justify-center">
-                                                <button onClick={handleBack} className="px-8 py-2 border rounded-full">Back</button>
-                                                <button onClick={handleNext} className="px-8 py-2 bg-black text-white rounded-full">Next</button>
+                                    {/* Step 2: Company Details */}
+                                    {currentStep === 2 && (
+                                        <div className="flex flex-col pr-2" style={{ width: '100%' }}>
+                                            <h2
+                                                style={{
+                                                    width: '686px', height: '36px', fontFamily: 'Mona Sans, sans-serif',
+                                                    fontWeight: '600', fontSize: '20px', color: 'hsla(0, 0%, 20%, 1)',
+                                                    display: 'flex', alignItems: 'center', paddingBottom: '8px',
+                                                    marginBottom: '12px', borderBottom: '1px solid hsla(0, 0%, 93%, 1)', gap: '8px'
+                                                }}
+                                            >
+                                                Company Details
+                                            </h2>
+                                            <div className="flex flex-col gap-[21px]">
+                                                <TextInput label="Company Name" required error={errors.companyName} placeholder="Placeholder" value={formData.company.companyName} onChange={(e) => handleTextChange('company', 'companyName', e.target.value)} />
+                                                <div className="grid grid-cols-2 gap-[21px]">
+                                                    <TextInput label="Type of Company" required isSelect options={['Proprietorship', 'Partnership', 'Private Limited', 'Public Limited', 'LLP', 'Other']} error={errors.companyType} placeholder="Placeholder" value={formData.company.companyType} onChange={(e) => handleTextChange('company', 'companyType', e.target.value)} />
+                                                    <TextInput label="Approx no. of employee" required error={errors.employees} placeholder="Placeholder" value={formData.company.employees} onChange={(e) => handleTextChange('company', 'employees', e.target.value)} />
+                                                </div>
+                                                <TextInput label="Your Designation" required error={errors.designation} placeholder="Placeholder" value={formData.company.designation} onChange={(e) => handleTextChange('company', 'designation', e.target.value)} />
+                                                <div className="grid grid-cols-2 gap-[21px]">
+                                                    <TextInput label="Duration of Service in the company" required error={errors.duration} placeholder="Placeholder" value={formData.company.duration} onChange={(e) => handleTextChange('company', 'duration', e.target.value)} />
+                                                    <TextInput label="Official Company email" required error={errors.email} placeholder="Placeholder" value={formData.company.email} onChange={(e) => handleTextChange('company', 'email', e.target.value)} />
+                                                </div>
+                                                <TextInput label="Company Address" required error={errors.address} placeholder="Placeholder" value={formData.company.address} onChange={(e) => handleTextChange('company', 'address', e.target.value)} />
+                                                <div className="grid grid-cols-2 gap-[21px]">
+                                                    <TextInput label="City" required error={errors.city} placeholder="Placeholder" value={formData.company.city} onChange={(e) => handleCityChange('company', e.target.value)} />
+                                                    <TextInput label="State" required isSelect options={INDIAN_STATES} error={errors.state} value={formData.company.state} onChange={(e) => handleStateChange('company', e.target.value)} />
+                                                </div>
+                                                <div className="grid grid-cols-2 gap-[21px]">
+                                                    <TextInput label="Pincode" required error={errors.pincode} placeholder="Placeholder" value={formData.company.pincode} onChange={(e) => handlePincodeChange('company', e.target.value)} />
+                                                    <TextInput label="Country" required value="India" readOnly />
+                                                </div>
+                                                
+                                                <div className="grid grid-cols-2 gap-[21px] mt-4 mb-6">
+                                                    <button
+                                                        onClick={handleBack}
+                                                        className="transition-colors flex items-center justify-center"
+                                                        style={{
+                                                            width: '100%', height: '35px', borderRadius: '9999px',
+                                                            background: '#FFFFFF', border: '1px solid #1D1D1F',
+                                                            color: '#1D1D1F', fontWeight: '500', fontSize: '16px'
+                                                        }}
+                                                    >
+                                                        Back
+                                                    </button>
+                                                    <button
+                                                        onClick={handleNext}
+                                                        className="transition-colors flex items-center justify-center"
+                                                        style={{
+                                                            width: '100%', height: '35px', borderRadius: '9999px',
+                                                            background: 'hsla(44, 100%, 64%, 1)', border: 'none',
+                                                            color: 'hsla(0, 0%, 12%, 1)', fontWeight: '500', fontSize: '16px'
+                                                        }}
+                                                    >
+                                                        Next
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    {/* Step 3: Reference Only */}
+                                    {currentStep === 3 && (
+                                        <div className="flex flex-col pr-2" style={{ width: '100%' }}>
+                                            <h2
+                                                style={{
+                                                    width: '686px', height: '36px', fontFamily: 'Mona Sans, sans-serif',
+                                                    fontWeight: '600', fontSize: '20px', color: 'hsla(0, 0%, 20%, 1)',
+                                                    display: 'flex', alignItems: 'center', paddingBottom: '8px',
+                                                    marginBottom: '12px', borderBottom: '1px solid hsla(0, 0%, 93%, 1)', gap: '8px'
+                                                }}
+                                            >
+                                                Reference Only
+                                            </h2>
+                                            <div className="flex flex-col gap-[21px]">
+                                                <TextInput label="Reference Name" required error={errors.name} placeholder="Placeholder" value={formData.reference.name} onChange={(e) => handleTextChange('reference', 'name', e.target.value)} />
+                                                <TextInput label="Relation of the person" required isSelect options={['Father', 'Mother', 'Brother', 'Sister', 'Friend', 'Colleague', 'Other']} error={errors.relation} placeholder="Placeholder" value={formData.reference.relation} onChange={(e) => handleTextChange('reference', 'relation', e.target.value)} />
+                                                <TextInput label="Mobile No." required error={errors.phone} placeholder="Placeholder" value={formData.reference.phone} onChange={(e) => handleTextChange('reference', 'phone', e.target.value)} />
+                                                <TextInput label="Reference Address" required error={errors.address} placeholder="Placeholder" value={formData.reference.address} onChange={(e) => handleTextChange('reference', 'address', e.target.value)} />
+                                                
+                                                <div className="grid grid-cols-2 gap-[21px]">
+                                                    <TextInput label="City" required error={errors.city} placeholder="Placeholder" value={formData.reference.city} onChange={(e) => handleCityChange('reference', e.target.value)} />
+                                                    <TextInput label="State" required isSelect options={INDIAN_STATES} error={errors.state} value={formData.reference.state} onChange={(e) => handleStateChange('reference', e.target.value)} />
+                                                </div>
+                                                <div className="grid grid-cols-2 gap-[21px]">
+                                                    <TextInput label="Pincode" required error={errors.pincode} placeholder="Placeholder" value={formData.reference.pincode} onChange={(e) => handlePincodeChange('reference', e.target.value)} />
+                                                    <TextInput label="Country" required value="India" readOnly />
+                                                </div>
+                                                
+                                                <div className="grid grid-cols-2 gap-[21px] mt-4 mb-6">
+                                                    <button
+                                                        onClick={handleBack}
+                                                        className="transition-colors flex items-center justify-center"
+                                                        style={{
+                                                            width: '100%', height: '35px', borderRadius: '9999px',
+                                                            background: '#FFFFFF', border: '1px solid #1D1D1F',
+                                                            color: '#1D1D1F', fontWeight: '500', fontSize: '16px'
+                                                        }}
+                                                    >
+                                                        Back
+                                                    </button>
+                                                    <button
+                                                        onClick={handleNext}
+                                                        className="transition-colors flex items-center justify-center"
+                                                        style={{
+                                                            width: '100%', height: '35px', borderRadius: '9999px',
+                                                            background: 'hsla(44, 100%, 64%, 1)', border: 'none',
+                                                            color: 'hsla(0, 0%, 12%, 1)', fontWeight: '500', fontSize: '16px'
+                                                        }}
+                                                    >
+                                                        Next
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    {/* Step 4: Documents Upload */}
+                                    {currentStep === 4 && (
+                                        <div className="flex flex-col pr-2" style={{ width: '100%' }}>
+                                            <h2
+                                                style={{
+                                                    width: '686px', height: '36px', fontFamily: 'Mona Sans, sans-serif',
+                                                    fontWeight: '600', fontSize: '20px', color: 'hsla(0, 0%, 20%, 1)',
+                                                    display: 'flex', alignItems: 'center', paddingBottom: '8px',
+                                                    marginBottom: '12px', borderBottom: '1px solid hsla(0, 0%, 93%, 1)', gap: '8px'
+                                                }}
+                                            >
+                                                Documents Upload
+                                            </h2>
+                                            <div className="flex flex-col gap-[21px]">
+                                                {/* Identity Proof */}
+                                                <div className="flex flex-col gap-2">
+                                                    <TextInput 
+                                                        label="Identity Proof" required isSelect 
+                                                        options={['Aadhar Card', 'Voter ID', 'Passport']} 
+                                                        value={formData.documents.identityProof} 
+                                                        onChange={(e) => handleTextChange('documents', 'identityProof', e.target.value)} 
+                                                    />
+                                                    <div className="flex flex-col gap-1 mt-1">
+                                                        <label className="font-semibold text-xs text-gray-800">{formData.documents.identityProof || 'Identity Proof'} Card <span className="text-red-500">*</span></label>
+                                                        <div className="flex items-center gap-2">
+                                                            <button onClick={() => identityProofRef.current?.click()} className="flex items-center justify-center gap-2 border border-gray-300 rounded-md px-4 py-2 text-sm text-[#0B5ED7] bg-white hover:bg-gray-50 transition-colors w-fit">
+                                                                <svg width="14" height="14" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                                    <path d="M8 11.3333V3.33333M8 3.33333L4.66667 6.66667M8 3.33333L11.3333 6.66667M3.33333 14H12.6667" stroke="#0B5ED7" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                                                                </svg>
+                                                                Attach File
+                                                            </button>
+                                                            <span className="text-xs text-green-600 font-medium truncate w-48">{identityProofRef.current?.files?.[0]?.name || ''}</span>
+                                                            <input type="file" className="hidden" ref={identityProofRef} onChange={() => setFormData({...formData})} />
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <hr className="border-t border-gray-100 my-2" />
+
+                                                {/* Address Proof */}
+                                                <div className="flex flex-col gap-2">
+                                                    <TextInput 
+                                                        label="Address Proof" required isSelect 
+                                                        options={['House Electricity Bill', 'Rental Agreement']} 
+                                                        value={formData.documents.addressProof} 
+                                                        onChange={(e) => handleTextChange('documents', 'addressProof', e.target.value)} 
+                                                    />
+                                                    <div className="flex flex-col gap-1 mt-1">
+                                                        <label className="font-semibold text-xs text-gray-800">{formData.documents.addressProof || 'Address Proof'} <span className="text-red-500">*</span></label>
+                                                        <div className="flex items-center gap-2">
+                                                            <button onClick={() => addressProofRef.current?.click()} className="flex items-center justify-center gap-2 border border-gray-300 rounded-md px-4 py-2 text-sm text-[#0B5ED7] bg-white hover:bg-gray-50 transition-colors w-fit">
+                                                                <svg width="14" height="14" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                                    <path d="M8 11.3333V3.33333M8 3.33333L4.66667 6.66667M8 3.33333L11.3333 6.66667M3.33333 14H12.6667" stroke="#0B5ED7" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                                                                </svg>
+                                                                Attach File
+                                                            </button>
+                                                            <span className="text-xs text-green-600 font-medium truncate w-48">{addressProofRef.current?.files?.[0]?.name || ''}</span>
+                                                            <input type="file" className="hidden" ref={addressProofRef} onChange={() => setFormData({...formData})} />
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <hr className="border-t border-gray-100 my-2" />
+
+                                                {/* Bank Statement */}
+                                                <div className="flex flex-col gap-2">
+                                                    <div className="flex flex-col gap-1 mt-1">
+                                                        <label className="font-semibold text-xs text-gray-800">Bank Statement - 3 Months <span className="text-red-500">*</span></label>
+                                                        <div className="flex items-center gap-2">
+                                                            <button onClick={() => bankStatementRef.current?.click()} className="flex items-center justify-center gap-2 border border-gray-300 rounded-md px-4 py-2 text-sm text-[#0B5ED7] bg-white hover:bg-gray-50 transition-colors w-fit">
+                                                                <svg width="14" height="14" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                                    <path d="M8 11.3333V3.33333M8 3.33333L4.66667 6.66667M8 3.33333L11.3333 6.66667M3.33333 14H12.6667" stroke="#0B5ED7" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                                                                </svg>
+                                                                Attach File
+                                                            </button>
+                                                            <span className="text-xs text-green-600 font-medium truncate w-48">{bankStatementRef.current?.files?.[0]?.name || ''}</span>
+                                                            <input type="file" className="hidden" ref={bankStatementRef} onChange={() => setFormData({...formData})} />
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div 
+                                                    className="flex items-start bg-white"
+                                                    style={{
+                                                        width: '560px',
+                                                        height: '48px',
+                                                        gap: '14px',
+                                                        opacity: 1,
+                                                        marginTop: '24px'
+                                                    }}
+                                                >
+                                                    <input 
+                                                        type="checkbox" 
+                                                        checked={isDocumentsChecked}
+                                                        onChange={(e) => setIsDocumentsChecked(e.target.checked)}
+                                                        className="mt-[2px] shrink-0"
+                                                        style={{
+                                                            width: '16px',
+                                                            height: '16px',
+                                                            borderRadius: '4px',
+                                                            border: '1px solid hsla(0, 0%, 69%, 1)'
+                                                        }}
+                                                    />
+                                                    <p 
+                                                        style={{
+                                                            width: '532px',
+                                                            height: '48px',
+                                                            fontFamily: 'Mona Sans, sans-serif',
+                                                            fontWeight: '600',
+                                                            fontSize: '12px',
+                                                            color: 'hsla(0, 0%, 46%, 1)',
+                                                            textAlign: 'justify',
+                                                            lineHeight: '16px',
+                                                            letterSpacing: '0px'
+                                                        }}
+                                                    >
+                                                        By checking this box, I acknowledge that I have read and accepted the “Privacy Policy”, and I consent to the use of my provided documents and data for the sole purpose of identity verification and rental agreement processing.
+                                                    </p>
+                                                </div>
+                                                
+                                                <div className="mt-[10px] w-full">
+                                                    <button
+                                                        onClick={handleNext}
+                                                        disabled={loading}
+                                                        className="transition-colors flex items-center justify-center disabled:opacity-70"
+                                                        style={{
+                                                            width: '100%', height: '48px', borderRadius: '9999px',
+                                                            background: 'hsla(44, 100%, 64%, 1)', border: 'none',
+                                                            color: 'hsla(0, 0%, 12%, 1)', fontWeight: '500', fontSize: '16px'
+                                                        }}
+                                                    >
+                                                        {loading ? 'Uploading...' : 'Continue to payment'}
+                                                    </button>
+                                                </div>
                                             </div>
                                         </div>
                                     )}

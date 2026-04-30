@@ -6,14 +6,19 @@ import { Chip, Spinner, Avatar } from "@heroui/react";
 import {
     Plus, PencilSimple, Trash, FileText,
     Eye, Clock, ArrowLeft, Image as PhosphorImage,
-    FloppyDisk, CheckCircle, Tag, Globe
+    FloppyDisk, CheckCircle, Tag, Globe, Gear
 } from "@phosphor-icons/react";
+import dynamic from 'next/dynamic';
 import Toggle from "@/components/Toggle";
+import ImageUploader from "@/components/ImageUploader";
+import 'react-quill/dist/quill.snow.css';
+
+const ReactQuill = dynamic(() => import('react-quill'), { ssr: false });
 
 const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
 const getToken = () => typeof window !== "undefined" ? localStorage.getItem("adminToken") : null;
 
-const EMPTY_FORM = { title: "", excerpt: "", content: "", coverImage: "", author: "Admin", tags: "", status: "draft" };
+const EMPTY_FORM = { title: "", excerpt: "", content: "", coverImage: "", images: [], author: "Admin", tags: "", status: "draft" };
 
 // ── Shared native Field ────────────────────────────────────────────────────
 const Field = ({ label, value, onChange, placeholder, rows, type = "text", className = "" }) => (
@@ -29,13 +34,100 @@ const Field = ({ label, value, onChange, placeholder, rows, type = "text", class
     </div>
 );
 
+// ── Page Config Editor ──────────────────────────────────────────────────────
+function PageConfigEditor({ onBack }) {
+    const [config, setConfig] = useState({ blogTitle: '', blogSubtitle: '', blogTabs: '' });
+    const [loading, setLoading] = useState(true);
+    const [saving, setSaving] = useState(false);
+    const [saved, setSaved] = useState(false);
+
+    useEffect(() => {
+        const fetchConfig = async () => {
+            try {
+                const res = await fetch(`${API}/api/cms/blog`);
+                if (res.ok) {
+                    const data = await res.json();
+                    setConfig({
+                        blogTitle: data.blogTitle || 'Latest News & Resources',
+                        blogSubtitle: data.blogSubtitle || 'The latest industry news, interviews, technologies, and resources.',
+                        blogTabs: (data.blogTabs || ['View all', 'Short term', 'Long term', 'Production on service', 'Next Tech', 'News']).join(', ')
+                    });
+                }
+            } catch (e) {
+                console.error("Failed to fetch CMS config", e);
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchConfig();
+    }, []);
+
+    const handleSave = async () => {
+        try {
+            setSaving(true);
+            const payload = {
+                pageName: 'blog',
+                blogTitle: config.blogTitle,
+                blogSubtitle: config.blogSubtitle,
+                blogTabs: config.blogTabs.split(',').map(t => t.trim()).filter(Boolean)
+            };
+            const res = await fetch(`${API}/api/cms/blog`, {
+                method: "PUT",
+                headers: { "Content-Type": "application/json", Authorization: `Bearer ${getToken()}` },
+                body: JSON.stringify(payload)
+            });
+            if (!res.ok) throw new Error("Failed to save config");
+            setSaved(true);
+            setTimeout(() => setSaved(false), 2000);
+        } catch (e) {
+            alert(e.message);
+        } finally {
+            setSaving(false);
+        }
+    };
+
+    if (loading) return <div className="flex items-center justify-center p-12"><Spinner /></div>;
+
+    return (
+        <motion.div initial={{ opacity: 0, x: 24 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -24 }} className="space-y-6">
+            <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                    <button onClick={onBack} className="w-9 h-9 rounded-xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-500 hover:bg-slate-200 dark:hover:bg-slate-700 transition-all">
+                        <ArrowLeft size={18} />
+                    </button>
+                    <h2 className="text-xl font-bold text-slate-900 dark:text-slate-100">
+                        Blog Page Configuration
+                    </h2>
+                </div>
+                <div className="flex items-center gap-3">
+                    {saved && (
+                        <span className="flex items-center gap-1.5 text-emerald-600 text-sm font-semibold">
+                            <CheckCircle size={14} weight="fill" /> Saved!
+                        </span>
+                    )}
+                    <button onClick={handleSave} disabled={saving} className="flex items-center gap-1.5 h-9 px-4 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-sm transition-all">
+                        {saving ? <Spinner size="sm" color="white" /> : <FloppyDisk size={14} weight="bold" />} Save Config
+                    </button>
+                </div>
+            </div>
+
+            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 space-y-5 shadow-sm max-w-3xl">
+                <Field label="Page Title" value={config.blogTitle} onChange={v => setConfig({...config, blogTitle: v})} placeholder="Latest News & Resources" />
+                <Field label="Page Subtitle" value={config.blogSubtitle} onChange={v => setConfig({...config, blogSubtitle: v})} placeholder="The latest industry news..." rows={2} />
+                <Field label="Filter Tabs (comma separated)" value={config.blogTabs} onChange={v => setConfig({...config, blogTabs: v})} placeholder="View all, Short term, Long term..." />
+            </div>
+        </motion.div>
+    );
+}
+
+
 // ── Blog post editor ──────────────────────────────────────────────────────────
 function PostEditor({ post, onBack, onSaved }) {
     const isNew = !post;
     const [form, setForm] = useState(
         isNew ? EMPTY_FORM : {
             title: post.title || "", excerpt: post.excerpt || "", content: post.content || "",
-            coverImage: post.coverImage || "", author: post.author || "Admin",
+            coverImage: post.coverImage || "", images: post.images || [], author: post.author || "Admin",
             tags: (post.tags || []).join(", "), status: post.status || "draft",
         }
     );
@@ -98,9 +190,28 @@ function PostEditor({ post, onBack, onSaved }) {
                             placeholder="How to Choose the Right Camera for Rent" />
                         <Field label="Excerpt / Summary" value={form.excerpt} onChange={v => set("excerpt", v)}
                             placeholder="A short description shown in the post listing…" rows={2} />
-                        <Field label="Full Content (HTML supported)" value={form.content} onChange={v => set("content", v)}
-                            placeholder="Write your full blog post here. HTML is supported." rows={16} />
-                        <p className="text-xs text-slate-400">{form.content.length.toLocaleString()} characters</p>
+                        <div className="flex flex-col gap-1.5">
+                            <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Full Content (Rich Text)</label>
+                            <div className="rounded-xl overflow-hidden border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 min-h-[400px]">
+                                <ReactQuill
+                                    theme="snow"
+                                    value={form.content}
+                                    onChange={v => set("content", v)}
+                                    placeholder="Write your full blog post here..."
+                                    className="h-[350px] dark:text-white"
+                                    modules={{
+                                        toolbar: [
+                                            [{ 'header': [1, 2, 3, false] }],
+                                            ['bold', 'italic', 'underline', 'strike'],
+                                            [{ 'list': 'ordered' }, { 'list': 'bullet' }],
+                                            ['link', 'image'],
+                                            ['clean']
+                                        ],
+                                    }}
+                                />
+                            </div>
+                        </div>
+                        <p className="text-xs text-slate-400">{form.content.replace(/<[^>]*>/g, '').length.toLocaleString()} characters (text only)</p>
                     </div>
                 </div>
 
@@ -129,17 +240,23 @@ function PostEditor({ post, onBack, onSaved }) {
                     {/* Cover image */}
                     <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-sm space-y-3">
                         <h4 className="text-xs font-bold uppercase tracking-wider text-slate-500">Cover Image</h4>
-                        <div className="relative">
-                            <PhosphorImage size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
-                            <input type="url" value={form.coverImage} onChange={e => set("coverImage", e.target.value)}
-                                placeholder="https://res.cloudinary.com/..."
-                                className="w-full h-10 pl-9 pr-3 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-400 transition-all" />
-                        </div>
-                        {form.coverImage && (
-                            <div className="aspect-video rounded-xl overflow-hidden bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700">
-                                <img src={form.coverImage} alt="Cover preview" className="w-full h-full object-cover" />
-                            </div>
-                        )}
+                        <ImageUploader
+                            multiple={false}
+                            label="Cover Image"
+                            existingUrl={form.coverImage}
+                            onUpload={(url) => set("coverImage", url)}
+                        />
+                    </div>
+
+                    {/* Blog Gallery Images */}
+                    <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-sm space-y-3">
+                        <h4 className="text-xs font-bold uppercase tracking-wider text-slate-500">Gallery / Content Images</h4>
+                        <ImageUploader
+                            multiple={true}
+                            label="Gallery Images"
+                            existingUrls={form.images}
+                            onUploadMany={(urls) => set("images", urls)}
+                        />
                     </div>
 
                     {/* Details */}
@@ -198,7 +315,9 @@ export default function BlogManagement() {
     return (
         <div className="w-full space-y-6 pb-12">
             <AnimatePresence mode="wait">
-                {editing !== null ? (
+                {editing === "config" ? (
+                    <PageConfigEditor key="config" onBack={backToList} />
+                ) : editing !== null ? (
                     <PostEditor key={editing === "new" ? "new" : editing._id}
                         post={editing === "new" ? null : editing} onBack={backToList} onSaved={backToList} />
                 ) : (
@@ -211,10 +330,16 @@ export default function BlogManagement() {
                                 </h1>
                                 <p className="text-slate-600 dark:text-slate-400">Create, edit, and publish blog posts and industry news.</p>
                             </motion.div>
-                            <button onClick={() => setEditing("new")}
-                                className="flex items-center gap-2 h-10 px-5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-sm shadow-lg shadow-indigo-500/20 transition-all">
-                                <Plus weight="bold" size={15} /> Create Post
-                            </button>
+                            <div className="flex items-center gap-3">
+                                <button onClick={() => setEditing("config")}
+                                    className="flex items-center gap-2 h-10 px-5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 font-bold text-sm transition-all">
+                                    <Gear weight="bold" size={15} /> Page Config
+                                </button>
+                                <button onClick={() => setEditing("new")}
+                                    className="flex items-center gap-2 h-10 px-5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-sm shadow-lg shadow-indigo-500/20 transition-all">
+                                    <Plus weight="bold" size={15} /> Create Post
+                                </button>
+                            </div>
                         </div>
 
                         {/* Stats */}

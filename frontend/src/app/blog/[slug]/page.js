@@ -125,7 +125,6 @@ export default function BlogPostPage() {
                     )}
                 </div>
 
-                {/* Content Body */}
                 <div
                     className="prose prose-lg prose-slate max-w-none 
                                prose-headings:font-bold prose-headings:text-slate-900 prose-headings:tracking-tight 
@@ -133,6 +132,20 @@ export default function BlogPostPage() {
                                prose-img:rounded-2xl prose-img:border prose-img:border-slate-100 prose-img:shadow-sm"
                     dangerouslySetInnerHTML={{ __html: post.content }}
                 />
+
+                {/* Blog Post Gallery Images */}
+                {post.images && post.images.length > 0 && (
+                    <div className="mt-12 space-y-6">
+                        <h3 className="text-2xl font-bold text-slate-900 tracking-tight">Gallery</h3>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            {post.images.map((img, i) => (
+                                <div key={i} className="aspect-video rounded-2xl overflow-hidden bg-slate-50 border border-slate-100 shadow-sm cursor-pointer hover:shadow-md transition-shadow">
+                                    <img src={img} alt={`Gallery image ${i + 1}`} className="w-full h-full object-cover hover:scale-105 transition-transform duration-500" />
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                )}
 
                 {/* Footer Meta */}
                 <footer className="mt-16 pt-8 border-t border-slate-200">

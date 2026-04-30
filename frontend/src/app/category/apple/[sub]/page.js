@@ -1,11 +1,13 @@
 'use client';
 import { useSearchParams } from 'next/navigation';
 import SubcategoryProductsPage from '../../../../components/SubcategoryProductsPage';
+import React from 'react';
 
 export default function AppleSubcategoryPage({ params }) {
     const searchParams = useSearchParams();
     const subId = searchParams.get('subId'); // ObjectId passed from category page link
-    const subSlug = params.sub;
+    const unwrappedParams = React.use(params);
+    const subSlug = unwrappedParams.sub;
 
     // Convert slug to a readable display name
     const displayName = subSlug

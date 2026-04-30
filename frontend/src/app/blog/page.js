@@ -9,29 +9,51 @@ const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
 
 export default function BlogPage() {
     const [posts, setPosts] = useState([]);
+    const [cmsData, setCmsData] = useState(null);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        const fetchPosts = async () => {
+        const fetchData = async () => {
             try {
-                const res = await fetch(`${API}/api/blog?status=published`);
-                if (res.ok) {
-                    const data = await res.json();
-                    setPosts(data);
+                const [postsRes, cmsRes] = await Promise.all([
+                    fetch(`${API}/api/blog?status=published`),
+                    fetch(`${API}/api/cms/blog`)
+                ]);
+                
+                if (postsRes.ok) setPosts(await postsRes.json());
+                
+                if (cmsRes.ok) {
+                    setCmsData(await cmsRes.json());
+                } else {
+                    setCmsData({
+                        blogTitle: 'Latest News & Resources',
+                        blogSubtitle: 'The latest industry news, interviews, technologies, and resources.',
+                        blogTabs: ['View all', 'Short term', 'Long term', 'Production on service', 'Next Tech', 'News']
+                    });
                 }
             } catch (err) {
-                console.error("Failed to fetch blog posts:", err);
+                console.error("Failed to fetch blog data:", err);
             } finally {
                 setLoading(false);
             }
         };
-        fetchPosts();
+        fetchData();
     }, []);
 
     const formatDate = (dateString) => {
         const options = { day: 'numeric', month: 'short', year: 'numeric' };
         return new Date(dateString).toLocaleDateString('en-GB', options);
     };
+
+    const tabs = cmsData?.blogTabs || ['View all', 'Short term', 'Long term', 'Production on service', 'Next Tech', 'News'];
+    const [activeTab, setActiveTab] = useState('View all');
+
+    // Make sure activeTab falls back correctly if tabs change
+    useEffect(() => {
+        if (tabs.length > 0 && !tabs.includes(activeTab)) {
+            setActiveTab(tabs[0]);
+        }
+    }, [tabs, activeTab]);
 
     if (loading) {
         return (
@@ -42,133 +64,183 @@ export default function BlogPage() {
         );
     }
 
-    const featuredPost = posts[0];
-    const gridPosts = posts.slice(1);
+    // Filter posts based on active tab
+    const filteredPosts = activeTab === 'View all' 
+        ? posts 
+        : posts.filter(p => p.tags && p.tags.some(tag => tag.toLowerCase() === activeTab.toLowerCase()));
+
+    const featuredPost = filteredPosts[0] || {
+        _id: 'placeholder-1',
+        title: 'Long-Term Rentals',
+        excerpt: 'Lorem ipsum dolor sit amet consectetur. Ut cras sit pulvinar dui tristique. Auctor os nullo.',
+        category: 'Category',
+        author: 'John Doe',
+        createdAt: '2022-01-11T00:00:00Z',
+        coverImage: 'https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=1200&auto=format&fit=crop&q=80'
+    };
+    
+    // Fill the rest with placeholders if not enough posts to match the design visually
+    const defaultGridPosts = [
+        { _id: 'p2', title: 'Long-Term Rentals', excerpt: 'Lorem ipsum dolor sit amet consectetur. Ut cras sit pulvinar dui tristique. Auctor os nullo.', category: 'Category', author: 'John Doe', createdAt: '2022-01-11T00:00:00Z', coverImage: 'https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=800&auto=format&fit=crop&q=60' },
+        { _id: 'p3', title: 'Long-Term Rentals', excerpt: 'Lorem ipsum dolor sit amet consectetur. Ut cras sit pulvinar dui tristique. Auctor os nullo.', category: 'Category', author: 'John Doe', createdAt: '2022-01-11T00:00:00Z', coverImage: 'https://images.unsplash.com/photo-1517336714731-489689fd1ca8?w=800&auto=format&fit=crop&q=60' },
+        { _id: 'p4', title: 'Long-Term Rentals', excerpt: 'Lorem ipsum dolor sit amet consectetur. Ut cras sit pulvinar dui tristique. Auctor os nullo.', category: 'Category', author: 'John Doe', createdAt: '2022-01-11T00:00:00Z', coverImage: 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=800&auto=format&fit=crop&q=60' },
+        { _id: 'p5', title: 'Long-Term Rentals', excerpt: 'Lorem ipsum dolor sit amet consectetur. Ut cras sit pulvinar dui tristique. Auctor os nullo.', category: 'Category', author: 'John Doe', createdAt: '2022-01-11T00:00:00Z', coverImage: 'https://images.unsplash.com/photo-1531297172867-4d5ce290d291?w=800&auto=format&fit=crop&q=60' },
+        { _id: 'p6', title: 'Long-Term Rentals', excerpt: 'Lorem ipsum dolor sit amet consectetur. Ut cras sit pulvinar dui tristique. Auctor os nullo.', category: 'Category', author: 'John Doe', createdAt: '2022-01-11T00:00:00Z', coverImage: 'https://images.unsplash.com/photo-1550751827-4bd374c3f58b?w=800&auto=format&fit=crop&q=60' },
+        { _id: 'p7', title: 'Long-Term Rentals', excerpt: 'Lorem ipsum dolor sit amet consectetur. Ut cras sit pulvinar dui tristique. Auctor os nullo.', category: 'Category', author: 'John Doe', createdAt: '2022-01-11T00:00:00Z', coverImage: 'https://images.unsplash.com/photo-1504384308090-c894fdcc538d?w=800&auto=format&fit=crop&q=60' },
+    ];
+    
+    const gridPosts = filteredPosts.length > 1 ? filteredPosts.slice(1) : (filteredPosts.length === 1 ? [] : defaultGridPosts);
 
     return (
-        <div className="bg-white min-h-screen pb-24">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-16 md:pt-24">
-
+        <div 
+            className="w-full flex justify-center"
+            style={{ 
+                background: 'hsla(0, 0%, 100%, 1)', 
+                paddingTop: '20px',
+                minHeight: '2141px' // outer section height
+            }}
+        >
+            <div 
+                className="w-full max-w-[1440px] px-[80px]"
+                style={{
+                    background: 'var(--Color-Scheme-1-Background, hsla(0, 0%, 100%, 1))',
+                    paddingTop: '28px',
+                    paddingBottom: '28px',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '48px',
+                    minHeight: '2121px' // inner section height
+                }}
+            >
                 {/* Header Section */}
-                <div className="mb-12">
-                    <h1 className="text-4xl md:text-6xl font-black text-slate-900 tracking-tight mb-4">
-                        Latest News & Resources
+                <div className="flex flex-col gap-2">
+                    <h1 className="text-[40px] font-bold text-[#1D1D1F] font-['Mona_Sans',sans-serif] tracking-tight">
+                        {cmsData?.blogTitle || 'Latest News & Resources'}
                     </h1>
-                    <p className="text-lg md:text-xl text-slate-800">
-                        The latest industry news, interviews, technoloigies, and resources
+                    <p className="text-[16px] text-gray-500 font-['Mona_Sans',sans-serif]">
+                        {cmsData?.blogSubtitle || 'The latest industry news, interviews, technologies, and resources.'}
                     </p>
                 </div>
 
-                {posts.length === 0 ? (
-                    <div className="py-20 text-center text-slate-500">
-                        <p className="text-xl">No published blog posts yet.</p>
-                        <p className="mt-2">Check back soon for the latest news!</p>
+                {/* Featured Hero Post */}
+                <div className="flex flex-col gap-4">
+                    <Link href={`/blog/${featuredPost.slug || featuredPost._id}`} className="group flex flex-col gap-4">
+                        <span className="text-[#0B5ED7] text-[12px] font-semibold bg-[#E7F0FC] px-3 py-1 rounded-full w-fit">
+                            {featuredPost.tags && featuredPost.tags.length > 0 ? featuredPost.tags[0] : featuredPost.category || "Category"}
+                        </span>
+                        
+                        <div className="w-full h-[540px] rounded-[24px] overflow-hidden relative">
+                            {featuredPost.coverImage ? (
+                                <img
+                                    src={featuredPost.coverImage}
+                                    alt={featuredPost.title}
+                                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                                />
+                            ) : (
+                                <div className="w-full h-full bg-slate-100 flex items-center justify-center text-slate-300">
+                                    <span>Image Placeholder</span>
+                                </div>
+                            )}
+                        </div>
+
+                        <div className="flex flex-col max-w-[800px] mt-2">
+                            <div className="flex items-center justify-between">
+                                <h2 className="text-[24px] md:text-[32px] font-bold text-[#1D1D1F] group-hover:text-[#0B5ED7] transition-colors leading-tight mb-2">
+                                    {featuredPost.title}
+                                </h2>
+                                <FiArrowUpRight size={28} className="text-gray-400 group-hover:text-[#0B5ED7] transition-colors shrink-0" />
+                            </div>
+                            {featuredPost.excerpt && (
+                                <p className="text-gray-500 text-[16px] mb-6 line-clamp-2">
+                                    {featuredPost.excerpt}
+                                </p>
+                            )}
+                            <div className="flex items-center gap-3">
+                                <div className="w-10 h-10 rounded-full overflow-hidden flex items-center justify-center bg-gray-200">
+                                    <img src={`https://ui-avatars.com/api/?name=${encodeURIComponent(featuredPost.author || "John Doe")}&background=random`} alt={featuredPost.author || "Admin"} className="w-full h-full object-cover" />
+                                </div>
+                                <div className="flex flex-col justify-center">
+                                    <div className="text-[14px] font-semibold text-[#1D1D1F] leading-none mb-1">{featuredPost.author || "John Doe"}</div>
+                                    <div className="text-[12px] text-gray-500 leading-none">{formatDate(featuredPost.createdAt)}</div>
+                                </div>
+                            </div>
+                        </div>
+                    </Link>
+                </div>
+
+                {/* Tabs / Filters */}
+                <div className="w-full border-b border-gray-200">
+                    <div className="flex items-center gap-8 overflow-x-auto no-scrollbar">
+                        {tabs.map((tab) => (
+                            <button
+                                key={tab}
+                                onClick={() => setActiveTab(tab)}
+                                className={`pb-4 text-[15px] font-medium transition-colors relative whitespace-nowrap ${
+                                    activeTab === tab 
+                                        ? 'text-[#0B5ED7]' 
+                                        : 'text-[#1D1D1F] hover:text-[#0B5ED7]'
+                                }`}
+                            >
+                                {tab}
+                                {activeTab === tab && (
+                                    <div className="absolute bottom-0 left-0 w-full h-[2px] bg-[#0B5ED7] rounded-t-full" />
+                                )}
+                            </button>
+                        ))}
                     </div>
-                ) : (
-                    <>
-                        {/* Featured Hero Post */}
-                        {featuredPost && (
-                            <div className="mb-20">
-                                <Link href={`/blog/${featuredPost.slug || featuredPost._id}`} className="group block">
-                                    <h3 className="text-blue-500 font-semibold mb-3">
-                                        {featuredPost.tags && featuredPost.tags.length > 0 ? featuredPost.tags[0] : "Category"}
+                </div>
+
+                {/* Grid Posts */}
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-[48px]">
+                    {gridPosts.map((post) => (
+                        <Link key={post._id} href={`/blog/${post.slug || post._id}`} className="group flex flex-col gap-4">
+                            
+                            <div className="w-full aspect-[4/3] rounded-[16px] overflow-hidden relative">
+                                {post.coverImage ? (
+                                    <img
+                                        src={post.coverImage}
+                                        alt={post.title}
+                                        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                                    />
+                                ) : (
+                                    <div className="w-full h-full bg-slate-100 flex items-center justify-center text-slate-300">
+                                        <span>Image Placeholder</span>
+                                    </div>
+                                )}
+                            </div>
+
+                            <div className="flex flex-col">
+                                <span className="text-[#0B5ED7] text-[12px] font-semibold bg-[#E7F0FC] px-3 py-1 rounded-full w-fit mb-3">
+                                    {post.tags && post.tags.length > 0 ? post.tags[0] : post.category || "Category"}
+                                </span>
+                                
+                                <div className="flex items-start justify-between gap-4 mb-2">
+                                    <h3 className="text-[18px] font-bold text-[#1D1D1F] group-hover:text-[#0B5ED7] transition-colors line-clamp-2 leading-snug">
+                                        {post.title}
                                     </h3>
-
-                                    {/* Image Space - Retaining layout even if empty */}
-                                    <div className="w-full aspect-[21/9] md:aspect-[2.5/1] bg-slate-100 rounded-3xl overflow-hidden mb-6 relative border border-slate-200">
-                                        {featuredPost.coverImage ? (
-                                            <img
-                                                src={featuredPost.coverImage}
-                                                alt={featuredPost.title}
-                                                className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                                            />
-                                        ) : (
-                                            <div className="absolute inset-0 flex items-center justify-center text-slate-300">
-                                                <span>Image Placeholder</span>
-                                            </div>
-                                        )}
+                                    <FiArrowUpRight size={22} className="text-gray-400 group-hover:text-[#0B5ED7] transition-colors shrink-0 mt-1" />
+                                </div>
+                                
+                                {post.excerpt && (
+                                    <p className="text-gray-500 text-[14px] leading-relaxed line-clamp-2 mb-4">
+                                        {post.excerpt}
+                                    </p>
+                                )}
+                                
+                                <div className="flex items-center gap-3 mt-auto">
+                                    <div className="w-8 h-8 rounded-full overflow-hidden flex items-center justify-center bg-gray-200">
+                                        <img src={`https://ui-avatars.com/api/?name=${encodeURIComponent(post.author || "John Doe")}&background=random`} alt={post.author || "Admin"} className="w-full h-full object-cover" />
                                     </div>
-
-                                    <div className="max-w-4xl">
-                                        <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-4 group-hover:text-blue-600 transition-colors">
-                                            {featuredPost.title}
-                                        </h2>
-                                        {featuredPost.excerpt && (
-                                            <p className="text-slate-600 text-lg md:text-xl mb-6 line-clamp-2">
-                                                {featuredPost.excerpt}
-                                            </p>
-                                        )}
-
-                                        <div className="flex items-center gap-3">
-                                            <div className="w-10 h-10 rounded-full overflow-hidden flex items-center justify-center font-bold text-slate-500 bg-indigo-50 border border-indigo-100">
-                                                {featuredPost.author ? featuredPost.author.charAt(0).toUpperCase() : "A"}
-                                            </div>
-                                            <div>
-                                                <div className="text-sm font-bold text-slate-900">{featuredPost.author || "Admin"}</div>
-                                                <div className="text-sm text-slate-500">{formatDate(featuredPost.createdAt)}</div>
-                                            </div>
-                                        </div>
+                                    <div className="flex flex-col justify-center">
+                                        <div className="text-[13px] font-semibold text-[#1D1D1F] leading-none mb-1">{post.author || "John Doe"}</div>
+                                        <div className="text-[11px] text-gray-500 leading-none">{formatDate(post.createdAt)}</div>
                                     </div>
-                                </Link>
+                                </div>
                             </div>
-                        )}
+                        </Link>
+                    ))}
+                </div>
 
-                        {/* Grid Posts */}
-                        {gridPosts.length > 0 && (
-                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-12">
-                                {gridPosts.map((post) => (
-                                    <Link key={post._id} href={`/blog/${post.slug || post._id}`} className="group block">
-
-                                        {/* Image Space - Retaining layout even if empty */}
-                                        <div className="w-full aspect-[3/2] bg-slate-100 rounded-2xl overflow-hidden mb-5 relative border border-slate-200">
-                                            {post.coverImage ? (
-                                                <img
-                                                    src={post.coverImage}
-                                                    alt={post.title}
-                                                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                                                />
-                                            ) : (
-                                                <div className="absolute inset-0 flex items-center justify-center text-slate-300">
-                                                    <span>Image Placeholder</span>
-                                                </div>
-                                            )}
-                                        </div>
-
-                                        <div className="inline-block px-3 py-1 bg-blue-50 border border-blue-200 text-blue-500 text-xs font-semibold rounded-full mb-4">
-                                            {post.tags && post.tags.length > 0 ? post.tags[0] : "Category"}
-                                        </div>
-
-                                        <div className="flex items-start justify-between gap-4 mb-2">
-                                            <h3 className="text-xl font-bold text-slate-900 group-hover:text-blue-600 transition-colors line-clamp-2">
-                                                {post.title}
-                                            </h3>
-                                            <FiArrowUpRight size={22} className="text-slate-400 group-hover:text-blue-600 transition-colors shrink-0 mt-1" />
-                                        </div>
-
-                                        {post.excerpt && (
-                                            <p className="text-slate-600 mb-6 line-clamp-2 text-sm md:text-base leading-relaxed">
-                                                {post.excerpt}
-                                            </p>
-                                        )}
-
-                                        <div className="flex items-center gap-3 mt-auto">
-                                            <div className="w-9 h-9 rounded-full overflow-hidden flex items-center justify-center font-bold text-xs text-slate-500 bg-indigo-50 border border-indigo-100 relative">
-                                                {post.coverImage ? (
-                                                    <img src="https://ui-avatars.com/api/?name=John+Doe&background=random" className="absolute opacity-0" />
-                                                ) : null}
-                                                {post.author ? post.author.charAt(0).toUpperCase() : "A"}
-                                            </div>
-                                            <div>
-                                                <div className="text-xs font-bold text-slate-900">{post.author || "Admin"}</div>
-                                                <div className="text-xs text-slate-500">{formatDate(post.createdAt)}</div>
-                                            </div>
-                                        </div>
-                                    </Link>
-                                ))}
-                            </div>
-                        )}
-                    </>
-                )}
             </div>
         </div>
     );

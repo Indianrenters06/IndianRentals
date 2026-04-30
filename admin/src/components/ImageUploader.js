@@ -16,7 +16,7 @@
  *   className              – extra wrapper class
  */
 
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
 import { Spinner } from "@heroui/react";
 import { CloudArrowUp, Image as PhosphorImage, CheckCircle, Warning } from "@phosphor-icons/react";
 
@@ -31,15 +31,23 @@ export default function ImageUploader({
     multiple = false,
     label = "Product Image",
     existingUrl = "",
+    existingUrls = [],
     className = "",
 }) {
     const fileRef = useRef(null);
     const [dragging, setDragging] = useState(false);
     const [uploading, setUploading] = useState(false);
     const [preview, setPreview] = useState(existingUrl);
-    const [previews, setPreviews] = useState([]);   // for multiple mode
+    const [previews, setPreviews] = useState(existingUrls || []);   // for multiple mode
     const [error, setError] = useState("");
     const [success, setSuccess] = useState(false);
+
+    // Sync when existingUrls load from a network request (e.g. in Edit mode)
+    useEffect(() => {
+        if (multiple && existingUrls?.length > 0 && previews.length === 0) {
+            setPreviews(existingUrls);
+        }
+    }, [existingUrls, multiple]);
 
     // ── Upload logic ──────────────────────────────────────────────────────────
     const uploadFiles = async (files) => {

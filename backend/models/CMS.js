@@ -220,6 +220,11 @@ const cmsSchema = new mongoose.Schema({
     metaTitle: { type: String, default: '' },
     metaDescription: { type: String, default: '' },
 
+    // ── Blog Page ─────────────────────────────────────────────────────────────
+    blogTitle: { type: String, default: 'Latest News & Resources' },
+    blogSubtitle: { type: String, default: 'The latest industry news, interviews, technologies, and resources.' },
+    blogTabs: { type: [String], default: ['View all', 'Short term', 'Long term', 'Production on service', 'Next Tech', 'News'] },
+
     // ── Status ───────────────────────────────────────────────────────────────
     publishStatus: {
         type: String,

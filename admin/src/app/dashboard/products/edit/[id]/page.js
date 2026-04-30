@@ -570,39 +570,15 @@ export default function EditProduct() {
                                 Upload new images or keep the existing ones. The first image is the primary listing photo.
                             </p>
 
-                            {/* Existing images */}
-                            {form.images.filter(Boolean).length > 0 && (
-                                <div>
-                                    <p className="text-xs font-semibold text-slate-500 mb-2">Current Images</p>
-                                    <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-3">
-                                        {form.images.filter(Boolean).map((url, i) => (
-                                            <div key={i} className="relative group aspect-square rounded-xl overflow-hidden border-2 border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900">
-                                                <img src={url} alt={`img-${i + 1}`} className="w-full h-full object-cover" />
-                                                <button
-                                                    onClick={() => removeImage(i)}
-                                                    className="absolute top-1 right-1 w-5 h-5 rounded-full bg-red-500 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity text-xs font-bold hover:bg-red-600"
-                                                >
-                                                    ×
-                                                </button>
-                                                {i === 0 && (
-                                                    <div className="absolute bottom-0 left-0 right-0 text-[9px] font-bold text-center py-0.5 bg-indigo-600 text-white">
-                                                        PRIMARY
-                                                    </div>
-                                                )}
-                                            </div>
-                                        ))}
-                                    </div>
-                                </div>
-                            )}
-
                             {/* Upload new images */}
                             <ImageUploader
                                 multiple
-                                label="Upload New Images"
-                                onUploadMany={newUrls =>
+                                existingUrls={form.images}
+                                label="Product Images"
+                                onUploadMany={urls =>
                                     setForm(p => ({
                                         ...p,
-                                        images: [...p.images.filter(Boolean), ...newUrls],
+                                        images: urls,
                                     }))
                                 }
                             />
