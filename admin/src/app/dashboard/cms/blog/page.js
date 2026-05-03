@@ -11,9 +11,9 @@ import {
 import dynamic from 'next/dynamic';
 import Toggle from "@/components/Toggle";
 import ImageUploader from "@/components/ImageUploader";
-import 'react-quill/dist/quill.snow.css';
 
-const ReactQuill = dynamic(() => import('react-quill'), { ssr: false });
+const MDEditor = dynamic(() => import('@uiw/react-md-editor'), { ssr: false });
+const MDPreview = dynamic(() => import('@uiw/react-md-editor').then(m => m.default.Markdown), { ssr: false });
 
 const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
 const getToken = () => typeof window !== "undefined" ? localStorage.getItem("adminToken") : null;
@@ -191,27 +191,18 @@ function PostEditor({ post, onBack, onSaved }) {
                         <Field label="Excerpt / Summary" value={form.excerpt} onChange={v => set("excerpt", v)}
                             placeholder="A short description shown in the post listing…" rows={2} />
                         <div className="flex flex-col gap-1.5">
-                            <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Full Content (Rich Text)</label>
-                            <div className="rounded-xl overflow-hidden border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 min-h-[400px]">
-                                <ReactQuill
-                                    theme="snow"
+                            <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Full Content (Markdown)</label>
+                            <div data-color-mode="light" className="rounded-xl overflow-hidden border border-slate-200 dark:border-slate-700 min-h-[400px]">
+                                <MDEditor
                                     value={form.content}
-                                    onChange={v => set("content", v)}
-                                    placeholder="Write your full blog post here..."
-                                    className="h-[350px] dark:text-white"
-                                    modules={{
-                                        toolbar: [
-                                            [{ 'header': [1, 2, 3, false] }],
-                                            ['bold', 'italic', 'underline', 'strike'],
-                                            [{ 'list': 'ordered' }, { 'list': 'bullet' }],
-                                            ['link', 'image'],
-                                            ['clean']
-                                        ],
-                                    }}
+                                    onChange={v => set("content", v || "")}
+                                    height={400}
+                                    preview="edit"
+                                    style={{ borderRadius: '0.75rem' }}
                                 />
                             </div>
                         </div>
-                        <p className="text-xs text-slate-400">{form.content.replace(/<[^>]*>/g, '').length.toLocaleString()} characters (text only)</p>
+                        <p className="text-xs text-slate-400">{(form.content || '').length.toLocaleString()} characters</p>
                     </div>
                 </div>
 
