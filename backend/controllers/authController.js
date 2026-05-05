@@ -20,9 +20,9 @@ const adminLogin = asyncHandler(async (req, res) => {
     const user = await User.findOne({ email }).select('+password');
 
     if (user && (await user.matchPassword(password))) {
-        if (user.role !== 'admin') {
+        if (user.role !== 'admin' && user.role !== 'staff') {
             res.status(401);
-            throw new Error('Not authorized as an admin');
+            throw new Error('Not authorized to access the admin panel');
         }
 
         const token = generateToken(res, user._id);
@@ -32,6 +32,7 @@ const adminLogin = asyncHandler(async (req, res) => {
             name: user.name,
             email: user.email,
             role: user.role,
+            adminPermissions: user.adminPermissions || [],
             token: token,
         });
     } else {

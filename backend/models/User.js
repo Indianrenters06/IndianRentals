@@ -30,8 +30,14 @@ const userSchema = new mongoose.Schema({
     },
     role: {
         type: String,
-        enum: ['customer', 'admin'],
+        enum: ['customer', 'admin', 'staff'],
         default: 'customer'
+    },
+    // For staff members: which admin sections they can access
+    // e.g. ['cms', 'products', 'orders', 'inventory', 'users', 'kyc', 'payments', 'coupons', 'reports', 'notifications', 'settings']
+    adminPermissions: {
+        type: [String],
+        default: []
     },
     kyc: {
         status: {

@@ -5,7 +5,7 @@ import { motion } from 'framer-motion';
 import {
     MagnifyingGlass, Funnel, DownloadSimple, PencilSimple, Trash,
     Phone, MapPin, DotsThreeVertical,
-    UserPlus, ShieldCheck, User
+    UserPlus, ShieldCheck, User, Key, CheckCircle
 } from '@phosphor-icons/react';
 import {
     Card,
@@ -29,7 +29,8 @@ import {
     DropdownItem,
     Pagination,
     Spinner,
-    Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, useDisclosure, Divider
+    Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, useDisclosure, Divider,
+    CheckboxGroup, Checkbox
 } from "@heroui/react";
 
 export default function UsersManagement() {
@@ -47,7 +48,62 @@ export default function UsersManagement() {
     const handleView = (user, type) => {
         setSelectedUser(user);
         setModalType(type);
+        if (type === 'assign_role') {
+            setRole(user.role || 'customer');
+            setPermissions(user.adminPermissions || []);
+        }
         onOpen();
+    };
+
+    const [role, setRole] = useState('customer');
+    const [permissions, setPermissions] = useState([]);
+    const [saving, setSaving] = useState(false);
+
+    const availablePermissions = [
+        { label: 'CMS Management', value: 'cms' },
+        { label: 'Products', value: 'products' },
+        { label: 'Inventory', value: 'inventory' },
+        { label: 'Users', value: 'users' },
+        { label: 'KYC Verification', value: 'kyc' },
+        { label: 'Orders', value: 'orders' },
+        { label: 'Payments', value: 'payments' },
+        { label: 'Coupons & Deals', value: 'coupons' },
+        { label: 'Reports', value: 'reports' },
+        { label: 'Notifications', value: 'notifications' },
+        { label: 'Settings', value: 'settings' },
+    ];
+
+    const handleAssignRole = async () => {
+        if (!selectedUser) return;
+        setSaving(true);
+        try {
+            const token = localStorage.getItem('adminToken');
+            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/admin/users/${selectedUser._id}/role`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({
+                    role,
+                    adminPermissions: role === 'staff' ? permissions : []
+                })
+            });
+
+            if (response.ok) {
+                const updatedUser = await response.json();
+                setUsers(users.map(u => u._id === updatedUser._id ? { ...u, role: updatedUser.role, adminPermissions: updatedUser.adminPermissions } : u));
+                onOpenChange(false);
+            } else {
+                const errorData = await response.json();
+                alert(errorData.message || 'Failed to update role');
+            }
+        } catch (error) {
+            console.error('Error updating role:', error);
+            alert('Network error. Please try again.');
+        } finally {
+            setSaving(false);
+        }
     };
 
     useEffect(() => {
@@ -136,14 +192,20 @@ export default function UsersManagement() {
                     </div>
                 );
             case "role":
-                const isAdmin = user?.role === 'admin' || user?.role === 'Admin' || user?.isAdmin;
+                const roleValue = user?.role?.toLowerCase() || 'customer';
+                const isAdminRole = roleValue === 'admin';
+                const isStaffRole = roleValue === 'staff';
+                
                 return (
-                    <div className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 font-medium text-xs ${isAdmin
+                    <div className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 font-medium text-xs ${
+                        isAdminRole
                         ? "bg-indigo-50 dark:bg-indigo-500/10 text-indigo-700 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-500/20"
+                        : isStaffRole
+                        ? "bg-purple-50 dark:bg-purple-500/10 text-purple-700 dark:text-purple-400 border border-purple-200 dark:border-purple-500/20"
                         : "bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700"
                         }`}>
-                        {isAdmin ? <ShieldCheck className="w-3 h-3" /> : <User className="w-3 h-3" />}
-                        {isAdmin ? 'Admin' : 'Customer'}
+                        {isAdminRole ? <ShieldCheck className="w-3 h-3" /> : isStaffRole ? <Key className="w-3 h-3" /> : <User className="w-3 h-3" />}
+                        {roleValue.charAt(0).toUpperCase() + roleValue.slice(1)}
                     </div>
                 );
             case "contact":
@@ -189,6 +251,7 @@ export default function UsersManagement() {
                             </DropdownTrigger>
                             <DropdownMenu aria-label="User Actions" variant="flat">
                                 <DropdownItem key="view" startContent={<User />} onPress={() => handleView(user, 'profile')}>View Profile</DropdownItem>
+                                <DropdownItem key="assign" startContent={<ShieldCheck />} onPress={() => handleView(user, 'assign_role')}>Assign Role & Permissions</DropdownItem>
                                 <DropdownItem key="orders" startContent={<MapPin />} onPress={() => handleView(user, 'orders')}>View Orders</DropdownItem>
                                 <DropdownItem
                                     key="delete"
@@ -343,7 +406,7 @@ export default function UsersManagement() {
                         <>
                             <ModalHeader className="flex flex-col gap-1 border-b border-slate-100 dark:border-slate-800/60 pb-4 pt-5 px-6">
                                 <h2 className="text-xl font-bold tracking-tight text-slate-900 dark:text-slate-100">
-                                    {modalType === 'profile' ? 'User Profile' : 'User Orders'}
+                                    {modalType === 'profile' ? 'User Profile' : modalType === 'assign_role' ? 'Assign Role & Permissions' : 'User Orders'}
                                 </h2>
                             </ModalHeader>
                             <ModalBody className="py-6 px-6">
@@ -404,6 +467,62 @@ export default function UsersManagement() {
                                     </div>
                                 )}
 
+                                {selectedUser && modalType === 'assign_role' && (
+                                    <div className="space-y-6">
+                                        <div className="flex items-center gap-4 p-4 bg-slate-50 dark:bg-slate-900/50 rounded-2xl border border-slate-200 dark:border-slate-800">
+                                            <Avatar name={selectedUser.name?.charAt(0)} className="bg-indigo-500 text-white" />
+                                            <div>
+                                                <h4 className="font-bold text-slate-900 dark:text-slate-100">{selectedUser.name}</h4>
+                                                <p className="text-xs text-slate-500">{selectedUser.email}</p>
+                                            </div>
+                                        </div>
+
+                                        <div className="space-y-4">
+                                            <div>
+                                                <label className="text-xs font-bold text-slate-500 uppercase tracking-wider block mb-2">Select User Role</label>
+                                                <Select
+                                                    label="Role"
+                                                    placeholder="Select a role"
+                                                    selectedKeys={[role]}
+                                                    onChange={(e) => setRole(e.target.value)}
+                                                    className="max-w-xs"
+                                                    variant="bordered"
+                                                >
+                                                    <SelectItem key="customer" startContent={<User size={18} />}>Customer (Basic Access)</SelectItem>
+                                                    <SelectItem key="staff" startContent={<Key size={18} />}>Staff (Restricted Admin)</SelectItem>
+                                                    <SelectItem key="admin" startContent={<ShieldCheck size={18} />}>Administrator (Full Access)</SelectItem>
+                                                </Select>
+                                            </div>
+
+                                            {role === 'staff' && (
+                                                <motion.div
+                                                    initial={{ opacity: 0, y: 10 }}
+                                                    animate={{ opacity: 1, y: 0 }}
+                                                    className="space-y-3 pt-2"
+                                                >
+                                                    <label className="text-xs font-bold text-slate-500 uppercase tracking-wider block">Staff Permissions</label>
+                                                    <p className="text-xs text-slate-400 mb-4">Select the sections this staff member can access in the admin panel.</p>
+                                                    <CheckboxGroup
+                                                        value={permissions}
+                                                        onValueChange={setPermissions}
+                                                        className="gap-x-8 gap-y-3"
+                                                        orientation="horizontal"
+                                                        color="indigo"
+                                                    >
+                                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-3">
+                                                            {availablePermissions.map(p => (
+                                                                <Checkbox key={p.value} value={p.value} classNames={{ label: "text-sm font-medium text-slate-700 dark:text-slate-300" }}>
+                                                                    {p.label}
+                                                                </Checkbox>
+                                                            ))}
+                                                        </div>
+                                                    </CheckboxGroup>
+                                                </motion.div>
+                                            )}
+                                        </div>
+                                    </div>
+                                )}
+
                                 {selectedUser && modalType === 'orders' && (
                                     <div className="flex flex-col items-center justify-center text-center py-12 px-4 border border-dashed border-slate-200 dark:border-slate-800 rounded-2xl bg-slate-50 dark:bg-slate-900/50">
                                         <div className="w-16 h-16 bg-white dark:bg-slate-800 shadow-sm rounded-full flex items-center justify-center mb-4">
@@ -417,9 +536,24 @@ export default function UsersManagement() {
                                 )}
                             </ModalBody>
                             <ModalFooter className="border-t border-slate-100 dark:border-slate-800/60 pb-5 px-6">
-                                <Button color="primary" variant="flat" onPress={onClose} className="font-semibold">
-                                    Close Window
-                                </Button>
+                                {modalType === 'assign_role' ? (
+                                    <>
+                                        <Button variant="light" onPress={onClose} className="font-semibold text-slate-500">Cancel</Button>
+                                        <Button
+                                            color="primary"
+                                            onPress={handleAssignRole}
+                                            isLoading={saving}
+                                            className="font-bold bg-indigo-600 shadow-lg shadow-indigo-500/30"
+                                            startContent={!saving && <CheckCircle size={18} weight="bold" />}
+                                        >
+                                            Save Permissions
+                                        </Button>
+                                    </>
+                                ) : (
+                                    <Button color="primary" variant="flat" onPress={onClose} className="font-semibold">
+                                        Close Window
+                                    </Button>
+                                )}
                             </ModalFooter>
                         </>
                     )}

@@ -33,6 +33,8 @@ const {
     adjustStock,
 } = require('../controllers/adminController');
 const { protect, admin } = require('../middleware/authMiddleware');
+const User = require('../models/User');
+const asyncHandler = require('express-async-handler');
 
 // Dashboard
 router.get('/stats', protect, admin, getDashboardStats);
@@ -54,6 +56,23 @@ router.route('/users/:id')
     .get(protect, admin, getUserById)
     .put(protect, admin, updateUser)
     .delete(protect, admin, deleteUser);
+
+// ── Role & Permission Assignment (superadmin only) ────────────────────────────
+router.put('/users/:id/role', protect, admin, asyncHandler(async (req, res) => {
+    const { role, adminPermissions } = req.body;
+    const user = await User.findById(req.params.id);
+    if (!user) { res.status(404); throw new Error('User not found'); }
+    if (role) user.role = role;
+    if (Array.isArray(adminPermissions)) user.adminPermissions = adminPermissions;
+    await user.save();
+    res.json({
+        _id: user._id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        adminPermissions: user.adminPermissions,
+    });
+}));
 
 // Rentals Management
 router.route('/rentals')

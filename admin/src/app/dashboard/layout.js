@@ -27,7 +27,7 @@ import { ThemeToggle } from "../../components/ThemeToggle";
 export default function DashboardLayout({ children }) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [openMenus, setOpenMenus] = useState({});
-  const [adminInfo, setAdminInfo] = useState({ name: 'Admin', role: 'admin' });
+  const [adminInfo, setAdminInfo] = useState({ name: 'Admin', role: 'admin', adminPermissions: [] });
   const [notifications, setNotifications] = useState([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const [isMobile, setIsMobile] = useState(false);
@@ -132,10 +132,16 @@ export default function DashboardLayout({ children }) {
     }));
   };
 
-  const menuItems = [
+  // Permission-aware menu items — each top-level item has a `permission` key
+  // that maps to an adminPermissions value. Admins see everything; staff see only their sections.
+  const isAdmin = adminInfo?.role === 'admin';
+  const perms = adminInfo?.adminPermissions || [];
+  const can = (section) => isAdmin || perms.includes(section);
+
+  const allMenuItems = [
     { name: 'Dashboard', icon: House, path: '/dashboard' },
     {
-      name: 'CMS', icon: Layout, path: '/dashboard/cms',
+      name: 'CMS', icon: Layout, path: '/dashboard/cms', permission: 'cms',
       submenu: [
         { name: 'Homepage',    path: '/dashboard/cms/homepage' },
         { name: 'Global Layout',path: '/dashboard/cms/layout' },
@@ -147,7 +153,7 @@ export default function DashboardLayout({ children }) {
       ]
     },
     {
-      name: 'Products', icon: Package, path: '/dashboard/products',
+      name: 'Products', icon: Package, path: '/dashboard/products', permission: 'products',
       submenu: [
         { name: 'Add Product', path: '/dashboard/products/add' },
         { name: 'All Products', path: '/dashboard/products' },
@@ -161,7 +167,7 @@ export default function DashboardLayout({ children }) {
       ]
     },
     {
-      name: 'Inventory', icon: Cube, path: '/dashboard/inventory',
+      name: 'Inventory', icon: Cube, path: '/dashboard/inventory', permission: 'inventory',
       submenu: [
         { name: 'Available Stock', path: '/dashboard/inventory/available' },
         { name: 'Assigned Stock', path: '/dashboard/inventory/assigned' },
@@ -172,7 +178,7 @@ export default function DashboardLayout({ children }) {
       ]
     },
     {
-      name: 'Users', icon: Users, path: '/dashboard/users',
+      name: 'Users', icon: Users, path: '/dashboard/users', permission: 'users',
       submenu: [
         { name: 'All Users', path: '/dashboard/users' },
         { name: 'Active Users', path: '/dashboard/users/active' },
@@ -184,7 +190,7 @@ export default function DashboardLayout({ children }) {
       ]
     },
     {
-      name: 'KYC ', icon: ShieldCheck, path: '/dashboard/kyc',
+      name: 'KYC ', icon: ShieldCheck, path: '/dashboard/kyc', permission: 'kyc',
       submenu: [
         { name: 'Pending', path: '/dashboard/kyc/pending' },
         { name: 'Under Review', path: '/dashboard/kyc/review' },
@@ -194,7 +200,7 @@ export default function DashboardLayout({ children }) {
       ]
     },
     {
-      name: 'Orders', icon: ShoppingCart, path: '/dashboard/orders',
+      name: 'Orders', icon: ShoppingCart, path: '/dashboard/orders', permission: 'orders',
       submenu: [
         { name: 'All Orders', path: '/dashboard/orders' },
         { name: 'Pending Orders', path: '/dashboard/orders/pending' },
@@ -205,7 +211,7 @@ export default function DashboardLayout({ children }) {
       ]
     },
     {
-      name: 'Payments', icon: CreditCard, path: '/dashboard/payments',
+      name: 'Payments', icon: CreditCard, path: '/dashboard/payments', permission: 'payments',
       submenu: [
         { name: 'All Transactions', path: '/dashboard/payments' },
         { name: 'Successful', path: '/dashboard/payments/successful' },
@@ -217,7 +223,7 @@ export default function DashboardLayout({ children }) {
       ]
     },
     {
-      name: 'Coupons', icon: Tag, path: '/dashboard/coupons',
+      name: 'Coupons', icon: Tag, path: '/dashboard/coupons', permission: 'coupons',
       submenu: [
         { name: 'Create Coupon', path: '/dashboard/coupons/create' },
         { name: 'Active Coupons', path: '/dashboard/coupons/active' },
@@ -227,7 +233,7 @@ export default function DashboardLayout({ children }) {
       ]
     },
     {
-      name: 'Reports', icon: ChartBar, path: '/dashboard/reports',
+      name: 'Reports', icon: ChartBar, path: '/dashboard/reports', permission: 'reports',
       submenu: [
         { name: 'Revenue', path: '/dashboard/reports/revenue' },
         { name: 'Rental Duration', path: '/dashboard/reports/duration' },
@@ -238,7 +244,7 @@ export default function DashboardLayout({ children }) {
       ]
     },
     {
-      name: 'Notifications', icon: ChatCenteredText, path: '/dashboard/notifications',
+      name: 'Notifications', icon: ChatCenteredText, path: '/dashboard/notifications', permission: 'notifications',
       submenu: [
         { name: 'Push Notifications', path: '/dashboard/notifications/push' },
         { name: 'Email Campaigns', path: '/dashboard/notifications/email' },
@@ -249,7 +255,7 @@ export default function DashboardLayout({ children }) {
       ]
     },
     {
-      name: 'Settings', icon: Gear, path: '/dashboard/settings',
+      name: 'Settings', icon: Gear, path: '/dashboard/settings', permission: 'settings',
       submenu: [
         { name: 'General Settings', path: '/dashboard/settings/general' },
         { name: 'Logo & Branding', path: '/dashboard/settings/branding' },
@@ -264,6 +270,8 @@ export default function DashboardLayout({ children }) {
       ]
     },
   ];
+
+  const menuItems = allMenuItems.filter(item => !item.permission || can(item.permission));
 
   const handleLogout = () => {
     router.push("/");

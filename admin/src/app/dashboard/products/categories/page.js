@@ -1,36 +1,11 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
+import { Spinner } from "@heroui/react";
 import {
-    Card,
-    CardBody,
-    Button,
-    Input,
-    Textarea,
-    Modal,
-    ModalContent,
-    ModalHeader,
-    ModalBody,
-    ModalFooter,
-    useDisclosure,
-    Chip,
-    Avatar,
-    Tooltip,
-    Spinner,
-} from "@heroui/react";
-import {
-    Plus,
-    Folder,
-    FolderPlus,
-    FolderOpen,
-    Image,
-    Trash,
-    PencilSimple,
-    CaretDown,
-    CaretRight,
-    TreeStructure,
-    Tag,
+    Plus, Folder, FolderPlus, FolderOpen, Trash, PencilSimple,
+    CaretDown, CaretRight, TreeStructure, Tag, Check, X, FloppyDisk,
 } from "@phosphor-icons/react";
 import ImageUploader from "@/components/ImageUploader";
 
@@ -40,55 +15,67 @@ function getToken() {
     return typeof window !== "undefined" ? localStorage.getItem("adminToken") : null;
 }
 
-// ─── Subcategory pill row ─────────────────────────────────────────────────────
-function SubcategoryRow({ sub, onEdit, onDelete }) {
+// ── Subcategory row ───────────────────────────────────────────────────────────
+function SubRow({ sub, onDelete, onSave }) {
+    const [editing, setEditing] = useState(false);
+    const [name, setName] = useState(sub.name);
+    const [saving, setSaving] = useState(false);
+
+    const save = async () => {
+        if (!name.trim()) return;
+        setSaving(true);
+        try {
+            const res = await fetch(`${API}/api/categories/${sub._id}`, {
+                method: "PUT",
+                headers: { "Content-Type": "application/json", Authorization: `Bearer ${getToken()}` },
+                body: JSON.stringify({ name }),
+            });
+            if (!res.ok) throw new Error((await res.json()).message || "Failed");
+            onSave();
+            setEditing(false);
+        } catch (e) { alert(e.message); }
+        finally { setSaving(false); }
+    };
+
     return (
-        <div className="flex items-center gap-3 px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-100 dark:border-slate-700/50 group">
+        <div className="flex items-center gap-3 px-4 py-2.5 bg-slate-50 dark:bg-slate-800/40 border-t border-slate-100 dark:border-slate-800/60 pl-14 group">
             <Tag size={13} weight="fill" className="text-indigo-400 shrink-0" />
-            <Avatar
-                src={
-                    sub.image ||
-                    `https://ui-avatars.com/api/?name=${sub.name}&size=32&background=e0e7ff&color=6366f1`
-                }
-                size="sm"
-                isBordered
-                className="w-10 h-10 shrink-0 border-white dark:border-slate-800 shadow-sm group-hover:scale-110 transition-transform cursor-pointer"
-                onClick={() => onEdit(sub)}
-            />
-            <div className="flex flex-col flex-1 min-w-0">
-                <span className="text-sm font-semibold text-slate-800 dark:text-slate-200 truncate">
-                    {sub.name}
-                </span>
-                <span className="text-xs font-mono text-slate-400">/{sub.slug}</span>
-            </div>
-            {sub.description && (
-                <span className="hidden md:block text-xs text-slate-500 line-clamp-1 max-w-[180px]">
-                    {sub.description}
-                </span>
+            {sub.image && (
+                <img src={sub.image} alt={sub.name} className="w-8 h-8 rounded-lg object-contain bg-white border border-slate-200 p-0.5 shrink-0" />
             )}
-            <Chip
-                size="sm"
-                color={sub.isActive ? "success" : "default"}
-                variant="flat"
-                className="shrink-0"
-            >
+            {editing ? (
+                <input
+                    autoFocus
+                    value={name}
+                    onChange={e => setName(e.target.value)}
+                    onKeyDown={e => { if (e.key === "Enter") save(); if (e.key === "Escape") setEditing(false); }}
+                    className="flex-1 h-8 px-2 rounded-lg border border-indigo-400 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/30 dark:bg-slate-900 dark:text-white"
+                />
+            ) : (
+                <div className="flex-1 min-w-0">
+                    <span className="text-sm font-semibold text-slate-800 dark:text-slate-200">{sub.name}</span>
+                    {sub.slug && <span className="ml-2 text-xs font-mono text-slate-400">/{sub.slug}</span>}
+                </div>
+            )}
+            <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${sub.isActive ? "bg-emerald-50 text-emerald-600" : "bg-slate-100 text-slate-500"}`}>
                 {sub.isActive ? "Active" : "Off"}
-            </Chip>
-            <div className="flex items-center gap-1">
-                <button
-                    type="button"
-                    title="Edit"
-                    onClick={() => onEdit(sub)}
-                    className="p-1.5 rounded-lg text-slate-400 hover:text-indigo-500 hover:bg-indigo-50 dark:hover:bg-indigo-500/10 transition-colors"
-                >
-                    <PencilSimple size={14} weight="bold" />
-                </button>
-                <button
-                    type="button"
-                    title="Delete"
-                    onClick={() => onDelete(sub._id.toString())}
-                    className="p-1.5 rounded-lg text-slate-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors"
-                >
+            </span>
+            <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                {editing ? (
+                    <>
+                        <button onClick={save} disabled={saving} className="p-1.5 rounded-lg text-emerald-500 hover:bg-emerald-50 dark:hover:bg-emerald-500/10 transition-colors">
+                            {saving ? <Spinner size="sm" /> : <Check size={14} weight="bold" />}
+                        </button>
+                        <button onClick={() => setEditing(false)} className="p-1.5 rounded-lg text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors">
+                            <X size={14} weight="bold" />
+                        </button>
+                    </>
+                ) : (
+                    <button onClick={() => setEditing(true)} className="p-1.5 rounded-lg text-slate-400 hover:text-indigo-500 hover:bg-indigo-50 dark:hover:bg-indigo-500/10 transition-colors">
+                        <PencilSimple size={14} weight="bold" />
+                    </button>
+                )}
+                <button onClick={() => onDelete(sub._id)} className="p-1.5 rounded-lg text-slate-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors">
                     <Trash size={14} weight="bold" />
                 </button>
             </div>
@@ -96,28 +83,338 @@ function SubcategoryRow({ sub, onEdit, onDelete }) {
     );
 }
 
-// ─── Main page ────────────────────────────────────────────────────────────────
-export default function CategoriesCMS() {
-    const newCatModal = useDisclosure();
-    const newSubModal = useDisclosure();
-    const editModal = useDisclosure();
+// ── Inline Add Subcategory Row ───────────────────────────────────────────────
+function AddSubRow({ parentId, onDone, onCancel }) {
+    const [name, setName] = useState("");
+    const [saving, setSaving] = useState(false);
 
+    const save = async () => {
+        if (!name.trim()) return;
+        setSaving(true);
+        try {
+            const res = await fetch(`${API}/api/categories/${parentId}/subcategories`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json", Authorization: `Bearer ${getToken()}` },
+                body: JSON.stringify({ name }),
+            });
+            if (!res.ok) throw new Error((await res.json()).message || "Failed");
+            onDone();
+        } catch (e) { alert(e.message); setSaving(false); }
+    };
+
+    return (
+        <div className="flex items-center gap-3 px-4 py-2.5 bg-indigo-50/50 dark:bg-indigo-500/5 border-t border-indigo-100 dark:border-indigo-500/20 pl-14">
+            <Tag size={13} weight="fill" className="text-indigo-300 shrink-0" />
+            <input
+                autoFocus
+                value={name}
+                onChange={e => setName(e.target.value)}
+                onKeyDown={e => { if (e.key === "Enter") save(); if (e.key === "Escape") onCancel(); }}
+                placeholder="Subcategory name…"
+                className="flex-1 h-8 px-3 rounded-lg border border-indigo-300 dark:border-indigo-500/50 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/30 bg-white dark:bg-slate-900 dark:text-white placeholder:text-slate-400"
+            />
+            <button onClick={save} disabled={saving || !name.trim()}
+                className="h-8 px-3 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold disabled:opacity-50 transition-colors flex items-center gap-1.5">
+                {saving ? <Spinner size="sm" color="white" /> : <Check size={14} weight="bold" />} Add
+            </button>
+            <button onClick={onCancel} className="h-8 px-2 rounded-lg text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors">
+                <X size={14} />
+            </button>
+        </div>
+    );
+}
+
+// ── Category Row ──────────────────────────────────────────────────────────────
+function CatRow({ cat, onDelete, onRefresh }) {
+    const [expanded, setExpanded] = useState(false);
+    const [addingSub, setAddingSub] = useState(false);
+    const [editing, setEditing] = useState(false);
+    const [editName, setEditName] = useState(cat.name);
+    const [editImage, setEditImage] = useState(cat.image || "");
+    const [saving, setSaving] = useState(false);
+
+    const openEdit = () => {
+        setEditName(cat.name);
+        setEditImage(cat.image || "");
+        setEditing(true);
+    };
+
+    const cancelEdit = () => {
+        setEditing(false);
+        setEditName(cat.name);
+        setEditImage(cat.image || "");
+    };
+
+    const saveEdit = async () => {
+        if (!editName.trim()) return;
+        setSaving(true);
+        try {
+            const res = await fetch(`${API}/api/categories/${cat._id}`, {
+                method: "PUT",
+                headers: { "Content-Type": "application/json", Authorization: `Bearer ${getToken()}` },
+                body: JSON.stringify({ name: editName, image: editImage }),
+            });
+            if (!res.ok) throw new Error((await res.json()).message || "Failed");
+            onRefresh();
+            setEditing(false);
+        } catch (e) { alert(e.message); }
+        finally { setSaving(false); }
+    };
+
+    const subCount = cat.subcategories?.length || 0;
+
+    return (
+        <div className="border-b border-slate-100 dark:border-slate-800/60 last:border-b-0">
+            {/* Main row */}
+            <div className="flex items-center gap-3 px-5 py-3.5 hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors group">
+                <button onClick={() => setExpanded(v => !v)}
+                    className="p-1 rounded text-slate-400 hover:text-indigo-500 transition-colors shrink-0">
+                    {expanded ? <CaretDown size={13} weight="bold" /> : <CaretRight size={13} weight="bold" />}
+                </button>
+
+                {/* Category image preview */}
+                {(editing ? editImage : cat.image) ? (
+                    <img
+                        src={editing ? editImage : cat.image}
+                        alt={cat.name}
+                        className="w-10 h-10 rounded-xl object-contain bg-white border border-slate-200 p-0.5 shrink-0"
+                    />
+                ) : (
+                    <div className="w-10 h-10 rounded-xl bg-indigo-50 dark:bg-indigo-500/10 flex items-center justify-center shrink-0">
+                        <Folder size={18} className="text-indigo-400" weight="duotone" />
+                    </div>
+                )}
+
+                <div className="flex-1 min-w-0">
+                    <span className="text-sm font-bold text-slate-900 dark:text-slate-100 group-hover:text-indigo-600 transition-colors">{cat.name}</span>
+                    {cat.slug && <span className="ml-2 text-xs font-mono text-slate-400">/{cat.slug}</span>}
+                    {cat.description && <p className="text-xs text-slate-400 mt-0.5 truncate max-w-xs">{cat.description}</p>}
+                </div>
+
+                <button onClick={() => { setExpanded(true); setAddingSub(true); }}
+                    className="hidden group-hover:flex items-center gap-1 h-7 px-2.5 text-xs font-semibold text-indigo-600 bg-indigo-50 dark:bg-indigo-500/10 rounded-lg hover:bg-indigo-100 transition-colors shrink-0">
+                    <Plus size={11} weight="bold" /> Sub
+                </button>
+
+                <span className="text-xs font-semibold text-indigo-600 bg-indigo-50 dark:bg-indigo-500/10 px-2 py-0.5 rounded-full shrink-0">
+                    {subCount} sub{subCount !== 1 ? "s" : ""}
+                </span>
+
+                <span className={`text-xs font-semibold px-2 py-0.5 rounded-full shrink-0 ${cat.isActive ? "bg-emerald-50 text-emerald-600" : "bg-slate-100 text-slate-500"}`}>
+                    {cat.isActive ? "Active" : "Off"}
+                </span>
+
+                <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity shrink-0">
+                    <button
+                        onClick={editing ? cancelEdit : openEdit}
+                        className={`p-1.5 rounded-lg transition-colors ${
+                            editing
+                                ? "text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700"
+                                : "text-slate-400 hover:text-indigo-500 hover:bg-indigo-50 dark:hover:bg-indigo-500/10"
+                        }`}
+                    >
+                        {editing ? <X size={14} /> : <PencilSimple size={14} weight="bold" />}
+                    </button>
+                    <button onClick={() => onDelete(cat._id)} className="p-1.5 rounded-lg text-slate-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors">
+                        <Trash size={14} weight="bold" />
+                    </button>
+                </div>
+            </div>
+
+            {/* ── Edit Panel ─────────────────────────────────────────────────── */}
+            <AnimatePresence>
+                {editing && (
+                    <motion.div
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: "auto" }}
+                        exit={{ opacity: 0, height: 0 }}
+                        transition={{ duration: 0.2 }}
+                        className="overflow-hidden"
+                    >
+                        <div className="mx-5 mb-4 mt-1 p-5 rounded-2xl border border-indigo-200 dark:border-indigo-500/30 bg-indigo-50/40 dark:bg-indigo-500/5">
+                            <p className="text-xs font-bold text-indigo-500 uppercase tracking-wider mb-4">Edit Category — {cat.name}</p>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                                {/* Left: name field */}
+                                <div className="space-y-3">
+                                    <div>
+                                        <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider block mb-1.5">Name</label>
+                                        <input
+                                            autoFocus
+                                            value={editName}
+                                            onChange={e => setEditName(e.target.value)}
+                                            onKeyDown={e => { if (e.key === "Enter") saveEdit(); if (e.key === "Escape") cancelEdit(); }}
+                                            className="w-full h-10 px-3 rounded-xl border border-slate-200 dark:border-slate-700 text-sm font-semibold bg-white dark:bg-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/30 transition-all"
+                                        />
+                                    </div>
+                                    {editImage && (
+                                        <div className="flex items-center gap-3 p-3 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-700">
+                                            <img src={editImage} alt="preview" className="w-14 h-14 rounded-lg object-contain" />
+                                            <div className="flex-1 min-w-0">
+                                                <p className="text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">Current Image</p>
+                                                <button
+                                                    onClick={() => setEditImage("")}
+                                                    className="text-xs text-red-500 hover:text-red-700 font-semibold"
+                                                >
+                                                    Remove image
+                                                </button>
+                                            </div>
+                                        </div>
+                                    )}
+                                    <div className="flex gap-2 pt-1">
+                                        <button
+                                            onClick={saveEdit}
+                                            disabled={saving || !editName.trim()}
+                                            className="flex items-center gap-2 h-9 px-4 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-bold disabled:opacity-50 transition-colors shadow-md shadow-indigo-500/20"
+                                        >
+                                            {saving ? <Spinner size="sm" color="white" /> : <Check size={14} weight="bold" />}
+                                            {saving ? "Saving…" : "Save Changes"}
+                                        </button>
+                                        <button
+                                            onClick={cancelEdit}
+                                            className="h-9 px-4 rounded-xl border border-slate-200 dark:border-slate-700 text-sm text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"
+                                        >
+                                            Cancel
+                                        </button>
+                                    </div>
+                                </div>
+                                {/* Right: image uploader */}
+                                <div>
+                                    <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider block mb-1.5">Category Image</label>
+                                    <ImageUploader
+                                        key={`edit-${cat._id}-${editing}`}
+                                        existingUrl={editImage}
+                                        onUpload={url => setEditImage(url)}
+                                        label="Upload new image"
+                                    />
+                                </div>
+                            </div>
+                        </div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
+
+            {/* Subcategories */}
+            <AnimatePresence>
+                {expanded && (
+                    <motion.div
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: "auto", opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        transition={{ duration: 0.18, ease: "easeInOut" }}
+                        className="overflow-hidden"
+                    >
+                        {cat.subcategories?.map(sub => (
+                            <SubRow
+                                key={sub._id}
+                                sub={sub}
+                                onDelete={async (id) => {
+                                    if (!confirm("Delete this subcategory?")) return;
+                                    const res = await fetch(`${API}/api/categories/${id}`, {
+                                        method: "DELETE",
+                                        headers: { Authorization: `Bearer ${getToken()}` },
+                                    });
+                                    if (res.ok) onRefresh();
+                                    else alert((await res.json()).message || "Failed");
+                                }}
+                                onSave={onRefresh}
+                            />
+                        ))}
+                        {addingSub && (
+                            <AddSubRow
+                                parentId={cat._id}
+                                onDone={() => { setAddingSub(false); onRefresh(); }}
+                                onCancel={() => setAddingSub(false)}
+                            />
+                        )}
+                        {!addingSub && (
+                            <div className="pl-14 py-2 border-t border-slate-100 dark:border-slate-800/60">
+                                <button
+                                    onClick={() => setAddingSub(true)}
+                                    className="flex items-center gap-1.5 text-xs text-indigo-500 hover:text-indigo-700 font-semibold transition-colors"
+                                >
+                                    <Plus size={12} weight="bold" /> Add Subcategory
+                                </button>
+                            </div>
+                        )}
+                    </motion.div>
+                )}
+            </AnimatePresence>
+        </div>
+    );
+}
+
+// ── Inline Add Category Row ──────────────────────────────────────────────────
+function AddCatRow({ onDone, onCancel }) {
+    const [name, setName] = useState("");
+    const [description, setDescription] = useState("");
+    const [saving, setSaving] = useState(false);
+
+    const save = async () => {
+        if (!name.trim()) return;
+        setSaving(true);
+        try {
+            const res = await fetch(`${API}/api/categories`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json", Authorization: `Bearer ${getToken()}` },
+                body: JSON.stringify({ name, description }),
+            });
+            if (!res.ok) throw new Error((await res.json()).message || "Failed");
+            onDone();
+        } catch (e) { alert(e.message); setSaving(false); }
+    };
+
+    return (
+        <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: "auto" }}
+            exit={{ opacity: 0, height: 0 }}
+            transition={{ duration: 0.2 }}
+            className="overflow-hidden"
+        >
+            <div className="flex items-center gap-3 px-5 py-3.5 bg-indigo-50/60 dark:bg-indigo-500/10 border-b border-indigo-100 dark:border-indigo-500/20">
+                <div className="w-10 h-10 rounded-xl bg-indigo-100 dark:bg-indigo-500/20 flex items-center justify-center shrink-0">
+                    <FolderPlus size={18} className="text-indigo-500" weight="duotone" />
+                </div>
+                <input
+                    autoFocus
+                    value={name}
+                    onChange={e => setName(e.target.value)}
+                    onKeyDown={e => { if (e.key === "Enter") save(); if (e.key === "Escape") onCancel(); }}
+                    placeholder="Category name (required)…"
+                    className="flex-1 h-10 px-4 rounded-xl border border-indigo-300 dark:border-indigo-500/50 text-sm font-semibold bg-white dark:bg-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/40 transition-all"
+                />
+                <input
+                    value={description}
+                    onChange={e => setDescription(e.target.value)}
+                    placeholder="Description (optional)…"
+                    className="w-52 h-10 px-3 rounded-xl border border-slate-200 dark:border-slate-700 text-sm bg-white dark:bg-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 transition-all hidden md:block"
+                />
+                <button
+                    onClick={save}
+                    disabled={saving || !name.trim()}
+                    className="h-10 px-5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-bold disabled:opacity-50 transition-colors flex items-center gap-2 shrink-0 shadow-lg shadow-indigo-500/20"
+                >
+                    {saving ? <Spinner size="sm" color="white" /> : <Check size={15} weight="bold" />}
+                    {saving ? "Saving…" : "Save"}
+                </button>
+                <button onClick={onCancel} className="h-10 px-3 rounded-xl text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors shrink-0">
+                    <X size={16} />
+                </button>
+            </div>
+        </motion.div>
+    );
+}
+
+// ── Main Page ─────────────────────────────────────────────────────────────────
+export default function CategoriesPage() {
     const [categories, setCategories] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [expandedIds, setExpandedIds] = useState(new Set());
+    const [search, setSearch] = useState("");
+    const [addingCat, setAddingCat] = useState(false);
+    const [mounted, setMounted] = useState(false);
 
-    // Forms
-    const [catForm, setCatForm] = useState({ name: "", description: "", image: "" });
-    const [catSaving, setCatSaving] = useState(false);
-    const [subForm, setSubForm] = useState({ name: "", description: "", image: "" });
-    const [subSaving, setSubSaving] = useState(false);
-    const [activeCat, setActiveCat] = useState(null); // parent for the sub modal
+    useEffect(() => { setMounted(true); }, []);
 
-    // Edit Form
-    const [editForm, setEditForm] = useState({ _id: null, name: "", slug: "", description: "", image: "", isActive: true });
-    const [editSaving, setEditSaving] = useState(false);
-
-    // ── Fetch ─────────────────────────────────────────────────────────────────
     const fetchCategories = useCallback(async () => {
         try {
             setLoading(true);
@@ -135,632 +432,118 @@ export default function CategoriesCMS() {
         }
     }, []);
 
-    useEffect(() => {
-        fetchCategories();
-    }, [fetchCategories]);
+    useEffect(() => { fetchCategories(); }, [fetchCategories]);
 
-    // ── Helpers ───────────────────────────────────────────────────────────────
-    const toggleExpand = (id) => {
-        setExpandedIds((prev) => {
-            const next = new Set(prev);
-            next.has(id) ? next.delete(id) : next.add(id);
-            return next;
-        });
-    };
-
-    const openSubModal = (cat) => {
-        setActiveCat(cat);
-        setSubForm({ name: "", description: "", image: "" });
-        newSubModal.onOpen();
-    };
-
-    const openEditModal = (item) => {
-        if (!item) return;
-        setEditForm({
-            _id: item._id ? item._id.toString() : null,
-            name: item.name || "",
-            slug: item.slug || "",
-            description: item.description || "",
-            image: item.image || "",
-            isActive: item.isActive !== undefined ? item.isActive : true
-        });
-        editModal.onOpen();
-    };
-
-    // ── CRUD ──────────────────────────────────────────────────────────────────
-    const handleCreateCategory = async (onClose) => {
-        try {
-            setCatSaving(true);
-            const res = await fetch(`${API}/api/categories`, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    Authorization: `Bearer ${getToken()}`,
-                },
-                body: JSON.stringify(catForm),
-            });
-            if (!res.ok) throw new Error((await res.json()).message || "Failed");
-            setCatForm({ name: "", description: "", image: "" });
-            onClose();
-            await fetchCategories();
-        } catch (err) {
-            alert(err.message);
-        } finally {
-            setCatSaving(false);
-        }
-    };
-
-    const handleCreateSubcategory = async (onClose) => {
-        if (!activeCat) return;
-        try {
-            setSubSaving(true);
-            const res = await fetch(`${API}/api/categories/${activeCat._id}/subcategories`, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    Authorization: `Bearer ${getToken()}`,
-                },
-                body: JSON.stringify(subForm),
-            });
-            if (!res.ok) throw new Error((await res.json()).message || "Failed");
-            setSubForm({ name: "", description: "", image: "" });
-            onClose();
-            setExpandedIds((prev) => new Set([...prev, activeCat._id]));
-            await fetchCategories();
-        } catch (err) {
-            alert(err.message);
-        } finally {
-            setSubSaving(false);
-        }
-    };
-
-    const handleDeleteCategory = async (id) => {
+    const handleDelete = async (id) => {
         if (!confirm("Delete this category and ALL its subcategories?")) return;
-        try {
-            const res = await fetch(`${API}/api/categories/${id}`, {
-                method: "DELETE",
-                headers: { Authorization: `Bearer ${getToken()}` },
-            });
-            if (res.ok) await fetchCategories();
-            else alert((await res.json()).message || "Failed");
-        } catch (err) {
-            alert(err.message);
-        }
+        const res = await fetch(`${API}/api/categories/${id}`, {
+            method: "DELETE",
+            headers: { Authorization: `Bearer ${getToken()}` },
+        });
+        if (res.ok) fetchCategories();
+        else alert((await res.json()).message || "Failed");
     };
 
-    const handleDeleteSubcategory = async (subId) => {
-        if (!confirm("Delete this subcategory?")) return;
-        try {
-            const res = await fetch(`${API}/api/categories/${subId}`, {
-                method: "DELETE",
-                headers: { Authorization: `Bearer ${getToken()}` },
-            });
-            if (res.ok) await fetchCategories();
-            else alert((await res.json()).message || "Failed");
-        } catch (err) {
-            alert(err.message);
-        }
-    };
+    const filtered = search.trim()
+        ? categories.filter(c => c.name.toLowerCase().includes(search.toLowerCase()))
+        : categories;
 
-    const handleUpdateItem = async (onClose) => {
-        try {
-            setEditSaving(true);
-            const res = await fetch(`${API}/api/categories/${editForm._id}`, {
-                method: "PUT",
-                headers: {
-                    "Content-Type": "application/json",
-                    Authorization: `Bearer ${getToken()}`,
-                },
-                body: JSON.stringify(editForm),
-            });
-            if (!res.ok) throw new Error((await res.json()).message || "Failed to update");
-            onClose();
-            await fetchCategories();
-        } catch (err) {
-            alert(err.message);
-        } finally {
-            setEditSaving(false);
-        }
-    };
-
-    // ── Totals ────────────────────────────────────────────────────────────────
     const totalSubs = categories.reduce((a, c) => a + (c.subcategories?.length || 0), 0);
-    const activeCount = categories.filter((c) => c.isActive).length;
+    const activeCount = categories.filter(c => c.isActive).length;
 
-    // ─────────────────────────────────────────────────────────────────────────
+    if (!mounted) return null;
+
     return (
-        <div className="w-full space-y-6 pb-12">
-            {/* ══ Modals ══════════════════════════════════════════════════════════════ */}
-            <Modal
-                isOpen={editModal.isOpen}
-                onOpenChange={editModal.onOpenChange}
-                placement="top-center"
-                scrollBehavior="inside"
-                size="3xl"
-                classNames={{
-                    base: "dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-2xl",
-                    backdrop: "bg-slate-900/50 backdrop-blur-md",
-                }}
-            >
-                <ModalContent>
-                    {(onClose) => (
-                        <>
-                            <ModalHeader className="flex items-center gap-2 text-slate-900 dark:text-white border-b border-slate-100 dark:border-slate-800/60 pb-4">
-                                <div className="p-2 rounded-lg bg-indigo-50 dark:bg-indigo-500/10 text-indigo-500">
-                                    <PencilSimple size={20} weight="bold" />
-                                </div>
-                                <div className="flex flex-col">
-                                    <span className="text-lg font-bold">Edit Category Details</span>
-                                    <span className="text-xs font-normal text-slate-400">Modify properties and cover image</span>
-                                </div>
-                            </ModalHeader>
-                            <ModalBody className="p-6 min-h-[400px]">
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                    <div className="space-y-6">
-                                        <div className="space-y-2">
-                                            <label className="text-xs font-bold text-slate-500 uppercase tracking-widest">Category Details</label>
-                                            <Input
-                                                label="Name"
-                                                placeholder="e.g. Photography"
-                                                variant="bordered"
-                                                value={editForm.name}
-                                                onValueChange={(v) => setEditForm(p => ({ ...p, name: v }))}
-                                                classNames={{
-                                                    inputWrapper: "bg-white dark:bg-slate-950 border-slate-200 dark:border-slate-800",
-                                                }}
-                                            />
-                                            <Input
-                                                label="Slug"
-                                                placeholder="e.g. photography"
-                                                variant="bordered"
-                                                value={editForm.slug}
-                                                onValueChange={(v) => setEditForm(p => ({ ...p, slug: v }))}
-                                                classNames={{
-                                                    inputWrapper: "bg-white dark:bg-slate-950 border-slate-200 dark:border-slate-800",
-                                                }}
-                                            />
-                                        </div>
-                                        <div className="space-y-2">
-                                            <Textarea
-                                                label="Description"
-                                                placeholder="Describe this category..."
-                                                variant="bordered"
-                                                minRows={3}
-                                                value={editForm.description}
-                                                onValueChange={(v) => setEditForm(p => ({ ...p, description: v }))}
-                                                classNames={{
-                                                    inputWrapper: "bg-white dark:bg-slate-950 border-slate-200 dark:border-slate-800",
-                                                }}
-                                            />
-                                        </div>
-                                        <div>
-                                            <label className="text-sm text-slate-700 dark:text-slate-300 font-medium block mb-1.5">Status</label>
-                                            <div className="flex items-center gap-3">
-                                                <button
-                                                    type="button"
-                                                    onClick={() => setEditForm((p) => ({ ...p, isActive: true }))}
-                                                    className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors ${editForm.isActive ? 'bg-emerald-500 text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400'}`}
-                                                >
-                                                    Active
-                                                </button>
-                                                <button
-                                                    type="button"
-                                                    onClick={() => setEditForm((p) => ({ ...p, isActive: false }))}
-                                                    className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors ${!editForm.isActive ? 'bg-slate-700 text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400'}`}
-                                                >
-                                                    Disabled
-                                                </button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div>
-                                        <label className="text-sm text-slate-700 dark:text-slate-300 font-medium block mb-1.5">Cover Image (Optional)</label>
-                                        <ImageUploader
-                                            key={`edit-${editModal.isOpen}-${editForm._id}`}
-                                            existingUrl={editForm.image}
-                                            onUpload={(url) => setEditForm((p) => ({ ...p, image: url }))}
-                                            label="Click or drag to update image"
-                                        />
-                                    </div>
-                                </div>
-                            </ModalBody>
-                            <ModalFooter className="border-t border-slate-100 dark:border-slate-800/60 p-4">
-                                <Button variant="flat" onPress={onClose} className="rounded-xl font-semibold bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 transition-colors">Cancel</Button>
-                                <Button
-                                    className="rounded-xl font-semibold bg-indigo-600 hover:bg-indigo-700 text-white shadow-lg shadow-indigo-500/30 transition-all font-medium"
-                                    isLoading={editSaving}
-                                    onPress={() => handleUpdateItem(onClose)}
-                                >
-                                    Save Changes
-                                </Button>
-                            </ModalFooter>
-                        </>
-                    )}
-                </ModalContent>
-            </Modal>
-
+        <div className="w-full space-y-5 pb-12">
             {/* Header */}
             <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-                <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }}>
+                <div>
                     <h1 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-slate-100 mb-1">
                         Category{" "}
-                        <span className="text-transparent bg-clip-text bg-linear-to-r from-indigo-500 to-purple-500">
+                        <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-500 to-purple-500">
                             Management
                         </span>
                     </h1>
-                    <p className="text-slate-600 dark:text-slate-400">
-                        Organize your inventory with root categories and subcategories.
+                    <p className="text-slate-500 dark:text-slate-400 text-sm">
+                        Click <span className="font-semibold text-indigo-500">+ Add Category</span> to add inline. Click the row to expand subcategories.
                     </p>
-                </motion.div>
-
-                <button
-                    type="button"
-                    onClick={newCatModal.onOpen}
-                    className="inline-flex items-center gap-2 h-10 px-5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-sm shadow-lg shadow-indigo-500/25 transition-all"
-                >
-                    <FolderPlus size={16} />
-                    Add Category
-                </button>
+                </div>
+                <div className="flex items-center gap-3">
+                    <input
+                        type="text"
+                        value={search}
+                        onChange={e => setSearch(e.target.value)}
+                        placeholder="Search categories…"
+                        className="h-10 px-4 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 transition-all w-52 dark:text-white"
+                    />
+                    <button
+                        onClick={() => { setAddingCat(true); setSearch(""); }}
+                        className="inline-flex items-center gap-2 h-10 px-5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-sm shadow-lg shadow-indigo-500/25 transition-all"
+                    >
+                        <FolderPlus size={16} /> Add Category
+                    </button>
+                </div>
             </div>
 
-            {/* Stats strip */}
-            <motion.div
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.05 }}
-                className="grid grid-cols-3 gap-4"
-            >
+            {/* Stats */}
+            <div className="grid grid-cols-3 gap-4">
                 {[
-                    { label: "Categories", value: categories.length, icon: <Folder size={20} weight="duotone" />, color: "text-indigo-500", bg: "bg-indigo-50 dark:bg-indigo-500/10" },
-                    { label: "Subcategories", value: totalSubs, icon: <TreeStructure size={20} weight="duotone" />, color: "text-purple-500", bg: "bg-purple-50 dark:bg-purple-500/10" },
-                    { label: "Active", value: activeCount, icon: <Tag size={20} weight="duotone" />, color: "text-emerald-500", bg: "bg-emerald-50 dark:bg-emerald-500/10" },
-                ].map((s) => (
-                    <Card key={s.label} className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm">
-                        <CardBody className="flex flex-row items-center gap-3 p-4">
-                            <div className={`p-2.5 rounded-xl ${s.bg} ${s.color}`}>{s.icon}</div>
-                            <div>
-                                <p className="text-2xl font-black text-slate-900 dark:text-white">{s.value}</p>
-                                <p className="text-xs text-slate-500">{s.label}</p>
-                            </div>
-                        </CardBody>
-                    </Card>
-                ))}
-            </motion.div>
-
-            {/* Category list (custom layout — avoids HeroUI Table colSpan limitation) */}
-            <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.18, duration: 0.45 }}
-            >
-                <Card className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm w-full overflow-hidden">
-                    {/* Table header */}
-                    <div className="grid grid-cols-[auto_1fr_1fr_auto_auto_auto] gap-x-4 items-center px-5 py-3 bg-slate-50 dark:bg-slate-950/80 border-b border-slate-200 dark:border-slate-800">
-                        <div className="w-6" />
-                        <span className="text-xs font-semibold uppercase tracking-wider text-slate-500">Category</span>
-                        <span className="text-xs font-semibold uppercase tracking-wider text-slate-500 hidden md:block">Description</span>
-                        <span className="text-xs font-semibold uppercase tracking-wider text-slate-500">Subcats</span>
-                        <span className="text-xs font-semibold uppercase tracking-wider text-slate-500">Status</span>
-                        <span className="text-xs font-semibold uppercase tracking-wider text-slate-500 text-center">Actions</span>
+                    { label: "Total Categories", value: categories.length, color: "text-indigo-500", bg: "bg-indigo-50 dark:bg-indigo-500/10" },
+                    { label: "Subcategories", value: totalSubs, color: "text-purple-500", bg: "bg-purple-50 dark:bg-purple-500/10" },
+                    { label: "Active", value: activeCount, color: "text-emerald-500", bg: "bg-emerald-50 dark:bg-emerald-500/10" },
+                ].map(s => (
+                    <div key={s.label} className={`rounded-2xl border border-slate-200 dark:border-slate-800 p-4 flex items-center gap-3 bg-white dark:bg-slate-900 shadow-sm`}>
+                        <p className={`text-2xl font-black ${s.color}`}>{s.value}</p>
+                        <p className="text-xs text-slate-500 font-medium">{s.label}</p>
                     </div>
+                ))}
+            </div>
 
-                    {loading ? (
-                        <div className="flex items-center justify-center gap-2 py-16 text-slate-400">
-                            <Spinner size="sm" color="secondary" />
-                            <span>Loading categories…</span>
-                        </div>
-                    ) : categories.length === 0 ? (
-                        <div className="text-center py-16 text-slate-400">
-                            <Folder size={48} className="mx-auto mb-3 opacity-30" />
-                            <p>No categories found.</p>
-                        </div>
-                    ) : (
-                        <CardBody className="p-0 divide-y divide-slate-100 dark:divide-slate-800/60">
-                            {categories.map((cat, idx) => {
-                                const isExpanded = expandedIds.has(cat._id);
-                                const subCount = cat.subcategories?.length || 0;
-                                return (
-                                    <motion.div
-                                        key={cat._id}
-                                        initial={{ opacity: 0, y: 8 }}
-                                        animate={{ opacity: 1, y: 0 }}
-                                        transition={{ delay: idx * 0.04 }}
-                                    >
-                                        {/* ── Main category row ─────────────────────────── */}
-                                        <div className="grid grid-cols-[auto_1fr_1fr_auto_auto_auto] gap-x-4 items-center px-5 py-4 hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors group">
-                                            {/* Expand toggle */}
-                                            <button
-                                                onClick={() => toggleExpand(cat._id)}
-                                                className="p-1 rounded-md text-slate-400 hover:text-indigo-500 hover:bg-indigo-50 dark:hover:bg-indigo-500/10 transition-colors"
-                                                aria-label={isExpanded ? "Collapse" : "Expand"}
-                                            >
-                                                {isExpanded ? (
-                                                    <CaretDown size={13} weight="bold" />
-                                                ) : (
-                                                    <CaretRight size={13} weight="bold" />
-                                                )}
-                                            </button>
+            {/* Table */}
+            <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
+                {/* Table header */}
+                <div className="flex items-center px-5 py-3 bg-slate-50 dark:bg-slate-950/80 border-b border-slate-200 dark:border-slate-800 gap-3">
+                    <span className="w-6" />
+                    <span className="w-10" />
+                    <span className="flex-1 text-xs font-semibold uppercase tracking-wider text-slate-500">Category</span>
+                    <span className="text-xs font-semibold uppercase tracking-wider text-slate-500 w-24 text-center">Subcats</span>
+                    <span className="text-xs font-semibold uppercase tracking-wider text-slate-500 w-16 text-center">Status</span>
+                    <span className="text-xs font-semibold uppercase tracking-wider text-slate-500 w-20 text-center">Actions</span>
+                </div>
 
-                                            {/* Name + avatar */}
-                                            <div className="flex items-center gap-3 min-w-0">
-                                                <Avatar
-                                                    src={cat.image || `https://ui-avatars.com/api/?name=${cat.name}`}
-                                                    size="md"
-                                                    isBordered
-                                                    className="ring-slate-200 dark:ring-slate-700 shrink-0 w-12 h-12 shadow-sm group-hover:scale-110 transition-transform cursor-pointer"
-                                                    onClick={() => openEditModal(cat)}
-                                                />
-                                                <div className="flex flex-col min-w-0">
-                                                    <span className="text-sm font-semibold text-slate-900 dark:text-slate-200 group-hover:text-indigo-500 transition-colors truncate">
-                                                        {cat.name}
-                                                    </span>
-                                                    <span className="text-xs text-slate-400 font-mono">/{cat.slug}</span>
-                                                </div>
-                                            </div>
-
-                                            {/* Description */}
-                                            <span className="text-sm text-slate-500 dark:text-slate-400 line-clamp-1 hidden md:block">
-                                                {cat.description || "—"}
-                                            </span>
-
-                                            {/* Subcategory count badge */}
-                                            <div
-                                                className="inline-flex items-center gap-1 bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-300 font-semibold cursor-pointer rounded-full px-2 py-0.5 text-xs"
-                                                onClick={() => toggleExpand(cat._id)}
-                                            >
-                                                <TreeStructure size={11} />
-                                                {subCount} sub{subCount !== 1 ? "s" : ""}
-                                            </div>
-
-                                            {/* Status */}
-                                            <Chip
-                                                size="sm"
-                                                color={cat.isActive ? "success" : "default"}
-                                                variant="flat"
-                                            >
-                                                {cat.isActive ? "Active" : "Disabled"}
-                                            </Chip>
-                                            {/* Actions */}
-                                            <div className="flex items-center gap-1">
-                                                <button
-                                                    type="button"
-                                                    title="Add Subcategory"
-                                                    onClick={() => openSubModal(cat)}
-                                                    className="p-1.5 rounded-lg text-indigo-500 bg-indigo-50 hover:bg-indigo-100 dark:bg-indigo-500/10 dark:hover:bg-indigo-500/20 transition-colors"
-                                                >
-                                                    <Plus size={15} weight="bold" />
-                                                </button>
-                                                <button
-                                                    type="button"
-                                                    title="Edit Category"
-                                                    onClick={() => openEditModal(cat)}
-                                                    className="p-1.5 rounded-lg text-slate-400 hover:text-indigo-500 hover:bg-indigo-50 dark:hover:bg-indigo-500/10 transition-colors"
-                                                >
-                                                    <PencilSimple size={15} weight="bold" />
-                                                </button>
-                                                <button
-                                                    type="button"
-                                                    title="Delete Category"
-                                                    onClick={() => handleDeleteCategory(cat._id.toString())}
-                                                    className="p-1.5 rounded-lg text-slate-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors"
-                                                >
-                                                    <Trash size={15} weight="bold" />
-                                                </button>
-                                            </div>
-                                        </div>
-
-                                        {/* ── Expanded subcategory section ───────────────── */}
-                                        <AnimatePresence>
-                                            {isExpanded && (
-                                                <motion.div
-                                                    key="subs"
-                                                    initial={{ height: 0, opacity: 0 }}
-                                                    animate={{ height: "auto", opacity: 1 }}
-                                                    exit={{ height: 0, opacity: 0 }}
-                                                    transition={{ duration: 0.22, ease: "easeInOut" }}
-                                                    className="overflow-hidden"
-                                                >
-                                                    <div className="ml-10 mr-4 pb-4 pt-1 space-y-2 border-l-2 border-indigo-100 dark:border-indigo-500/20 pl-4">
-                                                        {/* Section label + inline add button */}
-                                                        <div className="flex items-center gap-2 py-1">
-                                                            <FolderOpen
-                                                                size={13}
-                                                                className="text-indigo-400 shrink-0"
-                                                                weight="duotone"
-                                                            />
-                                                            <span className="text-xs font-semibold text-slate-400 uppercase tracking-widest">
-                                                                Subcategories of{" "}
-                                                                <span className="text-indigo-500 normal-case font-bold">
-                                                                    {cat.name}
-                                                                </span>
-                                                            </span>
-                                                            <button
-                                                                type="button"
-                                                                onClick={() => openSubModal(cat)}
-                                                                className="ml-auto inline-flex items-center gap-1 h-6 px-2.5 text-xs text-indigo-600 bg-indigo-50 dark:bg-indigo-500/10 font-semibold rounded-lg hover:bg-indigo-100 transition-colors"
-                                                            >
-                                                                <Plus size={11} weight="bold" />
-                                                                Add Subcategory
-                                                            </button>
-                                                        </div>
-
-                                                        {/* Subcategory rows */}
-                                                        {cat.subcategories && cat.subcategories.length > 0 ? (
-                                                            cat.subcategories.map((sub) => (
-                                                                <SubcategoryRow
-                                                                    key={sub._id}
-                                                                    sub={sub}
-                                                                    onEdit={openEditModal}
-                                                                    onDelete={handleDeleteSubcategory}
-                                                                />
-                                                            ))
-                                                        ) : (
-                                                            <div className="py-4 px-4 text-sm text-slate-400 flex items-center gap-2 rounded-xl bg-slate-50 dark:bg-slate-800/40 border border-dashed border-slate-200 dark:border-slate-700">
-                                                                <TreeStructure size={15} className="opacity-50" />
-                                                                No subcategories yet.{" "}
-                                                                <button
-                                                                    onClick={() => openSubModal(cat)}
-                                                                    className="text-indigo-500 hover:underline font-semibold"
-                                                                >
-                                                                    Add one →
-                                                                </button>
-                                                            </div>
-                                                        )}
-                                                    </div>
-                                                </motion.div>
-                                            )}
-                                        </AnimatePresence>
-                                    </motion.div>
-                                );
-                            })}
-                        </CardBody>
+                {/* Inline Add Row */}
+                <AnimatePresence>
+                    {addingCat && (
+                        <AddCatRow
+                            onDone={() => { setAddingCat(false); fetchCategories(); }}
+                            onCancel={() => setAddingCat(false)}
+                        />
                     )}
-                </Card>
-            </motion.div>
+                </AnimatePresence>
 
-            {/* ══ Modal: Add Root Category ══════════════════════════════════════ */}
-            <Modal
-                isOpen={newCatModal.isOpen}
-                onOpenChange={newCatModal.onOpenChange}
-                backdrop="blur"
-                placement="top-center"
-                scrollBehavior="inside"
-                size="3xl"
-                classNames={{ base: "bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800" }}
-            >
-                <ModalContent>
-                    {(onClose) => (
-                        <>
-                            <ModalHeader className="flex items-center gap-2 text-slate-900 dark:text-white">
-                                <Folder className="text-indigo-500" size={20} /> Add Root Category
-                            </ModalHeader>
-                            <ModalBody className="p-6">
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                    <div className="space-y-4">
-                                        <div>
-                                            <label className="text-sm text-slate-700 dark:text-slate-300 font-medium block mb-1.5">Category Name <span className="text-red-500">*</span></label>
-                                            <input
-                                                autoFocus
-                                                required
-                                                value={catForm.name}
-                                                onChange={(e) => setCatForm((p) => ({ ...p, name: e.target.value }))}
-                                                placeholder="e.g. Photography"
-                                                className="w-full h-10 px-3 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 transition-all shadow-sm"
-                                            />
-                                        </div>
-                                        <div>
-                                            <label className="text-sm text-slate-700 dark:text-slate-300 font-medium block mb-1.5">Description</label>
-                                            <textarea
-                                                value={catForm.description}
-                                                onChange={(e) => setCatForm((p) => ({ ...p, description: e.target.value }))}
-                                                placeholder="Short description of this category..."
-                                                rows={5}
-                                                className="w-full p-3 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 transition-all shadow-sm resize-y"
-                                            />
-                                        </div>
-                                    </div>
-                                    <div>
-                                        <label className="text-sm text-slate-700 dark:text-slate-300 font-medium block mb-1.5">Cover Image (Optional)</label>
-                                        <ImageUploader
-                                            key={`cat-${newCatModal.isOpen}`}
-                                            existingUrl={catForm.image}
-                                            onUpload={(url) => setCatForm((p) => ({ ...p, image: url }))}
-                                            label="Click or drag to upload category banner"
-                                        />
-                                    </div>
-                                </div>
-                            </ModalBody>
-                            <ModalFooter className="border-t border-slate-100 dark:border-slate-800/60 p-4">
-                                <Button variant="flat" onPress={onClose} className="rounded-xl font-semibold bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 transition-colors">Cancel</Button>
-                                <Button
-                                    className="rounded-xl font-semibold bg-indigo-600 hover:bg-indigo-700 text-white shadow-lg shadow-indigo-500/30 transition-all font-medium"
-                                    isLoading={catSaving}
-                                    onPress={() => handleCreateCategory(onClose)}
-                                >
-                                    Create Category
-                                </Button>
-                            </ModalFooter>
-                        </>
-                    )}
-                </ModalContent>
-            </Modal>
-
-            {/* ══ Modal: Add Subcategory ════════════════════════════════════════ */}
-            <Modal
-                isOpen={newSubModal.isOpen}
-                onOpenChange={newSubModal.onOpenChange}
-                backdrop="blur"
-                placement="top-center"
-                scrollBehavior="inside"
-                size="3xl"
-                classNames={{ base: "bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800" }}
-            >
-                <ModalContent>
-                    {(onClose) => (
-                        <>
-                            <ModalHeader className="flex flex-col gap-0.5 text-slate-900 dark:text-white">
-                                <div className="flex items-center gap-2">
-                                    <TreeStructure className="text-purple-500" size={20} />
-                                    Add Subcategory
-                                </div>
-                                {activeCat && (
-                                    <p className="text-sm font-normal text-slate-400 ml-7">
-                                        Under{" "}
-                                        <span className="text-indigo-500 font-semibold">{activeCat.name}</span>
-                                    </p>
-                                )}
-                            </ModalHeader>
-                            <ModalBody className="p-6">
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                    <div className="space-y-4">
-                                        <div>
-                                            <label className="text-sm text-slate-700 dark:text-slate-300 font-medium block mb-1.5">Subcategory Name <span className="text-red-500">*</span></label>
-                                            <input
-                                                autoFocus
-                                                required
-                                                value={subForm.name}
-                                                onChange={(e) => setSubForm((p) => ({ ...p, name: e.target.value }))}
-                                                placeholder="e.g. MacBook Air"
-                                                className="w-full h-10 px-3 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 transition-all shadow-sm"
-                                            />
-                                        </div>
-                                        <div>
-                                            <label className="text-sm text-slate-700 dark:text-slate-300 font-medium block mb-1.5">Description</label>
-                                            <textarea
-                                                value={subForm.description}
-                                                onChange={(e) => setSubForm((p) => ({ ...p, description: e.target.value }))}
-                                                placeholder="Short description..."
-                                                rows={5}
-                                                className="w-full p-3 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 transition-all shadow-sm resize-y"
-                                            />
-                                        </div>
-                                    </div>
-                                    <div>
-                                        <label className="text-sm text-slate-700 dark:text-slate-300 font-medium block mb-1.5">Cover Image (Optional)</label>
-                                        <ImageUploader
-                                            key={`sub-${newSubModal.isOpen}`}
-                                            existingUrl={subForm.image}
-                                            onUpload={(url) => setSubForm((p) => ({ ...p, image: url }))}
-                                            label="Click or drag to upload subcategory banner"
-                                        />
-                                    </div>
-                                </div>
-                            </ModalBody>
-                            <ModalFooter className="border-t border-slate-100 dark:border-slate-800/60 p-4">
-                                <Button variant="flat" onPress={onClose} className="rounded-xl font-semibold bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 transition-colors">Cancel</Button>
-                                <Button
-                                    className="rounded-xl font-semibold bg-indigo-600 hover:bg-indigo-700 text-white shadow-lg shadow-indigo-500/30 transition-all font-medium"
-                                    isLoading={subSaving}
-                                    onPress={() => handleCreateSubcategory(onClose)}
-                                >
-                                    Add Subcategory
-                                </Button>
-                            </ModalFooter>
-                        </>
-                    )}
-                </ModalContent>
-            </Modal>
-
+                {/* Content */}
+                {loading ? (
+                    <div className="flex items-center justify-center gap-2 py-16 text-slate-400">
+                        <Spinner size="sm" color="secondary" /> Loading categories…
+                    </div>
+                ) : filtered.length === 0 ? (
+                    <div className="text-center py-16 text-slate-400">
+                        <Folder size={40} className="mx-auto mb-3 opacity-30" weight="duotone" />
+                        <p>{search ? "No categories match your search." : "No categories yet. Click \"Add Category\" to get started."}</p>
+                    </div>
+                ) : (
+                    <div>
+                        {filtered.map(cat => (
+                            <CatRow
+                                key={cat._id}
+                                cat={cat}
+                                onDelete={handleDelete}
+                                onRefresh={fetchCategories}
+                            />
+                        ))}
+                    </div>
+                )}
+            </div>
         </div>
     );
 }
