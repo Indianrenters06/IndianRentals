@@ -21,12 +21,15 @@ const defaultCMS = {
 
 const CategoriesPage = () => {
     const [cmsData, setCmsData] = useState(defaultCMS);
+    const [realCategories, setRealCategories] = useState([]);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        const fetchCMS = async () => {
+        const fetchData = async () => {
             try {
                 const API = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+
+                // Fetch CMS Data (for titles & subtitles)
                 const res = await fetch(`${API}/api/cms/categories-page`);
                 if (res.ok) {
                     const data = await res.json();
@@ -36,15 +39,40 @@ const CategoriesPage = () => {
                         categoriesGrid: data.categoriesGrid && data.categoriesGrid.length > 0 ? data.categoriesGrid : prev.categoriesGrid,
                     }));
                 }
+
+                // Fetch Real DB Categories
+                const cats = await getCategories();
+                if (cats && Array.isArray(cats)) {
+                    setRealCategories(cats);
+                }
             } catch (error) {
-                console.error("Failed to fetch CMS categories page", error);
+                console.error("Failed to fetch data for categories page", error);
             } finally {
                 setLoading(false);
             }
         };
 
-        fetchCMS();
+        fetchData();
     }, []);
+
+    const getCategoryRoute = (cat) => {
+        const lowerName = cat.name.toLowerCase();
+        if (lowerName.includes('apple')) return '/category/apple';
+        if (lowerName.includes('dslr')) return '/category/dslr';
+        if (lowerName.includes('it')) return '/category/it-products';
+        if (lowerName.includes('av')) return '/category/av-products';
+        if (lowerName.includes('office')) return '/category/office-equipment';
+        return `/category/${cat.slug || cat.name.toLowerCase().replace(/\s+/g, '-')}`;
+    };
+
+    const gridItems = realCategories.length > 0
+        ? realCategories.map(cat => ({
+            id: cat._id,
+            title: cat.name,
+            image: cat.image,
+            href: getCategoryRoute(cat)
+        }))
+        : cmsData.categoriesGrid;
 
     return (
         <div className="min-h-screen bg-white w-full flex flex-col items-center">
@@ -76,133 +104,133 @@ const CategoriesPage = () => {
                         opacity: 1
                     }}
                 >
-                {/* Header Section */}
-                <div className="flex flex-col gap-[12px] w-full">
-                    {/* Breadcrumb */}
-                    <div className="flex items-center gap-[8px] w-full max-w-[1200px] h-[16px] text-[12px] font-medium text-[#64748B]">
-                        <span style={{
-                            fontFamily: "'Mona Sans', sans-serif",
-                            fontWeight: 400,
-                            fontSize: "12px",
-                            lineHeight: "16px",
-                            textAlign: "center",
-                            color: "hsla(0, 0%, 33%, 1)",
-                            width: "61px",
-                            height: "16px",
-                            display: "inline-block"
-                        }}>Homepage</span>
-                        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" className="text-gray-400">
-                            <path d="M9 18L15 12L9 6" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
-                        </svg>
-                        <span className="text-[#1E293B] font-bold">All Categories</span>
+                    {/* Header Section */}
+                    <div className="flex flex-col gap-[12px] w-full">
+                        {/* Breadcrumb */}
+                        <div className="flex items-center gap-[8px] w-full max-w-[1200px] h-[16px] text-[12px] font-medium text-[#64748B]">
+                            <span style={{
+                                fontFamily: "'Mona Sans', sans-serif",
+                                fontWeight: 400,
+                                fontSize: "12px",
+                                lineHeight: "16px",
+                                textAlign: "center",
+                                color: "hsla(0, 0%, 33%, 1)",
+                                width: "61px",
+                                height: "16px",
+                                display: "inline-block"
+                            }}>Homepage</span>
+                            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" className="text-gray-400">
+                                <path d="M9 18L15 12L9 6" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+                            </svg>
+                            <span className="text-[#1E293B] font-bold">All Categories</span>
+                        </div>
+
+                        <motion.h1
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            style={{
+                                fontFamily: "'Mona Sans', sans-serif",
+                                fontWeight: 600,
+                                fontSize: "44px",
+                                lineHeight: "58px",
+                                letterSpacing: "-0.01em",
+                                color: "hsla(0, 0%, 12%, 1)",
+                                width: "100%",
+                                maxWidth: "1200px"
+                            }}
+                        >
+                            {cmsData.categoriesPageTitle}
+                        </motion.h1>
+
+                        <motion.p
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: 0.1 }}
+                            style={{
+                                fontFamily: "'Mona Sans', sans-serif",
+                                fontWeight: 400,
+                                fontSize: "14px",
+                                lineHeight: "1.5",
+                                color: "hsla(0, 0%, 46%, 1)",
+                                width: "100%",
+                                maxWidth: "1200px"
+                            }}
+                        >
+                            {cmsData.categoriesPageSubtitle}
+                        </motion.p>
                     </div>
 
-                    <motion.h1
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        style={{
-                            fontFamily: "'Mona Sans', sans-serif",
-                            fontWeight: 600,
-                            fontSize: "44px",
-                            lineHeight: "58px",
-                            letterSpacing: "-0.01em",
-                            color: "hsla(0, 0%, 12%, 1)",
-                            width: "100%",
-                            maxWidth: "1200px"
-                        }}
-                    >
-                        {cmsData.categoriesPageTitle}
-                    </motion.h1>
-
-                    <motion.p
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.1 }}
-                        style={{
-                            fontFamily: "'Mona Sans', sans-serif",
-                            fontWeight: 400,
-                            fontSize: "14px",
-                            lineHeight: "1.5",
-                            color: "hsla(0, 0%, 46%, 1)",
-                            width: "100%",
-                            maxWidth: "1200px"
-                        }}
-                    >
-                        {cmsData.categoriesPageSubtitle}
-                    </motion.p>
-                </div>
-
-                {/* Category Grid */}
-                <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-3 gap-[24px] w-full max-w-[1200px]">
-                    {cmsData.categoriesGrid.map((category, index) => (
-                        <motion.div
-                            key={index}
-                            initial={{ opacity: 0, y: 30 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ delay: index * 0.08 + 0.1 }}
-                        >
-                            <Link href={category.href} className="group block h-full">
-                                {/* Card Wrapper */}
-                                <div
-                                    className="flex flex-col group overflow-hidden transition-all duration-300"
-                                    style={{
-                                        width: "100%",
-                                        height: "276px",
-                                        borderRadius: "12px",
-                                        border: "1px solid hsla(0, 0%, 89%, 1)",
-                                        backgroundColor: "hsla(0, 0%, 100%, 1)",
-                                        boxShadow: "0px 1px 3px 0px hsla(0, 0%, 87%, 0.08), 0px 6px 6px 0px hsla(0, 0%, 87%, 0.07), 0px 13px 8px 0px hsla(0, 0%, 87%, 0.04), 0px 23px 9px 0px hsla(0, 0%, 87%, 0.01), 0px 36px 10px 0px hsla(0, 0%, 87%, 0)"
-                                    }}
-                                >
-                                    {/* Image Container */}
-                                    <div className="relative w-full flex-1 flex items-center justify-center p-6">
-                                        <div className="relative w-full h-[180px] transform group-hover:scale-105 transition-transform duration-500">
-                                            {category.image ? (
-                                                <Image
-                                                    src={category.image}
-                                                    alt={category.title}
-                                                    fill
-                                                    unoptimized
-                                                    className="object-contain"
-                                                    sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
-                                                />
-                                            ) : (
-                                                <div className="w-full h-full flex items-center justify-center text-gray-300">
-                                                    <span className="text-xs">No Image</span>
-                                                </div>
-                                            )}
-                                        </div>
-                                    </div>
-
-                                    {/* Footer Label */}
+                    {/* Category Grid */}
+                    <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-3 gap-[24px] w-full max-w-[1200px]">
+                        {gridItems.map((category, index) => (
+                            <motion.div
+                                key={index}
+                                initial={{ opacity: 0, y: 30 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ delay: index * 0.08 + 0.1 }}
+                            >
+                                <Link href={category.href} className="group block h-full">
+                                    {/* Card Wrapper */}
                                     <div
-                                        className="flex items-center shrink-0 w-full group-hover:bg-gray-50 transition-colors"
+                                        className="flex flex-col group overflow-hidden transition-all duration-300"
                                         style={{
                                             width: "100%",
-                                            maxWidth: "384px",
-                                            height: "52px",
-                                            justifyContent: "space-between",
-                                            padding: "12px 18px"
+                                            height: "276px",
+                                            borderRadius: "12px",
+                                            border: "1px solid hsla(0, 0%, 89%, 1)",
+                                            backgroundColor: "hsla(0, 0%, 100%, 1)",
+                                            boxShadow: "0px 1px 3px 0px hsla(0, 0%, 87%, 0.08), 0px 6px 6px 0px hsla(0, 0%, 87%, 0.07), 0px 13px 8px 0px hsla(0, 0%, 87%, 0.04), 0px 23px 9px 0px hsla(0, 0%, 87%, 0.01), 0px 36px 10px 0px hsla(0, 0%, 87%, 0)"
                                         }}
                                     >
-                                        <h3 className="font-semibold text-[17px] tracking-tight text-[#1E293B] group-hover:text-black transition-colors">
-                                            {category.title}
-                                        </h3>
-                                        <ArrowRight
-                                            weight="regular"
-                                            className="text-[#000000] flex-shrink-0"
+                                        {/* Image Container */}
+                                        <div className="relative w-full flex-1 flex items-center justify-center p-6">
+                                            <div className="relative w-full h-[180px] transform group-hover:scale-105 transition-transform duration-500">
+                                                {category.image ? (
+                                                    <Image
+                                                        src={category.image}
+                                                        alt={category.title}
+                                                        fill
+                                                        unoptimized
+                                                        className="object-contain"
+                                                        sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
+                                                    />
+                                                ) : (
+                                                    <div className="w-full h-full flex items-center justify-center text-gray-300">
+                                                        <span className="text-xs">No Image</span>
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </div>
+
+                                        {/* Footer Label */}
+                                        <div
+                                            className="flex items-center shrink-0 w-full group-hover:bg-gray-50 transition-colors"
                                             style={{
-                                                width: "24px",
-                                                height: "24px",
-                                                opacity: 1,
+                                                width: "100%",
+                                                maxWidth: "384px",
+                                                height: "52px",
+                                                justifyContent: "space-between",
+                                                padding: "12px 18px"
                                             }}
-                                        />
+                                        >
+                                            <h3 className="font-semibold text-[17px] tracking-tight text-[#1E293B] group-hover:text-black transition-colors">
+                                                {category.title}
+                                            </h3>
+                                            <ArrowRight
+                                                weight="regular"
+                                                className="text-[#000000] flex-shrink-0"
+                                                style={{
+                                                    width: "24px",
+                                                    height: "24px",
+                                                    opacity: 1,
+                                                }}
+                                            />
+                                        </div>
                                     </div>
-                                </div>
-                            </Link>
-                        </motion.div>
-                    ))}
-                </div>
+                                </Link>
+                            </motion.div>
+                        ))}
+                    </div>
                 </div>
             </main>
         </div>

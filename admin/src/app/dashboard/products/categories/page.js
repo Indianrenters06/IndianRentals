@@ -6,6 +6,7 @@ import { Spinner } from "@heroui/react";
 import {
     Plus, Folder, FolderPlus, FolderOpen, Trash, PencilSimple,
     CaretDown, CaretRight, TreeStructure, Tag, Check, X, FloppyDisk,
+    Warning, CheckCircle, XCircle
 } from "@phosphor-icons/react";
 import ImageUploader from "@/components/ImageUploader";
 
@@ -15,119 +16,90 @@ function getToken() {
     return typeof window !== "undefined" ? localStorage.getItem("adminToken") : null;
 }
 
-// ── Subcategory row ───────────────────────────────────────────────────────────
-function SubRow({ sub, onDelete, onSave }) {
-    const [editing, setEditing] = useState(false);
-    const [name, setName] = useState(sub.name);
-    const [saving, setSaving] = useState(false);
-
-    const save = async () => {
-        if (!name.trim()) return;
-        setSaving(true);
-        try {
-            const res = await fetch(`${API}/api/categories/${sub._id}`, {
-                method: "PUT",
-                headers: { "Content-Type": "application/json", Authorization: `Bearer ${getToken()}` },
-                body: JSON.stringify({ name }),
-            });
-            if (!res.ok) throw new Error((await res.json()).message || "Failed");
-            onSave();
-            setEditing(false);
-        } catch (e) { alert(e.message); }
-        finally { setSaving(false); }
-    };
-
+// ── Toast Notification ────────────────────────────────────────────────────────
+function Toast({ toasts }) {
     return (
-        <div className="flex items-center gap-3 px-4 py-2.5 bg-slate-50 dark:bg-slate-800/40 border-t border-slate-100 dark:border-slate-800/60 pl-14 group">
-            <Tag size={13} weight="fill" className="text-indigo-400 shrink-0" />
-            {sub.image && (
-                <img src={sub.image} alt={sub.name} className="w-8 h-8 rounded-lg object-contain bg-white border border-slate-200 p-0.5 shrink-0" />
-            )}
-            {editing ? (
-                <input
-                    autoFocus
-                    value={name}
-                    onChange={e => setName(e.target.value)}
-                    onKeyDown={e => { if (e.key === "Enter") save(); if (e.key === "Escape") setEditing(false); }}
-                    className="flex-1 h-8 px-2 rounded-lg border border-indigo-400 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/30 dark:bg-slate-900 dark:text-white"
-                />
-            ) : (
-                <div className="flex-1 min-w-0">
-                    <span className="text-sm font-semibold text-slate-800 dark:text-slate-200">{sub.name}</span>
-                    {sub.slug && <span className="ml-2 text-xs font-mono text-slate-400">/{sub.slug}</span>}
+        <div className="fixed bottom-6 right-6 z-[9999] flex flex-col gap-2 pointer-events-none">
+            <AnimatePresence>
+                {toasts.map((t) => (
+                    <motion.div
+                        key={t.id}
+                        initial={{ opacity: 0, y: 20, scale: 0.95 }}
+                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                        exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                        transition={{ duration: 0.22 }}
+                        className={`flex items-center gap-3 px-4 py-3 rounded-2xl shadow-xl text-sm font-semibold text-white pointer-events-auto min-w-[260px] ${
+                            t.type === "success" ? "bg-emerald-600" : "bg-red-600"
+                        }`}
+                    >
+                        {t.type === "success"
+                            ? <CheckCircle size={18} weight="bold" />
+                            : <XCircle size={18} weight="bold" />}
+                        {t.message}
+                    </motion.div>
+                ))}
+            </AnimatePresence>
+        </div>
+    );
+}
+
+// ── Confirm Delete Modal ──────────────────────────────────────────────────────
+function ConfirmDeleteModal({ isOpen, onClose, onConfirm, title, description, loading }) {
+    return (
+        <AnimatePresence>
+            {isOpen && (
+                <div className="fixed inset-0 z-[9998] flex items-center justify-center p-4">
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="absolute inset-0 bg-black/50 backdrop-blur-sm"
+                        onClick={onClose}
+                    />
+                    <motion.div
+                        initial={{ opacity: 0, scale: 0.92, y: 20 }}
+                        animate={{ opacity: 1, scale: 1, y: 0 }}
+                        exit={{ opacity: 0, scale: 0.92, y: 10 }}
+                        transition={{ duration: 0.22, ease: "easeOut" }}
+                        className="relative z-10 bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-2xl p-7 max-w-sm w-full"
+                    >
+                        <div className="flex flex-col items-center text-center gap-4">
+                            <div className="w-16 h-16 rounded-2xl bg-red-50 dark:bg-red-500/10 flex items-center justify-center">
+                                <Warning size={32} weight="duotone" className="text-red-500" />
+                            </div>
+                            <div>
+                                <h3 className="text-lg font-bold text-slate-900 dark:text-slate-100 mb-1">{title}</h3>
+                                <p className="text-sm text-slate-500 dark:text-slate-400">{description}</p>
+                            </div>
+                            <div className="flex gap-3 w-full pt-1">
+                                <button
+                                    onClick={onClose}
+                                    disabled={loading}
+                                    className="flex-1 h-11 rounded-2xl border border-slate-200 dark:border-slate-700 text-sm font-semibold text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors disabled:opacity-50"
+                                >
+                                    Cancel
+                                </button>
+                                <button
+                                    onClick={onConfirm}
+                                    disabled={loading}
+                                    className="flex-1 h-11 rounded-2xl bg-red-600 hover:bg-red-700 text-white text-sm font-bold shadow-lg shadow-red-500/25 transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+                                >
+                                    {loading ? <Spinner size="sm" color="white" /> : <Trash size={15} weight="bold" />}
+                                    {loading ? "Deleting…" : "Delete"}
+                                </button>
+                            </div>
+                        </div>
+                    </motion.div>
                 </div>
             )}
-            <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${sub.isActive ? "bg-emerald-50 text-emerald-600" : "bg-slate-100 text-slate-500"}`}>
-                {sub.isActive ? "Active" : "Off"}
-            </span>
-            <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                {editing ? (
-                    <>
-                        <button onClick={save} disabled={saving} className="p-1.5 rounded-lg text-emerald-500 hover:bg-emerald-50 dark:hover:bg-emerald-500/10 transition-colors">
-                            {saving ? <Spinner size="sm" /> : <Check size={14} weight="bold" />}
-                        </button>
-                        <button onClick={() => setEditing(false)} className="p-1.5 rounded-lg text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors">
-                            <X size={14} weight="bold" />
-                        </button>
-                    </>
-                ) : (
-                    <button onClick={() => setEditing(true)} className="p-1.5 rounded-lg text-slate-400 hover:text-indigo-500 hover:bg-indigo-50 dark:hover:bg-indigo-500/10 transition-colors">
-                        <PencilSimple size={14} weight="bold" />
-                    </button>
-                )}
-                <button onClick={() => onDelete(sub._id)} className="p-1.5 rounded-lg text-slate-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors">
-                    <Trash size={14} weight="bold" />
-                </button>
-            </div>
-        </div>
+        </AnimatePresence>
     );
 }
 
-// ── Inline Add Subcategory Row ───────────────────────────────────────────────
-function AddSubRow({ parentId, onDone, onCancel }) {
-    const [name, setName] = useState("");
-    const [saving, setSaving] = useState(false);
 
-    const save = async () => {
-        if (!name.trim()) return;
-        setSaving(true);
-        try {
-            const res = await fetch(`${API}/api/categories/${parentId}/subcategories`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json", Authorization: `Bearer ${getToken()}` },
-                body: JSON.stringify({ name }),
-            });
-            if (!res.ok) throw new Error((await res.json()).message || "Failed");
-            onDone();
-        } catch (e) { alert(e.message); setSaving(false); }
-    };
-
-    return (
-        <div className="flex items-center gap-3 px-4 py-2.5 bg-indigo-50/50 dark:bg-indigo-500/5 border-t border-indigo-100 dark:border-indigo-500/20 pl-14">
-            <Tag size={13} weight="fill" className="text-indigo-300 shrink-0" />
-            <input
-                autoFocus
-                value={name}
-                onChange={e => setName(e.target.value)}
-                onKeyDown={e => { if (e.key === "Enter") save(); if (e.key === "Escape") onCancel(); }}
-                placeholder="Subcategory name…"
-                className="flex-1 h-8 px-3 rounded-lg border border-indigo-300 dark:border-indigo-500/50 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/30 bg-white dark:bg-slate-900 dark:text-white placeholder:text-slate-400"
-            />
-            <button onClick={save} disabled={saving || !name.trim()}
-                className="h-8 px-3 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold disabled:opacity-50 transition-colors flex items-center gap-1.5">
-                {saving ? <Spinner size="sm" color="white" /> : <Check size={14} weight="bold" />} Add
-            </button>
-            <button onClick={onCancel} className="h-8 px-2 rounded-lg text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors">
-                <X size={14} />
-            </button>
-        </div>
-    );
-}
 
 // ── Category Row ──────────────────────────────────────────────────────────────
-function CatRow({ cat, onDelete, onRefresh }) {
-    const [expanded, setExpanded] = useState(false);
-    const [addingSub, setAddingSub] = useState(false);
+function CatRow({ cat, onDelete, onRefresh, addToast }) {
     const [editing, setEditing] = useState(false);
     const [editName, setEditName] = useState(cat.name);
     const [editImage, setEditImage] = useState(cat.image || "");
@@ -155,10 +127,14 @@ function CatRow({ cat, onDelete, onRefresh }) {
                 body: JSON.stringify({ name: editName, image: editImage }),
             });
             if (!res.ok) throw new Error((await res.json()).message || "Failed");
+            addToast("Category updated successfully!", "success");
             onRefresh();
             setEditing(false);
-        } catch (e) { alert(e.message); }
-        finally { setSaving(false); }
+        } catch (e) { 
+            addToast(e.message, "error"); 
+        } finally { 
+            setSaving(false); 
+        }
     };
 
     const subCount = cat.subcategories?.length || 0;
@@ -167,10 +143,6 @@ function CatRow({ cat, onDelete, onRefresh }) {
         <div className="border-b border-slate-100 dark:border-slate-800/60 last:border-b-0">
             {/* Main row */}
             <div className="flex items-center gap-3 px-5 py-3.5 hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors group">
-                <button onClick={() => setExpanded(v => !v)}
-                    className="p-1 rounded text-slate-400 hover:text-indigo-500 transition-colors shrink-0">
-                    {expanded ? <CaretDown size={13} weight="bold" /> : <CaretRight size={13} weight="bold" />}
-                </button>
 
                 {/* Category image preview */}
                 {(editing ? editImage : cat.image) ? (
@@ -191,10 +163,7 @@ function CatRow({ cat, onDelete, onRefresh }) {
                     {cat.description && <p className="text-xs text-slate-400 mt-0.5 truncate max-w-xs">{cat.description}</p>}
                 </div>
 
-                <button onClick={() => { setExpanded(true); setAddingSub(true); }}
-                    className="hidden group-hover:flex items-center gap-1 h-7 px-2.5 text-xs font-semibold text-indigo-600 bg-indigo-50 dark:bg-indigo-500/10 rounded-lg hover:bg-indigo-100 transition-colors shrink-0">
-                    <Plus size={11} weight="bold" /> Sub
-                </button>
+
 
                 <span className="text-xs font-semibold text-indigo-600 bg-indigo-50 dark:bg-indigo-500/10 px-2 py-0.5 rounded-full shrink-0">
                     {subCount} sub{subCount !== 1 ? "s" : ""}
@@ -215,7 +184,7 @@ function CatRow({ cat, onDelete, onRefresh }) {
                     >
                         {editing ? <X size={14} /> : <PencilSimple size={14} weight="bold" />}
                     </button>
-                    <button onClick={() => onDelete(cat._id)} className="p-1.5 rounded-lg text-slate-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors">
+                    <button onClick={() => onDelete(cat)} className="p-1.5 rounded-lg text-slate-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors">
                         <Trash size={14} weight="bold" />
                     </button>
                 </div>
@@ -293,58 +262,13 @@ function CatRow({ cat, onDelete, onRefresh }) {
                 )}
             </AnimatePresence>
 
-            {/* Subcategories */}
-            <AnimatePresence>
-                {expanded && (
-                    <motion.div
-                        initial={{ height: 0, opacity: 0 }}
-                        animate={{ height: "auto", opacity: 1 }}
-                        exit={{ height: 0, opacity: 0 }}
-                        transition={{ duration: 0.18, ease: "easeInOut" }}
-                        className="overflow-hidden"
-                    >
-                        {cat.subcategories?.map(sub => (
-                            <SubRow
-                                key={sub._id}
-                                sub={sub}
-                                onDelete={async (id) => {
-                                    if (!confirm("Delete this subcategory?")) return;
-                                    const res = await fetch(`${API}/api/categories/${id}`, {
-                                        method: "DELETE",
-                                        headers: { Authorization: `Bearer ${getToken()}` },
-                                    });
-                                    if (res.ok) onRefresh();
-                                    else alert((await res.json()).message || "Failed");
-                                }}
-                                onSave={onRefresh}
-                            />
-                        ))}
-                        {addingSub && (
-                            <AddSubRow
-                                parentId={cat._id}
-                                onDone={() => { setAddingSub(false); onRefresh(); }}
-                                onCancel={() => setAddingSub(false)}
-                            />
-                        )}
-                        {!addingSub && (
-                            <div className="pl-14 py-2 border-t border-slate-100 dark:border-slate-800/60">
-                                <button
-                                    onClick={() => setAddingSub(true)}
-                                    className="flex items-center gap-1.5 text-xs text-indigo-500 hover:text-indigo-700 font-semibold transition-colors"
-                                >
-                                    <Plus size={12} weight="bold" /> Add Subcategory
-                                </button>
-                            </div>
-                        )}
-                    </motion.div>
-                )}
-            </AnimatePresence>
+
         </div>
     );
 }
 
 // ── Inline Add Category Row ──────────────────────────────────────────────────
-function AddCatRow({ onDone, onCancel }) {
+function AddCatRow({ onDone, onCancel, addToast }) {
     const [name, setName] = useState("");
     const [description, setDescription] = useState("");
     const [saving, setSaving] = useState(false);
@@ -359,8 +283,12 @@ function AddCatRow({ onDone, onCancel }) {
                 body: JSON.stringify({ name, description }),
             });
             if (!res.ok) throw new Error((await res.json()).message || "Failed");
+            addToast("Category created successfully!", "success");
             onDone();
-        } catch (e) { alert(e.message); setSaving(false); }
+        } catch (e) { 
+            addToast(e.message, "error"); 
+            setSaving(false); 
+        }
     };
 
     return (
@@ -413,6 +341,20 @@ export default function CategoriesPage() {
     const [addingCat, setAddingCat] = useState(false);
     const [mounted, setMounted] = useState(false);
 
+    // Confirm modal state
+    const [confirmOpen, setConfirmOpen] = useState(false);
+    const [deleteTarget, setDeleteTarget] = useState(null); // { id, name, type: 'category' | 'subcategory' }
+    const [deleting, setDeleting] = useState(false);
+
+    // Toast state
+    const [toasts, setToasts] = useState([]);
+
+    const addToast = useCallback((message, type = "success") => {
+        const id = Date.now();
+        setToasts((prev) => [...prev, { id, message, type }]);
+        setTimeout(() => setToasts((prev) => prev.filter((t) => t.id !== id)), 3500);
+    }, []);
+
     useEffect(() => { setMounted(true); }, []);
 
     const fetchCategories = useCallback(async () => {
@@ -434,14 +376,31 @@ export default function CategoriesPage() {
 
     useEffect(() => { fetchCategories(); }, [fetchCategories]);
 
-    const handleDelete = async (id) => {
-        if (!confirm("Delete this category and ALL its subcategories?")) return;
-        const res = await fetch(`${API}/api/categories/${id}`, {
-            method: "DELETE",
-            headers: { Authorization: `Bearer ${getToken()}` },
-        });
-        if (res.ok) fetchCategories();
-        else alert((await res.json()).message || "Failed");
+    const askDeleteCategory = (cat) => {
+        setDeleteTarget({ id: cat._id, name: cat.name, type: 'category' });
+        setConfirmOpen(true);
+    };
+
+
+
+    const confirmDelete = async () => {
+        if (!deleteTarget) return;
+        setDeleting(true);
+        try {
+            const res = await fetch(`${API}/api/categories/${deleteTarget.id}`, {
+                method: "DELETE",
+                headers: { Authorization: `Bearer ${getToken()}` },
+            });
+            if (!res.ok) throw new Error((await res.json()).message || "Failed to delete");
+            addToast(`"${deleteTarget.name}" deleted successfully!`);
+            setConfirmOpen(false);
+            setDeleteTarget(null);
+            fetchCategories();
+        } catch (err) {
+            addToast(err.message, "error");
+        } finally {
+            setDeleting(false);
+        }
     };
 
     const filtered = search.trim()
@@ -455,6 +414,21 @@ export default function CategoriesPage() {
 
     return (
         <div className="w-full space-y-5 pb-12">
+            {/* Toast Notifications */}
+            <Toast toasts={toasts} />
+
+            {/* Confirm Delete Modal */}
+            <ConfirmDeleteModal
+                isOpen={confirmOpen}
+                onClose={() => { if (!deleting) { setConfirmOpen(false); setDeleteTarget(null); } }}
+                onConfirm={confirmDelete}
+                title={deleteTarget?.type === 'category' ? "Delete Category?" : "Delete Subcategory?"}
+                description={deleteTarget?.type === 'category' 
+                    ? `"${deleteTarget?.name}" and ALL its subcategories will be permanently removed.` 
+                    : `"${deleteTarget?.name}" will be permanently removed. This cannot be undone.`}
+                loading={deleting}
+            />
+
             {/* Header */}
             <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
                 <div>
@@ -465,7 +439,7 @@ export default function CategoriesPage() {
                         </span>
                     </h1>
                     <p className="text-slate-500 dark:text-slate-400 text-sm">
-                        Click <span className="font-semibold text-indigo-500">+ Add Category</span> to add inline. Click the row to expand subcategories.
+                        Click <span className="font-semibold text-indigo-500">+ Add Category</span> to add a main category.
                     </p>
                 </div>
                 <div className="flex items-center gap-3">
@@ -503,7 +477,6 @@ export default function CategoriesPage() {
             <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
                 {/* Table header */}
                 <div className="flex items-center px-5 py-3 bg-slate-50 dark:bg-slate-950/80 border-b border-slate-200 dark:border-slate-800 gap-3">
-                    <span className="w-6" />
                     <span className="w-10" />
                     <span className="flex-1 text-xs font-semibold uppercase tracking-wider text-slate-500">Category</span>
                     <span className="text-xs font-semibold uppercase tracking-wider text-slate-500 w-24 text-center">Subcats</span>
@@ -517,6 +490,7 @@ export default function CategoriesPage() {
                         <AddCatRow
                             onDone={() => { setAddingCat(false); fetchCategories(); }}
                             onCancel={() => setAddingCat(false)}
+                            addToast={addToast}
                         />
                     )}
                 </AnimatePresence>
@@ -537,8 +511,9 @@ export default function CategoriesPage() {
                             <CatRow
                                 key={cat._id}
                                 cat={cat}
-                                onDelete={handleDelete}
+                                onDelete={askDeleteCategory}
                                 onRefresh={fetchCategories}
+                                addToast={addToast}
                             />
                         ))}
                     </div>

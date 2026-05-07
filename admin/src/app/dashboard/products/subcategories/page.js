@@ -1,34 +1,361 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from "react";
-import { motion } from "framer-motion";
+import { useState, useEffect, useCallback } from "react";
+import { AnimatePresence, motion } from "framer-motion";
+import { Spinner } from "@heroui/react";
 import {
-    Card, CardBody, Button, Table, TableHeader, TableColumn,
-    TableBody, TableRow, TableCell, Chip, Select, SelectItem,
-    Modal, ModalContent, ModalHeader, ModalBody, ModalFooter,
-    useDisclosure, Input, Textarea, Avatar
-} from "@heroui/react";
-import { Plus, SquaresFour, Trash, PencilSimple, Folder, Image, FloppyDisk } from "@phosphor-icons/react";
+    Plus, Tag, Trash, PencilSimple, Warning, CheckCircle, XCircle, Check, X
+} from "@phosphor-icons/react";
 import ImageUploader from "@/components/ImageUploader";
 
+const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+
+function getToken() {
+    return typeof window !== "undefined" ? localStorage.getItem("adminToken") : null;
+}
+
+// ── Toast Notification ────────────────────────────────────────────────────────
+function Toast({ toasts }) {
+    return (
+        <div className="fixed bottom-6 right-6 z-[9999] flex flex-col gap-2 pointer-events-none">
+            <AnimatePresence>
+                {toasts.map((t) => (
+                    <motion.div
+                        key={t.id}
+                        initial={{ opacity: 0, y: 20, scale: 0.95 }}
+                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                        exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                        transition={{ duration: 0.22 }}
+                        className={`flex items-center gap-3 px-4 py-3 rounded-2xl shadow-xl text-sm font-semibold text-white pointer-events-auto min-w-[260px] ${
+                            t.type === "success" ? "bg-emerald-600" : "bg-red-600"
+                        }`}
+                    >
+                        {t.type === "success"
+                            ? <CheckCircle size={18} weight="bold" />
+                            : <XCircle size={18} weight="bold" />}
+                        {t.message}
+                    </motion.div>
+                ))}
+            </AnimatePresence>
+        </div>
+    );
+}
+
+// ── Confirm Delete Modal ──────────────────────────────────────────────────────
+function ConfirmDeleteModal({ isOpen, onClose, onConfirm, title, description, loading }) {
+    return (
+        <AnimatePresence>
+            {isOpen && (
+                <div className="fixed inset-0 z-[9998] flex items-center justify-center p-4">
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="absolute inset-0 bg-black/50 backdrop-blur-sm"
+                        onClick={onClose}
+                    />
+                    <motion.div
+                        initial={{ opacity: 0, scale: 0.92, y: 20 }}
+                        animate={{ opacity: 1, scale: 1, y: 0 }}
+                        exit={{ opacity: 0, scale: 0.92, y: 10 }}
+                        transition={{ duration: 0.22, ease: "easeOut" }}
+                        className="relative z-10 bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-2xl p-7 max-w-sm w-full"
+                    >
+                        <div className="flex flex-col items-center text-center gap-4">
+                            <div className="w-16 h-16 rounded-2xl bg-red-50 dark:bg-red-500/10 flex items-center justify-center">
+                                <Warning size={32} weight="duotone" className="text-red-500" />
+                            </div>
+                            <div>
+                                <h3 className="text-lg font-bold text-slate-900 dark:text-slate-100 mb-1">{title}</h3>
+                                <p className="text-sm text-slate-500 dark:text-slate-400">{description}</p>
+                            </div>
+                            <div className="flex gap-3 w-full pt-1">
+                                <button
+                                    onClick={onClose}
+                                    disabled={loading}
+                                    className="flex-1 h-11 rounded-2xl border border-slate-200 dark:border-slate-700 text-sm font-semibold text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors disabled:opacity-50"
+                                >
+                                    Cancel
+                                </button>
+                                <button
+                                    onClick={onConfirm}
+                                    disabled={loading}
+                                    className="flex-1 h-11 rounded-2xl bg-red-600 hover:bg-red-700 text-white text-sm font-bold shadow-lg shadow-red-500/25 transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+                                >
+                                    {loading ? <Spinner size="sm" color="white" /> : <Trash size={15} weight="bold" />}
+                                    {loading ? "Deleting…" : "Delete"}
+                                </button>
+                            </div>
+                        </div>
+                    </motion.div>
+                </div>
+            )}
+        </AnimatePresence>
+    );
+}
+
+// ── Inline Add Subcategory Row ───────────────────────────────────────────────
+function AddSubRow({ parentId, onDone, onCancel, addToast }) {
+    const [name, setName] = useState("");
+    const [description, setDescription] = useState("");
+    const [saving, setSaving] = useState(false);
+
+    const save = async () => {
+        if (!name.trim()) return;
+        setSaving(true);
+        try {
+            const res = await fetch(`${API}/api/categories/${parentId}/subcategories`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json", Authorization: `Bearer ${getToken()}` },
+                body: JSON.stringify({ name, description }),
+            });
+            if (!res.ok) throw new Error((await res.json()).message || "Failed");
+            addToast("Subcategory created successfully!", "success");
+            onDone();
+        } catch (e) { 
+            addToast(e.message, "error"); 
+            setSaving(false); 
+        }
+    };
+
+    return (
+        <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: "auto" }}
+            exit={{ opacity: 0, height: 0 }}
+            transition={{ duration: 0.2 }}
+            className="overflow-hidden"
+        >
+            <div className="flex items-center gap-3 px-5 py-3.5 bg-indigo-50/60 dark:bg-indigo-500/10 border-b border-indigo-100 dark:border-indigo-500/20">
+                <div className="w-10 h-10 rounded-xl bg-indigo-100 dark:bg-indigo-500/20 flex items-center justify-center shrink-0">
+                    <Tag size={18} className="text-indigo-500" weight="duotone" />
+                </div>
+                <input
+                    autoFocus
+                    value={name}
+                    onChange={e => setName(e.target.value)}
+                    onKeyDown={e => { if (e.key === "Enter") save(); if (e.key === "Escape") onCancel(); }}
+                    placeholder="Subcategory name (required)…"
+                    className="flex-1 h-10 px-4 rounded-xl border border-indigo-300 dark:border-indigo-500/50 text-sm font-semibold bg-white dark:bg-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/40 transition-all"
+                />
+                <input
+                    value={description}
+                    onChange={e => setDescription(e.target.value)}
+                    placeholder="Description (optional)…"
+                    className="w-52 h-10 px-3 rounded-xl border border-slate-200 dark:border-slate-700 text-sm bg-white dark:bg-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 transition-all hidden md:block"
+                />
+                <button
+                    onClick={save}
+                    disabled={saving || !name.trim()}
+                    className="h-10 px-5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-bold disabled:opacity-50 transition-colors flex items-center gap-2 shrink-0 shadow-lg shadow-indigo-500/20"
+                >
+                    {saving ? <Spinner size="sm" color="white" /> : <Check size={15} weight="bold" />}
+                    {saving ? "Saving…" : "Save"}
+                </button>
+                <button onClick={onCancel} className="h-10 px-3 rounded-xl text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors shrink-0">
+                    <X size={16} />
+                </button>
+            </div>
+        </motion.div>
+    );
+}
+
+// ── Subcategory Row ───────────────────────────────────────────────────────────
+function SubRow({ sub, onDelete, onRefresh, addToast }) {
+    const [editing, setEditing] = useState(false);
+    const [editName, setEditName] = useState(sub.name);
+    const [editDescription, setEditDescription] = useState(sub.description || "");
+    const [editImage, setEditImage] = useState(sub.image || "");
+    const [saving, setSaving] = useState(false);
+
+    const openEdit = () => {
+        setEditName(sub.name);
+        setEditDescription(sub.description || "");
+        setEditImage(sub.image || "");
+        setEditing(true);
+    };
+
+    const cancelEdit = () => {
+        setEditing(false);
+        setEditName(sub.name);
+        setEditDescription(sub.description || "");
+        setEditImage(sub.image || "");
+    };
+
+    const saveEdit = async () => {
+        if (!editName.trim()) return;
+        setSaving(true);
+        try {
+            const res = await fetch(`${API}/api/categories/${sub._id}`, {
+                method: "PUT",
+                headers: { "Content-Type": "application/json", Authorization: `Bearer ${getToken()}` },
+                body: JSON.stringify({ name: editName, description: editDescription, image: editImage }),
+            });
+            if (!res.ok) throw new Error((await res.json()).message || "Failed");
+            addToast("Subcategory updated successfully!", "success");
+            onRefresh();
+            setEditing(false);
+        } catch (e) { 
+            addToast(e.message, "error"); 
+        } finally { 
+            setSaving(false); 
+        }
+    };
+
+    return (
+        <div className="border-b border-slate-100 dark:border-slate-800/60 last:border-b-0">
+            {/* Main row */}
+            <div className="flex items-center gap-3 px-5 py-3.5 hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors group">
+                {(editing ? editImage : sub.image) ? (
+                    <img
+                        src={editing ? editImage : sub.image}
+                        alt={sub.name}
+                        className="w-10 h-10 rounded-xl object-contain bg-white border border-slate-200 p-0.5 shrink-0"
+                    />
+                ) : (
+                    <div className="w-10 h-10 rounded-xl bg-indigo-50 dark:bg-indigo-500/10 flex items-center justify-center shrink-0">
+                        <Tag size={18} className="text-indigo-400" weight="duotone" />
+                    </div>
+                )}
+
+                <div className="flex-1 min-w-0">
+                    <span className="text-sm font-bold text-slate-900 dark:text-slate-100 group-hover:text-indigo-600 transition-colors">{sub.name}</span>
+                    {sub.slug && <span className="ml-2 text-xs font-mono text-slate-400">/{sub.slug}</span>}
+                    {sub.description && <p className="text-xs text-slate-400 mt-0.5 truncate max-w-xs">{sub.description}</p>}
+                </div>
+
+                <span className={`text-xs font-semibold px-2 py-0.5 rounded-full shrink-0 ${sub.isActive ? "bg-emerald-50 text-emerald-600" : "bg-slate-100 text-slate-500"}`}>
+                    {sub.isActive ? "Active" : "Off"}
+                </span>
+
+                <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity shrink-0">
+                    <button
+                        onClick={editing ? cancelEdit : openEdit}
+                        className={`p-1.5 rounded-lg transition-colors ${
+                            editing
+                                ? "text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700"
+                                : "text-slate-400 hover:text-indigo-500 hover:bg-indigo-50 dark:hover:bg-indigo-500/10"
+                        }`}
+                    >
+                        {editing ? <X size={14} /> : <PencilSimple size={14} weight="bold" />}
+                    </button>
+                    <button onClick={() => onDelete(sub)} className="p-1.5 rounded-lg text-slate-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors">
+                        <Trash size={14} weight="bold" />
+                    </button>
+                </div>
+            </div>
+
+            {/* ── Edit Panel ─────────────────────────────────────────────────── */}
+            <AnimatePresence>
+                {editing && (
+                    <motion.div
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: "auto" }}
+                        exit={{ opacity: 0, height: 0 }}
+                        transition={{ duration: 0.2 }}
+                        className="overflow-hidden"
+                    >
+                        <div className="mx-5 mb-4 mt-1 p-5 rounded-2xl border border-indigo-200 dark:border-indigo-500/30 bg-indigo-50/40 dark:bg-indigo-500/5">
+                            <p className="text-xs font-bold text-indigo-500 uppercase tracking-wider mb-4">Edit Subcategory — {sub.name}</p>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                                {/* Left: name & description field */}
+                                <div className="space-y-3">
+                                    <div>
+                                        <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider block mb-1.5">Name</label>
+                                        <input
+                                            autoFocus
+                                            value={editName}
+                                            onChange={e => setEditName(e.target.value)}
+                                            onKeyDown={e => { if (e.key === "Enter") saveEdit(); if (e.key === "Escape") cancelEdit(); }}
+                                            className="w-full h-10 px-3 rounded-xl border border-slate-200 dark:border-slate-700 text-sm font-semibold bg-white dark:bg-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/30 transition-all"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider block mb-1.5">Description</label>
+                                        <input
+                                            value={editDescription}
+                                            onChange={e => setEditDescription(e.target.value)}
+                                            onKeyDown={e => { if (e.key === "Enter") saveEdit(); if (e.key === "Escape") cancelEdit(); }}
+                                            className="w-full h-10 px-3 rounded-xl border border-slate-200 dark:border-slate-700 text-sm font-semibold bg-white dark:bg-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/30 transition-all"
+                                        />
+                                    </div>
+                                    {editImage && (
+                                        <div className="flex items-center gap-3 p-3 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-700">
+                                            <img src={editImage} alt="preview" className="w-14 h-14 rounded-lg object-contain" />
+                                            <div className="flex-1 min-w-0">
+                                                <p className="text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">Current Image</p>
+                                                <button
+                                                    onClick={() => setEditImage("")}
+                                                    className="text-xs text-red-500 hover:text-red-700 font-semibold"
+                                                >
+                                                    Remove image
+                                                </button>
+                                            </div>
+                                        </div>
+                                    )}
+                                    <div className="flex gap-2 pt-1">
+                                        <button
+                                            onClick={saveEdit}
+                                            disabled={saving || !editName.trim()}
+                                            className="flex items-center gap-2 h-9 px-4 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-bold disabled:opacity-50 transition-colors shadow-md shadow-indigo-500/20"
+                                        >
+                                            {saving ? <Spinner size="sm" color="white" /> : <Check size={14} weight="bold" />}
+                                            {saving ? "Saving…" : "Save Changes"}
+                                        </button>
+                                        <button
+                                            onClick={cancelEdit}
+                                            className="h-9 px-4 rounded-xl border border-slate-200 dark:border-slate-700 text-sm text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"
+                                        >
+                                            Cancel
+                                        </button>
+                                    </div>
+                                </div>
+                                {/* Right: image uploader */}
+                                <div>
+                                    <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider block mb-1.5">Subcategory Image</label>
+                                    <ImageUploader
+                                        key={`edit-${sub._id}-${editing}`}
+                                        existingUrl={editImage}
+                                        onUpload={url => setEditImage(url)}
+                                        label="Upload new image"
+                                    />
+                                </div>
+                            </div>
+                        </div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
+        </div>
+    );
+}
+
+// ── Main Component ────────────────────────────────────────────────────────────
 export default function SubcategoriesManagement() {
-    const { isOpen, onOpen, onOpenChange } = useDisclosure();
     const [categories, setCategories] = useState([]);
     const [subcategories, setSubcategories] = useState([]);
     const [loading, setLoading] = useState(true);
     const [selectedParent, setSelectedParent] = useState("");
-    const [isEdit, setIsEdit] = useState(false);
-    const [selectedSubId, setSelectedSubId] = useState(null);
-    const [formData, setFormData] = useState({
-        name: "",
-        description: "",
-        image: "",
-        parentCategory: ""
-    });
+    const [addingSub, setAddingSub] = useState(false);
+
+    // Confirm modal state
+    const [confirmOpen, setConfirmOpen] = useState(false);
+    const [deleteTarget, setDeleteTarget] = useState(null); // { id, name }
+    const [deleting, setDeleting] = useState(false);
+
+    // Toast state
+    const [toasts, setToasts] = useState([]);
+
+    const addToast = useCallback((message, type = "success") => {
+        const id = Date.now();
+        setToasts((prev) => [...prev, { id, message, type }]);
+        setTimeout(() => setToasts((prev) => prev.filter((t) => t.id !== id)), 3500);
+    }, []);
 
     const fetchCategories = async () => {
         try {
-            const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:5000"}/api/categories`);
+            const res = await fetch(`${API}/api/categories/admin`, {
+                headers: { Authorization: `Bearer ${getToken()}` },
+            });
             if (res.ok) {
                 const data = await res.json();
                 const cats = Array.isArray(data) ? data : data.categories || [];
@@ -46,7 +373,9 @@ export default function SubcategoriesManagement() {
         if (!parentId) return;
         try {
             setLoading(true);
-            const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:5000"}/api/categories/${parentId}/subcategories`);
+            const res = await fetch(`${API}/api/categories/${parentId}/subcategories`, {
+                headers: { Authorization: `Bearer ${getToken()}` },
+            });
             if (res.ok) {
                 const data = await res.json();
                 setSubcategories(Array.isArray(data) ? data : data.subcategories || []);
@@ -58,112 +387,58 @@ export default function SubcategoriesManagement() {
         }
     };
 
-    useEffect(() => {
-        fetchCategories();
-    }, []);
+    useEffect(() => { fetchCategories(); }, []);
+    useEffect(() => { if (selectedParent) fetchSubcategories(selectedParent); }, [selectedParent]);
 
-    useEffect(() => {
-        if (selectedParent) {
-            fetchSubcategories(selectedParent);
-        }
-    }, [selectedParent]);
-
-    const handleCreateSubcategory = async (onClose) => {
-        try {
-            const token = localStorage.getItem("adminToken");
-            const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:5000"}/api/categories/${formData.parentCategory}/subcategories`, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    "Authorization": `Bearer ${token}`
-                },
-                body: JSON.stringify({
-                    name: formData.name,
-                    description: formData.description,
-                    image: formData.image
-                })
-            });
-
-            if (!res.ok) {
-                const errData = await res.json();
-                throw new Error(errData.message || "Failed to create subcategory");
-            }
-
-            alert("Subcategory created successfully!");
-            resetForm();
-            onClose();
-            if (formData.parentCategory === selectedParent) {
-                fetchSubcategories(selectedParent);
-            } else {
-                setSelectedParent(formData.parentCategory);
-            }
-        } catch (err) {
-            alert(err.message);
-        }
+    // ── Delete flow ───────────────────────────────────────────────────────────
+    const askDelete = (sub) => {
+        setDeleteTarget({ id: sub._id, name: sub.name });
+        setConfirmOpen(true);
     };
 
-    const handleUpdateSubcategory = async (onClose) => {
+    const confirmDelete = async () => {
+        if (!deleteTarget) return;
+        setDeleting(true);
         try {
-            const token = localStorage.getItem("adminToken");
-            const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:5000"}/api/categories/${selectedSubId}`, {
-                method: "PUT",
-                headers: {
-                    "Content-Type": "application/json",
-                    "Authorization": `Bearer ${token}`
-                },
-                body: JSON.stringify({
-                    name: formData.name,
-                    description: formData.description,
-                    image: formData.image
-                    // We don't change parent for now as the API might not support re-parenting easily without checking
-                })
+            const res = await fetch(`${API}/api/categories/${deleteTarget.id}`, {
+                method: "DELETE",
+                headers: { Authorization: `Bearer ${getToken()}` },
             });
-
-            if (!res.ok) {
-                const errData = await res.json();
-                throw new Error(errData.message || "Failed to update subcategory");
-            }
-
-            alert("Subcategory updated successfully!");
-            resetForm();
-            onClose();
+            if (!res.ok) throw new Error((await res.json()).message || "Failed to delete");
+            addToast(`"${deleteTarget.name}" deleted successfully!`);
+            setConfirmOpen(false);
+            setDeleteTarget(null);
             fetchSubcategories(selectedParent);
         } catch (err) {
-            alert(err.message);
+            addToast(err.message, "error");
+        } finally {
+            setDeleting(false);
         }
-    };
-
-    const resetForm = () => {
-        setFormData({ name: "", description: "", image: "", parentCategory: "" });
-        setIsEdit(false);
-        setSelectedSubId(null);
-    };
-
-    const openEditModal = (sub) => {
-        setFormData({
-            name: sub.name,
-            description: sub.description || "",
-            image: sub.image || "",
-            parentCategory: selectedParent // Subcategories in the table are already under selectedParent
-        });
-        setSelectedSubId(sub._id);
-        setIsEdit(true);
-        onOpen();
-    };
-
-    const handleDelete = async (subId) => {
-        if (!confirm("Are you sure? This backend might not support direct subcategory deletion yet (check API).")) return;
-        // The API route doesn't show a direct DELETE for subcategories in categoryRoutes.js
-        // Usually handled by updating the parent or a general subcategory route.
-        alert("Delete functionality needs specific backend endpoint for subcategories.");
     };
 
     return (
         <div className="w-full space-y-6 pb-12">
+            {/* Toast Notifications */}
+            <Toast toasts={toasts} />
+
+            {/* Confirm Delete Modal */}
+            <ConfirmDeleteModal
+                isOpen={confirmOpen}
+                onClose={() => { if (!deleting) { setConfirmOpen(false); setDeleteTarget(null); } }}
+                onConfirm={confirmDelete}
+                title="Delete Subcategory?"
+                description={`"${deleteTarget?.name}" will be permanently removed. This cannot be undone.`}
+                loading={deleting}
+            />
+
+            {/* Header */}
             <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
                 <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }}>
                     <h1 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-slate-100 mb-1">
-                        Subcategory <span className="text-transparent bg-clip-text bg-linear-to-r from-indigo-500 to-purple-500">Management</span>
+                        Subcategory{" "}
+                        <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-500 to-purple-500">
+                            Management
+                        </span>
                     </h1>
                     <p className="text-slate-600 dark:text-slate-400">Drill down your catalogue into specific sub-groups.</p>
                 </motion.div>
@@ -171,9 +446,11 @@ export default function SubcategoriesManagement() {
                 <button
                     type="button"
                     onClick={() => {
-                        resetForm();
-                        setFormData(prev => ({ ...prev, parentCategory: selectedParent }));
-                        onOpen();
+                        if (!selectedParent) {
+                            addToast("Please select a parent category first.", "error");
+                            return;
+                        }
+                        setAddingSub(true);
                     }}
                     className="inline-flex items-center gap-2 h-10 px-5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-sm shadow-lg shadow-indigo-500/25 transition-all"
                 >
@@ -182,15 +459,19 @@ export default function SubcategoriesManagement() {
                 </button>
             </div>
 
+            {/* Filter by parent */}
             <div className="flex flex-col md:flex-row gap-4 items-center bg-slate-50 dark:bg-slate-900/40 p-4 rounded-2xl border border-slate-200 dark:border-slate-800">
                 <span className="text-sm font-bold text-slate-500 uppercase tracking-wider">Filter by Parent:</span>
                 <div className="relative max-w-xs w-full">
                     <select
                         value={selectedParent}
-                        onChange={e => setSelectedParent(e.target.value)}
+                        onChange={e => {
+                            setSelectedParent(e.target.value);
+                            setAddingSub(false);
+                        }}
                         className="w-full h-10 px-3 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/30 transition-all appearance-none cursor-pointer"
                     >
-                        <option value="">Select parent category</option>
+                        <option value="" disabled>Select parent category...</option>
                         {categories.map((cat) => (
                             <option key={cat._id} value={cat._id}>{cat.name}</option>
                         ))}
@@ -199,103 +480,57 @@ export default function SubcategoriesManagement() {
                 </div>
             </div>
 
-            <Card className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
-                <CardBody className="p-0">
-                    <Table
-                        aria-label="Subcategories Table"
-                        classNames={{
-                            wrapper: "p-0 rounded-none shadow-none bg-transparent",
-                            thead: "bg-slate-50 dark:bg-slate-950/80",
-                            th: "text-slate-500 font-semibold uppercase text-xs py-4 px-6 border-b border-slate-200 dark:border-slate-800",
-                            td: "py-4 px-6 border-b border-slate-100 dark:border-slate-800/50",
-                            tr: "hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors"
-                        }}
-                    >
-                        <TableHeader>
-                            <TableColumn>SUBCATEGORY</TableColumn>
-                            <TableColumn>DESCRIPTION</TableColumn>
-                            <TableColumn align="center">ACTIONS</TableColumn>
-                        </TableHeader>
-                        <TableBody items={subcategories} isLoading={loading} emptyContent={loading ? "Loading subcategories..." : "No subcategories found for this category."}>
-                            {(sub) => (
-                                <TableRow key={sub._id || sub.name}>
-                                    <TableCell>
-                                        <div className="flex items-center gap-3">
-                                            <Avatar src={sub.image || "https://ui-avatars.com/api/?name=" + sub.name} size="sm" />
-                                            <span className="text-sm font-semibold">{sub.name}</span>
-                                        </div>
-                                    </TableCell>
-                                    <TableCell>
-                                        <span className="text-sm text-slate-500 line-clamp-1">{sub.description || "—"}</span>
-                                    </TableCell>
-                                    <TableCell>
-                                        <div className="flex justify-center gap-2">
-                                            <Button isIconOnly size="sm" variant="light" onPress={() => openEditModal(sub)}><PencilSimple /></Button>
-                                            <Button isIconOnly size="sm" variant="light" color="danger" onPress={() => handleDelete(sub._id)}><Trash /></Button>
-                                        </div>
-                                    </TableCell>
-                                </TableRow>
-                            )}
-                        </TableBody>
-                    </Table>
-                </CardBody>
-            </Card>
+            {/* Table */}
+            <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
+                {/* Table header */}
+                <div className="flex items-center px-5 py-3 bg-slate-50 dark:bg-slate-950/80 border-b border-slate-200 dark:border-slate-800 gap-3">
+                    <span className="w-10" />
+                    <span className="flex-1 text-xs font-semibold uppercase tracking-wider text-slate-500">Subcategory</span>
+                    <span className="text-xs font-semibold uppercase tracking-wider text-slate-500 w-16 text-center">Status</span>
+                    <span className="text-xs font-semibold uppercase tracking-wider text-slate-500 w-20 text-center">Actions</span>
+                </div>
 
-            <Modal isOpen={isOpen} onOpenChange={onOpenChange} classNames={{ base: "bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800" }}>
-                <ModalContent>
-                    {(onClose) => (
-                        <>
-                            <ModalHeader className="flex flex-col gap-1">{isEdit ? "Edit Subcategory" : "Add Subcategory"}</ModalHeader>
-                            <ModalBody className="space-y-4">
-                                <Select
-                                    label="Parent Category"
-                                    isRequired
-                                    selectedKeys={formData.parentCategory ? [formData.parentCategory] : []}
-                                    onSelectionChange={(keys) => setFormData(prev => ({ ...prev, parentCategory: Array.from(keys)[0] }))}
-                                    variant="bordered"
-                                >
-                                    {categories.map((cat) => (
-                                        <SelectItem key={cat._id} value={cat._id}>
-                                            {cat.name}
-                                        </SelectItem>
-                                    ))}
-                                </Select>
-                                <Input
-                                    label="Subcategory Name"
-                                    placeholder="e.g. DSLR Cameras"
-                                    variant="bordered"
-                                    value={formData.name}
-                                    onValueChange={(val) => setFormData(prev => ({ ...prev, name: val }))}
-                                />
-                                <Textarea
-                                    label="Description"
-                                    placeholder="Brief description..."
-                                    variant="bordered"
-                                    value={formData.description}
-                                    onValueChange={(val) => setFormData(prev => ({ ...prev, description: val }))}
-                                />
-                                <div>
-                                    <ImageUploader
-                                        label="Subcategory Icon / Image"
-                                        existingUrl={formData.image}
-                                        onUpload={(url) => setFormData(prev => ({ ...prev, image: url }))}
-                                    />
-                                </div>
-                            </ModalBody>
-                            <ModalFooter>
-                                <Button color="danger" variant="flat" onPress={() => { resetForm(); onClose(); }}>Cancel</Button>
-                                <Button
-                                    color="primary"
-                                    className="bg-indigo-600 font-bold"
-                                    onPress={() => isEdit ? handleUpdateSubcategory(onClose) : handleCreateSubcategory(onClose)}
-                                >
-                                    {isEdit ? "Update" : "Create"}
-                                </Button>
-                            </ModalFooter>
-                        </>
+                {/* Inline Add Row */}
+                <AnimatePresence>
+                    {addingSub && selectedParent && (
+                        <AddSubRow
+                            parentId={selectedParent}
+                            onDone={() => { setAddingSub(false); fetchSubcategories(selectedParent); }}
+                            onCancel={() => setAddingSub(false)}
+                            addToast={addToast}
+                        />
                     )}
-                </ModalContent>
-            </Modal>
+                </AnimatePresence>
+
+                {/* Content */}
+                {loading ? (
+                    <div className="flex items-center justify-center gap-2 py-16 text-slate-400">
+                        <Spinner size="sm" color="secondary" /> Loading subcategories…
+                    </div>
+                ) : !selectedParent ? (
+                    <div className="text-center py-16 text-slate-400">
+                        <Tag size={40} className="mx-auto mb-3 opacity-30" weight="duotone" />
+                        <p>Please select a parent category to view subcategories.</p>
+                    </div>
+                ) : subcategories.length === 0 ? (
+                    <div className="text-center py-16 text-slate-400">
+                        <Tag size={40} className="mx-auto mb-3 opacity-30" weight="duotone" />
+                        <p>No subcategories yet. Click "Add Subcategory" to get started.</p>
+                    </div>
+                ) : (
+                    <div>
+                        {subcategories.map(sub => (
+                            <SubRow
+                                key={sub._id}
+                                sub={sub}
+                                onDelete={askDelete}
+                                onRefresh={() => fetchSubcategories(selectedParent)}
+                                addToast={addToast}
+                            />
+                        ))}
+                    </div>
+                )}
+            </div>
         </div>
     );
 }

@@ -58,7 +58,24 @@ const RentByCategory = () => {
     useEffect(() => {
         const fetchCategories = async () => {
             try {
-                const data = await getCategories();
+                const rawData = await getCategories();
+
+                // Flatten categories to include both parents and subcategories
+                let data = [];
+                if (Array.isArray(rawData)) {
+                    rawData.forEach(parent => {
+                        const parentSlug = parent.slug || parent.name.toLowerCase().replace(/\s+/g, '-');
+                        data.push({ ...parent, calculatedRoute: `/category/${parentSlug}` });
+
+                        if (parent.subcategories && Array.isArray(parent.subcategories)) {
+                            parent.subcategories.forEach(sub => {
+                                const subSlug = sub.slug || sub.name.toLowerCase().replace(/\s+/g, '-');
+                                // Pass subId parameter to support the DynamicCategoryPage layout logic
+                                data.push({ ...sub, calculatedRoute: `/category/${parentSlug}/${subSlug}?subId=${sub._id}` });
+                            });
+                        }
+                    });
+                }
 
                 // Define the specific order requested
                 const targetOrder = ["MacBook", "DSLR", "All In One", "iPad", "SmartPhone", "Desktop"];

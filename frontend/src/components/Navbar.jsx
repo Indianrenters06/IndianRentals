@@ -11,6 +11,7 @@ import AuthModal from "./AuthModal";
 import { useSelector } from "react-redux";
 import { selectCartTotalQuantity } from "../redux/features/cartSlice";
 import { useSettings } from "../context/SettingsContext";
+import { getCategories } from "../services/categoryService";
 
 const Navbar = () => {
     const router = useRouter();
@@ -27,6 +28,7 @@ const Navbar = () => {
     const [pincodeLoading, setPincodeLoading] = useState(false);
     const [pincodeArea, setPincodeArea] = useState("");
     const [pincodeError, setPincodeError] = useState("");
+    const [fetchedCategories, setFetchedCategories] = useState([]);
 
     // Redux Cart Selector
     const totalQuantity = useSelector(selectCartTotalQuantity);
@@ -64,8 +66,18 @@ const Navbar = () => {
             }
         };
 
+        const fetchNavCategories = async () => {
+            try {
+                const cats = await getCategories();
+                setFetchedCategories(cats || []);
+            } catch (err) {
+                console.error("Error fetching categories for navbar", err);
+            }
+        };
+
         checkUserInfo();
         loadLocation();
+        fetchNavCategories();
 
         window.addEventListener("userInfoChanged", checkUserInfo);
         // Listen for storage events (in case login happens in another tab/window)
@@ -154,16 +166,45 @@ const Navbar = () => {
         // Optionally dispatch a custom event if other components need to know
     };
 
-    const navLinks = settings?.navbarLinks?.length > 0 ? settings.navbarLinks : [
-        { name: "Apple Products", href: "/category/apple" },
-        { name: "IT Products", href: "/category/it-products" },
-        { name: "AV Products", href: "/category/av-products" },
-        { name: "Office Equipment", href: "/category/office-equipment" },
-        { name: "DSLR Cameras", href: "/category/dslr" },
-        { name: "More", href: "/categories" },
-        { name: "Latest Launch", href: "/products", separator: true },
-        { name: "Deals %", href: "/products" }
-    ];
+    let navLinks = [];
+    if (settings?.navbarLinks?.length > 0) {
+        navLinks = settings.navbarLinks;
+    } else {
+        const getCategoryRoute = (cat) => {
+            const lowerName = cat.name.toLowerCase();
+            if (lowerName.includes('apple')) return '/category/apple';
+            if (lowerName.includes('dslr')) return '/category/dslr';
+            if (lowerName.includes('it')) return '/category/it-products';
+            if (lowerName.includes('av')) return '/category/av-products';
+            if (lowerName.includes('office')) return '/category/office-equipment';
+            return `/category/${cat.slug || cat.name.toLowerCase().replace(/\s+/g, '-')}`;
+        };
+
+        const dynamicLinks = fetchedCategories.slice(0, 5).map(cat => ({
+            name: cat.name,
+            href: getCategoryRoute(cat)
+        }));
+
+        if (dynamicLinks.length > 0) {
+            navLinks = [
+                ...dynamicLinks,
+                { name: "More", href: "/categories" },
+                { name: "Latest Launch", href: "/products", separator: true },
+                { name: "Deals %", href: "/products" }
+            ];
+        } else {
+            navLinks = [
+                { name: "Apple Products", href: "/category/apple" },
+                { name: "IT Products", href: "/category/it-products" },
+                { name: "AV Products", href: "/category/av-products" },
+                { name: "Office Equipment", href: "/category/office-equipment" },
+                { name: "DSLR Cameras", href: "/category/dslr" },
+                { name: "More", href: "/categories" },
+                { name: "Latest Launch", href: "/products", separator: true },
+                { name: "Deals %", href: "/products" }
+            ];
+        }
+    }
 
     const handleSearch = (e) => {
         if (e.key === 'Enter') {

@@ -45,19 +45,17 @@ export default function UsersManagement() {
     const [modalType, setModalType] = useState('profile');
     const [fetchError, setFetchError] = useState(null);
 
+    const [permissions, setPermissions] = useState([]);
+    const [saving, setSaving] = useState(false);
+
     const handleView = (user, type) => {
         setSelectedUser(user);
         setModalType(type);
         if (type === 'assign_role') {
-            setRole(user.role || 'customer');
             setPermissions(user.adminPermissions || []);
         }
         onOpen();
     };
-
-    const [role, setRole] = useState('customer');
-    const [permissions, setPermissions] = useState([]);
-    const [saving, setSaving] = useState(false);
 
     const availablePermissions = [
         { label: 'CMS Management', value: 'cms' },
@@ -78,6 +76,8 @@ export default function UsersManagement() {
         setSaving(true);
         try {
             const token = localStorage.getItem('adminToken');
+            const newRole = permissions.length > 0 ? 'staff' : 'customer';
+            
             const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/admin/users/${selectedUser._id}/role`, {
                 method: 'PUT',
                 headers: {
@@ -85,8 +85,8 @@ export default function UsersManagement() {
                     'Authorization': `Bearer ${token}`
                 },
                 body: JSON.stringify({
-                    role,
-                    adminPermissions: role === 'staff' ? permissions : []
+                    role: newRole,
+                    adminPermissions: permissions
                 })
             });
 
@@ -249,9 +249,12 @@ export default function UsersManagement() {
                                     <DotsThreeVertical className="w-4 h-4" />
                                 </Button>
                             </DropdownTrigger>
-                            <DropdownMenu aria-label="User Actions" variant="flat">
+                            <DropdownMenu 
+                                aria-label="User Actions" 
+                                variant="flat"
+                            >
                                 <DropdownItem key="view" startContent={<User />} onPress={() => handleView(user, 'profile')}>View Profile</DropdownItem>
-                                <DropdownItem key="assign" startContent={<ShieldCheck />} onPress={() => handleView(user, 'assign_role')}>Assign Role & Permissions</DropdownItem>
+                                <DropdownItem key="assign" startContent={<ShieldCheck />} onPress={() => handleView(user, 'assign_role')}>Assign Admin Sections</DropdownItem>
                                 <DropdownItem key="orders" startContent={<MapPin />} onPress={() => handleView(user, 'orders')}>View Orders</DropdownItem>
                                 <DropdownItem
                                     key="delete"
@@ -406,7 +409,7 @@ export default function UsersManagement() {
                         <>
                             <ModalHeader className="flex flex-col gap-1 border-b border-slate-100 dark:border-slate-800/60 pb-4 pt-5 px-6">
                                 <h2 className="text-xl font-bold tracking-tight text-slate-900 dark:text-slate-100">
-                                    {modalType === 'profile' ? 'User Profile' : modalType === 'assign_role' ? 'Assign Role & Permissions' : 'User Orders'}
+                                    {modalType === 'profile' ? 'User Profile' : modalType === 'assign_role' ? 'Assign Admin Sections' : 'User Orders'}
                                 </h2>
                             </ModalHeader>
                             <ModalBody className="py-6 px-6">
@@ -478,47 +481,29 @@ export default function UsersManagement() {
                                         </div>
 
                                         <div className="space-y-4">
-                                            <div>
-                                                <label className="text-xs font-bold text-slate-500 uppercase tracking-wider block mb-2">Select User Role</label>
-                                                <Select
-                                                    label="Role"
-                                                    placeholder="Select a role"
-                                                    selectedKeys={[role]}
-                                                    onChange={(e) => setRole(e.target.value)}
-                                                    className="max-w-xs"
-                                                    variant="bordered"
+                                            <motion.div
+                                                initial={{ opacity: 0, y: 10 }}
+                                                animate={{ opacity: 1, y: 0 }}
+                                                className="space-y-3 pt-2"
+                                            >
+                                                <label className="text-xs font-bold text-slate-500 uppercase tracking-wider block">Admin Sections Access</label>
+                                                <p className="text-xs text-slate-400 mb-4">Select the specific sections this user is allowed to handle in the admin panel. Selecting sections will automatically grant them staff access.</p>
+                                                <CheckboxGroup
+                                                    value={permissions}
+                                                    onValueChange={setPermissions}
+                                                    className="gap-x-8 gap-y-3"
+                                                    orientation="horizontal"
+                                                    color="primary"
                                                 >
-                                                    <SelectItem key="customer" startContent={<User size={18} />}>Customer (Basic Access)</SelectItem>
-                                                    <SelectItem key="staff" startContent={<Key size={18} />}>Staff (Restricted Admin)</SelectItem>
-                                                    <SelectItem key="admin" startContent={<ShieldCheck size={18} />}>Administrator (Full Access)</SelectItem>
-                                                </Select>
-                                            </div>
-
-                                            {role === 'staff' && (
-                                                <motion.div
-                                                    initial={{ opacity: 0, y: 10 }}
-                                                    animate={{ opacity: 1, y: 0 }}
-                                                    className="space-y-3 pt-2"
-                                                >
-                                                    <label className="text-xs font-bold text-slate-500 uppercase tracking-wider block">Staff Permissions</label>
-                                                    <p className="text-xs text-slate-400 mb-4">Select the sections this staff member can access in the admin panel.</p>
-                                                    <CheckboxGroup
-                                                        value={permissions}
-                                                        onValueChange={setPermissions}
-                                                        className="gap-x-8 gap-y-3"
-                                                        orientation="horizontal"
-                                                        color="indigo"
-                                                    >
-                                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-3">
-                                                            {availablePermissions.map(p => (
-                                                                <Checkbox key={p.value} value={p.value} classNames={{ label: "text-sm font-medium text-slate-700 dark:text-slate-300" }}>
-                                                                    {p.label}
-                                                                </Checkbox>
-                                                            ))}
-                                                        </div>
-                                                    </CheckboxGroup>
-                                                </motion.div>
-                                            )}
+                                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-3">
+                                                        {availablePermissions.map(p => (
+                                                            <Checkbox key={p.value} value={p.value} classNames={{ label: "text-sm font-medium text-slate-700 dark:text-slate-300" }}>
+                                                                {p.label}
+                                                            </Checkbox>
+                                                        ))}
+                                                    </div>
+                                                </CheckboxGroup>
+                                            </motion.div>
                                         </div>
                                     </div>
                                 )}

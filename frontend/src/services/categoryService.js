@@ -35,7 +35,8 @@ export const getSubcategoriesByParentId = async (parentId) => {
 export const getSubcategoriesByParentName = async (parentName) => {
     const categories = await getCategories();
     const parent = categories.find(
-        (c) => c.name.toLowerCase() === parentName.toLowerCase()
+        (c) => c.name.toLowerCase().includes(parentName.toLowerCase()) || 
+               parentName.toLowerCase().includes(c.name.toLowerCase())
     );
     return parent ? (parent.subcategories || []) : [];
 };
