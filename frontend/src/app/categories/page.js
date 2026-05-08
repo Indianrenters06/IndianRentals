@@ -55,24 +55,51 @@ const CategoriesPage = () => {
         fetchData();
     }, []);
 
-    const getCategoryRoute = (cat) => {
-        const lowerName = cat.name.toLowerCase();
-        if (lowerName.includes('apple')) return '/category/apple';
-        if (lowerName.includes('dslr')) return '/category/dslr';
-        if (lowerName.includes('it')) return '/category/it-products';
-        if (lowerName.includes('av')) return '/category/av-products';
-        if (lowerName.includes('office')) return '/category/office-equipment';
-        return `/category/${cat.slug || cat.name.toLowerCase().replace(/\s+/g, '-')}`;
+    // Map DB category slug → frontend static route (for categories that have dedicated pages)
+    // For any unknown slug, fall back to /category/<slug>
+    const SLUG_TO_ROUTE = {
+        'apple': '/category/apple',
+        'apple-products': '/category/apple',
+        'dslr': '/category/dslr',
+        'dslr-cameras': '/category/dslr',
+        'it-products': '/category/it-products',
+        'av-products': '/category/av-products',
+        'office-equipment': '/category/office-equipment',
     };
 
-    const gridItems = realCategories.length > 0
-        ? realCategories.map(cat => ({
-            id: cat._id,
-            title: cat.name,
-            image: cat.image,
-            href: getCategoryRoute(cat)
-        }))
-        : cmsData.categoriesGrid;
+    const getCategoryRoute = (cat) => {
+        const slug = cat.slug || cat.name?.toLowerCase().replace(/\s+/g, '-');
+        return SLUG_TO_ROUTE[slug] || `/category/${slug}`;
+    };
+
+    // Build a name→route map from DB categories so CMS items get correct hrefs
+    const nameToRoute = {};
+    realCategories.forEach(cat => {
+        nameToRoute[cat.name] = getCategoryRoute(cat);
+    });
+
+    // Priority: CMS grid (admin-uploaded images) → DB categories → static defaults
+    const gridItems = (() => {
+        // If admin has configured the CMS grid with images, use it (this is where admin uploads go)
+        if (cmsData.categoriesGrid && cmsData.categoriesGrid.length > 0) {
+            return cmsData.categoriesGrid.map(item => ({
+                ...item,
+                // Prefer CMS href, but override with DB slug-based route if we have it
+                href: nameToRoute[item.title] || item.href,
+            }));
+        }
+        // Fallback: use live DB categories
+        if (realCategories.length > 0) {
+            return realCategories.map(cat => ({
+                id: cat._id,
+                title: cat.name,
+                image: cat.image,
+                href: getCategoryRoute(cat)
+            }));
+        }
+        // Last resort: static defaults
+        return defaultCMS.categoriesGrid;
+    })();
 
     return (
         <div className="min-h-screen bg-white w-full flex flex-col items-center">

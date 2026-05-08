@@ -34,7 +34,7 @@ const fallbackItems = [
 export default function ApplePage() {
     return (
         <DynamicCategoryPage
-            categoryName="Apple"
+            categoryName="Apple Products"
             displayTitle="Apple Products"
             categorySlug="apple"
             filterChips={filterChips}

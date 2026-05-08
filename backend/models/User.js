@@ -75,6 +75,18 @@ const userSchema = new mongoose.Schema({
     phoneOtp: {
         type: String,
     },
+    isBlocked: {
+        type: Boolean,
+        default: false,
+    },
+    isActive: {
+        type: Boolean,
+        default: true,
+    },
+    blockedReason: {
+        type: String,
+        default: ''
+    },
     otpExpires: {
         type: Date,
     }

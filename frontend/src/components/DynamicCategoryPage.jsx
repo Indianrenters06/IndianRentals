@@ -191,7 +191,7 @@ export default function DynamicCategoryPage({
                 style={{
                     maxWidth: '1440px',
                     width: '100%',
-                    height: '722px',
+                    minHeight: '600px',
                     margin: '0 auto',
                     paddingTop: '20px',
                     display: 'flex',
@@ -208,7 +208,7 @@ export default function DynamicCategoryPage({
                         maxWidth: '1200px',
                         width: '100%',
                         paddingTop: '40px',
-                        paddingBottom: '80px',
+                        paddingBottom: '120px',
                         paddingLeft: '32px',
                         paddingRight: '32px',
                         display: 'flex',

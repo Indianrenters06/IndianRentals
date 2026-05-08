@@ -57,20 +57,73 @@ router.route('/users/:id')
     .put(protect, admin, updateUser)
     .delete(protect, admin, deleteUser);
 
+// ── User Status Management (block / unblock / activate / deactivate) ─────────
+router.patch('/users/:id/status', protect, admin, asyncHandler(async (req, res) => {
+    const { action, reason } = req.body;
+    // action: 'block' | 'unblock' | 'deactivate' | 'activate'
+
+    const updatePayload = {};
+    if (action === 'block') {
+        updatePayload.isBlocked = true;
+        updatePayload.isActive = false;
+        updatePayload.blockedReason = reason || 'Blocked by admin';
+    } else if (action === 'unblock') {
+        updatePayload.isBlocked = false;
+        updatePayload.isActive = true;
+        updatePayload.blockedReason = '';
+    } else if (action === 'deactivate') {
+        updatePayload.isActive = false;
+    } else if (action === 'activate') {
+        updatePayload.isActive = true;
+    } else {
+        res.status(400);
+        throw new Error('Invalid action. Use: block, unblock, activate, deactivate');
+    }
+
+    const updatedUser = await User.findByIdAndUpdate(
+        req.params.id,
+        { $set: updatePayload },
+        { new: true, runValidators: false }
+    ).select('-password');
+
+    if (!updatedUser) { res.status(404); throw new Error('User not found'); }
+
+    res.json({
+        _id: updatedUser._id,
+        name: updatedUser.name,
+        email: updatedUser.email,
+        role: updatedUser.role,
+        isBlocked: updatedUser.isBlocked,
+        isActive: updatedUser.isActive,
+        blockedReason: updatedUser.blockedReason,
+    });
+}));
+
 // ── Role & Permission Assignment (superadmin only) ────────────────────────────
 router.put('/users/:id/role', protect, admin, asyncHandler(async (req, res) => {
     const { role, adminPermissions } = req.body;
-    const user = await User.findById(req.params.id);
-    if (!user) { res.status(404); throw new Error('User not found'); }
-    if (role) user.role = role;
-    if (Array.isArray(adminPermissions)) user.adminPermissions = adminPermissions;
-    await user.save();
+
+    // Determine final role based on permissions
+    const finalRole = role || (Array.isArray(adminPermissions) && adminPermissions.length > 0 ? 'staff' : 'customer');
+
+    const updatePayload = { role: finalRole };
+    if (Array.isArray(adminPermissions)) updatePayload.adminPermissions = adminPermissions;
+
+    // Use findByIdAndUpdate to avoid triggering the password pre-save hook
+    const updatedUser = await User.findByIdAndUpdate(
+        req.params.id,
+        { $set: updatePayload },
+        { new: true, runValidators: false }
+    ).select('-password');
+
+    if (!updatedUser) { res.status(404); throw new Error('User not found'); }
+
     res.json({
-        _id: user._id,
-        name: user.name,
-        email: user.email,
-        role: user.role,
-        adminPermissions: user.adminPermissions,
+        _id: updatedUser._id,
+        name: updatedUser.name,
+        email: updatedUser.email,
+        role: updatedUser.role,
+        adminPermissions: updatedUser.adminPermissions,
     });
 }));
 

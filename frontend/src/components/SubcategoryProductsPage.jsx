@@ -42,9 +42,21 @@ export default function SubcategoryProductsPage({ subcategoryId, subcategoryName
 
         const fetchSubcategories = async () => {
             try {
-                const parentSearch = parentName === 'Apple' ? 'Apple Products' : (parentName?.includes('Products') ? parentName : `${parentName} Products`);
                 const { getSubcategoriesByParentName } = await import('../services/categoryService');
-                const subs = await getSubcategoriesByParentName(parentSearch) || [];
+
+                // Try different name variants to handle naming mismatches between DB and component props
+                // e.g. parentName='Apple' but DB might have 'Apple' or 'Apple Products'
+                const namesToTry = [
+                    parentName,
+                    parentName?.replace(/\s*Products?\s*/i, '').trim(), // strip 'Products' suffix
+                    `${parentName} Products`,
+                ].filter(Boolean);
+
+                let subs = [];
+                for (const name of namesToTry) {
+                    subs = await getSubcategoriesByParentName(name) || [];
+                    if (subs.length > 0) break;
+                }
 
                 if (subs.length === 0 && parentName?.toLowerCase() === 'apple') {
                     setSubcategories([

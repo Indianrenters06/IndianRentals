@@ -5,7 +5,8 @@ import { motion } from 'framer-motion';
 import {
     MagnifyingGlass, Funnel, DownloadSimple, PencilSimple, Trash,
     Phone, MapPin, DotsThreeVertical,
-    UserPlus, ShieldCheck, User, Key, CheckCircle
+    UserPlus, ShieldCheck, User, Key, CheckCircle,
+    ProhibitInset, LockOpen, ToggleLeft, ToggleRight, Warning
 } from '@phosphor-icons/react';
 import {
     Card,
@@ -29,8 +30,7 @@ import {
     DropdownItem,
     Pagination,
     Spinner,
-    Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, useDisclosure, Divider,
-    CheckboxGroup, Checkbox
+    Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, useDisclosure, Divider
 } from "@heroui/react";
 
 export default function UsersManagement() {
@@ -47,6 +47,9 @@ export default function UsersManagement() {
 
     const [permissions, setPermissions] = useState([]);
     const [saving, setSaving] = useState(false);
+    const [blockReason, setBlockReason] = useState('');
+    const [statusAction, setStatusAction] = useState(null); // 'block'|'unblock'|'activate'|'deactivate'
+    const { isOpen: isBlockOpen, onOpen: onBlockOpen, onOpenChange: onBlockOpenChange } = useDisclosure();
 
     const handleView = (user, type) => {
         setSelectedUser(user);
@@ -77,7 +80,7 @@ export default function UsersManagement() {
         try {
             const token = localStorage.getItem('adminToken');
             const newRole = permissions.length > 0 ? 'staff' : 'customer';
-            
+
             const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/admin/users/${selectedUser._id}/role`, {
                 method: 'PUT',
                 headers: {
@@ -90,13 +93,17 @@ export default function UsersManagement() {
                 })
             });
 
+            const data = await response.json();
+
             if (response.ok) {
-                const updatedUser = await response.json();
-                setUsers(users.map(u => u._id === updatedUser._id ? { ...u, role: updatedUser.role, adminPermissions: updatedUser.adminPermissions } : u));
+                setUsers(prev => prev.map(u =>
+                    u._id === data._id
+                        ? { ...u, role: data.role, adminPermissions: data.adminPermissions }
+                        : u
+                ));
                 onOpenChange(false);
             } else {
-                const errorData = await response.json();
-                alert(errorData.message || 'Failed to update role');
+                alert(data.message || 'Failed to update role');
             }
         } catch (error) {
             console.error('Error updating role:', error);
@@ -104,6 +111,38 @@ export default function UsersManagement() {
         } finally {
             setSaving(false);
         }
+    };
+
+    // ── Status Actions (block / unblock / activate / deactivate) ────────────────
+    const handleStatusChange = async (user, action, reason = '') => {
+        try {
+            const token = localStorage.getItem('adminToken');
+            const response = await fetch(
+                `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/admin/users/${user._id}/status`,
+                {
+                    method: 'PATCH',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                    body: JSON.stringify({ action, reason })
+                }
+            );
+            const data = await response.json();
+            if (response.ok) {
+                setUsers(prev => prev.map(u =>
+                    u._id === data._id ? { ...u, isBlocked: data.isBlocked, isActive: data.isActive, blockedReason: data.blockedReason } : u
+                ));
+            } else {
+                alert(data.message || 'Failed to update user status');
+            }
+        } catch (err) {
+            alert('Network error. Could not update status.');
+        }
+    };
+
+    const openBlockModal = (user) => {
+        setSelectedUser(user);
+        setStatusAction('block');
+        setBlockReason('');
+        onBlockOpen();
     };
 
     useEffect(() => {
@@ -139,7 +178,24 @@ export default function UsersManagement() {
 
     const handleDeleteUser = async (userId) => {
         if (!confirm('Are you sure you want to delete this user?')) return;
-        setUsers(users.filter(u => u._id !== userId));
+        try {
+            const token = localStorage.getItem('adminToken');
+            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/admin/users/${userId}`, {
+                method: 'DELETE',
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+            if (response.ok) {
+                setUsers(prev => prev.filter(u => u._id !== userId));
+            } else {
+                const data = await response.json();
+                alert(data.message || 'Failed to delete user');
+            }
+        } catch (error) {
+            console.error('Error deleting user:', error);
+            alert('Network error. Could not delete user.');
+        }
     };
 
     const exportCSV = () => {
@@ -235,34 +291,55 @@ export default function UsersManagement() {
                         </span>
                     </div>
                 );
+            case "status":
+                if (user.isBlocked) return (
+                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold bg-red-50 text-red-600 border border-red-200">
+                        <ProhibitInset className="w-3 h-3" /> Blocked
+                    </span>
+                );
+                if (!user.isActive) return (
+                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold bg-amber-50 text-amber-600 border border-amber-200">
+                        <ToggleLeft className="w-3 h-3" /> Inactive
+                    </span>
+                );
+                return (
+                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold bg-green-50 text-green-600 border border-green-200">
+                        <ToggleRight className="w-3 h-3" /> Active
+                    </span>
+                );
             case "actions":
                 return (
                     <div className="flex justify-end items-center gap-2 pr-4">
-                        <Tooltip content="Edit user" color="primary" delay={0}>
-                            <Button isIconOnly size="sm" variant="light" color="primary" className="text-slate-400 hover:text-indigo-400">
-                                <PencilSimple className="w-4 h-4" />
-                            </Button>
-                        </Tooltip>
                         <Dropdown classNames={{ content: "bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 z-50 shadow-xl" }}>
                             <DropdownTrigger>
                                 <Button isIconOnly size="sm" variant="light" className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-300">
                                     <DotsThreeVertical className="w-4 h-4" />
                                 </Button>
                             </DropdownTrigger>
-                            <DropdownMenu 
-                                aria-label="User Actions" 
-                                variant="flat"
-                            >
+                            <DropdownMenu aria-label="User Actions" variant="flat">
                                 <DropdownItem key="view" startContent={<User />} onPress={() => handleView(user, 'profile')}>View Profile</DropdownItem>
                                 <DropdownItem key="assign" startContent={<ShieldCheck />} onPress={() => handleView(user, 'assign_role')}>Assign Admin Sections</DropdownItem>
                                 <DropdownItem key="orders" startContent={<MapPin />} onPress={() => handleView(user, 'orders')}>View Orders</DropdownItem>
-                                <DropdownItem
-                                    key="delete"
-                                    className="text-danger"
-                                    color="danger"
-                                    startContent={<Trash className="text-danger" />}
-                                    onPress={() => handleDeleteUser(user._id)}
-                                >
+                                {/* Status actions */}
+                                {!user.isBlocked ? (
+                                    <DropdownItem key="block" className="text-red-600" color="danger" startContent={<ProhibitInset className="text-red-500" />} onPress={() => openBlockModal(user)}>
+                                        Block User
+                                    </DropdownItem>
+                                ) : (
+                                    <DropdownItem key="unblock" className="text-green-600" startContent={<LockOpen className="text-green-500" />} onPress={() => handleStatusChange(user, 'unblock')}>
+                                        Unblock User
+                                    </DropdownItem>
+                                )}
+                                {user.isActive && !user.isBlocked ? (
+                                    <DropdownItem key="deactivate" className="text-amber-600" startContent={<ToggleLeft className="text-amber-500" />} onPress={() => handleStatusChange(user, 'deactivate')}>
+                                        Deactivate
+                                    </DropdownItem>
+                                ) : (!user.isBlocked && !user.isActive) ? (
+                                    <DropdownItem key="activate" className="text-green-600" startContent={<ToggleRight className="text-green-500" />} onPress={() => handleStatusChange(user, 'activate')}>
+                                        Activate
+                                    </DropdownItem>
+                                ) : null}
+                                <DropdownItem key="delete" className="text-danger" color="danger" startContent={<Trash className="text-danger" />} onPress={() => handleDeleteUser(user._id)}>
                                     Delete User
                                 </DropdownItem>
                             </DropdownMenu>
@@ -377,6 +454,7 @@ export default function UsersManagement() {
                         <TableHeader>
                             <TableColumn key="user">USER INFO</TableColumn>
                             <TableColumn key="role">ROLE</TableColumn>
+                            <TableColumn key="status">STATUS</TableColumn>
                             <TableColumn key="contact">CONTACT & LOCATION</TableColumn>
                             <TableColumn key="joined">JOINED DATE</TableColumn>
                             <TableColumn key="actions" align="center">ACTIONS</TableColumn>
@@ -480,30 +558,40 @@ export default function UsersManagement() {
                                             </div>
                                         </div>
 
-                                        <div className="space-y-4">
-                                            <motion.div
-                                                initial={{ opacity: 0, y: 10 }}
-                                                animate={{ opacity: 1, y: 0 }}
-                                                className="space-y-3 pt-2"
-                                            >
-                                                <label className="text-xs font-bold text-slate-500 uppercase tracking-wider block">Admin Sections Access</label>
-                                                <p className="text-xs text-slate-400 mb-4">Select the specific sections this user is allowed to handle in the admin panel. Selecting sections will automatically grant them staff access.</p>
-                                                <CheckboxGroup
-                                                    value={permissions}
-                                                    onValueChange={setPermissions}
-                                                    className="gap-x-8 gap-y-3"
-                                                    orientation="horizontal"
-                                                    color="primary"
-                                                >
-                                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-3">
-                                                        {availablePermissions.map(p => (
-                                                            <Checkbox key={p.value} value={p.value} classNames={{ label: "text-sm font-medium text-slate-700 dark:text-slate-300" }}>
-                                                                {p.label}
-                                                            </Checkbox>
-                                                        ))}
-                                                    </div>
-                                                </CheckboxGroup>
-                                            </motion.div>
+                                        <div>
+                                            <p className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Admin Sections Access</p>
+                                            <p className="text-xs text-slate-400 mb-4">Select sections this user can manage. Selecting any section grants staff access automatically.</p>
+                                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                                {availablePermissions.map(p => {
+                                                    const checked = permissions.includes(p.value);
+                                                    return (
+                                                        <label
+                                                            key={p.value}
+                                                            className={`flex items-center gap-3 p-3 rounded-xl border cursor-pointer transition-all select-none ${
+                                                                checked
+                                                                    ? 'border-indigo-400 bg-indigo-50 dark:bg-indigo-500/10 dark:border-indigo-500/50'
+                                                                    : 'border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800/40 hover:border-indigo-300'
+                                                            }`}
+                                                        >
+                                                            <input
+                                                                type="checkbox"
+                                                                checked={checked}
+                                                                onChange={() =>
+                                                                    setPermissions(prev =>
+                                                                        prev.includes(p.value)
+                                                                            ? prev.filter(v => v !== p.value)
+                                                                            : [...prev, p.value]
+                                                                    )
+                                                                }
+                                                                className="w-4 h-4 accent-indigo-600 cursor-pointer"
+                                                            />
+                                                            <span className={`text-sm font-medium ${
+                                                                checked ? 'text-indigo-700 dark:text-indigo-300' : 'text-slate-700 dark:text-slate-300'
+                                                            }`}>{p.label}</span>
+                                                        </label>
+                                                    );
+                                                })}
+                                            </div>
                                         </div>
                                     </div>
                                 )}
@@ -539,6 +627,47 @@ export default function UsersManagement() {
                                         Close Window
                                     </Button>
                                 )}
+                            </ModalFooter>
+                        </>
+                    )}
+                </ModalContent>
+            </Modal>
+
+            {/* Block User Modal */}
+            <Modal isOpen={isBlockOpen} onOpenChange={onBlockOpenChange} size="sm" classNames={{ backdrop: "bg-slate-900/50 backdrop-blur-sm" }}>
+                <ModalContent className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-2xl">
+                    {(onClose) => (
+                        <>
+                            <ModalHeader className="flex items-center gap-2 pb-3 border-b border-slate-100 dark:border-slate-800">
+                                <Warning className="text-red-500" size={20} weight="fill" />
+                                <h2 className="text-lg font-bold text-slate-900 dark:text-slate-100">Block User</h2>
+                            </ModalHeader>
+                            <ModalBody className="py-5">
+                                <p className="text-sm text-slate-600 dark:text-slate-400 mb-3">
+                                    Blocking <span className="font-bold text-slate-900 dark:text-slate-100">{selectedUser?.name}</span> will prevent them from logging in or using the platform.
+                                </p>
+                                <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Reason (optional)</label>
+                                <textarea
+                                    value={blockReason}
+                                    onChange={e => setBlockReason(e.target.value)}
+                                    placeholder="e.g. Fraudulent activity, Terms violation..."
+                                    rows={3}
+                                    className="w-full border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-sm text-slate-800 dark:text-slate-200 bg-white dark:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-red-400/50 resize-none"
+                                />
+                            </ModalBody>
+                            <ModalFooter className="border-t border-slate-100 dark:border-slate-800 pt-4">
+                                <Button variant="light" onPress={onClose} className="font-semibold text-slate-500">Cancel</Button>
+                                <Button
+                                    color="danger"
+                                    onPress={async () => {
+                                        await handleStatusChange(selectedUser, 'block', blockReason);
+                                        onClose();
+                                    }}
+                                    startContent={<ProhibitInset size={16} weight="bold" />}
+                                    className="font-bold"
+                                >
+                                    Block User
+                                </Button>
                             </ModalFooter>
                         </>
                     )}

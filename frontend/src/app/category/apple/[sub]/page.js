@@ -19,7 +19,7 @@ export default function AppleSubcategoryPage({ params }) {
         <SubcategoryProductsPage
             subcategoryId={subId}
             subcategoryName={displayName}
-            parentName="Apple"
+            parentName="Apple Products"
             parentHref="/category/apple"
         />
     );

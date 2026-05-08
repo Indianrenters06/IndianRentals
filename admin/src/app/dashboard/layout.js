@@ -108,7 +108,7 @@ export default function DashboardLayout({ children }) {
           setIsSidebarOpen(true);
         }
       };
-      
+
       checkMobile();
       window.addEventListener('resize', checkMobile);
 
@@ -138,18 +138,52 @@ export default function DashboardLayout({ children }) {
   const perms = adminInfo?.adminPermissions || [];
   const can = (section) => isAdmin || perms.includes(section);
 
+  // Map URL prefixes to required permission keys
+  const PATH_PERMISSION_MAP = [
+    { prefix: '/dashboard/cms',           permission: 'cms' },
+    { prefix: '/dashboard/products',      permission: 'products' },
+    { prefix: '/dashboard/inventory',     permission: 'inventory' },
+    { prefix: '/dashboard/users',         permission: 'users' },
+    { prefix: '/dashboard/kyc',           permission: 'kyc' },
+    { prefix: '/dashboard/orders',        permission: 'orders' },
+    { prefix: '/dashboard/payments',      permission: 'payments' },
+    { prefix: '/dashboard/coupons',       permission: 'coupons' },
+    { prefix: '/dashboard/reports',       permission: 'reports' },
+    { prefix: '/dashboard/notifications', permission: 'notifications' },
+    { prefix: '/dashboard/settings',      permission: 'settings' },
+  ];
+
+  // Guard: redirect staff away from sections they don't have permission for
+  useEffect(() => {
+    if (!adminInfo || adminInfo.role === 'admin') return; // admins pass freely
+    if (adminInfo.role !== 'staff') return;
+
+    const matched = PATH_PERMISSION_MAP.find(({ prefix }) => pathname?.startsWith(prefix));
+    if (matched && !perms.includes(matched.permission)) {
+      router.replace('/dashboard');
+    }
+  }, [pathname, adminInfo]);
+
+  // Determine if current page is blocked for this user (for inline fallback)
+  const isBlocked = (() => {
+    if (!adminInfo || adminInfo.role === 'admin') return false;
+    if (adminInfo.role !== 'staff') return false;
+    const matched = PATH_PERMISSION_MAP.find(({ prefix }) => pathname?.startsWith(prefix));
+    return matched ? !perms.includes(matched.permission) : false;
+  })();
+
   const allMenuItems = [
     { name: 'Dashboard', icon: House, path: '/dashboard' },
     {
       name: 'CMS', icon: Layout, path: '/dashboard/cms', permission: 'cms',
       submenu: [
-        { name: 'Homepage',    path: '/dashboard/cms/homepage' },
-        { name: 'Global Layout',path: '/dashboard/cms/layout' },
-        { name: 'About Us',    path: '/dashboard/cms/about' },
-        { name: 'Blog',        path: '/dashboard/cms/blog' },
+        { name: 'Homepage', path: '/dashboard/cms/homepage' },
+        { name: 'Global Layout', path: '/dashboard/cms/layout' },
+        { name: 'About Us', path: '/dashboard/cms/about' },
+        { name: 'Blog', path: '/dashboard/cms/blog' },
         { name: 'Categories Page', path: '/dashboard/cms/categories-page' },
         { name: '🖼️ Category Images', path: '/dashboard/cms/category-images' },
-        { name: 'Static Pages',path: '/dashboard/cms/pages' },
+        { name: 'Static Pages', path: '/dashboard/cms/pages' },
       ]
     },
     {
@@ -281,21 +315,19 @@ export default function DashboardLayout({ children }) {
     <div className="flex bg-slate-50 dark:bg-slate-900 border-none m-0 p-0 text-slate-800 dark:text-slate-100 h-screen overflow-hidden relative z-10 w-full transition-colors duration-300">
       {/* Mobile Backdrop */}
       {isMobile && isSidebarOpen && (
-        <div 
-          className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-40 transition-opacity" 
+        <div
+          className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-40 transition-opacity"
           onClick={() => setIsSidebarOpen(false)}
         />
       )}
 
       {/* Sidebar */}
       <aside
-        className={`${
-          isMobile ? "fixed h-full z-50 left-0" : "sticky top-0 h-screen"
-        } ${
-          isSidebarOpen 
-            ? (isMobile ? "translate-x-0 w-72" : "w-72") 
+        className={`${isMobile ? "fixed h-full z-50 left-0" : "sticky top-0 h-screen"
+          } ${isSidebarOpen
+            ? (isMobile ? "translate-x-0 w-72" : "w-72")
             : (isMobile ? "-translate-x-full w-72" : "w-0")
-        } transition-all duration-300 border-r border-slate-200 dark:border-slate-800/60 bg-white dark:bg-slate-950 flex flex-col overflow-hidden`}
+          } transition-all duration-300 border-r border-slate-200 dark:border-slate-800/60 bg-white dark:bg-slate-950 flex flex-col overflow-hidden`}
       >
         <div className="h-16 flex items-center px-6 border-b border-slate-200 dark:border-slate-800/60 shrink-0 bg-transparent">
           <img
@@ -514,7 +546,17 @@ export default function DashboardLayout({ children }) {
         {/* Page Content */}
         <div className="flex-1 w-full bg-slate-50 dark:bg-slate-900/40 relative z-10 overflow-x-hidden p-4 md:p-6 lg:p-8">
           <div className="max-w-[1600px] mx-auto w-full">
-            {children}
+            {isBlocked ? (
+              <div className="flex flex-col items-center justify-center h-[60vh] gap-4 text-center">
+                <div className="w-20 h-20 rounded-full bg-red-50 dark:bg-red-500/10 flex items-center justify-center mb-2">
+                  <ShieldCheck className="w-10 h-10 text-red-400" />
+                </div>
+                <h2 className="text-2xl font-bold text-slate-800 dark:text-slate-100">Access Denied</h2>
+                <p className="text-slate-500 dark:text-slate-400 max-w-sm">
+                  You don&apos;t have permission to access this section. Contact your administrator to request access.
+                </p>
+              </div>
+            ) : children}
           </div>
         </div>
       </main>
