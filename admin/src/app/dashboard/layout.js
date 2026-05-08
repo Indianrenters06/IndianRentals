@@ -212,11 +212,11 @@ export default function DashboardLayout({ children }) {
       ]
     },
     {
-      name: 'Users', icon: Users, path: '/dashboard/users', permission: 'users',
+      name: 'Customers', icon: Users, path: '/dashboard/users', permission: 'users',
       submenu: [
-        { name: 'All Users', path: '/dashboard/users' },
-        { name: 'Active Users', path: '/dashboard/users/active' },
-        { name: 'Blocked Users', path: '/dashboard/users/blocked' },
+        { name: 'All Customers', path: '/dashboard/users' },
+        { name: 'Active Customers', path: '/dashboard/users/active' },
+        { name: 'Blocked Customers', path: '/dashboard/users/blocked' },
         { name: 'Rental History', path: '/dashboard/users/rentals' },
         { name: 'Payment History', path: '/dashboard/users/payments' },
         { name: 'Wallet Balance', path: '/dashboard/users/wallet' },
@@ -292,6 +292,7 @@ export default function DashboardLayout({ children }) {
       name: 'Settings', icon: Gear, path: '/dashboard/settings', permission: 'settings',
       submenu: [
         { name: 'General Settings', path: '/dashboard/settings/general' },
+        { name: 'Team Members & Roles', path: '/dashboard/settings/team' },
         { name: 'Logo & Branding', path: '/dashboard/settings/branding' },
         { name: 'Payment Gateway', path: '/dashboard/settings/payment-gateway' },
         { name: 'GST Configuration', path: '/dashboard/settings/gst' },

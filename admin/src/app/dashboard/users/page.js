@@ -33,7 +33,7 @@ import {
     Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, useDisclosure, Divider
 } from "@heroui/react";
 
-export default function UsersManagement() {
+export default function CustomersManagement() {
     const [users, setUsers] = useState([]);
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState('');
@@ -208,7 +208,7 @@ export default function UsersManagement() {
         const a = document.createElement('a');
         a.setAttribute('hidden', '');
         a.setAttribute('href', url);
-        a.setAttribute('download', 'users_report.csv');
+        a.setAttribute('download', 'customers_report.csv');
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
@@ -364,9 +364,9 @@ export default function UsersManagement() {
             <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
                 <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }}>
                     <h1 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-slate-100 mb-1">
-                        Users <span className="text-transparent bg-clip-text bg-linear-to-r from-indigo-500 to-purple-500">Management</span>
+                        Customers <span className="text-transparent bg-clip-text bg-linear-to-r from-indigo-500 to-purple-500">Management</span>
                     </h1>
-                    <p className="text-slate-600 dark:text-slate-400">Complete directory of all registered customers and administrators.</p>
+                    <p className="text-slate-600 dark:text-slate-400">Complete directory of all registered customers.</p>
                 </motion.div>
                 <div className="flex flex-wrap items-center gap-3">
                     <button type="button" onClick={exportCSV} className="inline-flex items-center gap-2 h-10 px-4 rounded-xl border border-slate-300 dark:border-slate-700 text-indigo-600 dark:text-indigo-400 font-semibold text-sm bg-indigo-50 dark:bg-indigo-500/10 hover:border-indigo-400 transition-colors">
@@ -375,7 +375,7 @@ export default function UsersManagement() {
                     </button>
                     <button type="button" className="inline-flex items-center gap-2 h-10 px-5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-sm shadow-lg shadow-indigo-500/25 transition-all">
                         <UserPlus className="w-4 h-4" />
-                        Add New User
+                        Add New Customer
                     </button>
                 </div>
             </div>
@@ -421,12 +421,12 @@ export default function UsersManagement() {
                     </div>
 
                     <Table
-                        aria-label="Users management table"
+                        aria-label="Customers management table"
                         bottomContent={
                             filteredUsers.length > 0 ? (
                                 <div className="flex w-full justify-between items-center py-4 px-6 border-t border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950/30">
                                     <span className="text-sm text-slate-500">
-                                        Showing {filteredUsers.length} total users
+                                        Showing {filteredUsers.length} total customers
                                     </span>
                                     <Pagination
                                         isCompact
@@ -466,8 +466,8 @@ export default function UsersManagement() {
                                     <div className="w-16 h-16 bg-slate-100 dark:bg-slate-800 rounded-full flex items-center justify-center mb-4 text-slate-400">
                                         <MagnifyingGlass className="w-6 h-6" />
                                     </div>
-                                    <h3 className="text-lg font-medium text-slate-900 dark:text-slate-200 mb-1">No users found</h3>
-                                    <p className="text-slate-500 text-sm text-center">We couldn't find any real users matching your filters or failed to load them.</p>
+                                    <h3 className="text-lg font-medium text-slate-900 dark:text-slate-200 mb-1">No customers found</h3>
+                                    <p className="text-slate-500 text-sm text-center">We couldn't find any customers matching your filters or failed to load them.</p>
                                 </div>
                             }
                         >

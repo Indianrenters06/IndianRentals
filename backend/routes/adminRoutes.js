@@ -31,6 +31,8 @@ const {
     getDamagedInventory,
     getStockAlerts,
     adjustStock,
+    getTeamMembers,
+    createTeamMember,
 } = require('../controllers/adminController');
 const { protect, admin } = require('../middleware/authMiddleware');
 const User = require('../models/User');
@@ -126,6 +128,11 @@ router.put('/users/:id/role', protect, admin, asyncHandler(async (req, res) => {
         adminPermissions: updatedUser.adminPermissions,
     });
 }));
+
+// Team Management
+router.route('/team')
+    .get(protect, admin, getTeamMembers)
+    .post(protect, admin, createTeamMember);
 
 // Rentals Management
 router.route('/rentals')

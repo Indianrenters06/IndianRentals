@@ -5,9 +5,11 @@ import { Card, CardBody, Button, Table, TableHeader, TableColumn, TableBody, Tab
 import { Plus, Package, Trash, PencilSimple, PlusCircle } from "@phosphor-icons/react";
 
 const ADDONS = [
-    { id: 1, name: "SanDisk 128GB SD Card", price: "₹99/day", category: "Memory", stock: 24 },
-    { id: 2, name: "Extra NP-FZ100 Battery", price: "₹149/day", category: "Power", stock: 15 },
-    { id: 3, name: "GoPro Head Strap", price: "₹49/day", category: "Mounts", stock: 8 },
+    { id: 1, name: "Delivery & Pickup", price: "₹499/order", category: "Delivery", stock: "Unlimited", description: "Standard delivery and pickup service." },
+    { id: 2, name: "Express Delivery", price: "₹999/order", category: "Delivery", stock: "Unlimited", description: "Same day or priority delivery." },
+    { id: 3, name: "Relocation / Reinstallation", price: "₹1499/request", category: "Service", stock: "Unlimited", description: "Relocate and reinstall rented items to a new address." },
+    { id: 4, name: "Extra Accessories", price: "Varies", category: "Accessories", stock: "Variable", description: "Additional cables, memory cards, mounts, etc." },
+    { id: 5, name: "Upgrade Option", price: "Conditional", category: "Subscription", stock: "Unlimited", description: "Users can upgrade the product if they have rented for around 6 months or more." },
 ];
 
 export default function AddonsManagement() {
@@ -50,8 +52,11 @@ export default function AddonsManagement() {
                                 <TableRow key={item.id}>
                                     <TableCell>
                                         <div className="flex items-center gap-3">
-                                            <Avatar name={item.name.charAt(0)} size="sm" className="bg-cyan-100 text-cyan-600 dark:bg-cyan-900/40 dark:text-cyan-400" />
-                                            <span className="text-sm font-semibold">{item.name}</span>
+                                            <Avatar name={item.name.charAt(0)} size="sm" className="bg-cyan-100 text-cyan-600 dark:bg-cyan-900/40 dark:text-cyan-400 shrink-0" />
+                                            <div className="flex flex-col">
+                                                <span className="text-sm font-semibold">{item.name}</span>
+                                                <span className="text-xs text-slate-500">{item.description}</span>
+                                            </div>
                                         </div>
                                     </TableCell>
                                     <TableCell>
@@ -61,7 +66,7 @@ export default function AddonsManagement() {
                                         <span className="text-sm font-bold text-slate-900 dark:text-white">{item.price}</span>
                                     </TableCell>
                                     <TableCell>
-                                        <span className={`text-sm ${item.stock < 10 ? 'text-amber-500' : 'text-slate-500'}`}>{item.stock} Units</span>
+                                        <span className="text-sm text-slate-500">{item.stock}</span>
                                     </TableCell>
                                     <TableCell>
                                         <div className="flex justify-center gap-2">

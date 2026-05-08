@@ -144,11 +144,11 @@ const deleteProduct = asyncHandler(async (req, res) => {
 
 // ============= USER MANAGEMENT =============
 
-// @desc    Get all users
+// @desc    Get all users (customers)
 // @route   GET /api/admin/users
 // @access  Private/Admin
 const getAllUsers = asyncHandler(async (req, res) => {
-    const users = await User.find({}).select('-password').sort({ createdAt: -1 });
+    const users = await User.find({ role: 'customer' }).select('-password').sort({ createdAt: -1 });
     res.json(users);
 });
 
@@ -199,6 +199,48 @@ const deleteUser = asyncHandler(async (req, res) => {
 
     await User.findByIdAndDelete(req.params.id);
     res.json({ message: 'User removed successfully' });
+});
+
+// ============= TEAM MEMBERS MANAGEMENT =============
+
+// @desc    Get all team members (staff and admins)
+// @route   GET /api/admin/team
+// @access  Private/Admin
+const getTeamMembers = asyncHandler(async (req, res) => {
+    const team = await User.find({ role: { $in: ['admin', 'staff', 'superadmin', 'operations_manager', 'sales_executive', 'finance_executive'] } }).select('-password').sort({ createdAt: -1 });
+    res.json(team);
+});
+
+// @desc    Create a team member
+// @route   POST /api/admin/team
+// @access  Private/Admin
+const createTeamMember = asyncHandler(async (req, res) => {
+    const { name, email, password, phone, role, adminPermissions } = req.body;
+
+    const userExists = await User.findOne({ email });
+    if (userExists) {
+        res.status(400);
+        throw new Error('User already exists');
+    }
+
+    const member = await User.create({
+        name,
+        email,
+        password,
+        phone,
+        role: role || 'staff',
+        adminPermissions: adminPermissions || [],
+        isEmailVerified: true,
+        isPhoneVerified: true
+    });
+
+    res.status(201).json({
+        _id: member._id,
+        name: member.name,
+        email: member.email,
+        role: member.role,
+        adminPermissions: member.adminPermissions
+    });
 });
 
 // ============= RENTAL MANAGEMENT =============
@@ -535,4 +577,7 @@ module.exports = {
     getDamagedInventory,
     getStockAlerts,
     adjustStock,
+    // Team
+    getTeamMembers,
+    createTeamMember,
 };
