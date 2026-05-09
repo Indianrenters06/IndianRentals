@@ -303,14 +303,14 @@ export default function KYCManagement() {
                                                 variant="flat"
                                                 startContent={<XCircle weight="bold" />}
                                                 onPress={() => setModalMode("reject")}
-                                                className="font-bold px-6"
+                                                className="h-12 px-6 rounded-xl font-bold"
                                             >
                                                 Mark as Rejected
                                             </Button>
                                             <Button
                                                 color="success"
                                                 variant="shadow"
-                                                className="text-white font-bold px-8 shadow-emerald-500/20 bg-emerald-500"
+                                                className="h-12 px-8 rounded-xl text-white font-bold shadow-lg shadow-emerald-500/30 bg-emerald-600 hover:bg-emerald-700"
                                                 startContent={<CheckCircle weight="bold" />}
                                                 onPress={() => handleUpdateStatus(selectedKyc._id, 'approved')}
                                             >
@@ -322,7 +322,7 @@ export default function KYCManagement() {
                                     <div className="flex justify-end w-full gap-3">
                                         <Button
                                             variant="light"
-                                            className="font-medium text-slate-500"
+                                            className="h-12 px-6 rounded-xl font-medium text-slate-500"
                                             onPress={() => {
                                                 setModalMode("view");
                                                 setRejectionReason("");
@@ -333,7 +333,7 @@ export default function KYCManagement() {
                                         <Button
                                             color="danger"
                                             variant="shadow"
-                                            className="font-bold px-8 bg-rose-500 shadow-rose-500/20"
+                                            className="h-12 px-8 rounded-xl font-bold bg-rose-600 hover:bg-rose-700 shadow-lg shadow-rose-500/30"
                                             onPress={() => handleUpdateStatus(selectedKyc._id, 'rejected')}
                                             isDisabled={!rejectionReason.trim()}
                                         >

@@ -227,3 +227,64 @@ body {
   background-color: #1e293b !important;
   border-color: #334155 !important;
 }
+
+/* ── HeroUI v2 + Tailwind v4 Portal/Popover Fix ──────────────────────────────
+   Ensures dropdowns, select menus, autocompletes, and modals have solid 
+   backgrounds. This targets the slots used by HeroUI's internal system.
+   ─────────────────────────────────────────────────────────────────────────── */
+
+/* Select, Autocomplete, Dropdown, Popover content containers */
+[data-slot="content"], 
+[data-slot="listbox"],
+[data-slot="popover"],
+[data-slot="menu"],
+[data-slot="base"]:is(.heroui-modal),
+[role="listbox"],
+[role="menu"],
+[role="dialog"]:is(.heroui-popover),
+.heroui-dropdown-menu,
+.heroui-popover-content {
+  background-color: #ffffff !important;
+  color: #0f172a !important;
+  border: 1px solid #e2e8f0 !important;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05) !important;
+  opacity: 1 !important;
+}
+
+/* Dark mode overrides */
+.dark [data-slot="content"],
+.dark [data-slot="listbox"],
+.dark [data-slot="popover"],
+.dark [data-slot="menu"],
+.dark [data-slot="base"]:is(.heroui-modal),
+.dark [role="listbox"],
+.dark [role="menu"],
+.dark [role="dialog"]:is(.heroui-popover),
+.dark .heroui-dropdown-menu,
+.dark .heroui-popover-content {
+  background-color: #0f172a !important;
+  color: #f8fafc !important;
+  border: 1px solid #1e293b !important;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5) !important;
+  opacity: 1 !important;
+}
+
+/* Fix for SelectItem/DropdownItem hover and selected states */
+[role="option"]:hover,
+[role="menuitem"]:hover,
+[data-hover="true"],
+[data-selectable="true"][data-selected="true"] {
+  background-color: #f1f5f9 !important;
+}
+
+.dark [role="option"]:hover,
+.dark [role="menuitem"]:hover,
+.dark [data-hover="true"],
+.dark [data-selectable="true"][data-selected="true"] {
+  background-color: #1e293b !important;
+}
+
+/* Ensure the portal container has a high z-index and is not transparent */
+div[data-overlay-container="true"] {
+  z-index: 9999 !important;
+}

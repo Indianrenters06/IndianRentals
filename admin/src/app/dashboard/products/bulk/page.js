@@ -194,8 +194,7 @@ export default function BulkUpload() {
 
                                     <div className="flex gap-4">
                                         <Button
-                                            color="primary"
-                                            className="px-10 font-bold bg-indigo-600 shadow-lg shadow-indigo-500/20"
+                                            className="h-12 px-10 rounded-xl font-bold bg-indigo-600 hover:bg-indigo-700 text-white shadow-lg shadow-indigo-500/30 transition-all"
                                             isLoading={uploadingProducts}
                                             onPress={() => csvFileRef.current.click()}
                                         >
@@ -256,7 +255,12 @@ export default function BulkUpload() {
                                             <span>Maximum 500 rows per file.</span>
                                         </li>
                                     </ul>
-                                    <Button onPress={handleDownloadTemplate} fullWidth variant="flat" color="secondary" startContent={<DownloadSimple weight="bold" />} className="mt-4 font-bold bg-indigo-500/10 text-indigo-600 dark:text-indigo-400">
+                                    <Button 
+                                        onPress={handleDownloadTemplate} 
+                                        fullWidth 
+                                        className="mt-4 h-11 rounded-xl font-bold bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-100 dark:hover:bg-indigo-500/20 transition-all"
+                                        startContent={<DownloadSimple weight="bold" size={18} />}
+                                    >
                                         Download CSV Template
                                     </Button>
                                 </CardBody>
@@ -284,10 +288,10 @@ export default function BulkUpload() {
 
                                     <input type="file" multiple accept="image/*" ref={imageFileRef} className="hidden" onChange={handleImageUpload} />
                                     <Button
-                                        color="secondary"
-                                        className="w-full font-bold shadow-lg shadow-purple-500/20"
+                                        className="w-full h-12 rounded-xl font-bold bg-purple-600 hover:bg-purple-700 text-white shadow-lg shadow-purple-500/30 transition-all"
                                         isLoading={uploadingImages}
                                         onPress={() => imageFileRef.current.click()}
+                                        startContent={<CloudArrowUp weight="bold" size={20} />}
                                     >
                                         {uploadingImages ? 'Uploading Assets...' : 'Choose Images'}
                                     </Button>

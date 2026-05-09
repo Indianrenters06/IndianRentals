@@ -29,10 +29,10 @@ import { toast } from "react-hot-toast";
 
 const PREDEFINED_ROLES = [
   {
-    id: "admin",
+    id: "super_admin",
     name: "Super Admin",
-    description: "Full access to all modules.",
-    permissions: [] // backend logic assumes admin has everything or we just pass all permissions
+    description: "Full access to all modules and configurations.",
+    permissions: ["cms", "products", "inventory", "users", "kyc", "orders", "payments", "coupons", "reports", "notifications", "settings"]
   },
   {
     id: "operations_manager",
@@ -53,18 +53,20 @@ const PREDEFINED_ROLES = [
     permissions: ["payments", "reports", "settings"]
   },
   {
-    id: "staff",
-    name: "Custom Admin / Staff",
-    description: "Customized admin-level permissions.",
-    permissions: []
+    id: "admin",
+    name: "Admin",
+    description: "Similar to Super Admin but with limited configuration access.",
+    permissions: ["cms", "products", "inventory", "users", "kyc", "orders", "payments", "coupons", "reports", "notifications"]
   }
 ];
 
 export default function TeamMembersPage() {
   const [teamMembers, setTeamMembers] = useState([]);
   const [loading, setLoading] = useState(true);
-  const { isOpen, onOpen, onOpenChange } = useDisclosure();
+  const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isEdit, setIsEdit] = useState(false);
+  const [editId, setEditId] = useState(null);
 
   const [formData, setFormData] = useState({
     name: "",
@@ -108,22 +110,46 @@ export default function TeamMembersPage() {
     });
   };
 
+  const handleAdd = () => {
+    setIsEdit(false);
+    setEditId(null);
+    setFormData({ name: "", email: "", phone: "", password: "", role: "staff", adminPermissions: [] });
+    onOpen();
+  };
+
+  const handleEdit = (member) => {
+    setIsEdit(true);
+    setEditId(member._id);
+    setFormData({
+      name: member.name || "",
+      email: member.email || "",
+      phone: member.phone || "",
+      password: "", // Leave blank for security
+      role: member.role || "staff",
+      adminPermissions: member.adminPermissions || []
+    });
+    onOpen();
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
     try {
       const token = localStorage.getItem("adminToken");
       
-      const payload = {
-         ...formData,
-         role: formData.role === "admin" ? "admin" : "staff", // "admin" gets full access, everything else is "staff" with specific permissions
-         // Actually, if we want to store operations_manager as role, we can, but backend handles "staff" logic for permissions. Let's pass the selected role.
-      };
-      // Keep exact role name to display it nicely
-      payload.role = formData.role;
+      const payload = { ...formData };
+      
+      // If editing and password is empty, don't send it
+      if (isEdit && !payload.password) {
+        delete payload.password;
+      }
 
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000"}/api/admin/team`, {
-        method: "POST",
+      const url = isEdit 
+        ? `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000"}/api/admin/team/${editId}`
+        : `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000"}/api/admin/team`;
+
+      const res = await fetch(url, {
+        method: isEdit ? "PUT" : "POST",
         headers: { 
           "Content-Type": "application/json",
           "Authorization": `Bearer ${token}` 
@@ -133,12 +159,12 @@ export default function TeamMembersPage() {
       
       const data = await res.json();
       if (res.ok) {
-        toast.success("Team member added successfully");
+        toast.success(isEdit ? "Team member updated" : "Team member added");
         setFormData({ name: "", email: "", phone: "", password: "", role: "staff", adminPermissions: [] });
         fetchTeamMembers();
-        onOpenChange(false);
+        onClose();
       } else {
-        toast.error(data.message || "Failed to add team member");
+        toast.error(data.message || "Action failed");
       }
     } catch (error) {
       toast.error("Something went wrong");
@@ -147,18 +173,39 @@ export default function TeamMembersPage() {
     }
   };
 
+  const handleDeleteTeamMember = async (id) => {
+    if (!confirm("Remove this team member?")) return;
+    try {
+      const token = localStorage.getItem("adminToken");
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000"}/api/admin/team/${id}`, {
+        method: "DELETE",
+        headers: { "Authorization": `Bearer ${token}` }
+      });
+      if (res.ok) {
+        toast.success("Member removed");
+        fetchTeamMembers();
+      } else {
+        const data = await res.json();
+        toast.error(data.message || "Failed to remove");
+      }
+    } catch (error) {
+      toast.error("Something went wrong");
+    }
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-slate-800 dark:text-slate-100">Team Members & Roles</h1>
-          <p className="text-slate-500 text-sm mt-1">Manage your company staff and their dashboard permissions</p>
+          <h1 className="text-2xl font-bold text-slate-800 dark:text-slate-100">Team Members</h1>
+          <p className="text-slate-500 text-sm mt-1">Manage your company staff.</p>
         </div>
         <Button 
           color="primary" 
+          variant="shadow" 
+          className="h-12 px-8 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-sm shadow-lg shadow-indigo-500/30 transition-all" 
           startContent={<Plus weight="bold" />}
-          onClick={onOpen}
-          className="shadow-lg shadow-indigo-500/20"
+          onPress={handleAdd}
         >
           Add Member
         </Button>
@@ -208,10 +255,22 @@ export default function TeamMembersPage() {
                 </TableCell>
                 <TableCell>
                   <div className="flex items-center gap-2 justify-center">
-                    <Button isIconOnly size="sm" variant="light" className="text-slate-500 hover:text-indigo-500">
+                    <Button 
+                      isIconOnly 
+                      size="sm" 
+                      variant="light" 
+                      className="text-slate-500 hover:text-indigo-500"
+                      onPress={() => handleEdit(item)}
+                    >
                       <PencilSimple className="w-4 h-4" />
                     </Button>
-                    <Button isIconOnly size="sm" variant="light" className="text-slate-500 hover:text-red-500">
+                    <Button 
+                      isIconOnly 
+                      size="sm" 
+                      variant="light" 
+                      className="text-slate-500 hover:text-red-500"
+                      onPress={() => handleDeleteTeamMember(item._id)}
+                    >
                       <Trash className="w-4 h-4" />
                     </Button>
                   </div>
@@ -222,15 +281,25 @@ export default function TeamMembersPage() {
         </Table>
       </Card>
 
-      <Modal isOpen={isOpen} onOpenChange={onOpenChange} size="2xl">
+      <Modal 
+        isOpen={isOpen} 
+        onOpenChange={onOpenChange} 
+        size="2xl"
+        classNames={{
+          backdrop: "bg-slate-900/50 backdrop-blur-sm",
+          base: "bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-2xl",
+          header: "border-b border-slate-100 dark:border-slate-800/60",
+          footer: "border-t border-slate-100 dark:border-slate-800/60",
+        }}
+      >
         <ModalContent>
           {(onClose) => (
-            <form onSubmit={handleSubmit}>
-              <ModalHeader className="flex flex-col gap-1">
-                <h2 className="text-xl font-bold">Add Team Member</h2>
-                <p className="text-sm text-slate-500 font-normal">Create a new staff account and assign a role.</p>
+            <form onSubmit={handleSubmit} className="flex flex-col">
+              <ModalHeader className="flex flex-col gap-1 py-5 px-6">
+                <h2 className="text-xl font-bold text-slate-900 dark:text-slate-100">{isEdit ? "Edit Team Member" : "Add Team Member"}</h2>
+                <p className="text-sm text-slate-500 font-normal">{isEdit ? "Update account details and role permissions." : "Create a new staff account and assign a role."}</p>
               </ModalHeader>
-              <ModalBody>
+              <ModalBody className="py-6 px-6">
                 <div className="grid grid-cols-2 gap-4">
                   <Input 
                     label="Full Name" 
@@ -238,6 +307,7 @@ export default function TeamMembersPage() {
                     isRequired 
                     value={formData.name}
                     onChange={e => setFormData({...formData, name: e.target.value})}
+                    classNames={{ inputWrapper: "h-12" }}
                   />
                   <Input 
                     label="Phone Number" 
@@ -245,6 +315,7 @@ export default function TeamMembersPage() {
                     isRequired 
                     value={formData.phone}
                     onChange={e => setFormData({...formData, phone: e.target.value})}
+                    classNames={{ inputWrapper: "h-12" }}
                   />
                   <Input 
                     label="Email Address" 
@@ -253,14 +324,17 @@ export default function TeamMembersPage() {
                     isRequired 
                     value={formData.email}
                     onChange={e => setFormData({...formData, email: e.target.value})}
+                    classNames={{ inputWrapper: "h-12" }}
                   />
                   <Input 
                     label="Password" 
                     type="password" 
                     variant="bordered" 
-                    isRequired 
+                    isRequired={!isEdit} 
                     value={formData.password}
                     onChange={e => setFormData({...formData, password: e.target.value})}
+                    classNames={{ inputWrapper: "h-12" }}
+                    placeholder={isEdit ? "Leave blank to keep current" : ""}
                   />
                 </div>
 
@@ -271,6 +345,12 @@ export default function TeamMembersPage() {
                     isRequired
                     selectedKeys={[formData.role]}
                     onChange={handleRoleChange}
+                    classNames={{ trigger: "h-12" }}
+                    popoverProps={{
+                      classNames: {
+                        content: "bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-2xl",
+                      }
+                    }}
                     description="Roles automatically determine which dashboard sections are accessible."
                   >
                     {PREDEFINED_ROLES.map((role) => (
@@ -284,9 +364,9 @@ export default function TeamMembersPage() {
                   </Select>
                 </div>
 
-                {formData.role !== 'admin' && (
+                {formData.role !== 'super_admin' && (
                   <div className="mt-4 p-4 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800">
-                    <h3 className="text-sm font-semibold mb-2 flex items-center gap-2">
+                    <h3 className="text-sm font-semibold mb-2 flex items-center gap-2 text-slate-700 dark:text-slate-200">
                       <ShieldCheck className="w-4 h-4 text-indigo-500" />
                       Granted Permissions
                     </h3>
@@ -304,12 +384,18 @@ export default function TeamMembersPage() {
                   </div>
                 )}
               </ModalBody>
-              <ModalFooter>
-                <Button variant="light" onPress={onClose}>
+              <ModalFooter className="py-4 px-6">
+                <Button variant="light" onPress={onClose} className="font-semibold">
                   Cancel
                 </Button>
-                <Button color="primary" type="submit" isLoading={isSubmitting}>
-                  Create Member
+                <Button 
+                  color="primary" 
+                  type="submit" 
+                  isLoading={isSubmitting} 
+                  variant="shadow"
+                  className="h-12 px-10 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-sm shadow-lg shadow-indigo-500/30 transition-all"
+                >
+                  {isEdit ? "Update Member" : "Create Member"}
                 </Button>
               </ModalFooter>
             </form>

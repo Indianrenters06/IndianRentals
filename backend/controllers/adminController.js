@@ -4,6 +4,8 @@ const Product = require('../models/Product');
 const Rental = require('../models/Rental');
 const KYC = require('../models/KYC');
 const Notification = require('../models/Notification');
+const PricingPlan = require('../models/PricingPlan');
+const Variant = require('../models/Variant');
 
 // @desc    Get admin dashboard statistics
 // @route   GET /api/admin/stats
@@ -241,6 +243,53 @@ const createTeamMember = asyncHandler(async (req, res) => {
         role: member.role,
         adminPermissions: member.adminPermissions
     });
+});
+
+// @desc    Update a team member
+// @route   PUT /api/admin/team/:id
+// @access  Private/Admin
+const updateTeamMember = asyncHandler(async (req, res) => {
+    const user = await User.findById(req.params.id);
+
+    if (!user) {
+        res.status(404);
+        throw new Error('Team member not found');
+    }
+
+    const { name, email, password, phone, role, adminPermissions } = req.body;
+
+    if (name) user.name = name;
+    if (email) user.email = email;
+    if (phone) user.phone = phone;
+    if (role) user.role = role;
+    if (adminPermissions) user.adminPermissions = adminPermissions;
+    if (password) user.password = password;
+
+    const updatedUser = await user.save();
+
+    res.json({
+        _id: updatedUser._id,
+        name: updatedUser.name,
+        email: updatedUser.email,
+        role: updatedUser.role,
+        adminPermissions: updatedUser.adminPermissions,
+        phone: updatedUser.phone
+    });
+});
+
+// @desc    Delete a team member
+// @route   DELETE /api/admin/team/:id
+// @access  Private/Admin
+const deleteTeamMember = asyncHandler(async (req, res) => {
+    const user = await User.findById(req.params.id);
+
+    if (!user) {
+        res.status(404);
+        throw new Error('Team member not found');
+    }
+
+    await User.findByIdAndDelete(req.params.id);
+    res.json({ message: 'Team member removed successfully' });
 });
 
 // ============= RENTAL MANAGEMENT =============
@@ -546,6 +595,70 @@ const adjustStock = asyncHandler(async (req, res) => {
     });
 });
 
+// ============= PRICING PLANS =============
+
+// @desc    Get all pricing plans
+// @route   GET /api/admin/pricing-plans
+// @access  Private/Admin
+const getPricingPlans = asyncHandler(async (req, res) => {
+    const plans = await PricingPlan.find({}).sort({ baseRate: 1 });
+    res.json(plans);
+});
+
+// @desc    Create a pricing plan
+// @route   POST /api/admin/pricing-plans
+// @access  Private/Admin
+const createPricingPlan = asyncHandler(async (req, res) => {
+    const { name, baseRate, duration, features, description } = req.body;
+    const plan = await PricingPlan.create({ name, baseRate, duration, features, description });
+    res.status(201).json(plan);
+});
+
+// @desc    Delete a pricing plan
+// @route   DELETE /api/admin/pricing-plans/:id
+// @access  Private/Admin
+const deletePricingPlan = asyncHandler(async (req, res) => {
+    const plan = await PricingPlan.findById(req.params.id);
+    if (!plan) {
+        res.status(404);
+        throw new Error('Plan not found');
+    }
+    await PricingPlan.findByIdAndDelete(req.params.id);
+    res.json({ message: 'Plan removed' });
+});
+
+// ============= VARIANTS =============
+
+// @desc    Get all variants
+// @route   GET /api/admin/variants
+// @access  Private/Admin
+const getVariants = asyncHandler(async (req, res) => {
+    const variants = await Variant.find({}).sort({ createdAt: -1 });
+    res.json(variants);
+});
+
+// @desc    Create a variant
+// @route   POST /api/admin/variants
+// @access  Private/Admin
+const createVariant = asyncHandler(async (req, res) => {
+    const { name, options } = req.body;
+    const variant = await Variant.create({ name, options });
+    res.status(201).json(variant);
+});
+
+// @desc    Delete a variant
+// @route   DELETE /api/admin/variants/:id
+// @access  Private/Admin
+const deleteVariant = asyncHandler(async (req, res) => {
+    const variant = await Variant.findById(req.params.id);
+    if (!variant) {
+        res.status(404);
+        throw new Error('Variant not found');
+    }
+    await Variant.findByIdAndDelete(req.params.id);
+    res.json({ message: 'Variant removed' });
+});
+
 module.exports = {
     getDashboardStats,
     // Products
@@ -580,4 +693,12 @@ module.exports = {
     // Team
     getTeamMembers,
     createTeamMember,
+    updateTeamMember,
+    deleteTeamMember,
+    getPricingPlans,
+    createPricingPlan,
+    deletePricingPlan,
+    getVariants,
+    createVariant,
+    deleteVariant,
 };

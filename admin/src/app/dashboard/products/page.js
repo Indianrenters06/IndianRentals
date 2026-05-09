@@ -137,9 +137,9 @@ export default function AllProducts() {
                     <button
                         type="button"
                         onClick={() => router.push("/dashboard/products/add")}
-                        className="inline-flex items-center gap-2 h-10 px-5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-sm shadow-lg shadow-indigo-500/25 transition-all"
+                        className="inline-flex items-center gap-2 h-12 px-8 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-sm shadow-lg shadow-indigo-500/30 transition-all"
                     >
-                        <Plus weight="bold" size={15} />
+                        <Plus weight="bold" size={18} />
                         Add New Product
                     </button>
                 </motion.div>
@@ -172,13 +172,15 @@ export default function AllProducts() {
                     <div className="p-4 border-b border-slate-200 dark:border-slate-800 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 bg-slate-50 dark:bg-slate-900/60">
                         {/* Search */}
                         <div className="relative group w-full sm:w-72">
-                            <MagnifyingGlass className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-indigo-500" size={15} />
+                            <div className="absolute left-3 top-1/2 -translate-y-1/2 flex items-center justify-center pointer-events-none z-10">
+                                <MagnifyingGlass className="text-slate-400 group-focus-within:text-indigo-500" size={18} />
+                            </div>
                             <input
                                 type="text"
                                 value={search}
                                 onChange={e => setSearch(e.target.value)}
                                 placeholder="Search by name, brand, category…"
-                                className="bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 rounded-lg pl-9 pr-4 py-2 text-sm text-slate-900 dark:text-slate-200 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/40 w-full transition-all"
+                                className="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl pl-10 pr-4 py-2 text-sm text-slate-900 dark:text-slate-200 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 transition-all h-10 shadow-xs"
                             />
                         </div>
 

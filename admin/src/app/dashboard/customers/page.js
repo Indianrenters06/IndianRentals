@@ -50,67 +50,22 @@ export default function CustomersManagement() {
     const [blockReason, setBlockReason] = useState('');
     const [statusAction, setStatusAction] = useState(null); // 'block'|'unblock'|'activate'|'deactivate'
     const { isOpen: isBlockOpen, onOpen: onBlockOpen, onOpenChange: onBlockOpenChange } = useDisclosure();
+    const { isOpen: isAddOpen, onOpen: onAddOpen, onOpenChange: onAddOpenChange } = useDisclosure();
+
+    const [addFormData, setAddFormData] = useState({
+        name: "",
+        email: "",
+        phone: "",
+        password: "",
+        city: "",
+        state: ""
+    });
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
     const handleView = (user, type) => {
         setSelectedUser(user);
         setModalType(type);
-        if (type === 'assign_role') {
-            setPermissions(user.adminPermissions || []);
-        }
         onOpen();
-    };
-
-    const availablePermissions = [
-        { label: 'CMS Management', value: 'cms' },
-        { label: 'Products', value: 'products' },
-        { label: 'Inventory', value: 'inventory' },
-        { label: 'Users', value: 'users' },
-        { label: 'KYC Verification', value: 'kyc' },
-        { label: 'Orders', value: 'orders' },
-        { label: 'Payments', value: 'payments' },
-        { label: 'Coupons & Deals', value: 'coupons' },
-        { label: 'Reports', value: 'reports' },
-        { label: 'Notifications', value: 'notifications' },
-        { label: 'Settings', value: 'settings' },
-    ];
-
-    const handleAssignRole = async () => {
-        if (!selectedUser) return;
-        setSaving(true);
-        try {
-            const token = localStorage.getItem('adminToken');
-            const newRole = permissions.length > 0 ? 'staff' : 'customer';
-
-            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/admin/users/${selectedUser._id}/role`, {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
-                },
-                body: JSON.stringify({
-                    role: newRole,
-                    adminPermissions: permissions
-                })
-            });
-
-            const data = await response.json();
-
-            if (response.ok) {
-                setUsers(prev => prev.map(u =>
-                    u._id === data._id
-                        ? { ...u, role: data.role, adminPermissions: data.adminPermissions }
-                        : u
-                ));
-                onOpenChange(false);
-            } else {
-                alert(data.message || 'Failed to update role');
-            }
-        } catch (error) {
-            console.error('Error updating role:', error);
-            alert('Network error. Please try again.');
-        } finally {
-            setSaving(false);
-        }
     };
 
     // ── Status Actions (block / unblock / activate / deactivate) ────────────────
@@ -199,9 +154,9 @@ export default function CustomersManagement() {
     };
 
     const exportCSV = () => {
-        const headers = ["Name,Email,Phone,City,State,Role,Joined\n"];
+        const headers = ["Name,Email,Phone,City,State,Joined\n"];
         const rows = users.map(u =>
-            `${u.name},${u.email},${u.phone || ""},${u.city || ""},${u.state || ""},${u.role === 'admin' ? "Admin" : "Customer"},${new Date(u.createdAt).toLocaleDateString()}`
+            `${u.name},${u.email},${u.phone || ""},${u.city || ""},${u.state || ""},${new Date(u.createdAt).toLocaleDateString()}`
         ).join("\n");
         const blob = new Blob([headers, rows], { type: 'text/csv' });
         const url = window.URL.createObjectURL(blob);
@@ -216,14 +171,10 @@ export default function CustomersManagement() {
 
     const filteredUsers = useMemo(() => {
         return users.filter(user => {
-            const matchesSearch = user.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            return user.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
                 user.email?.toLowerCase().includes(searchTerm.toLowerCase());
-            const matchesRole = filterRole === 'all' ||
-                (filterRole === 'admin' && (user?.role === 'admin' || user?.role === 'Admin' || user?.isAdmin)) ||
-                (filterRole === 'user' && user?.role !== 'admin' && user?.role !== 'Admin' && !user?.isAdmin);
-            return matchesSearch && matchesRole;
         });
-    }, [users, searchTerm, filterRole]);
+    }, [users, searchTerm]);
 
     const items = useMemo(() => {
         const start = (page - 1) * rowsPerPage;
@@ -247,23 +198,7 @@ export default function CustomersManagement() {
                         </div>
                     </div>
                 );
-            case "role":
-                const roleValue = user?.role?.toLowerCase() || 'customer';
-                const isAdminRole = roleValue === 'admin';
-                const isStaffRole = roleValue === 'staff';
-                
-                return (
-                    <div className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 font-medium text-xs ${
-                        isAdminRole
-                        ? "bg-indigo-50 dark:bg-indigo-500/10 text-indigo-700 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-500/20"
-                        : isStaffRole
-                        ? "bg-purple-50 dark:bg-purple-500/10 text-purple-700 dark:text-purple-400 border border-purple-200 dark:border-purple-500/20"
-                        : "bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700"
-                        }`}>
-                        {isAdminRole ? <ShieldCheck className="w-3 h-3" /> : isStaffRole ? <Key className="w-3 h-3" /> : <User className="w-3 h-3" />}
-                        {roleValue.charAt(0).toUpperCase() + roleValue.slice(1)}
-                    </div>
-                );
+
             case "contact":
                 return (
                     <div className="flex flex-col gap-1">
@@ -318,7 +253,6 @@ export default function CustomersManagement() {
                             </DropdownTrigger>
                             <DropdownMenu aria-label="User Actions" variant="flat">
                                 <DropdownItem key="view" startContent={<User />} onPress={() => handleView(user, 'profile')}>View Profile</DropdownItem>
-                                <DropdownItem key="assign" startContent={<ShieldCheck />} onPress={() => handleView(user, 'assign_role')}>Assign Admin Sections</DropdownItem>
                                 <DropdownItem key="orders" startContent={<MapPin />} onPress={() => handleView(user, 'orders')}>View Orders</DropdownItem>
                                 {/* Status actions */}
                                 {!user.isBlocked ? (
@@ -373,8 +307,12 @@ export default function CustomersManagement() {
                         <DownloadSimple className="w-4 h-4" />
                         Export CSV
                     </button>
-                    <button type="button" className="inline-flex items-center gap-2 h-10 px-5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-sm shadow-lg shadow-indigo-500/25 transition-all">
-                        <UserPlus className="w-4 h-4" />
+                    <button
+                        type="button"
+                        onClick={onAddOpen}
+                        className="inline-flex items-center gap-2 h-12 px-8 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-sm shadow-lg shadow-indigo-500/30 transition-all"
+                    >
+                        <UserPlus className="w-5 h-5" weight="bold" />
                         Add New Customer
                     </button>
                 </div>
@@ -394,29 +332,16 @@ export default function CustomersManagement() {
                 <CardBody className="p-0">
                     <div className="px-6 py-5 bg-slate-50 dark:bg-slate-900/50 border-b border-slate-200 dark:border-slate-800 flex flex-col sm:flex-row gap-4">
                         <div className="flex-1 max-w-md relative group">
-                            <MagnifyingGlass className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 z-10 group-focus-within:text-indigo-500 transition-colors" />
+                            <div className="absolute left-3 top-1/2 -translate-y-1/2 flex items-center justify-center pointer-events-none z-10">
+                                <MagnifyingGlass className="text-slate-400 group-focus-within:text-indigo-500 transition-colors" size={18} />
+                            </div>
                             <input
                                 type="text"
                                 placeholder="Search by name or email..."
                                 value={searchTerm}
                                 onChange={(e) => setSearchTerm(e.target.value)}
-                                className="w-full bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 rounded-xl pl-10 pr-4 py-2 text-sm text-slate-900 dark:text-slate-200 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all h-11"
+                                className="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl pl-10 pr-4 py-2 text-sm text-slate-900 dark:text-slate-200 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all h-11"
                             />
-                        </div>
-                        <div className="w-full sm:w-48 relative">
-                            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none z-10">
-                                <Funnel size={16} />
-                            </span>
-                            <select
-                                value={filterRole}
-                                onChange={(e) => setFilterRole(e.target.value)}
-                                className="w-full bg-white dark:bg-slate-950/50 border border-slate-200 dark:border-slate-700 rounded-xl pl-9 pr-8 py-2 text-sm text-slate-900 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 h-11 appearance-none cursor-pointer transition-all shadow-sm"
-                            >
-                                <option value="all">All Roles</option>
-                                <option value="admin">Administrators</option>
-                                <option value="user">Customers</option>
-                            </select>
-                            <span className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none">▾</span>
                         </div>
                     </div>
 
@@ -453,7 +378,6 @@ export default function CustomersManagement() {
                     >
                         <TableHeader>
                             <TableColumn key="user">USER INFO</TableColumn>
-                            <TableColumn key="role">ROLE</TableColumn>
                             <TableColumn key="status">STATUS</TableColumn>
                             <TableColumn key="contact">CONTACT & LOCATION</TableColumn>
                             <TableColumn key="joined">JOINED DATE</TableColumn>
@@ -487,7 +411,7 @@ export default function CustomersManagement() {
                         <>
                             <ModalHeader className="flex flex-col gap-1 border-b border-slate-100 dark:border-slate-800/60 pb-4 pt-5 px-6">
                                 <h2 className="text-xl font-bold tracking-tight text-slate-900 dark:text-slate-100">
-                                    {modalType === 'profile' ? 'User Profile' : modalType === 'assign_role' ? 'Assign Admin Sections' : 'User Orders'}
+                                    {modalType === 'profile' ? 'User Profile' : 'User Orders'}
                                 </h2>
                             </ModalHeader>
                             <ModalBody className="py-6 px-6">
@@ -548,54 +472,6 @@ export default function CustomersManagement() {
                                     </div>
                                 )}
 
-                                {selectedUser && modalType === 'assign_role' && (
-                                    <div className="space-y-6">
-                                        <div className="flex items-center gap-4 p-4 bg-slate-50 dark:bg-slate-900/50 rounded-2xl border border-slate-200 dark:border-slate-800">
-                                            <Avatar name={selectedUser.name?.charAt(0)} className="bg-indigo-500 text-white" />
-                                            <div>
-                                                <h4 className="font-bold text-slate-900 dark:text-slate-100">{selectedUser.name}</h4>
-                                                <p className="text-xs text-slate-500">{selectedUser.email}</p>
-                                            </div>
-                                        </div>
-
-                                        <div>
-                                            <p className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Admin Sections Access</p>
-                                            <p className="text-xs text-slate-400 mb-4">Select sections this user can manage. Selecting any section grants staff access automatically.</p>
-                                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                                                {availablePermissions.map(p => {
-                                                    const checked = permissions.includes(p.value);
-                                                    return (
-                                                        <label
-                                                            key={p.value}
-                                                            className={`flex items-center gap-3 p-3 rounded-xl border cursor-pointer transition-all select-none ${
-                                                                checked
-                                                                    ? 'border-indigo-400 bg-indigo-50 dark:bg-indigo-500/10 dark:border-indigo-500/50'
-                                                                    : 'border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800/40 hover:border-indigo-300'
-                                                            }`}
-                                                        >
-                                                            <input
-                                                                type="checkbox"
-                                                                checked={checked}
-                                                                onChange={() =>
-                                                                    setPermissions(prev =>
-                                                                        prev.includes(p.value)
-                                                                            ? prev.filter(v => v !== p.value)
-                                                                            : [...prev, p.value]
-                                                                    )
-                                                                }
-                                                                className="w-4 h-4 accent-indigo-600 cursor-pointer"
-                                                            />
-                                                            <span className={`text-sm font-medium ${
-                                                                checked ? 'text-indigo-700 dark:text-indigo-300' : 'text-slate-700 dark:text-slate-300'
-                                                            }`}>{p.label}</span>
-                                                        </label>
-                                                    );
-                                                })}
-                                            </div>
-                                        </div>
-                                    </div>
-                                )}
-
                                 {selectedUser && modalType === 'orders' && (
                                     <div className="flex flex-col items-center justify-center text-center py-12 px-4 border border-dashed border-slate-200 dark:border-slate-800 rounded-2xl bg-slate-50 dark:bg-slate-900/50">
                                         <div className="w-16 h-16 bg-white dark:bg-slate-800 shadow-sm rounded-full flex items-center justify-center mb-4">
@@ -609,24 +485,9 @@ export default function CustomersManagement() {
                                 )}
                             </ModalBody>
                             <ModalFooter className="border-t border-slate-100 dark:border-slate-800/60 pb-5 px-6">
-                                {modalType === 'assign_role' ? (
-                                    <>
-                                        <Button variant="light" onPress={onClose} className="font-semibold text-slate-500">Cancel</Button>
-                                        <Button
-                                            color="primary"
-                                            onPress={handleAssignRole}
-                                            isLoading={saving}
-                                            className="font-bold bg-indigo-600 shadow-lg shadow-indigo-500/30"
-                                            startContent={!saving && <CheckCircle size={18} weight="bold" />}
-                                        >
-                                            Save Permissions
-                                        </Button>
-                                    </>
-                                ) : (
-                                    <Button color="primary" variant="flat" onPress={onClose} className="font-semibold">
-                                        Close Window
-                                    </Button>
-                                )}
+                                <Button color="primary" variant="flat" onPress={onClose} className="font-semibold">
+                                    Close Window
+                                </Button>
                             </ModalFooter>
                         </>
                     )}
@@ -670,6 +531,116 @@ export default function CustomersManagement() {
                                 </Button>
                             </ModalFooter>
                         </>
+                    )}
+                </ModalContent>
+            </Modal>
+
+            {/* Add New Customer Modal */}
+            <Modal
+                isOpen={isAddOpen}
+                onOpenChange={onAddOpenChange}
+                size="2xl"
+                classNames={{
+                    backdrop: "bg-slate-900/50 backdrop-blur-sm",
+                    base: "bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-2xl",
+                    header: "border-b border-slate-100 dark:border-slate-800/60",
+                    footer: "border-t border-slate-100 dark:border-slate-800/60",
+                }}
+            >
+                <ModalContent>
+                    {(onClose) => (
+                        <form onSubmit={async (e) => {
+                            e.preventDefault();
+                            setIsSubmitting(true);
+                            try {
+                                const token = localStorage.getItem('adminToken');
+                                const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/admin/users`, {
+                                    method: 'POST',
+                                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                                    body: JSON.stringify(addFormData)
+                                });
+                                if (res.ok) {
+                                    fetchUsers();
+                                    onClose();
+                                    setAddFormData({ name: "", email: "", phone: "", password: "", city: "", state: "" });
+                                } else {
+                                    const data = await res.json();
+                                    alert(data.message || "Failed to create customer");
+                                }
+                            } catch (err) {
+                                alert("Network error");
+                            } finally {
+                                setIsSubmitting(false);
+                            }
+                        }} className="flex flex-col">
+                            <ModalHeader className="flex flex-col gap-1 py-5 px-6">
+                                <h2 className="text-xl font-bold text-slate-900 dark:text-slate-100">Add New Customer</h2>
+                                <p className="text-sm text-slate-500 font-normal">Register a new customer account manually.</p>
+                            </ModalHeader>
+                            <ModalBody className="py-6 px-6">
+                                <div className="grid grid-cols-2 gap-4">
+                                    <Input
+                                        label="Full Name"
+                                        variant="bordered"
+                                        isRequired
+                                        value={addFormData.name}
+                                        onChange={e => setAddFormData({ ...addFormData, name: e.target.value })}
+                                        classNames={{ inputWrapper: "h-12" }}
+                                    />
+                                    <Input
+                                        label="Email Address"
+                                        type="email"
+                                        variant="bordered"
+                                        isRequired
+                                        value={addFormData.email}
+                                        onChange={e => setAddFormData({ ...addFormData, email: e.target.value })}
+                                        classNames={{ inputWrapper: "h-12" }}
+                                    />
+                                    <Input
+                                        label="Phone Number"
+                                        variant="bordered"
+                                        value={addFormData.phone}
+                                        onChange={e => setAddFormData({ ...addFormData, phone: e.target.value })}
+                                        classNames={{ inputWrapper: "h-12" }}
+                                    />
+                                    <Input
+                                        label="Password"
+                                        type="password"
+                                        variant="bordered"
+                                        isRequired
+                                        value={addFormData.password}
+                                        onChange={e => setAddFormData({ ...addFormData, password: e.target.value })}
+                                        classNames={{ inputWrapper: "h-12" }}
+                                    />
+                                    <Input
+                                        label="City"
+                                        variant="bordered"
+                                        value={addFormData.city}
+                                        onChange={e => setAddFormData({ ...addFormData, city: e.target.value })}
+                                        classNames={{ inputWrapper: "h-12" }}
+                                    />
+                                    <Input
+                                        label="State"
+                                        variant="bordered"
+                                        value={addFormData.state}
+                                        onChange={e => setAddFormData({ ...addFormData, state: e.target.value })}
+                                        classNames={{ inputWrapper: "h-12" }}
+                                    />
+                                </div>
+                            </ModalBody>
+                            <ModalFooter className="py-4 px-6">
+                                <Button variant="light" onPress={onClose} className="font-semibold">Cancel</Button>
+                                <Button
+                                    color="primary"
+                                    type="submit"
+                                    isLoading={isSubmitting}
+                                    variant="shadow"
+                                    className="h-12 px-10 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-sm shadow-lg shadow-indigo-500/30 transition-all"
+                                >
+                                    Create Customer
+                                </Button>
+                            </ModalFooter>
+                        </form>
                     )}
                 </ModalContent>
             </Modal>

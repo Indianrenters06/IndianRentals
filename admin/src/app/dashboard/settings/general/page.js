@@ -186,14 +186,14 @@ export default function GeneralSettings() {
                     type="button"
                     onClick={handleSave}
                     disabled={saving}
-                    className="inline-flex items-center gap-2 h-10 px-8 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-sm shadow-lg shadow-indigo-500/20 disabled:opacity-60 transition-all"
+                    className="inline-flex items-center gap-2 h-12 px-10 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-sm shadow-lg shadow-indigo-500/30 disabled:opacity-60 transition-all"
                 >
                     {saving ? (
                         <svg className="animate-spin w-4 h-4" viewBox="0 0 24 24" fill="none"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" /></svg>
                     ) : saved ? (
-                        <CheckCircle weight="bold" size={16} />
+                        <CheckCircle weight="bold" size={18} />
                     ) : (
-                        <FloppyDisk weight="bold" size={16} />
+                        <FloppyDisk weight="bold" size={18} />
                     )}
                     {saving ? "Saving…" : saved ? "Saved!" : "Save Changes"}
                 </button>

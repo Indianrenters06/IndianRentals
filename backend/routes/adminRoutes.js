@@ -33,6 +33,14 @@ const {
     adjustStock,
     getTeamMembers,
     createTeamMember,
+    updateTeamMember,
+    deleteTeamMember,
+    getPricingPlans,
+    createPricingPlan,
+    deletePricingPlan,
+    getVariants,
+    createVariant,
+    deleteVariant,
 } = require('../controllers/adminController');
 const { protect, admin } = require('../middleware/authMiddleware');
 const User = require('../models/User');
@@ -130,9 +138,27 @@ router.put('/users/:id/role', protect, admin, asyncHandler(async (req, res) => {
 }));
 
 // Team Management
+// Pricing Plans
+router.route('/pricing-plans')
+    .get(protect, admin, getPricingPlans)
+    .post(protect, admin, createPricingPlan);
+
+router.delete('/pricing-plans/:id', protect, admin, deletePricingPlan);
+
+// Variants
+router.route('/variants')
+    .get(protect, admin, getVariants)
+    .post(protect, admin, createVariant);
+
+router.delete('/variants/:id', protect, admin, deleteVariant);
+
 router.route('/team')
     .get(protect, admin, getTeamMembers)
     .post(protect, admin, createTeamMember);
+
+router.route('/team/:id')
+    .put(protect, admin, updateTeamMember)
+    .delete(protect, admin, deleteTeamMember);
 
 // Rentals Management
 router.route('/rentals')

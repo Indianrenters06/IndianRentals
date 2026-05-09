@@ -28,9 +28,8 @@ function Toast({ toasts }) {
                         animate={{ opacity: 1, y: 0, scale: 1 }}
                         exit={{ opacity: 0, y: 10, scale: 0.95 }}
                         transition={{ duration: 0.22 }}
-                        className={`flex items-center gap-3 px-4 py-3 rounded-2xl shadow-xl text-sm font-semibold text-white pointer-events-auto min-w-[260px] ${
-                            t.type === "success" ? "bg-emerald-600" : "bg-red-600"
-                        }`}
+                        className={`flex items-center gap-3 px-4 py-3 rounded-2xl shadow-xl text-sm font-semibold text-white pointer-events-auto min-w-[260px] ${t.type === "success" ? "bg-emerald-600" : "bg-red-600"
+                            }`}
                     >
                         {t.type === "success"
                             ? <CheckCircle size={18} weight="bold" />
@@ -130,10 +129,10 @@ function CatRow({ cat, onDelete, onRefresh, addToast }) {
             addToast("Category updated successfully!", "success");
             onRefresh();
             setEditing(false);
-        } catch (e) { 
-            addToast(e.message, "error"); 
-        } finally { 
-            setSaving(false); 
+        } catch (e) {
+            addToast(e.message, "error");
+        } finally {
+            setSaving(false);
         }
     };
 
@@ -176,11 +175,10 @@ function CatRow({ cat, onDelete, onRefresh, addToast }) {
                 <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity shrink-0">
                     <button
                         onClick={editing ? cancelEdit : openEdit}
-                        className={`p-1.5 rounded-lg transition-colors ${
-                            editing
+                        className={`p-1.5 rounded-lg transition-colors ${editing
                                 ? "text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700"
                                 : "text-slate-400 hover:text-indigo-500 hover:bg-indigo-50 dark:hover:bg-indigo-500/10"
-                        }`}
+                            }`}
                     >
                         {editing ? <X size={14} /> : <PencilSimple size={14} weight="bold" />}
                     </button>
@@ -233,14 +231,14 @@ function CatRow({ cat, onDelete, onRefresh, addToast }) {
                                         <button
                                             onClick={saveEdit}
                                             disabled={saving || !editName.trim()}
-                                            className="flex items-center gap-2 h-9 px-4 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-bold disabled:opacity-50 transition-colors shadow-md shadow-indigo-500/20"
+                                            className="flex items-center gap-2 h-12 px-8 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-bold disabled:opacity-50 transition-all shadow-lg shadow-indigo-500/30"
                                         >
-                                            {saving ? <Spinner size="sm" color="white" /> : <Check size={14} weight="bold" />}
+                                            {saving ? <Spinner size="sm" color="white" /> : <Check size={16} weight="bold" />}
                                             {saving ? "Saving…" : "Save Changes"}
                                         </button>
                                         <button
                                             onClick={cancelEdit}
-                                            className="h-9 px-4 rounded-xl border border-slate-200 dark:border-slate-700 text-sm text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"
+                                            className="h-12 px-6 rounded-xl border border-slate-200 dark:border-slate-700 text-sm font-semibold text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
                                         >
                                             Cancel
                                         </button>
@@ -285,9 +283,9 @@ function AddCatRow({ onDone, onCancel, addToast }) {
             if (!res.ok) throw new Error((await res.json()).message || "Failed");
             addToast("Category created successfully!", "success");
             onDone();
-        } catch (e) { 
-            addToast(e.message, "error"); 
-            setSaving(false); 
+        } catch (e) {
+            addToast(e.message, "error");
+            setSaving(false);
         }
     };
 
@@ -423,8 +421,8 @@ export default function CategoriesPage() {
                 onClose={() => { if (!deleting) { setConfirmOpen(false); setDeleteTarget(null); } }}
                 onConfirm={confirmDelete}
                 title={deleteTarget?.type === 'category' ? "Delete Category?" : "Delete Subcategory?"}
-                description={deleteTarget?.type === 'category' 
-                    ? `"${deleteTarget?.name}" and ALL its subcategories will be permanently removed.` 
+                description={deleteTarget?.type === 'category'
+                    ? `"${deleteTarget?.name}" and ALL its subcategories will be permanently removed.`
                     : `"${deleteTarget?.name}" will be permanently removed. This cannot be undone.`}
                 loading={deleting}
             />
@@ -443,18 +441,23 @@ export default function CategoriesPage() {
                     </p>
                 </div>
                 <div className="flex items-center gap-3">
-                    <input
-                        type="text"
-                        value={search}
-                        onChange={e => setSearch(e.target.value)}
-                        placeholder="Search categories…"
-                        className="h-10 px-4 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 transition-all w-52 dark:text-white"
-                    />
+                    <div className="relative group">
+                        <div className="absolute left-3 top-1/2 -translate-y-1/2 flex items-center justify-center pointer-events-none z-10">
+                            <MagnifyingGlass className="text-slate-400 group-focus-within:text-indigo-500 transition-colors" size={16} />
+                        </div>
+                        <input
+                            type="text"
+                            value={search}
+                            onChange={e => setSearch(e.target.value)}
+                            placeholder="Search categories…"
+                            className="h-10 pl-10 pr-4 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 transition-all w-52 dark:text-white"
+                        />
+                    </div>
                     <button
                         onClick={() => { setAddingCat(true); setSearch(""); }}
-                        className="inline-flex items-center gap-2 h-10 px-5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-sm shadow-lg shadow-indigo-500/25 transition-all"
+                        className="inline-flex items-center gap-2 h-12 px-8 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-sm shadow-lg shadow-indigo-500/30 transition-all"
                     >
-                        <FolderPlus size={16} /> Add Category
+                        <FolderPlus size={18} weight="bold" /> Add Category
                     </button>
                 </div>
             </div>

@@ -107,17 +107,10 @@ export default function AdminDashboard() {
 
   // Derived stats using Real Data
   const stats = [
-    { label: "Total Revenue", value: `₹${parseFloat(dashboardData?.totalRevenue || 0).toLocaleString()}`, change: "+12.5%", isPositive: true, icon: CurrencyInr, color: "success" },
-    { label: "Total Orders", value: (dashboardData?.totalRentals || 0).toLocaleString(), change: "+18.1%", isPositive: true, icon: Package, color: "primary" },
-    {
-      label: "Pending KYC",
-      value: (dashboardData?.pendingKYC || 0).toLocaleString(),
-      change: dashboardData?.pendingKYC > 0 ? "Review Required" : "All Approved",
-      isPositive: dashboardData?.pendingKYC === 0,
-      icon: ShieldCheck,
-      color: dashboardData?.pendingKYC > 0 ? "warning" : "success"
-    },
-    { label: "Total Products", value: (dashboardData?.totalProducts || 0).toLocaleString(), change: "+2.4%", isPositive: true, icon: ChartLineUp, color: "secondary" },
+    { label: "Total Revenue", value: `₹${parseFloat(dashboardData?.totalRevenue || 0).toLocaleString()}`, change: "0%", isPositive: true, icon: CurrencyInr, color: "success" },
+    { label: "Total Orders", value: (dashboardData?.totalRentals || 0).toLocaleString(), change: "0%", isPositive: true, icon: Package, color: "primary" },
+    { label: "Active Users", value: (dashboardData?.activeNow || 0).toLocaleString(), change: "0%", isPositive: true, icon: Users, color: "secondary" },
+    { label: "Pending KYC", value: (dashboardData?.pendingKYC || 0).toLocaleString(), change: "0%", isPositive: false, icon: ShieldCheck, color: "warning" },
   ];
 
   const recentRentals = dashboardData?.recentRentals?.map(rental => ({
@@ -136,7 +129,7 @@ export default function AdminDashboard() {
     datasets: [
       {
         label: 'Revenue (₹)',
-        data: [15000, 22000, 18000, 29000, 24000, 38000, 32000],
+        data: [0, 0, 0, 0, 0, 0, 0],
         borderColor: '#818cf8', // Indigo 400
         backgroundColor: 'rgba(129, 140, 248, 0.2)',
         fill: true,
@@ -154,14 +147,14 @@ export default function AdminDashboard() {
     labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4'],
     datasets: [
       {
-        label: 'New Users',
-        data: [120, 150, 180, 210],
+        label: 'New Customers',
+        data: [0, 0, 0, 0],
         backgroundColor: '#a78bfa', // Purple 400
         borderRadius: 6,
       },
       {
         label: 'New Rentals',
-        data: [80, 110, 140, 170],
+        data: [0, 0, 0, 0],
         backgroundColor: '#34d399', // Emerald 400
         borderRadius: 6,
       }
@@ -257,7 +250,8 @@ export default function AdminDashboard() {
           </Button>
           <Button
             color="primary"
-            className="rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-semibold shadow-lg shadow-indigo-500/25 h-10 px-5 transition-all"
+            variant="shadow"
+            className="rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold shadow-lg shadow-indigo-500/30 h-12 px-8 transition-all"
             onPress={() => window.location.href = '/dashboard/orders'}
           >
             + New Order
@@ -426,7 +420,7 @@ export default function AdminDashboard() {
           <CardHeader className="flex flex-col sm:flex-row justify-between items-start sm:items-center px-6 py-5 gap-4 bg-slate-50 dark:bg-slate-900/50">
             <div>
               <h3 className="text-lg font-semibold text-slate-900 dark:text-white">Recent Rentals</h3>
-              <p className="text-sm text-slate-500 dark:text-slate-400">Latest activity across all your users.</p>
+              <p className="text-sm text-slate-500 dark:text-slate-400">Latest activity across all your customers.</p>
             </div>
             <div className="flex items-center gap-3">
               <AvatarGroup isBordered max={3} size="sm" className="hidden sm:flex">
@@ -436,7 +430,15 @@ export default function AdminDashboard() {
                 <Avatar src="https://i.pravatar.cc/150?u=a04258114e29026302d" />
                 <Avatar src="https://i.pravatar.cc/150?u=a04258114e29026702d" />
               </AvatarGroup>
-              <Button size="sm" variant="flat" color="primary" className="font-medium bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400">View All</Button>
+              <Button 
+                size="sm" 
+                variant="flat" 
+                color="primary" 
+                className="font-medium bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400"
+                onPress={() => router.push("/dashboard/orders")}
+              >
+                View All
+              </Button>
             </div>
           </CardHeader>
 
@@ -492,10 +494,10 @@ export default function AdminDashboard() {
                           </Button>
                         </DropdownTrigger>
                         <DropdownMenu aria-label="Table Actions" variant="flat">
-                          <DropdownItem key="view">View Details</DropdownItem>
-                          <DropdownItem key="edit">Edit Order</DropdownItem>
-                          <DropdownItem key="invoice">Download Invoice</DropdownItem>
-                          <DropdownItem key="delete" className="text-danger" color="danger">Cancel Rental</DropdownItem>
+                          <DropdownItem key="view" onPress={() => router.push(`/dashboard/orders`)}>View Details</DropdownItem>
+                          <DropdownItem key="edit" onPress={() => alert("Order editing logic will be implemented soon.")}>Edit Order</DropdownItem>
+                          <DropdownItem key="invoice" onPress={() => alert("Generating Invoice PDF...")}>Download Invoice</DropdownItem>
+                          <DropdownItem key="delete" className="text-danger" color="danger" onPress={() => alert("Requesting order cancellation...")}>Cancel Rental</DropdownItem>
                         </DropdownMenu>
                       </Dropdown>
                     </div>

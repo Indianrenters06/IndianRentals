@@ -70,21 +70,23 @@ function ConfirmDeleteModal({ isOpen, onClose, onConfirm, title, description, lo
                                 <p className="text-sm text-slate-500 dark:text-slate-400">{description}</p>
                             </div>
                             <div className="flex gap-3 w-full pt-1">
-                                <button
-                                    onClick={onClose}
-                                    disabled={loading}
-                                    className="flex-1 h-11 rounded-2xl border border-slate-200 dark:border-slate-700 text-sm font-semibold text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors disabled:opacity-50"
+                                <Button
+                                    variant="bordered"
+                                    onPress={onClose}
+                                    isDisabled={loading}
+                                    className="flex-1 h-11 rounded-2xl font-semibold border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300"
                                 >
                                     Cancel
-                                </button>
-                                <button
-                                    onClick={onConfirm}
-                                    disabled={loading}
-                                    className="flex-1 h-11 rounded-2xl bg-red-600 hover:bg-red-700 text-white text-sm font-bold shadow-lg shadow-red-500/25 transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+                                </Button>
+                                <Button
+                                    color="danger"
+                                    variant="shadow"
+                                    onPress={onConfirm}
+                                    isLoading={loading}
+                                    className="flex-1 h-11 rounded-2xl font-bold shadow-lg shadow-red-500/25"
                                 >
-                                    {loading ? <Spinner size="sm" color="white" /> : <Trash size={15} weight="bold" />}
                                     {loading ? "Deleting…" : "Delete"}
-                                </button>
+                                </Button>
                             </div>
                         </div>
                     </motion.div>
@@ -144,17 +146,19 @@ function AddSubRow({ parentId, onDone, onCancel, addToast }) {
                     placeholder="Description (optional)…"
                     className="w-52 h-10 px-3 rounded-xl border border-slate-200 dark:border-slate-700 text-sm bg-white dark:bg-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 transition-all hidden md:block"
                 />
-                <button
-                    onClick={save}
-                    disabled={saving || !name.trim()}
-                    className="h-10 px-5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-bold disabled:opacity-50 transition-colors flex items-center gap-2 shrink-0 shadow-lg shadow-indigo-500/20"
+                <Button
+                    color="primary"
+                    variant="shadow"
+                    onPress={save}
+                    isDisabled={saving || !name.trim()}
+                    isLoading={saving}
+                    className="h-10 px-6 rounded-xl font-bold shadow-lg shadow-indigo-500/20"
                 >
-                    {saving ? <Spinner size="sm" color="white" /> : <Check size={15} weight="bold" />}
-                    {saving ? "Saving…" : "Save"}
-                </button>
-                <button onClick={onCancel} className="h-10 px-3 rounded-xl text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors shrink-0">
+                    Save
+                </Button>
+                <Button isIconOnly variant="light" onPress={onCancel} className="text-slate-500">
                     <X size={16} />
-                </button>
+                </Button>
             </div>
         </motion.div>
     );
@@ -229,19 +233,18 @@ function SubRow({ sub, onDelete, onRefresh, addToast }) {
                 </span>
 
                 <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity shrink-0">
-                    <button
-                        onClick={editing ? cancelEdit : openEdit}
-                        className={`p-1.5 rounded-lg transition-colors ${
-                            editing
-                                ? "text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700"
-                                : "text-slate-400 hover:text-indigo-500 hover:bg-indigo-50 dark:hover:bg-indigo-500/10"
-                        }`}
+                    <Button
+                        isIconOnly
+                        variant="light"
+                        size="sm"
+                        onPress={editing ? cancelEdit : openEdit}
+                        className={editing ? "text-slate-400" : "text-slate-400 hover:text-indigo-500"}
                     >
                         {editing ? <X size={14} /> : <PencilSimple size={14} weight="bold" />}
-                    </button>
-                    <button onClick={() => onDelete(sub)} className="p-1.5 rounded-lg text-slate-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors">
+                    </Button>
+                    <Button isIconOnly variant="light" size="sm" className="text-slate-400 hover:text-red-500" onPress={() => onDelete(sub)}>
                         <Trash size={14} weight="bold" />
-                    </button>
+                    </Button>
                 </div>
             </div>
 
@@ -294,20 +297,19 @@ function SubRow({ sub, onDelete, onRefresh, addToast }) {
                                         </div>
                                     )}
                                     <div className="flex gap-2 pt-1">
-                                        <button
-                                            onClick={saveEdit}
-                                            disabled={saving || !editName.trim()}
-                                            className="flex items-center gap-2 h-9 px-4 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-bold disabled:opacity-50 transition-colors shadow-md shadow-indigo-500/20"
+                                        <Button
+                                            color="primary"
+                                            variant="shadow"
+                                            onPress={saveEdit}
+                                            isDisabled={saving || !editName.trim()}
+                                            isLoading={saving}
+                                            className="h-9 px-4 rounded-xl font-bold shadow-md shadow-indigo-500/20"
                                         >
-                                            {saving ? <Spinner size="sm" color="white" /> : <Check size={14} weight="bold" />}
-                                            {saving ? "Saving…" : "Save Changes"}
-                                        </button>
-                                        <button
-                                            onClick={cancelEdit}
-                                            className="h-9 px-4 rounded-xl border border-slate-200 dark:border-slate-700 text-sm text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"
-                                        >
+                                            Save Changes
+                                        </Button>
+                                        <Button variant="bordered" onPress={cancelEdit} className="h-9 px-4 rounded-xl">
                                             Cancel
-                                        </button>
+                                        </Button>
                                     </div>
                                 </div>
                                 {/* Right: image uploader */}
@@ -443,20 +445,21 @@ export default function SubcategoriesManagement() {
                     <p className="text-slate-600 dark:text-slate-400">Drill down your catalogue into specific sub-groups.</p>
                 </motion.div>
 
-                <button
-                    type="button"
-                    onClick={() => {
+                <Button
+                    color="primary"
+                    variant="shadow"
+                    className="h-12 px-8 rounded-xl font-bold bg-indigo-600 hover:bg-indigo-700 text-white shadow-lg shadow-indigo-500/30 transition-all"
+                    onPress={() => {
                         if (!selectedParent) {
                             addToast("Please select a parent category first.", "error");
                             return;
                         }
                         setAddingSub(true);
                     }}
-                    className="inline-flex items-center gap-2 h-10 px-5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-sm shadow-lg shadow-indigo-500/25 transition-all"
+                    startContent={<Plus weight="bold" size={18} />}
                 >
-                    <Plus weight="bold" size={15} />
                     Add Subcategory
-                </button>
+                </Button>
             </div>
 
             {/* Filter by parent */}

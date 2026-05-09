@@ -108,6 +108,10 @@ const createProduct = asyncHandler(async (req, res) => {
         benefits,
         specifications,
         faqs,
+        seoTitle,
+        seoDescription,
+        seoKeywords,
+        slug,
     } = req.body;
 
     // Check if category exists, if not create it
@@ -143,6 +147,10 @@ const createProduct = asyncHandler(async (req, res) => {
         benefits,
         specifications,
         faqs: Array.isArray(faqs) ? faqs : [],
+        seoTitle: seoTitle || "",
+        seoDescription: seoDescription || "",
+        seoKeywords: seoKeywords || "",
+        slug: slug || name.toLowerCase().replace(/ /g, "-").replace(/[^\w-]/g, ""),
     });
 
     const createdProduct = await product.save();
@@ -175,6 +183,10 @@ const updateProduct = asyncHandler(async (req, res) => {
         benefits,
         specifications,
         faqs,
+        seoTitle,
+        seoDescription,
+        seoKeywords,
+        slug,
     } = req.body;
 
     const product = await Product.findById(req.params.id);
@@ -222,6 +234,11 @@ const updateProduct = asyncHandler(async (req, res) => {
         if (faqs !== undefined) {
             product.faqs = Array.isArray(faqs) ? faqs : [];
         }
+
+        product.seoTitle = seoTitle !== undefined ? seoTitle : product.seoTitle;
+        product.seoDescription = seoDescription !== undefined ? seoDescription : product.seoDescription;
+        product.seoKeywords = seoKeywords !== undefined ? seoKeywords : product.seoKeywords;
+        product.slug = slug !== undefined ? slug : product.slug;
 
         const updatedProduct = await product.save();
         await updatedProduct.populate('subcategory', 'name slug');

@@ -84,7 +84,28 @@ const productSchema = new mongoose.Schema({
     faqs: [{
         question: String,
         answer: String
-    }]
+    }],
+    addons: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Addon'
+    }],
+    seoTitle: {
+        type: String,
+        default: ""
+    },
+    seoDescription: {
+        type: String,
+        default: ""
+    },
+    seoKeywords: {
+        type: String,
+        default: ""
+    },
+    slug: {
+        type: String,
+        unique: true,
+        sparse: true
+    }
 }, {
     timestamps: true
 });

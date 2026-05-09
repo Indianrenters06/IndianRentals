@@ -140,17 +140,17 @@ export default function DashboardLayout({ children }) {
 
   // Map URL prefixes to required permission keys
   const PATH_PERMISSION_MAP = [
-    { prefix: '/dashboard/cms',           permission: 'cms' },
-    { prefix: '/dashboard/products',      permission: 'products' },
-    { prefix: '/dashboard/inventory',     permission: 'inventory' },
-    { prefix: '/dashboard/users',         permission: 'users' },
-    { prefix: '/dashboard/kyc',           permission: 'kyc' },
-    { prefix: '/dashboard/orders',        permission: 'orders' },
-    { prefix: '/dashboard/payments',      permission: 'payments' },
-    { prefix: '/dashboard/coupons',       permission: 'coupons' },
-    { prefix: '/dashboard/reports',       permission: 'reports' },
+    { prefix: '/dashboard/cms', permission: 'cms' },
+    { prefix: '/dashboard/products', permission: 'products' },
+    { prefix: '/dashboard/inventory', permission: 'inventory' },
+    { prefix: '/dashboard/customers', permission: 'users' },
+    { prefix: '/dashboard/kyc', permission: 'kyc' },
+    { prefix: '/dashboard/orders', permission: 'orders' },
+    { prefix: '/dashboard/payments', permission: 'payments' },
+    { prefix: '/dashboard/coupons', permission: 'coupons' },
+    { prefix: '/dashboard/reports', permission: 'reports' },
     { prefix: '/dashboard/notifications', permission: 'notifications' },
-    { prefix: '/dashboard/settings',      permission: 'settings' },
+    { prefix: '/dashboard/settings', permission: 'settings' },
   ];
 
   // Guard: redirect staff away from sections they don't have permission for
@@ -212,15 +212,15 @@ export default function DashboardLayout({ children }) {
       ]
     },
     {
-      name: 'Customers', icon: Users, path: '/dashboard/users', permission: 'users',
+      name: 'Customers', icon: Users, path: '/dashboard/customers', permission: 'users',
       submenu: [
-        { name: 'All Customers', path: '/dashboard/users' },
-        { name: 'Active Customers', path: '/dashboard/users/active' },
-        { name: 'Blocked Customers', path: '/dashboard/users/blocked' },
-        { name: 'Rental History', path: '/dashboard/users/rentals' },
-        { name: 'Payment History', path: '/dashboard/users/payments' },
-        { name: 'Wallet Balance', path: '/dashboard/users/wallet' },
-        { name: 'Blacklist', path: '/dashboard/users/blacklist' },
+        { name: 'All Customers', path: '/dashboard/customers' },
+        { name: 'Active Customers', path: '/dashboard/customers/active' },
+        { name: 'Blocked Customers', path: '/dashboard/customers/blocked' },
+        { name: 'Rental History', path: '/dashboard/customers/rentals' },
+        { name: 'Payment History', path: '/dashboard/customers/payments' },
+        { name: 'Wallet Balance', path: '/dashboard/customers/wallet' },
+        { name: 'Blacklist', path: '/dashboard/customers/blacklist' },
       ]
     },
     {
@@ -292,7 +292,8 @@ export default function DashboardLayout({ children }) {
       name: 'Settings', icon: Gear, path: '/dashboard/settings', permission: 'settings',
       submenu: [
         { name: 'General Settings', path: '/dashboard/settings/general' },
-        { name: 'Team Members & Roles', path: '/dashboard/settings/team' },
+        { name: 'Team Members', path: '/dashboard/settings/team' },
+        { name: 'Roles & Permissions', path: '/dashboard/settings/roles' },
         { name: 'Logo & Branding', path: '/dashboard/settings/branding' },
         { name: 'Payment Gateway', path: '/dashboard/settings/payment-gateway' },
         { name: 'GST Configuration', path: '/dashboard/settings/gst' },
@@ -432,11 +433,13 @@ export default function DashboardLayout({ children }) {
             </button>
 
             <div className="hidden md:flex relative group">
-              <MagnifyingGlass className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500 group-focus-within:text-indigo-500 dark:group-focus-within:text-indigo-400 transition-colors w-4 h-4" />
+              <div className="absolute left-3 top-1/2 -translate-y-1/2 flex items-center justify-center pointer-events-none z-10">
+                <MagnifyingGlass className="text-slate-400 dark:text-slate-500 group-focus-within:text-indigo-500 dark:group-focus-within:text-indigo-400 transition-colors" size={16} />
+              </div>
               <input
                 type="text"
                 placeholder="Search Admin..."
-                className="bg-slate-100 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 rounded-xl pl-10 pr-4 py-2 text-sm text-slate-900 dark:text-slate-200 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-all w-64 focus:w-80"
+                className="bg-slate-100 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 rounded-xl pl-10 pr-4 py-2 text-sm text-slate-900 dark:text-slate-200 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-all w-64 focus:w-80 h-10"
               />
             </div>
           </div>
@@ -444,7 +447,13 @@ export default function DashboardLayout({ children }) {
           <div className="flex items-center gap-5">
             <ThemeToggle />
 
-            <Dropdown placement="bottom-end" className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 w-80">
+            <Dropdown placement="bottom-end"
+              popoverProps={{
+                classNames: {
+                  content: "bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-2xl p-0 min-w-[320px]",
+                }
+              }}
+            >
               <DropdownTrigger>
                 <button className="relative p-2 text-slate-400 hover:text-slate-200 hover:bg-slate-800/80 rounded-xl transition-all">
                   <Bell className="w-5 h-5" />
@@ -499,7 +508,13 @@ export default function DashboardLayout({ children }) {
 
             <div className="h-8 w-px bg-slate-300 dark:bg-slate-800"></div>
 
-            <Dropdown placement="bottom-end" className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 min-w-[220px]">
+            <Dropdown placement="bottom-end"
+              popoverProps={{
+                classNames: {
+                  content: "bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-2xl p-0",
+                }
+              }}
+            >
               <DropdownTrigger>
                 <div className="flex items-center gap-2.5 cursor-pointer group">
                   {/* Simple 'A' circle avatar — no external image */}

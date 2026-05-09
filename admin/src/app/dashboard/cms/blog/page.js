@@ -105,8 +105,12 @@ function PageConfigEditor({ onBack }) {
                             <CheckCircle size={14} weight="fill" /> Saved!
                         </span>
                     )}
-                    <button onClick={handleSave} disabled={saving} className="flex items-center gap-1.5 h-9 px-4 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-sm transition-all">
-                        {saving ? <Spinner size="sm" color="white" /> : <FloppyDisk size={14} weight="bold" />} Save Config
+                    <button 
+                        onClick={handleSave} 
+                        disabled={saving} 
+                        className="flex items-center gap-2 h-11 px-6 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-sm shadow-lg shadow-indigo-500/30 transition-all"
+                    >
+                        {saving ? <Spinner size="sm" color="white" /> : <FloppyDisk size={16} weight="bold" />} Save Config
                     </button>
                 </div>
             </div>
@@ -327,8 +331,8 @@ export default function BlogManagement() {
                                     <Gear weight="bold" size={15} /> Page Config
                                 </button>
                                 <button onClick={() => setEditing("new")}
-                                    className="flex items-center gap-2 h-10 px-5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-sm shadow-lg shadow-indigo-500/20 transition-all">
-                                    <Plus weight="bold" size={15} /> Create Post
+                                    className="flex items-center gap-2 h-12 px-8 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-sm shadow-lg shadow-indigo-500/30 transition-all">
+                                    <Plus weight="bold" size={18} /> Create Post
                                 </button>
                             </div>
                         </div>

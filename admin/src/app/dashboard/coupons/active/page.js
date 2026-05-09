@@ -147,8 +147,8 @@ export default function ActiveCoupons() {
                     <div className="inline-flex items-center gap-2 bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-500/20 rounded-full px-3 py-1.5 font-bold text-sm">
                         {coupons.filter(c => c.isActive && !isExpired(c.expiryDate)).length} Active
                     </div>
-                    <button type="button" onClick={onOpen} className="inline-flex items-center gap-2 h-10 px-5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-sm shadow-lg shadow-indigo-500/25 transition-all">
-                        <Plus weight="bold" size={15} />
+                    <button type="button" onClick={onOpen} className="inline-flex items-center gap-2 h-12 px-8 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-sm shadow-lg shadow-indigo-500/30 transition-all">
+                        <Plus weight="bold" size={18} />
                         Create Coupon
                     </button>
                 </div>
@@ -276,11 +276,11 @@ export default function ActiveCoupons() {
                             </ModalBody>
                             <ModalFooter>
                                 <Button variant="flat" onPress={onClose}>Cancel</Button>
-                                <button type="button" disabled={saving} onClick={handleCreate} className="inline-flex items-center gap-2 h-10 px-5 rounded-xl bg-indigo-600 hover:bg-indigo-700 disabled:opacity-60 text-white font-bold text-sm transition-all">
+                                <button type="button" disabled={saving} onClick={handleCreate} className="inline-flex items-center gap-2 h-11 px-8 rounded-xl bg-indigo-600 hover:bg-indigo-700 disabled:opacity-60 text-white font-bold text-sm shadow-lg shadow-indigo-500/30 transition-all">
                                     {saving ? (
                                         <svg className="animate-spin w-4 h-4" viewBox="0 0 24 24" fill="none"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" /></svg>
                                     ) : (
-                                        <Tag weight="bold" size={15} />
+                                        <Tag weight="bold" size={18} />
                                     )}
                                     Create Coupon
                                 </button>
