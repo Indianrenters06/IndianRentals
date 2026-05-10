@@ -6,6 +6,7 @@ const KYC = require('../models/KYC');
 const Notification = require('../models/Notification');
 const PricingPlan = require('../models/PricingPlan');
 const Variant = require('../models/Variant');
+const Role = require('../models/Role');
 
 // @desc    Get admin dashboard statistics
 // @route   GET /api/admin/stats
@@ -209,7 +210,7 @@ const deleteUser = asyncHandler(async (req, res) => {
 // @route   GET /api/admin/team
 // @access  Private/Admin
 const getTeamMembers = asyncHandler(async (req, res) => {
-    const team = await User.find({ role: { $in: ['admin', 'staff', 'superadmin', 'operations_manager', 'sales_executive', 'finance_executive'] } }).select('-password').sort({ createdAt: -1 });
+    const team = await User.find({ role: { $ne: 'customer' } }).select('-password').sort({ createdAt: -1 });
     res.json(team);
 });
 
@@ -659,6 +660,101 @@ const deleteVariant = asyncHandler(async (req, res) => {
     res.json({ message: 'Variant removed' });
 });
 
+// ============= ROLE MANAGEMENT =============
+
+// @desc    Get all roles
+// @route   GET /api/admin/roles
+// @access  Private/Admin
+const getRoles = asyncHandler(async (req, res) => {
+    let roles = await Role.find({}).sort({ isPredefined: -1, createdAt: -1 });
+
+    if (roles.length === 0) {
+        const predefinedRoles = [
+            {
+                id: "super_admin",
+                name: "Super Admin",
+                description: "Full access to all modules and configurations.",
+                permissions: ["cms", "products", "inventory", "users", "kyc", "orders", "payments", "coupons", "reports", "notifications", "settings"],
+                isPredefined: true
+            },
+            {
+                id: "admin",
+                name: "Admin",
+                description: "Similar to Super Admin but with limited configuration access.",
+                permissions: ["cms", "products", "inventory", "users", "kyc", "orders", "payments", "coupons", "reports", "notifications"],
+                isPredefined: true
+            },
+            {
+                id: "operations_manager",
+                name: "Operations Manager",
+                description: "Orders, Inventory, Returns, Damaged items, Delivery flow.",
+                permissions: ["orders", "inventory", "products"],
+                isPredefined: true
+            },
+            {
+                id: "sales_executive",
+                name: "Sales / KYC Executive",
+                description: "Customers, KYC, Calls, Approvals, Customer notes.",
+                permissions: ["users", "kyc"],
+                isPredefined: true
+            },
+            {
+                id: "finance_executive",
+                name: "Finance Executive",
+                description: "Payments, Refunds, Deposits, Late fees, GST, Invoices.",
+                permissions: ["payments", "reports", "settings"],
+                isPredefined: true
+            }
+        ];
+        await Role.insertMany(predefinedRoles);
+        roles = await Role.find({}).sort({ isPredefined: -1, createdAt: -1 });
+    }
+    res.json(roles);
+});
+
+// @desc    Create a custom role
+// @route   POST /api/admin/roles
+// @access  Private/Admin
+const createRole = asyncHandler(async (req, res) => {
+    const { name, id, description, permissions } = req.body;
+
+    const roleExists = await Role.findOne({ $or: [{ name }, { id }] });
+    if (roleExists) {
+        res.status(400);
+        throw new Error('Role with this name or ID already exists');
+    }
+
+    const role = await Role.create({
+        name,
+        id: id ? id.toLowerCase().replace(/\s+/g, '_') : name.toLowerCase().replace(/\s+/g, '_'),
+        description,
+        permissions,
+        isPredefined: false
+    });
+
+    res.status(201).json(role);
+});
+
+// @desc    Delete a custom role
+// @route   DELETE /api/admin/roles/:id
+// @access  Private/Admin
+const deleteRole = asyncHandler(async (req, res) => {
+    const role = await Role.findById(req.params.id);
+
+    if (!role) {
+        res.status(404);
+        throw new Error('Role not found');
+    }
+
+    if (role.isPredefined) {
+        res.status(400);
+        throw new Error('Predefined roles cannot be deleted');
+    }
+
+    await Role.findByIdAndDelete(req.params.id);
+    res.json({ message: 'Role removed successfully' });
+});
+
 module.exports = {
     getDashboardStats,
     // Products
@@ -701,4 +797,8 @@ module.exports = {
     getVariants,
     createVariant,
     deleteVariant,
+    // Roles
+    getRoles,
+    createRole,
+    deleteRole,
 };

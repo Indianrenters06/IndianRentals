@@ -27,9 +27,10 @@ const protect = asyncHandler(async (req, res, next) => {
     }
 });
 
-// Full admin only
+// Admin OR staff member (anyone with dashboard access)
 const admin = (req, res, next) => {
-    if (req.user && req.user.role === 'admin') {
+    const adminRoles = ['admin', 'super_admin', 'staff', 'operations_manager', 'sales_executive', 'finance_executive'];
+    if (req.user && adminRoles.includes(req.user.role)) {
         next();
     } else {
         res.status(403);
@@ -43,9 +44,10 @@ const hasPermission = (section) => (req, res, next) => {
         res.status(401);
         throw new Error('Not authorized');
     }
-    if (req.user.role === 'admin') return next(); // superadmin always passes
+    if (req.user.role === 'admin' || req.user.role === 'super_admin') return next(); // superadmin/admin always passes
+    const staffRoles = ['staff', 'operations_manager', 'sales_executive', 'finance_executive'];
     if (
-        req.user.role === 'staff' &&
+        staffRoles.includes(req.user.role) &&
         Array.isArray(req.user.adminPermissions) &&
         req.user.adminPermissions.includes(section)
     ) {

@@ -41,6 +41,10 @@ const {
     getVariants,
     createVariant,
     deleteVariant,
+    // Roles
+    getRoles,
+    createRole,
+    deleteRole,
 } = require('../controllers/adminController');
 const { protect, admin } = require('../middleware/authMiddleware');
 const User = require('../models/User');
@@ -204,6 +208,13 @@ router.route('/inventory/alerts')
 
 router.route('/inventory/adjustment')
     .post(protect, admin, adjustStock);
+
+// Roles Management
+router.route('/roles')
+    .get(protect, admin, getRoles)
+    .post(protect, admin, createRole);
+
+router.delete('/roles/:id', protect, admin, deleteRole);
 
 module.exports = router;
 

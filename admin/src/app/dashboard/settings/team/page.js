@@ -27,41 +27,9 @@ import {
 import { Plus, PencilSimple, Trash, ShieldCheck } from "@phosphor-icons/react";
 import { toast } from "react-hot-toast";
 
-const PREDEFINED_ROLES = [
-  {
-    id: "super_admin",
-    name: "Super Admin",
-    description: "Full access to all modules and configurations.",
-    permissions: ["cms", "products", "inventory", "users", "kyc", "orders", "payments", "coupons", "reports", "notifications", "settings"]
-  },
-  {
-    id: "operations_manager",
-    name: "Operations Manager",
-    description: "Orders, Inventory, Returns, Damaged items, Delivery flow.",
-    permissions: ["orders", "inventory", "products"]
-  },
-  {
-    id: "sales_executive",
-    name: "Sales / KYC Executive",
-    description: "Customers, KYC, Calls, Approvals, Customer notes.",
-    permissions: ["users", "kyc"]
-  },
-  {
-    id: "finance_executive",
-    name: "Finance Executive",
-    description: "Payments, Refunds, Deposits, Late fees, GST, Invoices.",
-    permissions: ["payments", "reports", "settings"]
-  },
-  {
-    id: "admin",
-    name: "Admin",
-    description: "Similar to Super Admin but with limited configuration access.",
-    permissions: ["cms", "products", "inventory", "users", "kyc", "orders", "payments", "coupons", "reports", "notifications"]
-  }
-];
-
 export default function TeamMembersPage() {
   const [teamMembers, setTeamMembers] = useState([]);
+  const [roles, setRoles] = useState([]);
   const [loading, setLoading] = useState(true);
   const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure();
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -95,13 +63,29 @@ export default function TeamMembersPage() {
     }
   };
 
+  const fetchRoles = async () => {
+    try {
+      const token = localStorage.getItem("adminToken");
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000"}/api/admin/roles`, {
+        headers: { "Authorization": `Bearer ${token}` }
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setRoles(data);
+      }
+    } catch (error) {
+      console.error("Failed to load roles");
+    }
+  };
+
   useEffect(() => {
     fetchTeamMembers();
+    fetchRoles();
   }, []);
 
   const handleRoleChange = (e) => {
     const selectedRoleId = e.target.value;
-    const selectedRole = PREDEFINED_ROLES.find(r => r.id === selectedRoleId);
+    const selectedRole = roles.find(r => r.id === selectedRoleId);
     
     setFormData({
       ...formData,
@@ -233,12 +217,12 @@ export default function TeamMembersPage() {
                   </div>
                 </TableCell>
                 <TableCell>
-                  <Chip size="sm" color={item.role === 'admin' ? 'secondary' : 'primary'} variant="flat" className="capitalize">
+                  <Chip size="sm" color={(item.role === 'admin' || item.role === 'super_admin') ? 'secondary' : 'primary'} variant="flat" className="capitalize">
                     {item.role.replace('_', ' ')}
                   </Chip>
                 </TableCell>
                 <TableCell>
-                  {item.role === 'admin' ? (
+                  {(item.role === 'admin' || item.role === 'super_admin') ? (
                     <span className="text-xs text-slate-500 italic">Full Access</span>
                   ) : (
                     <div className="flex gap-1 flex-wrap max-w-xs">
@@ -353,11 +337,11 @@ export default function TeamMembersPage() {
                     }}
                     description="Roles automatically determine which dashboard sections are accessible."
                   >
-                    {PREDEFINED_ROLES.map((role) => (
+                    {roles.map((role) => (
                       <SelectItem key={role.id} value={role.id} textValue={role.name}>
                         <div className="flex flex-col">
                           <span className="font-semibold">{role.name}</span>
-                          <span className="text-xs text-slate-500">{role.description}</span>
+                          <span className="text-xs text-slate-500 line-clamp-1">{role.description}</span>
                         </div>
                       </SelectItem>
                     ))}

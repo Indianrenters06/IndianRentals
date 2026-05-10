@@ -278,14 +278,30 @@ export default function AddonsManagement() {
             </div>
 
             {/* Modal for Add/Edit */}
-            <Modal isOpen={isOpen} onOpenChange={onOpenChange} size="2xl">
+            <Modal 
+                isOpen={isOpen} 
+                onOpenChange={onOpenChange} 
+                size="2xl"
+                scrollBehavior="inside"
+                classNames={{
+                    backdrop: "bg-slate-900/50 backdrop-blur-sm",
+                    base: "bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-2xl",
+                    header: "border-b border-slate-100 dark:border-slate-800/60",
+                    footer: "border-t border-slate-100 dark:border-slate-800/60",
+                }}
+            >
                 <ModalContent>
                     {(onClose) => (
                         <form onSubmit={handleSubmit}>
-                            <ModalHeader className="flex flex-col gap-1">
-                                {modalType === "add" ? "Create New Add-on" : "Edit Add-on"}
+                            <ModalHeader className="flex flex-col gap-1 py-5 px-6">
+                                <h2 className="text-xl font-bold text-slate-900 dark:text-slate-100">
+                                    {modalType === "add" ? "Create New Add-on" : "Edit Add-on"}
+                                </h2>
+                                <p className="text-sm text-slate-500 font-normal">
+                                    {modalType === "add" ? "Add a new service, accessory, or delivery option." : "Update the details and rules for this add-on."}
+                                </p>
                             </ModalHeader>
-                            <ModalBody className="space-y-4">
+                            <ModalBody className="py-6 px-6 space-y-4">
                                 <div className="grid grid-cols-2 gap-4">
                                     <Input 
                                         label="Name" 
@@ -364,12 +380,13 @@ export default function AddonsManagement() {
                                     </AnimatePresence>
                                 </div>
                             </ModalBody>
-                            <ModalFooter>
-                                <Button variant="light" onPress={onClose}>Cancel</Button>
+                            <ModalFooter className="py-4 px-6">
+                                <Button variant="light" onPress={onClose} className="font-semibold">Cancel</Button>
                                 <Button 
-                                    className="h-12 px-8 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-sm shadow-lg shadow-indigo-500/30 transition-all" 
+                                    className="h-12 px-10 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-sm shadow-lg shadow-indigo-500/30 transition-all" 
                                     type="submit" 
                                     isLoading={isSubmitting}
+                                    variant="shadow"
                                 >
                                     {modalType === "add" ? "Create Add-on" : "Save Changes"}
                                 </Button>
