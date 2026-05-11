@@ -8,7 +8,7 @@ import {
 } from "@heroui/react";
 import { 
     Ticket, ArrowLeft, CheckCircle, WarningCircle, 
-    Calendar, Tag, Percent, CurrencyInr 
+    Calendar, Tag, Percent, CurrencyInr, Info 
 } from "@phosphor-icons/react";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
