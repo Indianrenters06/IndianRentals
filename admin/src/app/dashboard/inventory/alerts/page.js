@@ -49,7 +49,13 @@ export default function InventoryAlerts() {
                             {highCount} Critical
                         </Chip>
                     )}
-                    <Button color="primary" variant="flat" className="font-bold border px-6 border-indigo-500 text-indigo-500" startContent={<ShoppingCart weight="bold" />}>
+                    <Button 
+                        color="primary" 
+                        variant="flat" 
+                        style={{ borderRadius: '12px' }}
+                        className="font-bold h-10 px-6 rounded-xl bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-500/30" 
+                        startContent={<ShoppingCart weight="bold" />}
+                    >
                         Settings & Thresholds
                     </Button>
                 </div>
@@ -115,7 +121,11 @@ export default function InventoryAlerts() {
                                         </TableCell>
                                         <TableCell>
                                             <div className="flex justify-center">
-                                                <Button size="sm" color="primary" variant="shadow" className="font-bold h-7 bg-indigo-600 shadow-indigo-500/20">
+                                                <Button 
+                                                    size="sm" 
+                                                    style={{ borderRadius: '12px' }}
+                                                    className="font-bold h-9 px-6 rounded-xl bg-indigo-600 text-white shadow-md border-none"
+                                                >
                                                     Order Stock
                                                 </Button>
                                             </div>

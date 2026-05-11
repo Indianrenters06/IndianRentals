@@ -110,10 +110,8 @@ export default function DamagedInventory() {
                                             <div className="flex justify-center">
                                                 <Button
                                                     size="sm"
-                                                    color="secondary"
-                                                    variant="flat"
+                                                    className="font-bold h-9 px-6 rounded-xl bg-indigo-600 text-white shadow-md border-none"
                                                     startContent={<Wrench weight="bold" />}
-                                                    className="font-bold h-7 bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400"
                                                 >
                                                     {item.status}
                                                 </Button>

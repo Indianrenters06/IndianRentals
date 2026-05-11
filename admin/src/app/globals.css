@@ -294,3 +294,41 @@ body {
 div[data-overlay-container="true"] {
   z-index: 9999 !important;
 }
+
+/* ── Global UI Lock ─────────────────────────────────────────────────────────
+   Enforces rounded-xl (12px) corners and disables hover/active color shifts
+   for all buttons and interactive elements globally.
+   ─────────────────────────────────────────────────────────────────────────── */
+
+button, 
+[role="button"], 
+.heroui-button,
+[data-slot="base"],
+[data-slot="trigger"] {
+  border-radius: 12px !important;
+  transition: none !important;
+  animation: none !important;
+}
+
+/* Disable HeroUI's hover/pressed state overlays */
+[data-hover="true"]::before,
+[data-hover="true"]::after,
+[data-pressed="true"]::before,
+[data-pressed="true"]::after {
+  display: none !important;
+  content: none !important;
+  opacity: 0 !important;
+}
+
+/* Lock background color and opacity to prevent any interaction feedback */
+button:hover,
+button[data-hover="true"],
+button:active,
+button[data-pressed="true"],
+[role="button"]:hover,
+[role="button"][data-hover="true"] {
+  opacity: 1 !important;
+  filter: none !important;
+  transform: none !important;
+  box-shadow: inherit !important;
+}

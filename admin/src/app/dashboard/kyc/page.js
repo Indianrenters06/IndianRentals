@@ -135,10 +135,8 @@ export default function KYCManagement({ initialFilter }) {
                                             <div className="flex justify-center items-center gap-2">
                                                 <Button
                                                     size="sm"
-                                                    variant="flat"
-                                                    color="primary"
-                                                    className="rounded-full font-bold px-5 h-9"
-                                                    startContent={<Eye />}
+                                                    className="rounded-full font-bold px-6 h-9 bg-indigo-600 text-white shadow-md border-none"
+                                                    startContent={<Eye weight="bold" />}
                                                     onPress={() => {
                                                         setSelectedKyc(kyc);
                                                         setModalMode("view");
