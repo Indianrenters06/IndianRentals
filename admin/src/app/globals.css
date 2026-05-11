@@ -207,22 +207,28 @@ body {
   background-color: #1e293b !important;
   border-color: #334155 !important;
 }
+
 .dark .ql-container {
   background-color: #0f172a !important;
   border-color: #334155 !important;
 }
+
 .dark .ql-editor {
   color: #f8fafc !important;
 }
+
 .dark .ql-picker {
   color: #f8fafc !important;
 }
+
 .dark .ql-stroke {
   stroke: #f8fafc !important;
 }
+
 .dark .ql-fill {
   fill: #f8fafc !important;
 }
+
 .dark .ql-picker-options {
   background-color: #1e293b !important;
   border-color: #334155 !important;
@@ -234,7 +240,7 @@ body {
    ─────────────────────────────────────────────────────────────────────────── */
 
 /* Select, Autocomplete, Dropdown, Popover content containers */
-[data-slot="content"], 
+[data-slot="content"],
 [data-slot="listbox"],
 [data-slot="popover"],
 [data-slot="menu"],
