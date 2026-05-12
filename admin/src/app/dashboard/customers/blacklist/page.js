@@ -143,9 +143,11 @@ export default function BlacklistManagement() {
                             <ModalBody className="flex flex-col gap-4 py-4">
                                 <Select
                                     label="Identifier Type"
+                                    variant="bordered"
+                                    radius="xl"
                                     selectedKeys={[form.type]}
                                     onSelectionChange={(keys) => setForm(f => ({ ...f, type: [...keys][0] || "Email Address" }))}
-                                    classNames={{ trigger: "bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700" }}
+                                    classNames={{ trigger: "bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 h-[60px]" }}
                                 >
                                     <SelectItem key="Email Address">Email Address</SelectItem>
                                     <SelectItem key="Phone Number">Phone Number</SelectItem>
@@ -157,14 +159,20 @@ export default function BlacklistManagement() {
                                     placeholder={form.type === "Email Address" ? "e.g. fraud@spam.com" : form.type === "Phone Number" ? "e.g. 9876543210" : "Enter identifier"}
                                     value={form.identifier}
                                     onValueChange={(v) => setForm(f => ({ ...f, identifier: v }))}
-                                    classNames={{ inputWrapper: "bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700" }}
+                                    variant="bordered"
+                                    radius="xl"
+                                    startContent={<ShieldSlash className="text-slate-400" />}
+                                    classNames={{ inputWrapper: "bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 h-[60px]" }}
                                 />
                                 <Input
                                     label="Reason"
                                     placeholder="e.g. Fraudulent activity, Policy violation..."
                                     value={form.reason}
                                     onValueChange={(v) => setForm(f => ({ ...f, reason: v }))}
-                                    classNames={{ inputWrapper: "bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700" }}
+                                    variant="bordered"
+                                    radius="xl"
+                                    startContent={<WarningCircle className="text-slate-400" />}
+                                    classNames={{ inputWrapper: "bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 h-[60px]" }}
                                 />
                                 {formError && (
                                     <p className="text-sm text-rose-500 flex items-center gap-2">

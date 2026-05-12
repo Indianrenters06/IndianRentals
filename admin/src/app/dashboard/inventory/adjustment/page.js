@@ -200,54 +200,60 @@ export default function StockAdjustment() {
                             <ModalHeader className="font-bold text-slate-900 dark:text-slate-100">New Stock Adjustment</ModalHeader>
                             <ModalBody className="py-6 flex flex-col gap-4">
                                 <Select
-                                    label="Select Product"
-                                    placeholder="Choose a product to adjust"
-                                    selectedKeys={selectedProduct ? [selectedProduct] : []}
-                                    onSelectionChange={(keys) => setSelectedProduct([...keys][0] || "")}
-                                    classNames={{ trigger: "bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700" }}
-                                >
-                                    {products.map(p => (
-                                        <SelectItem key={p._id} value={p._id} description={`Current stock: ${p.stock}`}>
-                                            {p.name}
-                                        </SelectItem>
-                                    ))}
-                                </Select>
+                                     label="Select Product"
+                                     variant="bordered"
+                                     radius="xl"
+                                     placeholder="Choose a product to adjust"
+                                     selectedKeys={selectedProduct ? [selectedProduct] : []}
+                                     onSelectionChange={(keys) => setSelectedProduct([...keys][0] || "")}
+                                     classNames={{ trigger: "bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 h-[60px]" }}
+                                 >
+                                     {products.map(p => (
+                                         <SelectItem key={p._id} value={p._id} description={`Current stock: ${p.stock}`}>
+                                             {p.name}
+                                         </SelectItem>
+                                     ))}
+                                 </Select>
 
-                                <div className="grid grid-cols-2 gap-3">
-                                    {["increase", "decrease"].map(type => (
-                                        <button
-                                            key={type}
-                                            onClick={() => setChangeType(type)}
-                                            className={`flex items-center justify-center gap-2 py-3 rounded-xl border-2 font-bold text-sm transition-all ${changeType === type
-                                                ? type === "increase"
-                                                    ? "border-emerald-500 bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600"
-                                                    : "border-rose-500 bg-rose-50 dark:bg-rose-500/10 text-rose-600"
-                                                : "border-slate-200 dark:border-slate-700 text-slate-500"
-                                                }`}
-                                        >
-                                            {type === "increase" ? <ArrowUp weight="bold" /> : <ArrowDown weight="bold" />}
-                                            {type === "increase" ? "Increase Stock" : "Decrease Stock"}
-                                        </button>
-                                    ))}
-                                </div>
+                                 <div className="grid grid-cols-2 gap-3">
+                                     {["increase", "decrease"].map(type => (
+                                         <button
+                                             key={type}
+                                             onClick={() => setChangeType(type)}
+                                             className={`flex items-center justify-center gap-2 py-3 rounded-xl border-2 font-bold text-sm transition-all ${changeType === type
+                                                 ? type === "increase"
+                                                     ? "border-emerald-500 bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600"
+                                                     : "border-rose-500 bg-rose-50 dark:bg-rose-500/10 text-rose-600"
+                                                 : "border-slate-200 dark:border-slate-700 text-slate-500"
+                                                 }`}
+                                         >
+                                             {type === "increase" ? <ArrowUp weight="bold" /> : <ArrowDown weight="bold" />}
+                                             {type === "increase" ? "Increase Stock" : "Decrease Stock"}
+                                         </button>
+                                     ))}
+                                 </div>
 
-                                <Input
-                                    label="Quantity"
-                                    placeholder="Enter amount"
-                                    type="number"
-                                    min="1"
-                                    value={amount}
-                                    onValueChange={setAmount}
-                                    classNames={{ inputWrapper: "bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700" }}
-                                />
+                                 <Input
+                                     label="Quantity"
+                                     placeholder="Enter amount"
+                                     type="number"
+                                     min="1"
+                                     value={amount}
+                                     onValueChange={setAmount}
+                                     variant="bordered"
+                                     radius="xl"
+                                     classNames={{ inputWrapper: "bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 h-[60px]" }}
+                                 />
 
-                                <Textarea
-                                    label="Reason / Note"
-                                    placeholder="e.g. Procurement sync, stock mismatch correction..."
-                                    value={reason}
-                                    onValueChange={setReason}
-                                    classNames={{ inputWrapper: "bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700" }}
-                                />
+                                 <Textarea
+                                     label="Reason / Note"
+                                     placeholder="e.g. Procurement sync, stock mismatch correction..."
+                                     value={reason}
+                                     onValueChange={setReason}
+                                     variant="bordered"
+                                     radius="xl"
+                                     classNames={{ inputWrapper: "bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700" }}
+                                 />
 
                                 {formError && (
                                     <p className="text-sm text-rose-500 font-medium flex items-center gap-2">

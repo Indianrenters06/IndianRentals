@@ -331,16 +331,18 @@ export default function CustomersManagement() {
             <Card className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
                 <CardBody className="p-0">
                     <div className="px-6 py-5 bg-slate-50 dark:bg-slate-900/50 border-b border-slate-200 dark:border-slate-800 flex flex-col sm:flex-row gap-4">
-                        <div className="flex-1 max-w-md relative group">
-                            <div className="absolute left-3 top-1/2 -translate-y-1/2 flex items-center justify-center pointer-events-none z-10">
-                                <MagnifyingGlass className="text-slate-400 group-focus-within:text-indigo-500 transition-colors" size={18} />
-                            </div>
-                            <input
-                                type="text"
+                        <div className="flex-1 max-w-md">
+                            <Input
                                 placeholder="Search by name or email..."
                                 value={searchTerm}
-                                onChange={(e) => setSearchTerm(e.target.value)}
-                                className="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl pl-10 pr-4 py-2 text-sm text-slate-900 dark:text-slate-200 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all h-11"
+                                onValueChange={setSearchTerm}
+                                variant="bordered"
+                                radius="xl"
+                                startContent={<MagnifyingGlass className="text-slate-400" size={18} />}
+                                classNames={{ 
+                                    inputWrapper: "bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 h-[50px] shadow-sm",
+                                    input: "text-sm"
+                                }}
                             />
                         </div>
                     </div>
@@ -582,49 +584,61 @@ export default function CustomersManagement() {
                                     <Input
                                         label="Full Name"
                                         variant="bordered"
+                                        radius="xl"
                                         isRequired
                                         value={addFormData.name}
-                                        onChange={e => setAddFormData({ ...addFormData, name: e.target.value })}
-                                        classNames={{ inputWrapper: "h-12" }}
+                                        onValueChange={v => setAddFormData({ ...addFormData, name: v })}
+                                        startContent={<User className="text-slate-400" />}
+                                        classNames={{ inputWrapper: "bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 h-[60px]" }}
                                     />
                                     <Input
                                         label="Email Address"
                                         type="email"
                                         variant="bordered"
+                                        radius="xl"
                                         isRequired
                                         value={addFormData.email}
-                                        onChange={e => setAddFormData({ ...addFormData, email: e.target.value })}
-                                        classNames={{ inputWrapper: "h-12" }}
+                                        onValueChange={v => setAddFormData({ ...addFormData, email: v })}
+                                        startContent={<EnvelopeSimple className="text-slate-400" />}
+                                        classNames={{ inputWrapper: "bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 h-[60px]" }}
                                     />
                                     <Input
                                         label="Phone Number"
                                         variant="bordered"
+                                        radius="xl"
                                         value={addFormData.phone}
-                                        onChange={e => setAddFormData({ ...addFormData, phone: e.target.value })}
-                                        classNames={{ inputWrapper: "h-12" }}
+                                        onValueChange={v => setAddFormData({ ...addFormData, phone: v })}
+                                        startContent={<Phone className="text-slate-400" />}
+                                        classNames={{ inputWrapper: "bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 h-[60px]" }}
                                     />
                                     <Input
                                         label="Password"
                                         type="password"
                                         variant="bordered"
+                                        radius="xl"
                                         isRequired
                                         value={addFormData.password}
-                                        onChange={e => setAddFormData({ ...addFormData, password: e.target.value })}
-                                        classNames={{ inputWrapper: "h-12" }}
+                                        onValueChange={v => setAddFormData({ ...addFormData, password: v })}
+                                        startContent={<Key className="text-slate-400" />}
+                                        classNames={{ inputWrapper: "bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 h-[60px]" }}
                                     />
                                     <Input
                                         label="City"
                                         variant="bordered"
+                                        radius="xl"
                                         value={addFormData.city}
-                                        onChange={e => setAddFormData({ ...addFormData, city: e.target.value })}
-                                        classNames={{ inputWrapper: "h-12" }}
+                                        onValueChange={v => setAddFormData({ ...addFormData, city: v })}
+                                        startContent={<MapPin className="text-slate-400" />}
+                                        classNames={{ inputWrapper: "bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 h-[60px]" }}
                                     />
                                     <Input
                                         label="State"
                                         variant="bordered"
+                                        radius="xl"
                                         value={addFormData.state}
-                                        onChange={e => setAddFormData({ ...addFormData, state: e.target.value })}
-                                        classNames={{ inputWrapper: "h-12" }}
+                                        onValueChange={v => setAddFormData({ ...addFormData, state: v })}
+                                        startContent={<MapPin className="text-slate-400" />}
+                                        classNames={{ inputWrapper: "bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 h-[60px]" }}
                                     />
                                 </div>
                             </ModalBody>

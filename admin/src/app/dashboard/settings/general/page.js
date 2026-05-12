@@ -97,63 +97,81 @@ export default function GeneralSettings() {
             <Card className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm">
                 <CardBody className="p-6 space-y-5">
                     <p className="text-xs font-bold uppercase tracking-widest text-indigo-500 flex items-center gap-2"><Globe weight="bold" /> Platform Identity</p>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div className="flex flex-col gap-1.5">
-                            <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Site Name</label>
-                            <input
-                                type="text"
-                                value={form.siteName}
-                                onChange={e => setForm(f => ({ ...f, siteName: e.target.value }))}
-                                placeholder="IndianRentals"
-                                className="h-11 px-3 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 text-sm text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 transition-all"
-                            />
-                        </div>
-                        <div className="flex flex-col gap-1.5 md:col-span-2">
-                            <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Site Logo URL</label>
-                            <input
-                                type="text"
-                                value={form.siteLogo}
-                                onChange={e => setForm(f => ({ ...f, siteLogo: e.target.value }))}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-6">
+                        <Input
+                            label="Site Name"
+                            placeholder="IndianRentals"
+                            value={form.siteName}
+                            onValueChange={v => setForm(f => ({ ...f, siteName: v }))}
+                            variant="bordered"
+                            radius="xl"
+                            startContent={<Globe className="text-slate-400" />}
+                            classNames={{ inputWrapper: "bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 h-[60px]" }}
+                        />
+                        <Input
+                            label="Support Email"
+                            type="email"
+                            placeholder="support@example.com"
+                            value={form.siteEmail}
+                            onValueChange={v => setForm(f => ({ ...f, siteEmail: v }))}
+                            variant="bordered"
+                            radius="xl"
+                            startContent={<Globe className="text-slate-400" />}
+                            classNames={{ inputWrapper: "bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 h-[60px]" }}
+                        />
+                        <div className="md:col-span-2">
+                            <Input
+                                label="Site Logo URL"
                                 placeholder="https://res.cloudinary.com/..."
-                                className="h-11 px-3 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 text-sm text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 transition-all font-mono"
-                            />
-                            <p className="text-[10px] text-slate-400 mt-1">Provide a Cloudinary or direct image link for the logo.</p>
-                        </div>
-                        <div className="flex flex-col gap-1.5">
-                            <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Support Email</label>
-                            <input
-                                type="email"
-                                value={form.siteEmail}
-                                onChange={e => setForm(f => ({ ...f, siteEmail: e.target.value }))}
-                                placeholder="support@example.com"
-                                className="h-11 px-3 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 text-sm text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 transition-all"
+                                value={form.siteLogo}
+                                onValueChange={v => setForm(f => ({ ...f, siteLogo: v }))}
+                                variant="bordered"
+                                radius="xl"
+                                description="Provide a Cloudinary or direct image link for the logo."
+                                classNames={{ 
+                                    inputWrapper: "bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 h-[60px]",
+                                    input: "font-mono text-xs"
+                                }}
                             />
                         </div>
-                        <div className="flex flex-col gap-1.5">
-                            <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Phone Number</label>
-                            <div className="relative">
-                                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"><Phone size={15} /></span>
-                                <input type="text" value={form.sitePhone} onChange={e => setForm(f => ({ ...f, sitePhone: e.target.value }))} placeholder="+91 9876543210" className="w-full h-11 pl-9 pr-3 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 text-sm text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 transition-all" />
-                            </div>
-                        </div>
-                        <div className="flex flex-col gap-1.5">
-                            <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Address</label>
-                            <div className="relative">
-                                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"><MapPin size={15} /></span>
-                                <input type="text" value={form.address} onChange={e => setForm(f => ({ ...f, address: e.target.value }))} placeholder="Mumbai, Maharashtra, India" className="w-full h-11 pl-9 pr-3 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 text-sm text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 transition-all" />
-                            </div>
-                        </div>
-                        <div className="flex flex-col gap-1.5">
-                            <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Currency</label>
-                            <div className="relative">
-                                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"><CurrencyInr size={15} /></span>
-                                <input type="text" value={form.currency} readOnly className="w-full h-11 pl-9 pr-3 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 text-sm text-slate-900 dark:text-white opacity-60 cursor-not-allowed" />
-                            </div>
-                        </div>
-                        <div className="flex flex-col gap-1.5">
-                            <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Timezone</label>
-                            <input type="text" value={form.timezone} readOnly className="h-11 px-3 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 text-sm text-slate-900 dark:text-white opacity-60 cursor-not-allowed" />
-                        </div>
+                        <Input
+                            label="Phone Number"
+                            placeholder="+91 9876543210"
+                            value={form.sitePhone}
+                            onValueChange={v => setForm(f => ({ ...f, sitePhone: v }))}
+                            variant="bordered"
+                            radius="xl"
+                            startContent={<Phone className="text-slate-400" />}
+                            classNames={{ inputWrapper: "bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 h-[60px]" }}
+                        />
+                        <Input
+                            label="Address"
+                            placeholder="Mumbai, Maharashtra, India"
+                            value={form.address}
+                            onValueChange={v => setForm(f => ({ ...f, address: v }))}
+                            variant="bordered"
+                            radius="xl"
+                            startContent={<MapPin className="text-slate-400" />}
+                            classNames={{ inputWrapper: "bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 h-[60px]" }}
+                        />
+                        <Input
+                            label="Currency"
+                            value={form.currency}
+                            variant="bordered"
+                            radius="xl"
+                            isReadOnly
+                            startContent={<CurrencyInr className="text-slate-400" />}
+                            classNames={{ inputWrapper: "bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 h-[60px] opacity-60" }}
+                        />
+                        <Input
+                            label="Timezone"
+                            value={form.timezone}
+                            variant="bordered"
+                            radius="xl"
+                            isReadOnly
+                            startContent={<Globe className="text-slate-400" />}
+                            classNames={{ inputWrapper: "bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 h-[60px] opacity-60" }}
+                        />
                     </div>
 
                     <Divider className="bg-slate-200 dark:bg-slate-800 my-2" />

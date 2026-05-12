@@ -7,7 +7,7 @@ import {
     TableRow, TableCell, Chip, Input, Modal, ModalContent, ModalHeader,
     ModalBody, ModalFooter, Select, SelectItem, useDisclosure, Skeleton, Spinner
 } from "@heroui/react";
-import { Tag, Plus, Trash, WarningCircle, CheckCircle, Clock, MagnifyingGlass, ArrowClockwise } from "@phosphor-icons/react";
+import { Tag, Plus, Trash, WarningCircle, CheckCircle, Clock, MagnifyingGlass, ArrowClockwise, Percent, CurrencyInr, Calendar, User } from "@phosphor-icons/react";
 
 const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
 const getToken = () => localStorage.getItem("adminToken");
@@ -158,12 +158,17 @@ export default function ActiveCoupons() {
             {/* Search */}
             <div className="relative group max-w-sm">
                 <MagnifyingGlass className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 z-10" />
-                <input
+                <Input
                     type="text"
                     placeholder="Search coupons..."
                     value={search}
-                    onChange={e => setSearch(e.target.value)}
-                    className="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl pl-10 pr-4 py-2.5 text-sm placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 h-11"
+                    onValueChange={setSearch}
+                    variant="bordered"
+                    radius="xl"
+                    classNames={{ 
+                        inputWrapper: "bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 pl-10 h-11",
+                        input: "text-sm placeholder:text-slate-500"
+                    }}
                 />
             </div>
 
@@ -255,8 +260,8 @@ export default function ActiveCoupons() {
                 <ModalContent>
                     {(onClose) => (
                         <>
-                            <ModalHeader className="font-bold text-slate-900 dark:text-slate-100">Create New Coupon</ModalHeader>
-                            <ModalBody className="flex flex-col gap-4 py-4">
+                            <ModalHeader className="font-bold text-slate-900 dark:text-slate-100 px-6 pt-6">Create New Coupon</ModalHeader>
+                            <ModalBody className="flex flex-col gap-4 py-6 px-6">
                                 <div className="grid grid-cols-2 gap-x-4 gap-y-6">
                                     <Input 
                                         label="Coupon Code" 
@@ -264,35 +269,43 @@ export default function ActiveCoupons() {
                                         value={form.code} 
                                         onValueChange={v => setForm(f => ({ ...f, code: v.toUpperCase() }))} 
                                         variant="bordered"
+                                        radius="xl"
+                                        startContent={<Tag className="text-slate-400" />}
                                         classNames={{ 
-                                            inputWrapper: "bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 h-[56px]",
-                                            label: "text-slate-500 dark:text-slate-400 font-medium"
+                                            inputWrapper: "bg-white dark:bg-slate-950 border-2 border-slate-200 dark:border-slate-800 h-[65px] shadow-sm hover:border-indigo-500 transition-all",
+                                            label: "text-slate-900 dark:text-slate-100 font-bold",
+                                            input: "font-mono font-bold tracking-widest text-slate-900 dark:text-slate-100"
                                         }} 
                                     />
                                     <Select
                                         label="Discount Type"
                                         variant="bordered"
+                                        radius="xl"
                                         selectedKeys={[form.discountType]}
                                         onSelectionChange={(keys) => setForm(f => ({ ...f, discountType: Array.from(keys)[0] }))}
                                         classNames={{ 
-                                            trigger: "bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 h-[56px]",
-                                            label: "text-slate-500 dark:text-slate-400 font-medium"
+                                            trigger: "bg-white dark:bg-slate-950 border-2 border-slate-200 dark:border-slate-800 h-[65px] shadow-sm hover:border-indigo-500 transition-all",
+                                            label: "text-slate-900 dark:text-slate-100 font-bold",
+                                            value: "text-slate-900 dark:text-slate-100 font-bold"
                                         }}
                                     >
-                                        <SelectItem key="percentage" value="percentage">Percentage (%)</SelectItem>
-                                        <SelectItem key="fixed" value="fixed">Flat Amount (₹)</SelectItem>
+                                        <SelectItem key="percentage" value="percentage" startContent={<Percent size={18} />}>Percentage (%)</SelectItem>
+                                        <SelectItem key="fixed" value="fixed" startContent={<CurrencyInr size={18} />}>Flat Amount (₹)</SelectItem>
                                     </Select>
 
                                     <Input 
-                                        label={form.discountType === "percentage" ? "Discount %" : "Discount ₹"} 
+                                        label={form.discountType === "percentage" ? "Discount (%)" : "Discount (₹)"} 
                                         placeholder={form.discountType === "percentage" ? "e.g. 20" : "e.g. 100"} 
                                         type="number" 
                                         value={form.discountAmount} 
                                         onValueChange={v => setForm(f => ({ ...f, discountAmount: v }))} 
                                         variant="bordered"
+                                        radius="xl"
+                                        startContent={form.discountType === "percentage" ? <Percent className="text-slate-400" /> : <CurrencyInr className="text-slate-400" />}
                                         classNames={{ 
-                                            inputWrapper: "bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 h-[56px]",
-                                            label: "text-slate-500 dark:text-slate-400 font-medium"
+                                            inputWrapper: "bg-white dark:bg-slate-950 border-2 border-slate-200 dark:border-slate-800 h-[65px] shadow-sm hover:border-indigo-500 transition-all",
+                                            label: "text-slate-900 dark:text-slate-100 font-bold",
+                                            input: "font-bold text-slate-900 dark:text-slate-100"
                                         }} 
                                     />
                                     <Input 
@@ -302,9 +315,12 @@ export default function ActiveCoupons() {
                                         value={form.minOrderAmount} 
                                         onValueChange={v => setForm(f => ({ ...f, minOrderAmount: v }))} 
                                         variant="bordered"
+                                        radius="xl"
+                                        startContent={<CurrencyInr className="text-slate-400" />}
                                         classNames={{ 
-                                            inputWrapper: "bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 h-[56px]",
-                                            label: "text-slate-500 dark:text-slate-400 font-medium"
+                                            inputWrapper: "bg-white dark:bg-slate-950 border-2 border-slate-200 dark:border-slate-800 h-[65px] shadow-sm hover:border-indigo-500 transition-all",
+                                            label: "text-slate-900 dark:text-slate-100 font-bold",
+                                            input: "font-bold text-slate-900 dark:text-slate-100"
                                         }} 
                                     />
                                 </div>
@@ -316,9 +332,11 @@ export default function ActiveCoupons() {
                                         value={form.expiryDate} 
                                         onValueChange={v => setForm(f => ({ ...f, expiryDate: v }))} 
                                         variant="bordered"
+                                        radius="xl"
+                                        startContent={<Calendar className="text-slate-400" />}
                                         classNames={{ 
-                                            inputWrapper: "bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 h-[56px]",
-                                            label: "text-slate-500 dark:text-slate-400 font-medium"
+                                            inputWrapper: "bg-white dark:bg-slate-950 border-2 border-slate-200 dark:border-slate-800 h-[65px] shadow-sm hover:border-indigo-500 transition-all",
+                                            label: "text-slate-900 dark:text-slate-100 font-bold"
                                         }} 
                                     />
                                     <Input 
@@ -328,19 +346,22 @@ export default function ActiveCoupons() {
                                         value={form.usageLimit} 
                                         onValueChange={v => setForm(f => ({ ...f, usageLimit: v }))} 
                                         variant="bordered"
+                                        radius="xl"
+                                        startContent={<User className="text-slate-400" />}
                                         classNames={{ 
-                                            inputWrapper: "bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 h-[56px]",
-                                            label: "text-slate-500 dark:text-slate-400 font-medium"
+                                            inputWrapper: "bg-white dark:bg-slate-950 border-2 border-slate-200 dark:border-slate-800 h-[65px] shadow-sm hover:border-indigo-500 transition-all",
+                                            label: "text-slate-900 dark:text-slate-100 font-bold",
+                                            input: "font-bold text-slate-900 dark:text-slate-100"
                                         }} 
                                     />
                                 </div>
-                                {formError && <p className="text-sm text-rose-500 flex items-center gap-2"><WarningCircle weight="bold" />{formError}</p>}
+                                {formError && <p className="text-sm text-rose-500 flex items-center gap-2 font-bold"><WarningCircle weight="bold" />{formError}</p>}
                             </ModalBody>
-                            <ModalFooter>
-                                <Button variant="flat" onPress={onClose}>Cancel</Button>
+                            <ModalFooter className="px-6 pb-6 pt-0">
+                                <Button variant="flat" onPress={onClose} className="font-bold">Cancel</Button>
                                 <button type="button" disabled={saving} onClick={handleCreate} className="inline-flex items-center gap-2 h-11 px-8 rounded-xl bg-indigo-600 hover:bg-indigo-700 disabled:opacity-60 text-white font-bold text-sm shadow-lg shadow-indigo-500/30 transition-all">
                                     {saving ? (
-                                        <svg className="animate-spin w-4 h-4" viewBox="0 0 24 24" fill="none"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" /></svg>
+                                        <Spinner size="sm" color="white" />
                                     ) : (
                                         <Tag weight="bold" size={18} />
                                     )}

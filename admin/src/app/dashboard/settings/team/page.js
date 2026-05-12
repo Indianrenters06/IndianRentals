@@ -24,7 +24,7 @@ import {
   useDisclosure,
   Spinner
 } from "@heroui/react";
-import { Plus, PencilSimple, Trash, ShieldCheck } from "@phosphor-icons/react";
+import { Plus, PencilSimple, Trash, ShieldCheck, User, Phone, EnvelopeSimple, Lock } from "@phosphor-icons/react";
 import { toast } from "react-hot-toast";
 
 export default function TeamMembersPage() {
@@ -288,36 +288,44 @@ export default function TeamMembersPage() {
                   <Input 
                     label="Full Name" 
                     variant="bordered" 
+                    radius="xl"
                     isRequired 
                     value={formData.name}
-                    onChange={e => setFormData({...formData, name: e.target.value})}
-                    classNames={{ inputWrapper: "h-12" }}
+                    onValueChange={v => setFormData({...formData, name: v})}
+                    startContent={<User className="text-slate-400" />}
+                    classNames={{ inputWrapper: "bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 h-[60px]" }}
                   />
                   <Input 
                     label="Phone Number" 
                     variant="bordered" 
+                    radius="xl"
                     isRequired 
                     value={formData.phone}
-                    onChange={e => setFormData({...formData, phone: e.target.value})}
-                    classNames={{ inputWrapper: "h-12" }}
+                    onValueChange={v => setFormData({...formData, phone: v})}
+                    startContent={<Phone className="text-slate-400" />}
+                    classNames={{ inputWrapper: "bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 h-[60px]" }}
                   />
                   <Input 
                     label="Email Address" 
                     type="email" 
                     variant="bordered" 
+                    radius="xl"
                     isRequired 
                     value={formData.email}
-                    onChange={e => setFormData({...formData, email: e.target.value})}
-                    classNames={{ inputWrapper: "h-12" }}
+                    onValueChange={v => setFormData({...formData, email: v})}
+                    startContent={<EnvelopeSimple className="text-slate-400" />}
+                    classNames={{ inputWrapper: "bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 h-[60px]" }}
                   />
                   <Input 
                     label="Password" 
                     type="password" 
                     variant="bordered" 
+                    radius="xl"
                     isRequired={!isEdit} 
                     value={formData.password}
-                    onChange={e => setFormData({...formData, password: e.target.value})}
-                    classNames={{ inputWrapper: "h-12" }}
+                    onValueChange={v => setFormData({...formData, password: v})}
+                    startContent={<Lock className="text-slate-400" />}
+                    classNames={{ inputWrapper: "bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 h-[60px]" }}
                     placeholder={isEdit ? "Leave blank to keep current" : ""}
                   />
                 </div>
@@ -326,10 +334,12 @@ export default function TeamMembersPage() {
                   <Select 
                     label="Assign Role" 
                     variant="bordered" 
+                    radius="xl"
                     isRequired
                     selectedKeys={[formData.role]}
-                    onChange={handleRoleChange}
-                    classNames={{ trigger: "h-12" }}
+                    onSelectionChange={keys => setFormData({...formData, role: [...keys][0] || "staff"})}
+                    startContent={<ShieldCheck className="text-slate-400" />}
+                    classNames={{ trigger: "bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 h-[60px]" }}
                     popoverProps={{
                       classNames: {
                         content: "bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-2xl",

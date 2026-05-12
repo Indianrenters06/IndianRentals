@@ -99,9 +99,14 @@ export default function CreateCoupon() {
                                         value={formData.code}
                                         onValueChange={(v) => setFormData({...formData, code: v.toUpperCase()})}
                                         variant="bordered"
+                                        radius="xl"
                                         isRequired
                                         startContent={<Tag className="text-slate-400" />}
-                                        classNames={{ input: "font-mono font-bold tracking-widest" }}
+                                        classNames={{ 
+                                            inputWrapper: "bg-white dark:bg-slate-950 border-2 border-slate-200 dark:border-slate-800 h-[65px] shadow-sm hover:border-indigo-500 transition-all",
+                                            label: "text-slate-900 dark:text-slate-100 font-bold",
+                                            input: "font-mono font-bold tracking-widest text-slate-900 dark:text-slate-100" 
+                                        }}
                                     />
                                     <Textarea
                                         label="Description"
@@ -109,6 +114,11 @@ export default function CreateCoupon() {
                                         value={formData.description}
                                         onValueChange={(v) => setFormData({...formData, description: v})}
                                         variant="bordered"
+                                        radius="xl"
+                                        classNames={{ 
+                                            inputWrapper: "bg-white dark:bg-slate-950 border-2 border-slate-200 dark:border-slate-800 min-h-[100px] shadow-sm hover:border-indigo-500 transition-all",
+                                            label: "text-slate-900 dark:text-slate-100 font-bold"
+                                        }}
                                     />
                                 </div>
 
@@ -120,8 +130,14 @@ export default function CreateCoupon() {
                                         <Select 
                                             label="Discount Type"
                                             variant="bordered"
+                                            radius="xl"
                                             selectedKeys={[formData.discountType]}
                                             onSelectionChange={(keys) => setFormData({...formData, discountType: Array.from(keys)[0]})}
+                                            classNames={{ 
+                                                trigger: "bg-white dark:bg-slate-950 border-2 border-slate-200 dark:border-slate-800 h-[65px] shadow-sm hover:border-indigo-500 transition-all",
+                                                label: "text-slate-900 dark:text-slate-100 font-bold",
+                                                value: "text-slate-900 dark:text-slate-100 font-bold"
+                                            }}
                                         >
                                             <SelectItem key="percentage" startContent={<Percent />}>Percentage</SelectItem>
                                             <SelectItem key="fixed" startContent={<CurrencyInr />}>Fixed Amount</SelectItem>
@@ -133,7 +149,14 @@ export default function CreateCoupon() {
                                             value={formData.discountAmount}
                                             onValueChange={(v) => setFormData({...formData, discountAmount: v})}
                                             variant="bordered"
+                                            radius="xl"
                                             isRequired
+                                            startContent={formData.discountType === 'percentage' ? <Percent className="text-slate-400" /> : <CurrencyInr className="text-slate-400" />}
+                                            classNames={{ 
+                                                inputWrapper: "bg-white dark:bg-slate-950 border-2 border-slate-200 dark:border-slate-800 h-[65px] shadow-sm hover:border-indigo-500 transition-all",
+                                                label: "text-slate-900 dark:text-slate-100 font-bold",
+                                                input: "font-bold text-slate-900 dark:text-slate-100"
+                                            }}
                                         />
                                     </div>
                                     <div className="grid grid-cols-2 gap-4">
@@ -144,6 +167,13 @@ export default function CreateCoupon() {
                                             value={formData.minOrderAmount}
                                             onValueChange={(v) => setFormData({...formData, minOrderAmount: v})}
                                             variant="bordered"
+                                            radius="xl"
+                                            startContent={<CurrencyInr className="text-slate-400" />}
+                                            classNames={{ 
+                                                inputWrapper: "bg-white dark:bg-slate-950 border-2 border-slate-200 dark:border-slate-800 h-[65px] shadow-sm hover:border-indigo-500 transition-all",
+                                                label: "text-slate-900 dark:text-slate-100 font-bold",
+                                                input: "font-bold text-slate-900 dark:text-slate-100"
+                                            }}
                                         />
                                         <Input
                                             label="Max. Discount"
@@ -152,7 +182,14 @@ export default function CreateCoupon() {
                                             value={formData.maxDiscountAmount}
                                             onValueChange={(v) => setFormData({...formData, maxDiscountAmount: v})}
                                             variant="bordered"
+                                            radius="xl"
                                             isDisabled={formData.discountType === 'fixed'}
+                                            startContent={<CurrencyInr className="text-slate-400" />}
+                                            classNames={{ 
+                                                inputWrapper: "bg-white dark:bg-slate-950 border-2 border-slate-200 dark:border-slate-800 h-[65px] shadow-sm hover:border-indigo-500 transition-all",
+                                                label: "text-slate-900 dark:text-slate-100 font-bold",
+                                                input: "font-bold text-slate-900 dark:text-slate-100"
+                                            }}
                                         />
                                     </div>
                                 </div>
@@ -172,8 +209,13 @@ export default function CreateCoupon() {
                                         value={formData.expiryDate}
                                         onValueChange={(v) => setFormData({...formData, expiryDate: v})}
                                         variant="bordered"
+                                        radius="xl"
                                         isRequired
                                         startContent={<Calendar className="text-slate-400" />}
+                                        classNames={{ 
+                                            inputWrapper: "bg-white dark:bg-slate-950 border-2 border-slate-200 dark:border-slate-800 h-[65px] shadow-sm hover:border-indigo-500 transition-all",
+                                            label: "text-slate-900 dark:text-slate-100 font-bold"
+                                        }}
                                     />
                                     <Input
                                         label="Usage Limit"
@@ -182,6 +224,13 @@ export default function CreateCoupon() {
                                         value={formData.usageLimit}
                                         onValueChange={(v) => setFormData({...formData, usageLimit: v})}
                                         variant="bordered"
+                                        radius="xl"
+                                        startContent={<Tag className="text-slate-400" />}
+                                        classNames={{ 
+                                            inputWrapper: "bg-white dark:bg-slate-950 border-2 border-slate-200 dark:border-slate-800 h-[65px] shadow-sm hover:border-indigo-500 transition-all",
+                                            label: "text-slate-900 dark:text-slate-100 font-bold",
+                                            input: "font-bold text-slate-900 dark:text-slate-100"
+                                        }}
                                     />
                                 </div>
 

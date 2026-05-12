@@ -184,29 +184,60 @@ export default function PushNotifications() {
                             <ModalHeader className="font-bold text-slate-900 dark:text-slate-100">📣 Broadcast Notification</ModalHeader>
                             <ModalBody className="flex flex-col gap-4 py-4">
                                 <div className="grid grid-cols-2 gap-3">
-                                    <Select label="Type" selectedKeys={[form.type]} onSelectionChange={keys => setForm(f => ({ ...f, type: [...keys][0] || "general" }))} classNames={{ trigger: "bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700" }}>
+                                    <Select 
+                                        label="Type" 
+                                        variant="bordered"
+                                        radius="xl"
+                                        selectedKeys={[form.type]} 
+                                        onSelectionChange={keys => setForm(f => ({ ...f, type: [...keys][0] || "general" }))} 
+                                        classNames={{ trigger: "bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 h-[60px]" }}
+                                    >
                                         <SelectItem key="order" startContent={<Package size={14} />}>Order Update</SelectItem>
                                         <SelectItem key="kyc" startContent={<CheckCircle size={14} />}>KYC Alert</SelectItem>
                                         <SelectItem key="offer" startContent={<Tag size={14} />}>Offer / Promo</SelectItem>
                                         <SelectItem key="general" startContent={<Bell size={14} />}>General</SelectItem>
                                     </Select>
-                                    <Select label="Target Audience" selectedKeys={[form.target]} onSelectionChange={keys => setForm(f => ({ ...f, target: [...keys][0] || "all" }))} classNames={{ trigger: "bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700" }}>
+                                    <Select 
+                                        label="Target Audience" 
+                                        variant="bordered"
+                                        radius="xl"
+                                        selectedKeys={[form.target]} 
+                                        onSelectionChange={keys => setForm(f => ({ ...f, target: [...keys][0] || "all" }))} 
+                                        classNames={{ trigger: "bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 h-[60px]" }}
+                                    >
                                         <SelectItem key="all" startContent={<Users size={14} />}>All Users</SelectItem>
                                         <SelectItem key="active">Active Users</SelectItem>
                                         <SelectItem key="kyc_pending">Pending KYC</SelectItem>
                                     </Select>
                                 </div>
-                                <Input label="Notification Title" placeholder="e.g. Your order has been shipped" value={form.title} onValueChange={v => setForm(f => ({ ...f, title: v }))} classNames={{ inputWrapper: "bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700" }} />
-                                <Textarea label="Message Body" placeholder="Full notification message..." value={form.message} onValueChange={v => setForm(f => ({ ...f, message: v }))} classNames={{ inputWrapper: "bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700" }} />
+                                <Input 
+                                    label="Notification Title" 
+                                    placeholder="e.g. Your order has been shipped" 
+                                    value={form.title} 
+                                    onValueChange={v => setForm(f => ({ ...f, title: v }))} 
+                                    variant="bordered"
+                                    radius="xl"
+                                    startContent={<Bell className="text-slate-400" />}
+                                    classNames={{ inputWrapper: "bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 h-[60px]" }} 
+                                />
+                                <Textarea 
+                                    label="Message Body" 
+                                    placeholder="Full notification message..." 
+                                    value={form.message} 
+                                    onValueChange={v => setForm(f => ({ ...f, message: v }))} 
+                                    variant="bordered"
+                                    radius="xl"
+                                    classNames={{ inputWrapper: "bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700" }} 
+                                />
                                 {formError && <p className="text-sm text-rose-500 flex items-center gap-2"><WarningCircle weight="bold" />{formError}</p>}
                             </ModalBody>
                             <ModalFooter>
                                 <Button variant="flat" onPress={onClose}>Cancel</Button>
-                                <button type="button" disabled={sending} onClick={handleSend} className="inline-flex items-center gap-2 h-10 px-5 rounded-xl bg-indigo-600 hover:bg-indigo-700 disabled:opacity-60 text-white font-bold text-sm transition-all">
+                                <button type="button" disabled={sending} onClick={handleSend} className="inline-flex items-center gap-2 h-11 px-8 rounded-xl bg-indigo-600 hover:bg-indigo-700 disabled:opacity-60 text-white font-bold text-sm shadow-lg shadow-indigo-500/25 transition-all">
                                     {sending ? (
                                         <svg className="animate-spin w-4 h-4" viewBox="0 0 24 24" fill="none"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" /></svg>
                                     ) : (
-                                        <PaperPlaneTilt weight="bold" size={15} />
+                                        <PaperPlaneTilt weight="bold" size={18} />
                                     )}
                                     Send Now
                                 </button>
