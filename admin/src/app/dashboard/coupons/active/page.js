@@ -55,6 +55,7 @@ export default function ActiveCoupons() {
     const handleCreate = async () => {
         if (!form.code.trim()) return setFormError("Coupon code is required.");
         if (!form.discountAmount || isNaN(form.discountAmount)) return setFormError("Enter a valid discount value.");
+        if (!form.expiryDate) return setFormError("Expiry date is required.");
         setFormError("");
         setSaving(true);
         try {
@@ -262,14 +263,14 @@ export default function ActiveCoupons() {
                                         <label className="text-sm text-slate-700 dark:text-slate-300 font-medium">Discount Type</label>
                                         <select value={form.discountType} onChange={e => setForm(f => ({ ...f, discountType: e.target.value }))} className="h-12 px-3 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/30 appearance-none cursor-pointer">
                                             <option value="percentage">Percentage (%)</option>
-                                            <option value="flat">Flat Amount (₹)</option>
+                                            <option value="fixed">Flat Amount (₹)</option>
                                         </select>
                                     </div>
                                     <Input label={form.discountType === "percentage" ? "Discount %" : "Discount ₹"} placeholder={form.discountType === "percentage" ? "e.g. 20" : "e.g. 100"} type="number" value={form.discountAmount} onValueChange={v => setForm(f => ({ ...f, discountAmount: v }))} classNames={{ inputWrapper: "bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700" }} />
                                     <Input label="Minimum Order (₹)" placeholder="e.g. 500 (optional)" type="number" value={form.minOrderAmount} onValueChange={v => setForm(f => ({ ...f, minOrderAmount: v }))} classNames={{ inputWrapper: "bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700" }} />
                                 </div>
                                 <div className="grid grid-cols-2 gap-3">
-                                    <Input label="Expiry Date" type="date" value={form.expiryDate} onValueChange={v => setForm(f => ({ ...f, expiryDate: v }))} classNames={{ inputWrapper: "bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700" }} />
+                                    <Input label="Expiry Date" type="date" isRequired value={form.expiryDate} onValueChange={v => setForm(f => ({ ...f, expiryDate: v }))} classNames={{ inputWrapper: "bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700" }} />
                                     <Input label="Usage Limit (optional)" placeholder="e.g. 100" type="number" value={form.usageLimit} onValueChange={v => setForm(f => ({ ...f, usageLimit: v }))} classNames={{ inputWrapper: "bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700" }} />
                                 </div>
                                 {formError && <p className="text-sm text-rose-500 flex items-center gap-2"><WarningCircle weight="bold" />{formError}</p>}

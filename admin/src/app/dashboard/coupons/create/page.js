@@ -22,8 +22,8 @@ export default function CreateCoupon() {
         code: "",
         discountType: "percentage",
         discountAmount: "",
-        minPurchase: "",
-        maxDiscount: "",
+        minOrderAmount: "",
+        maxDiscountAmount: "",
         expiryDate: "",
         usageLimit: "",
         isActive: true,
@@ -35,13 +35,25 @@ export default function CreateCoupon() {
         setLoading(true);
         try {
             const token = localStorage.getItem("adminToken");
-            const res = await fetch(`${API}/api/admin/coupons`, {
+            const payload = {
+                ...formData,
+                discountAmount: Number(formData.discountAmount),
+                minOrderAmount: Number(formData.minOrderAmount) || 0,
+                maxDiscountAmount: Number(formData.maxDiscountAmount) || null,
+                usageLimit: formData.usageLimit ? Number(formData.usageLimit) : null,
+            };
+            
+            // Remove the old fields if they exist (though we'll rename them in state too)
+            delete payload.minPurchase;
+            delete payload.maxDiscount;
+
+            const res = await fetch(`${API}/api/coupons`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
                     "Authorization": `Bearer ${token}`
                 },
-                body: JSON.stringify(formData)
+                body: JSON.stringify(payload)
             });
 
             if (res.ok) {
@@ -129,16 +141,16 @@ export default function CreateCoupon() {
                                             label="Min. Purchase"
                                             type="number"
                                             placeholder="e.g. 1000"
-                                            value={formData.minPurchase}
-                                            onValueChange={(v) => setFormData({...formData, minPurchase: v})}
+                                            value={formData.minOrderAmount}
+                                            onValueChange={(v) => setFormData({...formData, minOrderAmount: v})}
                                             variant="bordered"
                                         />
                                         <Input
                                             label="Max. Discount"
                                             type="number"
                                             placeholder="e.g. 2000"
-                                            value={formData.maxDiscount}
-                                            onValueChange={(v) => setFormData({...formData, maxDiscount: v})}
+                                            value={formData.maxDiscountAmount}
+                                            onValueChange={(v) => setFormData({...formData, maxDiscountAmount: v})}
                                             variant="bordered"
                                             isDisabled={formData.discountType === 'fixed'}
                                         />

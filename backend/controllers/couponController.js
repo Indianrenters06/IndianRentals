@@ -15,7 +15,7 @@ const getCoupons = asyncHandler(async (req, res) => {
 const createCoupon = asyncHandler(async (req, res) => {
     const {
         code, discountType, discountAmount, minOrderAmount,
-        maxDiscountAmount, isActive, expiryDate, usageLimit
+        maxDiscountAmount, isActive, expiryDate, usageLimit, description
     } = req.body;
 
     const couponExists = await Coupon.findOne({ code: code.toUpperCase() });
@@ -33,7 +33,8 @@ const createCoupon = asyncHandler(async (req, res) => {
         maxDiscountAmount,
         isActive,
         expiryDate,
-        usageLimit
+        usageLimit,
+        description
     });
 
     if (coupon) {
@@ -59,6 +60,7 @@ const updateCoupon = asyncHandler(async (req, res) => {
         coupon.isActive = req.body.isActive !== undefined ? req.body.isActive : coupon.isActive;
         coupon.expiryDate = req.body.expiryDate || coupon.expiryDate;
         coupon.usageLimit = req.body.usageLimit !== undefined ? req.body.usageLimit : coupon.usageLimit;
+        coupon.description = req.body.description || coupon.description;
 
         const updatedCoupon = await coupon.save();
         res.json(updatedCoupon);

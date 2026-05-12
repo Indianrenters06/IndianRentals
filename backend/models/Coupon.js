@@ -40,6 +40,10 @@ const couponSchema = new mongoose.Schema({
     usageCount: {
         type: Number,
         default: 0
+    },
+    description: {
+        type: String,
+        trim: true
     }
 }, {
     timestamps: true
