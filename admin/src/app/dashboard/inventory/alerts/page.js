@@ -2,8 +2,9 @@
 
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Card, CardBody, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Chip, Button, Skeleton } from "@heroui/react";
-import { WarningCircle, TrendDown, ShoppingCart } from "@phosphor-icons/react";
+import { Card, CardBody, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Chip, Button, Skeleton, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Input, useDisclosure, Spinner } from "@heroui/react";
+import { WarningCircle, TrendDown, ShoppingCart, Package, ArrowUp, CheckCircle } from "@phosphor-icons/react";
+import toast from "react-hot-toast";
 
 const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
 
@@ -11,25 +12,73 @@ export default function InventoryAlerts() {
     const [alerts, setAlerts] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure();
+    
+    // Reorder state
+    const [selectedItem, setSelectedItem] = useState(null);
+    const [orderQty, setOrderQty] = useState("");
+    const [submitting, setSubmitting] = useState(false);
+
+    const fetchAlerts = async () => {
+        try {
+            setLoading(true);
+            const token = localStorage.getItem("adminToken");
+            const res = await fetch(`${API}/api/admin/inventory/alerts`, {
+                headers: { Authorization: `Bearer ${token}` },
+            });
+            if (!res.ok) throw new Error("Failed to fetch inventory alerts");
+            const data = await res.json();
+            setAlerts(data);
+        } catch (err) {
+            setError(err.message);
+        } finally {
+            setLoading(false);
+        }
+    };
 
     useEffect(() => {
-        const fetchAlerts = async () => {
-            try {
-                const token = localStorage.getItem("adminToken");
-                const res = await fetch(`${API}/api/admin/inventory/alerts`, {
-                    headers: { Authorization: `Bearer ${token}` },
-                });
-                if (!res.ok) throw new Error("Failed to fetch inventory alerts");
-                const data = await res.json();
-                setAlerts(data);
-            } catch (err) {
-                setError(err.message);
-            } finally {
-                setLoading(false);
-            }
-        };
         fetchAlerts();
     }, []);
+
+    const handleReorderClick = (item) => {
+        setSelectedItem(item);
+        setOrderQty("");
+        onOpen();
+    };
+
+    const handleReorderSubmit = async () => {
+        if (!orderQty || isNaN(orderQty) || Number(orderQty) <= 0) {
+            toast.error("Please enter a valid quantity");
+            return;
+        }
+
+        setSubmitting(true);
+        try {
+            const token = localStorage.getItem("adminToken");
+            const res = await fetch(`${API}/api/admin/inventory/adjustment`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${token}`,
+                },
+                body: JSON.stringify({
+                    productId: selectedItem._id,
+                    change: Number(orderQty),
+                    reason: `Restock via Inventory Alerts (Ordered ${orderQty} units)`
+                }),
+            });
+
+            if (!res.ok) throw new Error("Restock failed");
+
+            toast.success(`${selectedItem.item} stock updated!`);
+            onClose();
+            fetchAlerts(); // Refresh list
+        } catch (err) {
+            toast.error(err.message);
+        } finally {
+            setSubmitting(false);
+        }
+    };
 
     const highCount = alerts.filter(a => a.priority === 'High').length;
 
@@ -45,15 +94,15 @@ export default function InventoryAlerts() {
 
                 <div className="flex items-center gap-3">
                     {!loading && highCount > 0 && (
-                        <Chip size="lg" color="danger" variant="flat" className="font-bold text-sm px-3">
+                        <Chip size="lg" color="danger" variant="flat" className="font-bold text-sm px-3 h-10 rounded-xl">
                             {highCount} Critical
                         </Chip>
                     )}
                     <Button 
                         color="primary" 
                         variant="flat" 
-                        style={{ borderRadius: '12px' }}
-                        className="font-bold h-10 px-6 rounded-xl bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-500/30" 
+                        radius="xl"
+                        className="font-bold h-11 px-6 bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-500/30" 
                         startContent={<ShoppingCart weight="bold" />}
                     >
                         Settings & Thresholds
@@ -123,8 +172,9 @@ export default function InventoryAlerts() {
                                             <div className="flex justify-center">
                                                 <Button 
                                                     size="sm" 
-                                                    style={{ borderRadius: '12px' }}
-                                                    className="font-bold h-9 px-6 rounded-xl bg-indigo-600 text-white shadow-md border-none"
+                                                    radius="xl"
+                                                    onPress={() => handleReorderClick(item)}
+                                                    className="font-bold h-9 px-6 bg-indigo-600 text-white shadow-md border-none"
                                                 >
                                                     Order Stock
                                                 </Button>
@@ -137,6 +187,70 @@ export default function InventoryAlerts() {
                     )}
                 </CardBody>
             </Card>
+
+            {/* Quick Reorder Modal */}
+            <Modal 
+                isOpen={isOpen} 
+                onOpenChange={onOpenChange} 
+                size="md" 
+                placement="center"
+                classNames={{ base: "bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800" }}
+            >
+                <ModalContent>
+                    {(onClose) => (
+                        <>
+                            <ModalHeader className="font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2 px-6 pt-6">
+                                <Package weight="bold" className="text-indigo-500" />
+                                Quick Reorder
+                            </ModalHeader>
+                            <ModalBody className="py-6 px-6 space-y-4">
+                                <div className="p-4 bg-indigo-50 dark:bg-indigo-500/10 rounded-2xl border border-indigo-100 dark:border-indigo-500/20">
+                                    <p className="text-xs text-indigo-600 dark:text-indigo-400 font-bold uppercase tracking-widest mb-1">Product</p>
+                                    <p className="text-lg font-bold text-slate-900 dark:text-slate-100">{selectedItem?.item}</p>
+                                    <div className="flex items-center gap-2 mt-2">
+                                        <Chip size="sm" variant="flat" color={selectedItem?.stock === 0 ? "danger" : "warning"} className="font-bold">
+                                            Current Stock: {selectedItem?.stock}
+                                        </Chip>
+                                    </div>
+                                </div>
+
+                                <Input
+                                    label="Order Quantity"
+                                    placeholder="Number of units to add"
+                                    type="number"
+                                    value={orderQty}
+                                    onValueChange={setOrderQty}
+                                    variant="bordered"
+                                    radius="xl"
+                                    autoFocus
+                                    startContent={<ArrowUp weight="bold" className="text-emerald-500" />}
+                                    classNames={{ 
+                                        inputWrapper: "bg-white dark:bg-slate-950 border-2 border-slate-200 dark:border-slate-800 h-[65px] shadow-sm hover:border-emerald-500 transition-all",
+                                        label: "text-slate-900 dark:text-slate-100 font-bold",
+                                        input: "font-bold text-slate-900 dark:text-slate-100"
+                                    }}
+                                />
+                                <p className="text-[10px] text-slate-400 uppercase tracking-widest font-bold px-1">
+                                    Note: This will increase the system stock count immediately.
+                                </p>
+                            </ModalBody>
+                            <ModalFooter className="px-6 pb-6 pt-0">
+                                <Button variant="flat" onPress={onClose} className="font-bold">Cancel</Button>
+                                <Button 
+                                    color="success" 
+                                    isLoading={submitting} 
+                                    onPress={handleReorderSubmit}
+                                    className="h-11 px-8 rounded-xl bg-emerald-600 text-white font-bold shadow-lg shadow-emerald-500/30"
+                                    startContent={!submitting && <CheckCircle weight="bold" />}
+                                >
+                                    Confirm Order
+                                </Button>
+                            </ModalFooter>
+                        </>
+                    )}
+                </ModalContent>
+            </Modal>
         </div>
     );
 }
+

@@ -199,14 +199,18 @@ export default function StockAdjustment() {
                         <>
                             <ModalHeader className="font-bold text-slate-900 dark:text-slate-100">New Stock Adjustment</ModalHeader>
                             <ModalBody className="py-6 flex flex-col gap-4">
-                                <Select
+                                 <Select
                                      label="Select Product"
                                      variant="bordered"
                                      radius="xl"
                                      placeholder="Choose a product to adjust"
                                      selectedKeys={selectedProduct ? [selectedProduct] : []}
                                      onSelectionChange={(keys) => setSelectedProduct([...keys][0] || "")}
-                                     classNames={{ trigger: "bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 h-[60px]" }}
+                                     classNames={{ 
+                                         trigger: "bg-white dark:bg-slate-950 border-2 border-slate-200 dark:border-slate-800 h-[65px] shadow-sm hover:border-indigo-500 transition-all",
+                                         label: "text-slate-900 dark:text-slate-100 font-bold",
+                                         value: "text-slate-900 dark:text-slate-100 font-bold"
+                                     }}
                                  >
                                      {products.map(p => (
                                          <SelectItem key={p._id} value={p._id} description={`Current stock: ${p.stock}`}>
@@ -220,11 +224,11 @@ export default function StockAdjustment() {
                                          <button
                                              key={type}
                                              onClick={() => setChangeType(type)}
-                                             className={`flex items-center justify-center gap-2 py-3 rounded-xl border-2 font-bold text-sm transition-all ${changeType === type
+                                             className={`flex items-center justify-center gap-2 py-4 rounded-xl border-2 font-bold text-sm transition-all ${changeType === type
                                                  ? type === "increase"
-                                                     ? "border-emerald-500 bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600"
-                                                     : "border-rose-500 bg-rose-50 dark:bg-rose-500/10 text-rose-600"
-                                                 : "border-slate-200 dark:border-slate-700 text-slate-500"
+                                                     ? "border-emerald-500 bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 shadow-md"
+                                                     : "border-rose-500 bg-rose-50 dark:bg-rose-500/10 text-rose-600 shadow-md"
+                                                 : "border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 text-slate-500"
                                                  }`}
                                          >
                                              {type === "increase" ? <ArrowUp weight="bold" /> : <ArrowDown weight="bold" />}
@@ -242,7 +246,11 @@ export default function StockAdjustment() {
                                      onValueChange={setAmount}
                                      variant="bordered"
                                      radius="xl"
-                                     classNames={{ inputWrapper: "bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 h-[60px]" }}
+                                     classNames={{ 
+                                         inputWrapper: "bg-white dark:bg-slate-950 border-2 border-slate-200 dark:border-slate-800 h-[65px] shadow-sm hover:border-indigo-500 transition-all",
+                                         label: "text-slate-900 dark:text-slate-100 font-bold",
+                                         input: "font-bold text-slate-900 dark:text-slate-100"
+                                     }}
                                  />
 
                                  <Textarea
@@ -252,7 +260,11 @@ export default function StockAdjustment() {
                                      onValueChange={setReason}
                                      variant="bordered"
                                      radius="xl"
-                                     classNames={{ inputWrapper: "bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700" }}
+                                     classNames={{ 
+                                         inputWrapper: "bg-white dark:bg-slate-950 border-2 border-slate-200 dark:border-slate-800 shadow-sm hover:border-indigo-500 transition-all",
+                                         label: "text-slate-900 dark:text-slate-100 font-bold",
+                                         input: "text-slate-900 dark:text-slate-100"
+                                     }}
                                  />
 
                                 {formError && (

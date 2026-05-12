@@ -3,12 +3,12 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import {
-    Card, CardBody, Input, Button, Select, SelectItem, 
+    Card, CardBody, Input, Button, Select, SelectItem,
     Textarea, Switch, Divider
 } from "@heroui/react";
-import { 
-    Ticket, ArrowLeft, CheckCircle, WarningCircle, 
-    Calendar, Tag, Percent, CurrencyInr, Info 
+import {
+    Ticket, ArrowLeft, CheckCircle, WarningCircle,
+    Calendar, Tag, Percent, CurrencyInr, Info
 } from "@phosphor-icons/react";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
@@ -42,7 +42,7 @@ export default function CreateCoupon() {
                 maxDiscountAmount: Number(formData.maxDiscountAmount) || null,
                 usageLimit: formData.usageLimit ? Number(formData.usageLimit) : null,
             };
-            
+
             // Remove the old fields if they exist (though we'll rename them in state too)
             delete payload.minPurchase;
             delete payload.maxDiscount;
@@ -73,7 +73,7 @@ export default function CreateCoupon() {
     return (
         <div className="w-full max-w-4xl mx-auto space-y-6 pb-12">
             <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }}>
-                <button 
+                <button
                     onClick={() => router.back()}
                     className="flex items-center gap-2 text-slate-500 hover:text-indigo-500 transition-colors mb-4 text-sm font-medium"
                 >
@@ -97,25 +97,25 @@ export default function CreateCoupon() {
                                         label="Coupon Code"
                                         placeholder="e.g. SUMMER50"
                                         value={formData.code}
-                                        onValueChange={(v) => setFormData({...formData, code: v.toUpperCase()})}
+                                        onValueChange={(v) => setFormData({ ...formData, code: v.toUpperCase() })}
                                         variant="bordered"
                                         radius="xl"
                                         isRequired
                                         startContent={<Tag className="text-slate-400" />}
-                                        classNames={{ 
+                                        classNames={{
                                             inputWrapper: "bg-white dark:bg-slate-950 border-2 border-slate-200 dark:border-slate-800 h-[65px] shadow-sm hover:border-indigo-500 transition-all",
                                             label: "text-slate-900 dark:text-slate-100 font-bold",
-                                            input: "font-mono font-bold tracking-widest text-slate-900 dark:text-slate-100" 
+                                            input: "font-mono font-bold tracking-widest text-slate-900 dark:text-slate-100"
                                         }}
                                     />
                                     <Textarea
                                         label="Description"
                                         placeholder="Briefly describe what this coupon offers..."
                                         value={formData.description}
-                                        onValueChange={(v) => setFormData({...formData, description: v})}
+                                        onValueChange={(v) => setFormData({ ...formData, description: v })}
                                         variant="bordered"
                                         radius="xl"
-                                        classNames={{ 
+                                        classNames={{
                                             inputWrapper: "bg-white dark:bg-slate-950 border-2 border-slate-200 dark:border-slate-800 min-h-[100px] shadow-sm hover:border-indigo-500 transition-all",
                                             label: "text-slate-900 dark:text-slate-100 font-bold"
                                         }}
@@ -127,13 +127,13 @@ export default function CreateCoupon() {
                                 <div className="space-y-4">
                                     <h3 className="text-sm font-bold uppercase tracking-widest text-slate-400">Discount Configuration</h3>
                                     <div className="grid grid-cols-2 gap-4">
-                                        <Select 
+                                        <Select
                                             label="Discount Type"
                                             variant="bordered"
                                             radius="xl"
                                             selectedKeys={[formData.discountType]}
-                                            onSelectionChange={(keys) => setFormData({...formData, discountType: Array.from(keys)[0]})}
-                                            classNames={{ 
+                                            onSelectionChange={(keys) => setFormData({ ...formData, discountType: Array.from(keys)[0] })}
+                                            classNames={{
                                                 trigger: "bg-white dark:bg-slate-950 border-2 border-slate-200 dark:border-slate-800 h-[65px] shadow-sm hover:border-indigo-500 transition-all",
                                                 label: "text-slate-900 dark:text-slate-100 font-bold",
                                                 value: "text-slate-900 dark:text-slate-100 font-bold"
@@ -147,12 +147,12 @@ export default function CreateCoupon() {
                                             type="number"
                                             placeholder={formData.discountType === 'percentage' ? "e.g. 15" : "e.g. 500"}
                                             value={formData.discountAmount}
-                                            onValueChange={(v) => setFormData({...formData, discountAmount: v})}
+                                            onValueChange={(v) => setFormData({ ...formData, discountAmount: v })}
                                             variant="bordered"
                                             radius="xl"
                                             isRequired
                                             startContent={formData.discountType === 'percentage' ? <Percent className="text-slate-400" /> : <CurrencyInr className="text-slate-400" />}
-                                            classNames={{ 
+                                            classNames={{
                                                 inputWrapper: "bg-white dark:bg-slate-950 border-2 border-slate-200 dark:border-slate-800 h-[65px] shadow-sm hover:border-indigo-500 transition-all",
                                                 label: "text-slate-900 dark:text-slate-100 font-bold",
                                                 input: "font-bold text-slate-900 dark:text-slate-100"
@@ -165,11 +165,11 @@ export default function CreateCoupon() {
                                             type="number"
                                             placeholder="e.g. 1000"
                                             value={formData.minOrderAmount}
-                                            onValueChange={(v) => setFormData({...formData, minOrderAmount: v})}
+                                            onValueChange={(v) => setFormData({ ...formData, minOrderAmount: v })}
                                             variant="bordered"
                                             radius="xl"
                                             startContent={<CurrencyInr className="text-slate-400" />}
-                                            classNames={{ 
+                                            classNames={{
                                                 inputWrapper: "bg-white dark:bg-slate-950 border-2 border-slate-200 dark:border-slate-800 h-[65px] shadow-sm hover:border-indigo-500 transition-all",
                                                 label: "text-slate-900 dark:text-slate-100 font-bold",
                                                 input: "font-bold text-slate-900 dark:text-slate-100"
@@ -180,12 +180,12 @@ export default function CreateCoupon() {
                                             type="number"
                                             placeholder="e.g. 2000"
                                             value={formData.maxDiscountAmount}
-                                            onValueChange={(v) => setFormData({...formData, maxDiscountAmount: v})}
+                                            onValueChange={(v) => setFormData({ ...formData, maxDiscountAmount: v })}
                                             variant="bordered"
                                             radius="xl"
                                             isDisabled={formData.discountType === 'fixed'}
                                             startContent={<CurrencyInr className="text-slate-400" />}
-                                            classNames={{ 
+                                            classNames={{
                                                 inputWrapper: "bg-white dark:bg-slate-950 border-2 border-slate-200 dark:border-slate-800 h-[65px] shadow-sm hover:border-indigo-500 transition-all",
                                                 label: "text-slate-900 dark:text-slate-100 font-bold",
                                                 input: "font-bold text-slate-900 dark:text-slate-100"
@@ -207,12 +207,12 @@ export default function CreateCoupon() {
                                         label="Expiry Date"
                                         type="date"
                                         value={formData.expiryDate}
-                                        onValueChange={(v) => setFormData({...formData, expiryDate: v})}
+                                        onValueChange={(v) => setFormData({ ...formData, expiryDate: v })}
                                         variant="bordered"
                                         radius="xl"
                                         isRequired
                                         startContent={<Calendar className="text-slate-400" />}
-                                        classNames={{ 
+                                        classNames={{
                                             inputWrapper: "bg-white dark:bg-slate-950 border-2 border-slate-200 dark:border-slate-800 h-[65px] shadow-sm hover:border-indigo-500 transition-all",
                                             label: "text-slate-900 dark:text-slate-100 font-bold"
                                         }}
@@ -222,11 +222,11 @@ export default function CreateCoupon() {
                                         type="number"
                                         placeholder="Total times usable"
                                         value={formData.usageLimit}
-                                        onValueChange={(v) => setFormData({...formData, usageLimit: v})}
+                                        onValueChange={(v) => setFormData({ ...formData, usageLimit: v })}
                                         variant="bordered"
                                         radius="xl"
                                         startContent={<Tag className="text-slate-400" />}
-                                        classNames={{ 
+                                        classNames={{
                                             inputWrapper: "bg-white dark:bg-slate-950 border-2 border-slate-200 dark:border-slate-800 h-[65px] shadow-sm hover:border-indigo-500 transition-all",
                                             label: "text-slate-900 dark:text-slate-100 font-bold",
                                             input: "font-bold text-slate-900 dark:text-slate-100"
@@ -241,14 +241,14 @@ export default function CreateCoupon() {
                                         <p className="text-sm font-bold">Active Status</p>
                                         <p className="text-[10px] text-slate-500 uppercase tracking-tight">Enable/Disable Coupon</p>
                                     </div>
-                                    <Switch 
+                                    <Switch
                                         isSelected={formData.isActive}
-                                        onValueChange={(v) => setFormData({...formData, isActive: v})}
+                                        onValueChange={(v) => setFormData({ ...formData, isActive: v })}
                                         color="success"
                                     />
                                 </div>
 
-                                <Button 
+                                <Button
                                     type="submit"
                                     color="primary"
                                     className="w-full h-12 rounded-xl font-bold text-sm bg-indigo-600 shadow-lg shadow-indigo-500/20"
