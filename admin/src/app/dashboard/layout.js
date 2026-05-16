@@ -223,16 +223,7 @@ export default function DashboardLayout({ children }) {
         { name: 'Blacklist', path: '/dashboard/customers/blacklist' },
       ]
     },
-    {
-      name: 'KYC ', icon: ShieldCheck, path: '/dashboard/kyc', permission: 'kyc',
-      submenu: [
-        { name: 'Pending', path: '/dashboard/kyc/pending' },
-        { name: 'Under Review', path: '/dashboard/kyc/review' },
-        { name: 'Approved', path: '/dashboard/kyc/approved' },
-        { name: 'Rejected', path: '/dashboard/kyc/rejected' },
-        { name: 'Document Viewer', path: '/dashboard/kyc/viewer' },
-      ]
-    },
+    { name: 'KYC', icon: ShieldCheck, path: '/dashboard/kyc', permission: 'kyc' },
     {
       name: 'Orders', icon: ShoppingCart, path: '/dashboard/orders', permission: 'orders',
       submenu: [

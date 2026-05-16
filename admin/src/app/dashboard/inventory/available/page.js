@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useMemo } from "react";
 import { motion } from "framer-motion";
-import { Card, CardBody, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Chip, Skeleton } from "@heroui/react";
+import { Card, CardBody, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Chip, Skeleton, Pagination } from "@heroui/react";
 import { Package, MagnifyingGlass, WarningCircle } from "@phosphor-icons/react";
 
 const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
@@ -12,6 +12,12 @@ export default function AvailableStock() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [search, setSearch] = useState("");
+    const [page, setPage] = useState(1);
+    const [rowsPerPage] = useState(10);
+    const [sortDescriptor, setSortDescriptor] = useState({
+        column: "name",
+        direction: "ascending",
+    });
 
     useEffect(() => {
         const fetchStock = async () => {
@@ -32,16 +38,32 @@ export default function AvailableStock() {
         fetchStock();
     }, []);
 
-    const filtered = useMemo(() => {
-        if (!search.trim()) return stock;
-        const q = search.toLowerCase();
-        return stock.filter(
-            (item) =>
-                item.name?.toLowerCase().includes(q) ||
-                item.sku?.toLowerCase().includes(q) ||
-                item.location?.toLowerCase().includes(q)
-        );
-    }, [stock, search]);
+    const sortedItems = useMemo(() => {
+        let list = [...stock];
+        if (search.trim()) {
+            const q = search.toLowerCase();
+            list = list.filter(
+                (item) =>
+                    item.name?.toLowerCase().includes(q) ||
+                    item.sku?.toLowerCase().includes(q) ||
+                    item.location?.toLowerCase().includes(q)
+            );
+        }
+
+        return list.sort((a, b) => {
+            const first = a[sortDescriptor.column];
+            const second = b[sortDescriptor.column];
+            const cmp = first < second ? -1 : first > second ? 1 : 0;
+
+            return sortDescriptor.direction === "descending" ? -cmp : cmp;
+        });
+    }, [stock, search, sortDescriptor]);
+
+    const items = useMemo(() => {
+        const start = (page - 1) * rowsPerPage;
+        const end = start + rowsPerPage;
+        return sortedItems.slice(start, end);
+    }, [page, sortedItems, rowsPerPage]);
 
     return (
         <div className="w-full space-y-6 pb-12">
@@ -58,7 +80,7 @@ export default function AvailableStock() {
                         variant="flat"
                         color="success"
                         startContent={<Package weight="bold" className="mr-1" />}
-                        className="font-bold text-sm px-3"
+                        className="font-bold text-sm px-3 bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800"
                     >
                         {loading ? "..." : `${stock.length} Products`}
                     </Chip>
@@ -95,6 +117,29 @@ export default function AvailableStock() {
                     ) : (
                         <Table
                             aria-label="Available stock table"
+                            sortDescriptor={sortDescriptor}
+                            onSortChange={setSortDescriptor}
+                            bottomContent={
+                                sortedItems.length > 0 ? (
+                                    <div className="flex w-full justify-between items-center py-4 px-6 border-t border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950/30">
+                                        <span className="text-sm text-slate-500">
+                                            Showing {items.length} of {sortedItems.length} products
+                                        </span>
+                                        <Pagination
+                                            isCompact
+                                            showControls
+                                            showShadow
+                                            color="primary"
+                                            page={page}
+                                            total={Math.ceil(sortedItems.length / rowsPerPage)}
+                                            onChange={(page) => setPage(page)}
+                                            classNames={{
+                                                cursor: "bg-indigo-500 shadow-indigo-500/30",
+                                            }}
+                                        />
+                                    </div>
+                                ) : null
+                            }
                             classNames={{
                                 wrapper: "p-0 rounded-none shadow-none bg-transparent",
                                 th: "bg-slate-50 dark:bg-slate-950/80 uppercase text-xs font-bold h-12 pt-0 px-6",
@@ -102,14 +147,14 @@ export default function AvailableStock() {
                             }}
                         >
                             <TableHeader>
-                                <TableColumn>ITEM NAME</TableColumn>
-                                <TableColumn>SKU ID</TableColumn>
-                                <TableColumn>LOCATION</TableColumn>
-                                <TableColumn>STOCK</TableColumn>
-                                <TableColumn>CONDITION</TableColumn>
-                                <TableColumn align="center">STATUS</TableColumn>
+                                <TableColumn key="name" allowsSorting>ITEM NAME</TableColumn>
+                                <TableColumn key="sku" allowsSorting>SKU ID</TableColumn>
+                                <TableColumn key="location" allowsSorting>LOCATION</TableColumn>
+                                <TableColumn key="stock" allowsSorting>STOCK</TableColumn>
+                                <TableColumn key="condition" allowsSorting>CONDITION</TableColumn>
+                                <TableColumn key="status" align="center" allowsSorting>STATUS</TableColumn>
                             </TableHeader>
-                            <TableBody items={filtered} emptyContent="No available items found.">
+                            <TableBody items={items} emptyContent="No available items found.">
                                 {(item) => (
                                     <TableRow key={item._id}>
                                         <TableCell className="font-semibold text-slate-900 dark:text-slate-100">{item.name}</TableCell>
@@ -135,7 +180,7 @@ export default function AvailableStock() {
                                                     size="sm"
                                                     color={item.status === 'Ready' ? 'success' : 'warning'}
                                                     variant="dot"
-                                                    className="border-none"
+                                                    className="border-none font-bold"
                                                 >
                                                     {item.status}
                                                 </Chip>

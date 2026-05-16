@@ -1,9 +1,9 @@
 'use client';
 
-import { useState, useEffect } from "react";
-import { motion } from "framer-motion";
-import { Card, CardBody, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Chip, Button, Skeleton, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Input, useDisclosure, Spinner } from "@heroui/react";
-import { WarningCircle, TrendDown, ShoppingCart, Package, ArrowUp, CheckCircle } from "@phosphor-icons/react";
+import { useState, useEffect, useMemo, useCallback } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { Card, CardBody, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Chip, Button, Skeleton, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Input, useDisclosure, Spinner, Pagination } from "@heroui/react";
+import { WarningCircle, TrendDown, ShoppingCart, Package, ArrowUp, CheckCircle, MagnifyingGlass, XCircle } from "@phosphor-icons/react";
 import toast from "react-hot-toast";
 
 const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
@@ -13,7 +13,16 @@ export default function InventoryAlerts() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure();
-    
+
+    // Table state
+    const [search, setSearch] = useState("");
+    const [page, setPage] = useState(1);
+    const [rowsPerPage] = useState(10);
+    const [sortDescriptor, setSortDescriptor] = useState({
+        column: "priority",
+        direction: "descending",
+    });
+
     // Reorder state
     const [selectedItem, setSelectedItem] = useState(null);
     const [orderQty, setOrderQty] = useState("");
@@ -80,6 +89,33 @@ export default function InventoryAlerts() {
         }
     };
 
+    const sortedItems = useMemo(() => {
+        let list = [...alerts];
+        if (search.trim()) {
+            const q = search.toLowerCase();
+            list = list.filter(
+                (item) =>
+                    item.item?.toLowerCase().includes(q) ||
+                    item.message?.toLowerCase().includes(q) ||
+                    item.type?.toLowerCase().includes(q)
+            );
+        }
+
+        return list.sort((a, b) => {
+            const first = a[sortDescriptor.column];
+            const second = b[sortDescriptor.column];
+            const cmp = first < second ? -1 : first > second ? 1 : 0;
+
+            return sortDescriptor.direction === "descending" ? -cmp : cmp;
+        });
+    }, [alerts, search, sortDescriptor]);
+
+    const items = useMemo(() => {
+        const start = (page - 1) * rowsPerPage;
+        const end = start + rowsPerPage;
+        return sortedItems.slice(start, end);
+    }, [page, sortedItems, rowsPerPage]);
+
     const highCount = alerts.filter(a => a.priority === 'High').length;
 
     return (
@@ -94,24 +130,37 @@ export default function InventoryAlerts() {
 
                 <div className="flex items-center gap-3">
                     {!loading && highCount > 0 && (
-                        <Chip size="lg" color="danger" variant="flat" className="font-bold text-sm px-3 h-10 rounded-xl">
-                            {highCount} Critical
+                        <Chip size="lg" color="danger" variant="flat" className="font-bold text-sm px-4 h-11 rounded-xl bg-rose-50 dark:bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-100 dark:border-rose-500/20">
+                            {highCount} Critical Alerts
                         </Chip>
                     )}
-                    <Button 
-                        color="primary" 
-                        variant="flat" 
+                    <Button
+                        color="primary"
+                        variant="flat"
                         radius="xl"
-                        className="font-bold h-11 px-6 bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-500/30" 
+                        className="font-bold h-11 px-6 bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-500/30"
                         startContent={<ShoppingCart weight="bold" />}
                     >
-                        Settings & Thresholds
+                        Alert Thresholds
                     </Button>
                 </div>
             </div>
 
             <Card className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
                 <CardBody className="p-0">
+                    <div className="p-6 border-b border-slate-200 dark:border-slate-800 flex flex-col md:flex-row gap-4 bg-slate-50 dark:bg-slate-950/30">
+                        <div className="relative group flex-1 max-w-md">
+                            <MagnifyingGlass className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-indigo-500 transition-colors" />
+                            <input
+                                type="text"
+                                value={search}
+                                onChange={(e) => setSearch(e.target.value)}
+                                placeholder="Search by item name or alert..."
+                                className="w-full bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 rounded-xl pl-10 pr-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/50 h-11"
+                            />
+                        </div>
+                    </div>
+
                     {error ? (
                         <div className="flex flex-col items-center justify-center py-20 gap-3 text-rose-500">
                             <WarningCircle size={40} weight="bold" />
@@ -127,6 +176,29 @@ export default function InventoryAlerts() {
                     ) : (
                         <Table
                             aria-label="Inventory alerts table"
+                            sortDescriptor={sortDescriptor}
+                            onSortChange={setSortDescriptor}
+                            bottomContent={
+                                sortedItems.length > 0 ? (
+                                    <div className="flex w-full justify-between items-center py-4 px-6 border-t border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950/30">
+                                        <span className="text-sm text-slate-500">
+                                            Showing {items.length} of {sortedItems.length} alerts
+                                        </span>
+                                        <Pagination
+                                            isCompact
+                                            showControls
+                                            showShadow
+                                            color="primary"
+                                            page={page}
+                                            total={Math.ceil(sortedItems.length / rowsPerPage)}
+                                            onChange={(page) => setPage(page)}
+                                            classNames={{
+                                                cursor: "bg-indigo-500 shadow-indigo-500/30",
+                                            }}
+                                        />
+                                    </div>
+                                ) : null
+                            }
                             classNames={{
                                 wrapper: "p-0 rounded-none shadow-none bg-transparent",
                                 th: "bg-slate-50 dark:bg-slate-950/80 uppercase text-xs font-bold h-12 pt-0 px-6",
@@ -134,14 +206,14 @@ export default function InventoryAlerts() {
                             }}
                         >
                             <TableHeader>
-                                <TableColumn>ITEM UNDER ALERT</TableColumn>
-                                <TableColumn>ALERT TYPE</TableColumn>
-                                <TableColumn>DESCRIPTION</TableColumn>
-                                <TableColumn>STOCK</TableColumn>
-                                <TableColumn align="center">PRIORITY</TableColumn>
+                                <TableColumn key="item" allowsSorting>ITEM UNDER ALERT</TableColumn>
+                                <TableColumn key="type" allowsSorting>ALERT TYPE</TableColumn>
+                                <TableColumn key="message" allowsSorting>DESCRIPTION</TableColumn>
+                                <TableColumn key="stock" allowsSorting>STOCK</TableColumn>
+                                <TableColumn key="priority" align="center" allowsSorting>PRIORITY</TableColumn>
                                 <TableColumn align="center">ACTION</TableColumn>
                             </TableHeader>
-                            <TableBody items={alerts} emptyContent="System healthy. No active alerts.">
+                            <TableBody items={items} emptyContent="System healthy. No active alerts.">
                                 {(item) => (
                                     <TableRow key={String(item._id)}>
                                         <TableCell className="font-semibold text-slate-900 dark:text-slate-200">{item.item}</TableCell>
@@ -170,8 +242,8 @@ export default function InventoryAlerts() {
                                         </TableCell>
                                         <TableCell>
                                             <div className="flex justify-center">
-                                                <Button 
-                                                    size="sm" 
+                                                <Button
+                                                    size="sm"
                                                     radius="xl"
                                                     onPress={() => handleReorderClick(item)}
                                                     className="font-bold h-9 px-6 bg-indigo-600 text-white shadow-md border-none"
@@ -189,17 +261,21 @@ export default function InventoryAlerts() {
             </Card>
 
             {/* Quick Reorder Modal */}
-            <Modal 
-                isOpen={isOpen} 
-                onOpenChange={onOpenChange} 
-                size="md" 
+            <Modal
+                isOpen={isOpen}
+                onOpenChange={onOpenChange}
+                size="md"
                 placement="center"
-                classNames={{ base: "bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800" }}
+                classNames={{ 
+                    base: "bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl",
+                    header: "px-6 pt-6 pb-0",
+                    footer: "px-6 pb-6 pt-0"
+                }}
             >
                 <ModalContent>
                     {(onClose) => (
                         <>
-                            <ModalHeader className="font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2 px-6 pt-6">
+                            <ModalHeader className="font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2">
                                 <Package weight="bold" className="text-indigo-500" />
                                 Quick Reorder
                             </ModalHeader>
@@ -224,7 +300,7 @@ export default function InventoryAlerts() {
                                     radius="xl"
                                     autoFocus
                                     startContent={<ArrowUp weight="bold" className="text-emerald-500" />}
-                                    classNames={{ 
+                                    classNames={{
                                         inputWrapper: "bg-white dark:bg-slate-950 border-2 border-slate-200 dark:border-slate-800 h-[65px] shadow-sm hover:border-emerald-500 transition-all",
                                         label: "text-slate-900 dark:text-slate-100 font-bold",
                                         input: "font-bold text-slate-900 dark:text-slate-100"
@@ -234,11 +310,11 @@ export default function InventoryAlerts() {
                                     Note: This will increase the system stock count immediately.
                                 </p>
                             </ModalBody>
-                            <ModalFooter className="px-6 pb-6 pt-0">
-                                <Button variant="flat" onPress={onClose} className="font-bold">Cancel</Button>
-                                <Button 
-                                    color="success" 
-                                    isLoading={submitting} 
+                            <ModalFooter>
+                                <Button variant="flat" onPress={onClose} className="font-bold text-slate-600 dark:text-slate-400">Cancel</Button>
+                                <Button
+                                    color="success"
+                                    isLoading={submitting}
                                     onPress={handleReorderSubmit}
                                     className="h-11 px-8 rounded-xl bg-emerald-600 text-white font-bold shadow-lg shadow-emerald-500/30"
                                     startContent={!submitting && <CheckCircle weight="bold" />}

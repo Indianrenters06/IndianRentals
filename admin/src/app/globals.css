@@ -300,8 +300,8 @@ div[data-overlay-container="true"] {
    for all buttons and interactive elements globally.
    ─────────────────────────────────────────────────────────────────────────── */
 
-button, 
-[role="button"], 
+button,
+[role="button"],
 .heroui-button,
 [data-slot="base"],
 [data-slot="trigger"] {
@@ -331,4 +331,4 @@ button[data-pressed="true"],
   filter: none !important;
   transform: none !important;
   box-shadow: inherit !important;
-}
+}

@@ -18,15 +18,15 @@ const API = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
 const getToken = () => typeof window !== 'undefined' ? localStorage.getItem('adminToken') : null;
 
 const PAGES = [
-    { key: 'about',          label: 'About Us',                   slug: '/about',          specialized: true },
-    { key: 'rental-process', label: 'Rental Process',             slug: '/rental-process', specialized: true },
-    { key: 'terms',          label: 'Rental Terms',               slug: '/terms' },
-    { key: 'privacy',        label: 'Privacy Policy',             slug: '/privacy' },
-    { key: 'kyc-policy',     label: 'KYC Policy',                 slug: '/kyc-policy' },
-    { key: 'shipping',       label: 'Shipping & Delivery',        slug: '/shipping' },
-    { key: 'refund',         label: 'Return & Refund Policy',     slug: '/refund-policy' },
-    { key: 'faq',            label: 'FAQ / Help Center',          slug: '/faq',            specialized: true },
-    { key: 'contact',        label: 'Contact Us',                 slug: '/contact',        specialized: true },
+    { key: 'about', label: 'About Us', slug: '/about', specialized: true },
+    { key: 'rental-process', label: 'Rental Process', slug: '/rental-process', specialized: true },
+    { key: 'terms', label: 'Rental Terms', slug: '/terms' },
+    { key: 'privacy', label: 'Privacy Policy', slug: '/privacy' },
+    { key: 'kyc-policy', label: 'KYC Policy', slug: '/kyc-policy' },
+    { key: 'shipping', label: 'Shipping & Delivery', slug: '/shipping' },
+    { key: 'refund', label: 'Return & Refund Policy', slug: '/refund-policy' },
+    { key: 'faq', label: 'FAQ / Help Center', slug: '/faq', specialized: true },
+    { key: 'contact', label: 'Contact Us', slug: '/contact', specialized: true },
 ];
 
 const PAGE_ICONS = {

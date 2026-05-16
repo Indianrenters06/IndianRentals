@@ -49,10 +49,10 @@ export default function AddProduct() {
                     fetch(`${API}/api/categories`),
                     fetch(`${API}/api/addons`)
                 ]);
-                
+
                 const catData = await catRes.json();
                 const addonData = await addonRes.json();
-                
+
                 setCategories(Array.isArray(catData) ? catData : catData.categories || []);
                 setAllAddons(addonData);
             } catch (err) {
@@ -92,9 +92,9 @@ export default function AddProduct() {
                     const lines = formData.faqs.split("\n").filter(l => l.trim() !== "");
                     const parsed = [];
                     for (let i = 0; i < lines.length; i += 2) {
-                        parsed.push({ 
-                            question: lines[i]?.trim() || "", 
-                            answer: lines[i + 1]?.trim() || "" 
+                        parsed.push({
+                            question: lines[i]?.trim() || "",
+                            answer: lines[i + 1]?.trim() || ""
                         });
                     }
                     return parsed;
@@ -147,7 +147,7 @@ export default function AddProduct() {
             <motion.form onSubmit={handleSubmit} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1, duration: 0.5 }}>
                 <Card className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm w-full">
                     <CardBody className="p-8 space-y-8">
-                        
+
                         <div className="space-y-6">
                             <div className="space-y-2">
                                 <h3 className="text-lg font-semibold text-slate-900 dark:text-white flex items-center gap-2">

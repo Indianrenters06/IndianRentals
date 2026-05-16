@@ -46,11 +46,11 @@ const TextArea = ({ label, value, onChange, placeholder, rows = 3 }) => (
 const Card = ({ icon, title, children, accent = 'indigo' }) => {
     const accents = {
         indigo: 'from-indigo-50 to-white dark:from-indigo-950/20 dark:to-slate-900 border-indigo-100 dark:border-indigo-900/30',
-        amber:  'from-amber-50 to-white dark:from-amber-950/20 dark:to-slate-900 border-amber-100 dark:border-amber-900/30',
-        emerald:'from-emerald-50 to-white dark:from-emerald-950/20 dark:to-slate-900 border-emerald-100 dark:border-emerald-900/30',
+        amber: 'from-amber-50 to-white dark:from-amber-950/20 dark:to-slate-900 border-amber-100 dark:border-amber-900/30',
+        emerald: 'from-emerald-50 to-white dark:from-emerald-950/20 dark:to-slate-900 border-emerald-100 dark:border-emerald-900/30',
         violet: 'from-violet-50 to-white dark:from-violet-950/20 dark:to-slate-900 border-violet-100 dark:border-violet-900/30',
-        rose:   'from-rose-50 to-white dark:from-rose-950/20 dark:to-slate-900 border-rose-100 dark:border-rose-900/30',
-        sky:    'from-sky-50 to-white dark:from-sky-950/20 dark:to-slate-900 border-sky-100 dark:border-sky-900/30',
+        rose: 'from-rose-50 to-white dark:from-rose-950/20 dark:to-slate-900 border-rose-100 dark:border-rose-900/30',
+        sky: 'from-sky-50 to-white dark:from-sky-950/20 dark:to-slate-900 border-sky-100 dark:border-sky-900/30',
     };
     return (
         <div className={`rounded-2xl border bg-gradient-to-br ${accents[accent] || accents.indigo} p-6 space-y-5 shadow-sm`}>
@@ -82,12 +82,12 @@ const DEFAULTS = {
     aboutStat2Value: '10,000+', aboutStat2Label: 'Happy Clients',
     aboutVisionTabLabel: 'Our Vision',
     aboutVision1Title: 'Rent Anything', aboutVision1Text: "Laptops, Macs, mobiles, AV, cameras, medical and more—if it's not listed, it's sourced on request.",
-    aboutVision2Title: 'Rent Anytime',  aboutVision2Text: 'Tenures that fit the job: 1, 3, 6, or 12 months, with easy extensions and mid-term upgrades.',
+    aboutVision2Title: 'Rent Anytime', aboutVision2Text: 'Tenures that fit the job: 1, 3, 6, or 12 months, with easy extensions and mid-term upgrades.',
     aboutVision3Title: 'Rent Anywhere', aboutVision3Text: 'Rapid delivery and support across major Indian cities through a reliable partner network.',
     aboutMissionTabLabel: 'Our Mission',
-    aboutMission1Title: 'Awesome Service',   aboutMission1Text: "Top-tier rental service with end-to-end support from order to return.",
-    aboutMission2Title: 'Awesome Quality',   aboutMission2Text: 'Every device is quality-tested, deep-cleaned, and verified before dispatch.',
-    aboutMission3Title: 'Happy Customers',   aboutMission3Text: 'Thousands of satisfied customers across India trust us for their rental needs.',
+    aboutMission1Title: 'Awesome Service', aboutMission1Text: "Top-tier rental service with end-to-end support from order to return.",
+    aboutMission2Title: 'Awesome Quality', aboutMission2Text: 'Every device is quality-tested, deep-cleaned, and verified before dispatch.',
+    aboutMission3Title: 'Happy Customers', aboutMission3Text: 'Thousands of satisfied customers across India trust us for their rental needs.',
     aboutWhyTitle: 'Why Choose Us?',
     aboutWhyText: "Join thousands who've switched to the flexible, affordable way to access high-end tech.",
     aboutWhyImage: 'https://res.cloudinary.com/dgkckcdk8/image/upload/v1769961565/indian-rentals/anmpufdlxxxblkxqxpds.jpg',

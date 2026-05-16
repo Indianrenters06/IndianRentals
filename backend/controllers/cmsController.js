@@ -98,7 +98,7 @@ const updatePage = asyncHandler(async (req, res) => {
         'aboutWhyStat1Value', 'aboutWhyStat1Label', 'aboutWhyStat2Value', 'aboutWhyStat2Label', 'aboutWhyStat3Value', 'aboutWhyStat3Label',
 
         // FAQ Page
-        'faqTitle', 'faqSubtitle', 'faqItems',
+        'faqTitle', 'faqSubtitle', 'faqItems', 'faqSectionEnabled',
 
         // Rental Process Page Features
         'rentalFeaturesTitle', 'rentalFeaturesSubtitle', 'rentalFeatures',

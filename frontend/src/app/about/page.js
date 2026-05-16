@@ -152,7 +152,7 @@ export default function AboutPage() {
             <WhyChooseUs cmsData={c} />
 
             {/* ── 5. FAQ ────────────────────────────────────────────────────── */}
-            <FaqSection />
+            <FaqSection pageName="about" />
 
             {/* ── 6. Best Rented Products ───────────────────────────────────── */}
             <BestRentedProducts />

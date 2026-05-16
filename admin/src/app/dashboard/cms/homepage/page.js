@@ -256,6 +256,7 @@ const DEFAULTS = {
     whyChooseUsImage: "",
     statsDevices: "90k+", statsCustomers: "30k+", statsCities: "401+",
     clientSectionEnabled: true, clientSectionTitle: "Trusted By", clientLogos: [],
+    faqSectionEnabled: true,
     featuredShowcaseEnabled: true,
     featuredShowcaseProductIds: [],
     featuredShowcaseBanners: [
@@ -310,6 +311,7 @@ export default function CMSHomepage() {
                 }
                 if (d.whyChooseUsEnabled === undefined) d.whyChooseUsEnabled = true;
                 if (d.clientSectionEnabled === undefined) d.clientSectionEnabled = true;
+                if (d.faqSectionEnabled === undefined) d.faqSectionEnabled = true;
                 setData({ ...DEFAULTS, ...d });
             }
         } catch (err) { console.error(err); }
@@ -821,6 +823,17 @@ export default function CMSHomepage() {
                                 </div>
                             </div>
                         </div>
+                    </div>
+
+                    {/* Global FAQ Toggle */}
+                    <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 shadow-sm space-y-6">
+                        <SectionRow
+                            icon={<ChatText weight="fill" className="text-violet-500" />}
+                            title="Global FAQ Section"
+                            desc="Show or hide the Global FAQ section on the homepage."
+                            toggle={data.faqSectionEnabled}
+                            onToggle={v => set("faqSectionEnabled", v)}
+                        />
                     </div>
                 </motion.div>
             )}

@@ -201,6 +201,7 @@ const cmsSchema = new mongoose.Schema({
     faqTitle: { type: String, default: 'FAQs' },
     faqSubtitle: { type: String, default: 'Everything you need to know about renting with IndianRenters.com' },
     faqItems: { type: [faqItemSchema], default: [] },
+    faqSectionEnabled: { type: Boolean, default: true },
 
     // ── Rental Process Page Features ──────────────────────────────────────────
     rentalFeaturesTitle: { type: String, default: 'Features' },

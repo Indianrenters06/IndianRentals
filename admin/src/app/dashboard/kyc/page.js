@@ -40,7 +40,7 @@ export default function KYCManagement({ initialFilter }) {
         fetchKYC();
     }, []);
 
-    const filteredRequests = initialFilter 
+    const filteredRequests = initialFilter
         ? kycRequests.filter(req => req.status === initialFilter)
         : kycRequests;
 
@@ -87,7 +87,7 @@ export default function KYCManagement({ initialFilter }) {
                         KYC <span className="text-transparent bg-clip-text bg-linear-to-r from-indigo-500 to-purple-500">{initialFilter ? initialFilter.charAt(0).toUpperCase() + initialFilter.slice(1) : "Verification Center"}</span>
                     </h1>
                     <p className="text-slate-600 dark:text-slate-400">
-                        {initialFilter 
+                        {initialFilter
                             ? `Reviewing all ${initialFilter} KYC applications.`
                             : "Review and approve documentation for platform trust & safety."}
                     </p>

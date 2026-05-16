@@ -6,7 +6,7 @@ import { Spinner } from "@heroui/react";
 import {
     Plus, Folder, FolderPlus, FolderOpen, Trash, PencilSimple,
     CaretDown, CaretRight, TreeStructure, Tag, Check, X, FloppyDisk,
-    Warning, CheckCircle, XCircle
+    Warning, CheckCircle, XCircle, MagnifyingGlass
 } from "@phosphor-icons/react";
 import ImageUploader from "@/components/ImageUploader";
 

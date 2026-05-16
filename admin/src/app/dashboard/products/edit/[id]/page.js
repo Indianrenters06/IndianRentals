@@ -169,9 +169,9 @@ export default function EditProduct() {
                     const lines = form.faqs.split("\n").filter(line => line.trim() !== "");
                     const parsed = [];
                     for (let i = 0; i < lines.length; i += 2) {
-                        parsed.push({ 
-                            question: lines[i]?.trim() || "", 
-                            answer: lines[i + 1]?.trim() || "" 
+                        parsed.push({
+                            question: lines[i]?.trim() || "",
+                            answer: lines[i + 1]?.trim() || ""
                         });
                     }
                     return parsed;

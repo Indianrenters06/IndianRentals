@@ -2,5 +2,5 @@
 import KYCManagement from "../page";
 
 export default function ReviewKYC() {
-    return <KYCManagement initialFilter="pending" />;
+    return <KYCManagement initialFilter="under review" />;
 }

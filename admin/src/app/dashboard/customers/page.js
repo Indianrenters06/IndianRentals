@@ -4,7 +4,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import {
     MagnifyingGlass, Funnel, DownloadSimple, PencilSimple, Trash,
-    Phone, MapPin, DotsThreeVertical,
+    Phone, MapPin, DotsThreeVertical, EnvelopeSimple,
     UserPlus, ShieldCheck, User, Key, CheckCircle,
     ProhibitInset, LockOpen, ToggleLeft, ToggleRight, Warning
 } from '@phosphor-icons/react';
@@ -40,6 +40,7 @@ export default function CustomersManagement() {
     const [filterRole, setFilterRole] = useState('all');
     const [page, setPage] = useState(1);
     const rowsPerPage = 10;
+    const [sortDescriptor, setSortDescriptor] = useState({ column: 'createdAt', direction: 'descending' });
     const { isOpen, onOpen, onOpenChange } = useDisclosure();
     const [selectedUser, setSelectedUser] = useState(null);
     const [modalType, setModalType] = useState('profile');
@@ -154,9 +155,9 @@ export default function CustomersManagement() {
     };
 
     const exportCSV = () => {
-        const headers = ["Name,Email,Phone,City,State,Joined\n"];
+        const headers = ["Name,Email,Phone,City,State,Status,Joined\n"];
         const rows = users.map(u =>
-            `${u.name},${u.email},${u.phone || ""},${u.city || ""},${u.state || ""},${new Date(u.createdAt).toLocaleDateString()}`
+            `${u.name},${u.email},${u.phone || ""},${u.city || ""},${u.state || ""},${u.isBlocked ? 'Blocked' : u.isActive ? 'Active' : 'Inactive'},${new Date(u.createdAt).toLocaleDateString()}`
         ).join("\n");
         const blob = new Blob([headers, rows], { type: 'text/csv' });
         const url = window.URL.createObjectURL(blob);
@@ -169,12 +170,35 @@ export default function CustomersManagement() {
         document.body.removeChild(a);
     };
 
+    const downloadUser = (user) => {
+        const content = [
+            `Customer Activity Report`,
+            `Generated: ${new Date().toLocaleString("en-IN")}`,
+            ``,
+            `Name: ${user.name || "N/A"}`,
+            `Email: ${user.email || "N/A"}`,
+            `Phone: ${user.phone || "N/A"}`,
+            `Location: ${user.city ? `${user.city}, ${user.state}` : "N/A"}`,
+            `Status: ${user.isBlocked ? "Blocked" : user.isActive ? "Active" : "Inactive"}`,
+            `Member Since: ${user.createdAt ? new Date(user.createdAt).toLocaleDateString("en-IN") : "N/A"}`,
+        ].join("\n");
+        const blob = new Blob([content], { type: "text/plain" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a"); a.href = url; a.download = `customer_${user.name?.replace(/\s+/g, "_") || "report"}.txt`; a.click();
+    };
+
     const filteredUsers = useMemo(() => {
-        return users.filter(user => {
+        let list = users.filter(user => {
             return user.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
                 user.email?.toLowerCase().includes(searchTerm.toLowerCase());
         });
-    }, [users, searchTerm]);
+        return list.sort((a, b) => {
+            const first = a[sortDescriptor.column];
+            const second = b[sortDescriptor.column];
+            const cmp = first < second ? -1 : first > second ? 1 : 0;
+            return sortDescriptor.direction === 'descending' ? -cmp : cmp;
+        });
+    }, [users, searchTerm, sortDescriptor]);
 
     const items = useMemo(() => {
         const start = (page - 1) * rowsPerPage;
@@ -245,6 +269,10 @@ export default function CustomersManagement() {
             case "actions":
                 return (
                     <div className="flex justify-end items-center gap-2 pr-4">
+                        <button type="button" title="Download Report" onClick={() => downloadUser(user)}
+                            className="inline-flex items-center justify-center w-8 h-8 rounded-lg text-slate-400 hover:text-indigo-500 hover:bg-indigo-50 dark:hover:bg-indigo-500/10 transition-colors">
+                            <DownloadSimple size={15} />
+                        </button>
                         <Dropdown classNames={{ content: "bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 z-50 shadow-xl" }}>
                             <DropdownTrigger>
                                 <Button isIconOnly size="sm" variant="light" className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-300">
@@ -349,6 +377,8 @@ export default function CustomersManagement() {
 
                     <Table
                         aria-label="Customers management table"
+                        sortDescriptor={sortDescriptor}
+                        onSortChange={setSortDescriptor}
                         bottomContent={
                             filteredUsers.length > 0 ? (
                                 <div className="flex w-full justify-between items-center py-4 px-6 border-t border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950/30">
@@ -379,10 +409,10 @@ export default function CustomersManagement() {
                         }}
                     >
                         <TableHeader>
-                            <TableColumn key="user">USER INFO</TableColumn>
-                            <TableColumn key="status">STATUS</TableColumn>
+                            <TableColumn key="user" allowsSorting>USER INFO</TableColumn>
+                            <TableColumn key="status" allowsSorting>STATUS</TableColumn>
                             <TableColumn key="contact">CONTACT & LOCATION</TableColumn>
-                            <TableColumn key="joined">JOINED DATE</TableColumn>
+                            <TableColumn key="joined" allowsSorting>JOINED DATE</TableColumn>
                             <TableColumn key="actions" align="center">ACTIONS</TableColumn>
                         </TableHeader>
                         <TableBody

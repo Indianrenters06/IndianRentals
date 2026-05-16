@@ -23,9 +23,10 @@ const faqs = [
 
 import { API } from '@/services/apiConfig';
 
-const FaqSection = ({ cmsData, limit }) => {
+const FaqSection = ({ cmsData, limit, pageName }) => {
     const [cms, setCms] = useState(cmsData || null);
     const [loading, setLoading] = useState(!cmsData);
+    const [enabled, setEnabled] = useState(true);
 
     useEffect(() => {
         if (cmsData) {
@@ -33,11 +34,27 @@ const FaqSection = ({ cmsData, limit }) => {
             setLoading(false);
             return;
         }
-        window.fetch(`${API}/api/cms/faq?t=${Date.now()}`)
-            .then(res => res.ok ? res.json() : null)
-            .then(data => { setCms(data); setLoading(false); })
+
+        const fetches = [
+            window.fetch(`${API}/api/cms/faq?t=${Date.now()}`).then(res => res.ok ? res.json() : null)
+        ];
+
+        if (pageName) {
+            fetches.push(
+                window.fetch(`${API}/api/cms/${pageName}?t=${Date.now()}`).then(res => res.ok ? res.json() : null)
+            );
+        }
+
+        Promise.all(fetches)
+            .then(([faqData, pageData]) => {
+                setCms(faqData);
+                if (pageData && pageData.faqSectionEnabled === false) {
+                    setEnabled(false);
+                }
+                setLoading(false);
+            })
             .catch(() => setLoading(false));
-    }, [cmsData]);
+    }, [cmsData, pageName]);
 
     let displayFaqs = cms?.faqItems && cms.faqItems.length > 0 ? cms.faqItems : faqs;
     if (limit) {
@@ -62,6 +79,7 @@ const FaqSection = ({ cmsData, limit }) => {
     };
 
     if (loading) return <div className="h-96 w-full animate-pulse bg-slate-50 rounded-3xl" />;
+    if (!enabled) return null;
 
     return (
         <section 
