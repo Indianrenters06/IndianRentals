@@ -1,4 +1,5 @@
 const express = require('express');
+const multer = require('multer');
 const router = express.Router();
 const {
     getProducts,
@@ -7,12 +8,18 @@ const {
     updateProduct,
     deleteProduct,
     createProductReview,
+    uploadProductsBulk,
 } = require('../controllers/productController');
 const { protect, admin } = require('../middleware/authMiddleware');
+
+const upload = multer();
 
 router.route('/')
     .get(getProducts)
     .post(protect, admin, createProduct);
+
+router.route('/bulk')
+    .post(protect, admin, upload.single('file'), uploadProductsBulk);
 
 router.route('/:id/reviews').post(createProductReview);
 
