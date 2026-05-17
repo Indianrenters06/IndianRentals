@@ -249,7 +249,7 @@ export default function AdminLogin() {
                         type="submit"
                         isLoading={isLoading}
                         disabled={isLoading}
-                        className="w-full h-14 bg-indigo-600 hover:bg-indigo-700 text-white shadow-lg shadow-indigo-500/25 font-bold text-lg rounded-xl flex items-center justify-center gap-2 transition-transform hover:scale-[1.02] active:scale-[0.98]"
+                        className="w-full h-14 !bg-indigo-600 hover:!bg-indigo-700 text-white shadow-lg shadow-indigo-500/25 font-bold text-lg rounded-xl flex items-center justify-center gap-2 transition-transform hover:scale-[1.02] active:scale-[0.98]"
                       >
                         {isLoading ? (
                           "Authenticating..."
@@ -300,7 +300,7 @@ export default function AdminLogin() {
                         type="submit"
                         isLoading={isLoading}
                         disabled={isLoading || !!forgotMessage}
-                        className="w-full h-14 bg-indigo-600 hover:bg-indigo-700 text-white shadow-lg shadow-indigo-500/25 font-bold text-lg rounded-xl flex items-center justify-center gap-2 transition-transform hover:scale-[1.02] active:scale-[0.98]"
+                        className="w-full h-14 !bg-indigo-600 hover:!bg-indigo-700 text-white shadow-lg shadow-indigo-500/25 font-bold text-lg rounded-xl flex items-center justify-center gap-2 transition-transform hover:scale-[1.02] active:scale-[0.98]"
                       >
                         {isLoading ? "Sending..." : "Send Reset Link"}
                       </Button>
