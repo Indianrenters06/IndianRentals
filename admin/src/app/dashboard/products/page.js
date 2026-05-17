@@ -15,7 +15,7 @@ import {
 } from "@phosphor-icons/react";
 
 const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
-const FRONTEND = process.env.NEXT_PUBLIC_FRONTEND_URL || "http://localhost:3000";
+const FRONTEND = process.env.NEXT_PUBLIC_FRONTEND_URL || "https://indian-rentals.vercel.app";
 const getToken = () => localStorage.getItem("adminToken");
 
 const getImageUrl = (path) => {
