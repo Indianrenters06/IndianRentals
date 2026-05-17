@@ -6,7 +6,7 @@ import { motion } from "framer-motion";
 import {
     Card, CardBody, Button, Chip, Avatar,
     Dropdown, DropdownTrigger, DropdownMenu, DropdownItem,
-    Spinner,
+    Spinner, Pagination
 } from "@heroui/react";
 import {
     Plus, MagnifyingGlass, DotsThreeVertical,
@@ -32,6 +32,11 @@ export default function AllProducts() {
     const [toggling, setToggling] = useState(null);
     const [search, setSearch] = useState("");
     const [filter, setFilter] = useState("all"); // all | active | draft
+
+    const [page, setPage] = useState(1);
+    const rowsPerPage = 10;
+    const [sortCol, setSortCol] = useState("createdAt");
+    const [sortDir, setSortDir] = useState("descending");
 
     // ── Fetch ─────────────────────────────────────────────────────────────────
     const fetchProducts = useCallback(async () => {
@@ -69,6 +74,23 @@ export default function AllProducts() {
         }
         return list;
     }, [products, search, filter]);
+
+    const sorted = useMemo(() => {
+        return [...visible].sort((a, b) => {
+            let first = a[sortCol];
+            let second = b[sortCol];
+            if (sortCol === 'rentalPrice') {
+                first = Number(first); second = Number(second);
+            }
+            const cmp = first < second ? -1 : first > second ? 1 : 0;
+            return sortDir === 'descending' ? -cmp : cmp;
+        });
+    }, [visible, sortCol, sortDir]);
+
+    const paginated = useMemo(() => {
+        const start = (page - 1) * rowsPerPage;
+        return sorted.slice(start, start + rowsPerPage);
+    }, [sorted, page]);
 
     const totalActive = products.filter(p => p.isActive).length;
     const totalDraft = products.filter(p => !p.isActive).length;
@@ -203,10 +225,10 @@ export default function AllProducts() {
 
                     {/* Column headers */}
                     <div className={`${gridClass} px-6 py-3 bg-slate-50 dark:bg-slate-950/80 border-b border-slate-200 dark:border-slate-800 text-[11px] font-bold uppercase tracking-wider text-slate-400`}>
-                        <span>Product</span>
-                        <span>Category</span>
-                        <span>Price / Deposit</span>
-                        <span>Stock</span>
+                        <button type="button" className="text-left hover:text-indigo-500" onClick={() => { setSortCol('name'); setSortDir(d => d === 'ascending' ? 'descending' : 'ascending')}}>Product {sortCol === 'name' && (sortDir === 'ascending' ? '↑' : '↓')}</button>
+                        <button type="button" className="text-left hover:text-indigo-500" onClick={() => { setSortCol('category'); setSortDir(d => d === 'ascending' ? 'descending' : 'ascending')}}>Category {sortCol === 'category' && (sortDir === 'ascending' ? '↑' : '↓')}</button>
+                        <button type="button" className="text-left hover:text-indigo-500" onClick={() => { setSortCol('rentalPrice'); setSortDir(d => d === 'ascending' ? 'descending' : 'ascending')}}>Price / Deposit {sortCol === 'rentalPrice' && (sortDir === 'ascending' ? '↑' : '↓')}</button>
+                        <button type="button" className="text-left hover:text-indigo-500" onClick={() => { setSortCol('stock'); setSortDir(d => d === 'ascending' ? 'descending' : 'ascending')}}>Stock {sortCol === 'stock' && (sortDir === 'ascending' ? '↑' : '↓')}</button>
                         <span className="text-center">Status</span>
                         <span className="text-center">Actions</span>
                     </div>
@@ -230,7 +252,7 @@ export default function AllProducts() {
                         </div>
                     ) : (
                         <CardBody className="p-0 divide-y divide-slate-100 dark:divide-slate-800/60">
-                            {visible.map((product, i) => (
+                            {paginated.map((product, i) => (
                                 <motion.div
                                     key={product._id}
                                     initial={{ opacity: 0, y: 6 }}
@@ -326,11 +348,22 @@ export default function AllProducts() {
                         </CardBody>
                     )}
 
-                    {/* Footer count */}
+                    {/* Footer count & pagination */}
                     {!loading && visible.length > 0 && (
-                        <div className="px-5 py-3 border-t border-slate-100 dark:border-slate-800 text-xs text-slate-400">
-                            Showing <span className="font-bold text-slate-600 dark:text-slate-300">{visible.length}</span> of {products.length} products
-                            {search && ` · filtered by "${search}"`}
+                        <div className="px-5 py-4 border-t border-slate-100 dark:border-slate-800 flex flex-col sm:flex-row justify-between items-center gap-4">
+                            <span className="text-xs text-slate-400">
+                                Showing <span className="font-bold text-slate-600 dark:text-slate-300">{(page - 1) * rowsPerPage + 1}</span> to <span className="font-bold text-slate-600 dark:text-slate-300">{Math.min(page * rowsPerPage, visible.length)}</span> of {visible.length} products
+                                {search && ` · filtered`}
+                            </span>
+                            <Pagination
+                                isCompact
+                                showControls
+                                showShadow
+                                color="primary"
+                                page={page}
+                                total={Math.ceil(visible.length / rowsPerPage)}
+                                onChange={(p) => setPage(p)}
+                            />
                         </div>
                     )}
                 </Card>

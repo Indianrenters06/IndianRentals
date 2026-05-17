@@ -1,14 +1,18 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import {  useState, useEffect , useMemo } from "react";
 import { motion } from "framer-motion";
-import {
+import { 
     Card, CardBody, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Chip, Button,
     Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, useDisclosure, Textarea, Divider
-} from "@heroui/react";
+, Pagination } from "@heroui/react";
 import { Eye, CheckCircle, WarningCircle, User, IdentificationCard, FileText, Info } from "@phosphor-icons/react";
 
-export default function KYCManagement({ initialFilter }) {
+import { DownloadSimple, MagnifyingGlassPlus, X } from "@phosphor-icons/react";
+
+export default function KYCManagement() {
+    const [statusFilter, setStatusFilter] = useState("all");
+    const [zoomedDoc, setZoomedDoc] = useState(null);
     const [kycRequests, setKycRequests] = useState([]);
     const [loading, setLoading] = useState(true);
     const [selectedKyc, setSelectedKyc] = useState(null);
@@ -40,9 +44,9 @@ export default function KYCManagement({ initialFilter }) {
         fetchKYC();
     }, []);
 
-    const filteredRequests = initialFilter
-        ? kycRequests.filter(req => req.status === initialFilter)
-        : kycRequests;
+    const filteredRequests = statusFilter === "all"
+        ? kycRequests
+        : kycRequests.filter(req => req.status?.toLowerCase() === statusFilter);
 
     if (!isMounted) return null;
 
@@ -78,26 +82,109 @@ export default function KYCManagement({ initialFilter }) {
         }
     };
 
-    return (
-        <div className="w-full space-y-6 pb-12">
+
+    const [page, setPage] = useState(1);
+
+
+    const rowsPerPage = 10;
+
+
+    const [sortDescriptor, setSortDescriptor] = useState({ column: '_id', direction: 'descending' });
+
+
+
+    const sortedItems = useMemo(() => {
+
+
+        if (!Array.isArray(filteredRequests)) return [];
+
+
+        return [...filteredRequests].sort((a, b) => {
+
+
+            const first = a[sortDescriptor.column];
+
+
+            const second = b[sortDescriptor.column];
+
+
+            const cmp = first < second ? -1 : first > second ? 1 : 0;
+
+
+            return sortDescriptor.direction === "descending" ? -cmp : cmp;
+
+
+        });
+
+
+    }, [sortDescriptor, filteredRequests]);
+
+
+
+    const items = useMemo(() => {
+
+
+        const start = (page - 1) * rowsPerPage;
+
+
+        const end = start + rowsPerPage;
+
+
+        return sortedItems.slice(start, end);
+
+
+    }, [page, sortedItems]);
+
+
+
+    return (<div className="w-full space-y-6 pb-12">
             {/* Header */}
             <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
                 <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }}>
                     <h1 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-slate-100 mb-1">
-                        KYC <span className="text-transparent bg-clip-text bg-linear-to-r from-indigo-500 to-purple-500">{initialFilter ? initialFilter.charAt(0).toUpperCase() + initialFilter.slice(1) : "Verification Center"}</span>
+                        KYC <span className="text-transparent bg-clip-text bg-linear-to-r from-indigo-500 to-purple-500">Verification Center</span>
                     </h1>
                     <p className="text-slate-600 dark:text-slate-400">
-                        {initialFilter
-                            ? `Reviewing all ${initialFilter} KYC applications.`
-                            : "Review and approve documentation for platform trust & safety."}
+                        Review and manage all user documentation for platform trust & safety.
                     </p>
                 </motion.div>
+                <div className="flex gap-2 flex-wrap">
+                    {["all", "pending", "review", "approved", "rejected"].map(s => (
+                        <Button
+                            key={s}
+                            size="sm"
+                            variant={statusFilter === s ? "solid" : "flat"}
+                            color={statusFilter === s ? "primary" : "default"}
+                            className="capitalize font-bold"
+                            onPress={() => { setStatusFilter(s); setPage(1); }}
+                        >
+                            {s === "review" ? "Under Review" : s}
+                        </Button>
+                    ))}
+                </div>
             </div>
 
             <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>
                 <Card className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm">
                     <CardBody className="p-0">
                         <Table
+                            sortDescriptor={sortDescriptor}
+                            onSortChange={setSortDescriptor}
+                            bottomContent={
+                                filteredRequests.length > 0 ? (
+                                    <div className="flex w-full justify-center mt-4 mb-4">
+                                        <Pagination
+                                            isCompact
+                                            showControls
+                                            showShadow
+                                            color="primary"
+                                            page={page}
+                                            total={Math.ceil(filteredRequests.length / rowsPerPage)}
+                                            onChange={(page) => setPage(page)}
+                                        />
+                                    </div>
+                                ) : null
+                            }
                             aria-label="KYC Requests Table"
                             classNames={{
                                 wrapper: "p-0 rounded-none shadow-none bg-transparent",
@@ -113,7 +200,7 @@ export default function KYCManagement({ initialFilter }) {
                                 <TableColumn>STATUS</TableColumn>
                                 <TableColumn align="center">ACTIONS</TableColumn>
                             </TableHeader>
-                            <TableBody items={filteredRequests} isLoading={loading} emptyContent={loading ? "Loading requests..." : `No ${initialFilter || ""} KYC requests found.`}>
+                            <TableBody items={items} isLoading={loading} emptyContent={loading ? "Loading requests..." : `No KYC requests found.`}>
                                 {(kyc) => (
                                     <TableRow key={kyc._id}>
                                         <TableCell>
@@ -235,7 +322,7 @@ export default function KYCManagement({ initialFilter }) {
                                                                 <img src={url} alt={key} className="w-full h-full object-cover" />
                                                                 <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center gap-2">
                                                                     <p className="text-white text-xs font-bold uppercase tracking-widest">{key.replace(/([A-Z])/g, ' $1')}</p>
-                                                                    <Button size="sm" color="primary" variant="solid" onPress={() => window.open(url, '_blank')}>View Original</Button>
+                                                                    <Button size="sm" color="primary" variant="solid" startContent={<MagnifyingGlassPlus weight="bold" />} onPress={() => setZoomedDoc(url)}>Zoom & View</Button>
                                                                 </div>
                                                                 <div className="absolute top-2 left-2 px-2 py-1 bg-black/40 backdrop-blur-md rounded-lg text-[10px] text-white font-bold uppercase tracking-tighter">
                                                                     {key.replace(/([A-Z])/g, ' $1')}
@@ -289,6 +376,46 @@ export default function KYCManagement({ initialFilter }) {
                     )}
                 </ModalContent>
             </Modal>
+
+            {/* Document Zoom & Download Overlay */}
+            {zoomedDoc && (
+                <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/90 p-4">
+                    <div className="relative max-w-5xl max-h-screen w-full h-full flex items-center justify-center">
+                        <Button 
+                            isIconOnly 
+                            className="absolute top-4 right-4 bg-white/10 hover:bg-white/20 text-white rounded-full z-50"
+                            onPress={() => setZoomedDoc(null)}
+                        >
+                            <X size={24} weight="bold" />
+                        </Button>
+                        
+                        <img src={zoomedDoc} alt="Zoomed KYC Document" className="max-w-full max-h-[85vh] object-contain rounded-xl shadow-2xl" />
+                        
+                        <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-4">
+                            <Button
+                                size="lg"
+                                className="font-bold bg-indigo-600 text-white shadow-lg"
+                                startContent={<DownloadSimple weight="bold" />}
+                                onPress={async () => {
+                                    try {
+                                        const response = await fetch(zoomedDoc);
+                                        const blob = await response.blob();
+                                        const fileUrl = window.URL.createObjectURL(blob);
+                                        const alink = document.createElement('a');
+                                        alink.href = fileUrl;
+                                        alink.download = "KYC_Document.jpg";
+                                        alink.click();
+                                    } catch (e) {
+                                        window.open(zoomedDoc, '_blank');
+                                    }
+                                }}
+                            >
+                                Download Document
+                            </Button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }
