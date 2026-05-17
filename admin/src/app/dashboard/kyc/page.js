@@ -157,7 +157,7 @@ export default function KYCManagement() {
                         color="primary"
                         variant="underlined"
                         classNames={{
-                            tabList: "gap-6 w-full relative rounded-none p-0 border-b border-divider",
+                            tabList: "gap-6 w-full relative rounded-none p-0 border-b border-slate-200 dark:border-slate-800 bg-transparent",
                             cursor: "w-full bg-indigo-500",
                             tab: "max-w-fit px-0 h-12",
                             tabContent: "group-data-[selected=true]:text-indigo-600 font-semibold"
