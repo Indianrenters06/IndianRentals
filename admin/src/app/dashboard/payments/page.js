@@ -59,7 +59,7 @@ export default function AllTransactions() {
                 </motion.div>
                 <div className="flex items-center gap-3">
                     {!loading && <div className="inline-flex items-center gap-2 bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-500/20 rounded-full px-3 py-1.5 font-bold text-sm">₹{total.toLocaleString("en-IN")} Collected</div>}
-                    <button type="button" onClick={exportCSV} className="inline-flex items-center gap-2 h-10 px-4 rounded-xl border border-indigo-500 text-indigo-600 dark:text-indigo-400 font-bold text-sm hover:bg-indigo-50 dark:hover:bg-indigo-500/10 transition-colors">
+                    <button type="button" onClick={exportCSV} className="inline-flex items-center gap-2 h-10 px-4 rounded-xl border border-indigo-500 text-indigo-600 dark:text-indigo-400 font-bold text-sm hover:!bg-indigo-50 dark:hover:!bg-indigo-500/10 transition-colors">
                         <DownloadSimple size={15} />
                         Export CSV
                     </button>

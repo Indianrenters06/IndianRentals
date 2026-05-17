@@ -153,7 +153,7 @@ export default function AddonsManagement() {
                 <Button 
                     color="primary" 
                     variant="shadow" 
-                    className="h-12 px-8 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-sm shadow-lg shadow-indigo-500/30 transition-all" 
+                    className="h-12 px-8 rounded-xl !bg-indigo-600 hover:!bg-indigo-700 text-white font-bold text-sm shadow-lg shadow-indigo-500/30 transition-all" 
                     startContent={<PlusCircle weight="bold" size={20} />}
                     onClick={() => handleOpenModal("add")}
                 >
@@ -383,7 +383,7 @@ export default function AddonsManagement() {
                             <ModalFooter className="py-4 px-6">
                                 <Button variant="light" onPress={onClose} className="font-semibold">Cancel</Button>
                                 <Button 
-                                    className="h-12 px-10 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-sm shadow-lg shadow-indigo-500/30 transition-all" 
+                                    className="h-12 px-10 rounded-xl !bg-indigo-600 hover:!bg-indigo-700 text-white font-bold text-sm shadow-lg shadow-indigo-500/30 transition-all" 
                                     type="submit" 
                                     isLoading={isSubmitting}
                                     variant="shadow"

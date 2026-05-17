@@ -238,7 +238,7 @@ export default function UserWallet() {
                             </ModalBody>
                             <ModalFooter className="px-6 pb-6 pt-0">
                                 <Button variant="flat" onPress={onClose} className="font-bold">Cancel</Button>
-                                <Button color="primary" isLoading={adding} onPress={handleAddCredit} className="bg-indigo-600 font-bold">
+                                <Button color="primary" isLoading={adding} onPress={handleAddCredit} className="!bg-indigo-600 font-bold">
                                     Add Credit
                                 </Button>
                             </ModalFooter>

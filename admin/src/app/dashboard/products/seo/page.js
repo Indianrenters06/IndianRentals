@@ -288,7 +288,7 @@ export default function SEOManagement() {
                                     color="primary"
                                     onPress={handleSaveSEO}
                                     isLoading={isSaving}
-                                    className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-10 rounded-2xl shadow-xl shadow-indigo-500/40 transition-all"
+                                    className="!bg-indigo-600 hover:!bg-indigo-700 text-white font-bold px-10 rounded-2xl shadow-xl shadow-indigo-500/40 transition-all"
                                     startContent={!isSaving && <FloppyDisk size={18} weight="bold" />}
                                 >
                                     Save SEO Data

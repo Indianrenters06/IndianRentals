@@ -124,7 +124,7 @@ export default function PricingPlans() {
 
                 <Button 
                     onPress={onOpen}
-                    className="h-12 px-8 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-sm shadow-lg shadow-indigo-500/30 transition-all" 
+                    className="h-12 px-8 rounded-xl !bg-indigo-600 hover:!bg-indigo-700 text-white font-bold text-sm shadow-lg shadow-indigo-500/30 transition-all" 
                     startContent={<Plus weight="bold" size={20} />}
                 >
                     Create Plan
@@ -145,7 +145,7 @@ export default function PricingPlans() {
                         <p className="text-slate-500 max-w-sm mb-8">Click the "Create Plan" button to start defining your rental durations and base pricing rates.</p>
                         <Button 
                             onPress={onOpen}
-                            className="h-11 px-8 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-sm shadow-lg shadow-indigo-500/30 transition-all" 
+                            className="h-11 px-8 rounded-xl !bg-indigo-600 hover:!bg-indigo-700 text-white font-bold text-sm shadow-lg shadow-indigo-500/30 transition-all" 
                             startContent={<Plus weight="bold" size={18} />}
                         >
                             Get Started
@@ -286,7 +286,7 @@ export default function PricingPlans() {
                                     color="primary" 
                                     onPress={handleCreate}
                                     isLoading={isSubmitting}
-                                    className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-8 rounded-xl shadow-lg shadow-indigo-500/30"
+                                    className="!bg-indigo-600 hover:!bg-indigo-700 text-white font-bold px-8 rounded-xl shadow-lg shadow-indigo-500/30"
                                 >
                                     Create Plan
                                 </Button>

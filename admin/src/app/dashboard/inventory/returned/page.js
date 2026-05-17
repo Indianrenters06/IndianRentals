@@ -228,7 +228,7 @@ export default function ReturnedInventory() {
                                                     <Button
                                                         size="sm"
                                                         isLoading={processing[item._id]}
-                                                        className="font-bold h-9 px-6 rounded-xl bg-indigo-600 text-white shadow-md border-none"
+                                                        className="font-bold h-9 px-6 rounded-xl !bg-indigo-600 text-white shadow-md border-none"
                                                         startContent={!processing[item._id] && <ArrowsClockwise weight="bold" />}
                                                         onPress={() => handleProcess(item._id)}
                                                     >

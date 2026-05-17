@@ -154,7 +154,7 @@ export default function AboutCMSPage() {
                         </span>
                     )}
                     <button onClick={save} disabled={saving}
-                        className="flex items-center gap-2 h-10 px-5 rounded-xl bg-indigo-600 hover:bg-indigo-700 disabled:opacity-60 text-white font-semibold text-sm shadow-lg shadow-indigo-500/20 transition-all">
+                        className="flex items-center gap-2 h-10 px-5 rounded-xl !bg-indigo-600 hover:!bg-indigo-700 disabled:opacity-60 text-white font-semibold text-sm shadow-lg shadow-indigo-500/20 transition-all">
                         {saving ? <Spinner size="sm" color="white" /> : <FloppyDisk size={15} weight="bold" />} Save All
                     </button>
                 </div>
@@ -302,7 +302,7 @@ export default function AboutCMSPage() {
             {/* Save button at bottom */}
             <div className="flex justify-end pt-4 border-t border-slate-200 dark:border-slate-800">
                 <button onClick={save} disabled={saving}
-                    className="flex items-center gap-2 h-11 px-8 rounded-xl bg-indigo-600 hover:bg-indigo-700 disabled:opacity-60 text-white font-bold text-sm shadow-lg shadow-indigo-500/20 transition-all">
+                    className="flex items-center gap-2 h-11 px-8 rounded-xl !bg-indigo-600 hover:!bg-indigo-700 disabled:opacity-60 text-white font-bold text-sm shadow-lg shadow-indigo-500/20 transition-all">
                     {saving ? <Spinner size="sm" color="white" /> : <FloppyDisk size={16} weight="bold" />}
                     {saving ? 'Saving…' : 'Save All Changes'}
                 </button>

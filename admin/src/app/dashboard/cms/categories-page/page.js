@@ -157,7 +157,7 @@ export default function CategoriesPageCMS() {
                         </span>
                     )}
                     <button onClick={save} disabled={saving}
-                        className="flex items-center gap-2 h-10 px-5 rounded-xl bg-indigo-600 hover:bg-indigo-700 disabled:opacity-60 text-white font-semibold text-sm shadow-lg shadow-indigo-500/20 transition-all">
+                        className="flex items-center gap-2 h-10 px-5 rounded-xl !bg-indigo-600 hover:!bg-indigo-700 disabled:opacity-60 text-white font-semibold text-sm shadow-lg shadow-indigo-500/20 transition-all">
                         {saving ? <Spinner size="sm" color="white" /> : <FloppyDisk size={15} weight="bold" />} Save Page
                     </button>
                 </div>
@@ -254,7 +254,7 @@ export default function CategoriesPageCMS() {
                                     ))}
                                 </AnimatePresence>
                                 <button onClick={addCard}
-                                    className="w-full py-4 border-2 border-dashed border-indigo-200 dark:border-indigo-500/30 rounded-xl flex items-center justify-center gap-2 text-indigo-500 hover:bg-indigo-50 dark:hover:bg-indigo-500/10 transition-all font-semibold text-sm">
+                                    className="w-full py-4 border-2 border-dashed border-indigo-200 dark:border-indigo-500/30 rounded-xl flex items-center justify-center gap-2 text-indigo-500 hover:!bg-indigo-50 dark:hover:!bg-indigo-500/10 transition-all font-semibold text-sm">
                                     <Plus size={18} weight="bold" /> Add Category Card
                                 </button>
                             </div>

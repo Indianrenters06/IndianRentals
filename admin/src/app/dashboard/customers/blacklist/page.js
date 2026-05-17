@@ -88,7 +88,7 @@ export default function BlacklistManagement() {
                             {blacklist.length} Blacklisted
                         </div>
                     )}
-                    <button type="button" onClick={onOpen} className="inline-flex items-center gap-2 h-10 px-5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-semibold text-sm shadow-lg shadow-rose-500/25 transition-all">
+                    <button type="button" onClick={onOpen} className="inline-flex items-center gap-2 h-10 px-5 rounded-xl !bg-rose-600 hover:!bg-rose-700 text-white font-semibold text-sm shadow-lg shadow-rose-500/25 transition-all">
                         <ShieldSlash weight="bold" size={15} /> Add to Blacklist
                     </button>
                 </div>
@@ -182,7 +182,7 @@ export default function BlacklistManagement() {
                             </ModalBody>
                             <ModalFooter className="px-6 pb-6 pt-0">
                                 <Button variant="flat" onPress={onClose} className="font-bold">Cancel</Button>
-                                <button type="button" onClick={handleAdd} className="inline-flex items-center gap-2 h-10 px-5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-bold text-sm transition-all">
+                                <button type="button" onClick={handleAdd} className="inline-flex items-center gap-2 h-10 px-5 rounded-xl !bg-rose-600 hover:!bg-rose-700 text-white font-bold text-sm transition-all">
                                     <ShieldSlash weight="bold" size={15} /> Blacklist
                                 </button>
                             </ModalFooter>

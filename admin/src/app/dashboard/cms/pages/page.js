@@ -57,7 +57,7 @@ const Field = ({ label, value, onChange, placeholder, rows, type = 'text' }) => 
 // ── HTML Toolbar Button ────────────────────────────────────────────────────────
 const ToolBtn = ({ icon, title, onClick, active }) => (
     <button type="button" title={title} onClick={onClick}
-        className={`w-8 h-8 rounded-lg flex items-center justify-center text-sm transition-all ${active ? 'bg-indigo-100 dark:bg-indigo-500/20 text-indigo-600 dark:text-indigo-400' : 'text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-700 hover:text-slate-800 dark:hover:text-slate-200'}`}>
+        className={`w-8 h-8 rounded-lg flex items-center justify-center text-sm transition-all ${active ? 'bg-indigo-100 dark:!bg-indigo-500/20 text-indigo-600 dark:text-indigo-400' : 'text-slate-500 hover:!bg-slate-100 dark:hover:!bg-slate-700 hover:text-slate-800 dark:hover:text-slate-200'}`}>
         {icon}
     </button>
 );
@@ -236,7 +236,7 @@ function PageEditor({ page, onBack }) {
             {/* Sub-header */}
             <div className="flex items-center justify-between flex-wrap gap-3">
                 <div className="flex items-center gap-3">
-                    <button onClick={onBack} className="w-9 h-9 rounded-xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-500 hover:bg-slate-200 dark:hover:bg-slate-700 transition-all">
+                    <button onClick={onBack} className="w-9 h-9 rounded-xl !bg-slate-100 dark:!bg-slate-800 flex items-center justify-center text-slate-500 hover:!bg-slate-200 dark:hover:!bg-slate-700 transition-all">
                         <ArrowLeft size={18} />
                     </button>
                     <div>
@@ -260,7 +260,7 @@ function PageEditor({ page, onBack }) {
                         {data.publishStatus === 'published' ? 'Live' : 'Draft'}
                     </Chip>
                     <button onClick={save} disabled={saving}
-                        className="flex items-center gap-2 h-9 px-4 rounded-xl bg-indigo-600 hover:bg-indigo-700 disabled:opacity-60 text-white font-semibold text-sm shadow-lg shadow-indigo-500/20 transition-all">
+                        className="flex items-center gap-2 h-9 px-4 rounded-xl !bg-indigo-600 hover:!bg-indigo-700 disabled:opacity-60 text-white font-semibold text-sm shadow-lg shadow-indigo-500/20 transition-all">
                         {saving ? <Spinner size="sm" color="white" /> : <FloppyDisk size={15} weight="bold" />} Save
                     </button>
                 </div>

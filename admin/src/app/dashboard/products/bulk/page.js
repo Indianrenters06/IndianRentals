@@ -194,7 +194,7 @@ export default function BulkUpload() {
 
                                     <div className="flex gap-4">
                                         <Button
-                                            className="h-12 px-10 rounded-xl font-bold bg-indigo-600 hover:bg-indigo-700 text-white shadow-lg shadow-indigo-500/30 transition-all"
+                                            className="h-12 px-10 rounded-xl font-bold !bg-indigo-600 hover:!bg-indigo-700 text-white shadow-lg shadow-indigo-500/30 transition-all"
                                             isLoading={uploadingProducts}
                                             onPress={() => csvFileRef.current.click()}
                                         >
@@ -258,7 +258,7 @@ export default function BulkUpload() {
                                     <Button 
                                         onPress={handleDownloadTemplate} 
                                         fullWidth 
-                                        className="mt-4 h-11 rounded-xl font-bold bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-100 dark:hover:bg-indigo-500/20 transition-all"
+                                        className="mt-4 h-11 rounded-xl font-bold !bg-indigo-50 dark:!bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 hover:!bg-indigo-100 dark:hover:!bg-indigo-500/20 transition-all"
                                         startContent={<DownloadSimple weight="bold" size={18} />}
                                     >
                                         Download CSV Template
@@ -288,7 +288,7 @@ export default function BulkUpload() {
 
                                     <input type="file" multiple accept="image/*" ref={imageFileRef} className="hidden" onChange={handleImageUpload} />
                                     <Button
-                                        className="w-full h-12 rounded-xl font-bold bg-purple-600 hover:bg-purple-700 text-white shadow-lg shadow-purple-500/30 transition-all"
+                                        className="w-full h-12 rounded-xl font-bold !bg-purple-600 hover:!bg-purple-700 text-white shadow-lg shadow-purple-500/30 transition-all"
                                         isLoading={uploadingImages}
                                         onPress={() => imageFileRef.current.click()}
                                         startContent={<CloudArrowUp weight="bold" size={20} />}

@@ -251,7 +251,7 @@ export default function AdminDashboard() {
           <Button
             color="primary"
             variant="shadow"
-            className="rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold shadow-lg shadow-indigo-500/30 h-12 px-8 transition-all"
+            className="rounded-xl !bg-indigo-600 hover:!bg-indigo-700 text-white font-bold shadow-lg shadow-indigo-500/30 h-12 px-8 transition-all"
             onPress={() => window.location.href = '/dashboard/orders'}
           >
             + New Order
@@ -434,7 +434,7 @@ export default function AdminDashboard() {
                 size="sm" 
                 variant="flat" 
                 color="primary" 
-                className="font-medium bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400"
+                className="font-medium !bg-indigo-50 dark:!bg-indigo-500/10 text-indigo-600 dark:text-indigo-400"
                 onPress={() => router.push("/dashboard/orders")}
               >
                 View All

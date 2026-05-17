@@ -138,7 +138,7 @@ export default function InventoryAlerts() {
                         color="primary"
                         variant="flat"
                         radius="xl"
-                        className="font-bold h-11 px-6 bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-500/30"
+                        className="font-bold h-11 px-6 !bg-indigo-50 dark:!bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-500/30"
                         startContent={<ShoppingCart weight="bold" />}
                     >
                         Alert Thresholds
@@ -316,7 +316,7 @@ export default function InventoryAlerts() {
                                     color="success"
                                     isLoading={submitting}
                                     onPress={handleReorderSubmit}
-                                    className="h-11 px-8 rounded-xl bg-emerald-600 text-white font-bold shadow-lg shadow-emerald-500/30"
+                                    className="h-11 px-8 rounded-xl !bg-emerald-600 text-white font-bold shadow-lg shadow-emerald-500/30"
                                     startContent={!submitting && <CheckCircle weight="bold" />}
                                 >
                                     Confirm Order

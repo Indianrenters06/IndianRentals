@@ -142,13 +142,13 @@ export default function ActiveCoupons() {
                     <p className="text-slate-600 dark:text-slate-400">Create, manage, and monitor discount coupons for your customers.</p>
                 </motion.div>
                 <div className="flex items-center gap-3">
-                    <button type="button" onClick={fetchCoupons} className="inline-flex items-center justify-center w-9 h-9 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-500 hover:text-indigo-500 transition-colors">
+                    <button type="button" onClick={fetchCoupons} className="inline-flex items-center justify-center w-9 h-9 rounded-xl !bg-slate-100 dark:!bg-slate-800 text-slate-500 hover:text-indigo-500 transition-colors">
                         <ArrowClockwise size={16} />
                     </button>
                     <div className="inline-flex items-center gap-2 bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-500/20 rounded-full px-3 py-1.5 font-bold text-sm">
                         {coupons.filter(c => c.isActive && !isExpired(c.expiryDate)).length} Active
                     </div>
-                    <button type="button" onClick={onOpen} className="inline-flex items-center gap-2 h-12 px-8 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-sm shadow-lg shadow-indigo-500/30 transition-all">
+                    <button type="button" onClick={onOpen} className="inline-flex items-center gap-2 h-12 px-8 rounded-xl !bg-indigo-600 hover:!bg-indigo-700 text-white font-bold text-sm shadow-lg shadow-indigo-500/30 transition-all">
                         <Plus weight="bold" size={18} />
                         Create Coupon
                     </button>
@@ -359,7 +359,7 @@ export default function ActiveCoupons() {
                             </ModalBody>
                             <ModalFooter className="px-6 pb-6 pt-0">
                                 <Button variant="flat" onPress={onClose} className="font-bold">Cancel</Button>
-                                <button type="button" disabled={saving} onClick={handleCreate} className="inline-flex items-center gap-2 h-11 px-8 rounded-xl bg-indigo-600 hover:bg-indigo-700 disabled:opacity-60 text-white font-bold text-sm shadow-lg shadow-indigo-500/30 transition-all">
+                                <button type="button" disabled={saving} onClick={handleCreate} className="inline-flex items-center gap-2 h-11 px-8 rounded-xl !bg-indigo-600 hover:!bg-indigo-700 disabled:opacity-60 text-white font-bold text-sm shadow-lg shadow-indigo-500/30 transition-all">
                                     {saving ? (
                                         <Spinner size="sm" color="white" />
                                     ) : (

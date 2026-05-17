@@ -129,7 +129,7 @@ export default function LayoutCMSPage() {
                 <button
                     onClick={handleSave}
                     disabled={saving}
-                    className="bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2.5 rounded-xl text-sm font-bold tracking-wide transition-all shadow-sm hover:shadow-md flex items-center gap-2 disabled:opacity-50"
+                    className="!bg-indigo-600 hover:!bg-indigo-700 text-white px-5 py-2.5 rounded-xl text-sm font-bold tracking-wide transition-all shadow-sm hover:shadow-md flex items-center gap-2 disabled:opacity-50"
                 >
                     <FloppyDisk weight="bold" className="w-4 h-4" />
                     {saving ? 'Saving...' : 'Save Layout'}

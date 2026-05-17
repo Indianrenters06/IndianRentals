@@ -448,7 +448,7 @@ export default function SubcategoriesManagement() {
                 <Button
                     color="primary"
                     variant="shadow"
-                    className="h-12 px-8 rounded-xl font-bold bg-indigo-600 hover:bg-indigo-700 text-white shadow-lg shadow-indigo-500/30 transition-all"
+                    className="h-12 px-8 rounded-xl font-bold !bg-indigo-600 hover:!bg-indigo-700 text-white shadow-lg shadow-indigo-500/30 transition-all"
                     onPress={() => {
                         if (!selectedParent) {
                             addToast("Please select a parent category first.", "error");

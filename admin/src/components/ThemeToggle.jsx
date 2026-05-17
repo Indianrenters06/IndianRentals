@@ -23,7 +23,7 @@ export function ThemeToggle() {
             isIconOnly
             variant="light"
             aria-label="Toggle Theme"
-            className="rounded-full bg-slate-200/50 dark:bg-slate-800/50 text-slate-800 dark:text-slate-200 backdrop-blur-md"
+            className="rounded-full !bg-slate-200/50 dark:!bg-slate-800/50 text-slate-800 dark:text-slate-200 backdrop-blur-md"
             onPress={() => setTheme(theme === "dark" ? "light" : "dark")}
         >
             {theme === "dark" ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}

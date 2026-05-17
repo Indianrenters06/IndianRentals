@@ -109,7 +109,7 @@ export default function StockAdjustment() {
                     <p className="text-slate-600 dark:text-slate-400">Manually adjust inventory levels and track the history of changes.</p>
                 </motion.div>
 
-                <Button color="primary" variant="shadow" className="font-bold bg-indigo-600 shadow-indigo-500/20 px-6" startContent={<Plus weight="bold" />} onPress={onOpen}>
+                <Button color="primary" variant="shadow" className="font-bold !bg-indigo-600 shadow-indigo-500/20 px-6" startContent={<Plus weight="bold" />} onPress={onOpen}>
                     New Adjustment
                 </Button>
             </div>
@@ -275,7 +275,7 @@ export default function StockAdjustment() {
                             </ModalBody>
                             <ModalFooter>
                                 <Button variant="flat" onPress={onClose} className="text-slate-600 dark:text-slate-400">Cancel</Button>
-                                <Button color="primary" isLoading={submitting} onPress={handleSubmit} className="bg-indigo-600 font-bold">
+                                <Button color="primary" isLoading={submitting} onPress={handleSubmit} className="!bg-indigo-600 font-bold">
                                     Apply Adjustment
                                 </Button>
                             </ModalFooter>

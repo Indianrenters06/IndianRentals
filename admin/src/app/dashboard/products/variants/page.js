@@ -112,7 +112,7 @@ export default function VariantsManagement() {
 
                 <Button 
                     onPress={onOpen}
-                    className="h-12 px-8 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-sm shadow-lg shadow-indigo-500/30 transition-all" 
+                    className="h-12 px-8 rounded-xl !bg-indigo-600 hover:!bg-indigo-700 text-white font-bold text-sm shadow-lg shadow-indigo-500/30 transition-all" 
                     startContent={<Plus weight="bold" size={20} />}
                 >
                     Define Type
@@ -226,7 +226,7 @@ export default function VariantsManagement() {
                                     color="primary" 
                                     onPress={handleCreate}
                                     isLoading={isSubmitting}
-                                    className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-8 rounded-xl shadow-lg shadow-indigo-500/30"
+                                    className="!bg-indigo-600 hover:!bg-indigo-700 text-white font-bold px-8 rounded-xl shadow-lg shadow-indigo-500/30"
                                 >
                                     Define Variant
                                 </Button>

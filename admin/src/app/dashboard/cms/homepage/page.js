@@ -56,10 +56,7 @@ const SectionRow = ({ icon, title, desc, toggle, onToggle }) => (
 const TabBtn = ({ icon, label, active, onClick }) => (
     <button
         onClick={onClick}
-        className={`flex items-center gap-2 px-4 py-2.5 text-sm font-semibold rounded-xl transition-all whitespace-nowrap ${active
-            ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-500/25'
-            : 'text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
-            }`}
+        className={`flex items-center gap-2 px-4 py-2.5 text-sm font-semibold rounded-xl transition-all whitespace-nowrap ${active ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-500/25' : 'text-slate-500 dark:text-slate-400 hover:!bg-slate-100 dark:hover:!bg-slate-800' }`}
     >
         {icon} {label}
     </button>
@@ -359,7 +356,7 @@ export default function CMSHomepage() {
                         </span>
                     )}
                     <button onClick={handleSave} disabled={saving}
-                        className="flex items-center gap-2 h-10 px-6 rounded-xl bg-indigo-600 hover:bg-indigo-700 disabled:opacity-60 text-white font-semibold text-sm shadow-lg shadow-indigo-500/25 transition-all">
+                        className="flex items-center gap-2 h-10 px-6 rounded-xl !bg-indigo-600 hover:!bg-indigo-700 disabled:opacity-60 text-white font-semibold text-sm shadow-lg shadow-indigo-500/25 transition-all">
                         {saving ? <Spinner size="sm" color="white" /> : <FloppyDisk size={18} weight="bold" />}
                         {saving ? "Publishing…" : "Publish Changes"}
                     </button>

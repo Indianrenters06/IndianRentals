@@ -107,7 +107,7 @@ export default function UserPayments() {
                             ₹{totalPaid.toLocaleString("en-IN")} Collected
                         </Chip>
                     )}
-                    <button type="button" onClick={exportCSV} className="inline-flex items-center gap-2 h-10 px-4 rounded-xl border border-indigo-500 text-indigo-600 dark:text-indigo-400 font-bold text-sm hover:bg-indigo-50 dark:hover:bg-indigo-500/10 transition-colors">
+                    <button type="button" onClick={exportCSV} className="inline-flex items-center gap-2 h-10 px-4 rounded-xl border border-indigo-500 text-indigo-600 dark:text-indigo-400 font-bold text-sm hover:!bg-indigo-50 dark:hover:!bg-indigo-500/10 transition-colors">
                         <DownloadSimple size={15} /> Export Report
                     </button>
                 </div>

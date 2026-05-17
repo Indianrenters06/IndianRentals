@@ -403,7 +403,7 @@ export default function DashboardLayout({ children }) {
         <div className="mt-auto px-4 py-2 border-t border-slate-200 dark:border-slate-800/60 bg-slate-50 dark:bg-slate-950/40">
           <button
             onClick={handleLogout}
-            className="w-full flex items-center px-4 py-3 text-slate-500 dark:text-slate-400 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-xl transition-colors text-sm font-bold tracking-wide"
+            className="w-full flex items-center px-4 py-3 text-slate-500 dark:text-slate-400 hover:text-red-600 dark:hover:text-red-400 hover:!bg-red-50 dark:hover:!bg-red-500/10 rounded-xl transition-colors text-sm font-bold tracking-wide"
           >
             <SignOut className="w-5 h-5 mr-3" />
             Sign Out
@@ -446,7 +446,7 @@ export default function DashboardLayout({ children }) {
               }}
             >
               <DropdownTrigger>
-                <button className="relative p-2 text-slate-400 hover:text-slate-200 hover:bg-slate-800/80 rounded-xl transition-all">
+                <button className="relative p-2 text-slate-400 hover:text-slate-200 hover:!bg-slate-800/80 rounded-xl transition-all">
                   <Bell className="w-5 h-5" />
                   {unreadCount > 0 && (
                     <span className="absolute top-1 right-1 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 border-2 border-slate-900 text-[9px] font-bold text-white">

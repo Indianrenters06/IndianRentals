@@ -251,7 +251,7 @@ export default function CreateCoupon() {
                                 <Button
                                     type="submit"
                                     color="primary"
-                                    className="w-full h-12 rounded-xl font-bold text-sm bg-indigo-600 shadow-lg shadow-indigo-500/20"
+                                    className="w-full h-12 rounded-xl font-bold text-sm !bg-indigo-600 shadow-lg shadow-indigo-500/20"
                                     isLoading={loading}
                                     startContent={!loading && <Ticket weight="bold" />}
                                 >

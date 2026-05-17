@@ -92,7 +92,7 @@ function PageConfigEditor({ onBack }) {
         <motion.div initial={{ opacity: 0, x: 24 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -24 }} className="space-y-6">
             <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                    <button onClick={onBack} className="w-9 h-9 rounded-xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-500 hover:bg-slate-200 dark:hover:bg-slate-700 transition-all">
+                    <button onClick={onBack} className="w-9 h-9 rounded-xl !bg-slate-100 dark:!bg-slate-800 flex items-center justify-center text-slate-500 hover:!bg-slate-200 dark:hover:!bg-slate-700 transition-all">
                         <ArrowLeft size={18} />
                     </button>
                     <h2 className="text-xl font-bold text-slate-900 dark:text-slate-100">
@@ -108,7 +108,7 @@ function PageConfigEditor({ onBack }) {
                     <button 
                         onClick={handleSave} 
                         disabled={saving} 
-                        className="flex items-center gap-2 h-11 px-6 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-sm shadow-lg shadow-indigo-500/30 transition-all"
+                        className="flex items-center gap-2 h-11 px-6 rounded-xl !bg-indigo-600 hover:!bg-indigo-700 text-white font-bold text-sm shadow-lg shadow-indigo-500/30 transition-all"
                     >
                         {saving ? <Spinner size="sm" color="white" /> : <FloppyDisk size={16} weight="bold" />} Save Config
                     </button>
@@ -162,7 +162,7 @@ function PostEditor({ post, onBack, onSaved }) {
             {/* Sub-header */}
             <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                    <button onClick={onBack} className="w-9 h-9 rounded-xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-500 hover:bg-slate-200 dark:hover:bg-slate-700 transition-all">
+                    <button onClick={onBack} className="w-9 h-9 rounded-xl !bg-slate-100 dark:!bg-slate-800 flex items-center justify-center text-slate-500 hover:!bg-slate-200 dark:hover:!bg-slate-700 transition-all">
                         <ArrowLeft size={18} />
                     </button>
                     <h2 className="text-xl font-bold text-slate-900 dark:text-slate-100">
@@ -180,7 +180,7 @@ function PostEditor({ post, onBack, onSaved }) {
                         {form.status === "published" ? "Switch to Draft" : "Publish"}
                     </button>
                     <button onClick={handleSave} disabled={saving}
-                        className="flex items-center gap-1.5 h-9 px-4 rounded-xl bg-indigo-600 hover:bg-indigo-700 disabled:opacity-60 text-white font-bold text-sm shadow-lg shadow-indigo-500/20 transition-all">
+                        className="flex items-center gap-1.5 h-9 px-4 rounded-xl !bg-indigo-600 hover:!bg-indigo-700 disabled:opacity-60 text-white font-bold text-sm shadow-lg shadow-indigo-500/20 transition-all">
                         {saving ? <Spinner size="sm" color="white" /> : <FloppyDisk size={14} weight="bold" />} Save
                     </button>
                 </div>

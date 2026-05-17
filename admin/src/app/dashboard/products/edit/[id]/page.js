@@ -215,7 +215,7 @@ export default function EditProduct() {
                 <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }}>
                     <Button
                         variant="light"
-                        className="mb-2 text-slate-500 dark:text-slate-400 p-0 hover:bg-transparent hover:text-indigo-500"
+                        className="mb-2 text-slate-500 dark:text-slate-400 p-0 hover:!bg-transparent hover:text-indigo-500"
                         startContent={<ArrowLeft />}
                         onPress={() => router.push("/dashboard/products")}
                     >

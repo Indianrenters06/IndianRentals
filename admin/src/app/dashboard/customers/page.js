@@ -331,14 +331,14 @@ export default function CustomersManagement() {
                     <p className="text-slate-600 dark:text-slate-400">Complete directory of all registered customers.</p>
                 </motion.div>
                 <div className="flex flex-wrap items-center gap-3">
-                    <button type="button" onClick={exportCSV} className="inline-flex items-center gap-2 h-10 px-4 rounded-xl border border-slate-300 dark:border-slate-700 text-indigo-600 dark:text-indigo-400 font-semibold text-sm bg-indigo-50 dark:bg-indigo-500/10 hover:border-indigo-400 transition-colors">
+                    <button type="button" onClick={exportCSV} className="inline-flex items-center gap-2 h-10 px-4 rounded-xl border border-slate-300 dark:border-slate-700 text-indigo-600 dark:text-indigo-400 font-semibold text-sm !bg-indigo-50 dark:!bg-indigo-500/10 hover:border-indigo-400 transition-colors">
                         <DownloadSimple className="w-4 h-4" />
                         Export CSV
                     </button>
                     <button
                         type="button"
                         onClick={onAddOpen}
-                        className="inline-flex items-center gap-2 h-12 px-8 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-sm shadow-lg shadow-indigo-500/30 transition-all"
+                        className="inline-flex items-center gap-2 h-12 px-8 rounded-xl !bg-indigo-600 hover:!bg-indigo-700 text-white font-bold text-sm shadow-lg shadow-indigo-500/30 transition-all"
                     >
                         <UserPlus className="w-5 h-5" weight="bold" />
                         Add New Customer
@@ -679,7 +679,7 @@ export default function CustomersManagement() {
                                     type="submit"
                                     isLoading={isSubmitting}
                                     variant="shadow"
-                                    className="h-12 px-10 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-sm shadow-lg shadow-indigo-500/30 transition-all"
+                                    className="h-12 px-10 rounded-xl !bg-indigo-600 hover:!bg-indigo-700 text-white font-bold text-sm shadow-lg shadow-indigo-500/30 transition-all"
                                 >
                                     Create Customer
                                 </Button>

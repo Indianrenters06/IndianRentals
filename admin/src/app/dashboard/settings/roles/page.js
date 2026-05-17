@@ -136,7 +136,7 @@ export default function RolesPermissionsPage() {
         <Button 
           color="primary" 
           variant="shadow"
-          className="h-12 px-8 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-sm shadow-lg shadow-indigo-500/30 transition-all" 
+          className="h-12 px-8 rounded-xl !bg-indigo-600 hover:!bg-indigo-700 text-white font-bold text-sm shadow-lg shadow-indigo-500/30 transition-all" 
           startContent={<Plus weight="bold" />}
           onPress={onOpen}
         >
@@ -262,7 +262,7 @@ export default function RolesPermissionsPage() {
                   type="submit" 
                   isLoading={isSubmitting} 
                   variant="shadow"
-                  className="h-12 px-10 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-sm shadow-lg shadow-indigo-500/30 transition-all"
+                  className="h-12 px-10 rounded-xl !bg-indigo-600 hover:!bg-indigo-700 text-white font-bold text-sm shadow-lg shadow-indigo-500/30 transition-all"
                 >
                   Create Role
                 </Button>

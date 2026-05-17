@@ -391,7 +391,7 @@ export default function AddProduct() {
                             <button
                                 type="submit"
                                 disabled={loading}
-                                className="inline-flex items-center justify-center gap-2 h-12 px-10 rounded-xl bg-indigo-600 hover:bg-indigo-700 disabled:opacity-60 text-white font-semibold text-sm shadow-lg shadow-indigo-500/30 transition-all"
+                                className="inline-flex items-center justify-center gap-2 h-12 px-10 rounded-xl !bg-indigo-600 hover:!bg-indigo-700 disabled:opacity-60 text-white font-semibold text-sm shadow-lg shadow-indigo-500/30 transition-all"
                             >
                                 {loading ? (
                                     <svg className="animate-spin w-4 h-4" viewBox="0 0 24 24" fill="none">

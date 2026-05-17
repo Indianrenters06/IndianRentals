@@ -135,7 +135,7 @@ export default function KYCManagement({ initialFilter }) {
                                             <div className="flex justify-center items-center gap-2">
                                                 <Button
                                                     size="sm"
-                                                    className="rounded-full font-bold px-6 h-9 bg-indigo-600 text-white shadow-md border-none"
+                                                    className="rounded-full font-bold px-6 h-9 !bg-indigo-600 text-white shadow-md border-none"
                                                     startContent={<Eye weight="bold" />}
                                                     onPress={() => {
                                                         setSelectedKyc(kyc);
@@ -277,7 +277,7 @@ export default function KYCManagement({ initialFilter }) {
                                         </div>
                                         <div className="flex gap-2">
                                             <Button color="danger" variant="flat" className="font-bold px-6 rounded-xl" onPress={() => setModalMode('reject')}>Reject Application</Button>
-                                            <Button color="success" variant="solid" className="font-bold px-8 bg-emerald-600 text-white rounded-xl shadow-lg shadow-emerald-500/20" onPress={() => handleUpdateStatus(selectedKyc._id, 'approved')}>Approve KYC</Button>
+                                            <Button color="success" variant="solid" className="font-bold px-8 !bg-emerald-600 text-white rounded-xl shadow-lg shadow-emerald-500/20" onPress={() => handleUpdateStatus(selectedKyc._id, 'approved')}>Approve KYC</Button>
                                         </div>
                                     </div>
                                 )}
