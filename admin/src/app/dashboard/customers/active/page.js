@@ -151,7 +151,7 @@ export default function ActiveUsers() {
                             bottomContent={sortedItems.length > 0 ? (
                                 <div className="flex w-full justify-between items-center py-4 px-6 border-t border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950/30">
                                     <span className="text-sm text-slate-500">Showing {items.length} of {sortedItems.length} active users</span>
-                                    <Pagination isCompact showControls showShadow color="primary" page={page} total={Math.ceil(sortedItems.length / rowsPerPage)} onChange={setPage} classNames={{ cursor: "bg-indigo-500 shadow-indigo-500/30" }} />
+                                    <Pagination radius="md" variant="flat" showControls  color="primary" page={page} total={Math.ceil(sortedItems.length / rowsPerPage)} onChange={setPage} classNames={{ cursor: "bg-indigo-500 shadow-indigo-500/30" }} />
                                 </div>
                             ) : null}
                             classNames={{ wrapper: "p-0 rounded-none shadow-none bg-transparent", th: "bg-slate-50 dark:bg-slate-950/80 uppercase text-xs font-bold h-12 pt-0 px-6", td: "py-4 px-6 border-b border-slate-100 dark:border-slate-800/50" }}>

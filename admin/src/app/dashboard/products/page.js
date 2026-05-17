@@ -356,9 +356,9 @@ export default function AllProducts() {
                                 {search && ` · filtered`}
                             </span>
                             <Pagination
-                                isCompact
+                                radius="md" variant="flat"
                                 showControls
-                                showShadow
+                                
                                 color="primary"
                                 page={page}
                                 total={Math.ceil(visible.length / rowsPerPage)}

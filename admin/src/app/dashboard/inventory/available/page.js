@@ -126,9 +126,9 @@ export default function AvailableStock() {
                                             Showing {items.length} of {sortedItems.length} products
                                         </span>
                                         <Pagination
-                                            isCompact
+                                            radius="md" variant="flat"
                                             showControls
-                                            showShadow
+                                            
                                             color="primary"
                                             page={page}
                                             total={Math.ceil(sortedItems.length / rowsPerPage)}

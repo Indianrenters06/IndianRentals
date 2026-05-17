@@ -183,9 +183,9 @@ export default function KYCManagement() {
                                 filteredRequests.length > 0 ? (
                                     <div className="flex w-full justify-center mt-4 mb-4">
                                         <Pagination
-                                            isCompact
+                                            radius="md" variant="flat"
                                             showControls
-                                            showShadow
+                                            
                                             color="primary"
                                             page={page}
                                             total={Math.ceil(filteredRequests.length / rowsPerPage)}

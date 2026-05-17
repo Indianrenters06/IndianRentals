@@ -195,9 +195,9 @@ export default function AssignedInventory() {
                                             Showing {items.length} of {sortedItems.length} active assignments
                                         </span>
                                         <Pagination
-                                            isCompact
+                                            radius="md" variant="flat"
                                             showControls
-                                            showShadow
+                                            
                                             color="primary"
                                             page={page}
                                             total={Math.ceil(sortedItems.length / rowsPerPage)}

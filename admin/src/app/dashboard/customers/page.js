@@ -386,9 +386,9 @@ export default function CustomersManagement() {
                                         Showing {filteredUsers.length} total customers
                                     </span>
                                     <Pagination
-                                        isCompact
+                                        radius="md" variant="flat"
                                         showControls
-                                        showShadow
+                                        
                                         color="primary"
                                         page={page}
                                         total={Math.ceil(filteredUsers.length / rowsPerPage)}

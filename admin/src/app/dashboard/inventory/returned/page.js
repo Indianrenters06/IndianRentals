@@ -175,9 +175,9 @@ export default function ReturnedInventory() {
                                             Showing {items.length} of {sortedItems.length} returns
                                         </span>
                                         <Pagination
-                                            isCompact
+                                            radius="md" variant="flat"
                                             showControls
-                                            showShadow
+                                            
                                             color="primary"
                                             page={page}
                                             total={Math.ceil(sortedItems.length / rowsPerPage)}
