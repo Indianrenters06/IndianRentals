@@ -149,7 +149,7 @@ export default function KYCManagement() {
                         Review and manage all user documentation for platform trust & safety.
                     </p>
                 </motion.div>
-                <div className="flex items-center gap-8 border-b border-slate-200 dark:border-slate-800 w-full md:w-auto overflow-x-auto">
+                <div className="flex items-center gap-8 border-b border-slate-200 dark:border-slate-800 w-full md:w-auto overflow-x-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
                     {["all", "pending", "review", "approved", "rejected"].map(s => {
                         const isActive = statusFilter === s;
                         return (
@@ -196,7 +196,7 @@ export default function KYCManagement() {
                             }
                             aria-label="KYC Requests Table"
                             classNames={{
-                                wrapper: "p-0 rounded-none shadow-none bg-transparent",
+                                wrapper: "p-0 rounded-none shadow-none bg-transparent [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]",
                                 thead: "bg-slate-50 dark:bg-slate-950/80",
                                 th: "text-slate-500 font-semibold uppercase text-xs py-4 px-6 border-b border-slate-200 dark:border-slate-800",
                                 td: "py-4 px-6 border-b border-slate-100 dark:border-slate-800/50"
