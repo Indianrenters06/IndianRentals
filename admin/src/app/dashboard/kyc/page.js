@@ -48,7 +48,6 @@ export default function KYCManagement() {
         ? kycRequests
         : kycRequests.filter(req => req.status?.toLowerCase() === statusFilter);
 
-    if (!isMounted) return null;
 
     const handleUpdateStatus = async (id, status) => {
         try {
@@ -136,6 +135,8 @@ export default function KYCManagement() {
     }, [page, sortedItems]);
 
 
+
+    if (!isMounted) return null;
 
     return (<div className="w-full space-y-6 pb-12">
             {/* Header */}
