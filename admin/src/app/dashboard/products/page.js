@@ -11,7 +11,7 @@ import {
 import {
     Plus, MagnifyingGlass, DotsThreeVertical,
     PencilSimple, Trash, Eye, CheckCircle, Package,
-    ArrowClockwise, FunnelSimple
+    ArrowClockwise, FunnelSimple, UploadSimple, DownloadSimple, X, CloudArrowUp, WarningCircle
 } from "@phosphor-icons/react";
 
 const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
@@ -33,6 +33,12 @@ export default function AllProducts() {
     const [search, setSearch] = useState("");
     const [filter, setFilter] = useState("all"); // all | active | draft
 
+    const [isBulkOpen, setIsBulkOpen] = useState(false);
+    const [bulkFile, setBulkFile] = useState(null);
+    const [uploadingBulk, setUploadingBulk] = useState(false);
+    const [bulkResult, setBulkResult] = useState(null);
+    const [bulkError, setBulkError] = useState("");
+
     const [page, setPage] = useState(1);
     const rowsPerPage = 10;
     const [sortCol, setSortCol] = useState("createdAt");
@@ -51,13 +57,60 @@ export default function AllProducts() {
             }
         } catch (err) {
             console.error("Network Fetch Error:", err);
-            // Fallback or empty state
             setProducts([]);
         }
         finally { setLoading(false); }
     }, []);
 
     useEffect(() => { fetchProducts(); }, [fetchProducts]);
+
+    const handleBulkUpload = async (e) => {
+        e.preventDefault();
+        if (!bulkFile) {
+            setBulkError("Please choose a CSV file first.");
+            return;
+        }
+        try {
+            setUploadingBulk(true);
+            setBulkError("");
+            setBulkResult(null);
+
+            const formData = new FormData();
+            formData.append("file", bulkFile);
+
+            const res = await fetch(`${API}/api/products/bulk`, {
+                method: "POST",
+                headers: {
+                    Authorization: `Bearer ${getToken()}`
+                },
+                body: formData
+            });
+
+            const data = await res.json();
+            if (res.ok) {
+                setBulkResult(data);
+                fetchProducts();
+            } else {
+                setBulkError(data.message || "Failed to process bulk upload");
+            }
+        } catch (err) {
+            setBulkError(err.message || "Something went wrong.");
+        } finally {
+            setUploadingBulk(false);
+        }
+    };
+
+    const downloadSampleCSV = () => {
+        const headers = "Name,Description,Category,Brand,RentalPrice,SecurityDeposit,Stock,Condition,City,State,MRP,DeliveryTime,Benefits,Images";
+        const sampleRow = "\"Premium Laptop\",\"Latest model high-speed gaming laptop\",\"Electronics\",\"BrandX\",\"1500\",\"5000\",\"10\",\"New\",\"Bangalore\",\"Karnataka\",\"75000\",\"2-3 days\",\"Free Delivery,1 Year Warranty\",\"https://images.unsplash.com/photo-1517336714731-489689fd1ca8\"";
+        const csvContent = "data:text/csv;charset=utf-8," + encodeURIComponent(headers + "\n" + sampleRow);
+        const link = document.createElement("a");
+        link.setAttribute("href", csvContent);
+        link.setAttribute("download", "indian_rentals_products_sample.csv");
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    };
 
     // ── Filtered view ─────────────────────────────────────────────────────────
     const visible = useMemo(() => {
@@ -156,6 +209,19 @@ export default function AllProducts() {
                     >
                         <ArrowClockwise size={16} />
                     </Button>
+                    <button
+                        type="button"
+                        onClick={() => {
+                            setIsBulkOpen(true);
+                            setBulkFile(null);
+                            setBulkResult(null);
+                            setBulkError("");
+                        }}
+                        className="inline-flex items-center gap-2 h-12 px-6 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:border-indigo-500 text-slate-700 dark:text-slate-200 font-bold text-sm shadow-sm transition-all"
+                    >
+                        <UploadSimple weight="bold" size={18} />
+                        Bulk Upload
+                    </button>
                     <button
                         type="button"
                         onClick={() => router.push("/dashboard/products/add")}
@@ -368,6 +434,163 @@ export default function AllProducts() {
                     )}
                 </Card>
             </motion.div>
+            {/* ── Bulk Upload Modal ── */}
+            {isBulkOpen && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-fade-in">
+                    <motion.div 
+                        initial={{ scale: 0.95, opacity: 0 }} 
+                        animate={{ scale: 1, opacity: 1 }}
+                        exit={{ scale: 0.95, opacity: 0 }}
+                        className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl w-full max-w-lg shadow-2xl overflow-hidden flex flex-col max-h-[90vh]"
+                    >
+                        {/* Header */}
+                        <div className="p-6 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between">
+                            <div>
+                                <h3 className="text-xl font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2">
+                                    <CloudArrowUp size={24} className="text-indigo-600" />
+                                    Bulk Upload Products
+                                </h3>
+                                <p className="text-slate-500 text-xs mt-1">Upload multiple products at once via CSV file.</p>
+                            </div>
+                            <button 
+                                onClick={() => setIsBulkOpen(false)}
+                                className="p-2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
+                            >
+                                <X size={20} />
+                            </button>
+                        </div>
+
+                        {/* Content */}
+                        <div className="p-6 overflow-y-auto space-y-6 flex-1 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+                            {/* Step 1: Download Sample */}
+                            <div className="bg-slate-50 dark:bg-slate-800/40 p-4 rounded-2xl border border-slate-200/50 dark:border-slate-700/30 flex items-center justify-between gap-4">
+                                <div className="min-w-0">
+                                    <p className="text-sm font-semibold text-slate-900 dark:text-slate-100">Need the template format?</p>
+                                    <p className="text-xs text-slate-500 truncate">Download our sample CSV to format your records correctly.</p>
+                                </div>
+                                <button
+                                    type="button"
+                                    onClick={downloadSampleCSV}
+                                    className="inline-flex items-center gap-1.5 h-10 px-4 rounded-xl bg-indigo-550 hover:bg-indigo-100 dark:bg-indigo-500/10 dark:hover:bg-indigo-500/20 text-indigo-600 dark:text-indigo-400 font-bold text-xs shrink-0 transition-all"
+                                >
+                                    <DownloadSimple weight="bold" size={16} />
+                                    Download CSV
+                                </button>
+                            </div>
+
+                            {/* Step 2: Upload Dropzone */}
+                            {!bulkResult && (
+                                <form onSubmit={handleBulkUpload} className="space-y-4">
+                                    <div className="relative group border-2 border-dashed border-slate-200 dark:border-slate-800 hover:border-indigo-500 rounded-2xl p-8 flex flex-col items-center justify-center gap-2 cursor-pointer transition-all bg-white dark:bg-slate-950/40">
+                                        <input
+                                            type="file"
+                                            accept=".csv"
+                                            onChange={(e) => setBulkFile(e.target.files[0])}
+                                            className="absolute inset-0 opacity-0 cursor-pointer z-10"
+                                        />
+                                        <CloudArrowUp size={40} className="text-slate-400 group-hover:text-indigo-500 transition-colors" />
+                                        {bulkFile ? (
+                                            <div className="text-center">
+                                                <p className="text-sm font-semibold text-indigo-600 dark:text-indigo-400 truncate max-w-[300px]">{bulkFile.name}</p>
+                                                <p className="text-[10px] text-slate-400 font-mono mt-0.5">{(bulkFile.size / 1024).toFixed(2)} KB</p>
+                                            </div>
+                                        ) : (
+                                            <div className="text-center">
+                                                <p className="text-sm font-semibold text-slate-700 dark:text-slate-300">Click to upload or drag & drop</p>
+                                                <p className="text-[10px] text-slate-400 mt-0.5">Supports CSV files only</p>
+                                            </div>
+                                        )}
+                                    </div>
+
+                                    {bulkError && (
+                                        <div className="p-3 bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/20 rounded-xl text-red-600 dark:text-red-400 text-xs flex items-center gap-2">
+                                            <WarningCircle size={16} className="shrink-0" />
+                                            <p className="font-semibold">{bulkError}</p>
+                                        </div>
+                                    )}
+
+                                    <div className="flex gap-3 justify-end pt-2">
+                                        <button
+                                            type="button"
+                                            onClick={() => setIsBulkOpen(false)}
+                                            className="h-11 px-5 rounded-xl border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300 font-bold text-xs transition-colors"
+                                        >
+                                            Cancel
+                                        </button>
+                                        <button
+                                            type="submit"
+                                            disabled={uploadingBulk || !bulkFile}
+                                            className="h-11 px-6 rounded-xl bg-indigo-600 hover:bg-indigo-700 disabled:opacity-40 text-white font-bold text-xs shadow-md shadow-indigo-500/10 transition-all flex items-center justify-center gap-2 min-w-[120px]"
+                                        >
+                                            {uploadingBulk ? (
+                                                <>
+                                                    <Spinner size="sm" color="white" />
+                                                    Processing...
+                                                </>
+                                            ) : (
+                                                "Upload and Process"
+                                            )}
+                                        </button>
+                                    </div>
+                                </form>
+                            )}
+
+                            {/* Step 3: Result Summary */}
+                            {bulkResult && (
+                                <div className="space-y-4 animate-fade-in">
+                                    <div className="grid grid-cols-2 gap-3">
+                                        <div className="bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-100 dark:border-emerald-500/20 p-4 rounded-2xl text-center">
+                                            <p className="text-3xl font-black text-emerald-600 dark:text-emerald-400">{bulkResult.successCount}</p>
+                                            <p className="text-[10px] font-bold text-emerald-500 uppercase tracking-wide mt-1">Successfully Uploaded</p>
+                                        </div>
+                                        <div className="bg-amber-50 dark:bg-amber-500/10 border border-amber-100 dark:border-amber-500/20 p-4 rounded-2xl text-center">
+                                            <p className="text-3xl font-black text-amber-600 dark:text-amber-400">{bulkResult.failCount}</p>
+                                            <p className="text-[10px] font-bold text-amber-500 uppercase tracking-wide mt-1">Failed Records</p>
+                                        </div>
+                                    </div>
+
+                                    {bulkResult.failCount > 0 && (
+                                        <div className="border border-slate-200 dark:border-slate-800 rounded-2xl overflow-hidden">
+                                            <div className="bg-slate-50 dark:bg-slate-950 px-4 py-2 border-b border-slate-200 dark:border-slate-800 text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+                                                Errors Report
+                                            </div>
+                                            <div className="divide-y divide-slate-100 dark:divide-slate-800 max-h-[180px] overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+                                                {bulkResult.failed.map((fail, index) => (
+                                                    <div key={index} className="p-3 text-[11px] flex flex-col gap-0.5">
+                                                        <span className="font-bold text-amber-600 dark:text-amber-400">Row {fail.rowNum}</span>
+                                                        <span className="text-slate-600 dark:text-slate-400 font-medium">{fail.error}</span>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    <div className="flex gap-3 justify-end pt-2">
+                                        <button
+                                            type="button"
+                                            onClick={() => {
+                                                setBulkFile(null);
+                                                setBulkResult(null);
+                                                setBulkError("");
+                                            }}
+                                            className="h-11 px-5 rounded-xl border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300 font-bold text-xs transition-colors"
+                                        >
+                                            Upload Another
+                                        </button>
+                                        <button
+                                            type="button"
+                                            onClick={() => setIsBulkOpen(false)}
+                                            className="h-11 px-6 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs shadow-md shadow-indigo-500/10 transition-colors"
+                                        >
+                                            Close
+                                        </button>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                    </motion.div>
+                </div>
+            )}
         </div>
     );
 }
