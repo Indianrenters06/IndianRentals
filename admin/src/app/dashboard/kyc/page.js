@@ -149,20 +149,27 @@ export default function KYCManagement() {
                         Review and manage all user documentation for platform trust & safety.
                     </p>
                 </motion.div>
-                <div className="flex gap-2">
-                    <Tabs
-                        aria-label="KYC Status Filter"
-                        selectedKey={statusFilter}
-                        onSelectionChange={(key) => { setStatusFilter(key); setPage(1); }}
-                        color="primary"
-                        variant="underlined"
-                    >
-                        <Tab key="all" title="All Requests" />
-                        <Tab key="pending" title="Pending" />
-                        <Tab key="review" title="Under Review" />
-                        <Tab key="approved" title="Approved" />
-                        <Tab key="rejected" title="Rejected" />
-                    </Tabs>
+                <div className="flex items-center gap-8 border-b border-slate-200 dark:border-slate-800 w-full md:w-auto overflow-x-auto">
+                    {["all", "pending", "review", "approved", "rejected"].map(s => {
+                        const isActive = statusFilter === s;
+                        return (
+                            <button
+                                key={s}
+                                onClick={() => { setStatusFilter(s); setPage(1); }}
+                                className={`pb-3 text-sm font-bold capitalize relative whitespace-nowrap transition-colors ${
+                                    isActive ? "text-indigo-600 dark:text-indigo-400" : "text-slate-500 hover:text-slate-800 dark:hover:text-slate-200"
+                                }`}
+                            >
+                                {s === "review" ? "Under Review" : s === "all" ? "All Requests" : s}
+                                {isActive && (
+                                    <motion.div
+                                        layoutId="activeKycTab"
+                                        className="absolute -bottom-[1px] left-0 right-0 h-[2px] bg-indigo-600 dark:bg-indigo-400"
+                                    />
+                                )}
+                            </button>
+                        );
+                    })}
                 </div>
             </div>
 
