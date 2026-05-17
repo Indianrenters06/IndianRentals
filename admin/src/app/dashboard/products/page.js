@@ -15,7 +15,7 @@ import {
 } from "@phosphor-icons/react";
 
 const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
-const FRONTEND = process.env.NEXT_PUBLIC_FRONTEND_URL || "http://localhost:3001";
+const FRONTEND = process.env.NEXT_PUBLIC_FRONTEND_URL || "http://localhost:3000";
 const getToken = () => localStorage.getItem("adminToken");
 
 const getImageUrl = (path) => {
@@ -298,7 +298,7 @@ export default function AllProducts() {
                                         <button
                                             type="button"
                                             title="View on Site"
-                                            onClick={() => window.open(`${process.env.NEXT_PUBLIC_FRONTEND_URL || "http://localhost:3000"}/products/${product._id}`, "_blank")}
+                                            onClick={() => window.open(`${FRONTEND}/products/${product._id}`, "_blank")}
                                             className="inline-flex items-center justify-center w-8 h-8 rounded-lg text-slate-400 hover:text-indigo-500 hover:bg-indigo-50 dark:hover:bg-indigo-500/10 transition-colors"
                                         >
                                             <Eye size={15} />
