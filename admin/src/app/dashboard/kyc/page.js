@@ -4,8 +4,8 @@ import {  useState, useEffect , useMemo } from "react";
 import { motion } from "framer-motion";
 import { 
     Card, CardBody, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Chip, Button,
-    Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, useDisclosure, Textarea, Divider
-, Pagination } from "@heroui/react";
+    Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, useDisclosure, Textarea, Divider,
+    Pagination, Tabs, Tab } from "@heroui/react";
 import { Eye, CheckCircle, WarningCircle, User, IdentificationCard, FileText, Info } from "@phosphor-icons/react";
 
 import { DownloadSimple, MagnifyingGlassPlus, X } from "@phosphor-icons/react";
@@ -149,19 +149,26 @@ export default function KYCManagement() {
                         Review and manage all user documentation for platform trust & safety.
                     </p>
                 </motion.div>
-                <div className="flex gap-2 flex-wrap">
-                    {["all", "pending", "review", "approved", "rejected"].map(s => (
-                        <Button
-                            key={s}
-                            size="sm"
-                            variant={statusFilter === s ? "solid" : "flat"}
-                            color={statusFilter === s ? "primary" : "default"}
-                            className="capitalize font-bold"
-                            onPress={() => { setStatusFilter(s); setPage(1); }}
-                        >
-                            {s === "review" ? "Under Review" : s}
-                        </Button>
-                    ))}
+                <div className="flex gap-2">
+                    <Tabs
+                        aria-label="KYC Status Filter"
+                        selectedKey={statusFilter}
+                        onSelectionChange={(key) => { setStatusFilter(key); setPage(1); }}
+                        color="primary"
+                        variant="underlined"
+                        classNames={{
+                            tabList: "gap-6 w-full relative rounded-none p-0 border-b border-divider",
+                            cursor: "w-full bg-indigo-500",
+                            tab: "max-w-fit px-0 h-12",
+                            tabContent: "group-data-[selected=true]:text-indigo-600 font-semibold"
+                        }}
+                    >
+                        <Tab key="all" title="All Requests" />
+                        <Tab key="pending" title="Pending" />
+                        <Tab key="review" title="Under Review" />
+                        <Tab key="approved" title="Approved" />
+                        <Tab key="rejected" title="Rejected" />
+                    </Tabs>
                 </div>
             </div>
 
@@ -223,8 +230,10 @@ export default function KYCManagement() {
                                             <div className="flex justify-center items-center gap-2">
                                                 <Button
                                                     size="sm"
-                                                    className="rounded-full font-bold px-6 h-9 !bg-indigo-600 text-white shadow-md border-none"
-                                                    startContent={<Eye weight="bold" />}
+                                                    variant="flat"
+                                                    color="primary"
+                                                    className="font-bold bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 rounded-lg h-8 px-4"
+                                                    startContent={<Eye weight="bold" size={14} />}
                                                     onPress={() => {
                                                         setSelectedKyc(kyc);
                                                         setModalMode("view");
