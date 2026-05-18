@@ -254,7 +254,7 @@ export default function KYCManagement() {
             </motion.div>
 
             {/* Verification Modal */}
-            <Modal size="4xl" isOpen={isOpen} onOpenChange={onClose} scrollBehavior="inside"
+            <Modal size="4xl" isOpen={isOpen} onOpenChange={onClose} scrollBehavior="inside" backdrop="blur"
                 classNames={{
                     base: "bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800",
                     header: "border-b border-slate-200 dark:border-slate-800",
@@ -390,7 +390,7 @@ export default function KYCManagement() {
 
             {/* Document Zoom & Download Overlay */}
             {zoomedDoc && (
-                <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/90 p-4">
+                <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/90 backdrop-blur-sm p-4">
                     <div className="relative max-w-5xl max-h-screen w-full h-full flex items-center justify-center">
                         <Button 
                             isIconOnly 

@@ -179,7 +179,6 @@ export default function DashboardLayout({ children }) {
       submenu: [
         { name: 'Homepage', path: '/dashboard/cms/homepage' },
         { name: 'Global Layout', path: '/dashboard/cms/layout' },
-        { name: 'About Us', path: '/dashboard/cms/about' },
         { name: 'Blog', path: '/dashboard/cms/blog' },
         { name: 'Categories Page', path: '/dashboard/cms/categories-page' },
         { name: '🖼️ Category Images', path: '/dashboard/cms/category-images' },
