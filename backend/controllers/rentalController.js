@@ -1,6 +1,7 @@
 const asyncHandler = require('express-async-handler');
 const Rental = require('../models/Rental');
 const Product = require('../models/Product');
+const Coupon = require('../models/Coupon');
 const { RENTAL_STATUS } = require('../config/constants');
 const { createNotification } = require('./notificationController');
 
@@ -15,6 +16,8 @@ const addRentalItems = asyncHandler(async (req, res) => {
         itemsPrice,
         taxPrice,
         shippingPrice,
+        couponCode,
+        couponDiscount,
         totalPrice,
         rentalPeriod,
     } = req.body;
@@ -31,11 +34,21 @@ const addRentalItems = asyncHandler(async (req, res) => {
             itemsPrice,
             taxPrice,
             shippingPrice,
+            couponCode,
+            couponDiscount,
             totalPrice,
             rentalPeriod,
         });
 
         const createdRental = await rental.save();
+
+        if (couponCode) {
+            const coupon = await Coupon.findOne({ code: couponCode });
+            if (coupon) {
+                coupon.usageCount = (coupon.usageCount || 0) + 1;
+                await coupon.save();
+            }
+        }
 
         await createNotification({
             title: 'New Rental Order',

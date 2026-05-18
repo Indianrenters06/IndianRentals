@@ -51,7 +51,7 @@ const INDIAN_STATES = Object.keys(STATE_CITY_MAP).sort();
 export default function KYCPage() {
     const router = useRouter();
     const totals = useSelector(selectCartTotals);
-    const { securityAmount, deliveryCharges, monthlyRentTotal, totalGST, totalOneTime, payToday, savedAmount } = totals;
+    const { securityAmount, deliveryCharges, monthlyRentTotal, totalGST, totalOneTime, payToday, savedAmount, couponDiscount, couponCode } = totals;
 
     const [customerType, setCustomerType] = useState('Customer');
     const [currentStep, setCurrentStep] = useState(1);
@@ -863,6 +863,8 @@ export default function KYCPage() {
                                 totalOneTime={totalOneTime}
                                 payToday={payToday}
                                 savedAmount={savedAmount}
+                                couponDiscount={couponDiscount}
+                                couponCode={couponCode}
                                 paymentConfirmed={true}
                                 showButton={false}
                             />

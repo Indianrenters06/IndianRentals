@@ -300,24 +300,27 @@ export default function KYCManagement() {
                                                     <User size={16} /> Personal Information
                                                 </h4>
                                                 <div className="grid grid-cols-1 gap-3">
-                                                    <div className="bg-slate-50 dark:bg-slate-950/20 p-3 rounded-xl border border-slate-100 dark:border-slate-800">
-                                                        <p className="text-xs text-slate-400 mb-1">Full Name (on Document)</p>
-                                                        <p className="text-sm font-semibold">{selectedKyc.personalDetails?.fullName || "Not provided"}</p>
-                                                    </div>
-                                                    <div className="bg-slate-50 dark:bg-slate-950/20 p-3 rounded-xl border border-slate-100 dark:border-slate-800">
-                                                        <p className="text-xs text-slate-400 mb-1">Date of Birth</p>
-                                                        <p className="text-sm font-semibold">{selectedKyc.personalDetails?.dob || "Not provided"}</p>
-                                                    </div>
-                                                    <div className="bg-slate-50 dark:bg-slate-950/20 p-3 rounded-xl border border-slate-100 dark:border-slate-800">
-                                                        <p className="text-xs text-slate-400 mb-1">Document Type</p>
-                                                        <p className="text-sm font-semibold flex items-center gap-2">
-                                                            <IdentificationCard weight="bold" /> {selectedKyc.personalDetails?.idType || "Not provided"}
-                                                        </p>
-                                                    </div>
-                                                    <div className="bg-slate-50 dark:bg-slate-950/20 p-3 rounded-xl border border-slate-100 dark:border-slate-800">
-                                                        <p className="text-xs text-slate-400 mb-1">Document ID Number</p>
-                                                        <p className="text-sm font-mono font-bold tracking-wider">{selectedKyc.personalDetails?.idNumber || "Not provided"}</p>
-                                                    </div>
+                                                    {[
+                                                        { label: 'Full Name', val: selectedKyc.personalDetails?.name || selectedKyc.personalDetails?.fullName },
+                                                        { label: 'Email', val: selectedKyc.personalDetails?.email },
+                                                        { label: 'Phone', val: selectedKyc.personalDetails?.phone },
+                                                        { label: 'Father / Guardian', val: selectedKyc.personalDetails?.fatherName },
+                                                        { label: 'Father Phone', val: selectedKyc.personalDetails?.fatherPhone },
+                                                        { label: 'Date of Birth', val: selectedKyc.personalDetails?.dob },
+                                                        { label: 'Address', val: selectedKyc.personalDetails?.address || selectedKyc.personalDetails?.permanentAddress },
+                                                        { label: 'City / State', val: [selectedKyc.personalDetails?.city, selectedKyc.personalDetails?.state].filter(Boolean).join(', ') },
+                                                        { label: 'Pincode', val: selectedKyc.personalDetails?.pincode },
+                                                        { label: 'ID Type', val: selectedKyc.personalDetails?.idType },
+                                                        { label: 'ID Number', val: selectedKyc.personalDetails?.idNumber },
+                                                    ].map(({ label, val }) => val ? (
+                                                        <div key={label} className="bg-slate-50 dark:bg-slate-950/20 p-3 rounded-xl border border-slate-100 dark:border-slate-800">
+                                                            <p className="text-xs text-slate-400 mb-0.5">{label}</p>
+                                                            <p className="text-sm font-semibold">{val}</p>
+                                                        </div>
+                                                    ) : null)}
+                                                    {!selectedKyc.personalDetails?.name && !selectedKyc.personalDetails?.fullName && (
+                                                        <p className="text-xs text-slate-400 italic">No personal details submitted yet.</p>
+                                                    )}
                                                 </div>
                                             </div>
 
@@ -327,20 +330,44 @@ export default function KYCManagement() {
                                                     <FileText size={16} /> Verification Documents
                                                 </h4>
                                                 <div className="grid grid-cols-1 gap-4">
-                                                    {Object.entries(selectedKyc.documents || {}).map(([key, url]) => (
-                                                        url && (
+                                                    {Object.entries(selectedKyc.documents || {}).filter(([, url]) => url && url.startsWith('http')).length === 0 && (
+                                                        <p className="text-xs text-slate-400 italic">No documents uploaded yet.</p>
+                                                    )}
+                                                    {Object.entries(selectedKyc.documents || {}).map(([key, url]) => {
+                                                        if (!url || !url.startsWith('http')) return null;
+                                                        const isPDF = url.toLowerCase().includes('.pdf') || url.includes('/raw/');
+                                                        const label = key.replace(/([A-Z])/g, ' $1').replace(/^./, s => s.toUpperCase());
+                                                        return isPDF ? (
+                                                            // PDF: show a card with open link
+                                                            <div key={key} className="flex items-center justify-between p-4 rounded-2xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900">
+                                                                <div className="flex items-center gap-3">
+                                                                    <div className="w-10 h-10 rounded-xl bg-red-50 dark:bg-red-500/10 flex items-center justify-center">
+                                                                        <FileText size={20} className="text-red-500" weight="fill" />
+                                                                    </div>
+                                                                    <div>
+                                                                        <p className="text-sm font-bold text-slate-800 dark:text-slate-100">{label}</p>
+                                                                        <p className="text-[10px] text-slate-400">PDF Document</p>
+                                                                    </div>
+                                                                </div>
+                                                                <a href={url} target="_blank" rel="noopener noreferrer"
+                                                                    className="flex items-center gap-1.5 text-xs font-bold text-indigo-600 dark:text-indigo-400 hover:underline px-3 py-1.5 bg-indigo-50 dark:bg-indigo-500/10 rounded-lg">
+                                                                    Open PDF
+                                                                </a>
+                                                            </div>
+                                                        ) : (
+                                                            // Image: show thumbnail with zoom
                                                             <div key={key} className="group relative rounded-2xl overflow-hidden border border-slate-200 dark:border-slate-800 bg-slate-100 dark:bg-slate-950 aspect-video">
-                                                                <img src={url} alt={key} className="w-full h-full object-cover" />
+                                                                <img src={url} alt={label} className="w-full h-full object-cover" />
                                                                 <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center gap-2">
-                                                                    <p className="text-white text-xs font-bold uppercase tracking-widest">{key.replace(/([A-Z])/g, ' $1')}</p>
+                                                                    <p className="text-white text-xs font-bold uppercase tracking-widest">{label}</p>
                                                                     <Button size="sm" color="primary" variant="solid" startContent={<MagnifyingGlassPlus weight="bold" />} onPress={() => setZoomedDoc(url)}>Zoom & View</Button>
                                                                 </div>
                                                                 <div className="absolute top-2 left-2 px-2 py-1 bg-black/40 backdrop-blur-md rounded-lg text-[10px] text-white font-bold uppercase tracking-tighter">
-                                                                    {key.replace(/([A-Z])/g, ' $1')}
+                                                                    {label}
                                                                 </div>
                                                             </div>
-                                                        )
-                                                    ))}
+                                                        );
+                                                    })}
                                                 </div>
                                             </div>
                                         </div>

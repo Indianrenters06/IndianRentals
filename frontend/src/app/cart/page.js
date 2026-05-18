@@ -6,15 +6,16 @@ import Link from 'next/link';
 import { RiDeleteBin6Line } from 'react-icons/ri';
 import { HiOutlineSparkles } from 'react-icons/hi';
 import { BsCheckCircleFill, BsCreditCard } from 'react-icons/bs';
-import { FaArrowRight } from 'react-icons/fa';
+import { FaArrowRight, FaSpinner } from 'react-icons/fa';
 import { IoIosArrowDown } from "react-icons/io";
 import { AiOutlineClose } from "react-icons/ai";
 import { ShoppingCartSimple } from '@phosphor-icons/react';
 
 import { useRouter } from 'next/navigation';
 import { useSelector, useDispatch } from 'react-redux';
-import { selectCartItems, selectCartTotals, updateCartItem, removeFromCart } from '../../redux/features/cartSlice';
+import { selectCartItems, selectCartTotals, updateCartItem, removeFromCart, setCoupon, removeCoupon } from '../../redux/features/cartSlice';
 import OrderSummary from '../../components/OrderSummary';
+import { API_BASE_URL } from '../../services/apiConfig';
 
 const CartItem = ({ item, onUpdate, onRemove }) => {
     const [isDurationOpen, setIsDurationOpen] = useState(false);
@@ -136,13 +137,44 @@ export default function CartPage() {
     const router = useRouter();
     const cartItems = useSelector(selectCartItems);
     const totals = useSelector(selectCartTotals);
-    const { securityAmount, deliveryCharges, monthlyRentTotal, totalGST, totalOneTime, payToday, savedAmount } = totals;
+    const { securityAmount, deliveryCharges, monthlyRentTotal, totalGST, totalOneTime, payToday, savedAmount, couponDiscount, couponCode: appliedCouponCode } = totals;
 
-    const [couponCode, setCouponCode] = useState('');
-    const [isCouponApplied, setIsCouponApplied] = useState(false);
+    const [couponCode, setCouponCodeInput] = useState('');
+    const [couponError, setCouponError] = useState('');
+    const [couponLoading, setCouponLoading] = useState(false);
 
-    const handleApplyCoupon = () => { if (couponCode.trim()) setIsCouponApplied(true); };
-    const handleRemoveCoupon = () => { setIsCouponApplied(false); setCouponCode(''); };
+    const handleApplyCoupon = async () => {
+        const code = couponCode.trim();
+        if (!code) return;
+        setCouponError('');
+        setCouponLoading(true);
+        try {
+            const userInfo = JSON.parse(localStorage.getItem('userInfo') || '{}');
+            const token = userInfo?.token;
+            const res = await fetch(`${API_BASE_URL}/api/coupons/verify`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    ...(token ? { Authorization: `Bearer ${token}` } : {}),
+                },
+                body: JSON.stringify({ code, orderAmount: payToday }),
+            });
+            const data = await res.json();
+            if (!res.ok) throw new Error(data.message || 'Invalid coupon');
+            dispatch(setCoupon({ code: data.code, discountAmount: data.discountAmount, description: data.description }));
+        } catch (err) {
+            setCouponError(err.message);
+            dispatch(removeCoupon());
+        } finally {
+            setCouponLoading(false);
+        }
+    };
+
+    const handleRemoveCoupon = () => {
+        dispatch(removeCoupon());
+        setCouponCodeInput('');
+        setCouponError('');
+    };
 
     const updateItem = (id, updates) => {
         let finalUpdates = { ...updates };
@@ -236,14 +268,17 @@ export default function CartPage() {
                                     <input
                                         type="text"
                                         placeholder="Enter Your Coupon Code"
-                                        className="flex-1 bg-white border border-[#D3D3D3] rounded-lg px-4 text-sm outline-none focus:border-black transition-colors text-gray-900 font-sans"
+                                        className="flex-1 bg-white border border-[#D3D3D3] rounded-lg px-4 text-sm outline-none focus:border-black transition-colors text-gray-900 font-sans uppercase"
                                         style={{ height: '39px' }}
                                         value={couponCode}
-                                        onChange={(e) => setCouponCode(e.target.value)}
+                                        onChange={(e) => { setCouponCodeInput(e.target.value.toUpperCase()); setCouponError(''); }}
+                                        onKeyDown={(e) => e.key === 'Enter' && handleApplyCoupon()}
+                                        disabled={!!appliedCouponCode}
                                     />
                                     <button
                                         onClick={handleApplyCoupon}
-                                        className="transition-all rounded-xl flex items-center justify-center font-semibold"
+                                        disabled={couponLoading || !!appliedCouponCode}
+                                        className="transition-all rounded-xl flex items-center justify-center font-semibold disabled:opacity-60"
                                         style={{
                                             width: '83px',
                                             height: '39px',
@@ -251,19 +286,23 @@ export default function CartPage() {
                                             color: '#FFFFFF',
                                             padding: '6px 20px',
                                             gap: '2px',
-                                            opacity: 1,
-                                            borderRadius: '12px', // rounded-4xl is very round, image looks more like rounded-xl/2xl
-                                            borderBottom: '1px solid rgba(255,255,255,0.1)',
-                                            boxShadow: '0px 1px 2px 0px hsla(0, 0%, 55%, 0.1), 0px 3px 3px 0px hsla(0, 0%, 55%, 0.09), 0px 8px 5px 0px hsla(0, 0%, 55%, 0.05), 0px 14px 5px 0px hsla(0, 0%, 55%, 0.01)',
+                                            borderRadius: '12px',
                                             fontFamily: "'Mona Sans', sans-serif",
                                             fontWeight: 500,
                                             fontSize: '16px',
-                                            lineHeight: '23px'
                                         }}
                                     >
-                                        Apply
+                                        {couponLoading ? <FaSpinner className="animate-spin" /> : 'Apply'}
                                     </button>
                                 </div>
+
+                                {/* Error */}
+                                {couponError && (
+                                    <p className="text-red-500 text-xs font-medium mb-3 flex items-center gap-1">
+                                        <AiOutlineClose size={12} /> {couponError}
+                                    </p>
+                                )}
+
                                 <button 
                                     className="w-full rounded-full flex items-center justify-center transition-colors shadow-sm tracking-tight"
                                     style={{ 
@@ -283,15 +322,18 @@ export default function CartPage() {
                                 </button>
                             </div>
 
-                            {/* Coupon Activated Message */}
-                            {isCouponApplied && (
+                            {/* Coupon Applied Success */}
+                            {appliedCouponCode && (
                                 <div className="bg-[#E8F8F0] border border-[#C6EDD8] rounded-[10px] py-1 px-4 flex items-center justify-between">
-                                    <div className="flex items-center gap-2 text-gray-900 font-bold text-[15px] font-sans">
-                                        <HiOutlineSparkles className="text-lg text-[#007F5F]" />
-                                        <span>“{couponCode}” Activated</span>
+                                    <div className="flex flex-col">
+                                        <div className="flex items-center gap-2 text-gray-900 font-bold text-[15px] font-sans">
+                                            <HiOutlineSparkles className="text-lg text-[#007F5F]" />
+                                            <span>"{appliedCouponCode}" Applied</span>
+                                        </div>
+                                        <span className="text-[#007F5F] text-xs font-semibold ml-6">You save ₹{couponDiscount}!</span>
                                     </div>
                                     <div className="flex items-center gap-3">
-                                        <span className="text-[#00C853] font-bold text-sm font-sans">Applied</span>
+                                        <span className="text-[#00C853] font-bold text-sm font-sans">-₹{couponDiscount}</span>
                                         <button
                                             onClick={handleRemoveCoupon}
                                             className="text-gray-400 hover:text-gray-600 p-1"
@@ -311,6 +353,8 @@ export default function CartPage() {
                                 totalOneTime={totalOneTime}
                                 payToday={payToday}
                                 savedAmount={savedAmount}
+                                couponDiscount={couponDiscount || 0}
+                                couponCode={appliedCouponCode || ''}
                                 onCheckout={() => router.push('/checkout/address')}
                             />
                         </div>

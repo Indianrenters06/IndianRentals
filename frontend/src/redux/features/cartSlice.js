@@ -4,6 +4,7 @@ const initialState = {
     items: [],
     totalQuantity: 0,
     totalAmount: 0,
+    coupon: null, // { code, discountAmount, description }
 };
 
 const cartSlice = createSlice({
@@ -70,16 +71,24 @@ const cartSlice = createSlice({
             state.items = action.payload.items || [];
             state.totalQuantity = action.payload.totalQuantity || 0;
             state.totalAmount = action.payload.totalAmount || 0;
+            state.coupon = action.payload.coupon || null;
         },
         clearCart: (state) => {
             state.items = [];
             state.totalQuantity = 0;
             state.totalAmount = 0;
+            state.coupon = null;
+        },
+        setCoupon: (state, action) => {
+            state.coupon = action.payload;
+        },
+        removeCoupon: (state) => {
+            state.coupon = null;
         }
     },
 });
 
-export const { addToCart, removeFromCart, updateCartItemQuantity, updateCartItem, restoreCart, clearCart } = cartSlice.actions;
+export const { addToCart, removeFromCart, updateCartItemQuantity, updateCartItem, restoreCart, clearCart, setCoupon, removeCoupon } = cartSlice.actions;
 
 // Selectors
 export const selectCartItems = (state) => state.cart.items;
@@ -101,7 +110,12 @@ export const selectCartTotals = (state) => {
     // payToday = first month rent + GST + delivery (security is separate)
     const payToday = monthlyRentTotal + totalGST + deliveryCharges;
     const savedAmount = items.length > 0 ? Math.max(0, totalOneTime * 0.1) : 0; // 10% savings indicator
-    return { securityAmount, deliveryCharges, monthlyRentTotal, totalGST, totalOneTime, payToday, savedAmount };
+    
+    // Apply coupon if exists
+    const couponDiscount = state.cart.coupon ? state.cart.coupon.discountAmount : 0;
+    const netPayToday = Math.max(0, payToday - couponDiscount);
+
+    return { securityAmount, deliveryCharges, monthlyRentTotal, totalGST, totalOneTime, payToday, savedAmount, couponDiscount, netPayToday, couponCode: state.cart.coupon?.code || null };
 };
 
 export default cartSlice.reducer;

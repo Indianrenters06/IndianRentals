@@ -19,7 +19,7 @@ const initialAddresses = [];
 export default function AddressPage() {
     const router = useRouter();
     const totals = useSelector(selectCartTotals);
-    const { securityAmount, deliveryCharges, monthlyRentTotal, totalGST, totalOneTime, payToday, savedAmount } = totals;
+    const { securityAmount, deliveryCharges, monthlyRentTotal, totalGST, totalOneTime, payToday, savedAmount, couponDiscount, couponCode } = totals;
 
     const [addresses, setAddresses] = useState(initialAddresses);
     const [selectedAddressId, setSelectedAddressId] = useState(null);
@@ -71,6 +71,10 @@ export default function AddressPage() {
         if (!selectedAddressId) {
             alert("Please select an address to continue.");
             return;
+        }
+        const selectedAddress = addresses.find(addr => addr.id === selectedAddressId);
+        if (selectedAddress) {
+            localStorage.setItem('shippingAddress', JSON.stringify(selectedAddress));
         }
         // Proceed to KYC
         router.push('/checkout/kyc');
@@ -290,6 +294,8 @@ export default function AddressPage() {
                             totalOneTime={totalOneTime}
                             payToday={payToday}
                             savedAmount={savedAmount}
+                            couponDiscount={couponDiscount}
+                            couponCode={couponCode}
                             onCheckout={handleContinue}
                             btnText="Continue for KYC process"
                             showButton={false}

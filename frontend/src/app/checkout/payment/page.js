@@ -4,24 +4,114 @@ import React, { useState } from 'react';
 
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useSelector } from 'react-redux';
-import { FaCreditCard, FaRegCheckCircle, FaLock } from 'react-icons/fa';
+import { useDispatch, useSelector } from 'react-redux';
+import { FaCreditCard, FaRegCheckCircle, FaLock, FaSpinner } from 'react-icons/fa';
 import { BsBank, BsPhone, BsWallet2 } from 'react-icons/bs';
 import { SiPaytm, SiGooglepay, SiPhonepe } from 'react-icons/si';
-import { selectCartTotals } from '../../../redux/features/cartSlice';
+import { selectCartTotals, selectCartItems, clearCart } from '../../../redux/features/cartSlice';
 import OrderSummary from '../../../components/OrderSummary';
+import { API_BASE_URL } from '../../../services/apiConfig';
 
 export default function PaymentPage() {
+    const dispatch = useDispatch();
     const router = useRouter();
     const totals = useSelector(selectCartTotals);
-    const { securityAmount, deliveryCharges, monthlyRentTotal, totalGST, totalOneTime, payToday, savedAmount } = totals;
+    const cartItems = useSelector(selectCartItems);
+    const { securityAmount, deliveryCharges, monthlyRentTotal, totalGST, totalOneTime, payToday, savedAmount, couponDiscount, couponCode, netPayToday } = totals;
 
     const [selectedMethod, setSelectedMethod] = useState('card');
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState(null);
 
-    const handlePay = () => {
-        // Navigate to confirmation with real amount (Razorpay integration to be done separately)
-        const params = new URLSearchParams({ amount: String(payToday) });
-        router.push(`/order-confirmation?${params.toString()}`);
+    const handlePay = async () => {
+        if (!cartItems || cartItems.length === 0) {
+            alert('Your cart is empty');
+            return;
+        }
+
+        setLoading(true);
+        setError(null);
+
+        try {
+            const userInfo = JSON.parse(localStorage.getItem('userInfo') || '{}');
+            if (!userInfo.token) {
+                alert('Please log in to place an order');
+                router.push('/login');
+                return;
+            }
+
+            const shippingAddressRaw = localStorage.getItem('shippingAddress');
+            if (!shippingAddressRaw) {
+                alert('Shipping address is missing. Please go back and select an address.');
+                return;
+            }
+            const shippingAddress = JSON.parse(shippingAddressRaw);
+
+            const orderItems = cartItems.map(item => ({
+                name: item.name,
+                qty: item.quantity,
+                image: item.image,
+                price: item.monthlyRent || item.price,
+                securityDeposit: item.refundableAmount || 0,
+                product: item.id
+            }));
+
+            const maxDuration = Math.max(...cartItems.map(item => item.duration || 1));
+            const startDate = new Date();
+            const endDate = new Date();
+            endDate.setMonth(startDate.getMonth() + maxDuration);
+
+            const orderData = {
+                orderItems,
+                shippingAddress: {
+                    address: shippingAddress.addressLine,
+                    city: shippingAddress.city,
+                    postalCode: shippingAddress.pincode,
+                    country: shippingAddress.country || 'India',
+                    phone: shippingAddress.phone
+                },
+                paymentMethod: selectedMethod,
+                itemsPrice: monthlyRentTotal,
+                taxPrice: totalGST,
+                shippingPrice: deliveryCharges,
+                couponCode,
+                couponDiscount,
+                totalPrice: netPayToday,
+                rentalPeriod: {
+                    startDate,
+                    endDate,
+                    durationMonths: maxDuration
+                }
+            };
+
+            const res = await fetch(`${API_BASE_URL}/api/rentals`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${userInfo.token}`
+                },
+                body: JSON.stringify(orderData)
+            });
+
+            const data = await res.json();
+            if (!res.ok) {
+                throw new Error(data.message || 'Failed to create order');
+            }
+
+            // Order created successfully!
+            dispatch(clearCart());
+            const params = new URLSearchParams({ 
+                amount: String(netPayToday),
+                orderId: data._id
+            });
+            router.push(`/order-confirmation?${params.toString()}`);
+
+        } catch (err) {
+            console.error('Order creation error:', err);
+            setError(err.message);
+        } finally {
+            setLoading(false);
+        }
     };
 
     const paymentMethods = [
@@ -97,17 +187,25 @@ export default function PaymentPage() {
                             ))}
                         </div>
 
+                        {error && (
+                            <div className="mt-4 p-4 bg-red-50 text-red-600 rounded-xl border border-red-200">
+                                {error}
+                            </div>
+                        )}
+
                         {/* Pay Button */}
-                        <div className="mt-8 p-6 bg-gray-100 rounded-2xl flex items-center justify-between">
+                        <div className="mt-8 p-6 bg-gray-100 rounded-2xl flex flex-col sm:flex-row items-center justify-between gap-4">
                             <div className="flex items-center gap-2 text-gray-600 text-sm">
                                 <FaLock />
                                 <span>Payments are 100% secure and encrypted</span>
                             </div>
                             <button
                                 onClick={handlePay}
-                                className="bg-[#FFD740] hover:bg-[#FFC400] text-[#1D1D1F] px-10 py-3.5 rounded-full text-lg font-medium shadow-md transition-all hover:scale-105"
+                                disabled={loading}
+                                className="bg-[#FFD740] hover:bg-[#FFC400] disabled:opacity-70 disabled:hover:scale-100 text-[#1D1D1F] px-10 py-3.5 rounded-full text-lg font-medium shadow-md transition-all hover:scale-105 flex items-center gap-2"
                             >
-                                Pay ₹{payToday}
+                                {loading ? <FaSpinner className="animate-spin" /> : null}
+                                {loading ? 'Processing...' : `Pay ₹${netPayToday}`}
                             </button>
                         </div>
                     </div>
@@ -122,6 +220,8 @@ export default function PaymentPage() {
                             totalOneTime={totalOneTime}
                             payToday={payToday}
                             savedAmount={savedAmount}
+                            couponDiscount={couponDiscount}
+                            couponCode={couponCode}
                             showButton={false}
                         />
                     </div>

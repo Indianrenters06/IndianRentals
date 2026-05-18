@@ -2,11 +2,71 @@ const asyncHandler = require('express-async-handler');
 const Coupon = require('../models/Coupon');
 
 // @desc    Get all coupons
-// @route   GET /api/admin/coupons
+// @route   GET /api/coupons
 // @access  Private/Admin
 const getCoupons = asyncHandler(async (req, res) => {
     const coupons = await Coupon.find({}).sort({ createdAt: -1 });
     res.json(coupons);
+});
+
+// @desc    Verify / Apply a coupon code (for logged-in users at checkout)
+// @route   POST /api/coupons/verify
+// @access  Private (any logged-in user)
+const verifyCoupon = asyncHandler(async (req, res) => {
+    const { code, orderAmount } = req.body;
+
+    if (!code) {
+        res.status(400);
+        throw new Error('Coupon code is required');
+    }
+
+    const coupon = await Coupon.findOne({ code: code.toUpperCase() });
+
+    if (!coupon) {
+        res.status(404);
+        throw new Error('Invalid coupon code');
+    }
+
+    if (!coupon.isActive) {
+        res.status(400);
+        throw new Error('This coupon is no longer active');
+    }
+
+    if (coupon.expiryDate && new Date(coupon.expiryDate) < new Date()) {
+        res.status(400);
+        throw new Error('This coupon has expired');
+    }
+
+    if (coupon.usageLimit && coupon.usageCount >= coupon.usageLimit) {
+        res.status(400);
+        throw new Error('This coupon has reached its usage limit');
+    }
+
+    if (coupon.minOrderAmount && orderAmount < coupon.minOrderAmount) {
+        res.status(400);
+        throw new Error(`Minimum order amount of ₹${coupon.minOrderAmount} required for this coupon`);
+    }
+
+    // Calculate discount
+    let discountAmount = 0;
+    if (coupon.discountType === 'percentage') {
+        discountAmount = (orderAmount * coupon.discountAmount) / 100;
+        if (coupon.maxDiscountAmount) {
+            discountAmount = Math.min(discountAmount, coupon.maxDiscountAmount);
+        }
+    } else {
+        // flat
+        discountAmount = coupon.discountAmount;
+    }
+    discountAmount = Math.round(discountAmount);
+
+    res.json({
+        valid: true,
+        code: coupon.code,
+        discountType: coupon.discountType,
+        discountAmount,
+        description: coupon.description,
+    });
 });
 
 // @desc    Create a new coupon
@@ -87,6 +147,7 @@ const deleteCoupon = asyncHandler(async (req, res) => {
 
 module.exports = {
     getCoupons,
+    verifyCoupon,
     createCoupon,
     updateCoupon,
     deleteCoupon

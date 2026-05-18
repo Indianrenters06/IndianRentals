@@ -11,11 +11,14 @@ const OrderSummary = ({
     totalOneTime,
     payToday,
     savedAmount,
+    couponDiscount = 0,
+    couponCode = '',
     onCheckout,
     btnText = "Continue to checkout",
     showButton = true,
     paymentConfirmed = false,
 }) => {
+    const netPayToday = Math.max(0, payToday - couponDiscount);
     return (
         <div className="w-full bg-white rounded-2xl shadow-[0_6px_24px_rgba(0,0,0,0.08)] px-3.5 py-4 font-sans">
 
@@ -65,6 +68,21 @@ const OrderSummary = ({
                     <span>Subtotal (incl. GST)</span>
                     <span>₹{totalOneTime}</span>
                 </div>
+
+                {/* Coupon Discount Line */}
+                {couponDiscount > 0 && (
+                    <>
+                        <div className="border-t border-dashed border-green-300 my-2" />
+                        <div className="flex justify-between text-sm font-semibold text-green-600">
+                            <span>🎟️ Coupon {couponCode && `(${couponCode})`}</span>
+                            <span>-₹{couponDiscount}</span>
+                        </div>
+                        <div className="flex justify-between text-sm font-bold text-gray-900 mt-1">
+                            <span>Net Payable</span>
+                            <span>₹{netPayToday}</span>
+                        </div>
+                    </>
+                )}
             </div>
 
             {/* PAYMENT CONFIRMED */}
@@ -281,7 +299,7 @@ const OrderSummary = ({
                                     <span className="text-[12px] text-[#6E6E73] mt-1">Partial Monthly Rental Fees</span>
                                 </div>
                             </div>
-                            <span className="text-[20px] font-bold text-[#17B31B]">₹{payToday}</span>
+                            <span className="text-[20px] font-bold text-[#17B31B]">₹{netPayToday}</span>
                         </div>
 
                         {/* Info Box (Yellow) */}

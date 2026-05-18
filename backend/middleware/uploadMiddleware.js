@@ -1,31 +1,27 @@
 const multer = require('multer');
+const cloudinary = require('cloudinary').v2;
+const streamifier = require('streamifier');
 const path = require('path');
-const fs = require('fs');
 
-// Ensure uploads directory exists
-const uploadDir = 'uploads/';
-if (!fs.existsSync(uploadDir)) {
-    fs.mkdirSync(uploadDir);
-}
-
-const storage = multer.diskStorage({
-    destination(req, file, cb) {
-        cb(null, 'uploads/');
-    },
-    filename(req, file, cb) {
-        cb(null, `${file.fieldname}-${Date.now()}${path.extname(file.originalname)}`);
-    }
+// Configure Cloudinary
+cloudinary.config({
+    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+    api_key: process.env.CLOUDINARY_API_KEY,
+    api_secret: process.env.CLOUDINARY_API_SECRET,
 });
+
+// Use memory storage — files are streamed directly to Cloudinary, never saved to disk
+const storage = multer.memoryStorage();
 
 function checkFileType(file, cb) {
     const filetypes = /jpg|jpeg|png|pdf/;
     const extname = filetypes.test(path.extname(file.originalname).toLowerCase());
-    const mimetype = filetypes.test(file.mimetype);
+    const mimetype = /image\/(jpeg|jpg|png)|application\/pdf/.test(file.mimetype);
 
     if (extname && mimetype) {
         return cb(null, true);
     } else {
-        cb('Images and PDFs only!');
+        cb(new Error('Images (JPG/PNG) and PDFs only!'));
     }
 }
 
@@ -33,7 +29,33 @@ const upload = multer({
     storage,
     fileFilter: function (req, file, cb) {
         checkFileType(file, cb);
-    }
+    },
+    limits: { fileSize: 10 * 1024 * 1024 }, // 10 MB per file
 });
 
+/**
+ * Upload a single file buffer to Cloudinary.
+ * Returns the secure_url string.
+ */
+const uploadToCloudinary = (fileBuffer, fieldName) => {
+    return new Promise((resolve, reject) => {
+        const stream = cloudinary.uploader.upload_stream(
+            {
+                folder: 'indian-rentals/kyc',
+                resource_type: 'auto',
+                public_id: `${fieldName}-${Date.now()}`,
+            },
+            (error, result) => {
+                if (result) {
+                    resolve(result.secure_url);
+                } else {
+                    reject(error);
+                }
+            }
+        );
+        streamifier.createReadStream(fileBuffer).pipe(stream);
+    });
+};
+
 module.exports = upload;
+module.exports.uploadToCloudinary = uploadToCloudinary;
