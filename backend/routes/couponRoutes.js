@@ -3,8 +3,8 @@ const router = express.Router();
 const { getCoupons, verifyCoupon, createCoupon, updateCoupon, deleteCoupon } = require('../controllers/couponController');
 const { protect, admin } = require('../middleware/authMiddleware');
 
-// Public (logged-in user) route — verify a coupon code at checkout
-router.post('/verify', protect, verifyCoupon);
+// Public route — verify a coupon code at checkout
+router.post('/verify', verifyCoupon);
 
 // Admin-only routes
 router.route('/')

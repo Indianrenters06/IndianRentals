@@ -46,10 +46,13 @@ export default function ActiveCoupons() {
 
     useEffect(() => { fetchCoupons(); }, [fetchCoupons]);
 
-    const filtered = coupons.filter(c =>
-        c.code?.toLowerCase().includes(search.toLowerCase()) ||
-        c.description?.toLowerCase().includes(search.toLowerCase())
-    );
+    const filtered = coupons.filter(c => {
+        const isExp = c.expiryDate && new Date(c.expiryDate) < new Date();
+        return !isExp && (
+            c.code?.toLowerCase().includes(search.toLowerCase()) ||
+            c.description?.toLowerCase().includes(search.toLowerCase())
+        );
+    });
 
     // ── Create ─────────────────────────────────────────────────────────────────
     const handleCreate = async () => {
