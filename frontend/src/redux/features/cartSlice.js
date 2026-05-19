@@ -109,11 +109,12 @@ export const selectCartTotals = (state) => {
     const totalOneTime = securityAmount + deliveryCharges + monthlyRentTotal + totalGST;
     // payToday = first month rent + GST + delivery (security is separate)
     const payToday = monthlyRentTotal + totalGST + deliveryCharges;
-    const savedAmount = items.length > 0 ? Math.max(0, totalOneTime * 0.1) : 0; // 10% savings indicator
-    
     // Apply coupon if exists
     const couponDiscount = state.cart.coupon ? state.cart.coupon.discountAmount : 0;
     const netPayToday = Math.max(0, payToday - couponDiscount);
+
+    const baseSavedAmount = items.length > 0 ? Math.max(0, totalOneTime * 0.1) : 0; // 10% savings indicator
+    const savedAmount = baseSavedAmount + couponDiscount;
 
     return { securityAmount, deliveryCharges, monthlyRentTotal, totalGST, totalOneTime, payToday, savedAmount, couponDiscount, netPayToday, couponCode: state.cart.coupon?.code || null };
 };
