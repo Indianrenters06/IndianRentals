@@ -33,7 +33,92 @@ import {
     Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, useDisclosure, Divider
 } from "@heroui/react";
 
+const API = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+
+const STATUS_COLORS = {
+    Pending: 'warning', Approved: 'primary', Shipped: 'secondary',
+    Delivered: 'success', Active: 'success', Returned: 'default', Cancelled: 'danger',
+};
+
+function CustomerOrdersList({ userId }) {
+    const [orders, setOrders] = useState([]);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        const fetchOrders = async () => {
+            try {
+                const token = localStorage.getItem('adminToken');
+                const res = await fetch(`${API}/api/admin/users/${userId}/orders`, {
+                    headers: { Authorization: `Bearer ${token}` }
+                });
+                if (res.ok) setOrders(await res.json());
+            } catch (e) { console.error(e); }
+            finally { setLoading(false); }
+        };
+        fetchOrders();
+    }, [userId]);
+
+    if (loading) return (
+        <div className="flex items-center justify-center py-16 text-slate-400 gap-3">
+            <Spinner size="sm" color="secondary" /> Loading orders…
+        </div>
+    );
+
+    if (orders.length === 0) return (
+        <div className="flex flex-col items-center justify-center py-16 text-center">
+            <div className="w-16 h-16 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center mb-4 text-3xl">📦</div>
+            <p className="text-slate-700 dark:text-slate-300 font-semibold">No orders found</p>
+            <p className="text-slate-400 text-sm mt-1">This customer hasn't placed any orders yet.</p>
+        </div>
+    );
+
+    return (
+        <div className="space-y-4">
+            <p className="text-xs text-slate-400 font-semibold uppercase tracking-wider">{orders.length} order{orders.length !== 1 ? 's' : ''} found</p>
+            {orders.map((order) => (
+                <div key={order._id} className="rounded-2xl border border-slate-200 dark:border-slate-700 overflow-hidden">
+                    {/* Order Header */}
+                    <div className="flex items-center justify-between px-4 py-3 bg-slate-50 dark:bg-slate-800/50">
+                        <div>
+                            <p className="text-xs font-mono text-slate-400">#{order._id.slice(-8).toUpperCase()}</p>
+                            <p className="text-xs text-slate-500 mt-0.5">
+                                {new Date(order.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
+                            </p>
+                        </div>
+                        <div className="flex items-center gap-3">
+                            <Chip size="sm" color={STATUS_COLORS[order.status] || 'default'} variant="flat">
+                                {order.status}
+                            </Chip>
+                            <span className="text-sm font-bold text-slate-900 dark:text-slate-100">₹{order.totalPrice?.toLocaleString('en-IN')}</span>
+                        </div>
+                    </div>
+                    {/* Order Items */}
+                    <div className="divide-y divide-slate-100 dark:divide-slate-800">
+                        {order.orderItems?.map((item, i) => (
+                            <div key={i} className="flex items-center gap-3 px-4 py-3">
+                                {item.image && (
+                                    <img src={item.image} alt={item.name} className="w-10 h-10 rounded-lg object-cover bg-slate-100 shrink-0" />
+                                )}
+                                <div className="flex-1 min-w-0">
+                                    <p className="text-sm font-semibold text-slate-800 dark:text-slate-100 truncate">{item.name}</p>
+                                    <p className="text-xs text-slate-400">Qty: {item.qty} · ₹{item.price?.toLocaleString('en-IN')}/mo</p>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                    {/* Order Footer */}
+                    <div className="px-4 py-2.5 bg-slate-50 dark:bg-slate-800/30 flex items-center justify-between text-xs text-slate-500">
+                        <span>📅 {order.rentalPeriod?.durationMonths} month{order.rentalPeriod?.durationMonths !== 1 ? 's' : ''} rental</span>
+                        <span>{order.isPaid ? '✅ Paid' : '⏳ Unpaid'} · {order.paymentMethod}</span>
+                    </div>
+                </div>
+            ))}
+        </div>
+    );
+}
+
 export default function CustomersManagement() {
+
     const [users, setUsers] = useState([]);
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState('');
@@ -437,13 +522,13 @@ export default function CustomersManagement() {
                 </CardBody>
             </Card>
 
-            <Modal isOpen={isOpen} onOpenChange={onOpenChange} size="2xl" scrollBehavior="inside" classNames={{ backdrop: "bg-slate-900/50 backdrop-blur-sm" }}>
+            <Modal isOpen={isOpen} onOpenChange={onOpenChange} size="3xl" scrollBehavior="inside" classNames={{ backdrop: "bg-slate-900/50 backdrop-blur-sm" }}>
                 <ModalContent className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-2xl">
                     {(onClose) => (
                         <>
                             <ModalHeader className="flex flex-col gap-1 border-b border-slate-100 dark:border-slate-800/60 pb-4 pt-5 px-6">
                                 <h2 className="text-xl font-bold tracking-tight text-slate-900 dark:text-slate-100">
-                                    {modalType === 'profile' ? 'User Profile' : 'User Orders'}
+                                    {modalType === 'profile' ? 'User Profile' : `Orders — ${selectedUser?.name}`}
                                 </h2>
                             </ModalHeader>
                             <ModalBody className="py-6 px-6">
@@ -505,15 +590,7 @@ export default function CustomersManagement() {
                                 )}
 
                                 {selectedUser && modalType === 'orders' && (
-                                    <div className="flex flex-col items-center justify-center text-center py-12 px-4 border border-dashed border-slate-200 dark:border-slate-800 rounded-2xl bg-slate-50 dark:bg-slate-900/50">
-                                        <div className="w-16 h-16 bg-white dark:bg-slate-800 shadow-sm rounded-full flex items-center justify-center mb-4">
-                                            <MapPin className="w-8 h-8 text-indigo-400" weight="duotone" />
-                                        </div>
-                                        <h3 className="text-lg font-bold text-slate-900 dark:text-slate-100 mb-2">Order History for {selectedUser.name}</h3>
-                                        <p className="text-slate-500 text-sm max-w-sm">
-                                            We are currently developing the specific orders timeline view for each user. It will be available here soon.
-                                        </p>
-                                    </div>
+                                    <CustomerOrdersList userId={selectedUser._id} />
                                 )}
                             </ModalBody>
                             <ModalFooter className="border-t border-slate-100 dark:border-slate-800/60 pb-5 px-6">

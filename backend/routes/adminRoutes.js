@@ -71,6 +71,15 @@ router.route('/users/:id')
     .put(protect, admin, updateUser)
     .delete(protect, admin, deleteUser);
 
+// ── Orders for a specific user ────────────────────────────────────────────────
+const Rental = require('../models/Rental');
+router.get('/users/:id/orders', protect, admin, asyncHandler(async (req, res) => {
+    const orders = await Rental.find({ user: req.params.id })
+        .sort({ createdAt: -1 })
+        .lean();
+    res.json(orders);
+}));
+
 // ── User Status Management (block / unblock / activate / deactivate) ─────────
 router.patch('/users/:id/status', protect, admin, asyncHandler(async (req, res) => {
     const { action, reason } = req.body;
