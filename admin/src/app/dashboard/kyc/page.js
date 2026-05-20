@@ -417,40 +417,47 @@ export default function KYCManagement() {
 
             {/* Document Zoom & Download Overlay */}
             {zoomedDoc && (
-                <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/90 backdrop-blur-sm p-4">
-                    <div className="relative max-w-5xl max-h-screen w-full h-full flex items-center justify-center">
-                        <Button 
-                            isIconOnly 
-                            className="absolute top-4 right-4 bg-white/10 hover:bg-white/20 text-white rounded-full z-50"
-                            onPress={() => setZoomedDoc(null)}
+                <div
+                    className="fixed inset-0 z-[100] flex items-center justify-center bg-black/90 backdrop-blur-sm p-4"
+                    onClick={() => setZoomedDoc(null)}
+                >
+                    {/* Close button — fixed to top-right of the overlay */}
+                    <button
+                        onClick={() => setZoomedDoc(null)}
+                        className="fixed top-4 right-4 z-[110] w-10 h-10 flex items-center justify-center rounded-full bg-white/20 hover:bg-white/40 text-white transition-all backdrop-blur-sm border border-white/20"
+                    >
+                        <X size={20} weight="bold" />
+                    </button>
+
+                    {/* Content — stop click propagation so clicking image doesn't close */}
+                    <div
+                        className="relative flex flex-col items-center gap-6 max-w-4xl w-full"
+                        onClick={e => e.stopPropagation()}
+                    >
+                        <img
+                            src={zoomedDoc}
+                            alt="KYC Document"
+                            className="max-w-full max-h-[75vh] w-auto object-contain rounded-2xl shadow-2xl border border-white/10"
+                        />
+
+                        <button
+                            className="flex items-center gap-2 h-11 px-8 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-sm shadow-lg shadow-indigo-500/30 transition-all"
+                            onClick={async () => {
+                                try {
+                                    const response = await fetch(zoomedDoc);
+                                    const blob = await response.blob();
+                                    const fileUrl = window.URL.createObjectURL(blob);
+                                    const alink = document.createElement('a');
+                                    alink.href = fileUrl;
+                                    alink.download = 'KYC_Document.jpg';
+                                    alink.click();
+                                } catch (e) {
+                                    window.open(zoomedDoc, '_blank');
+                                }
+                            }}
                         >
-                            <X size={24} weight="bold" />
-                        </Button>
-                        
-                        <img src={zoomedDoc} alt="Zoomed KYC Document" className="max-w-full max-h-[85vh] object-contain rounded-xl shadow-2xl" />
-                        
-                        <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-4">
-                            <Button
-                                size="lg"
-                                className="font-bold bg-indigo-600 text-white shadow-lg"
-                                startContent={<DownloadSimple weight="bold" />}
-                                onPress={async () => {
-                                    try {
-                                        const response = await fetch(zoomedDoc);
-                                        const blob = await response.blob();
-                                        const fileUrl = window.URL.createObjectURL(blob);
-                                        const alink = document.createElement('a');
-                                        alink.href = fileUrl;
-                                        alink.download = "KYC_Document.jpg";
-                                        alink.click();
-                                    } catch (e) {
-                                        window.open(zoomedDoc, '_blank');
-                                    }
-                                }}
-                            >
-                                Download Document
-                            </Button>
-                        </div>
+                            <DownloadSimple size={18} weight="bold" /> Download Document
+                        </button>
                     </div>
                 </div>
             )}
