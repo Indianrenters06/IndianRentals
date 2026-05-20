@@ -27,12 +27,13 @@ const PAGES = [
     { key: 'refund', label: 'Return & Refund Policy', slug: '/refund-policy' },
     { key: 'faq', label: 'FAQ / Help Center', slug: '/faq', specialized: true },
     { key: 'contact', label: 'Contact Us', slug: '/contact', specialized: true },
+    { key: 'rules', label: 'Rules & Charges', slug: '/rules' },
 ];
 
 const PAGE_ICONS = {
     'about': '🏢', 'rental-process': '🔄', 'terms': '📋',
     'privacy': '🔒', 'shipping': '🚚', 'refund': '↩️', 'faq': '❓', 'contact': '📞',
-    'kyc-policy': '🆔',
+    'kyc-policy': '🆔', 'rules': '📜',
 };
 
 const DEFAULTS = {

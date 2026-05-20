@@ -1,7 +1,7 @@
 const asyncHandler = require('express-async-handler');
 const CMS = require('../models/CMS');
 
-const ALLOWED_PAGES = ['homepage', 'about', 'terms', 'privacy', 'contact', 'shipping', 'refund', 'faq', 'rental-process', 'kyc-policy', 'categories-page'];
+const ALLOWED_PAGES = ['homepage', 'about', 'terms', 'privacy', 'contact', 'shipping', 'refund', 'faq', 'rental-process', 'kyc-policy', 'categories-page', 'rules'];
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 const getOrCreatePage = async (pageName) => {

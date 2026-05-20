@@ -192,6 +192,9 @@ export default function GeneralSettings() {
                                     color={item.color}
                                     isSelected={form[item.key]}
                                     onValueChange={v => setForm(f => ({ ...f, [item.key]: v }))}
+                                    classNames={{
+                                        wrapper: "group-data-[selected=false]:bg-slate-300 dark:group-data-[selected=false]:bg-slate-600"
+                                    }}
                                 />
                             </div>
                         ))}
