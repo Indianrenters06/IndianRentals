@@ -1,218 +1,301 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { motion } from 'framer-motion';
-import { Spinner, Button } from '@heroui/react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Spinner, Chip } from '@heroui/react';
 import {
-    FloppyDisk, CheckCircle, Plus, Trash,
-    Question, ChatText, TextT, Eye
+    FloppyDisk, CheckCircle, Plus, Trash, CaretDown, CaretUp,
+    Question, MagnifyingGlass, ArrowLeft, PencilSimple
 } from '@phosphor-icons/react';
-import ImageUploader from '@/components/ImageUploader';
 
 const API = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
 const getToken = () => typeof window !== 'undefined' ? localStorage.getItem('adminToken') : null;
 
-// ── Reusable components ───────────────────────────────────────────────────────
-const Label = ({ children }) => (
-    <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">{children}</label>
-);
-
+// ── Small reusable components ─────────────────────────────────────────────────
 const TextInput = ({ label, value, onChange, placeholder }) => (
     <div>
-        {label && <Label>{label}</Label>}
+        {label && <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">{label}</label>}
         <input
-            type="text"
-            value={value || ''}
-            onChange={e => onChange(e.target.value)}
+            type="text" value={value || ''} onChange={e => onChange(e.target.value)}
             placeholder={placeholder}
             className="w-full h-10 px-3 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-400 transition-all"
         />
     </div>
 );
 
-const TextArea = ({ label, value, onChange, placeholder, rows = 3 }) => (
+const TextArea = ({ label, value, onChange, placeholder, rows = 2 }) => (
     <div>
-        {label && <Label>{label}</Label>}
+        {label && <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">{label}</label>}
         <textarea
-            value={value || ''}
-            onChange={e => onChange(e.target.value)}
-            placeholder={placeholder}
-            rows={rows}
+            value={value || ''} onChange={e => onChange(e.target.value)}
+            placeholder={placeholder} rows={rows}
             className="w-full px-3 py-2.5 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-400 transition-all resize-none"
         />
     </div>
 );
 
-const Card = ({ icon, title, children, accent = 'indigo' }) => {
-    const accents = {
-        indigo: 'from-indigo-50 to-white dark:from-indigo-950/20 dark:to-slate-900 border-indigo-100 dark:border-indigo-900/30',
-        sky: 'from-sky-50 to-white dark:from-sky-950/20 dark:to-slate-900 border-sky-100 dark:border-sky-900/30',
-        amber: 'from-amber-50 to-white dark:from-amber-950/20 dark:to-slate-900 border-amber-100 dark:border-amber-900/30',
-    };
-    return (
-        <div className={`rounded-2xl border bg-gradient-to-br ${accents[accent] || accents.indigo} p-6 space-y-5 shadow-sm`}>
-            <div className="flex items-center gap-2.5">
-                <span className="text-xl">{icon}</span>
-                <h3 className="text-base font-bold text-slate-800 dark:text-slate-100">{title}</h3>
-            </div>
-            {children}
-        </div>
-    );
-};
-
-// ── DEFAULTS ─────────────────────────────────────────────────────────────────
-const DEFAULTS = {
-    bannerImage: '', bannerTitle: 'FAQs',
-    faqTitle: 'Everything you need to know about renting with IndianRenters.com',
-    faqSubtitle: 'Welcome to FAQ!',
-    faqItems: [
-        { question: 'What is the minimum rental period?', answer: 'The minimum rental period for our products is 1 month.' },
-    ],
-    metaTitle: '', metaDescription: '', publishStatus: 'published',
-};
-
-export default function FaqCMSPage() {
-    const [data, setData] = useState(DEFAULTS);
-    const [loading, setLoading] = useState(true);
+// ── Product FAQ Editor panel ──────────────────────────────────────────────────
+function ProductFaqEditor({ product, onClose, onSaved }) {
+    const [faqs, setFaqs] = useState(product.faqs || []);
     const [saving, setSaving] = useState(false);
     const [saved, setSaved] = useState(false);
-    const [errorMsg, setErrorMsg] = useState(null);
 
-    const set = (k, v) => setData(p => ({ ...p, [k]: v }));
+    const addFaq = () => setFaqs(prev => [...prev, { question: '', answer: '' }]);
+    const removeFaq = (i) => setFaqs(prev => prev.filter((_, idx) => idx !== i));
+    const updateFaq = (i, k, v) => setFaqs(prev => {
+        const next = [...prev];
+        next[i] = { ...next[i], [k]: v };
+        return next;
+    });
+
+    const save = async () => {
+        setSaving(true);
+        try {
+            const res = await window.fetch(`${API}/api/products/${product._id}/faqs`, {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${getToken()}` },
+                body: JSON.stringify({ faqs }),
+            });
+            if (!res.ok) throw new Error((await res.json()).message || 'Failed to save');
+            setSaved(true);
+            onSaved(product._id, faqs);
+            setTimeout(() => setSaved(false), 3000);
+        } catch (e) {
+            alert(e.message);
+        } finally {
+            setSaving(false);
+        }
+    };
+
+    return (
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 20 }}
+            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm">
+            <div className="w-full max-w-2xl max-h-[90vh] flex flex-col bg-white dark:bg-slate-900 rounded-3xl shadow-2xl border border-slate-200 dark:border-slate-700 overflow-hidden">
+
+                {/* Header */}
+                <div className="flex items-center justify-between p-6 border-b border-slate-100 dark:border-slate-800 shrink-0">
+                    <div>
+                        <p className="text-xs font-bold uppercase tracking-widest text-indigo-500 mb-0.5">Product FAQs</p>
+                        <h2 className="text-lg font-bold text-slate-900 dark:text-slate-100 truncate max-w-sm">{product.name}</h2>
+                        <p className="text-xs text-slate-400 mt-0.5">{product.category}</p>
+                    </div>
+                    <div className="flex items-center gap-3">
+                        {saved && (
+                            <span className="flex items-center gap-1.5 text-emerald-600 text-xs font-semibold bg-emerald-50 border border-emerald-200 rounded-full px-3 py-1.5">
+                                <CheckCircle size={12} weight="fill" /> Saved!
+                            </span>
+                        )}
+                        <button onClick={save} disabled={saving}
+                            className="flex items-center gap-2 h-9 px-4 rounded-xl !bg-indigo-600 hover:!bg-indigo-700 disabled:opacity-60 text-white font-semibold text-sm shadow-lg shadow-indigo-500/20 transition-all">
+                            {saving ? <Spinner size="sm" color="white" /> : <FloppyDisk size={15} weight="bold" />} Save
+                        </button>
+                        <button onClick={onClose}
+                            className="w-9 h-9 rounded-xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-500 hover:text-slate-800 dark:hover:text-slate-200 transition-all">
+                            ✕
+                        </button>
+                    </div>
+                </div>
+
+                {/* FAQ list */}
+                <div className="flex-1 overflow-y-auto p-6 space-y-4">
+                    <AnimatePresence>
+                        {faqs.map((item, i) => (
+                            <motion.div key={i} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, x: -20 }}
+                                className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 space-y-3 relative group">
+                                <div className="flex items-center justify-between">
+                                    <span className="flex items-center gap-2">
+                                        <span className="w-6 h-6 rounded-full bg-indigo-100 dark:bg-indigo-500/20 text-indigo-600 flex items-center justify-center text-[10px] font-bold">{i + 1}</span>
+                                        <Question size={14} className="text-indigo-400" />
+                                    </span>
+                                    <button onClick={() => removeFaq(i)}
+                                        className="p-1.5 text-slate-400 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-500/10 rounded-lg transition-all opacity-0 group-hover:opacity-100">
+                                        <Trash size={15} />
+                                    </button>
+                                </div>
+                                <TextInput
+                                    label="Question"
+                                    value={item.question}
+                                    onChange={v => updateFaq(i, 'question', v)}
+                                    placeholder="e.g. What is the minimum rental period?"
+                                />
+                                <TextArea
+                                    label="Answer"
+                                    value={item.answer}
+                                    onChange={v => updateFaq(i, 'answer', v)}
+                                    placeholder="e.g. The minimum rental period is 1 month."
+                                    rows={2}
+                                />
+                            </motion.div>
+                        ))}
+                    </AnimatePresence>
+
+                    <button onClick={addFaq}
+                        className="w-full py-4 border-2 border-dashed border-slate-200 dark:border-slate-700 rounded-2xl flex items-center justify-center gap-2 text-slate-400 hover:text-indigo-500 hover:border-indigo-400 transition-all">
+                        <Plus size={18} /> Add FAQ
+                    </button>
+                </div>
+            </div>
+        </motion.div>
+    );
+}
+
+// ── Category accordion ────────────────────────────────────────────────────────
+function CategoryGroup({ category, products, onEdit }) {
+    const [open, setOpen] = useState(true);
+    return (
+        <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
+            <button onClick={() => setOpen(o => !o)}
+                className="w-full flex items-center justify-between px-6 py-4 hover:bg-slate-50 dark:hover:bg-slate-800/40 transition-all">
+                <div className="flex items-center gap-3">
+                    <span className="w-8 h-8 rounded-lg bg-indigo-50 dark:bg-indigo-500/10 flex items-center justify-center text-base">📦</span>
+                    <div className="text-left">
+                        <p className="font-bold text-slate-900 dark:text-slate-100">{category}</p>
+                        <p className="text-xs text-slate-400">{products.length} product{products.length !== 1 ? 's' : ''}</p>
+                    </div>
+                </div>
+                {open ? <CaretUp size={16} className="text-slate-400" /> : <CaretDown size={16} className="text-slate-400" />}
+            </button>
+
+            <AnimatePresence>
+                {open && (
+                    <motion.div initial={{ height: 0 }} animate={{ height: 'auto' }} exit={{ height: 0 }}
+                        className="overflow-hidden border-t border-slate-100 dark:border-slate-800">
+                        <div className="divide-y divide-slate-100 dark:divide-slate-800">
+                            {products.map(prod => (
+                                <div key={prod._id} className="flex items-center justify-between px-6 py-3.5 hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-all">
+                                    <div className="flex items-center gap-3">
+                                        {prod.images?.[0] && (
+                                            <img src={prod.images[0]} alt={prod.name} className="w-10 h-10 rounded-xl object-cover bg-slate-100 shrink-0" />
+                                        )}
+                                        <div>
+                                            <p className="text-sm font-semibold text-slate-800 dark:text-slate-100">{prod.name}</p>
+                                            <p className="text-xs text-slate-400">{prod.brand || '—'}</p>
+                                        </div>
+                                    </div>
+                                    <div className="flex items-center gap-3">
+                                        <Chip size="sm"
+                                            color={prod.faqs?.length > 0 ? 'success' : 'warning'}
+                                            variant="flat">
+                                            {prod.faqs?.length > 0 ? `${prod.faqs.length} FAQ${prod.faqs.length > 1 ? 's' : ''}` : 'No FAQs'}
+                                        </Chip>
+                                        <button onClick={() => onEdit(prod)}
+                                            className="flex items-center gap-1.5 h-8 px-3 rounded-lg !bg-indigo-50 dark:!bg-indigo-500/10 hover:!bg-indigo-100 dark:hover:!bg-indigo-500/20 text-indigo-600 font-semibold text-xs transition-all">
+                                            <PencilSimple size={13} /> Edit FAQs
+                                        </button>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
+        </div>
+    );
+}
+
+// ── Main Page ─────────────────────────────────────────────────────────────────
+export default function ProductFaqManager() {
+    const [products, setProducts] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [search, setSearch] = useState('');
+    const [editingProduct, setEditingProduct] = useState(null);
 
     const load = useCallback(async () => {
-        const fetchUrl = `${API}/api/cms/faq?t=${Date.now()}`;
         try {
-            setErrorMsg(null);
-            // Use window.fetch to bypass Next.js fetch cache patches that cause TypeErrors in Turbopack
-            const res = await window.fetch(fetchUrl);
-            if (res.ok) {
-                const json = await res.json();
-                const mergedData = { ...DEFAULTS, ...json };
-                if (json.faqItems) {
-                    mergedData.faqItems = json.faqItems;
-                }
-                setData(mergedData);
-            } else {
-                setErrorMsg(`Failed to fetch CMS FAQ data: ${res.status} ${res.statusText}. URL: ${fetchUrl}`);
-                console.warn("Failed to fetch CMS FAQ data:", res.status, res.statusText);
+            setLoading(true);
+            let allProducts = [];
+            let page = 1;
+            while (true) {
+                const res = await window.fetch(`${API}/api/products?limit=100&pageNumber=${page}`);
+                if (!res.ok) break;
+                const data = await res.json();
+                allProducts = [...allProducts, ...data.products];
+                if (page >= data.pages) break;
+                page++;
             }
-        } catch (err) {
-            setErrorMsg(`Error loading FAQ data: ${err.message}. URL: ${fetchUrl}`);
-            console.warn("Error loading FAQ data:", err);
+            setProducts(allProducts);
+        } catch (e) {
+            console.error('Failed to load products:', e);
+        } finally {
+            setLoading(false);
         }
-        finally { setLoading(false); }
     }, []);
 
     useEffect(() => { load(); }, [load]);
 
-    const save = async () => {
-        try {
-            setSaving(true);
-            const res = await window.fetch(`${API}/api/cms/faq`, {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${getToken()}` },
-                body: JSON.stringify(data),
-            });
-            if (!res.ok) throw new Error('Failed to save');
-            setSaved(true);
-            setTimeout(() => setSaved(false), 3000);
-        } catch (e) { alert(e.message); }
-        finally { setSaving(false); }
+    const handleSaved = (productId, newFaqs) => {
+        setProducts(prev => prev.map(p => p._id === productId ? { ...p, faqs: newFaqs } : p));
     };
 
-    const addItem = () => {
-        set('faqItems', [...(data.faqItems || []), { question: '', answer: '' }]);
-    };
-
-    const removeItem = (i) => {
-        const next = [...data.faqItems];
-        next.splice(i, 1);
-        set('faqItems', next);
-    };
-
-    const updateItem = (i, k, v) => {
-        const next = [...data.faqItems];
-        next[i] = { ...next[i], [k]: v };
-        set('faqItems', next);
-    };
-
-    if (loading) return (
-        <div className="flex items-center justify-center gap-3 py-24 text-slate-400">
-            <Spinner size="sm" color="secondary" /> Loading FAQ CMS…
-        </div>
+    // Filter by search
+    const filtered = products.filter(p =>
+        !search || p.name.toLowerCase().includes(search.toLowerCase()) || p.category.toLowerCase().includes(search.toLowerCase())
     );
+
+    // Group by category
+    const byCategory = filtered.reduce((acc, p) => {
+        const cat = p.category || 'Uncategorised';
+        if (!acc[cat]) acc[cat] = [];
+        acc[cat].push(p);
+        return acc;
+    }, {});
+
+    const categories = Object.keys(byCategory).sort();
 
     return (
         <div className="space-y-6 pb-16">
+            {/* Header */}
             <div className="flex items-center justify-between flex-wrap gap-3">
                 <div>
                     <h1 className="text-3xl font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2">
-                        ❓ FAQ <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-500 to-purple-500">CMS</span>
+                        <Question size={28} className="text-indigo-500" />
+                        Product <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-500 to-purple-500">FAQs</span>
                     </h1>
-                    <p className="text-sm text-slate-500 mt-1">Manage frequently asked questions — changes go live instantly.</p>
-                    {errorMsg && (
-                        <div className="mt-2 p-3 bg-red-100 border border-red-200 text-red-600 rounded-lg text-sm font-semibold">
-                            ⚠️ {errorMsg}
-                        </div>
-                    )}
+                    <p className="text-sm text-slate-500 mt-1">Manage FAQs for each product, organised by category.</p>
                 </div>
-                <div className="flex items-center gap-3">
-                    {saved && (
-                        <span className="flex items-center gap-1.5 text-emerald-600 text-sm font-semibold bg-emerald-50 border border-emerald-200 rounded-full px-3 py-1.5">
-                            <CheckCircle size={14} weight="fill" /> Saved!
-                        </span>
-                    )}
-                    <button onClick={save} disabled={saving}
-                        className="flex items-center gap-2 h-10 px-5 rounded-xl !bg-indigo-600 hover:!bg-indigo-700 disabled:opacity-60 text-white font-semibold text-sm shadow-lg shadow-indigo-500/20 transition-all">
-                        {saving ? <Spinner size="sm" color="white" /> : <FloppyDisk size={15} weight="bold" />} Save FAQ
-                    </button>
-                </div>
+                <Chip color="secondary" variant="flat" size="sm">{products.length} products</Chip>
             </div>
 
-            <div className="grid grid-cols-1 xl:grid-cols-3 gap-5">
-                <div className="xl:col-span-1 space-y-5">
-                    <Card icon="🖼️" title="Banner & SEO" accent="indigo">
-                        <TextInput label="Banner Title" value={data.bannerTitle} onChange={v => set('bannerTitle', v)} placeholder="FAQs" />
-                        <ImageUploader label="Banner Image" existingUrl={data.bannerImage} onUpload={url => set('bannerImage', url)} />
-                        <hr className="border-slate-100 dark:border-slate-800" />
-                        <TextInput label="Meta Title" value={data.metaTitle} onChange={v => set('metaTitle', v)} placeholder="FAQ – IndianRentals" />
-                        <TextArea label="Meta Description" value={data.metaDescription} onChange={v => set('metaDescription', v)} placeholder="Short SEO description..." rows={2} />
-                    </Card>
-
-                    <Card icon="📝" title="Header Text" accent="sky">
-                        <TextInput label="Small Heading" value={data.faqSubtitle} onChange={v => set('faqSubtitle', v)} placeholder="Welcome to FAQ!" />
-                        <TextArea label="Main Heading" value={data.faqTitle} onChange={v => set('faqTitle', v)} placeholder="Everything you need to know..." rows={3} />
-                    </Card>
-                </div>
-
-                <div className="xl:col-span-2 space-y-5">
-                    <Card icon="💬" title="Question & Answer Items" accent="amber">
-                        <div className="space-y-4">
-                            {(data.faqItems || []).map((item, i) => (
-                                <motion.div key={i} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
-                                    className="p-4 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 space-y-3 relative group">
-                                    <button onClick={() => removeItem(i)}
-                                        className="absolute top-3 right-3 p-1.5 text-slate-400 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-500/10 rounded-lg transition-all">
-                                        <Trash size={16} />
-                                    </button>
-                                    <div className="flex items-center gap-2 mb-1">
-                                        <span className="w-6 h-6 rounded-full bg-amber-100 dark:bg-amber-500/20 text-amber-600 flex items-center justify-center text-[10px] font-bold">{i + 1}</span>
-                                        <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">FAQ Item</p>
-                                    </div>
-                                    <TextInput label="Question" value={item.question} onChange={v => updateItem(i, 'question', v)} placeholder="What is..." />
-                                    <TextArea label="Answer" value={item.answer} onChange={v => updateItem(i, 'answer', v)} placeholder="The answer is..." rows={2} />
-                                </motion.div>
-                            ))}
-
-                            <button onClick={addItem}
-                                className="w-full py-4 border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-xl flex items-center justify-center gap-2 text-slate-400 hover:text-indigo-500 hover:border-indigo-500 transition-all">
-                                <Plus size={18} /> Add FAQ Item
-                            </button>
-                        </div>
-                    </Card>
-                </div>
+            {/* Search */}
+            <div className="relative max-w-sm">
+                <MagnifyingGlass size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+                <input
+                    type="text" value={search} onChange={e => setSearch(e.target.value)}
+                    placeholder="Search by product or category…"
+                    className="w-full h-10 pl-9 pr-3 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-400 transition-all"
+                />
             </div>
+
+            {/* List */}
+            {loading ? (
+                <div className="flex items-center justify-center gap-3 py-24 text-slate-400">
+                    <Spinner size="sm" color="secondary" /> Loading products…
+                </div>
+            ) : categories.length === 0 ? (
+                <div className="py-24 text-center text-slate-400 text-sm">No products found.</div>
+            ) : (
+                <div className="space-y-4">
+                    {categories.map(cat => (
+                        <CategoryGroup
+                            key={cat}
+                            category={cat}
+                            products={byCategory[cat]}
+                            onEdit={setEditingProduct}
+                        />
+                    ))}
+                </div>
+            )}
+
+            {/* Editor Modal */}
+            <AnimatePresence>
+                {editingProduct && (
+                    <ProductFaqEditor
+                        product={editingProduct}
+                        onClose={() => setEditingProduct(null)}
+                        onSaved={handleSaved}
+                    />
+                )}
+            </AnimatePresence>
         </div>
     );
 }
