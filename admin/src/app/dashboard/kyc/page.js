@@ -418,13 +418,13 @@ export default function KYCManagement() {
             {/* Document Zoom & Download Overlay */}
             {zoomedDoc && (
                 <div
-                    className="fixed inset-0 z-[100] flex items-center justify-center bg-black/90 backdrop-blur-sm p-4"
+                    className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/90 backdrop-blur-sm p-4"
                     onClick={() => setZoomedDoc(null)}
                 >
                     {/* Close button — fixed to top-right of the overlay */}
                     <button
                         onClick={() => setZoomedDoc(null)}
-                        className="fixed top-4 right-4 z-[110] w-10 h-10 flex items-center justify-center rounded-full bg-white/20 hover:bg-white/40 text-white transition-all backdrop-blur-sm border border-white/20"
+                        className="fixed top-4 right-4 z-[10000] w-10 h-10 flex items-center justify-center rounded-full bg-white/20 hover:bg-white/40 text-white transition-all backdrop-blur-sm border border-white/20"
                     >
                         <X size={20} weight="bold" />
                     </button>
