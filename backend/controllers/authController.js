@@ -54,6 +54,13 @@ const registerUser = asyncHandler(async (req, res) => {
         throw new Error('User already exists');
     }
 
+    const Settings = require('../models/Settings');
+    const settings = await Settings.findOne();
+    if (settings && settings.allowRegistrations === false) {
+        res.status(403);
+        throw new Error('New registrations are currently disabled by the administrator.');
+    }
+
     const emailOtp = generateOTP();
     const phoneOtp = generateOTP();
     const otpExpires = Date.now() + 10 * 60 * 1000; // 10 minutes

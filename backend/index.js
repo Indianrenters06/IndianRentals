@@ -112,6 +112,9 @@ app.get('/api/health', (req, res) => {
 });
 
 // Routes
+const { checkMaintenanceMode } = require('./middleware/maintenanceMiddleware');
+app.use(checkMaintenanceMode);
+
 const authRoutes = require('./routes/authRoutes');
 
 app.use('/api/auth', authRoutes);

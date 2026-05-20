@@ -26,6 +26,18 @@ const addRentalItems = asyncHandler(async (req, res) => {
         res.status(400);
         throw new Error('No order items');
     } else {
+        const Settings = require('../models/Settings');
+        const settings = await Settings.findOne();
+        
+        if (settings && settings.requireKYC) {
+            const User = require('../models/User');
+            const user = await User.findById(req.user._id);
+            if (!user.kyc || user.kyc.status !== 'approved') {
+                res.status(403);
+                throw new Error('KYC verification is required before placing a rental order.');
+            }
+        }
+
         const rental = new Rental({
             orderItems,
             user: req.user._id,
