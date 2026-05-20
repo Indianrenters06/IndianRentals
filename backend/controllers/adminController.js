@@ -5,7 +5,6 @@ const Rental = require('../models/Rental');
 const KYC = require('../models/KYC');
 const Notification = require('../models/Notification');
 const PricingPlan = require('../models/PricingPlan');
-const Variant = require('../models/Variant');
 const Role = require('../models/Role');
 
 // @desc    Get admin dashboard statistics
