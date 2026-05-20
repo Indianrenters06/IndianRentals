@@ -183,6 +183,7 @@ export default function DashboardLayout({ children }) {
         { name: 'Categories Page', path: '/dashboard/cms/categories-page' },
         { name: '🖼️ Category Images', path: '/dashboard/cms/category-images' },
         { name: 'Static Pages', path: '/dashboard/cms/pages' },
+        { name: '❓ Product FAQs', path: '/dashboard/cms/faq' },
       ]
     },
     {
@@ -286,11 +287,6 @@ export default function DashboardLayout({ children }) {
         { name: 'Roles & Permissions', path: '/dashboard/settings/roles' },
         { name: 'Logo & Branding', path: '/dashboard/settings/branding' },
         { name: 'Payment Gateway', path: '/dashboard/settings/payment-gateway' },
-        { name: 'GST Configuration', path: '/dashboard/settings/gst' },
-        { name: 'Delivery Charges', path: '/dashboard/settings/delivery' },
-        { name: 'Late Fee Rules', path: '/dashboard/settings/late-fees' },
-        { name: 'Cancellation Rules', path: '/dashboard/settings/cancellations' },
-        { name: 'Subscription Rules', path: '/dashboard/settings/subscriptions' },
         { name: 'Email Templates', path: '/dashboard/settings/emails' },
         { name: 'SMS Templates', path: '/dashboard/settings/sms' },
       ]

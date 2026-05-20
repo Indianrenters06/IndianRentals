@@ -27,13 +27,17 @@ const PAGES = [
     { key: 'refund', label: 'Return & Refund Policy', slug: '/refund-policy' },
     { key: 'faq', label: 'FAQ / Help Center', slug: '/faq', specialized: true },
     { key: 'contact', label: 'Contact Us', slug: '/contact', specialized: true },
-    { key: 'rules', label: 'Rules & Charges', slug: '/rules' },
+    { key: 'delivery-charges', label: 'Delivery Charges', slug: '/delivery-charges' },
+    { key: 'late-fee-rules', label: 'Late Fee Rules', slug: '/late-fee-rules' },
+    { key: 'cancellation-rules', label: 'Cancellation Rules', slug: '/cancellation-rules' },
+    { key: 'subscription-rules', label: 'Subscription Rules', slug: '/subscription-rules' },
 ];
 
 const PAGE_ICONS = {
     'about': '🏢', 'rental-process': '🔄', 'terms': '📋',
     'privacy': '🔒', 'shipping': '🚚', 'refund': '↩️', 'faq': '❓', 'contact': '📞',
     'kyc-policy': '🆔', 'rules': '📜',
+    'delivery-charges': '🚚', 'late-fee-rules': '⏰', 'cancellation-rules': '❌', 'subscription-rules': '🔄',
 };
 
 const DEFAULTS = {
