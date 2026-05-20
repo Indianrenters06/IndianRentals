@@ -85,6 +85,10 @@ const productSchema = new mongoose.Schema({
         question: String,
         answer: String
     }],
+    variants: [{
+        name: { type: String, required: true },
+        options: [{ type: String }]
+    }],
     addons: [{
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Addon'

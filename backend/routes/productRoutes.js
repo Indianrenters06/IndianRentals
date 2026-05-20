@@ -10,6 +10,7 @@ const {
     createProductReview,
     uploadProductsBulk,
     updateProductFaqs,
+    updateProductVariants,
 } = require('../controllers/productController');
 const { protect, admin } = require('../middleware/authMiddleware');
 
@@ -24,6 +25,7 @@ router.route('/bulk')
 
 router.route('/:id/reviews').post(createProductReview);
 router.route('/:id/faqs').patch(protect, admin, updateProductFaqs);
+router.route('/:id/variants').patch(protect, admin, updateProductVariants);
 
 router.route('/:id')
     .get(getProductById)

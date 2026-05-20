@@ -38,9 +38,6 @@ const {
     getPricingPlans,
     createPricingPlan,
     deletePricingPlan,
-    getVariants,
-    createVariant,
-    deleteVariant,
     // Roles
     getRoles,
     createRole,
@@ -158,12 +155,6 @@ router.route('/pricing-plans')
 
 router.delete('/pricing-plans/:id', protect, admin, deletePricingPlan);
 
-// Variants
-router.route('/variants')
-    .get(protect, admin, getVariants)
-    .post(protect, admin, createVariant);
-
-router.delete('/variants/:id', protect, admin, deleteVariant);
 
 router.route('/team')
     .get(protect, admin, getTeamMembers)

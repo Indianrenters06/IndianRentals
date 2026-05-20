@@ -474,6 +474,21 @@ const updateProductFaqs = asyncHandler(async (req, res) => {
     res.json({ _id: updated._id, faqs: updated.faqs });
 });
 
+// @desc    Update only variants of a product
+// @route   PATCH /api/products/:id/variants
+// @access  Private/Admin
+const updateProductVariants = asyncHandler(async (req, res) => {
+    const { variants } = req.body;
+    const product = await Product.findById(req.params.id);
+    if (!product) {
+        res.status(404);
+        throw new Error('Product not found');
+    }
+    product.variants = Array.isArray(variants) ? variants : [];
+    const updated = await product.save();
+    res.json({ _id: updated._id, variants: updated.variants });
+});
+
 module.exports = {
     getProducts,
     getProductById,
@@ -483,4 +498,5 @@ module.exports = {
     createProductReview,
     uploadProductsBulk,
     updateProductFaqs,
+    updateProductVariants,
 };

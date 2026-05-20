@@ -628,37 +628,6 @@ const deletePricingPlan = asyncHandler(async (req, res) => {
     res.json({ message: 'Plan removed' });
 });
 
-// ============= VARIANTS =============
-
-// @desc    Get all variants
-// @route   GET /api/admin/variants
-// @access  Private/Admin
-const getVariants = asyncHandler(async (req, res) => {
-    const variants = await Variant.find({}).sort({ createdAt: -1 });
-    res.json(variants);
-});
-
-// @desc    Create a variant
-// @route   POST /api/admin/variants
-// @access  Private/Admin
-const createVariant = asyncHandler(async (req, res) => {
-    const { name, options } = req.body;
-    const variant = await Variant.create({ name, options });
-    res.status(201).json(variant);
-});
-
-// @desc    Delete a variant
-// @route   DELETE /api/admin/variants/:id
-// @access  Private/Admin
-const deleteVariant = asyncHandler(async (req, res) => {
-    const variant = await Variant.findById(req.params.id);
-    if (!variant) {
-        res.status(404);
-        throw new Error('Variant not found');
-    }
-    await Variant.findByIdAndDelete(req.params.id);
-    res.json({ message: 'Variant removed' });
-});
 
 // ============= ROLE MANAGEMENT =============
 
@@ -794,9 +763,6 @@ module.exports = {
     getPricingPlans,
     createPricingPlan,
     deletePricingPlan,
-    getVariants,
-    createVariant,
-    deleteVariant,
     // Roles
     getRoles,
     createRole,
