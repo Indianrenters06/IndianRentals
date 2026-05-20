@@ -28,7 +28,7 @@ const updateSettings = asyncHandler(async (req, res) => {
         siteName, siteLogo, contactEmail, contactPhone, address,
         navbarAnnouncements, navbarLinks, footerDescription, socialLinks, footerQuickLinks,
         maintenanceMode, allowRegistrations, requireKYC,
-        paymentGatewaySecret
+        paymentGatewaySecret, theme
     } = req.body;
 
     if (siteName !== undefined) settings.siteName = siteName;
@@ -40,6 +40,7 @@ const updateSettings = asyncHandler(async (req, res) => {
     if (allowRegistrations !== undefined) settings.allowRegistrations = allowRegistrations;
     if (requireKYC !== undefined) settings.requireKYC = requireKYC;
     if (paymentGatewaySecret !== undefined) settings.paymentGatewaySecret = paymentGatewaySecret;
+    if (theme !== undefined) settings.theme = theme;
 
     if (navbarAnnouncements !== undefined) settings.navbarAnnouncements = navbarAnnouncements;
     if (navbarLinks !== undefined) settings.navbarLinks = navbarLinks;

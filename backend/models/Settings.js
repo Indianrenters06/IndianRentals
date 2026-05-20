@@ -7,6 +7,11 @@ const settingsSchema = new mongoose.Schema({
     contactEmail: { type: String, default: 'support@indianrentals.com' },
     contactPhone: { type: String, default: '+91 1234567890' },
     address: { type: String, default: '' },
+    
+    // Theme & Branding
+    theme: {
+        activeTheme: { type: String, default: 'default', enum: ['default', 'oceanic', 'forest', 'sunset', 'midnight'] }
+    },
 
     // Navbar
     navbarAnnouncements: { type: [String], default: ["♥ SAVE Extra 5% up to ₹100 on UPI Orders ♥", "♥ Free Delivery on orders above ₹500 ♥"] },
