@@ -416,51 +416,59 @@ export default function KYCManagement() {
             </Modal>
 
             {/* Document Zoom & Download Overlay */}
-            {zoomedDoc && (
-                <div
-                    className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/90 backdrop-blur-sm p-4"
-                    onClick={() => setZoomedDoc(null)}
-                >
-                    {/* Close button — fixed to top-right of the overlay */}
-                    <button
-                        onClick={() => setZoomedDoc(null)}
-                        className="fixed top-4 right-4 z-[10000] w-10 h-10 flex items-center justify-center rounded-full bg-white/20 hover:bg-white/40 text-white transition-all backdrop-blur-sm border border-white/20"
-                    >
-                        <X size={20} weight="bold" />
-                    </button>
+            <Modal
+                isOpen={!!zoomedDoc}
+                onOpenChange={(open) => { if (!open) setZoomedDoc(null) }}
+                size="4xl"
+                classNames={{
+                    base: "bg-transparent shadow-none",
+                    backdrop: "bg-black/90 backdrop-blur-sm z-[99999]",
+                    wrapper: "z-[99999]"
+                }}
+                hideCloseButton
+            >
+                <ModalContent>
+                    {() => (
+                        <>
+                            {/* Close button */}
+                            <button
+                                onClick={() => setZoomedDoc(null)}
+                                className="absolute top-0 right-0 z-50 w-10 h-10 flex items-center justify-center rounded-full bg-white/20 hover:bg-white/40 text-white transition-all backdrop-blur-sm border border-white/20"
+                            >
+                                <X size={20} weight="bold" />
+                            </button>
+                            <ModalBody className="p-0 flex flex-col items-center justify-center">
+                                <img
+                                    src={zoomedDoc}
+                                    alt="KYC Document"
+                                    className="max-w-full max-h-[75vh] w-auto object-contain rounded-2xl shadow-2xl border border-white/10"
+                                />
 
-                    {/* Content — stop click propagation so clicking image doesn't close */}
-                    <div
-                        className="relative flex flex-col items-center gap-6 max-w-4xl w-full"
-                        onClick={e => e.stopPropagation()}
-                    >
-                        <img
-                            src={zoomedDoc}
-                            alt="KYC Document"
-                            className="max-w-full max-h-[75vh] w-auto object-contain rounded-2xl shadow-2xl border border-white/10"
-                        />
-
-                        <button
-                            className="flex items-center gap-2 h-11 px-8 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-sm shadow-lg shadow-indigo-500/30 transition-all"
-                            onClick={async () => {
-                                try {
-                                    const response = await fetch(zoomedDoc);
-                                    const blob = await response.blob();
-                                    const fileUrl = window.URL.createObjectURL(blob);
-                                    const alink = document.createElement('a');
-                                    alink.href = fileUrl;
-                                    alink.download = 'KYC_Document.jpg';
-                                    alink.click();
-                                } catch (e) {
-                                    window.open(zoomedDoc, '_blank');
-                                }
-                            }}
-                        >
-                            <DownloadSimple size={18} weight="bold" /> Download Document
-                        </button>
-                    </div>
-                </div>
-            )}
+                                <div className="mt-4 pb-4">
+                                    <button
+                                        className="flex items-center gap-2 h-11 px-8 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-sm shadow-lg shadow-indigo-500/30 transition-all"
+                                        onClick={async () => {
+                                            try {
+                                                const response = await fetch(zoomedDoc);
+                                                const blob = await response.blob();
+                                                const fileUrl = window.URL.createObjectURL(blob);
+                                                const alink = document.createElement('a');
+                                                alink.href = fileUrl;
+                                                alink.download = 'KYC_Document.jpg';
+                                                alink.click();
+                                            } catch (e) {
+                                                window.open(zoomedDoc, '_blank');
+                                            }
+                                        }}
+                                    >
+                                        <DownloadSimple size={18} weight="bold" /> Download Document
+                                    </button>
+                                </div>
+                            </ModalBody>
+                        </>
+                    )}
+                </ModalContent>
+            </Modal>
         </div>
     );
 }
