@@ -193,7 +193,6 @@ export default function DashboardLayout({ children }) {
         { name: 'All Products', path: '/dashboard/products' },
         { name: 'Categories', path: '/dashboard/products/categories' },
         { name: 'Subcategories', path: '/dashboard/products/subcategories' },
-        { name: 'Pricing Plans', path: '/dashboard/products/pricing' },
         { name: 'Add-ons', path: '/dashboard/products/addons' },
         { name: 'Variants', path: '/dashboard/products/variants' },
         { name: 'Bulk Upload', path: '/dashboard/products/bulk' },

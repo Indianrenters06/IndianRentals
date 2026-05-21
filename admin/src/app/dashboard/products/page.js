@@ -41,7 +41,7 @@ export default function AllProducts() {
 
     const [page, setPage] = useState(1);
     const rowsPerPage = 10;
-    const [sortCol, setSortCol] = useState("createdAt");
+    const [sortCol, setSortCol] = useState("updatedAt");
     const [sortDir, setSortDir] = useState("descending");
 
     // ── Fetch ─────────────────────────────────────────────────────────────────
@@ -257,30 +257,55 @@ export default function AllProducts() {
                 <Card className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm w-full">
 
                     {/* Toolbar */}
-                    <div className="p-4 border-b border-slate-200 dark:border-slate-800 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 bg-slate-50 dark:bg-slate-900/60">
-                        {/* Search */}
-                        <div className="relative group w-full sm:w-72">
-                            <div className="absolute left-3 top-1/2 -translate-y-1/2 flex items-center justify-center pointer-events-none z-10">
-                                <MagnifyingGlass className="text-slate-400 group-focus-within:text-indigo-500" size={18} />
+                    <div className="p-4 border-b border-slate-200 dark:border-slate-800 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4 bg-slate-50 dark:bg-slate-900/60">
+                        {/* Search & Sort Group */}
+                        <div className="flex flex-col sm:flex-row items-center gap-3 w-full lg:w-auto">
+                            <div className="relative group w-full sm:w-72">
+                                <div className="absolute left-3 top-1/2 -translate-y-1/2 flex items-center justify-center pointer-events-none z-10">
+                                    <MagnifyingGlass className="text-slate-400 group-focus-within:text-indigo-500" size={18} />
+                                </div>
+                                <input
+                                    type="text"
+                                    value={search}
+                                    onChange={e => setSearch(e.target.value)}
+                                    placeholder="Search by name, brand, category…"
+                                    className="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl pl-10 pr-4 py-2 text-sm text-slate-900 dark:text-slate-200 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 transition-all h-10 shadow-xs"
+                                />
                             </div>
-                            <input
-                                type="text"
-                                value={search}
-                                onChange={e => setSearch(e.target.value)}
-                                placeholder="Search by name, brand, category…"
-                                className="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl pl-10 pr-4 py-2 text-sm text-slate-900 dark:text-slate-200 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 transition-all h-10 shadow-xs"
-                            />
+
+                            <div className="relative w-full sm:w-56">
+                                <select
+                                    value={`${sortCol}-${sortDir}`}
+                                    onChange={(e) => {
+                                        const [c, d] = e.target.value.split("-");
+                                        setSortCol(c);
+                                        setSortDir(d);
+                                    }}
+                                    className="w-full h-10 pl-3 pr-8 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl text-sm font-medium text-slate-700 dark:text-slate-300 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 shadow-xs cursor-pointer appearance-none"
+                                >
+                                    <option value="updatedAt-descending">Sort by: Recently Updated</option>
+                                    <option value="createdAt-descending">Sort by: Newest Arrivals</option>
+                                    <option value="rentalPrice-ascending">Price: Low to High</option>
+                                    <option value="rentalPrice-descending">Price: High to Low</option>
+                                    <option value="stock-ascending">Stock: Low to High</option>
+                                    <option value="stock-descending">Stock: High to Low</option>
+                                    <option value="name-ascending">Name: A to Z</option>
+                                </select>
+                                <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+                                </div>
+                            </div>
                         </div>
 
                         {/* Filter pills */}
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-2 w-full lg:w-auto overflow-x-auto pb-1 lg:pb-0 hide-scrollbar">
                             {["all", "active", "draft"].map(f => (
                                 <button
                                     key={f}
                                     onClick={() => setFilter(f)}
-                                    className={`px-3 py-1.5 rounded-full text-xs font-bold capitalize transition-all ${filter === f
-                                        ? "bg-indigo-600 text-white shadow-sm"
-                                        : "bg-white dark:bg-slate-800 text-slate-500 dark:text-slate-400 border border-slate-200 dark:border-slate-700 hover:border-indigo-300"
+                                    className={`px-4 py-2 rounded-xl text-xs font-bold capitalize transition-all whitespace-nowrap ${filter === f
+                                        ? "bg-indigo-600 text-white shadow-md shadow-indigo-500/20"
+                                        : "bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700 hover:border-indigo-300 hover:bg-indigo-50 dark:hover:bg-indigo-900/20"
                                         }`}
                                 >
                                     {f === "all" ? `All (${products.length})` : f === "active" ? `Active (${totalActive})` : `Draft (${totalDraft})`}
@@ -291,10 +316,10 @@ export default function AllProducts() {
 
                     {/* Column headers */}
                     <div className={`${gridClass} px-6 py-3 bg-slate-50 dark:bg-slate-950/80 border-b border-slate-200 dark:border-slate-800 text-[11px] font-bold uppercase tracking-wider text-slate-400`}>
-                        <button type="button" className="text-left hover:text-indigo-500" onClick={() => { setSortCol('name'); setSortDir(d => d === 'ascending' ? 'descending' : 'ascending')}}>Product {sortCol === 'name' && (sortDir === 'ascending' ? '↑' : '↓')}</button>
-                        <button type="button" className="text-left hover:text-indigo-500" onClick={() => { setSortCol('category'); setSortDir(d => d === 'ascending' ? 'descending' : 'ascending')}}>Category {sortCol === 'category' && (sortDir === 'ascending' ? '↑' : '↓')}</button>
-                        <button type="button" className="text-left hover:text-indigo-500" onClick={() => { setSortCol('rentalPrice'); setSortDir(d => d === 'ascending' ? 'descending' : 'ascending')}}>Price / Deposit {sortCol === 'rentalPrice' && (sortDir === 'ascending' ? '↑' : '↓')}</button>
-                        <button type="button" className="text-left hover:text-indigo-500" onClick={() => { setSortCol('stock'); setSortDir(d => d === 'ascending' ? 'descending' : 'ascending')}}>Stock {sortCol === 'stock' && (sortDir === 'ascending' ? '↑' : '↓')}</button>
+                        <span className="text-left">Product</span>
+                        <span className="text-left">Category</span>
+                        <span className="text-left">Price / Deposit</span>
+                        <span className="text-left">Stock</span>
                         <span className="text-center">Status</span>
                         <span className="text-center">Actions</span>
                     </div>
