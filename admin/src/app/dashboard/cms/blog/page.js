@@ -1,4 +1,5 @@
 'use client';
+import toast from 'react-hot-toast';
 
 import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from "framer-motion";
@@ -80,7 +81,7 @@ function PageConfigEditor({ onBack }) {
             setSaved(true);
             setTimeout(() => setSaved(false), 2000);
         } catch (e) {
-            alert(e.message);
+            toast.error(e.message);
         } finally {
             setSaving(false);
         }
@@ -140,7 +141,7 @@ function PostEditor({ post, onBack, onSaved }) {
     const set = (k, v) => setForm(p => ({ ...p, [k]: v }));
 
     const handleSave = async () => {
-        if (!form.title.trim()) return alert("Title is required");
+        if (!form.title.trim()) return toast.error("Title is required");
         try {
             setSaving(true);
             const payload = { ...form, tags: form.tags.split(",").map(t => t.trim()).filter(Boolean) };
@@ -153,7 +154,7 @@ function PostEditor({ post, onBack, onSaved }) {
             if (!res.ok) throw new Error((await res.json()).message || "Failed to save");
             setSaved(true);
             setTimeout(() => { setSaved(false); onSaved(); }, 1200);
-        } catch (e) { alert(e.message); }
+        } catch (e) { toast.error(e.message); }
         finally { setSaving(false); }
     };
 
@@ -298,8 +299,8 @@ export default function BlogManagement() {
             setDeleting(id);
             const res = await fetch(`${API}/api/blog/${id}`, { method: "DELETE", headers: { Authorization: `Bearer ${getToken()}` } });
             if (res.ok) await fetchPosts();
-            else alert((await res.json()).message || "Failed to delete");
-        } catch (e) { alert(e.message); }
+            else toast.error((await res.json()).message || "Failed to delete");
+        } catch (e) { toast.error(e.message); }
         finally { setDeleting(null); }
     };
 

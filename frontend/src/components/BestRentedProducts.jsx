@@ -184,7 +184,7 @@ import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/scrollbar';
 
-const BestRentedProducts = ({ type = "bestRented", defaultTitle = "Curated Products" }) => {
+const BestRentedProducts = ({ type = "bestRented", defaultTitle = "Curated Products", customProducts = null }) => {
     const [isDesktop, setIsDesktop] = useState(false);
     const router = useRouter();
     const dispatch = useDispatch();
@@ -246,6 +246,26 @@ const BestRentedProducts = ({ type = "bestRented", defaultTitle = "Curated Produ
                 setCmsConfig({ enabled: isEnabled, title: finalTitle, productIds: targetIds });
 
                 if (!isEnabled) {
+                    setLoading(false);
+                    return;
+                }
+
+                if (customProducts && customProducts.length > 0) {
+                    const mappedProducts = customProducts.map(p => ({
+                        id: p._id,
+                        name: p.name,
+                        category: p.category,
+                        image: (p.images && p.images.length > 0) ? p.images[0] : "/images/placeholder.png",
+                        rating: p.rating || 4.5,
+                        reviews: p.numReviews || 12,
+                        originalPrice: Math.round((p.rentalPrice || 0) * 1.5),
+                        rentPrice: p.rentalPrice,
+                        discount: p.condition === 'New' ? "NEW" : "HOT",
+                        isNew: p.condition === 'New',
+                        tags: ["Quality tested", "Deep Cleaned"],
+                        statusTags: ["Like New", "In Stock"],
+                    }));
+                    setProducts(mappedProducts);
                     setLoading(false);
                     return;
                 }

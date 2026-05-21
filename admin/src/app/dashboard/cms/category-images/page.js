@@ -1,4 +1,5 @@
 'use client';
+import toast from 'react-hot-toast';
 
 import { useState, useEffect, useCallback } from 'react';
 import { Spinner } from '@heroui/react';
@@ -69,7 +70,7 @@ export default function CategoryImagesCMS() {
                 };
             }));
         } catch (e) {
-            alert(e.message);
+            toast.error(e.message);
         } finally {
             setSaving(null);
         }

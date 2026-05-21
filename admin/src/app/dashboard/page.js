@@ -1,4 +1,5 @@
 "use client";
+import toast from 'react-hot-toast';
 
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
@@ -495,9 +496,9 @@ export default function AdminDashboard() {
                         </DropdownTrigger>
                         <DropdownMenu aria-label="Table Actions" variant="flat">
                           <DropdownItem key="view" onPress={() => router.push(`/dashboard/orders`)}>View Details</DropdownItem>
-                          <DropdownItem key="edit" onPress={() => alert("Order editing logic will be implemented soon.")}>Edit Order</DropdownItem>
-                          <DropdownItem key="invoice" onPress={() => alert("Generating Invoice PDF...")}>Download Invoice</DropdownItem>
-                          <DropdownItem key="delete" className="text-danger" color="danger" onPress={() => alert("Requesting order cancellation...")}>Cancel Rental</DropdownItem>
+                          <DropdownItem key="edit" onPress={() => toast.error("Order editing logic will be implemented soon.")}>Edit Order</DropdownItem>
+                          <DropdownItem key="invoice" onPress={() => toast.success("Generating Invoice PDF...")}>Download Invoice</DropdownItem>
+                          <DropdownItem key="delete" className="text-danger" color="danger" onPress={() => toast.success("Requesting order cancellation...")}>Cancel Rental</DropdownItem>
                         </DropdownMenu>
                       </Dropdown>
                     </div>

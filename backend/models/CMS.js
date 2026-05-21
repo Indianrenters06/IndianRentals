@@ -217,6 +217,18 @@ const cmsSchema = new mongoose.Schema({
     contactMapUrl: { type: String, default: '' },
     contactWhatsApp: { type: String, default: '' },
 
+    // ── Product Page ──────────────────────────────────────────────────────────
+    productPageBenefits: {
+        type: [String],
+        default: ["Fully Functional", "Accessories Included", "Free Repairs & Maintenance", "Professionally sanitized"]
+    },
+    productPageDeliveryText: { type: String, default: "2-4 days" },
+    productPageDiscountText: { type: String, default: "20% off" },
+    productPageEnableCompare: { type: Boolean, default: true },
+    productPageEnableRelated: { type: Boolean, default: true },
+    productPageEnableFaq: { type: Boolean, default: true },
+    productPageEnableTestimonials: { type: Boolean, default: true },
+
     // ── SEO ──────────────────────────────────────────────────────────────────
     metaTitle: { type: String, default: '' },
     metaDescription: { type: String, default: '' },

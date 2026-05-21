@@ -1,7 +1,7 @@
 const asyncHandler = require('express-async-handler');
 const CMS = require('../models/CMS');
 
-const ALLOWED_PAGES = ['homepage', 'about', 'terms', 'privacy', 'contact', 'shipping', 'refund', 'faq', 'rental-process', 'kyc-policy', 'categories-page', 'delivery-charges', 'late-fee-rules', 'cancellation-rules', 'subscription-rules'];
+const ALLOWED_PAGES = ['homepage', 'about', 'terms', 'privacy', 'contact', 'shipping', 'refund', 'faq', 'rental-process', 'kyc-policy', 'categories-page', 'delivery-charges', 'late-fee-rules', 'cancellation-rules', 'subscription-rules', 'product-page'];
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 const getOrCreatePage = async (pageName) => {
@@ -108,6 +108,10 @@ const updatePage = asyncHandler(async (req, res) => {
 
         // Categories Page
         'categoriesPageTitle', 'categoriesPageSubtitle', 'categoriesGrid',
+
+        // Product Page
+        'productPageBenefits', 'productPageDeliveryText', 'productPageDiscountText', 
+        'productPageEnableCompare', 'productPageEnableRelated', 'productPageEnableFaq', 'productPageEnableTestimonials',
 
         // SEO
         'metaTitle', 'metaDescription', 'publishStatus', 'scheduledPublishTime',

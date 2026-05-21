@@ -145,10 +145,81 @@ const deleteCoupon = asyncHandler(async (req, res) => {
     }
 });
 
+// @desc    Get coupon analytics
+// @route   GET /api/admin/coupons/analytics
+// @access  Private/Admin
+const getCouponAnalytics = asyncHandler(async (req, res) => {
+    // We need Rental to fetch usage stats
+    const Rental = require('../models/Rental');
+    
+    // Find all rentals that used a coupon
+    const rentals = await Rental.find({ couponCode: { $ne: null, $ne: "" } });
+
+    let totalDiscount = 0;
+    let totalRevenue = 0;
+    const usageByCode = {};
+    const timeline = {};
+
+    rentals.forEach(r => {
+        totalDiscount += (r.couponDiscount || 0);
+        totalRevenue += (r.totalPrice || 0);
+
+        const code = r.couponCode.toUpperCase();
+        usageByCode[code] = (usageByCode[code] || 0) + 1;
+
+        // Group by day for timeline
+        const dateStr = r.createdAt.toISOString().split('T')[0];
+        timeline[dateStr] = (timeline[dateStr] || 0) + 1;
+    });
+
+    const topCoupons = Object.entries(usageByCode)
+        .map(([code, count]) => ({ code, count }))
+        .sort((a, b) => b.count - a.count)
+        .slice(0, 5);
+
+    // Format timeline for charts
+    const timelineData = Object.entries(timeline)
+        .map(([date, count]) => ({ date, count }))
+        .sort((a, b) => new Date(a.date) - new Date(b.date));
+
+    res.json({
+        totalCouponsUsed: rentals.length,
+        totalDiscountGiven: totalDiscount,
+        revenueFromCoupons: totalRevenue,
+        topCoupons,
+        timelineData
+    });
+});
+
+// @desc    Get coupon usage report
+// @route   GET /api/admin/coupons/report
+// @access  Private/Admin
+const getCouponReport = asyncHandler(async (req, res) => {
+    const Rental = require('../models/Rental');
+    const rentals = await Rental.find({ couponCode: { $ne: null, $ne: "" } })
+        .populate('user', 'name email')
+        .sort({ createdAt: -1 });
+
+    const report = rentals.map(r => ({
+        orderId: r._id,
+        user: r.user ? r.user.name : 'Unknown',
+        email: r.user ? r.user.email : '',
+        date: r.createdAt,
+        couponCode: r.couponCode,
+        discount: r.couponDiscount,
+        orderTotal: r.totalPrice,
+        status: r.status
+    }));
+
+    res.json(report);
+});
+
 module.exports = {
     getCoupons,
     verifyCoupon,
     createCoupon,
     updateCoupon,
-    deleteCoupon
+    deleteCoupon,
+    getCouponAnalytics,
+    getCouponReport
 };

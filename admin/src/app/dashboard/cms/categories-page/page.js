@@ -1,4 +1,5 @@
 'use client';
+import toast from 'react-hot-toast';
 
 import React, { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -95,7 +96,7 @@ export default function CategoriesPageCMS() {
             if (!res.ok) throw new Error('Failed to save');
             setSaved(true);
             setTimeout(() => setSaved(false), 3000);
-        } catch (e) { alert(e.message); }
+        } catch (e) { toast.error(e.message); }
         finally { setSaving(false); }
     };
 

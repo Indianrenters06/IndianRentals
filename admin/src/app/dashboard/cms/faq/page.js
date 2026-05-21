@@ -1,4 +1,5 @@
 'use client';
+import toast from 'react-hot-toast';
 
 import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -61,7 +62,7 @@ function ProductFaqEditor({ product, onClose, onSaved }) {
             onSaved(product._id, faqs);
             setTimeout(() => setSaved(false), 3000);
         } catch (e) {
-            alert(e.message);
+            toast.error(e.message);
         } finally {
             setSaving(false);
         }

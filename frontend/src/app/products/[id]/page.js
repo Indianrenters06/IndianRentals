@@ -45,6 +45,9 @@ export default function ProductDetailPage() {
     const [isRentHovered, setIsRentHovered] = useState(false);
     const [isCompareOpen, setIsCompareOpen] = useState(false);
     const [isCancellationOpen, setIsCancellationOpen] = useState(false);
+    
+    // CMS Layout State
+    const [pageLayout, setPageLayout] = useState(null);
 
     // Fetch Product Data
     useEffect(() => {
@@ -57,6 +60,28 @@ export default function ProductDetailPage() {
                 // Since our backend uses MongoDB IDs, we hope the link passed the ID.
                 const data = await getProductById(params.id);
                 setProduct(data);
+                
+                try {
+                    const API = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+                    const cmsRes = await window.fetch(`${API}/api/cms/product-page`);
+                    if (cmsRes.ok) {
+                        const globalLayout = await cmsRes.json();
+                        // Merge product-specific layout overrides
+                        const prodLayout = data.pageLayout || {};
+                        setPageLayout({
+                            ...globalLayout,
+                            ...(prodLayout.enableCompare != null ? { productPageEnableCompare: prodLayout.enableCompare } : {}),
+                            ...(prodLayout.enableRelated != null ? { productPageEnableRelated: prodLayout.enableRelated } : {}),
+                            ...(prodLayout.enableFaq != null ? { productPageEnableFaq: prodLayout.enableFaq } : {}),
+                            ...(prodLayout.enableTestimonials != null ? { productPageEnableTestimonials: prodLayout.enableTestimonials } : {}),
+                            ...(prodLayout.discountText ? { productPageDiscountText: prodLayout.discountText } : {}),
+                            ...(prodLayout.deliveryText ? { productPageDeliveryText: prodLayout.deliveryText } : {}),
+                            ...(prodLayout.benefits?.length > 0 ? { productPageBenefits: prodLayout.benefits } : {}),
+                        });
+                    }
+                } catch (e) {
+                    console.error("Failed to load product page layout", e);
+                }
             } catch (err) {
                 console.error("Failed to load product", err);
                 setError("Product not found");
@@ -383,7 +408,7 @@ export default function ProductDetailPage() {
                                         </div>
                                         <div className="bg-[#00B200] text-white text-[11px] font-medium px-2 py-0.5 rounded-[6px] flex items-center justify-center gap-1.5 h-full whitespace-nowrap">
                                             <BsTruck size={13} className="stroke-[0.5]" />
-                                            <span className="mt-[1px]">{product.deliveryTime || "2-4 days"}</span>
+                                            <span className="mt-[1px]">{product.deliveryTime || pageLayout?.productPageDeliveryText || "2-4 days"}</span>
                                         </div>
                                     </div>
                                 </div>
@@ -553,27 +578,29 @@ export default function ProductDetailPage() {
                                         >
                                             price breakdown
                                         </Link>
-                                        <button
-                                            onClick={() => setIsCompareOpen(true)}
-                                            style={{
-                                                fontSize: 'var(--font-size-1, 12px)',
-                                                lineHeight: 'var(--font-line-height-1, 16px)',
-                                                letterSpacing: 'var(--font-letter-spacing-8, normal)',
-                                                color: 'var(--color-orange-orange-600, hsla(29, 100%, 50%, 1))',
-                                                textDecoration: 'underline',
-                                                textDecorationStyle: 'solid',
-                                                textUnderlineOffset: '8.5%',
-                                                textDecorationThickness: '11%',
-                                                opacity: 1,
-                                                whiteSpace: 'nowrap',
-                                                background: 'none',
-                                                border: 'none',
-                                                cursor: 'pointer',
-                                                padding: 0
-                                            }}
-                                        >
-                                            compare all tenures
-                                        </button>
+                                        {(pageLayout?.productPageEnableCompare !== false) && (
+                                            <button
+                                                onClick={() => setIsCompareOpen(true)}
+                                                style={{
+                                                    fontSize: 'var(--font-size-1, 12px)',
+                                                    lineHeight: 'var(--font-line-height-1, 16px)',
+                                                    letterSpacing: 'var(--font-letter-spacing-8, normal)',
+                                                    color: 'var(--color-orange-orange-600, hsla(29, 100%, 50%, 1))',
+                                                    textDecoration: 'underline',
+                                                    textDecorationStyle: 'solid',
+                                                    textUnderlineOffset: '8.5%',
+                                                    textDecorationThickness: '11%',
+                                                    opacity: 1,
+                                                    whiteSpace: 'nowrap',
+                                                    background: 'none',
+                                                    border: 'none',
+                                                    cursor: 'pointer',
+                                                    padding: 0
+                                                }}
+                                            >
+                                                compare all tenures
+                                            </button>
+                                        )}
                                     </div>
                                 </div>
 
@@ -675,7 +702,7 @@ export default function ProductDetailPage() {
                                                 >
                                                     {product.mrp 
                                                         ? `${Math.round(((product.mrp - currentPlan.price) / product.mrp) * 100)}% off`
-                                                        : "20% off"
+                                                        : (pageLayout?.productPageDiscountText || "20% off")
                                                     }
                                                 </span>
                                             </div>
@@ -764,9 +791,9 @@ export default function ProductDetailPage() {
                                     className="flex gap-[4px] w-full overflow-x-auto hide-scrollbar items-center"
                                     style={{ height: '48px' }}
                                 >
-                                    {(product.benefits && product.benefits.length > 0 ? product.benefits : [
+                                    {(product.benefits && product.benefits.length > 0 ? product.benefits : (pageLayout?.productPageBenefits || [
                                         "Fully Functional", "Accessories Included", "Free Repairs & Maintenance", "Professionally sanitized"
-                                    ]).map((benefit, idx) => {
+                                    ])).map((benefit, idx) => {
                                         const benefitText = benefit.type || benefit;
                                         const Icon = [Sparkle, Package, UserCircle, Bank][idx % 4];
                                         return (
@@ -1430,13 +1457,21 @@ export default function ProductDetailPage() {
                 </main>
             </div>
 
-            <Testimonials />
-            {product.faqs && product.faqs.length > 0 ? (
-                <FaqSection cmsData={{ faqItems: product.faqs, faqTitle: "Product FAQs", faqSubtitle: "Specific questions about this product." }} />
-            ) : (
-                <FaqSection limit={5} />
+            {pageLayout?.productPageEnableTestimonials !== false && <Testimonials />}
+            
+            {pageLayout?.productPageEnableFaq !== false && (
+                product.faqs && product.faqs.length > 0 ? (
+                    <FaqSection cmsData={{ faqItems: product.faqs, faqTitle: "Product FAQs", faqSubtitle: "Specific questions about this product." }} />
+                ) : (
+                    <FaqSection limit={5} />
+                )
             )}
-            <BestRentedProducts />
+            
+            {pageLayout?.productPageEnableRelated !== false && (
+                <BestRentedProducts 
+                    customProducts={product.pageLayout?.relatedProducts?.length > 0 ? product.pageLayout.relatedProducts : null} 
+                />
+            )}
 
             {/* Side Drawers */}
             <CompareTenures

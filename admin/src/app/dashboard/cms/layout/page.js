@@ -1,4 +1,5 @@
 "use client";
+import toast from 'react-hot-toast';
 
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
@@ -103,13 +104,13 @@ export default function LayoutCMSPage() {
                 body: JSON.stringify(data)
             });
             if (res.ok) {
-                alert("Layout settings updated successfully");
+                toast.success("Layout settings updated successfully");
             } else {
-                alert("Failed to update settings");
+                toast.error("Failed to update settings");
             }
         } catch (err) {
             console.error(err);
-            alert("Error saving settings");
+            toast.error("Error saving settings");
         } finally {
             setSaving(false);
         }

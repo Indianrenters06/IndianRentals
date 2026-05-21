@@ -452,7 +452,7 @@ export default function CustomersManagement() {
                                 variant="bordered"
                                 radius="xl"
                                 startContent={<MagnifyingGlass className="text-slate-400" size={18} />}
-                                classNames={{ 
+                                classNames={{
                                     inputWrapper: "bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 h-[50px] shadow-sm",
                                     input: "text-sm"
                                 }}
@@ -473,7 +473,7 @@ export default function CustomersManagement() {
                                     <Pagination
                                         radius="md" variant="flat"
                                         showControls
-                                        
+
                                         color="primary"
                                         page={page}
                                         total={Math.ceil(filteredUsers.length / rowsPerPage)}
@@ -766,5 +766,14 @@ export default function CustomersManagement() {
                 </ModalContent>
             </Modal>
         </div>
+    );
+}
+                                </Button >
+                            </ModalFooter >
+                        </form >
+                    )}
+                </ModalContent >
+            </Modal >
+        </div >
     );
 }

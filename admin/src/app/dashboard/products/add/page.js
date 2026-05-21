@@ -1,4 +1,5 @@
 'use client';
+import toast from 'react-hot-toast';
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
@@ -119,7 +120,7 @@ export default function AddProduct() {
                 throw new Error(err.message || "Failed to create product");
             }
         } catch (err) {
-            alert(err.message);
+            toast.error(err.message);
             console.error(err);
         } finally {
             setLoading(false);

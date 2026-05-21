@@ -1,4 +1,5 @@
 'use client';
+import toast from 'react-hot-toast';
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { motion } from "framer-motion";
@@ -328,7 +329,7 @@ export default function CMSHomepage() {
             if (!res.ok) throw new Error((await res.json()).message || "Failed to save");
             setSaved(true);
             setTimeout(() => setSaved(false), 3000);
-        } catch (err) { alert(err.message); }
+        } catch (err) { toast.error(err.message); }
         finally { setSaving(false); }
     };
 

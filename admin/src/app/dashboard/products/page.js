@@ -28,6 +28,8 @@ export default function AllProducts() {
     const router = useRouter();
     const [products, setProducts] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [confirmOpen, setConfirmOpen] = useState(false);
+    const [deleteTarget, setDeleteTarget] = useState(null);
     const [deleting, setDeleting] = useState(null);
     const [toggling, setToggling] = useState(null);
     const [search, setSearch] = useState("");
@@ -190,6 +192,15 @@ export default function AllProducts() {
 
     return (
         <div className="w-full space-y-6 pb-12">
+            <ConfirmDeleteModal
+                isOpen={confirmOpen}
+                onClose={() => setConfirmOpen(false)}
+                onConfirm={() => { setConfirmOpen(false); if (deleteTarget) handleDelete(deleteTarget.id); }}
+                title="Confirm Action"
+                description="Are you sure you want to perform this destructive action? This cannot be undone."
+                loading={false}
+            />
+
 
             {/* ── Header ── */}
             <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
@@ -292,7 +303,7 @@ export default function AllProducts() {
                                     <option value="name-ascending">Name: A to Z</option>
                                 </select>
                                 <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
-                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m6 9 6 6 6-6" /></svg>
                                 </div>
                             </div>
                         </div>
@@ -449,7 +460,7 @@ export default function AllProducts() {
                             <Pagination
                                 radius="md" variant="flat"
                                 showControls
-                                
+
                                 color="primary"
                                 page={page}
                                 total={Math.ceil(visible.length / rowsPerPage)}
@@ -462,8 +473,8 @@ export default function AllProducts() {
             {/* ── Bulk Upload Modal ── */}
             {isBulkOpen && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-fade-in">
-                    <motion.div 
-                        initial={{ scale: 0.95, opacity: 0 }} 
+                    <motion.div
+                        initial={{ scale: 0.95, opacity: 0 }}
                         animate={{ scale: 1, opacity: 1 }}
                         exit={{ scale: 0.95, opacity: 0 }}
                         className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl w-full max-w-lg shadow-2xl overflow-hidden flex flex-col max-h-[90vh]"
@@ -477,7 +488,7 @@ export default function AllProducts() {
                                 </h3>
                                 <p className="text-slate-500 text-xs mt-1">Upload multiple products at once via CSV file.</p>
                             </div>
-                            <button 
+                            <button
                                 onClick={() => setIsBulkOpen(false)}
                                 className="p-2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
                             >
@@ -617,5 +628,31 @@ export default function AllProducts() {
                 </div>
             )}
         </div>
+    );
+}
+onClick = {() => {
+    setBulkFile(null);
+    setBulkResult(null);
+    setBulkError("");
+}}
+className = "h-11 px-5 rounded-xl border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300 font-bold text-xs transition-colors"
+    >
+    Upload Another
+                                        </button >
+    <button
+        type="button"
+        onClick={() => setIsBulkOpen(false)}
+        className="h-11 px-6 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs shadow-md shadow-indigo-500/10 transition-colors"
+    >
+        Close
+    </button>
+                                    </div >
+                                </div >
+                            )}
+                        </div >
+                    </motion.div >
+                </div >
+            )}
+        </div >
     );
 }

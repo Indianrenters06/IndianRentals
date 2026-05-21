@@ -1,4 +1,5 @@
 "use client";
+import toast from 'react-hot-toast';
 
 import { useState, useEffect, useCallback } from "react";
 import { useRouter, useParams } from "next/navigation";
@@ -107,7 +108,7 @@ export default function EditProduct() {
             });
         } catch (err) {
             console.error("Fetch Error:", err);
-            alert(err.message);
+            toast.error(err.message);
             router.push("/dashboard/products");
         } finally {
             setLoading(false);
@@ -132,7 +133,7 @@ export default function EditProduct() {
     // ── Save ──────────────────────────────────────────────────────────────────
     const handleSave = async () => {
         if (!form.name || !form.rentalPrice || !form.securityDeposit || !form.city || !form.state) {
-            alert("Please fill all required fields.");
+            toast.error("Please fill all required fields.");
             return;
         }
         try {
@@ -192,7 +193,7 @@ export default function EditProduct() {
             setSaved(true);
             setTimeout(() => { setSaved(false); router.push("/dashboard/products"); }, 1500);
         } catch (err) {
-            alert(err.message);
+            toast.error(err.message);
         } finally {
             setSaving(false);
         }

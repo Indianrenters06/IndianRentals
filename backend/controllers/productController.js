@@ -74,7 +74,9 @@ const getProducts = asyncHandler(async (req, res) => {
 // @route   GET /api/products/:id
 // @access  Public
 const getProductById = asyncHandler(async (req, res) => {
-    const product = await Product.findById(req.params.id).populate('subcategory', 'name slug');
+    const product = await Product.findById(req.params.id)
+        .populate('subcategory', 'name slug')
+        .populate('pageLayout.relatedProducts', 'name images rentalPrice category');
 
     if (product) {
         res.json(product);
@@ -112,6 +114,7 @@ const createProduct = asyncHandler(async (req, res) => {
         seoDescription,
         seoKeywords,
         slug,
+        pageLayout,
     } = req.body;
 
     // Check if category exists, if not create it
@@ -151,6 +154,7 @@ const createProduct = asyncHandler(async (req, res) => {
         seoDescription: seoDescription || "",
         seoKeywords: seoKeywords || "",
         slug: slug || name.toLowerCase().replace(/ /g, "-").replace(/[^\w-]/g, ""),
+        pageLayout: pageLayout || {},
     });
 
     const createdProduct = await product.save();
@@ -187,6 +191,7 @@ const updateProduct = asyncHandler(async (req, res) => {
         seoDescription,
         seoKeywords,
         slug,
+        pageLayout,
     } = req.body;
 
     const product = await Product.findById(req.params.id);
@@ -239,6 +244,14 @@ const updateProduct = asyncHandler(async (req, res) => {
         product.seoDescription = seoDescription !== undefined ? seoDescription : product.seoDescription;
         product.seoKeywords = seoKeywords !== undefined ? seoKeywords : product.seoKeywords;
         product.slug = slug !== undefined ? slug : product.slug;
+
+        if (pageLayout !== undefined) {
+            product.pageLayout = { ...product.pageLayout, ...pageLayout };
+            // Ensure relatedProducts is properly set as an array or cleared if undefined
+            if (pageLayout.relatedProducts !== undefined) {
+                product.pageLayout.relatedProducts = pageLayout.relatedProducts;
+            }
+        }
 
         const updatedProduct = await product.save();
         await updatedProduct.populate('subcategory', 'name slug');

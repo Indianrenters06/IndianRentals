@@ -1,4 +1,5 @@
 'use client';
+import toast from 'react-hot-toast';
 
 import { useState, useRef } from 'react';
 import { motion } from "framer-motion";
@@ -126,10 +127,10 @@ export default function BulkUpload() {
                 setUploadedImageUrls(prev => [...data.images, ...prev]);
             } else {
                 const err = await res.json();
-                alert(`Upload failed: ${err.message}`);
+                toast.error(`Upload failed: ${err.message}`);
             }
         } catch (err) {
-            alert(`Upload failed: ${err.message}`);
+            toast.error(`Upload failed: ${err.message}`);
         } finally {
             setUploadingImages(false);
             if (imageFileRef.current) imageFileRef.current.value = "";

@@ -139,6 +139,17 @@ productSchema.add({
         required: true,
         default: 0,
     },
+    // Layout Overrides
+    pageLayout: {
+        enableCompare: { type: Boolean, default: null },
+        enableRelated: { type: Boolean, default: null },
+        enableFaq: { type: Boolean, default: null },
+        enableTestimonials: { type: Boolean, default: null },
+        discountText: { type: String, default: "" },
+        deliveryText: { type: String, default: "" },
+        benefits: { type: [String], default: [] },
+        relatedProducts: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Product' }]
+    }
 });
 
-module.exports = mongoose.model('Product', productSchema);
+module.exports = mongoose.models.Product || mongoose.model('Product', productSchema);
