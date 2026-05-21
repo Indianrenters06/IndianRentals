@@ -768,12 +768,3 @@ export default function CustomersManagement() {
         </div>
     );
 }
-                                </Button >
-                            </ModalFooter >
-                        </form >
-                    )}
-                </ModalContent >
-            </Modal >
-        </div >
-    );
-}
