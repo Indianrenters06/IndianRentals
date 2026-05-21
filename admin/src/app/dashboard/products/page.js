@@ -630,20 +630,3 @@ export default function AllProducts() {
         </div>
     );
 }
-    <button
-        type="button"
-        onClick={() => setIsBulkOpen(false)}
-        className="h-11 px-6 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs shadow-md shadow-indigo-500/10 transition-colors"
-    >
-        Close
-    </button>
-                                    </div >
-                                </div >
-                            )}
-                        </div >
-                    </motion.div >
-                </div >
-            )}
-        </div >
-    );
-}
