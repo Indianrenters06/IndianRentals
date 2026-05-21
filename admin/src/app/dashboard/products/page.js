@@ -630,15 +630,6 @@ export default function AllProducts() {
         </div>
     );
 }
-onClick = {() => {
-    setBulkFile(null);
-    setBulkResult(null);
-    setBulkError("");
-}}
-className = "h-11 px-5 rounded-xl border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300 font-bold text-xs transition-colors"
-    >
-    Upload Another
-                                        </button >
     <button
         type="button"
         onClick={() => setIsBulkOpen(false)}
