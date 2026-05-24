@@ -14,6 +14,7 @@ import {
     ArrowClockwise, FunnelSimple, UploadSimple, DownloadSimple, X, CloudArrowUp, WarningCircle
 } from "@phosphor-icons/react";
 import ConfirmDeleteModal from "@/components/ConfirmDeleteModal";
+import toast from 'react-hot-toast';
 
 const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
 const FRONTEND = process.env.NEXT_PUBLIC_FRONTEND_URL || "https://indian-rentals.vercel.app";
@@ -161,11 +162,12 @@ export default function AllProducts() {
             });
             if (res.ok) {
                 setProducts(p => p.filter(x => x._id !== id));
+                toast.success("Product deleted successfully");
             } else {
                 const e = await res.json();
-                alert(e.message || "Failed to delete");
+                toast.error(e.message || "Failed to delete");
             }
-        } catch (err) { alert(err.message); }
+        } catch (err) { toast.error(err.message || "Failed to delete"); }
         finally { setDeleting(null); }
     };
 
@@ -181,10 +183,11 @@ export default function AllProducts() {
             if (res.ok) {
                 const updated = await res.json();
                 setProducts(prev => prev.map(p => p._id === product._id ? { ...p, isActive: updated.isActive } : p));
+                toast.success(`Product ${updated.isActive ? 'activated' : 'set to draft'}`);
             } else {
-                alert("Failed to update status");
+                toast.error("Failed to update status");
             }
-        } catch (err) { alert(err.message); }
+        } catch (err) { toast.error(err.message || "Failed to toggle status"); }
         finally { setToggling(null); }
     };
 

@@ -8,6 +8,7 @@ import {
     ModalBody, ModalFooter, Select, SelectItem, useDisclosure, Skeleton, Spinner
 } from "@heroui/react";
 import { Tag, Plus, Trash, WarningCircle, CheckCircle, Clock, MagnifyingGlass, ArrowClockwise, Percent, CurrencyInr, Calendar, User } from "@phosphor-icons/react";
+import toast from 'react-hot-toast';
 
 const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
 const getToken = () => localStorage.getItem("adminToken");
@@ -83,6 +84,7 @@ export default function ActiveCoupons() {
             setForm({ code: "", discountAmount: "", discountType: "percentage", minOrderAmount: "", expiryDate: "", usageLimit: "", description: "" });
             onClose();
             fetchCoupons();
+            toast.success("Coupon created successfully");
         } catch (err) {
             setFormError(err.message);
         } finally {
@@ -101,12 +103,13 @@ export default function ActiveCoupons() {
             });
             if (res.ok) {
                 setCoupons(prev => prev.filter(c => c._id !== id));
+                toast.success("Coupon deleted");
             } else {
                 const err = await res.json();
-                alert(err.message || "Failed to delete");
+                toast.error(err.message || "Failed to delete");
             }
         } catch (err) {
-            alert(err.message);
+            toast.error(err.message || "Delete failed");
         } finally {
             setDeleting(null);
         }

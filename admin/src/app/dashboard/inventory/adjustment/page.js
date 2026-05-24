@@ -8,6 +8,7 @@ import {
     Select, SelectItem, Input, Textarea, Skeleton, useDisclosure
 } from "@heroui/react";
 import { Plus, WarningCircle, ArrowUp, ArrowDown } from "@phosphor-icons/react";
+import toast from 'react-hot-toast';
 
 const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
 
@@ -92,6 +93,7 @@ export default function StockAdjustment() {
             setAmount("");
             setReason("");
             onClose();
+            toast.success("Stock adjustment applied successfully");
         } catch (err) {
             setFormError(err.message);
         } finally {

@@ -7,6 +7,7 @@ import {
     Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, useDisclosure, Textarea, Divider,
     Pagination, Tabs, Tab } from "@heroui/react";
 import { Eye, CheckCircle, WarningCircle, User, IdentificationCard, FileText, Info } from "@phosphor-icons/react";
+import toast from 'react-hot-toast';
 import { DownloadSimple, MagnifyingGlassPlus, X } from "@phosphor-icons/react";
 import jsPDF from "jspdf";
 
@@ -64,11 +65,12 @@ export default function KYCManagement() {
             if (res.ok) {
                 fetchKYC();
                 onClose();
+                toast.success(status === 'approved' ? 'KYC approved successfully' : 'KYC rejected');
             } else {
                 throw new Error("Failed to update KYC");
             }
         } catch (err) {
-            console.error(err);
+            toast.error(err.message || 'Failed to update KYC status');
         }
     };
 

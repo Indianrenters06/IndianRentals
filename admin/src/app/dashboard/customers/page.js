@@ -36,6 +36,7 @@ import {
     Spinner,
     Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, useDisclosure, Divider
 } from "@heroui/react";
+import toast from 'react-hot-toast';
 
 const API = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
 
@@ -175,11 +176,13 @@ export default function CustomersManagement() {
                 setUsers(prev => prev.map(u =>
                     u._id === data._id ? { ...u, isBlocked: data.isBlocked, isActive: data.isActive, blockedReason: data.blockedReason } : u
                 ));
+                const actionLabel = { block: 'blocked', unblock: 'unblocked', activate: 'activated', deactivate: 'deactivated' }[action] || 'updated';
+                toast.success(`User ${actionLabel} successfully`);
             } else {
-                alert(data.message || 'Failed to update user status');
+                toast.error(data.message || 'Failed to update user status');
             }
         } catch (err) {
-            alert('Network error. Could not update status.');
+            toast.error('Network error. Could not update status.');
         }
     };
 
@@ -233,13 +236,14 @@ export default function CustomersManagement() {
             });
             if (response.ok) {
                 setUsers(prev => prev.filter(u => u._id !== userId));
+                toast.success('Customer deleted successfully');
             } else {
                 const data = await response.json();
-                alert(data.message || 'Failed to delete user');
+                toast.error(data.message || 'Failed to delete user');
             }
         } catch (error) {
             console.error('Error deleting user:', error);
-            alert('Network error. Could not delete user.');
+            toast.error('Network error. Could not delete user.');
         }
     };
 
@@ -679,12 +683,13 @@ export default function CustomersManagement() {
                                     fetchUsers();
                                     onClose();
                                     setAddFormData({ name: "", email: "", phone: "", password: "", city: "", state: "" });
+                                    toast.success("Customer created successfully");
                                 } else {
                                     const data = await res.json();
-                                    alert(data.message || "Failed to create customer");
+                                    toast.error(data.message || "Failed to create customer");
                                 }
                             } catch (err) {
-                                alert("Network error");
+                                toast.error("Network error");
                             } finally {
                                 setIsSubmitting(false);
                             }

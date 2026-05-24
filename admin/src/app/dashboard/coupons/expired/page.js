@@ -7,6 +7,7 @@ import {
     TableRow, TableCell, Input, Skeleton, Spinner
 } from "@heroui/react";
 import { Tag, Trash, Clock, MagnifyingGlass, ArrowClockwise } from "@phosphor-icons/react";
+import toast from 'react-hot-toast';
 
 const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
 const getToken = () => localStorage.getItem("adminToken");
@@ -56,12 +57,13 @@ export default function ExpiredCoupons() {
             });
             if (res.ok) {
                 setCoupons(prev => prev.filter(c => c._id !== id));
+                toast.success("Coupon deleted");
             } else {
                 const err = await res.json();
-                alert(err.message || "Failed to delete");
+                toast.error(err.message || "Failed to delete");
             }
         } catch (err) {
-            alert(err.message);
+            toast.error(err.message || "Delete failed");
         } finally {
             setDeleting(null);
         }

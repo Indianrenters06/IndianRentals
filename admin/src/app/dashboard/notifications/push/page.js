@@ -8,6 +8,7 @@ import {
     Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, useDisclosure, Skeleton, Switch
 } from "@heroui/react";
 import { Bell, BellRinging, Plus, PaperPlaneTilt, WarningCircle, CheckCircle, Users, Package, Tag } from "@phosphor-icons/react";
+import toast from 'react-hot-toast';
 
 const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
 
@@ -56,18 +57,9 @@ export default function PushNotifications() {
             setNotifications(prev => [newNotif, ...prev]);
             setForm({ title: "", message: "", type: "order", target: "all" });
             onClose();
+            toast.success("Notification sent successfully");
         } catch (err) {
-            // Optimistic update on failure
-            setNotifications(prev => [{
-                _id: Date.now().toString(),
-                title: form.title,
-                message: form.message,
-                type: form.type,
-                isRead: false,
-                createdAt: new Date().toISOString(),
-            }, ...prev]);
-            setForm({ title: "", message: "", type: "order", target: "all" });
-            onClose();
+            toast.error("Failed to send notification");
         } finally {
             setSending(false);
         }

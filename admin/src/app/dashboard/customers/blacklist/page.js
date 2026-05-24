@@ -8,6 +8,7 @@ import {
     ModalFooter, Input, Select, SelectItem, useDisclosure, Skeleton, Pagination
 } from "@heroui/react";
 import { ShieldSlash, WarningCircle, Warning, Plus, Trash, MagnifyingGlass } from "@phosphor-icons/react";
+import toast from 'react-hot-toast';
 
 const LOCAL_KEY = "admin_blacklist";
 const loadBlacklist = () => { try { return JSON.parse(localStorage.getItem(LOCAL_KEY) || "[]"); } catch { return []; } };
@@ -46,12 +47,14 @@ export default function BlacklistManagement() {
         saveBlacklist(updated);
         setForm({ identifier: "", type: "Email Address", reason: "" });
         onClose();
+        toast.success("Added to blacklist");
     };
 
     const handleRemove = (id) => {
         const updated = blacklist.filter(b => b.id !== id);
         setBlacklist(updated);
         saveBlacklist(updated);
+        toast.success("Removed from blacklist");
     };
 
     const sortedItems = useMemo(() => {
