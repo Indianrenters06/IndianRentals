@@ -339,7 +339,7 @@ export default function DashboardLayout({ children }) {
                       onClick={() => toggleMenu(item.name)}
                       className={`w-full flex items-center justify-between px-4 py-3 rounded-xl transition-all duration-200 group ${isActive
                         ? 'bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-500/20 shadow-inner'
-                        : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800/50 hover:text-slate-900 dark:hover:text-slate-200'
+                        : 'text-slate-600 dark:text-slate-400 hover:bg-slate-900 hover:text-white dark:hover:bg-slate-800/50 dark:hover:text-slate-200'
                         }`}
                     >
                       <div className="flex items-center gap-3">
@@ -357,7 +357,7 @@ export default function DashboardLayout({ children }) {
                       onClick={() => { if (isMobile) setIsSidebarOpen(false); }}
                       className={`w-full flex items-center justify-between px-4 py-3 rounded-xl transition-all duration-200 group ${isActive
                         ? 'bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-500/20 shadow-inner'
-                        : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800/50 hover:text-slate-900 dark:hover:text-slate-200'
+                        : 'text-slate-600 dark:text-slate-400 hover:bg-slate-900 hover:text-white dark:hover:bg-slate-800/50 dark:hover:text-slate-200'
                         }`}
                     >
                       <div className="flex items-center gap-3">
@@ -379,7 +379,7 @@ export default function DashboardLayout({ children }) {
                             onClick={() => { if (isMobile) setIsSidebarOpen(false); }}
                             className={`block px-4 py-2 text-sm rounded-lg transition-all duration-200 w-full text-left ${isSubActive
                               ? 'bg-indigo-50 dark:bg-indigo-500/10 text-indigo-700 dark:text-indigo-300 font-medium tracking-wide'
-                              : 'text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800/40 hover:text-slate-800 dark:hover:text-slate-300'
+                              : 'text-slate-500 hover:bg-slate-900 hover:text-white dark:hover:bg-slate-800/40 dark:hover:text-slate-300'
                               }`}
                           >
                             {subItem.name}
@@ -398,7 +398,7 @@ export default function DashboardLayout({ children }) {
         <div className="mt-auto px-4 py-2 border-t border-slate-200 dark:border-slate-800/60 bg-slate-50 dark:bg-slate-950/40">
           <button
             onClick={handleLogout}
-            className="w-full flex items-center px-4 py-3 text-slate-500 dark:text-slate-400 hover:text-red-600 dark:hover:text-red-400 hover:!bg-red-50 dark:hover:!bg-red-500/10 rounded-xl transition-colors text-sm font-bold tracking-wide"
+            className="w-full flex items-center px-4 py-3 text-slate-500 dark:text-slate-400 hover:text-white hover:!bg-slate-900 dark:hover:text-red-400 dark:hover:!bg-red-500/10 rounded-xl transition-colors text-sm font-bold tracking-wide"
           >
             <SignOut className="w-5 h-5 mr-3" />
             Sign Out
@@ -413,7 +413,7 @@ export default function DashboardLayout({ children }) {
           <div className="flex items-center gap-4">
             <button
               onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-              className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800/80 rounded-xl transition-colors text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200"
+              className="p-2 hover:bg-slate-900 hover:text-white dark:hover:bg-slate-800/80 rounded-xl transition-colors text-slate-600 dark:text-slate-400 dark:hover:text-slate-200"
             >
               {isSidebarOpen ? <CaretRight className="w-5 h-5" /> : <List className="w-5 h-5" />}
             </button>
