@@ -10,6 +10,7 @@ import {
   ChartLineUp, Clock, CheckCircle, DotsThreeVertical, DownloadSimple,
   Bell, WarningCircle, UserCheck, ShieldCheck
 } from "@phosphor-icons/react";
+import { downloadPDFInvoice } from "@/utils/pdfInvoice";
 import {
   Card,
   CardBody,
@@ -121,7 +122,8 @@ export default function AdminDashboard() {
     amount: `₹${parseFloat(rental.totalPrice || 0).toLocaleString()}`,
     status: rental.status || (rental.isPaid ? 'Active' : 'Pending'),
     date: new Date(rental.createdAt).toLocaleDateString("en-US", { month: "short", day: "numeric", hour: "numeric", minute: "numeric" }),
-    avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(rental.user?.name || "G")}&background=random`
+    avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(rental.user?.name || "G")}&background=random`,
+    _raw: rental
   })) || [];
 
   // Chart configurations
@@ -497,7 +499,7 @@ export default function AdminDashboard() {
                         <DropdownMenu aria-label="Table Actions" variant="flat">
                           <DropdownItem key="view" onPress={() => router.push(`/dashboard/orders`)}>View Details</DropdownItem>
                           <DropdownItem key="edit" onPress={() => toast.error("Order editing logic will be implemented soon.")}>Edit Order</DropdownItem>
-                          <DropdownItem key="invoice" onPress={() => toast.success("Generating Invoice PDF...")}>Download Invoice</DropdownItem>
+                          <DropdownItem key="invoice" onPress={() => downloadPDFInvoice(item._raw)}>Download Invoice</DropdownItem>
                           <DropdownItem key="delete" className="text-danger" color="danger" onPress={() => toast.success("Requesting order cancellation...")}>Cancel Rental</DropdownItem>
                         </DropdownMenu>
                       </Dropdown>
