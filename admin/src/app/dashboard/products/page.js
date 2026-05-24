@@ -13,6 +13,7 @@ import {
     PencilSimple, Trash, Eye, CheckCircle, Package,
     ArrowClockwise, FunnelSimple, UploadSimple, DownloadSimple, X, CloudArrowUp, WarningCircle
 } from "@phosphor-icons/react";
+import ConfirmDeleteModal from "@/components/ConfirmDeleteModal";
 
 const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
 const FRONTEND = process.env.NEXT_PUBLIC_FRONTEND_URL || "https://indian-rentals.vercel.app";
@@ -152,7 +153,6 @@ export default function AllProducts() {
 
     // ── Delete ────────────────────────────────────────────────────────────────
     const handleDelete = async (id) => {
-        if (!confirm("Delete this product permanently? This cannot be undone.")) return;
         try {
             setDeleting(id);
             const res = await fetch(`${API}/api/products/${id}`, {
@@ -439,7 +439,7 @@ export default function AllProducts() {
                                             type="button"
                                             title="Delete Product"
                                             disabled={deleting === product._id}
-                                            onClick={() => handleDelete(product._id)}
+                                            onClick={() => { setDeleteTarget({ id: product._id }); setConfirmOpen(true); }}
                                             className="inline-flex items-center justify-center w-8 h-8 rounded-lg text-slate-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 disabled:opacity-40 transition-colors"
                                         >
                                             {deleting === product._id ? <Spinner size="sm" /> : <Trash size={15} />}
