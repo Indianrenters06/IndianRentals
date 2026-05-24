@@ -1,4 +1,7 @@
 'use client';
+
+export const dynamic = 'force-dynamic';
+
 import ComingSoon from "../../../../components/ComingSoon";
 import { TrendDown } from "@phosphor-icons/react";
 export default function Page() {
