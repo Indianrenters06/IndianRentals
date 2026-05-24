@@ -86,6 +86,9 @@ export default function BrandingSettings() {
             
             if (!res.ok) throw new Error('Failed to update branding settings');
             toast.success('Branding settings updated!');
+            const bd = { siteLogo: settings.siteLogo, siteName: settings.siteName, theme: settings.theme };
+            localStorage.setItem('adminBranding', JSON.stringify(bd));
+            window.dispatchEvent(new Event('branding-updated'));
         } catch (error) {
             console.error(error);
             toast.error(error.message);

@@ -31,6 +31,7 @@ export default function DashboardLayout({ children }) {
   const [notifications, setNotifications] = useState([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const [isMobile, setIsMobile] = useState(false);
+  const [branding, setBranding] = useState({ siteLogo: null, siteName: 'IndianRentals', theme: { activeTheme: 'default' } });
 
   const pathname = usePathname();
   const router = useRouter();
@@ -114,6 +115,41 @@ export default function DashboardLayout({ children }) {
 
       fetchNotifications();
 
+      const applyBrandingTheme = (data) => {
+        if (!data?.theme?.activeTheme) return;
+        const COLORS = {
+          default: '#6366f1', oceanic: '#0ea5e9', forest: '#22c55e',
+          sunset: '#f43f5e', midnight: '#8b5cf6',
+        };
+        const color = COLORS[data.theme.activeTheme] || '#6366f1';
+        document.documentElement.style.setProperty('--heroui-colors-primary', color);
+      };
+
+      const loadBranding = () => {
+        try {
+          const cached = localStorage.getItem('adminBranding');
+          if (cached) {
+            const parsed = JSON.parse(cached);
+            setBranding(parsed);
+            applyBrandingTheme(parsed);
+          }
+        } catch {}
+        const token = localStorage.getItem('adminToken');
+        if (!token) return;
+        fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/admin/settings`, {
+          headers: { Authorization: `Bearer ${token}` }
+        }).then(res => res.ok ? res.json() : null).then(data => {
+          if (!data) return;
+          const bd = { siteLogo: data.siteLogo, siteName: data.siteName, theme: data.theme };
+          setBranding(bd);
+          applyBrandingTheme(bd);
+          localStorage.setItem('adminBranding', JSON.stringify(bd));
+        }).catch(() => {});
+      };
+
+      loadBranding();
+      window.addEventListener('branding-updated', loadBranding);
+
       const interval = setInterval(() => {
         fetchNotifications();
       }, 30000);
@@ -121,6 +157,7 @@ export default function DashboardLayout({ children }) {
       return () => {
         clearInterval(interval);
         window.removeEventListener('resize', checkMobile);
+        window.removeEventListener('branding-updated', loadBranding);
       };
     }
   }, []);
@@ -319,8 +356,8 @@ export default function DashboardLayout({ children }) {
       >
         <div className="h-16 flex items-center px-6 border-b border-slate-200 dark:border-slate-800/60 shrink-0 bg-transparent">
           <img
-            src="https://res.cloudinary.com/dgkckcdk8/image/upload/v1776892240/1d1f7c4e3c0490bcddb69ceb328c67be2f7cf361_6_kufcee.png"
-            alt="Logo"
+            src={branding.siteLogo || "https://res.cloudinary.com/dgkckcdk8/image/upload/v1776892240/1d1f7c4e3c0490bcddb69ceb328c67be2f7cf361_6_kufcee.png"}
+            alt={branding.siteName || "Logo"}
             className="h-10 w-auto object-contain"
           />
         </div>
@@ -339,7 +376,7 @@ export default function DashboardLayout({ children }) {
                       onClick={() => toggleMenu(item.name)}
                       className={`w-full flex items-center justify-between px-4 py-3 rounded-xl transition-all duration-200 group ${isActive
                         ? 'bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-500/20 shadow-inner'
-                        : 'text-slate-600 dark:text-slate-400 hover:bg-slate-900 hover:text-white dark:hover:bg-slate-800/50 dark:hover:text-slate-200'
+                        : 'text-slate-600 dark:text-slate-400 dark:hover:bg-slate-800/50 dark:hover:text-slate-200'
                         }`}
                     >
                       <div className="flex items-center gap-3">
@@ -357,7 +394,7 @@ export default function DashboardLayout({ children }) {
                       onClick={() => { if (isMobile) setIsSidebarOpen(false); }}
                       className={`w-full flex items-center justify-between px-4 py-3 rounded-xl transition-all duration-200 group ${isActive
                         ? 'bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-500/20 shadow-inner'
-                        : 'text-slate-600 dark:text-slate-400 hover:bg-slate-900 hover:text-white dark:hover:bg-slate-800/50 dark:hover:text-slate-200'
+                        : 'text-slate-600 dark:text-slate-400 dark:hover:bg-slate-800/50 dark:hover:text-slate-200'
                         }`}
                     >
                       <div className="flex items-center gap-3">
@@ -379,7 +416,7 @@ export default function DashboardLayout({ children }) {
                             onClick={() => { if (isMobile) setIsSidebarOpen(false); }}
                             className={`block px-4 py-2 text-sm rounded-lg transition-all duration-200 w-full text-left ${isSubActive
                               ? 'bg-indigo-50 dark:bg-indigo-500/10 text-indigo-700 dark:text-indigo-300 font-medium tracking-wide'
-                              : 'text-slate-500 hover:bg-slate-900 hover:text-white dark:hover:bg-slate-800/40 dark:hover:text-slate-300'
+                              : 'text-slate-500 dark:hover:bg-slate-800/40 dark:hover:text-slate-300'
                               }`}
                           >
                             {subItem.name}
@@ -398,7 +435,7 @@ export default function DashboardLayout({ children }) {
         <div className="mt-auto px-4 py-2 border-t border-slate-200 dark:border-slate-800/60 bg-slate-50 dark:bg-slate-950/40">
           <button
             onClick={handleLogout}
-            className="w-full flex items-center px-4 py-3 text-slate-500 dark:text-slate-400 hover:text-white hover:!bg-slate-900 dark:hover:text-red-400 dark:hover:!bg-red-500/10 rounded-xl transition-colors text-sm font-bold tracking-wide"
+            className="w-full flex items-center px-4 py-3 text-slate-500 dark:text-slate-400 dark:hover:text-red-400 dark:hover:!bg-red-500/10 rounded-xl transition-colors text-sm font-bold tracking-wide"
           >
             <SignOut className="w-5 h-5 mr-3" />
             Sign Out
@@ -413,7 +450,7 @@ export default function DashboardLayout({ children }) {
           <div className="flex items-center gap-4">
             <button
               onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-              className="p-2 hover:bg-slate-900 hover:text-white dark:hover:bg-slate-800/80 rounded-xl transition-colors text-slate-600 dark:text-slate-400 dark:hover:text-slate-200"
+              className="p-2 dark:hover:bg-slate-800/80 rounded-xl transition-colors text-slate-600 dark:text-slate-400 dark:hover:text-slate-200"
             >
               {isSidebarOpen ? <CaretRight className="w-5 h-5" /> : <List className="w-5 h-5" />}
             </button>
