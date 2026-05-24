@@ -259,7 +259,9 @@ export default function OrdersTable({ initialStatus = "all", title = "Orders" })
                                     {/* Total + payment */}
                                     <div>
                                         <p className="text-sm font-bold text-slate-900 dark:text-slate-100">₹{order.totalPrice?.toLocaleString("en-IN")}</p>
-                                        <Chip size="sm" color={order.isPaid ? "success" : "danger"} variant="dot" className="text-[10px] mt-0.5">{order.isPaid ? "Paid" : "Unpaid"}</Chip>
+                                        <span className={`text-[10px] font-semibold mt-0.5 inline-block ${order.isPaid ? 'text-emerald-500' : 'text-red-500'}`}>
+                                            {order.isPaid ? '● Paid' : '● Unpaid'}
+                                        </span>
                                     </div>
                                     {/* Status */}
                                     <StatusChip status={order.status}/>
@@ -305,9 +307,11 @@ export default function OrdersTable({ initialStatus = "all", title = "Orders" })
                                         </div>
                                     </div>
                                     <p className="text-sm font-semibold">{order.user?.name}</p>
-                                    <div className="flex items-center justify-between">
+                                    <div className="flex items-center gap-2">
                                         <span className="text-sm font-bold">₹{order.totalPrice?.toLocaleString("en-IN")}</span>
-                                        <Chip size="sm" color={order.isPaid ? "success" : "danger"} variant="dot" className="text-xs">{order.isPaid ? "Paid" : "Unpaid"}</Chip>
+                                        <span className={`text-xs font-semibold ${order.isPaid ? 'text-emerald-500' : 'text-red-500'}`}>
+                                            {order.isPaid ? '● Paid' : '● Unpaid'}
+                                        </span>
                                     </div>
                                 </div>
                             </CardBody>

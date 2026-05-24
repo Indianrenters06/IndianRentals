@@ -1,5 +1,7 @@
 "use client";
 
+export const dynamic = 'force-dynamic';
+
 import { useState, useEffect, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -284,9 +286,11 @@ export default function OrdersManagement() {
                                         </div>
                                         <p className="text-sm font-semibold">{order.user?.name}</p>
                                         <p className="text-xs text-slate-500 truncate">{(order.orderItems || []).map(i => i.name).join(", ")}</p>
-                                        <div className="flex items-center justify-between">
+                                        <div className="flex items-center gap-2">
                                             <span className="text-sm font-bold">₹{order.totalPrice?.toLocaleString("en-IN")}</span>
-                                            <Chip size="sm" color={order.isPaid ? "success" : "danger"} variant="dot" className="text-xs">{order.isPaid ? "Paid" : "Unpaid"}</Chip>
+                                            <span className={`text-xs font-semibold ${order.isPaid ? 'text-emerald-500' : 'text-red-500'}`}>
+                                                {order.isPaid ? '● Paid' : '● Unpaid'}
+                                            </span>
                                         </div>
                                     </div>
 
@@ -317,7 +321,9 @@ export default function OrdersManagement() {
                                         {/* Total + Payment */}
                                         <div>
                                             <p className="text-sm font-bold text-slate-900 dark:text-slate-100">₹{order.totalPrice?.toLocaleString("en-IN")}</p>
-                                            <Chip size="sm" color={order.isPaid ? "success" : "danger"} variant="dot" className="text-[10px] mt-0.5">{order.isPaid ? "Paid" : "Unpaid"}</Chip>
+                                            <span className={`text-[10px] font-semibold mt-0.5 inline-block ${order.isPaid ? 'text-emerald-500' : 'text-red-500'}`}>
+                                                {order.isPaid ? '● Paid' : '● Unpaid'}
+                                            </span>
                                         </div>
 
                                         {/* Status */}
