@@ -133,7 +133,7 @@ export default function SingleProductPageCMS() {
                     fetch(`${API}/api/cms/single-product-page?t=${Date.now()}`),
                     fetch(`${API}/api/admin/products`, { headers: { Authorization: `Bearer ${token}` } }),
                 ]);
-                if (cmsRes.ok) setTd(prev => ({ ...DEFAULTS, ...(await cmsRes.json()) }));
+                if (cmsRes.ok) { const cmsJson = await cmsRes.json(); setTd({ ...DEFAULTS, ...cmsJson }); }
                 if (prodRes.ok) {
                     const prods = await prodRes.json();
                     setProducts(prods);
