@@ -3,6 +3,7 @@ import toast from 'react-hot-toast';
 import React, { useEffect, useState } from 'react';
 import { ChartBar, Download, User, Calendar, Tag, CurrencyInr, CheckCircle, Clock } from '@phosphor-icons/react';
 import { Spinner } from '@heroui/react';
+import { downloadPDFReport } from "@/utils/pdfReport";
 
 const API = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
 const getToken = () => typeof window !== 'undefined' ? localStorage.getItem('adminToken') : null;
@@ -39,6 +40,24 @@ export default function ReportPage() {
         }
     };
 
+    const exportPDF = () => {
+        if (report.length === 0) {
+            toast.error("No data to export");
+            return;
+        }
+        const headers = ["Order Date", "Customer", "Email", "Coupon Code", "Discount", "Order Total", "Status"];
+        const data = report.map(item => [
+            new Date(item.date).toLocaleDateString('en-GB'),
+            item.user || "-",
+            item.email || "-",
+            item.couponCode || "-",
+            `Rs. ${item.discount}`,
+            `Rs. ${item.orderTotal}`,
+            item.status || "-"
+        ]);
+        downloadPDFReport("Coupon Usage Report", headers, data, "coupon_usage_report");
+    };
+
     if (loading) {
         return (
             <div className="flex flex-col items-center justify-center h-[50vh] text-slate-400 gap-3">
@@ -61,10 +80,10 @@ export default function ReportPage() {
                     </div>
                 </div>
                 <button 
-                    onClick={() => toast.success("CSV Export Coming Soon!")}
+                    onClick={exportPDF}
                     className="flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 text-slate-700 font-medium rounded-lg shadow-sm hover:bg-slate-50"
                 >
-                    <Download size={18} /> Export CSV
+                    <Download size={18} /> Export PDF
                 </button>
             </div>
 

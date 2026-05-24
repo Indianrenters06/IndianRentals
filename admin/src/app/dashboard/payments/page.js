@@ -7,6 +7,7 @@ import {
     TableRow, TableCell, Chip, Skeleton
 } from "@heroui/react";
 import { CurrencyInr, CheckCircle, XCircle, Clock, WarningCircle, DownloadSimple } from "@phosphor-icons/react";
+import { downloadPDFReport } from "@/utils/pdfReport";
 
 const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
 
@@ -40,12 +41,12 @@ export default function AllTransactions() {
 
     const total = transactions.filter(t => t.status === "Success").reduce((s, t) => s + t.amount, 0);
 
-    const exportCSV = () => {
-        const headers = "TXN ID,User,Email,Amount,Method,Status,Date\n";
-        const rows = transactions.map(t => `${t.txnId},${t.user},${t.email},${t.amount},${t.method},${t.status},${t.date}`).join("\n");
-        const blob = new Blob([headers + rows], { type: "text/csv" });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement("a"); a.href = url; a.download = "transactions.csv"; a.click();
+    const exportPDF = () => {
+        const headers = ["TXN ID", "User", "Email", "Amount", "Method", "Status", "Date"];
+        const data = transactions.map(t => [
+            t.txnId, t.user, t.email, `Rs. ${t.amount}`, t.method, t.status, t.date
+        ]);
+        downloadPDFReport("Transactions Report", headers, data, "transactions_report");
     };
 
     return (
@@ -59,9 +60,9 @@ export default function AllTransactions() {
                 </motion.div>
                 <div className="flex items-center gap-3">
                     {!loading && <div className="inline-flex items-center gap-2 bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-500/20 rounded-full px-3 py-1.5 font-bold text-sm">₹{total.toLocaleString("en-IN")} Collected</div>}
-                    <button type="button" onClick={exportCSV} className="inline-flex items-center gap-2 h-10 px-4 rounded-xl border border-indigo-500 text-indigo-600 dark:text-indigo-400 font-bold text-sm hover:!bg-indigo-50 dark:hover:!bg-indigo-500/10 transition-colors">
+                    <button type="button" onClick={exportPDF} className="inline-flex items-center gap-2 h-10 px-4 rounded-xl border border-indigo-500 text-indigo-600 dark:text-indigo-400 font-bold text-sm hover:!bg-indigo-50 dark:hover:!bg-indigo-500/10 transition-colors">
                         <DownloadSimple size={15} />
-                        Export CSV
+                        Export PDF
                     </button>
                 </div>
             </div>

@@ -4,6 +4,8 @@ export const dynamic = 'force-dynamic';
 
 import { useState, useEffect, useMemo } from 'react';
 import { motion } from 'framer-motion';
+import { downloadPDFReport } from "@/utils/pdfReport";
+import jsPDF from "jspdf";
 import {
     MagnifyingGlass, Funnel, DownloadSimple, PencilSimple, Trash,
     Phone, MapPin, DotsThreeVertical, EnvelopeSimple,
@@ -241,37 +243,39 @@ export default function CustomersManagement() {
         }
     };
 
-    const exportCSV = () => {
-        const headers = ["Name,Email,Phone,City,State,Status,Joined\n"];
-        const rows = users.map(u =>
-            `${u.name},${u.email},${u.phone || ""},${u.city || ""},${u.state || ""},${u.isBlocked ? 'Blocked' : u.isActive ? 'Active' : 'Inactive'},${new Date(u.createdAt).toLocaleDateString()}`
-        ).join("\n");
-        const blob = new Blob([headers, rows], { type: 'text/csv' });
-        const url = window.URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.setAttribute('hidden', '');
-        a.setAttribute('href', url);
-        a.setAttribute('download', 'customers_report.csv');
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
+    const exportPDF = () => {
+        const headers = ["Name", "Email", "Phone", "City", "State", "Status", "Joined Date"];
+        const data = users.map(u => [
+            u.name || "-",
+            u.email || "-",
+            u.phone || "-",
+            u.city || "-",
+            u.state || "-",
+            u.isBlocked ? 'Blocked' : u.isActive ? 'Active' : 'Inactive',
+            new Date(u.createdAt).toLocaleDateString()
+        ]);
+        downloadPDFReport("Customers Report", headers, data, "customers_report");
     };
 
     const downloadUser = (user) => {
-        const content = [
-            `Customer Activity Report`,
-            `Generated: ${new Date().toLocaleString("en-IN")}`,
-            ``,
-            `Name: ${user.name || "N/A"}`,
-            `Email: ${user.email || "N/A"}`,
-            `Phone: ${user.phone || "N/A"}`,
-            `Location: ${user.city ? `${user.city}, ${user.state}` : "N/A"}`,
-            `Status: ${user.isBlocked ? "Blocked" : user.isActive ? "Active" : "Inactive"}`,
-            `Member Since: ${user.createdAt ? new Date(user.createdAt).toLocaleDateString("en-IN") : "N/A"}`,
-        ].join("\n");
-        const blob = new Blob([content], { type: "text/plain" });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement("a"); a.href = url; a.download = `customer_${user.name?.replace(/\s+/g, "_") || "report"}.txt`; a.click();
+        const doc = new jsPDF();
+        doc.setFontSize(20);
+        doc.setFont("helvetica", "bold");
+        doc.text("Customer Activity Report", 14, 20);
+        
+        doc.setFontSize(10);
+        doc.setFont("helvetica", "normal");
+        doc.text(`Generated: ${new Date().toLocaleString("en-IN")}`, 14, 28);
+        
+        doc.setFontSize(12);
+        doc.text(`Name: ${user.name || "N/A"}`, 14, 45);
+        doc.text(`Email: ${user.email || "N/A"}`, 14, 53);
+        doc.text(`Phone: ${user.phone || "N/A"}`, 14, 61);
+        doc.text(`Location: ${user.city ? `${user.city}, ${user.state}` : "N/A"}`, 14, 69);
+        doc.text(`Status: ${user.isBlocked ? "Blocked" : user.isActive ? "Active" : "Inactive"}`, 14, 77);
+        doc.text(`Member Since: ${user.createdAt ? new Date(user.createdAt).toLocaleDateString("en-IN") : "N/A"}`, 14, 85);
+        
+        doc.save(`customer_${user.name?.replace(/\s+/g, "_") || "report"}.pdf`);
     };
 
     const filteredUsers = useMemo(() => {
@@ -418,10 +422,11 @@ export default function CustomersManagement() {
                     <p className="text-slate-600 dark:text-slate-400">Complete directory of all registered customers.</p>
                 </motion.div>
                 <div className="flex flex-wrap items-center gap-3">
-                    <button type="button" onClick={exportCSV} className="inline-flex items-center gap-2 h-10 px-4 rounded-xl border border-slate-300 dark:border-slate-700 text-indigo-600 dark:text-indigo-400 font-semibold text-sm !bg-indigo-50 dark:!bg-indigo-500/10 hover:border-indigo-400 transition-colors">
+                    <Button color="secondary" className="font-semibold shadow-md shadow-indigo-500/20" startContent={
                         <DownloadSimple className="w-4 h-4" />
-                        Export CSV
-                    </button>
+                    } onClick={exportPDF}>
+                        Export PDF
+                    </Button>
                     <button
                         type="button"
                         onClick={onAddOpen}

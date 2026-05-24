@@ -4,6 +4,8 @@ import { useState, useEffect, useMemo } from "react";
 import { motion } from "framer-motion";
 import { Card, CardBody, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Chip, Skeleton, Pagination } from "@heroui/react";
 import { CurrencyInr, WarningCircle, CheckCircle, ArrowDownRight, DownloadSimple, MagnifyingGlass } from "@phosphor-icons/react";
+import { downloadPDFReport } from "@/utils/pdfReport";
+import jsPDF from "jspdf";
 
 const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
 
@@ -44,30 +46,34 @@ export default function UserPayments() {
         fetchPayments();
     }, []);
 
-    const exportCSV = () => {
-        const headers = "Transaction ID,User,Email,Amount,Method,Status,Date\n";
-        const rows = payments.map(p => `${p.txnId},${p.user},${p.email},₹${p.amount},${p.method},${p.status},${p.date}`).join("\n");
-        const blob = new Blob([headers + rows], { type: "text/csv" });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement("a"); a.href = url; a.download = "payment_history.csv"; a.click();
+    const exportPDF = () => {
+        const headers = ["Transaction ID", "User", "Email", "Amount", "Method", "Status", "Date"];
+        const data = payments.map(p => [
+            p.txnId, p.user, p.email, `Rs. ${p.amount}`, p.method, p.status, p.date
+        ]);
+        downloadPDFReport("Customer Payment History", headers, data, "payment_history");
     };
 
     const downloadPayment = (item) => {
-        const content = [
-            `Payment Receipt`,
-            `Generated: ${new Date().toLocaleString("en-IN")}`,
-            ``,
-            `Transaction ID: ${item.txnId}`,
-            `Customer: ${item.user}`,
-            `Email: ${item.email}`,
-            `Amount: ₹${parseFloat(item.amount).toLocaleString("en-IN")}`,
-            `Payment Method: ${item.method}`,
-            `Status: ${item.status}`,
-            `Date: ${item.date}`,
-        ].join("\n");
-        const blob = new Blob([content], { type: "text/plain" });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement("a"); a.href = url; a.download = `receipt_${item.txnId}.txt`; a.click();
+        const doc = new jsPDF();
+        doc.setFontSize(20);
+        doc.setFont("helvetica", "bold");
+        doc.text("Payment Receipt", 14, 20);
+        
+        doc.setFontSize(10);
+        doc.setFont("helvetica", "normal");
+        doc.text(`Generated: ${new Date().toLocaleString("en-IN")}`, 14, 28);
+        
+        doc.setFontSize(12);
+        doc.text(`Transaction ID: ${item.txnId}`, 14, 45);
+        doc.text(`Customer: ${item.user}`, 14, 53);
+        doc.text(`Email: ${item.email}`, 14, 61);
+        doc.text(`Amount: Rs. ${parseFloat(item.amount).toLocaleString("en-IN")}`, 14, 69);
+        doc.text(`Payment Method: ${item.method}`, 14, 77);
+        doc.text(`Status: ${item.status}`, 14, 85);
+        doc.text(`Date: ${item.date}`, 14, 93);
+        
+        doc.save(`receipt_${item.txnId}.pdf`);
     };
 
     const totalPaid = payments.filter(p => p.status === "Success").reduce((s, p) => s + p.amount, 0);
@@ -107,8 +113,8 @@ export default function UserPayments() {
                             ₹{totalPaid.toLocaleString("en-IN")} Collected
                         </Chip>
                     )}
-                    <button type="button" onClick={exportCSV} className="inline-flex items-center gap-2 h-10 px-4 rounded-xl border border-indigo-500 text-indigo-600 dark:text-indigo-400 font-bold text-sm hover:!bg-indigo-50 dark:hover:!bg-indigo-500/10 transition-colors">
-                        <DownloadSimple size={15} /> Export Report
+                    <button type="button" onClick={exportPDF} className="inline-flex items-center gap-2 h-10 px-4 rounded-xl border border-indigo-500 text-indigo-600 dark:text-indigo-400 font-bold text-sm hover:!bg-indigo-50 dark:hover:!bg-indigo-500/10 transition-colors">
+                        <DownloadSimple size={15} /> Export PDF
                     </button>
                 </div>
             </div>

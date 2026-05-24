@@ -7,8 +7,8 @@ import {
     Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, useDisclosure, Textarea, Divider,
     Pagination, Tabs, Tab } from "@heroui/react";
 import { Eye, CheckCircle, WarningCircle, User, IdentificationCard, FileText, Info } from "@phosphor-icons/react";
-
 import { DownloadSimple, MagnifyingGlassPlus, X } from "@phosphor-icons/react";
+import jsPDF from "jspdf";
 
 export default function KYCManagement() {
     const [statusFilter, setStatusFilter] = useState("all");
@@ -451,11 +451,20 @@ export default function KYCManagement() {
                                             try {
                                                 const response = await fetch(zoomedDoc);
                                                 const blob = await response.blob();
-                                                const fileUrl = window.URL.createObjectURL(blob);
-                                                const alink = document.createElement('a');
-                                                alink.href = fileUrl;
-                                                alink.download = 'KYC_Document.jpg';
-                                                alink.click();
+                                                const reader = new FileReader();
+                                                reader.readAsDataURL(blob);
+                                                reader.onloadend = function() {
+                                                    const base64data = reader.result;
+                                                    const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+                                                    const imgProps = doc.getImageProperties(base64data);
+                                                    const pdfWidth = doc.internal.pageSize.getWidth();
+                                                    const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
+                                                    
+                                                    doc.setFontSize(16);
+                                                    doc.text("KYC Document", 10, 10);
+                                                    doc.addImage(base64data, 'JPEG', 0, 20, pdfWidth, pdfHeight);
+                                                    doc.save('KYC_Document.pdf');
+                                                };
                                             } catch (e) {
                                                 window.open(zoomedDoc, '_blank');
                                             }
