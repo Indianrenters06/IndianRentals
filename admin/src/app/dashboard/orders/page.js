@@ -12,8 +12,9 @@ import {
 import {
     DotsThreeVertical, Eye, Truck, ArrowCounterClockwise, XCircle,
     CheckCircle, Package, MapPin, Calendar, CurrencyDollar, User,
-    ArrowClockwise, Warning, Checks, MagnifyingGlass
+    ArrowClockwise, Warning, Checks, MagnifyingGlass, DownloadSimple
 } from "@phosphor-icons/react";
+import { downloadPDFInvoice } from "@/utils/pdfInvoice";
 
 const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
 
@@ -276,6 +277,7 @@ export default function OrdersManagement() {
                                                         </DropdownTrigger>
                                                         <DropdownMenu aria-label="Actions" variant="flat">
                                                             <DropdownItem key="view" startContent={<Eye weight="bold"/>} onPress={() => openModal(order)}>View Details</DropdownItem>
+                                                            <DropdownItem key="invoice" startContent={<DownloadSimple weight="bold"/>} onPress={() => downloadPDFInvoice(order)}>Download Invoice</DropdownItem>
                                                             {(ACTIONS[order.status] || []).map(a => (
                                                                 <DropdownItem key={a.s} color={a.danger ? "danger" : "default"} className={a.danger ? "text-danger" : ""} startContent={a.icon} onPress={() => handleStatusUpdate(order._id, a.s)}>{a.label}</DropdownItem>
                                                             ))}
@@ -340,6 +342,7 @@ export default function OrdersManagement() {
                                                     </DropdownTrigger>
                                                     <DropdownMenu aria-label="Order Actions" variant="flat">
                                                         <DropdownItem key="view" startContent={<Eye weight="bold"/>} onPress={() => openModal(order)}>View Order Details</DropdownItem>
+                                                        <DropdownItem key="invoice" startContent={<DownloadSimple weight="bold"/>} onPress={() => downloadPDFInvoice(order)}>Download Invoice</DropdownItem>
                                                         {(ACTIONS[order.status] || []).map(a => (
                                                             <DropdownItem key={a.s} color={a.danger ? "danger" : "default"} className={a.danger ? "text-danger" : ""} startContent={a.icon} onPress={() => handleStatusUpdate(order._id, a.s)}>{a.label}</DropdownItem>
                                                         ))}
