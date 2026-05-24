@@ -117,12 +117,30 @@ export default function DashboardLayout({ children }) {
 
       const applyBrandingTheme = (data) => {
         if (!data?.theme?.activeTheme) return;
-        const COLORS = {
-          default: '#6366f1', oceanic: '#0ea5e9', forest: '#22c55e',
-          sunset: '#f43f5e', midnight: '#8b5cf6',
+        const THEMES = {
+          default:  { 50: '#eef2ff', 100: '#e0e7ff', 200: '#c7d2fe', 400: '#818cf8', 500: '#6366f1', 600: '#4f46e5', 700: '#4338ca' },
+          oceanic:  { 50: '#e0f2fe', 100: '#bae6fd', 200: '#7dd3fc', 400: '#38bdf8', 500: '#0ea5e9', 600: '#0284c7', 700: '#0369a1' },
+          forest:   { 50: '#dcfce7', 100: '#bbf7d0', 200: '#86efac', 400: '#4ade80', 500: '#22c55e', 600: '#16a34a', 700: '#15803d' },
+          sunset:   { 50: '#fff1f2', 100: '#ffe4e6', 200: '#fecdd3', 400: '#fb7185', 500: '#f43f5e', 600: '#e11d48', 700: '#be123c' },
+          midnight: { 50: '#ede9fe', 100: '#ddd6fe', 200: '#c4b5fd', 400: '#a78bfa', 500: '#8b5cf6', 600: '#7c3aed', 700: '#6d28d9' },
         };
-        const color = COLORS[data.theme.activeTheme] || '#6366f1';
-        document.documentElement.style.setProperty('--heroui-colors-primary', color);
+        const t = THEMES[data.theme.activeTheme] || THEMES.default;
+        const root = document.documentElement;
+        // HeroUI primary
+        root.style.setProperty('--heroui-colors-primary', t[500]);
+        // Custom brand scale
+        root.style.setProperty('--color-brand-50',  t[50]);
+        root.style.setProperty('--color-brand-500', t[500]);
+        root.style.setProperty('--color-brand-600', t[600]);
+        root.style.setProperty('--color-brand-900', t[700]);
+        // Override the indigo scale (used for active nav, buttons, text, borders)
+        root.style.setProperty('--color-indigo-50',  t[50]);
+        root.style.setProperty('--color-indigo-100', t[100]);
+        root.style.setProperty('--color-indigo-200', t[200]);
+        root.style.setProperty('--color-indigo-400', t[400]);
+        root.style.setProperty('--color-indigo-500', t[500]);
+        root.style.setProperty('--color-indigo-600', t[600]);
+        root.style.setProperty('--color-indigo-700', t[700]);
       };
 
       const loadBranding = () => {
