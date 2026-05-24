@@ -161,7 +161,7 @@ export default function BlacklistManagement() {
                 <ModalContent>
                     {(onClose) => (
                         <>
-                            <ModalHeader className="font-bold text-rose-600 dark:text-rose-400 px-6 pt-6 pb-0">🚫 Add to Blacklist</ModalHeader>
+                            <ModalHeader className="font-bold text-rose-600 dark:text-rose-400 px-6 pt-6 pb-0">Add to Blacklist</ModalHeader>
                             <ModalBody className="flex flex-col gap-4 py-6 px-6">
                                 <Select label="Identifier Type" variant="bordered" radius="xl" selectedKeys={[form.type]}
                                     onSelectionChange={(keys) => setForm(f => ({ ...f, type: [...keys][0] || "Email Address" }))}

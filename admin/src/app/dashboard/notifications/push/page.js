@@ -173,7 +173,7 @@ export default function PushNotifications() {
                 <ModalContent>
                     {(onClose) => (
                         <>
-                            <ModalHeader className="font-bold text-slate-900 dark:text-slate-100">📣 Broadcast Notification</ModalHeader>
+                            <ModalHeader className="font-bold text-slate-900 dark:text-slate-100">Broadcast Notification</ModalHeader>
                             <ModalBody className="flex flex-col gap-4 py-4">
                                 <div className="grid grid-cols-2 gap-3">
                                     <Select 

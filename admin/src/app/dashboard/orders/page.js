@@ -96,7 +96,7 @@ function OrderModal({ order, isOpen, onClose, onAction }) {
                             <div>
                                 <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1 flex items-center gap-1"><CurrencyDollar size={11}/> Payment</p>
                                 <p className="text-sm font-bold">₹{order.totalPrice?.toLocaleString("en-IN")}</p>
-                                <p className="text-xs text-slate-500">{order.paymentMethod} · {order.isPaid ? "✅ Paid" : "⏳ Unpaid"}</p>
+                                <p className="text-xs text-slate-500">{order.paymentMethod} · {order.isPaid ? "Paid" : "Unpaid"}</p>
                             </div>
                         </div>
                         {addr.address && (<>
@@ -104,7 +104,7 @@ function OrderModal({ order, isOpen, onClose, onAction }) {
                             <div>
                                 <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1 flex items-center gap-1"><MapPin size={11}/> Shipping</p>
                                 <p className="text-sm text-slate-700 dark:text-slate-300">{addr.address}, {addr.city} – {addr.postalCode}</p>
-                                <p className="text-xs text-slate-500">📞 {addr.phone}</p>
+                                <p className="text-xs text-slate-500">{addr.phone}</p>
                             </div>
                         </>)}
                     </ModalBody>

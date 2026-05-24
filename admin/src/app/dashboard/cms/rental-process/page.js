@@ -54,10 +54,7 @@ const Card = ({ icon, title, children, accent = 'indigo' }) => {
     };
     return (
         <div className={`rounded-2xl border bg-gradient-to-br ${accents[accent] || accents.indigo} p-6 space-y-5 shadow-sm`}>
-            <div className="flex items-center gap-2.5">
-                <span className="text-xl">{icon}</span>
-                <h3 className="text-base font-bold text-slate-800 dark:text-slate-100">{title}</h3>
-            </div>
+            <h3 className="text-base font-bold text-slate-800 dark:text-slate-100">{title}</h3>
             {children}
         </div>
     );
@@ -149,7 +146,7 @@ export default function RentalProcessCMSPage() {
             <div className="flex items-center justify-between flex-wrap gap-3">
                 <div>
                     <h1 className="text-3xl font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2">
-                        🔄 Rental Process <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-500 to-purple-500">CMS</span>
+                        Rental Process <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-500 to-purple-500">CMS</span>
                     </h1>
                     <p className="text-sm text-slate-500 mt-1">Manage process page banners and feature grids.</p>
                 </div>
@@ -168,7 +165,7 @@ export default function RentalProcessCMSPage() {
 
             <div className="grid grid-cols-1 xl:grid-cols-3 gap-5">
                 <div className="xl:col-span-1 space-y-5">
-                    <Card icon="🖼️" title="Banner & SEO" accent="indigo">
+                    <Card title="Banner & SEO" accent="indigo">
                         <TextInput label="Banner Title" value={data.bannerTitle} onChange={v => set('bannerTitle', v)} placeholder="Rental Process" />
                         <ImageUploader label="Banner Image" existingUrl={data.bannerImage} onUpload={url => set('bannerImage', url)} />
                         <hr className="border-slate-100 dark:border-slate-800" />
@@ -176,14 +173,14 @@ export default function RentalProcessCMSPage() {
                         <TextArea label="Meta Description" value={data.metaDescription} onChange={v => set('metaDescription', v)} placeholder="Short SEO description..." rows={2} />
                     </Card>
 
-                    <Card icon="✨" title="Features Header" accent="emerald">
+                    <Card title="Features Header" accent="emerald">
                         <TextInput label="Features Heading" value={data.rentalFeaturesTitle} onChange={v => set('rentalFeaturesTitle', v)} placeholder="Features" />
                         <TextArea label="Features Description" value={data.rentalFeaturesSubtitle} onChange={v => set('rentalFeaturesSubtitle', v)} placeholder="Rent with confidence..." rows={3} />
                     </Card>
                 </div>
 
                 <div className="xl:col-span-2 space-y-5">
-                    <Card icon="🛤️" title="Rental Flow Steps" accent="indigo">
+                    <Card title="Rental Flow Steps" accent="indigo">
                         <div className="bg-slate-50 dark:bg-slate-800/50 rounded-xl p-4 mb-4 space-y-4">
                             <div className="flex justify-between items-center">
                                 <Label>Section Visibility</Label>

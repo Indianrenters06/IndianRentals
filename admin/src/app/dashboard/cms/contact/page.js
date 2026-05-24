@@ -55,10 +55,7 @@ const Card = ({ icon, title, children, accent = 'indigo' }) => {
     };
     return (
         <div className={`rounded-2xl border bg-gradient-to-br ${accents[accent] || accents.indigo} p-6 space-y-5 shadow-sm`}>
-            <div className="flex items-center gap-2.5">
-                <span className="text-xl">{icon}</span>
-                <h3 className="text-base font-bold text-slate-800 dark:text-slate-100">{title}</h3>
-            </div>
+            <h3 className="text-base font-bold text-slate-800 dark:text-slate-100">{title}</h3>
             {children}
         </div>
     );
@@ -124,7 +121,7 @@ export default function ContactCMSPage() {
             <div className="flex items-center justify-between flex-wrap gap-3">
                 <div>
                     <h1 className="text-3xl font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2">
-                        📞 Contact <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-500 to-purple-500">CMS</span>
+                        Contact <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-500 to-purple-500">CMS</span>
                     </h1>
                     <p className="text-sm text-slate-500 mt-1">Manage contact information and map settings.</p>
                 </div>
@@ -143,7 +140,7 @@ export default function ContactCMSPage() {
 
             <div className="grid grid-cols-1 xl:grid-cols-2 gap-5">
                 <div className="space-y-5">
-                    <Card icon="🖼️" title="Banner & Header" accent="indigo">
+                    <Card title="Banner & Header" accent="indigo">
                         <TextInput label="Banner Title" value={data.bannerTitle} onChange={v => set('bannerTitle', v)} placeholder="Contact Us" />
                         <ImageUploader label="Banner Image" existingUrl={data.bannerImage} onUpload={url => set('bannerImage', url)} />
                         <hr className="border-slate-100 dark:border-slate-800" />
@@ -151,14 +148,14 @@ export default function ContactCMSPage() {
                         <TextArea label="Sub-heading" value={data.contactSubtitle} onChange={v => set('contactSubtitle', v)} placeholder="Have questions?..." rows={2} />
                     </Card>
 
-                    <Card icon="🔍" title="SEO Settings" accent="sky">
+                    <Card title="SEO Settings" accent="sky">
                         <TextInput label="Meta Title" value={data.metaTitle} onChange={v => set('metaTitle', v)} placeholder="Contact – IndianRentals" />
                         <TextArea label="Meta Description" value={data.metaDescription} onChange={v => set('metaDescription', v)} placeholder="Short SEO description..." rows={3} />
                     </Card>
                 </div>
 
                 <div className="space-y-5">
-                    <Card icon="📞" title="Contact Details" accent="emerald">
+                    <Card title="Contact Details" accent="emerald">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <TextInput label="Email Address" value={data.contactEmail} onChange={v => set('contactEmail', v)} placeholder="support@..." icon={<EnvelopeSimple size={16} />} />
                             <TextInput label="Phone Number" value={data.contactPhone} onChange={v => set('contactPhone', v)} placeholder="+91 ..." icon={<Phone size={16} />} />

@@ -128,7 +128,7 @@ export default function CategoriesPageCMS() {
             <div className="flex items-center justify-between flex-wrap gap-3">
                 <div>
                     <h1 className="text-3xl font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2">
-                        🗂️ Categories Page <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-500 to-purple-500">CMS</span>
+                        Categories Page <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-500 to-purple-500">CMS</span>
                     </h1>
                     <p className="text-sm text-slate-500 mt-1">Manage the &quot;All Categories&quot; frontend page layout and cards.</p>
                 </div>
@@ -170,7 +170,7 @@ export default function CategoriesPageCMS() {
 
                     <div className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 p-6 shadow-sm">
                         <h3 className="text-lg font-bold text-slate-800 dark:text-slate-100 mb-5 flex items-center gap-2">
-                            🔍 SEO Settings
+                            SEO Settings
                         </h3>
                         <div className="space-y-4">
                             <TextInput label="Meta Title" value={data.metaTitle} onChange={v => set('metaTitle', v)} />

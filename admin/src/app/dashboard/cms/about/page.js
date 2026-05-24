@@ -55,10 +55,7 @@ const Card = ({ icon, title, children, accent = 'indigo' }) => {
     };
     return (
         <div className={`rounded-2xl border bg-gradient-to-br ${accents[accent] || accents.indigo} p-6 space-y-5 shadow-sm`}>
-            <div className="flex items-center gap-2.5">
-                <span className="text-xl">{icon}</span>
-                <h3 className="text-base font-bold text-slate-800 dark:text-slate-100">{title}</h3>
-            </div>
+            <h3 className="text-base font-bold text-slate-800 dark:text-slate-100">{title}</h3>
             {children}
         </div>
     );
@@ -144,7 +141,7 @@ export default function AboutCMSPage() {
             <div className="flex items-center justify-between flex-wrap gap-3">
                 <div>
                     <h1 className="text-3xl font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2">
-                        🏢 About Us <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-500 to-purple-500">CMS</span>
+                        About Us <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-500 to-purple-500">CMS</span>
                     </h1>
                     <p className="text-sm text-slate-500 mt-1">Edit every section of the About page — changes go live instantly.</p>
                 </div>
@@ -164,7 +161,7 @@ export default function AboutCMSPage() {
             <div className="grid grid-cols-1 xl:grid-cols-2 gap-5">
 
                 {/* ── BANNER ── */}
-                <Card icon="🖼️" title="Page Banner" accent="indigo">
+                <Card title="Page Banner" accent="indigo">
                     <TextInput label="Banner Title (overlay text)" value={data.bannerTitle} onChange={v => set('bannerTitle', v)} placeholder="About Us" />
                     <ImageUploader label="Banner Image" existingUrl={data.bannerImage} onUpload={url => set('bannerImage', url)} />
                     {!data.bannerImage && (
@@ -182,7 +179,7 @@ export default function AboutCMSPage() {
                 </Card>
 
                 {/* ── SEO ── */}
-                <Card icon="🔍" title="SEO Settings" accent="sky">
+                <Card title="SEO Settings" accent="sky">
                     <div>
                         <TextInput label="Meta Title" value={data.metaTitle} onChange={v => set('metaTitle', v)} placeholder="About Us – IndianRentals" />
                         <p className="text-xs text-slate-400 mt-1">{(data.metaTitle || '').length}/60</p>
@@ -200,7 +197,7 @@ export default function AboutCMSPage() {
                 </Card>
 
                 {/* ── OUR STORY ── */}
-                <Card icon="📖" title="Our Story Section" accent="amber">
+                <Card title="Our Story Section" accent="amber">
                     <TextInput label="Section Heading" value={data.aboutStoryTitle} onChange={v => set('aboutStoryTitle', v)} placeholder="Our Story" />
                     <TextArea label="Paragraph 1" value={data.aboutStoryPara1} onChange={v => set('aboutStoryPara1', v)} placeholder="First paragraph…" rows={4} />
                     <TextArea label="Paragraph 2" value={data.aboutStoryPara2} onChange={v => set('aboutStoryPara2', v)} placeholder="Second paragraph…" rows={3} />
@@ -211,7 +208,7 @@ export default function AboutCMSPage() {
                 </Card>
 
                 {/* ── STORY STATS ── */}
-                <Card icon="📊" title="Story Stats (2 badges)" accent="emerald">
+                <Card title="Story Stats (2 badges)" accent="emerald">
                     <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-3 p-3 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700">
                             <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">Stat 1</p>
@@ -239,7 +236,7 @@ export default function AboutCMSPage() {
                 </Card>
 
                 {/* ── VISION TAB ── */}
-                <Card icon="👁️" title="Vision Tab (3 Items)" accent="violet">
+                <Card title="Vision Tab (3 Items)" accent="violet">
                     <TextInput label="Tab Button Label" value={data.aboutVisionTabLabel} onChange={v => set('aboutVisionTabLabel', v)} placeholder="Our Vision" />
                     <ItemRow n={1} titleKey="aboutVision1Title" textKey="aboutVision1Text" data={data} set={set} />
                     <ItemRow n={2} titleKey="aboutVision2Title" textKey="aboutVision2Text" data={data} set={set} />
@@ -247,7 +244,7 @@ export default function AboutCMSPage() {
                 </Card>
 
                 {/* ── MISSION TAB ── */}
-                <Card icon="🎯" title="Mission Tab (3 Items)" accent="rose">
+                <Card title="Mission Tab (3 Items)" accent="rose">
                     <TextInput label="Tab Button Label" value={data.aboutMissionTabLabel} onChange={v => set('aboutMissionTabLabel', v)} placeholder="Our Mission" />
                     <ItemRow n={1} titleKey="aboutMission1Title" textKey="aboutMission1Text" data={data} set={set} />
                     <ItemRow n={2} titleKey="aboutMission2Title" textKey="aboutMission2Text" data={data} set={set} />
@@ -256,7 +253,7 @@ export default function AboutCMSPage() {
 
                 {/* ── WHY CHOOSE US ── */}
                 <div className="xl:col-span-2">
-                    <Card icon="🏆" title="Why Choose Us Section" accent="emerald">
+                    <Card title="Why Choose Us Section" accent="emerald">
                         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                             <div className="space-y-4">
                                 <TextInput label="Section Heading" value={data.aboutWhyTitle} onChange={v => set('aboutWhyTitle', v)} placeholder="Why Choose Us?" />

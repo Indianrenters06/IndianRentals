@@ -145,7 +145,7 @@ function CategoryGroup({ category, products, onEdit }) {
             <button onClick={() => setOpen(o => !o)}
                 className="w-full flex items-center justify-between px-6 py-4 hover:bg-slate-50 dark:hover:bg-slate-800/40 transition-all">
                 <div className="flex items-center gap-3">
-                    <span className="w-8 h-8 rounded-lg bg-indigo-50 dark:bg-indigo-500/10 flex items-center justify-center text-base">📦</span>
+                    <span className="w-8 h-8 rounded-lg bg-indigo-50 dark:bg-indigo-500/10 flex items-center justify-center text-indigo-500"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 256 256" fill="currentColor"><path d="M223.15,68.72l-88-48.18a14,14,0,0,0-14.3,0l-88,48.17a14,14,0,0,0-7.09,12.29V175a14,14,0,0,0,7.09,12.28l88,48.18a14,14,0,0,0,14.3,0l88-48.18A14,14,0,0,0,230.24,175V81A14,14,0,0,0,223.15,68.72ZM128,34l83.23,45.57L128,125.14,44.77,79.57ZM38,96.28l82,44.89V219.5L38,174.61Zm96,123.22V141.17l82-44.89V174.61Z"/></svg></span>
                     <div className="text-left">
                         <p className="font-bold text-slate-900 dark:text-slate-100">{category}</p>
                         <p className="text-xs text-slate-400">{products.length} product{products.length !== 1 ? 's' : ''}</p>

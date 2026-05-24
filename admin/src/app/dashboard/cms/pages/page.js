@@ -34,12 +34,7 @@ const PAGES = [
     { key: 'subscription-rules', label: 'Subscription Rules', slug: '/subscription-rules' },
 ];
 
-const PAGE_ICONS = {
-    'about': '🏢', 'rental-process': '🔄', 'terms': '📋',
-    'privacy': '🔒', 'shipping': '🚚', 'refund': '↩️', 'faq': '❓', 'contact': '📞',
-    'kyc-policy': '🆔', 'rules': '📜',
-    'delivery-charges': '🚚', 'late-fee-rules': '⏰', 'cancellation-rules': '❌', 'subscription-rules': '🔄',
-};
+const PAGE_ICONS = {};
 
 const DEFAULTS = {
     bannerImage: '', bannerTitle: '', pageContent: '',
@@ -247,7 +242,6 @@ function PageEditor({ page, onBack }) {
                     </button>
                     <div>
                         <div className="flex items-center gap-2">
-                            <span className="text-xl">{PAGE_ICONS[page.key] || '📄'}</span>
                             <h2 className="text-xl font-bold text-slate-900 dark:text-slate-100">{page.label}</h2>
                         </div>
                         <div className="flex items-center gap-1 text-xs text-slate-400 font-mono mt-0.5">
@@ -275,7 +269,7 @@ function PageEditor({ page, onBack }) {
             <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 md:p-8 space-y-8 shadow-sm">
                 {/* Banner */}
                 <div>
-                    <h4 className="text-sm font-bold text-slate-700 dark:text-slate-200 uppercase tracking-wider mb-4">📸 Page Banner</h4>
+                    <h4 className="text-sm font-bold text-slate-700 dark:text-slate-200 uppercase tracking-wider mb-4">Page Banner</h4>
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                         <div className="space-y-4">
                             <Field label="Banner Title" value={data.bannerTitle} onChange={v => set('bannerTitle', v)} placeholder={page.label} />
@@ -312,7 +306,7 @@ function PageEditor({ page, onBack }) {
                 <div>
                     <HtmlEditor value={data.pageContent} onChange={v => set('pageContent', v)} />
                     <p className="text-xs text-slate-400 mt-2">
-                        💡 Tip: Use <code className="bg-slate-100 dark:bg-slate-800 px-1 rounded">&lt;h2&gt;</code>, <code className="bg-slate-100 dark:bg-slate-800 px-1 rounded">&lt;p&gt;</code>, <code className="bg-slate-100 dark:bg-slate-800 px-1 rounded">&lt;ul&gt;&lt;li&gt;</code> tags. This is rendered directly on the public page.
+                        Tip: Use <code className="bg-slate-100 dark:bg-slate-800 px-1 rounded">&lt;h2&gt;</code>, <code className="bg-slate-100 dark:bg-slate-800 px-1 rounded">&lt;p&gt;</code>, <code className="bg-slate-100 dark:bg-slate-800 px-1 rounded">&lt;ul&gt;&lt;li&gt;</code> tags. This is rendered directly on the public page.
                     </p>
                 </div>
 
@@ -320,7 +314,7 @@ function PageEditor({ page, onBack }) {
 
                 {/* SEO */}
                 <div>
-                    <h4 className="text-sm font-bold text-slate-700 dark:text-slate-200 uppercase tracking-wider mb-4">🔍 SEO Settings</h4>
+                    <h4 className="text-sm font-bold text-slate-700 dark:text-slate-200 uppercase tracking-wider mb-4">SEO Settings</h4>
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                         <div className="space-y-1">
                             <Field label="Meta Title" value={data.metaTitle} onChange={v => set('metaTitle', v)} placeholder={`${page.label} – IndianRentals`} />
@@ -432,8 +426,8 @@ export default function StaticPages() {
                                                     }
                                                 }}>
                                                 <div className="p-5 flex flex-row items-center gap-4">
-                                                    <div className="w-12 h-12 rounded-xl bg-indigo-50 dark:bg-indigo-500/10 flex items-center justify-center text-2xl shrink-0">
-                                                        {PAGE_ICONS[page.key] || '📄'}
+                                                    <div className="w-12 h-12 rounded-xl bg-indigo-50 dark:bg-indigo-500/10 flex items-center justify-center shrink-0 text-indigo-500">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 256 256" fill="currentColor"><path d="M213.66,82.34l-56-56A8,8,0,0,0,152,24H56A16,16,0,0,0,40,40V216a16,16,0,0,0,16,16H200a16,16,0,0,0,16-16V88A8,8,0,0,0,213.66,82.34ZM160,51.31,188.69,80H160ZM200,216H56V40h88V88a8,8,0,0,0,8,8h48V216Z"/></svg>
                                                     </div>
                                                     <div className="flex-1 min-w-0">
                                                         <p className="font-bold text-slate-900 dark:text-slate-100 group-hover:text-indigo-600 transition-colors">{page.label}</p>
@@ -445,7 +439,7 @@ export default function StaticPages() {
                                                                 {hasContent ? '✓ Has content' : '⚠ No content'}
                                                             </span>
                                                             <span className={`text-[10px] px-2 py-0.5 rounded-full font-semibold ${hasBanner ? 'bg-blue-50 text-blue-600 border border-blue-200' : 'bg-slate-50 text-slate-400 border border-slate-200'}`}>
-                                                                {hasBanner ? '🖼 Banner set' : '🖼 No banner'}
+                                                                {hasBanner ? 'Banner set' : 'No banner'}
                                                             </span>
                                                         </div>
                                                     </div>

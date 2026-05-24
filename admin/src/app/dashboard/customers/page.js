@@ -71,7 +71,7 @@ function CustomerOrdersList({ userId }) {
 
     if (orders.length === 0) return (
         <div className="flex flex-col items-center justify-center py-16 text-center">
-            <div className="w-16 h-16 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center mb-4 text-3xl">📦</div>
+            <div className="w-16 h-16 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center mb-4 text-slate-400"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 256 256" fill="currentColor"><path d="M223.15,68.72l-88-48.18a14,14,0,0,0-14.3,0l-88,48.17a14,14,0,0,0-7.09,12.29V175a14,14,0,0,0,7.09,12.28l88,48.18a14,14,0,0,0,14.3,0l88-48.18A14,14,0,0,0,230.24,175V81A14,14,0,0,0,223.15,68.72ZM128,34l83.23,45.57L128,125.14,44.77,79.57ZM38,96.28l82,44.89V219.5L38,174.61Zm96,123.22V141.17l82-44.89V174.61Z"/></svg></div>
             <p className="text-slate-700 dark:text-slate-300 font-semibold">No orders found</p>
             <p className="text-slate-400 text-sm mt-1">This customer hasn't placed any orders yet.</p>
         </div>
@@ -113,8 +113,8 @@ function CustomerOrdersList({ userId }) {
                     </div>
                     {/* Order Footer */}
                     <div className="px-4 py-2.5 bg-slate-50 dark:bg-slate-800/30 flex items-center justify-between text-xs text-slate-500">
-                        <span>📅 {order.rentalPeriod?.durationMonths} month{order.rentalPeriod?.durationMonths !== 1 ? 's' : ''} rental</span>
-                        <span>{order.isPaid ? '✅ Paid' : '⏳ Unpaid'} · {order.paymentMethod}</span>
+                        <span>{order.rentalPeriod?.durationMonths} month{order.rentalPeriod?.durationMonths !== 1 ? 's' : ''} rental</span>
+                        <span>{order.isPaid ? 'Paid' : 'Unpaid'} · {order.paymentMethod}</span>
                     </div>
                 </div>
             ))}

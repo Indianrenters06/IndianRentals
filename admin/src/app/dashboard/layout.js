@@ -237,9 +237,9 @@ export default function DashboardLayout({ children }) {
         { name: 'Blog', path: '/dashboard/cms/blog' },
         { name: 'Categories Page', path: '/dashboard/cms/categories-page' },
         { name: 'Product Page', path: '/dashboard/cms/product-page' },
-        { name: '🖼️ Category Images', path: '/dashboard/cms/category-images' },
+        { name: 'Category Images', path: '/dashboard/cms/category-images' },
         { name: 'Static Pages', path: '/dashboard/cms/pages' },
-        { name: '❓ Product FAQs', path: '/dashboard/cms/faq' },
+        { name: 'Product FAQs', path: '/dashboard/cms/faq' },
       ]
     },
     {

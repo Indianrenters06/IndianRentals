@@ -153,10 +153,10 @@ export default function ProductPageCMS() {
                         onChange={handleProductSelect}
                         className="h-10 px-3 rounded-lg bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm font-medium focus:ring-2 focus:ring-indigo-500/30"
                     >
-                        <option value="GLOBAL">🌍 Edit Global Master Template</option>
+                        <option value="GLOBAL">Edit Global Master Template</option>
                         <optgroup label="Edit Specific Product">
                             {products.map(p => (
-                                <option key={p._id} value={p._id}>📦 {p.name}</option>
+                                <option key={p._id} value={p._id}>{p.name}</option>
                             ))}
                         </optgroup>
                     </select>
