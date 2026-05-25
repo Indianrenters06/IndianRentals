@@ -20,6 +20,7 @@ const DEFAULTS = {
     productPageTestimonialsHeading: "Don't just take our word for it",
     productPageFaqHeading: "Product FAQs",
     productPageRelatedHeading: "Best Rented Products",
+    productPageGlobalRelatedIds: [],
     productPageEnableCompare: true,
     productPageEnableRelated: true,
     productPageEnableFaq: true,
@@ -106,7 +107,7 @@ export default function ProductPageCMS() {
                 const res = await window.fetch(`${API}/api/cms/product-page`, {
                     method: 'PUT',
                     headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${getToken()}` },
-                    body: JSON.stringify(data),
+                    body: JSON.stringify({ ...data, productPageGlobalRelatedIds: data.productPageGlobalRelatedIds || [] }),
                 });
                 if (!res.ok) throw new Error('Failed to save global template');
                 setGlobalData(data);
@@ -459,46 +460,92 @@ export default function ProductPageCMS() {
                                     placeholder="Section heading..."
                                 />
                             </div>
-                            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                                {[1, 2, 3, 4].map(i => (
-                                    <div key={i} className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden h-[250px] flex flex-col">
-                                        <div className="h-[150px] bg-gray-100 flex items-center justify-center text-gray-400">
-                                            <Package size={32} />
-                                        </div>
-                                        <div className="p-4 flex flex-col gap-2">
-                                            <div className="w-3/4 h-3 bg-gray-200 rounded"></div>
-                                            <div className="w-1/2 h-4 bg-gray-200 rounded"></div>
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
 
-                            {isProduct && (
-                                <div className="mt-6 bg-white p-6 rounded-xl border border-gray-200">
-                                    <h3 className="font-bold text-gray-800 mb-2">Override Related Products</h3>
-                                    <p className="text-xs text-gray-500 mb-4">Select specific products to show in this slider for this product only. Leave empty to use global default.</p>
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                        {products.filter(p => p._id !== selectedProductId).map(p => (
-                                            <label key={p._id} className="flex items-center gap-3 p-3 border border-gray-100 rounded-lg hover:bg-gray-50 cursor-pointer">
-                                                <input
-                                                    type="checkbox"
-                                                    checked={(selectedProductData?.relatedProducts || []).includes(p._id)}
-                                                    onChange={(e) => {
-                                                        const current = [...(selectedProductData?.relatedProducts || [])];
-                                                        if (e.target.checked) {
-                                                            setProd('relatedProducts', [...current, p._id]);
-                                                        } else {
-                                                            setProd('relatedProducts', current.filter(id => id !== p._id));
-                                                        }
-                                                    }}
-                                                    className="w-4 h-4 text-indigo-600 rounded"
-                                                />
-                                                <span className="text-sm font-medium text-gray-700">{p.name}</span>
-                                            </label>
-                                        ))}
+                            {/* Interactive 4-slot product picker */}
+                            {(() => {
+                                const relatedIds = isProduct
+                                    ? (selectedProductData?.relatedProducts || [])
+                                    : (data.productPageGlobalRelatedIds || []);
+
+                                const setRelated = (newIds) => {
+                                    if (isProduct) setProd('relatedProducts', newIds);
+                                    else set('productPageGlobalRelatedIds', newIds);
+                                };
+
+                                const usedIds = new Set(relatedIds.filter(Boolean));
+
+                                const availableFor = (slotId) =>
+                                    products.filter(p =>
+                                        p._id !== selectedProductId &&
+                                        (!usedIds.has(p._id) || p._id === slotId)
+                                    );
+
+                                return (
+                                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                                        {[0, 1, 2, 3].map(i => {
+                                            const productId = relatedIds[i];
+                                            const product = products.find(p => p._id === productId);
+
+                                            const removeSlot = () => {
+                                                const next = [...relatedIds];
+                                                next.splice(i, 1);
+                                                setRelated(next);
+                                            };
+
+                                            const setSlot = (newId) => {
+                                                const next = [...relatedIds];
+                                                next[i] = newId;
+                                                setRelated(next);
+                                            };
+
+                                            return (
+                                                <div key={i} className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden h-[250px] flex flex-col relative group">
+                                                    {product ? (
+                                                        <>
+                                                            <div className="h-[150px] bg-gray-100 flex items-center justify-center text-gray-300 shrink-0">
+                                                                <Package size={36} />
+                                                            </div>
+                                                            <div className="p-3 flex flex-col gap-1">
+                                                                <p className="text-xs font-semibold text-gray-800 line-clamp-2 leading-snug">{product.name}</p>
+                                                                <p className="text-xs text-gray-500 font-medium">₹{product.rentalPrice}/mo</p>
+                                                            </div>
+                                                            {/* Hover overlay: change or remove */}
+                                                            <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center gap-2 rounded-2xl px-3">
+                                                                <select
+                                                                    value={productId}
+                                                                    onChange={e => setSlot(e.target.value)}
+                                                                    className="text-xs bg-white text-gray-800 px-2 py-1.5 rounded-lg w-full font-medium cursor-pointer"
+                                                                >
+                                                                    {availableFor(productId).map(p => (
+                                                                        <option key={p._id} value={p._id}>{p.name}</option>
+                                                                    ))}
+                                                                </select>
+                                                                <button onClick={removeSlot} className="text-xs text-white bg-red-500 hover:bg-red-600 px-4 py-1.5 rounded-lg font-semibold w-full transition-colors">
+                                                                    Remove
+                                                                </button>
+                                                            </div>
+                                                        </>
+                                                    ) : (
+                                                        <div className="h-full flex flex-col items-center justify-center gap-3 border-2 border-dashed border-gray-200 rounded-2xl p-3">
+                                                            <Package size={28} className="text-gray-300" />
+                                                            <select
+                                                                value=""
+                                                                onChange={e => e.target.value && setSlot(e.target.value)}
+                                                                className="text-xs bg-gray-50 border border-gray-200 text-gray-500 px-2 py-1.5 rounded-lg w-full cursor-pointer"
+                                                            >
+                                                                <option value="">+ Pick a product</option>
+                                                                {availableFor(null).map(p => (
+                                                                    <option key={p._id} value={p._id}>{p.name}</option>
+                                                                ))}
+                                                            </select>
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            );
+                                        })}
                                     </div>
-                                </div>
-                            )}
+                                );
+                            })()}
                         </div>
 
                     </div>
