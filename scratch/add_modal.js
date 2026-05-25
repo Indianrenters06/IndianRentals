@@ -5,6 +5,7 @@ const filesToUpdate = [
     'admin/src/app/dashboard/customers/page.js',
     'admin/src/app/dashboard/orders/page.js',
 
+
     'admin/src/app/dashboard/coupons/active/page.js',
     'admin/src/app/dashboard/coupons/expired/page.js'
 ];

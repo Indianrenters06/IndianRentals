@@ -337,7 +337,15 @@ export default function TeamMembersPage() {
                     radius="xl"
                     isRequired
                     selectedKeys={[formData.role]}
-                    onSelectionChange={keys => setFormData({...formData, role: [...keys][0] || "staff"})}
+                    onSelectionChange={keys => {
+                      const selectedId = [...keys][0] || "staff";
+                      const selectedRole = roles.find(r => r.id === selectedId);
+                      setFormData({
+                        ...formData,
+                        role: selectedId,
+                        adminPermissions: selectedRole ? (selectedRole.permissions || []) : []
+                      });
+                    }}
                     startContent={<ShieldCheck className="text-slate-400" />}
                     classNames={{ trigger: "bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 h-[60px]" }}
                     popoverProps={{
@@ -358,12 +366,23 @@ export default function TeamMembersPage() {
                   </Select>
                 </div>
 
-                {formData.role !== 'super_admin' && (
-                  <div className="mt-4 p-4 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800">
-                    <h3 className="text-sm font-semibold mb-2 flex items-center gap-2 text-slate-700 dark:text-slate-200">
-                      <ShieldCheck className="w-4 h-4 text-indigo-500" />
-                      Granted Permissions
-                    </h3>
+                <div className={`mt-4 p-4 rounded-xl border transition-colors ${
+                  (formData.role === 'super_admin' || formData.role === 'admin')
+                    ? 'bg-indigo-50 dark:bg-indigo-500/10 border-indigo-200 dark:border-indigo-500/30'
+                    : 'bg-slate-50 dark:bg-slate-800/50 border-slate-100 dark:border-slate-800'
+                }`}>
+                  <h3 className="text-sm font-semibold mb-2 flex items-center gap-2 text-slate-700 dark:text-slate-200">
+                    <ShieldCheck className="w-4 h-4 text-indigo-500" />
+                    {(formData.role === 'super_admin' || formData.role === 'admin') ? 'Access Level' : 'Granted Permissions'}
+                  </h3>
+                  {(formData.role === 'super_admin' || formData.role === 'admin') ? (
+                    <div className="flex items-center gap-2">
+                      <span className="inline-flex items-center gap-1.5 text-xs font-bold px-3 py-1.5 rounded-full bg-indigo-100 dark:bg-indigo-500/20 text-indigo-700 dark:text-indigo-300">
+                        <ShieldCheck className="w-3.5 h-3.5" weight="fill" />
+                        Full Access — All modules and configurations
+                      </span>
+                    </div>
+                  ) : (
                     <div className="flex flex-wrap gap-2">
                       {formData.adminPermissions.length > 0 ? (
                         formData.adminPermissions.map(perm => (
@@ -372,11 +391,11 @@ export default function TeamMembersPage() {
                           </Chip>
                         ))
                       ) : (
-                        <span className="text-xs text-slate-500">No specific sections assigned.</span>
+                        <span className="text-xs text-slate-500">No specific sections assigned. Select a role above to auto-assign permissions.</span>
                       )}
                     </div>
-                  </div>
-                )}
+                  )}
+                </div>
               </ModalBody>
               <ModalFooter className="py-4 px-6">
                 <Button variant="light" onPress={onClose} className="font-semibold">

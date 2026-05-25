@@ -6,8 +6,9 @@ const checkMaintenanceMode = asyncHandler(async (req, res, next) => {
     const exemptRoutes = [
         '/api/health',
         '/api/admin',
-        '/api/auth/adminLogin', // Admin login
-        '/api/settings' // Public settings might be needed by frontend to detect maintenance
+        '/api/auth/admin-login', // Admin login (kebab-case route)
+        '/api/auth/adminLogin',  // legacy alias — keep for safety
+        '/api/settings'          // public settings (frontend needs to detect maintenance)
     ];
 
     const isExempt = exemptRoutes.some(route => req.path.startsWith(route));

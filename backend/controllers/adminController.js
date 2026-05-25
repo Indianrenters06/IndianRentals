@@ -213,6 +213,9 @@ const getTeamMembers = asyncHandler(async (req, res) => {
     res.json(team);
 });
 
+const ALL_PERMISSIONS = ["cms", "products", "inventory", "users", "kyc", "orders", "payments", "coupons", "reports", "notifications", "settings"];
+const FULL_ACCESS_ROLES = ['admin', 'super_admin'];
+
 // @desc    Create a team member
 // @route   POST /api/admin/team
 // @access  Private/Admin
@@ -225,13 +228,16 @@ const createTeamMember = asyncHandler(async (req, res) => {
         throw new Error('User already exists');
     }
 
+    const finalRole = role || 'staff';
+    const finalPermissions = FULL_ACCESS_ROLES.includes(finalRole) ? ALL_PERMISSIONS : (adminPermissions || []);
+
     const member = await User.create({
         name,
         email,
         password,
         phone,
-        role: role || 'staff',
-        adminPermissions: adminPermissions || [],
+        role: finalRole,
+        adminPermissions: finalPermissions,
         isEmailVerified: true,
         isPhoneVerified: true
     });
@@ -261,8 +267,13 @@ const updateTeamMember = asyncHandler(async (req, res) => {
     if (name) user.name = name;
     if (email) user.email = email;
     if (phone) user.phone = phone;
-    if (role) user.role = role;
-    if (adminPermissions) user.adminPermissions = adminPermissions;
+    if (role) {
+        user.role = role;
+        // super_admin and admin always get full permissions
+        user.adminPermissions = FULL_ACCESS_ROLES.includes(role) ? ALL_PERMISSIONS : (adminPermissions || user.adminPermissions);
+    } else if (adminPermissions) {
+        user.adminPermissions = adminPermissions;
+    }
     if (password) user.password = password;
 
     const updatedUser = await user.save();

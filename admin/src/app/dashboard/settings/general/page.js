@@ -78,6 +78,7 @@ export default function GeneralSettings() {
             });
             if (!res.ok) throw new Error((await res.json()).message || "Failed to save");
             setSaved(true);
+            toast.success("Settings saved successfully");
             setTimeout(() => setSaved(false), 3000);
         } catch (err) {
             toast.error(err.message);
@@ -178,24 +179,52 @@ export default function GeneralSettings() {
                     <Divider className="bg-slate-200 dark:bg-slate-800 my-2" />
 
                     <p className="text-xs font-bold uppercase tracking-widest text-indigo-500 flex items-center gap-2"><Gear weight="bold" /> Platform Behaviour</p>
+
+                    {form.maintenanceMode && (
+                        <div className="flex items-center gap-3 p-3 rounded-xl bg-rose-50 dark:bg-rose-500/10 border border-rose-200 dark:border-rose-500/30 text-rose-700 dark:text-rose-400">
+                            <WarningCircle weight="bold" size={18} className="shrink-0" />
+                            <p className="text-sm font-semibold">Maintenance mode is currently <span className="underline">active</span>. The platform is offline for regular users. Remember to save and disable it when done.</p>
+                        </div>
+                    )}
+
                     <div className="space-y-4">
                         {[
-                            { key: "maintenanceMode", label: "Maintenance Mode", desc: "Temporarily take the site offline for users", color: "danger" },
-                            { key: "allowRegistrations", label: "Allow New Registrations", desc: "Let new users sign up on the platform", color: "success" },
-                            { key: "requireKYC", label: "Require KYC Before Checkout", desc: "Block orders until KYC documents are approved", color: "warning" },
+                            { key: "maintenanceMode", label: "Maintenance Mode", desc: "Temporarily take the site offline for regular users. Admins retain full access.", color: "danger" },
+                            { key: "allowRegistrations", label: "Allow New Registrations", desc: "Let new users sign up on the platform. Disable to freeze new sign-ups.", color: "success" },
+                            { key: "requireKYC", label: "Require KYC Before Checkout", desc: "Block rental orders until KYC documents are approved by an admin.", color: "warning" },
                         ].map(item => (
-                            <div key={item.key} className="flex items-center justify-between p-4 rounded-xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700/50">
-                                <div>
+                            <div key={item.key} className={`flex items-center justify-between p-4 rounded-xl border transition-colors ${
+                                item.key === "maintenanceMode" && form[item.key]
+                                    ? "bg-rose-50 dark:bg-rose-500/10 border-rose-200 dark:border-rose-500/30"
+                                    : item.key === "allowRegistrations" && !form[item.key]
+                                    ? "bg-amber-50 dark:bg-amber-500/10 border-amber-200 dark:border-amber-500/30"
+                                    : "bg-slate-50 dark:bg-slate-800/40 border-slate-200 dark:border-slate-700/50"
+                            }`}>
+                                <div className="flex-1 mr-6">
                                     <p className="text-sm font-semibold text-slate-900 dark:text-slate-100">{item.label}</p>
                                     <p className="text-xs text-slate-500 mt-0.5">{item.desc}</p>
+                                    <div className="mt-2">
+                                        {item.key === "maintenanceMode" && (
+                                            <span className={`inline-flex items-center gap-1 text-[11px] font-bold px-2 py-0.5 rounded-full ${form[item.key] ? "bg-rose-100 dark:bg-rose-500/20 text-rose-700 dark:text-rose-400" : "bg-emerald-100 dark:bg-emerald-500/20 text-emerald-700 dark:text-emerald-400"}`}>
+                                                {form[item.key] ? "● SITE OFFLINE" : "● SITE ONLINE"}
+                                            </span>
+                                        )}
+                                        {item.key === "allowRegistrations" && (
+                                            <span className={`inline-flex items-center gap-1 text-[11px] font-bold px-2 py-0.5 rounded-full ${form[item.key] ? "bg-emerald-100 dark:bg-emerald-500/20 text-emerald-700 dark:text-emerald-400" : "bg-amber-100 dark:bg-amber-500/20 text-amber-700 dark:text-amber-400"}`}>
+                                                {form[item.key] ? "● REGISTRATIONS OPEN" : "● REGISTRATIONS CLOSED"}
+                                            </span>
+                                        )}
+                                        {item.key === "requireKYC" && (
+                                            <span className={`inline-flex items-center gap-1 text-[11px] font-bold px-2 py-0.5 rounded-full ${form[item.key] ? "bg-amber-100 dark:bg-amber-500/20 text-amber-700 dark:text-amber-400" : "bg-slate-100 dark:bg-slate-700/50 text-slate-500"}`}>
+                                                {form[item.key] ? "● KYC REQUIRED" : "● KYC OPTIONAL"}
+                                            </span>
+                                        )}
+                                    </div>
                                 </div>
                                 <Switch
                                     color={item.color}
                                     isSelected={form[item.key]}
                                     onValueChange={v => setForm(f => ({ ...f, [item.key]: v }))}
-                                    classNames={{
-                                        wrapper: "group-data-[selected=false]:bg-slate-300 dark:group-data-[selected=false]:bg-slate-600"
-                                    }}
                                 />
                             </div>
                         ))}

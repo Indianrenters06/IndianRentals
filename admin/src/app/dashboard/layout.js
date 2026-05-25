@@ -18,7 +18,7 @@ import {
   House, Users, Package, ShoppingCart, FileText,
   CreditCard, Calendar, Gear, CaretRight, CaretDown, CaretLeft,
   MagnifyingGlass, Bell, Sun, Moon, List, SignOut, ShieldCheck,
-  Layout, Cube, Tag, ChartBar, ChatCenteredText
+  Layout, Cube, Tag, ChartBar, ChatCenteredText, WarningCircle
 } from '@phosphor-icons/react';
 
 import { useRouter } from "next/navigation";
@@ -32,6 +32,7 @@ export default function DashboardLayout({ children }) {
   const [unreadCount, setUnreadCount] = useState(0);
   const [isMobile, setIsMobile] = useState(false);
   const [branding, setBranding] = useState({ siteLogo: null, siteName: 'IndianRentals', theme: { activeTheme: 'default' } });
+  const [maintenanceBanner, setMaintenanceBanner] = useState(false);
 
   const pathname = usePathname();
   const router = useRouter();
@@ -157,7 +158,7 @@ export default function DashboardLayout({ children }) {
         } catch {}
         const token = localStorage.getItem('adminToken');
         if (!token) return;
-        fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/admin/settings`, {
+        fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/settings`, {
           headers: { Authorization: `Bearer ${token}` }
         }).then(res => res.ok ? res.json() : null).then(data => {
           if (!data) return;
@@ -165,6 +166,7 @@ export default function DashboardLayout({ children }) {
           setBranding(bd);
           applyBrandingTheme(bd);
           localStorage.setItem('adminBranding', JSON.stringify(bd));
+          setMaintenanceBanner(!!data.maintenanceMode);
         }).catch(() => {});
       };
 
@@ -190,12 +192,10 @@ export default function DashboardLayout({ children }) {
     }));
   };
 
-  // Permission-aware menu items — each top-level item has a `permission` key
-  // that maps to an adminPermissions value. Admins see everything; staff see only their sections.
-  // Rule: grant full access to anyone NOT explicitly marked as 'staff' — since only
-  // admins can authenticate through the admin-login endpoint.
+  // Roles with unrestricted access — see all sections, never redirected
+  const FULL_ACCESS_ROLES = ['admin', 'super_admin'];
   const roleRaw = (adminInfo?.role || '').toLowerCase().trim();
-  const isAdmin = roleRaw !== 'staff'; // staff is the only restricted role
+  const isAdmin = FULL_ACCESS_ROLES.includes(roleRaw);
   const perms = adminInfo?.adminPermissions || [];
   const can = (section) => isAdmin || perms.includes(section);
 
@@ -214,21 +214,18 @@ export default function DashboardLayout({ children }) {
     { prefix: '/dashboard/settings', permission: 'settings' },
   ];
 
-  // Guard: redirect staff away from sections they don't have permission for
+  // Guard: redirect non-admin roles away from sections they don't have permission for
   useEffect(() => {
-    const guardRole = (adminInfo?.role || '').toLowerCase().trim();
-    if (!adminInfo || guardRole !== 'staff') return; // only restrict explicit staff accounts
-
+    if (!adminInfo || isAdmin) return; // super_admin and admin are never restricted
     const matched = PATH_PERMISSION_MAP.find(({ prefix }) => pathname?.startsWith(prefix));
     if (matched && !perms.includes(matched.permission)) {
       router.replace('/dashboard');
     }
-  }, [pathname, adminInfo]);
+  }, [pathname, adminInfo, isAdmin]);
 
   // Determine if current page is blocked for this user (for inline fallback)
   const isBlocked = (() => {
-    const blockedRole = (adminInfo?.role || '').toLowerCase().trim();
-    if (blockedRole !== 'staff') return false; // only staff accounts can be blocked
+    if (isAdmin) return false; // super_admin and admin are never blocked
     const matched = PATH_PERMISSION_MAP.find(({ prefix }) => pathname?.startsWith(prefix));
     return matched ? !perms.includes(matched.permission) : false;
   })();
@@ -605,6 +602,14 @@ export default function DashboardLayout({ children }) {
             </Dropdown>
           </div>
         </header>
+
+        {/* Maintenance Mode Banner */}
+        {maintenanceBanner && (
+          <div className="bg-rose-600 text-white text-sm font-semibold px-6 py-2.5 flex items-center justify-center gap-2 shrink-0">
+            <WarningCircle weight="bold" size={16} className="shrink-0" />
+            Maintenance mode is <span className="font-extrabold underline">active</span> — the platform is currently offline for regular users.
+          </div>
+        )}
 
         {/* Page Content */}
         <div className="flex-1 w-full bg-slate-50 dark:bg-slate-900/40 relative z-10 overflow-x-hidden p-4 md:p-6 lg:p-8">
