@@ -237,7 +237,7 @@ export default function AdminDashboard() {
       <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
         <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.5 }}>
           <h1 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-slate-100 mb-1">
-            Welcome back, <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600 dark:from-indigo-400 dark:to-purple-400">{adminName}</span> 👋
+            Welcome back, <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600 dark:from-indigo-400 dark:to-purple-400">{adminName}</span>
           </h1>
           <p className="text-slate-600 dark:text-slate-400">Here's what's happening with your rental business today.</p>
         </motion.div>
