@@ -120,7 +120,7 @@ function CatRow({ cat, onDelete, onRefresh, addToast }) {
                     {cat.isActive ? "Active" : "Off"}
                 </span>
 
-                <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity shrink-0">
+                <div className="flex items-center gap-1 shrink-0">
                     <button
                         onClick={editing ? cancelEdit : openEdit}
                         className={`p-1.5 rounded-lg transition-colors ${editing ? "text-slate-400 hover:!bg-slate-100 dark:hover:!bg-slate-700" : "text-slate-400 hover:text-indigo-500 hover:!bg-indigo-50 dark:hover:!bg-indigo-500/10" }`}
@@ -155,7 +155,7 @@ function CatRow({ cat, onDelete, onRefresh, addToast }) {
                                             value={editName}
                                             onChange={e => setEditName(e.target.value)}
                                             onKeyDown={e => { if (e.key === "Enter") saveEdit(); if (e.key === "Escape") cancelEdit(); }}
-                                            className="w-full h-10 px-3 rounded-xl border border-slate-200 dark:border-slate-700 text-sm font-semibold bg-white dark:bg-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/30 transition-all"
+                                            className="w-full h-10 px-3 rounded-xl border border-slate-200 dark:border-slate-700 text-base font-semibold bg-white dark:bg-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/30 transition-all"
                                         />
                                     </div>
                                     {editImage && (
@@ -252,7 +252,7 @@ function AddCatRow({ onDone, onCancel, addToast }) {
                     onChange={e => setName(e.target.value)}
                     onKeyDown={e => { if (e.key === "Enter") save(); if (e.key === "Escape") onCancel(); }}
                     placeholder="Category name (required)…"
-                    className="flex-1 h-10 px-4 rounded-xl border border-indigo-300 dark:border-indigo-500/50 text-sm font-semibold bg-white dark:bg-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/40 transition-all"
+                    className="flex-1 h-10 px-4 rounded-xl border border-indigo-300 dark:border-indigo-500/50 text-base font-semibold bg-white dark:bg-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/40 transition-all"
                 />
                 <input
                     value={description}
@@ -377,11 +377,11 @@ export default function CategoriesPage() {
                 <div>
                     <h1 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-slate-100 mb-1">
                         Category{" "}
-                        <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-500 to-purple-500">
+                        <span className="text-indigo-600 dark:text-indigo-400 font-extrabold">
                             Management
                         </span>
                     </h1>
-                    <p className="text-slate-500 dark:text-slate-400 text-sm">
+                    <p className="text-slate-500 dark:text-slate-200 text-sm">
                         Click <span className="font-semibold text-indigo-500">+ Add Category</span> to add a main category.
                     </p>
                 </div>

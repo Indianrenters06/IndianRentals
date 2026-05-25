@@ -13,7 +13,7 @@ function SectionRow({ icon, title, desc, toggle, onToggle }) {
             </div>
             <div className="flex-1">
                 <h3 className="text-[15px] font-bold text-slate-900 dark:text-white mb-1">{title}</h3>
-                <p className="text-xs text-slate-500 dark:text-slate-400 max-w-lg leading-relaxed">{desc}</p>
+                <p className="text-xs text-slate-500 dark:text-slate-200 max-w-lg leading-relaxed">{desc}</p>
             </div>
             {onToggle !== undefined && (
                 <button
@@ -30,14 +30,14 @@ function SectionRow({ icon, title, desc, toggle, onToggle }) {
 function Field({ label, value, onChange, placeholder, type = "text", multiline = false }) {
     return (
         <div className="flex flex-col gap-1.5">
-            <label className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">{label}</label>
+            <label className="text-xs font-bold text-slate-500 dark:text-slate-200 uppercase tracking-wider">{label}</label>
             {multiline ? (
                 <textarea
                     value={value}
                     onChange={(e) => onChange(e.target.value)}
                     placeholder={placeholder}
                     rows={3}
-                    className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-4 py-2.5 text-sm text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500/50"
+                    className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-4 py-2.5 text-base text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500/50"
                 />
             ) : (
                 <input
@@ -45,7 +45,7 @@ function Field({ label, value, onChange, placeholder, type = "text", multiline =
                     value={value}
                     onChange={(e) => onChange(e.target.value)}
                     placeholder={placeholder}
-                    className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-4 py-2.5 text-sm text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500/50"
+                    className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-4 py-2.5 text-base text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500/50"
                 />
             )}
         </div>
@@ -125,7 +125,7 @@ export default function LayoutCMSPage() {
             <div className="flex items-center justify-between mb-8">
                 <div>
                     <h1 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight">Global Layout</h1>
-                    <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">Manage Navbar, Footer, and globally shared sections.</p>
+                    <p className="text-sm text-slate-500 dark:text-slate-200 mt-1">Manage Navbar, Footer, and globally shared sections.</p>
                 </div>
                 <button
                     onClick={handleSave}
@@ -155,7 +155,7 @@ export default function LayoutCMSPage() {
                                         newArr[idx] = e.target.value;
                                         set("navbarAnnouncements", newArr);
                                     }}
-                                    className="flex-1 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-4 py-2 text-sm focus:outline-none"
+                                    className="flex-1 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-4 py-2 text-base focus:outline-none"
                                 />
                                 <button onClick={() => {
                                     const newArr = [...data.navbarAnnouncements];
@@ -181,7 +181,7 @@ export default function LayoutCMSPage() {
                     />
                     <div className="space-y-3">
                         {data.navbarLinks.map((link, idx) => (
-                            <div key={idx} className="flex gap-2 items-center bg-slate-50 p-3 rounded-xl border border-slate-200">
+                            <div key={idx} className="flex gap-2 items-center bg-slate-50 dark:bg-slate-950 p-3 rounded-xl border border-slate-200 dark:border-slate-800">
                                 <input
                                     placeholder="Link Name"
                                     value={link.name}
@@ -190,7 +190,7 @@ export default function LayoutCMSPage() {
                                         newArr[idx].name = e.target.value;
                                         set("navbarLinks", newArr);
                                     }}
-                                    className="flex-1 bg-white border border-slate-200 rounded-lg px-3 py-1.5 text-sm"
+                                    className="flex-1 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg px-3 py-1.5 text-base text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500/50"
                                 />
                                 <input
                                     placeholder="URL (/category/apple)"
@@ -200,9 +200,9 @@ export default function LayoutCMSPage() {
                                         newArr[idx].href = e.target.value;
                                         set("navbarLinks", newArr);
                                     }}
-                                    className="flex-1 bg-white border border-slate-200 rounded-lg px-3 py-1.5 text-sm"
+                                    className="flex-1 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg px-3 py-1.5 text-base text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500/50"
                                 />
-                                <label className="flex items-center gap-1 text-xs text-slate-500 whitespace-nowrap">
+                                <label className="flex items-center gap-1 text-xs text-slate-500 dark:text-slate-300 whitespace-nowrap">
                                     <input type="checkbox" checked={link.separator} onChange={e => {
                                         const newArr = [...data.navbarLinks];
                                         newArr[idx].separator = e.target.checked;
@@ -213,7 +213,7 @@ export default function LayoutCMSPage() {
                                     const newArr = [...data.navbarLinks];
                                     newArr.splice(idx, 1);
                                     set("navbarLinks", newArr);
-                                }} className="p-2 text-red-500 hover:bg-red-50 rounded-xl">
+                                }} className="p-2 text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-xl">
                                     <Trash />
                                 </button>
                             </div>
@@ -247,10 +247,10 @@ export default function LayoutCMSPage() {
                     </div>
 
                     <div className="mt-4">
-                        <label className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider block mb-2">Footer Quick Links</label>
+                        <label className="text-xs font-bold text-slate-500 dark:text-slate-200 uppercase tracking-wider block mb-2">Footer Quick Links</label>
                         <div className="space-y-3">
                             {data.footerQuickLinks.map((link, idx) => (
-                                <div key={idx} className="flex gap-2 items-center bg-slate-50 p-2 rounded-xl border border-slate-200">
+                                <div key={idx} className="flex gap-2 items-center bg-slate-50 dark:bg-slate-950 p-2 rounded-xl border border-slate-200 dark:border-slate-800">
                                     <input
                                         placeholder="Link Name"
                                         value={link.name}
@@ -259,7 +259,7 @@ export default function LayoutCMSPage() {
                                             newArr[idx].name = e.target.value;
                                             set("footerQuickLinks", newArr);
                                         }}
-                                        className="flex-1 bg-white border border-slate-200 rounded-lg px-3 py-1.5 text-sm"
+                                        className="flex-1 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg px-3 py-1.5 text-base text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500/50"
                                     />
                                     <input
                                         placeholder="URL"
@@ -269,13 +269,13 @@ export default function LayoutCMSPage() {
                                             newArr[idx].href = e.target.value;
                                             set("footerQuickLinks", newArr);
                                         }}
-                                        className="flex-1 bg-white border border-slate-200 rounded-lg px-3 py-1.5 text-sm"
+                                        className="flex-1 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg px-3 py-1.5 text-base text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500/50"
                                     />
                                     <button onClick={() => {
                                         const newArr = [...data.footerQuickLinks];
                                         newArr.splice(idx, 1);
                                         set("footerQuickLinks", newArr);
-                                    }} className="p-2 text-red-500 hover:bg-red-50 rounded-xl">
+                                    }} className="p-2 text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-xl">
                                         <Trash />
                                     </button>
                                 </div>

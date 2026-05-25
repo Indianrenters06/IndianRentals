@@ -8,11 +8,11 @@ import { Card, CardBody, Textarea, Divider, CheckboxGroup, Checkbox } from "@her
 import { FloppyDisk, ArrowLeft, Tag, MapPin, CurrencyInr, Cube, ListPlus } from "@phosphor-icons/react";
 import ImageUploader from "@/components/ImageUploader";
 
-const inputCls = "w-full h-12 px-3 rounded-xl bg-white dark:bg-slate-950/60 border border-slate-200 dark:border-slate-800 text-sm text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 transition-all shadow-sm";
-const prefixInputCls = "w-full h-12 pl-9 pr-3 rounded-xl bg-white dark:bg-slate-950/60 border border-slate-200 dark:border-slate-800 text-sm text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 transition-all shadow-sm";
-const selectCls = "w-full h-12 px-3 rounded-xl bg-white dark:bg-slate-950/60 border border-slate-200 dark:border-slate-800 text-sm text-slate-900 dark:text-white appearance-none focus:outline-none focus:ring-2 focus:ring-indigo-500/30 transition-all shadow-sm";
-const labelCls = "block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2 ml-1";
-const textareaCls = "w-full min-h-[120px] p-4 rounded-xl bg-white dark:bg-slate-950/60 border border-slate-200 dark:border-slate-800 text-sm text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 transition-all shadow-sm resize-none";
+const inputCls = "w-full h-12 px-3 rounded-xl bg-white dark:bg-slate-950/60 border border-slate-200 dark:border-slate-800 text-base text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 transition-all shadow-sm";
+const prefixInputCls = "w-full h-12 pl-9 pr-3 rounded-xl bg-white dark:bg-slate-950/60 border border-slate-200 dark:border-slate-800 text-base text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 transition-all shadow-sm";
+const selectCls = "w-full h-12 px-3 rounded-xl bg-white dark:bg-slate-950/60 border border-slate-200 dark:border-slate-800 text-base text-slate-900 dark:text-white appearance-none focus:outline-none focus:ring-2 focus:ring-indigo-500/30 transition-all shadow-sm";
+const labelCls = "block text-xs font-bold text-slate-500 dark:text-slate-200 uppercase tracking-wider mb-2 ml-1";
+const textareaCls = "w-full min-h-[120px] p-4 rounded-xl bg-white dark:bg-slate-950/60 border border-slate-200 dark:border-slate-800 text-base text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 transition-all shadow-sm resize-none";
 
 export default function AddProduct() {
     const router = useRouter();
@@ -139,9 +139,9 @@ export default function AddProduct() {
                         <ArrowLeft size={15} /> Back to Products
                     </button>
                     <h1 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-slate-100 mb-1">
-                        Add New <span className="text-transparent bg-clip-text bg-linear-to-r from-indigo-500 to-purple-500">Product</span>
+                        Add New <span className="text-indigo-600 dark:text-indigo-400 font-extrabold">Product</span>
                     </h1>
-                    <p className="text-slate-600 dark:text-slate-400">List a new item in your inventory catalogue.</p>
+                    <p className="text-slate-600 dark:text-slate-200">List a new item in your inventory catalogue.</p>
                 </motion.div>
             </div>
 

@@ -95,7 +95,10 @@ export default function DashboardLayout({ children }) {
       if (storedInfo) {
         try {
           const parsed = JSON.parse(storedInfo);
-          setAdminInfo(parsed.user || parsed);
+          // Support multiple API response shapes: { user: {...} }, { admin: {...} }, or flat
+          const info = parsed.user || parsed.admin || parsed;
+          console.log('[AdminPanel] adminInfo loaded:', info); // temp debug — remove after confirming
+          setAdminInfo(info);
         } catch (err) {
           console.error("Failed to parse admin data", err);
         }
@@ -189,7 +192,10 @@ export default function DashboardLayout({ children }) {
 
   // Permission-aware menu items — each top-level item has a `permission` key
   // that maps to an adminPermissions value. Admins see everything; staff see only their sections.
-  const isAdmin = adminInfo?.role === 'admin';
+  // Rule: grant full access to anyone NOT explicitly marked as 'staff' — since only
+  // admins can authenticate through the admin-login endpoint.
+  const roleRaw = (adminInfo?.role || '').toLowerCase().trim();
+  const isAdmin = roleRaw !== 'staff'; // staff is the only restricted role
   const perms = adminInfo?.adminPermissions || [];
   const can = (section) => isAdmin || perms.includes(section);
 
@@ -210,8 +216,8 @@ export default function DashboardLayout({ children }) {
 
   // Guard: redirect staff away from sections they don't have permission for
   useEffect(() => {
-    if (!adminInfo || adminInfo.role === 'admin') return; // admins pass freely
-    if (adminInfo.role !== 'staff') return;
+    const guardRole = (adminInfo?.role || '').toLowerCase().trim();
+    if (!adminInfo || guardRole !== 'staff') return; // only restrict explicit staff accounts
 
     const matched = PATH_PERMISSION_MAP.find(({ prefix }) => pathname?.startsWith(prefix));
     if (matched && !perms.includes(matched.permission)) {
@@ -221,8 +227,8 @@ export default function DashboardLayout({ children }) {
 
   // Determine if current page is blocked for this user (for inline fallback)
   const isBlocked = (() => {
-    if (!adminInfo || adminInfo.role === 'admin') return false;
-    if (adminInfo.role !== 'staff') return false;
+    const blockedRole = (adminInfo?.role || '').toLowerCase().trim();
+    if (blockedRole !== 'staff') return false; // only staff accounts can be blocked
     const matched = PATH_PERMISSION_MAP.find(({ prefix }) => pathname?.startsWith(prefix));
     return matched ? !perms.includes(matched.permission) : false;
   })();
@@ -236,7 +242,6 @@ export default function DashboardLayout({ children }) {
         { name: 'Global Layout', path: '/dashboard/cms/layout' },
         { name: 'Blog', path: '/dashboard/cms/blog' },
         { name: 'Categories Page', path: '/dashboard/cms/categories-page' },
-        { name: 'Product Page', path: '/dashboard/cms/product-page' },
         { name: 'Single Product Page', path: '/dashboard/cms/single-product' },
         { name: 'Category Images', path: '/dashboard/cms/category-images' },
         { name: 'Static Pages', path: '/dashboard/cms/pages' },
@@ -373,11 +378,11 @@ export default function DashboardLayout({ children }) {
             : (isMobile ? "-translate-x-full w-72" : "w-0")
           } transition-all duration-300 border-r border-slate-200 dark:border-slate-800/60 bg-white dark:bg-slate-950 flex flex-col overflow-hidden`}
       >
-        <div className="h-16 flex items-center px-6 border-b border-slate-200 dark:border-slate-800/60 shrink-0 bg-transparent">
+        <div className="h-16 flex items-center px-5 border-b border-slate-200 dark:border-slate-800/60 shrink-0 bg-transparent">
           <img
             src={branding.siteLogo || "https://res.cloudinary.com/dgkckcdk8/image/upload/v1776892240/1d1f7c4e3c0490bcddb69ceb328c67be2f7cf361_6_kufcee.png"}
             alt={branding.siteName || "Logo"}
-            className="h-10 w-auto object-contain"
+            className="h-8 w-auto object-contain"
           />
         </div>
 
@@ -395,11 +400,11 @@ export default function DashboardLayout({ children }) {
                       onClick={() => toggleMenu(item.name)}
                       className={`w-full flex items-center justify-between px-4 py-3 rounded-xl transition-all duration-200 group ${isActive
                         ? 'bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-500/20 shadow-inner'
-                        : 'text-slate-600 dark:text-slate-400 dark:hover:bg-slate-800/50 dark:hover:text-slate-200'
+                        : 'text-slate-600 dark:text-slate-100 dark:hover:bg-slate-800/50 dark:hover:text-white'
                         }`}
                     >
                       <div className="flex items-center gap-3">
-                        <item.icon className={`w-5 h-5 shrink-0 ${isActive ? 'text-indigo-600 dark:text-indigo-400' : 'text-slate-500 dark:text-slate-500 group-hover:text-slate-700 dark:group-hover:text-slate-400'}`} />
+                        <item.icon className={`w-5 h-5 shrink-0 ${isActive ? 'text-indigo-600 dark:text-indigo-400' : 'text-slate-500 dark:text-slate-300 group-hover:text-slate-700 dark:group-hover:text-white'}`} />
                         <span className="font-medium text-sm text-left truncate tracking-wide">{item.name}</span>
                       </div>
                       {isSubmenuOpen ?
@@ -413,11 +418,11 @@ export default function DashboardLayout({ children }) {
                       onClick={() => { if (isMobile) setIsSidebarOpen(false); }}
                       className={`w-full flex items-center justify-between px-4 py-3 rounded-xl transition-all duration-200 group ${isActive
                         ? 'bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-500/20 shadow-inner'
-                        : 'text-slate-600 dark:text-slate-400 dark:hover:bg-slate-800/50 dark:hover:text-slate-200'
+                        : 'text-slate-600 dark:text-slate-100 dark:hover:bg-slate-800/50 dark:hover:text-white'
                         }`}
                     >
                       <div className="flex items-center gap-3">
-                        <item.icon className={`w-5 h-5 shrink-0 ${isActive ? 'text-indigo-600 dark:text-indigo-400' : 'text-slate-500 dark:text-slate-500 group-hover:text-slate-700 dark:group-hover:text-slate-400'}`} />
+                        <item.icon className={`w-5 h-5 shrink-0 ${isActive ? 'text-indigo-600 dark:text-indigo-400' : 'text-slate-500 dark:text-slate-300 group-hover:text-slate-700 dark:group-hover:text-white'}`} />
                         <span className="font-medium text-sm truncate tracking-wide">{item.name}</span>
                       </div>
                     </Link>
@@ -435,7 +440,7 @@ export default function DashboardLayout({ children }) {
                             onClick={() => { if (isMobile) setIsSidebarOpen(false); }}
                             className={`block px-4 py-2 text-sm rounded-lg transition-all duration-200 w-full text-left ${isSubActive
                               ? 'bg-indigo-50 dark:bg-indigo-500/10 text-indigo-700 dark:text-indigo-300 font-medium tracking-wide'
-                              : 'text-slate-500 dark:hover:bg-slate-800/40 dark:hover:text-slate-300'
+                              : 'text-slate-500 dark:text-slate-300 dark:hover:bg-slate-800/40 dark:hover:text-white'
                               }`}
                           >
                             {subItem.name}
@@ -454,7 +459,7 @@ export default function DashboardLayout({ children }) {
         <div className="mt-auto px-4 py-2 border-t border-slate-200 dark:border-slate-800/60 bg-slate-50 dark:bg-slate-950/40">
           <button
             onClick={handleLogout}
-            className="w-full flex items-center px-4 py-3 text-slate-500 dark:text-slate-400 dark:hover:text-red-400 dark:hover:!bg-red-500/10 rounded-xl transition-colors text-sm font-bold tracking-wide"
+            className="w-full flex items-center px-4 py-3 text-slate-500 dark:text-slate-300 dark:hover:text-red-400 dark:hover:!bg-red-500/10 rounded-xl transition-colors text-sm font-bold tracking-wide"
           >
             <SignOut className="w-5 h-5 mr-3" />
             Sign Out
@@ -469,7 +474,7 @@ export default function DashboardLayout({ children }) {
           <div className="flex items-center gap-4">
             <button
               onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-              className="p-2 dark:hover:bg-slate-800/80 rounded-xl transition-colors text-slate-600 dark:text-slate-400 dark:hover:text-slate-200"
+              className="p-2 dark:hover:bg-slate-800/80 rounded-xl transition-colors text-slate-600 dark:text-slate-200 dark:hover:text-slate-200"
             >
               {isSidebarOpen ? <CaretRight className="w-5 h-5" /> : <List className="w-5 h-5" />}
             </button>
@@ -610,7 +615,7 @@ export default function DashboardLayout({ children }) {
                   <ShieldCheck className="w-10 h-10 text-red-400" />
                 </div>
                 <h2 className="text-2xl font-bold text-slate-800 dark:text-slate-100">Access Denied</h2>
-                <p className="text-slate-500 dark:text-slate-400 max-w-sm">
+                <p className="text-slate-500 dark:text-slate-200 max-w-sm">
                   You don&apos;t have permission to access this section. Contact your administrator to request access.
                 </p>
               </div>

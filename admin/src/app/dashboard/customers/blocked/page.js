@@ -4,6 +4,7 @@ import { useState, useEffect, useMemo, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Card, CardBody, Button, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Chip, Avatar, Skeleton, Pagination } from "@heroui/react";
 import { Prohibit, WarningCircle, ArrowCounterClockwise, MagnifyingGlass, CheckCircle, XCircle, DownloadSimple } from "@phosphor-icons/react";
+import { downloadCustomerReport } from "@/utils/customerReport";
 
 const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
 
@@ -75,22 +76,14 @@ export default function BlockedUsers() {
         }
     };
 
-    const downloadUser = (user) => {
-        const content = [
-            `Blocked Account Report`,
-            `Generated: ${new Date().toLocaleString("en-IN")}`,
-            ``,
-            `Name: ${user.name || "N/A"}`,
-            `Email: ${user.email || "N/A"}`,
-            `Phone: ${user.phone || "N/A"}`,
-            `Status: ${user.isBlocked ? "Blocked" : "Inactive"}`,
-            `Block Reason: ${user.blockedReason || "Not specified"}`,
-            `Member Since: ${user.createdAt ? new Date(user.createdAt).toLocaleDateString("en-IN") : "N/A"}`,
-        ].join("\n");
-        const blob = new Blob([content], { type: "text/plain" });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement("a"); a.href = url; a.download = `blocked_${user.name?.replace(/\s+/g, "_") || "user"}.txt`; a.click();
-        addToast(`Report downloaded for ${user.name}`, "success");
+    const downloadUser = async (user) => {
+        try {
+            await downloadCustomerReport(user);
+            addToast(`Report downloaded for ${user.name}`, "success");
+        } catch (err) {
+            console.error(err);
+            addToast(err.message || "Failed to generate report", "error");
+        }
     };
 
     const sortedItems = useMemo(() => {
@@ -117,9 +110,9 @@ export default function BlockedUsers() {
             <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
                 <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }}>
                     <h1 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-slate-100 mb-1">
-                        Blocked <span className="text-transparent bg-clip-text bg-linear-to-r from-indigo-500 to-purple-500">Accounts</span>
+                        Blocked <span className="text-indigo-600 dark:text-indigo-400 font-extrabold">Accounts</span>
                     </h1>
-                    <p className="text-slate-600 dark:text-slate-400">Manage users who have been temporarily or permanently restricted.</p>
+                    <p className="text-slate-600 dark:text-slate-200">Manage users who have been temporarily or permanently restricted.</p>
                 </motion.div>
                 {!loading && (
                     <div className="inline-flex items-center gap-2 bg-rose-50 dark:bg-rose-500/10 text-rose-700 dark:text-rose-400 border border-rose-200 dark:border-rose-500/20 rounded-full px-4 py-2 font-bold text-sm">

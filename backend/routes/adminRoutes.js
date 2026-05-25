@@ -28,6 +28,7 @@ const {
     getAvailableStock,
     getAssignedInventory,
     getReturnedInventory,
+    processReturnedInspection,
     getDamagedInventory,
     getStockAlerts,
     adjustStock,
@@ -199,6 +200,9 @@ router.route('/inventory/assigned')
 
 router.route('/inventory/returned')
     .get(protect, admin, getReturnedInventory);
+
+router.route('/inventory/returned/:rentalId/:itemId')
+    .put(protect, admin, processReturnedInspection);
 
 router.route('/inventory/damaged')
     .get(protect, admin, getDamagedInventory);

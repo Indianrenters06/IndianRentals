@@ -176,7 +176,7 @@ export default function RolesPermissionsPage() {
                 </div>
               </CardHeader>
               <CardBody className="px-5 py-4 flex-1 flex flex-col">
-                <p className="text-sm text-slate-600 dark:text-slate-400 mb-4 flex-1 line-clamp-2">
+                <p className="text-sm text-slate-600 dark:text-slate-200 mb-4 flex-1 line-clamp-2">
                   {role.description}
                 </p>
                 

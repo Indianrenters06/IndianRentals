@@ -28,7 +28,7 @@ const TextInput = ({ label, value, onChange, placeholder, icon }) => (
                 value={value || ''}
                 onChange={e => onChange(e.target.value)}
                 placeholder={placeholder}
-                className={`w-full h-10 ${icon ? 'pl-10' : 'px-3'} rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-400 transition-all`}
+                className={`w-full h-10 ${icon ? 'pl-10' : 'px-3'} rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-base text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-400 transition-all`}
             />
         </div>
     </div>
@@ -42,7 +42,7 @@ const TextArea = ({ label, value, onChange, placeholder, rows = 3 }) => (
             onChange={e => onChange(e.target.value)}
             placeholder={placeholder}
             rows={rows}
-            className="w-full px-3 py-2.5 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-400 transition-all resize-none"
+            className="w-full px-3 py-2.5 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-base text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-400 transition-all resize-none"
         />
     </div>
 );
@@ -121,7 +121,7 @@ export default function ContactCMSPage() {
             <div className="flex items-center justify-between flex-wrap gap-3">
                 <div>
                     <h1 className="text-3xl font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2">
-                        Contact <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-500 to-purple-500">CMS</span>
+                        Contact <span className="text-indigo-600 dark:text-indigo-400 font-extrabold">CMS</span>
                     </h1>
                     <p className="text-sm text-slate-500 mt-1">Manage contact information and map settings.</p>
                 </div>

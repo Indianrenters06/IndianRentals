@@ -103,9 +103,9 @@ export default function UserPayments() {
             <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
                 <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }}>
                     <h1 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-slate-100 mb-1">
-                        Payment <span className="text-transparent bg-clip-text bg-linear-to-r from-indigo-500 to-purple-500">History</span>
+                        Payment <span className="text-indigo-600 dark:text-indigo-400 font-extrabold">History</span>
                     </h1>
-                    <p className="text-slate-600 dark:text-slate-400">Complete audit log of all financial transactions on the platform.</p>
+                    <p className="text-slate-600 dark:text-slate-200">Complete audit log of all financial transactions on the platform.</p>
                 </motion.div>
                 <div className="flex items-center gap-3">
                     {!loading && (

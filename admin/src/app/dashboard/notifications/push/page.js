@@ -82,9 +82,9 @@ export default function PushNotifications() {
             <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
                 <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }}>
                     <h1 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-slate-100 mb-1">
-                        Push <span className="text-transparent bg-clip-text bg-linear-to-r from-indigo-500 to-purple-500">Notifications</span>
+                        Push <span className="text-indigo-600 dark:text-indigo-400 font-extrabold">Notifications</span>
                     </h1>
-                    <p className="text-slate-600 dark:text-slate-400">Broadcast messages, alerts, and updates to your customers.</p>
+                    <p className="text-slate-600 dark:text-slate-200">Broadcast messages, alerts, and updates to your customers.</p>
                 </motion.div>
                 <div className="flex items-center gap-3">
                     <div className="inline-flex items-center gap-2 bg-indigo-50 dark:bg-indigo-500/10 text-indigo-700 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-500/20 rounded-full px-3 py-1.5 font-bold text-sm">
@@ -144,7 +144,7 @@ export default function PushNotifications() {
                                         <TableCell>
                                             <div className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 font-bold text-xs ${item.type === "order" ? "bg-blue-50 dark:bg-blue-500/10 text-blue-700 dark:text-blue-400" :
                                                     item.type === "kyc" ? "bg-amber-50 dark:bg-amber-500/10 text-amber-700 dark:text-amber-400" :
-                                                        "bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400"
+                                                        "bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-200"
                                                 }`}>
                                                 {getTypeIcon(item.type)}
                                                 {item.type || "general"}

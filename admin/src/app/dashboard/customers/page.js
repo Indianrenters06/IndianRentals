@@ -5,7 +5,7 @@ export const dynamic = 'force-dynamic';
 import { useState, useEffect, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { downloadPDFReport } from "@/utils/pdfReport";
-import jsPDF from "jspdf";
+import { downloadCustomerReport } from "@/utils/customerReport";
 import {
     MagnifyingGlass, Funnel, DownloadSimple, PencilSimple, Trash,
     Phone, MapPin, DotsThreeVertical, EnvelopeSimple,
@@ -261,25 +261,15 @@ export default function CustomersManagement() {
         downloadPDFReport("Customers Report", headers, data, "customers_report");
     };
 
-    const downloadUser = (user) => {
-        const doc = new jsPDF();
-        doc.setFontSize(20);
-        doc.setFont("helvetica", "bold");
-        doc.text("Customer Activity Report", 14, 20);
-        
-        doc.setFontSize(10);
-        doc.setFont("helvetica", "normal");
-        doc.text(`Generated: ${new Date().toLocaleString("en-IN")}`, 14, 28);
-        
-        doc.setFontSize(12);
-        doc.text(`Name: ${user.name || "N/A"}`, 14, 45);
-        doc.text(`Email: ${user.email || "N/A"}`, 14, 53);
-        doc.text(`Phone: ${user.phone || "N/A"}`, 14, 61);
-        doc.text(`Location: ${user.city ? `${user.city}, ${user.state}` : "N/A"}`, 14, 69);
-        doc.text(`Status: ${user.isBlocked ? "Blocked" : user.isActive ? "Active" : "Inactive"}`, 14, 77);
-        doc.text(`Member Since: ${user.createdAt ? new Date(user.createdAt).toLocaleDateString("en-IN") : "N/A"}`, 14, 85);
-        
-        doc.save(`customer_${user.name?.replace(/\s+/g, "_") || "report"}.pdf`);
+    const downloadUser = async (user) => {
+        const toastId = toast.loading("Generating customer report...");
+        try {
+            await downloadCustomerReport(user);
+            toast.success(`Report downloaded for ${user.name}`, { id: toastId });
+        } catch (err) {
+            console.error(err);
+            toast.error(err.message || "Failed to generate report", { id: toastId });
+        }
     };
 
     const filteredUsers = useMemo(() => {
@@ -308,7 +298,7 @@ export default function CustomersManagement() {
                     <div className="flex items-center gap-3">
                         <Avatar
                             name={user.name?.charAt(0).toUpperCase() || 'U'}
-                            className="bg-linear-to-br from-indigo-500 to-purple-500 text-white font-semibold shrink-0"
+                            className="bg-indigo-600 text-white font-semibold shrink-0"
                             size="sm"
                         />
                         <div className="flex flex-col">
@@ -322,7 +312,7 @@ export default function CustomersManagement() {
                 return (
                     <div className="flex flex-col gap-1">
                         {user.phone ? (
-                            <div className="flex items-center gap-2 text-xs text-slate-600 dark:text-slate-400">
+                            <div className="flex items-center gap-2 text-xs text-slate-600 dark:text-slate-200">
                                 <Phone className="w-3 h-3 text-indigo-500" />
                                 <span>{user.phone}</span>
                             </div>
@@ -330,7 +320,7 @@ export default function CustomersManagement() {
                             <span className="text-xs text-slate-500 italic">No phone</span>
                         )}
                         {user.city ? (
-                            <div className="flex items-center gap-2 text-xs text-slate-600 dark:text-slate-400">
+                            <div className="flex items-center gap-2 text-xs text-slate-600 dark:text-slate-200">
                                 <MapPin className="w-3 h-3 text-indigo-500" />
                                 <span>{user.city}, {user.state || 'India'}</span>
                             </div>
@@ -421,9 +411,9 @@ export default function CustomersManagement() {
             <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
                 <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }}>
                     <h1 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-slate-100 mb-1">
-                        Customers <span className="text-transparent bg-clip-text bg-linear-to-r from-indigo-500 to-purple-500">Management</span>
+                        Customers <span className="text-indigo-600 dark:text-indigo-400 font-extrabold">Management</span>
                     </h1>
-                    <p className="text-slate-600 dark:text-slate-400">Complete directory of all registered customers.</p>
+                    <p className="text-slate-600 dark:text-slate-200">Complete directory of all registered customers.</p>
                 </motion.div>
                 <div className="flex flex-wrap items-center gap-3">
                     <Button color="secondary" className="font-semibold shadow-md shadow-indigo-500/20" startContent={
@@ -456,18 +446,16 @@ export default function CustomersManagement() {
                 <CardBody className="p-0">
                     <div className="px-6 py-5 bg-slate-50 dark:bg-slate-900/50 border-b border-slate-200 dark:border-slate-800 flex flex-col sm:flex-row gap-4">
                         <div className="flex-1 max-w-md">
-                            <Input
-                                placeholder="Search by name or email..."
-                                value={searchTerm}
-                                onValueChange={setSearchTerm}
-                                variant="bordered"
-                                radius="xl"
-                                startContent={<MagnifyingGlass className="text-slate-400" size={18} />}
-                                classNames={{
-                                    inputWrapper: "bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 h-[50px] shadow-sm",
-                                    input: "text-sm"
-                                }}
-                            />
+                            <div className="relative group">
+                                <MagnifyingGlass className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-indigo-500 transition-colors" size={18} />
+                                <input
+                                    type="text"
+                                    placeholder="Search by name or email..."
+                                    value={searchTerm}
+                                    onChange={e => setSearchTerm(e.target.value)}
+                                    className="w-full h-[50px] pl-10 pr-4 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-sm text-slate-900 dark:text-slate-200 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 shadow-sm transition-all"
+                                />
+                            </div>
                         </div>
                     </div>
 
@@ -499,7 +487,7 @@ export default function CustomersManagement() {
                         classNames={{
                             wrapper: "p-0 rounded-none shadow-none border-none bg-transparent",
                             thead: "bg-slate-50 dark:bg-slate-950",
-                            th: "bg-slate-50 dark:bg-slate-950 border-b border-slate-200 dark:border-slate-800 text-slate-500 dark:text-slate-400 text-xs font-semibold py-4 uppercase tracking-wider h-12 pt-4",
+                            th: "bg-slate-50 dark:bg-slate-950 border-b border-slate-200 dark:border-slate-800 text-slate-500 dark:text-slate-200 text-xs font-semibold py-4 uppercase tracking-wider h-12 pt-4",
                             td: "py-4 border-b border-slate-100 dark:border-slate-800/60 group-hover:bg-slate-50 dark:group-hover:bg-slate-800/30 transition-colors",
                             tr: "group"
                         }}
@@ -548,7 +536,7 @@ export default function CustomersManagement() {
                                         <div className="flex items-start md:items-center gap-5 border-b border-slate-100 dark:border-slate-800/60 pb-6">
                                             <Avatar
                                                 name={selectedUser.name?.charAt(0).toUpperCase() || 'U'}
-                                                className="bg-linear-to-br from-indigo-500 to-purple-500 text-white w-20 h-20 text-2xl shadow-lg shrink-0"
+                                                className="bg-indigo-600 text-white w-20 h-20 text-2xl shadow-lg shrink-0"
                                             />
                                             <div className="flex-1 min-w-0">
                                                 <h3 className="text-2xl font-bold text-slate-900 dark:text-slate-100 tracking-tight truncate flex items-center gap-2">
@@ -624,7 +612,7 @@ export default function CustomersManagement() {
                                 <h2 className="text-lg font-bold text-slate-900 dark:text-slate-100">Block User</h2>
                             </ModalHeader>
                             <ModalBody className="py-5">
-                                <p className="text-sm text-slate-600 dark:text-slate-400 mb-3">
+                                <p className="text-sm text-slate-600 dark:text-slate-200 mb-3">
                                     Blocking <span className="font-bold text-slate-900 dark:text-slate-100">{selectedUser?.name}</span> will prevent them from logging in or using the platform.
                                 </p>
                                 <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Reason (optional)</label>
@@ -633,7 +621,7 @@ export default function CustomersManagement() {
                                     onChange={e => setBlockReason(e.target.value)}
                                     placeholder="e.g. Fraudulent activity, Terms violation..."
                                     rows={3}
-                                    className="w-full border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-sm text-slate-800 dark:text-slate-200 bg-white dark:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-red-400/50 resize-none"
+                                    className="w-full border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-base text-slate-800 dark:text-slate-200 bg-white dark:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-red-400/50 resize-none"
                                 />
                             </ModalBody>
                             <ModalFooter className="border-t border-slate-100 dark:border-slate-800 pt-4">
@@ -780,3 +768,4 @@ export default function CustomersManagement() {
         </div>
     );
 }
+

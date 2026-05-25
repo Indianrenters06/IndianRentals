@@ -216,16 +216,16 @@ export default function EditProduct() {
                 <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }}>
                     <Button
                         variant="light"
-                        className="mb-2 text-slate-500 dark:text-slate-400 p-0 hover:!bg-transparent hover:text-indigo-500"
+                        className="mb-2 text-slate-500 dark:text-slate-200 p-0 hover:!bg-transparent hover:text-indigo-500"
                         startContent={<ArrowLeft />}
                         onPress={() => router.push("/dashboard/products")}
                     >
                         Back to Products
                     </Button>
                     <h1 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-slate-100 mb-1">
-                        Edit <span className="text-transparent bg-clip-text bg-linear-to-r from-indigo-500 to-purple-500">Product</span>
+                        Edit <span className="text-indigo-600 dark:text-indigo-400 font-extrabold">Product</span>
                     </h1>
-                    <p className="text-slate-600 dark:text-slate-400 text-sm font-mono">ID: {id}</p>
+                    <p className="text-slate-600 dark:text-slate-200 text-sm font-mono">ID: {id}</p>
                 </motion.div>
 
                 <div className="flex items-center gap-3">
@@ -236,7 +236,7 @@ export default function EditProduct() {
                     )}
                     {/* Active / Draft toggle */}
                     <div className="flex items-center gap-2 px-4 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900">
-                        <span className="text-sm font-medium text-slate-600 dark:text-slate-400">
+                        <span className="text-sm font-medium text-slate-600 dark:text-slate-200">
                             {form.isActive ? "Active" : "Draft"}
                         </span>
                         <Switch

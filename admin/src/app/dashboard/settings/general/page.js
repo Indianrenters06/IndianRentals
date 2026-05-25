@@ -90,9 +90,9 @@ export default function GeneralSettings() {
         <div className="w-full space-y-6 pb-12 max-w-3xl">
             <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }}>
                 <h1 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-slate-100 mb-1">
-                    General <span className="text-transparent bg-clip-text bg-linear-to-r from-indigo-500 to-purple-500">Settings</span>
+                    General <span className="text-indigo-600 dark:text-indigo-400 font-extrabold">Settings</span>
                 </h1>
-                <p className="text-slate-600 dark:text-slate-400">Configure your platform's core identity and behaviour.</p>
+                <p className="text-slate-600 dark:text-slate-200">Configure your platform's core identity and behaviour.</p>
             </motion.div>
 
             <Card className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm">

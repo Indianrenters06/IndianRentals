@@ -211,18 +211,24 @@ export default function OrdersTable({ initialStatus = "all", title = "Orders" })
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                 <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }}>
                     <h1 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-slate-100 mb-1">
-                        {title} <span className="text-transparent bg-clip-text bg-linear-to-r from-indigo-500 to-purple-500">Orders</span>
+                        {title} <span className="text-indigo-600 dark:text-indigo-400 font-extrabold">Orders</span>
                     </h1>
-                    <p className="text-slate-600 dark:text-slate-400 text-sm">Track and manage rental order lifecycle.</p>
+                    <p className="text-slate-600 dark:text-slate-200 text-sm">Track and manage rental order lifecycle.</p>
                 </motion.div>
                 <div className="flex items-center gap-3">
                     <Button isIconOnly variant="flat" size="sm" onPress={fetchOrders} isLoading={loading} className="text-slate-500">
                         <ArrowClockwise size={16}/>
                     </Button>
-                    <Input placeholder="Search orders..." value={search} onValueChange={setSearch}
-                        startContent={<MagnifyingGlass className="text-slate-400" size={16}/>}
-                        classNames={{ inputWrapper: "bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 h-10 w-60 shadow-sm" }}
-                    />
+                    <div className="relative group w-60">
+                        <MagnifyingGlass className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-indigo-500 transition-colors" size={16} />
+                        <input
+                            type="text"
+                            placeholder="Search orders..."
+                            value={search}
+                            onChange={e => setSearch(e.target.value)}
+                            className="w-full h-10 pl-10 pr-4 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-sm text-slate-900 dark:text-slate-200 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 shadow-sm transition-all"
+                        />
+                    </div>
                 </div>
             </div>
 

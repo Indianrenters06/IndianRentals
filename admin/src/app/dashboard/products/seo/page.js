@@ -1,14 +1,14 @@
 'use client';
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
     Card, CardBody, Button, Table, TableHeader, TableColumn,
     TableBody, TableRow, TableCell, Chip, Input, Spinner,
     Modal, ModalContent, ModalHeader, ModalBody, ModalFooter,
-    useDisclosure, Textarea, Divider
+    useDisclosure, Textarea, Divider, Pagination
 } from "@heroui/react";
-import { MagnifyingGlass, FloppyDisk, Tag, Browser, Globe, Info, CheckCircle, WarningCircle } from "@phosphor-icons/react";
+import { MagnifyingGlass, FloppyDisk, Tag, Browser, Globe, Info, CheckCircle, WarningCircle, CaretLeft, CaretRight } from "@phosphor-icons/react";
 import { toast } from "react-hot-toast";
 
 const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
@@ -20,6 +20,11 @@ export default function SEOManagement() {
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState("");
     const [isSaving, setIsSaving] = useState(false);
+    
+    // Pagination & Sorting state
+    const [page, setPage] = useState(1);
+    const [rowsPerPage] = useState(10);
+    const [sortDescriptor, setSortDescriptor] = useState({ column: "name", direction: "ascending" });
 
     const [seoForm, setSeoForm] = useState({
         seoTitle: "",
@@ -47,10 +52,46 @@ export default function SEOManagement() {
         fetchProducts();
     }, []);
 
-    const filteredProducts = products.filter(p =>
-        p.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        p.category.toLowerCase().includes(searchTerm.toLowerCase())
-    );
+    const handleSearchChange = (value) => {
+        setSearchTerm(value);
+        setPage(1);
+    };
+
+    const sortedItems = useMemo(() => {
+        let list = [...products];
+        if (searchTerm.trim()) {
+            const q = searchTerm.toLowerCase();
+            list = list.filter(p =>
+                p.name.toLowerCase().includes(q) ||
+                p.category.toLowerCase().includes(q)
+            );
+        }
+        return list.sort((a, b) => {
+            let first = a[sortDescriptor.column];
+            let second = b[sortDescriptor.column];
+            
+            if (sortDescriptor.column === "seoTitle") {
+                first = a.seoTitle ? "Optimized" : "Pending";
+                second = b.seoTitle ? "Optimized" : "Pending";
+            } else {
+                first = first || "";
+                second = second || "";
+            }
+
+            if (typeof first === "string" && typeof second === "string") {
+                const cmp = first.localeCompare(second);
+                return sortDescriptor.direction === "descending" ? -cmp : cmp;
+            } else {
+                const cmp = first < second ? -1 : first > second ? 1 : 0;
+                return sortDescriptor.direction === "descending" ? -cmp : cmp;
+            }
+        });
+    }, [products, searchTerm, sortDescriptor]);
+
+    const paginatedItems = useMemo(() => {
+        const start = (page - 1) * rowsPerPage;
+        return sortedItems.slice(start, start + rowsPerPage);
+    }, [page, sortedItems, rowsPerPage]);
 
     const handleEditSEO = (product) => {
         setSelectedProduct(product);
@@ -96,43 +137,86 @@ export default function SEOManagement() {
             <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
                 <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }}>
                     <h1 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-slate-100 mb-1">
-                        SEO <span className="text-transparent bg-clip-text bg-linear-to-r from-indigo-500 to-purple-500">Management</span>
+                        SEO <span className="text-indigo-600 dark:text-indigo-400 font-extrabold">Management</span>
                     </h1>
-                    <p className="text-slate-600 dark:text-slate-400">Optimize meta tags and search visibility for your products.</p>
+                    <p className="text-slate-600 dark:text-slate-200">Optimize meta tags and search visibility for your products.</p>
                 </motion.div>
             </div>
 
             <Card className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
                 <CardBody className="p-0">
                     <div className="p-6 border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/50">
-                        <Input
-                            placeholder="Search product to optimize..."
-                            startContent={
-                                <div className="flex items-center justify-center pointer-events-none">
-                                    <MagnifyingGlass className="text-slate-400" size={18} />
-                                </div>
-                            }
-                            className="max-w-md"
-                            variant="bordered"
-                            value={searchTerm}
-                            onValueChange={setSearchTerm}
-                        />
+                        <div className="relative group max-w-md">
+                            <MagnifyingGlass className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-indigo-500 transition-colors" size={18} />
+                            <input
+                                type="text"
+                                value={searchTerm}
+                                onChange={e => handleSearchChange(e.target.value)}
+                                placeholder="Search product to optimize..."
+                                className="w-full bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 rounded-xl pl-10 pr-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/50 dark:text-white h-11"
+                            />
+                        </div>
                     </div>
                     <Table
                         aria-label="SEO management table"
+                        sortDescriptor={sortDescriptor}
+                        onSortChange={setSortDescriptor}
+                        bottomContent={sortedItems.length > 0 ? (
+                            <div className="flex w-full justify-between items-center py-4 px-6 border-t border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950/30">
+                                <span className="text-sm text-slate-500">Showing {paginatedItems.length} of {sortedItems.length} products</span>
+                                <div className="flex items-center gap-1.5">
+                                    <button
+                                        type="button"
+                                        disabled={page === 1}
+                                        onClick={() => setPage(p => Math.max(p - 1, 1))}
+                                        className="flex items-center justify-center w-8 h-8 rounded-lg border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 bg-white dark:bg-slate-900 hover:!bg-slate-50 dark:hover:!bg-slate-800/50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                                    >
+                                        <CaretLeft size={16} weight="bold" />
+                                    </button>
+                                    
+                                    {Array.from({ length: Math.ceil(sortedItems.length / rowsPerPage) }).map((_, idx) => {
+                                        const pageNum = idx + 1;
+                                        const isActive = pageNum === page;
+                                        return (
+                                            <button
+                                                key={pageNum}
+                                                type="button"
+                                                onClick={() => setPage(pageNum)}
+                                                className={`flex items-center justify-center w-8 h-8 text-xs font-bold rounded-lg transition-all ${
+                                                    isActive
+                                                        ? "!bg-indigo-600 text-white shadow-lg shadow-indigo-500/25"
+                                                        : "border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 hover:!bg-slate-50 dark:hover:!bg-slate-800/50"
+                                                }`}
+                                            >
+                                                {pageNum}
+                                            </button>
+                                        );
+                                    })}
+
+                                    <button
+                                        type="button"
+                                        disabled={page === Math.ceil(sortedItems.length / rowsPerPage)}
+                                        onClick={() => setPage(p => Math.min(p + 1, Math.ceil(sortedItems.length / rowsPerPage)))}
+                                        className="flex items-center justify-center w-8 h-8 rounded-lg border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 bg-white dark:bg-slate-900 hover:!bg-slate-50 dark:hover:!bg-slate-800/50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                                    >
+                                        <CaretRight size={16} weight="bold" />
+                                    </button>
+                                </div>
+                            </div>
+                        ) : null}
                         classNames={{
                             wrapper: "p-0 rounded-none shadow-none bg-transparent",
-                            th: "bg-slate-50 dark:bg-slate-950/80 text-slate-500 font-bold uppercase text-xs h-12 pt-0",
+                            th: "bg-slate-50 dark:bg-slate-950/80 text-slate-500 font-bold uppercase text-xs h-12 pt-0 px-6",
                             td: "py-4 px-6 border-b border-slate-100 dark:border-slate-800/50"
                         }}
                     >
                         <TableHeader>
-                            <TableColumn>PRODUCT</TableColumn>
-                            <TableColumn>CATEGORY</TableColumn>
-                            <TableColumn>SEO STATUS</TableColumn>
+                            <TableColumn key="name" allowsSorting>PRODUCT</TableColumn>
+                            <TableColumn key="category" allowsSorting>CATEGORY</TableColumn>
+                            <TableColumn key="seoTitle" allowsSorting>SEO STATUS</TableColumn>
                             <TableColumn align="center">ACTIONS</TableColumn>
                         </TableHeader>
-                        <TableBody items={filteredProducts} isLoading={loading} emptyContent={loading ? <Spinner /> : "No products found."}>
+                        <TableBody items={paginatedItems} isLoading={loading} emptyContent={loading ? <Spinner /> : "No products found."}>
                             {(item) => (
                                 <TableRow key={item._id}>
                                     <TableCell className="font-semibold text-slate-900 dark:text-slate-200">{item.name}</TableCell>

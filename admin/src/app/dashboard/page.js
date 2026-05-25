@@ -68,6 +68,9 @@ export default function AdminDashboard() {
   const router = useRouter();
 
   const [adminName, setAdminName] = useState("Admin");
+  const [sortDescriptor, setSortDescriptor] = useState({ column: 'date', direction: 'descending' });
+  const [currentPage, setCurrentPage] = useState(1);
+  const rowsPerPage = 5;
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -125,6 +128,26 @@ export default function AdminDashboard() {
     avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(rental.user?.name || "G")}&background=random`,
     _raw: rental
   })) || [];
+
+  const sortedRentals = [...recentRentals].sort((a, b) => {
+    const col = sortDescriptor.column;
+    let aVal, bVal;
+    if (col === 'amount') {
+      aVal = parseFloat((a.amount || '').replace(/[₹,]/g, ''));
+      bVal = parseFloat((b.amount || '').replace(/[₹,]/g, ''));
+    } else if (col === 'date') {
+      aVal = new Date(a._raw?.createdAt || 0).getTime();
+      bVal = new Date(b._raw?.createdAt || 0).getTime();
+    } else {
+      aVal = (a[col] || '').toLowerCase();
+      bVal = (b[col] || '').toLowerCase();
+    }
+    const cmp = aVal < bVal ? -1 : aVal > bVal ? 1 : 0;
+    return sortDescriptor.direction === 'ascending' ? cmp : -cmp;
+  });
+
+  const totalPages = Math.max(1, Math.ceil(sortedRentals.length / rowsPerPage));
+  const paginatedRentals = sortedRentals.slice((currentPage - 1) * rowsPerPage, currentPage * rowsPerPage);
 
   // Chart configurations
   const revenueChartData = {
@@ -236,10 +259,10 @@ export default function AdminDashboard() {
       {/* Top Welcome Section */}
       <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
         <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.5 }}>
-          <h1 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-slate-100 mb-1">
-            Welcome back, <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600 dark:from-indigo-400 dark:to-purple-400">{adminName}</span>
+          <h1 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-white mb-1">
+            Welcome back, <span className="text-indigo-600 dark:text-indigo-400 font-extrabold">{adminName}</span>
           </h1>
-          <p className="text-slate-600 dark:text-slate-400">Here's what's happening with your rental business today.</p>
+          <p className="text-slate-600 dark:text-slate-100">Here's what's happening with your rental business today.</p>
         </motion.div>
 
         <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.5 }} className="flex items-center gap-3">
@@ -277,7 +300,7 @@ export default function AdminDashboard() {
                 <CardBody className="p-5 flex flex-col gap-4">
                   <div className="flex justify-between items-start">
                     <div className="space-y-1">
-                      <p className="text-slate-500 dark:text-slate-400 text-sm font-medium">{stat.label}</p>
+                      <p className="text-slate-500 dark:text-slate-200 text-sm font-medium">{stat.label}</p>
                       <h3 className="text-3xl font-bold tracking-tight text-slate-800 dark:text-slate-100">{stat.value}</h3>
                     </div>
                     <div className={`p-3 rounded-xl flex items-center justify-center bg-${stat.color}-500/10 text-${stat.color}-400`}>
@@ -294,7 +317,7 @@ export default function AdminDashboard() {
                       )}
                       {stat.change}
                     </span>
-                    {stat.label !== "Pending KYC" && <span className="text-slate-500">vs last month</span>}
+                    {stat.label !== "Pending KYC" && <span className="text-slate-500 dark:text-slate-300">vs last month</span>}
                   </div>
                 </CardBody>
               </Card>
@@ -318,13 +341,13 @@ export default function AdminDashboard() {
             <CardHeader className="flex justify-between items-center px-6 py-5 border-b border-slate-200 dark:border-slate-800/60">
               <div>
                 <h3 className="text-lg font-semibold text-slate-900 dark:text-white">Revenue Overview</h3>
-                <p className="text-sm text-slate-500 dark:text-slate-400 font-medium">Weekly earnings and projections</p>
+                <p className="text-sm text-slate-500 dark:text-slate-200 font-medium">Weekly earnings and projections</p>
               </div>
               <div className="flex items-center gap-2">
                 <Chip size="sm" variant="flat" color="default" className="text-slate-600 dark:text-slate-300">This Week</Chip>
                 <Dropdown>
                   <DropdownTrigger>
-                    <Button isIconOnly variant="light" size="sm" className="text-slate-600 dark:text-slate-400"><DotsThreeVertical weight="bold" /></Button>
+                    <Button isIconOnly variant="light" size="sm" className="text-slate-600 dark:text-slate-200"><DotsThreeVertical weight="bold" /></Button>
                   </DropdownTrigger>
                   <DropdownMenu aria-label="Chart Actions">
                     <DropdownItem key="monthly">View Monthly</DropdownItem>
@@ -373,7 +396,7 @@ export default function AdminDashboard() {
                       </div>
                       <div className="flex-1">
                         <p className="text-sm font-semibold text-slate-900 dark:text-slate-200 line-clamp-1">{note.title}</p>
-                        <p className="text-xs text-slate-500 dark:text-slate-400 line-clamp-1">{note.message}</p>
+                        <p className="text-xs text-slate-500 dark:text-slate-200 line-clamp-1">{note.message}</p>
                       </div>
                       <span className="text-[10px] text-slate-400 whitespace-nowrap">{new Date(note.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
                     </div>
@@ -391,8 +414,8 @@ export default function AdminDashboard() {
               <div className="space-y-4">
                 <div>
                   <div className="flex justify-between mb-1">
-                    <span className="text-sm text-slate-700 dark:text-slate-300 font-medium">Pending Approvals</span>
-                    <span className="text-sm text-slate-600 dark:text-slate-400 font-medium">{dashboardData?.pendingKYC || 0} Accounts</span>
+                    <span className="text-sm text-slate-700 dark:text-white font-medium">Pending Approvals</span>
+                    <span className="text-sm text-slate-600 dark:text-slate-200 font-medium">{dashboardData?.pendingKYC || 0} Accounts</span>
                   </div>
                   <Progress
                     value={dashboardData?.pendingKYC > 0 ? (dashboardData.pendingKYC / (dashboardData.totalUsers || 1)) * 100 : 0}
@@ -402,8 +425,8 @@ export default function AdminDashboard() {
                 </div>
                 <div>
                   <div className="flex justify-between mb-1">
-                    <span className="text-sm text-slate-700 dark:text-slate-300 font-medium">Inventory Health</span>
-                    <span className="text-sm text-slate-600 dark:text-slate-400 font-medium">92%</span>
+                    <span className="text-sm text-slate-700 dark:text-white font-medium">Inventory Health</span>
+                    <span className="text-sm text-slate-600 dark:text-slate-200 font-medium">92%</span>
                   </div>
                   <Progress value={92} color="success" className="h-2" />
                 </div>
@@ -423,7 +446,7 @@ export default function AdminDashboard() {
           <CardHeader className="flex flex-col sm:flex-row justify-between items-start sm:items-center px-6 py-5 gap-4 bg-slate-50 dark:bg-slate-900/50">
             <div>
               <h3 className="text-lg font-semibold text-slate-900 dark:text-white">Recent Rentals</h3>
-              <p className="text-sm text-slate-500 dark:text-slate-400">Latest activity across all your customers.</p>
+              <p className="text-sm text-slate-500 dark:text-slate-100">Latest activity across all your customers.</p>
             </div>
             <div className="flex items-center gap-3">
               <AvatarGroup isBordered max={3} size="sm" className="hidden sm:flex">
@@ -447,52 +470,54 @@ export default function AdminDashboard() {
 
           <Table
             aria-label="Recent Rentals Table"
+            sortDescriptor={sortDescriptor}
+            onSortChange={(d) => { setSortDescriptor(d); setCurrentPage(1); }}
             classNames={{
               wrapper: "p-0 rounded-none shadow-none bg-transparent m-0",
               table: "w-full min-w-full",
               thead: "bg-slate-100 dark:bg-slate-950",
-              th: "text-slate-500 dark:text-slate-400 font-semibold uppercase text-xs tracking-wider py-4 border-b border-slate-200 dark:border-slate-800",
+              th: "text-slate-500 dark:text-slate-300 font-semibold uppercase text-xs tracking-wider py-4 border-b border-slate-200 dark:border-slate-800 cursor-pointer select-none",
               td: "py-4 border-b border-slate-100 dark:border-slate-800/50",
               tr: "hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors group"
             }}
           >
             <TableHeader>
-              <TableColumn>CUSTOMER</TableColumn>
-              <TableColumn>PRODUCT</TableColumn>
-              <TableColumn>STATUS</TableColumn>
-              <TableColumn>DATE & TIME</TableColumn>
-              <TableColumn align="end">AMOUNT</TableColumn>
-              <TableColumn align="center">ACTIONS</TableColumn>
+              <TableColumn key="user" allowsSorting>CUSTOMER</TableColumn>
+              <TableColumn key="item">PRODUCT</TableColumn>
+              <TableColumn key="status" allowsSorting>STATUS</TableColumn>
+              <TableColumn key="date" allowsSorting>DATE & TIME</TableColumn>
+              <TableColumn key="amount" allowsSorting align="end">AMOUNT</TableColumn>
+              <TableColumn key="actions" align="center">ACTIONS</TableColumn>
             </TableHeader>
-            <TableBody items={recentRentals}>
+            <TableBody items={paginatedRentals} emptyContent={<div className="py-8 text-slate-500 dark:text-slate-200 text-sm text-center">No rentals found</div>}>
               {(item) => (
                 <TableRow key={item.id}>
                   <TableCell>
                     <div className="flex items-center gap-3">
                       <Avatar src={item.avatar} size="sm" />
                       <div className="flex flex-col">
-                        <span className="text-sm font-semibold text-slate-900 dark:text-slate-200 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">{item.user}</span>
+                        <span className="text-sm font-semibold text-slate-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">{item.user}</span>
                         <span className="text-xs text-slate-500 font-mono">{item.id}</span>
                       </div>
                     </div>
                   </TableCell>
                   <TableCell>
-                    <span className="text-sm text-slate-700 dark:text-slate-300 font-medium">{item.item}</span>
+                    <span className="text-sm text-slate-700 dark:text-white font-medium">{item.item}</span>
                   </TableCell>
                   <TableCell>
                     {renderStatusChip(item.status)}
                   </TableCell>
                   <TableCell>
-                    <span className="text-sm text-slate-500 dark:text-slate-400">{item.date}</span>
+                    <span className="text-sm text-slate-500 dark:text-slate-200">{item.date}</span>
                   </TableCell>
                   <TableCell>
-                    <span className="text-sm font-semibold text-slate-900 dark:text-slate-200">{item.amount}</span>
+                    <span className="text-sm font-semibold text-slate-900 dark:text-white">{item.amount}</span>
                   </TableCell>
                   <TableCell>
                     <div className="flex justify-center items-center gap-2">
                       <Dropdown>
                         <DropdownTrigger>
-                          <Button isIconOnly size="sm" variant="light" className="text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200">
+                          <Button isIconOnly size="sm" variant="light" className="text-slate-500 dark:text-slate-200 hover:text-slate-900 dark:hover:text-slate-200">
                             <DotsThreeVertical weight="bold" />
                           </Button>
                         </DropdownTrigger>
@@ -509,6 +534,47 @@ export default function AdminDashboard() {
               )}
             </TableBody>
           </Table>
+          <CardFooter className="flex flex-col sm:flex-row justify-between items-center px-6 py-4 gap-3 border-t border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900">
+            <span className="text-sm text-slate-500 dark:text-slate-300">
+              {sortedRentals.length === 0
+                ? 'No entries'
+                : `Showing ${(currentPage - 1) * rowsPerPage + 1}–${Math.min(currentPage * rowsPerPage, sortedRentals.length)} of ${sortedRentals.length} entries`}
+            </span>
+            {totalPages > 1 && (
+              <div className="flex items-center gap-1.5">
+                <Button
+                  size="sm"
+                  variant="flat"
+                  isDisabled={currentPage === 1}
+                  onPress={() => setCurrentPage(p => p - 1)}
+                  className="font-medium text-slate-600 dark:text-slate-200"
+                >
+                  Previous
+                </Button>
+                {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
+                  <Button
+                    key={page}
+                    size="sm"
+                    variant={currentPage === page ? 'solid' : 'flat'}
+                    color={currentPage === page ? 'primary' : 'default'}
+                    onPress={() => setCurrentPage(page)}
+                    className={currentPage === page ? '!bg-indigo-600 text-white font-bold min-w-9' : 'text-slate-600 dark:text-slate-200 min-w-9'}
+                  >
+                    {page}
+                  </Button>
+                ))}
+                <Button
+                  size="sm"
+                  variant="flat"
+                  isDisabled={currentPage === totalPages}
+                  onPress={() => setCurrentPage(p => p + 1)}
+                  className="font-medium text-slate-600 dark:text-slate-200"
+                >
+                  Next
+                </Button>
+              </div>
+            )}
+          </CardFooter>
         </Card>
       </motion.div>
     </div>

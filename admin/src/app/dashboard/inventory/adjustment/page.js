@@ -106,9 +106,9 @@ export default function StockAdjustment() {
             <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
                 <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }}>
                     <h1 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-slate-100 mb-1">
-                        Stock <span className="text-transparent bg-clip-text bg-linear-to-r from-indigo-500 to-purple-500">Adjustment</span>
+                        Stock <span className="text-indigo-600 dark:text-indigo-400 font-extrabold">Adjustment</span>
                     </h1>
-                    <p className="text-slate-600 dark:text-slate-400">Manually adjust inventory levels and track the history of changes.</p>
+                    <p className="text-slate-600 dark:text-slate-200">Manually adjust inventory levels and track the history of changes.</p>
                 </motion.div>
 
                 <Button color="primary" variant="shadow" className="font-bold !bg-indigo-600 shadow-indigo-500/20 px-6" startContent={<Plus weight="bold" />} onPress={onOpen}>
@@ -276,7 +276,7 @@ export default function StockAdjustment() {
                                 )}
                             </ModalBody>
                             <ModalFooter>
-                                <Button variant="flat" onPress={onClose} className="text-slate-600 dark:text-slate-400">Cancel</Button>
+                                <Button variant="flat" onPress={onClose} className="text-slate-600 dark:text-slate-200">Cancel</Button>
                                 <Button color="primary" isLoading={submitting} onPress={handleSubmit} className="!bg-indigo-600 font-bold">
                                     Apply Adjustment
                                 </Button>

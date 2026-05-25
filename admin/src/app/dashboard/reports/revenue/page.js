@@ -32,9 +32,9 @@ export default function RevenueReport() {
             <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
                 <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }}>
                     <h1 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-slate-100 mb-1">
-                        Revenue <span className="text-transparent bg-clip-text bg-linear-to-r from-indigo-500 to-purple-500">Report</span>
+                        Revenue <span className="text-indigo-600 dark:text-indigo-400 font-extrabold">Report</span>
                     </h1>
-                    <p className="text-slate-600 dark:text-slate-400">Revenue trends, order volume, and financial performance overview.</p>
+                    <p className="text-slate-600 dark:text-slate-200">Revenue trends, order volume, and financial performance overview.</p>
                 </motion.div>
                 <div className="inline-flex items-center gap-2 bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-500/20 rounded-full px-3 py-1.5 font-bold text-sm">
                     <TrendUp weight="bold" size={14} />
@@ -109,7 +109,7 @@ export default function RevenueReport() {
                             { label: "Cancelled / Refunded", pct: 10, color: "bg-rose-500" },
                         ].map(item => (
                             <div key={item.label}>
-                                <div className="flex justify-between text-xs font-medium text-slate-600 dark:text-slate-400 mb-1.5">
+                                <div className="flex justify-between text-xs font-medium text-slate-600 dark:text-slate-200 mb-1.5">
                                     <span>{item.label}</span><span>{item.pct}%</span>
                                 </div>
                                 <div className="w-full bg-slate-100 dark:bg-slate-800 rounded-full h-2">
@@ -129,7 +129,7 @@ export default function RevenueReport() {
                             { label: "New Users (30d)", value: stats?.newUsersThisMonth || 0, color: "text-emerald-500" },
                         ].map(m => (
                             <div key={m.label} className="flex justify-between items-center py-2 border-b border-slate-100 dark:border-slate-800 last:border-0">
-                                <span className="text-sm text-slate-600 dark:text-slate-400">{m.label}</span>
+                                <span className="text-sm text-slate-600 dark:text-slate-200">{m.label}</span>
                                 {loading ? <Skeleton className="h-5 w-10 rounded" /> : (
                                     <span className={`text-lg font-black ${m.color}`}>{m.value}</span>
                                 )}
@@ -141,3 +141,4 @@ export default function RevenueReport() {
         </div>
     );
 }
+

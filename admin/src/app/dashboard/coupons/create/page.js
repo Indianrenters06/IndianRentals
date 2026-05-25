@@ -80,9 +80,9 @@ export default function CreateCoupon() {
                     <ArrowLeft /> Back to Coupons
                 </button>
                 <h1 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-slate-100 mb-1">
-                    Create <span className="text-transparent bg-clip-text bg-linear-to-r from-indigo-500 to-purple-500">New Coupon</span>
+                    Create <span className="text-indigo-600 dark:text-indigo-400 font-extrabold">New Coupon</span>
                 </h1>
-                <p className="text-slate-600 dark:text-slate-400">Launch a new marketing campaign with custom discount codes.</p>
+                <p className="text-slate-600 dark:text-slate-200">Launch a new marketing campaign with custom discount codes.</p>
             </motion.div>
 
             <form onSubmit={handleSubmit}>

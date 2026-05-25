@@ -4,6 +4,9 @@ import { useState, useEffect, useMemo } from "react";
 import { motion } from "framer-motion";
 import { Card, CardBody, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Chip, Avatar, Skeleton, Pagination, Button } from "@heroui/react";
 import { ShoppingCart, WarningCircle, CheckCircle, Clock, MagnifyingGlass, DownloadSimple } from "@phosphor-icons/react";
+import { downloadPDFReport } from "@/utils/pdfReport";
+import jsPDF from "jspdf";
+import "jspdf-autotable";
 
 const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
 
@@ -39,33 +42,184 @@ export default function RentalHistory() {
         return map[status] || "default";
     };
 
-    const exportCSV = () => {
-        const headers = "Order ID,Customer,Email,Items,Amount,Status,Start Date,End Date\n";
-        const rows = rentals.map(r =>
-            `ORD-${r._id.toString().slice(-6).toUpperCase()},${r.user?.name || "Unknown"},${r.user?.email || ""},${r.orderItems?.length || 0},₹${r.totalPrice || 0},${r.status},${r.rentalPeriod?.startDate ? new Date(r.rentalPeriod.startDate).toLocaleDateString("en-IN") : "N/A"},${r.rentalPeriod?.endDate ? new Date(r.rentalPeriod.endDate).toLocaleDateString("en-IN") : "N/A"}`
-        ).join("\n");
-        const blob = new Blob([headers + rows], { type: "text/csv" });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement("a"); a.href = url; a.download = "rental_history.csv"; a.click();
+    const exportPDF = () => {
+        const headers = ["Order ID", "Customer", "Email", "Items", "Duration", "Amount", "Method", "Paid", "Status", "Start Date", "End Date"];
+        const data = rentals.map(r => [
+            `ORD-${r._id.toString().slice(-6).toUpperCase()}`,
+            r.user?.name || "Unknown",
+            r.user?.email || "",
+            String(r.orderItems?.length || 0),
+            r.rentalPeriod?.durationMonths ? `${r.rentalPeriod.durationMonths} mo` : "N/A",
+            `Rs.${parseFloat(r.totalPrice || 0).toLocaleString("en-IN")}`,
+            r.paymentMethod || "N/A",
+            r.isPaid ? "Yes" : "No",
+            r.status,
+            r.rentalPeriod?.startDate ? new Date(r.rentalPeriod.startDate).toLocaleDateString("en-IN") : "N/A",
+            r.rentalPeriod?.endDate ? new Date(r.rentalPeriod.endDate).toLocaleDateString("en-IN") : "N/A",
+        ]);
+        downloadPDFReport("Rental History Report", headers, data, "rental_history");
     };
 
     const downloadRental = (rental) => {
-        const content = [
-            `Rental Record`,
-            `Generated: ${new Date().toLocaleString("en-IN")}`,
-            ``,
-            `Order ID: ORD-${rental._id.toString().slice(-6).toUpperCase()}`,
-            `Customer: ${rental.user?.name || "Unknown"}`,
-            `Email: ${rental.user?.email || "N/A"}`,
-            `Items: ${rental.orderItems?.length || 0}`,
-            `Total Amount: ₹${parseFloat(rental.totalPrice || 0).toLocaleString("en-IN")}`,
-            `Status: ${rental.status}`,
-            `Start Date: ${rental.rentalPeriod?.startDate ? new Date(rental.rentalPeriod.startDate).toLocaleDateString("en-IN") : "N/A"}`,
-            `End Date: ${rental.rentalPeriod?.endDate ? new Date(rental.rentalPeriod.endDate).toLocaleDateString("en-IN") : "N/A"}`,
-        ].join("\n");
-        const blob = new Blob([content], { type: "text/plain" });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement("a"); a.href = url; a.download = `rental_${rental._id.toString().slice(-6)}.txt`; a.click();
+        const doc = new jsPDF();
+        const pageW = doc.internal.pageSize.getWidth();
+        const orderId = `ORD-${rental._id.toString().slice(-6).toUpperCase()}`;
+
+        // ── Header Banner ──
+        doc.setFillColor(79, 70, 229);
+        doc.rect(0, 0, pageW, 34, "F");
+        doc.setFontSize(18);
+        doc.setFont("helvetica", "bold");
+        doc.setTextColor(255, 255, 255);
+        doc.text("INDIAN RENTALS", 14, 14);
+        doc.setFontSize(10);
+        doc.setFont("helvetica", "normal");
+        doc.text("Rental Order Record", 14, 23);
+        doc.text(`Generated: ${new Date().toLocaleString("en-IN")}`, pageW - 14, 23, { align: "right" });
+        doc.setTextColor(0, 0, 0);
+
+        // ── Section 1: Order Summary ──
+        doc.setFontSize(11);
+        doc.setFont("helvetica", "bold");
+        doc.text("1.  Order Summary", 14, 44);
+        doc.autoTable({
+            startY: 48,
+            head: [["Field", "Details"]],
+            body: [
+                ["Order ID", orderId],
+                ["Order Placed", rental.createdAt ? new Date(rental.createdAt).toLocaleString("en-IN") : "N/A"],
+                ["Order Status", rental.status || "N/A"],
+                ["Payment Status", rental.isPaid ? `Paid on ${rental.paidAt ? new Date(rental.paidAt).toLocaleDateString("en-IN") : "N/A"}` : "Unpaid"],
+                ["Payment Method", rental.paymentMethod || "N/A"],
+                ["Transaction ID", rental.paymentResult?.id || "N/A"],
+            ],
+            theme: "striped",
+            headStyles: { fillColor: [79, 70, 229], textColor: 255, fontStyle: "bold" },
+            styles: { font: "helvetica", fontSize: 10, cellPadding: 4 },
+            columnStyles: { 0: { fontStyle: "bold", cellWidth: 55 } },
+        });
+
+        // ── Section 2: Customer & Delivery ──
+        const y2 = doc.lastAutoTable.finalY + 10;
+        doc.setFontSize(11);
+        doc.setFont("helvetica", "bold");
+        doc.setTextColor(0, 0, 0);
+        doc.text("2.  Customer & Delivery Details", 14, y2);
+        doc.autoTable({
+            startY: y2 + 4,
+            head: [["Field", "Details"]],
+            body: [
+                ["Customer Name", rental.user?.name || "Unknown"],
+                ["Email", rental.user?.email || "N/A"],
+                ["Delivery Address", rental.shippingAddress?.address || "N/A"],
+                ["City", rental.shippingAddress?.city || "N/A"],
+                ["Postal Code", rental.shippingAddress?.postalCode || "N/A"],
+                ["Country", rental.shippingAddress?.country || "N/A"],
+                ["Contact Phone", rental.shippingAddress?.phone || "N/A"],
+                ["Delivered", rental.isDelivered ? `Yes — ${rental.deliveredAt ? new Date(rental.deliveredAt).toLocaleDateString("en-IN") : ""}` : "No"],
+                ["Returned", rental.isReturned ? `Yes — ${rental.returnedAt ? new Date(rental.returnedAt).toLocaleDateString("en-IN") : ""}` : "No"],
+            ],
+            theme: "striped",
+            headStyles: { fillColor: [79, 70, 229], textColor: 255, fontStyle: "bold" },
+            styles: { font: "helvetica", fontSize: 10, cellPadding: 4 },
+            columnStyles: { 0: { fontStyle: "bold", cellWidth: 55 } },
+        });
+
+        // ── Section 3: Rental Period ──
+        const y3 = doc.lastAutoTable.finalY + 10;
+        doc.setFontSize(11);
+        doc.setFont("helvetica", "bold");
+        doc.setTextColor(0, 0, 0);
+        doc.text("3.  Rental Period", 14, y3);
+        doc.autoTable({
+            startY: y3 + 4,
+            head: [["Field", "Details"]],
+            body: [
+                ["Start Date", rental.rentalPeriod?.startDate ? new Date(rental.rentalPeriod.startDate).toLocaleDateString("en-IN") : "N/A"],
+                ["End Date", rental.rentalPeriod?.endDate ? new Date(rental.rentalPeriod.endDate).toLocaleDateString("en-IN") : "N/A"],
+                ["Duration", rental.rentalPeriod?.durationMonths ? `${rental.rentalPeriod.durationMonths} Month${rental.rentalPeriod.durationMonths !== 1 ? "s" : ""}` : "N/A"],
+            ],
+            theme: "striped",
+            headStyles: { fillColor: [79, 70, 229], textColor: 255, fontStyle: "bold" },
+            styles: { font: "helvetica", fontSize: 10, cellPadding: 4 },
+            columnStyles: { 0: { fontStyle: "bold", cellWidth: 55 } },
+        });
+
+        // ── Section 4: Ordered Items ──
+        const y4 = doc.lastAutoTable.finalY + 10;
+        doc.setFontSize(11);
+        doc.setFont("helvetica", "bold");
+        doc.setTextColor(0, 0, 0);
+        doc.text(`4.  Ordered Items  (${rental.orderItems?.length || 0} item${rental.orderItems?.length !== 1 ? "s" : ""})`, 14, y4);
+        if (rental.orderItems?.length > 0) {
+            doc.autoTable({
+                startY: y4 + 4,
+                head: [["Product Name", "Qty", "Price/mo", "Security Deposit", "Condition"]],
+                body: rental.orderItems.map(item => [
+                    item.name || "N/A",
+                    String(item.qty || 1),
+                    `Rs.${parseFloat(item.price || 0).toLocaleString("en-IN")}`,
+                    `Rs.${parseFloat(item.securityDeposit || 0).toLocaleString("en-IN")}`,
+                    item.condition || "N/A",
+                ]),
+                theme: "striped",
+                headStyles: { fillColor: [79, 70, 229], textColor: 255, fontStyle: "bold" },
+                styles: { font: "helvetica", fontSize: 9.5, cellPadding: 3.5 },
+                columnStyles: { 0: { cellWidth: 70 } },
+            });
+        } else {
+            doc.setFontSize(10);
+            doc.setFont("helvetica", "italic");
+            doc.setTextColor(150, 150, 150);
+            doc.text("No items found.", 14, y4 + 8);
+            doc.setTextColor(0, 0, 0);
+        }
+
+        // ── Section 5: Financial Summary ──
+        const y5 = (doc.lastAutoTable?.finalY ?? y4 + 12) + 10;
+        doc.setFontSize(11);
+        doc.setFont("helvetica", "bold");
+        doc.setTextColor(0, 0, 0);
+        doc.text("5.  Financial Summary", 14, y5);
+        const finRows = [
+            ["Items Total", `Rs.${parseFloat(rental.itemsPrice || 0).toLocaleString("en-IN")}`],
+            ["Tax", `Rs.${parseFloat(rental.taxPrice || 0).toLocaleString("en-IN")}`],
+            ["Shipping", `Rs.${parseFloat(rental.shippingPrice || 0).toLocaleString("en-IN")}`],
+        ];
+        if (rental.couponCode) {
+            finRows.push(["Coupon Code", rental.couponCode]);
+            finRows.push(["Coupon Discount", `-Rs.${parseFloat(rental.couponDiscount || 0).toLocaleString("en-IN")}`]);
+        }
+        finRows.push(["TOTAL PAYABLE", `Rs.${parseFloat(rental.totalPrice || 0).toLocaleString("en-IN")}`]);
+        doc.autoTable({
+            startY: y5 + 4,
+            head: [["Description", "Amount"]],
+            body: finRows,
+            theme: "striped",
+            headStyles: { fillColor: [79, 70, 229], textColor: 255, fontStyle: "bold" },
+            styles: { font: "helvetica", fontSize: 10, cellPadding: 4 },
+            columnStyles: { 0: { fontStyle: "bold", cellWidth: 70 } },
+            didParseCell: (data) => {
+                if (data.row.index === finRows.length - 1) {
+                    data.cell.styles.fontStyle = "bold";
+                    data.cell.styles.fillColor = [237, 233, 254];
+                }
+            },
+        });
+
+        // ── Footer on every page ──
+        const pageCount = doc.internal.getNumberOfPages();
+        for (let i = 1; i <= pageCount; i++) {
+            doc.setPage(i);
+            const pY = doc.internal.pageSize.getHeight() - 10;
+            doc.setFontSize(8);
+            doc.setFont("helvetica", "italic");
+            doc.setTextColor(150, 150, 150);
+            doc.text("Confidential — Indian Rentals Admin", 14, pY);
+            doc.text(`Page ${i} of ${pageCount}`, pageW - 14, pY, { align: "right" });
+        }
+
+        doc.save(`rental_${orderId}.pdf`);
     };
 
     const statuses = ["All", "Active", "Delivered", "Pending", "Returned", "Cancelled"];
@@ -94,9 +248,9 @@ export default function RentalHistory() {
             <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
                 <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }}>
                     <h1 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-slate-100 mb-1">
-                        Rental <span className="text-transparent bg-clip-text bg-linear-to-r from-indigo-500 to-purple-500">History</span>
+                        Rental <span className="text-indigo-600 dark:text-indigo-400 font-extrabold">History</span>
                     </h1>
-                    <p className="text-slate-600 dark:text-slate-400">Track all active and past rentals across the user base.</p>
+                    <p className="text-slate-600 dark:text-slate-200">Track all active and past rentals across the user base.</p>
                 </motion.div>
                 <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="flex items-center gap-3">
                     <Chip size="lg" color="success" variant="flat" className="font-bold text-sm px-3">
@@ -105,8 +259,8 @@ export default function RentalHistory() {
                     <Chip size="lg" color="warning" variant="flat" className="font-bold text-sm px-3">
                         {loading ? "..." : `${rentals.filter(r => r.status === "Pending").length} Pending`}
                     </Chip>
-                    <button type="button" onClick={exportCSV} className="inline-flex items-center gap-2 h-10 px-4 rounded-xl border border-indigo-500 text-indigo-600 dark:text-indigo-400 font-bold text-sm hover:!bg-indigo-50 dark:hover:!bg-indigo-500/10 transition-colors">
-                        <DownloadSimple size={15} /> Export CSV
+                    <button type="button" onClick={exportPDF} className="inline-flex items-center gap-2 h-10 px-4 rounded-xl border border-indigo-500 text-indigo-600 dark:text-indigo-400 font-bold text-sm hover:!bg-indigo-50 dark:hover:!bg-indigo-500/10 transition-colors">
+                        <DownloadSimple size={15} /> Export PDF
                     </button>
                 </motion.div>
             </div>
@@ -172,7 +326,7 @@ export default function RentalHistory() {
                                             </div>
                                         </TableCell>
                                         <TableCell>
-                                            <span className="text-sm text-slate-600 dark:text-slate-400">
+                                            <span className="text-sm text-slate-600 dark:text-slate-200">
                                                 {rental.orderItems?.length || 0} item{rental.orderItems?.length !== 1 ? 's' : ''}
                                             </span>
                                         </TableCell>
@@ -222,3 +376,4 @@ export default function RentalHistory() {
         </div>
     );
 }
+

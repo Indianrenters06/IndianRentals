@@ -47,10 +47,10 @@ const Field = ({ label, value, onChange, placeholder, rows, type = 'text' }) => 
         {label && <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">{label}</label>}
         {rows ? (
             <textarea value={value} onChange={e => onChange(e.target.value)} placeholder={placeholder} rows={rows}
-                className="w-full px-3 py-2.5 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-400 transition-all resize-none font-mono" />
+                className="w-full px-3 py-2.5 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-base text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-400 transition-all resize-none font-mono" />
         ) : (
             <input type={type} value={value} onChange={e => onChange(e.target.value)} placeholder={placeholder}
-                className="w-full h-10 px-3 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-400 transition-all" />
+                className="w-full h-10 px-3 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-base text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-400 transition-all" />
         )}
     </div>
 );
@@ -281,7 +281,7 @@ function PageEditor({ page, onBack }) {
                                         <PhosphorImage size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
                                         <input type="url" value={data.bannerImage} onChange={e => set('bannerImage', e.target.value)}
                                             placeholder="https://res.cloudinary.com/..."
-                                            className="w-full h-10 pl-9 pr-3 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-400 transition-all" />
+                                            className="w-full h-10 pl-9 pr-3 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-base text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-400 transition-all" />
                                     </div>
                                 </div>
                             )}
@@ -390,9 +390,9 @@ export default function StaticPages() {
             {!selected && (
                 <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }}>
                     <h1 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-slate-100 mb-1">
-                        Static <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-500 to-purple-500">Pages</span>
+                        Static <span className="text-indigo-600 dark:text-indigo-400 font-extrabold">Pages</span>
                     </h1>
-                    <p className="text-slate-600 dark:text-slate-400">Manage content, banners, and SEO for all informational pages.</p>
+                    <p className="text-slate-600 dark:text-slate-200">Manage content, banners, and SEO for all informational pages.</p>
                 </motion.div>
             )}
 
@@ -433,14 +433,6 @@ export default function StaticPages() {
                                                         <p className="font-bold text-slate-900 dark:text-slate-100 group-hover:text-indigo-600 transition-colors">{page.label}</p>
                                                         <div className="flex items-center gap-2 text-xs text-slate-400 font-mono mt-0.5">
                                                             <LinkSimple size={10} weight="bold" />{page.slug}
-                                                        </div>
-                                                        <div className="flex items-center gap-2 mt-1.5">
-                                                            <span className={`text-[10px] px-2 py-0.5 rounded-full font-semibold ${hasContent ? 'bg-emerald-50 text-emerald-600 border border-emerald-200' : 'bg-amber-50 text-amber-600 border border-amber-200'}`}>
-                                                                {hasContent ? '✓ Has content' : '⚠ No content'}
-                                                            </span>
-                                                            <span className={`text-[10px] px-2 py-0.5 rounded-full font-semibold ${hasBanner ? 'bg-blue-50 text-blue-600 border border-blue-200' : 'bg-slate-50 text-slate-400 border border-slate-200'}`}>
-                                                                {hasBanner ? 'Banner set' : 'No banner'}
-                                                            </span>
                                                         </div>
                                                     </div>
                                                     <div className="text-xs text-slate-400 hidden md:block shrink-0">{updated}</div>

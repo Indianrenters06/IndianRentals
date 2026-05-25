@@ -121,9 +121,9 @@ export default function UserWallet() {
             <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
                 <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }}>
                     <h1 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-slate-100 mb-1">
-                        Wallet <span className="text-transparent bg-clip-text bg-linear-to-r from-indigo-500 to-purple-500">System</span>
+                        Wallet <span className="text-indigo-600 dark:text-indigo-400 font-extrabold">System</span>
                     </h1>
-                    <p className="text-slate-600 dark:text-slate-400">Manage user balances, deposit summaries, and in-platform currency.</p>
+                    <p className="text-slate-600 dark:text-slate-200">Manage user balances, deposit summaries, and in-platform currency.</p>
                 </motion.div>
                 <div className="flex items-center gap-3">
                     {!loading && (
@@ -232,7 +232,7 @@ export default function UserWallet() {
                                     <div className="relative">
                                         <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"><CurrencyInr size={16} /></span>
                                         <input type="number" min="1" value={creditAmount} onChange={e => setCreditAmount(e.target.value)} placeholder="Enter credit amount"
-                                            className="w-full h-11 pl-9 pr-3 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 text-sm text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 transition-all" />
+                                            className="w-full h-11 pl-9 pr-3 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 text-base text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 transition-all" />
                                     </div>
                                 </div>
                             </ModalBody>

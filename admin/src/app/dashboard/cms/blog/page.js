@@ -27,10 +27,10 @@ const Field = ({ label, value, onChange, placeholder, rows, type = "text", class
         {label && <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">{label}</label>}
         {rows ? (
             <textarea value={value} onChange={e => onChange(e.target.value)} placeholder={placeholder} rows={rows}
-                className="w-full px-3 py-2.5 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-400 transition-all resize-none" />
+                className="w-full px-3 py-2.5 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-base text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-400 transition-all resize-none" />
         ) : (
             <input type={type} value={value} onChange={e => onChange(e.target.value)} placeholder={placeholder}
-                className="w-full h-10 px-3 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-400 transition-all" />
+                className="w-full h-10 px-3 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-base text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-400 transition-all" />
         )}
     </div>
 );
@@ -265,7 +265,7 @@ function PostEditor({ post, onBack, onSaved }) {
                                 <Tag size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
                                 <input type="text" value={form.tags} onChange={e => set("tags", e.target.value)}
                                     placeholder="rental, cameras, guide"
-                                    className="w-full h-10 pl-9 pr-3 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-400 transition-all" />
+                                    className="w-full h-10 pl-9 pr-3 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-base text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-400 transition-all" />
                             </div>
                         </div>
                     </div>
@@ -322,9 +322,9 @@ export default function BlogManagement() {
                         <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
                             <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }}>
                                 <h1 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-slate-100 mb-1">
-                                    Blog <span className="text-transparent bg-clip-text bg-linear-to-r from-indigo-500 to-purple-500">Management</span>
+                                    Blog <span className="text-indigo-600 dark:text-indigo-400 font-extrabold">Management</span>
                                 </h1>
-                                <p className="text-slate-600 dark:text-slate-400">Create, edit, and publish blog posts and industry news.</p>
+                                <p className="text-slate-600 dark:text-slate-200">Create, edit, and publish blog posts and industry news.</p>
                             </motion.div>
                             <div className="flex items-center gap-3">
                                 <button onClick={() => setEditing("config")}
@@ -401,7 +401,7 @@ export default function BlogManagement() {
                                             <div className="flex items-center gap-2">
                                                 <Avatar name={post.author?.charAt(0) || "A"} size="sm"
                                                     className="w-7 h-7 text-xs bg-slate-100 dark:bg-slate-800 text-slate-600 shrink-0" />
-                                                <span className="text-xs font-medium text-slate-600 dark:text-slate-400">{post.author}</span>
+                                                <span className="text-xs font-medium text-slate-600 dark:text-slate-200">{post.author}</span>
                                             </div>
                                             <Chip size="sm" color={post.status === "published" ? "success" : "warning"} variant="flat">
                                                 {post.status === "published" ? "Published" : "Draft"}
@@ -431,3 +431,4 @@ export default function BlogManagement() {
         </div>
     );
 }
+

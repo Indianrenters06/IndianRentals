@@ -8,6 +8,7 @@ import {
     Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Divider
 } from "@heroui/react";
 import { Users, ArrowRight, WarningCircle, CheckCircle, XCircle, MagnifyingGlass, DownloadSimple, Eye, Phone, MapPin } from "@phosphor-icons/react";
+import { downloadCustomerReport } from "@/utils/customerReport";
 
 const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
 
@@ -75,23 +76,14 @@ export default function ActiveUsers() {
         return `${Math.floor(hrs / 24)}d ago`;
     };
 
-    const downloadUser = (user) => {
-        const content = [
-            `Customer Activity Report`,
-            `Generated: ${new Date().toLocaleString("en-IN")}`,
-            ``,
-            `Name: ${user.name || "N/A"}`,
-            `Email: ${user.email || "N/A"}`,
-            `Phone: ${user.phone || "N/A"}`,
-            `Location: ${user.city ? `${user.city}, ${user.state}` : "N/A"}`,
-            `Last Login: ${user.lastLogin ? new Date(user.lastLogin).toLocaleString("en-IN") : "Never"}`,
-            `Account Status: Active`,
-            `Member Since: ${user.createdAt ? new Date(user.createdAt).toLocaleDateString("en-IN") : "N/A"}`,
-        ].join("\n");
-        const blob = new Blob([content], { type: "text/plain" });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement("a"); a.href = url; a.download = `customer_${user.name?.replace(/\s+/g, "_") || "report"}.txt`; a.click();
-        addToast(`Report downloaded for ${user.name}`, "success");
+    const downloadUser = async (user) => {
+        try {
+            await downloadCustomerReport(user);
+            addToast(`Report downloaded for ${user.name}`, "success");
+        } catch (err) {
+            console.error(err);
+            addToast(err.message || "Failed to generate report", "error");
+        }
     };
 
     const sortedItems = useMemo(() => {
@@ -118,9 +110,9 @@ export default function ActiveUsers() {
             <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
                 <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }}>
                     <h1 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-slate-100 mb-1">
-                        Active <span className="text-transparent bg-clip-text bg-linear-to-r from-indigo-500 to-purple-500">Users</span>
+                        Active <span className="text-indigo-600 dark:text-indigo-400 font-extrabold">Users</span>
                     </h1>
-                    <p className="text-slate-600 dark:text-slate-400">Users who logged in within the last 24 hours.</p>
+                    <p className="text-slate-600 dark:text-slate-200">Users who logged in within the last 24 hours.</p>
                 </motion.div>
                 <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }}>
                     <div className="inline-flex items-center gap-2 bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-500/20 rounded-full px-4 py-2 font-bold text-sm">

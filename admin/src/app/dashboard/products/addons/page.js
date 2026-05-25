@@ -145,9 +145,9 @@ export default function AddonsManagement() {
             <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
                 <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }}>
                     <h1 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-slate-100 mb-1">
-                        Product <span className="text-transparent bg-clip-text bg-linear-to-r from-indigo-500 to-purple-500">Add-ons</span>
+                        Product <span className="text-indigo-600 dark:text-indigo-400 font-extrabold">Add-ons</span>
                     </h1>
-                    <p className="text-slate-600 dark:text-slate-400">Manage accessories, express delivery, and special services.</p>
+                    <p className="text-slate-600 dark:text-slate-200">Manage accessories, express delivery, and special services.</p>
                 </motion.div>
 
                 <Button 
@@ -243,7 +243,7 @@ export default function AddonsManagement() {
                             </div>
                             <h3 className="text-lg font-bold">Standard Add-ons</h3>
                         </div>
-                        <p className="text-sm text-slate-600 dark:text-slate-400 mb-4">
+                        <p className="text-sm text-slate-600 dark:text-slate-200 mb-4">
                             Make sure to include these standard services for your customers:
                         </p>
                         <ul className="space-y-2">
@@ -264,7 +264,7 @@ export default function AddonsManagement() {
                             </div>
                             <h3 className="text-lg font-bold">Upgrade Logic</h3>
                         </div>
-                        <p className="text-sm text-slate-600 dark:text-slate-400 mb-4">
+                        <p className="text-sm text-slate-600 dark:text-slate-200 mb-4">
                             Implement the "Upgrade Option" for loyal customers:
                         </p>
                         <div className="p-3 rounded-lg bg-white dark:bg-slate-900 border border-amber-200 dark:border-amber-900/50">

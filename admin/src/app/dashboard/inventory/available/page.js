@@ -70,9 +70,9 @@ export default function AvailableStock() {
             <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
                 <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }}>
                     <h1 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-slate-100 mb-1">
-                        Available <span className="text-transparent bg-clip-text bg-linear-to-r from-indigo-500 to-purple-500">Stock</span>
+                        Available <span className="text-indigo-600 dark:text-indigo-400 font-extrabold">Stock</span>
                     </h1>
-                    <p className="text-slate-600 dark:text-slate-400">Inventory items currently ready for immediate fulfillment.</p>
+                    <p className="text-slate-600 dark:text-slate-200">Inventory items currently ready for immediate fulfillment.</p>
                 </motion.div>
                 <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }}>
                     <Chip
@@ -159,7 +159,7 @@ export default function AvailableStock() {
                                     <TableRow key={item._id}>
                                         <TableCell className="font-semibold text-slate-900 dark:text-slate-100">{item.name}</TableCell>
                                         <TableCell className="font-mono text-xs text-slate-500 tracking-wider font-bold uppercase">{item.sku}</TableCell>
-                                        <TableCell className="text-sm font-medium text-slate-600 dark:text-slate-400">{item.location}</TableCell>
+                                        <TableCell className="text-sm font-medium text-slate-600 dark:text-slate-200">{item.location}</TableCell>
                                         <TableCell>
                                             <span className="font-bold text-indigo-600 dark:text-indigo-400">{item.stock}</span>
                                             <span className="text-xs text-slate-400 ml-1">units</span>
@@ -196,3 +196,4 @@ export default function AvailableStock() {
         </div>
     );
 }
+

@@ -88,7 +88,7 @@ export default function CategoryImagesCMS() {
             <div>
                 <h1 className="text-3xl font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2">
                     <Images className="text-indigo-500" size={32} weight="duotone" />
-                    Category <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-500 to-purple-500">Images</span>
+                    Category <span className="text-indigo-600 dark:text-indigo-400 font-extrabold">Images</span>
                 </h1>
                 <p className="text-sm text-slate-500 mt-1">
                     Upload images for each category and subcategory. Changes are saved instantly when you upload.

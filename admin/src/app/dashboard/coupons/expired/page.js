@@ -75,9 +75,9 @@ export default function ExpiredCoupons() {
             <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
                 <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }}>
                     <h1 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-slate-100 mb-1">
-                        Expired <span className="text-transparent bg-clip-text bg-linear-to-r from-rose-500 to-pink-500">Coupons</span>
+                        Expired <span className="text-rose-600 dark:text-rose-400 font-extrabold">Coupons</span>
                     </h1>
-                    <p className="text-slate-600 dark:text-slate-400">Review past and expired discount codes.</p>
+                    <p className="text-slate-600 dark:text-slate-200">Review past and expired discount codes.</p>
                 </motion.div>
                 <div className="flex items-center gap-3">
                     <button type="button" onClick={fetchCoupons} className="inline-flex items-center justify-center w-9 h-9 rounded-xl !bg-slate-100 dark:!bg-slate-800 text-slate-500 hover:text-rose-500 transition-colors">

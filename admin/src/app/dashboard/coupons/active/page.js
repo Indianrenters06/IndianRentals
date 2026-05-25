@@ -143,9 +143,9 @@ export default function ActiveCoupons() {
             <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
                 <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }}>
                     <h1 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-slate-100 mb-1">
-                        Coupon <span className="text-transparent bg-clip-text bg-linear-to-r from-indigo-500 to-purple-500">Manager</span>
+                        Coupon <span className="text-indigo-600 dark:text-indigo-400 font-extrabold">Manager</span>
                     </h1>
-                    <p className="text-slate-600 dark:text-slate-400">Create, manage, and monitor discount coupons for your customers.</p>
+                    <p className="text-slate-600 dark:text-slate-200">Create, manage, and monitor discount coupons for your customers.</p>
                 </motion.div>
                 <div className="flex items-center gap-3">
                     <button type="button" onClick={fetchCoupons} className="inline-flex items-center justify-center w-9 h-9 rounded-xl !bg-slate-100 dark:!bg-slate-800 text-slate-500 hover:text-indigo-500 transition-colors">

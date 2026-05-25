@@ -17,7 +17,10 @@ const rentalSchema = new mongoose.Schema({
                 type: mongoose.Schema.Types.ObjectId,
                 required: true,
                 ref: 'Product'
-            }
+            },
+            processed: { type: Boolean, default: false },
+            condition: { type: String, default: 'Pending Inspection' },
+            inspectionNotes: { type: String, default: '' }
         }
     ],
     shippingAddress: {

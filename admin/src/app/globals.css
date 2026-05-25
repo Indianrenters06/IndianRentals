@@ -345,3 +345,38 @@ button[data-pressed="true"],
   transform: none !important;
   box-shadow: inherit !important;
 }
+
+/* ── HeroUI Pagination UI Fixes ────────────────────────────────────────────── */
+nav[data-slot="base"]:has(ul[data-slot="wrapper"]) button,
+nav[data-slot="base"]:has(ul[data-slot="wrapper"]) [data-slot="item"],
+nav[data-slot="base"]:has(ul[data-slot="wrapper"]) [data-slot="prev"],
+nav[data-slot="base"]:has(ul[data-slot="wrapper"]) [data-slot="next"] {
+  border-radius: 8px !important;
+  transition: background-color 0.2s ease, color 0.2s ease !important;
+  background-color: transparent !important;
+  color: #94a3b8 !important; /* text-slate-400 */
+}
+
+/* Inactive button hovers */
+nav[data-slot="base"]:has(ul[data-slot="wrapper"]) button:hover,
+nav[data-slot="base"]:has(ul[data-slot="wrapper"]) [data-slot="item"]:hover,
+nav[data-slot="base"]:has(ul[data-slot="wrapper"]) [data-slot="prev"]:hover,
+nav[data-slot="base"]:has(ul[data-slot="wrapper"]) [data-slot="next"]:hover {
+  background-color: rgba(148, 163, 184, 0.1) !important;
+  color: #f8fafc !important; /* text-slate-50 */
+}
+
+/* Active page button text */
+nav[data-slot="base"]:has(ul[data-slot="wrapper"]) button[data-active="true"],
+nav[data-slot="base"]:has(ul[data-slot="wrapper"]) [data-slot="item"][data-active="true"] {
+  color: #ffffff !important;
+}
+
+/* Active sliding cursor styling */
+nav[data-slot="base"]:has(ul[data-slot="wrapper"]) [data-slot="cursor"] {
+  border-radius: 8px !important;
+  background-color: #6366f1 !important; /* brand-500 indigo */
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3) !important;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+

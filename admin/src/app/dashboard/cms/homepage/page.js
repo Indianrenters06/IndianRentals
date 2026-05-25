@@ -18,14 +18,14 @@ const getToken = () => typeof window !== "undefined" ? localStorage.getItem("adm
 // ── Reusable Native Input/Textarea ──────────────────────────────────────────
 const Field = ({ label, value, onChange, placeholder, type = "text", rows, className = "" }) => (
     <div className={`flex flex-col gap-1 ${className}`}>
-        {label && <label className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">{label}</label>}
+        {label && <label className="text-xs font-bold text-slate-500 dark:text-slate-200 uppercase tracking-wider">{label}</label>}
         {rows ? (
             <textarea
                 value={value}
                 onChange={e => onChange(e.target.value)}
                 placeholder={placeholder}
                 rows={rows}
-                className="w-full px-3 py-2.5 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/40 focus:border-indigo-400 transition-all resize-none"
+                className="w-full px-3 py-2.5 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-base text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/40 focus:border-indigo-400 transition-all resize-none"
             />
         ) : (
             <input
@@ -33,7 +33,7 @@ const Field = ({ label, value, onChange, placeholder, type = "text", rows, class
                 value={value}
                 onChange={e => onChange(e.target.value)}
                 placeholder={placeholder}
-                className="w-full h-10 px-3 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/40 focus:border-indigo-400 transition-all"
+                className="w-full h-10 px-3 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-base text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/40 focus:border-indigo-400 transition-all"
             />
         )}
     </div>
@@ -57,7 +57,7 @@ const SectionRow = ({ icon, title, desc, toggle, onToggle }) => (
 const TabBtn = ({ icon, label, active, onClick }) => (
     <button
         onClick={onClick}
-        className={`flex items-center gap-2 px-4 py-2.5 text-sm font-semibold rounded-xl transition-all whitespace-nowrap ${active ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-500/25' : 'text-slate-500 dark:text-slate-400 hover:!bg-slate-100 dark:hover:!bg-slate-800' }`}
+        className={`flex items-center gap-2 px-4 py-2.5 text-sm font-semibold rounded-xl transition-all whitespace-nowrap ${active ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-500/25' : 'text-slate-500 dark:text-slate-200 hover:!bg-slate-100 dark:hover:!bg-slate-800' }`}
     >
         {icon} {label}
     </button>
@@ -186,7 +186,7 @@ const ProductSelector = ({ label, selectedIds, onChange }) => {
                             value={query}
                             onChange={e => handleSearch(e.target.value)}
                             placeholder="Search by product name..."
-                            className="w-full h-10 pl-9 pr-9 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/40 focus:border-indigo-400 transition-all"
+                            className="w-full h-10 pl-9 pr-9 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-base text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/40 focus:border-indigo-400 transition-all"
                         />
                         {searching && <Spinner size="sm" className="absolute right-3" />}
                     </div>
@@ -346,9 +346,9 @@ export default function CMSHomepage() {
             <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
                 <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }}>
                     <h1 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-slate-100 mb-1">
-                        Homepage <span className="text-transparent bg-clip-text bg-linear-to-r from-indigo-500 to-purple-500">Editor</span>
+                        Homepage <span className="text-indigo-600 dark:text-indigo-400 font-extrabold">Editor</span>
                     </h1>
-                    <p className="text-slate-500 dark:text-slate-400 text-sm">Manage all homepage sections natively inside the platform.</p>
+                    <p className="text-slate-500 dark:text-slate-200 text-sm">Manage all homepage sections natively inside the platform.</p>
                 </motion.div>
                 <div className="flex items-center gap-3">
                     {saved && (
@@ -419,7 +419,7 @@ export default function CMSHomepage() {
                                             <Field label="Entire Slide Link (Optional)" value={slide.slideLink || ""} onChange={v => { const n = [...data.heroSlides]; n[index].slideLink = v; set("heroSlides", n); }} placeholder="https://..." />
                                             <div className="grid grid-cols-2 gap-4">
                                                 <div>
-                                                    <label className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider block mb-2">Background Color</label>
+                                                    <label className="text-xs font-bold text-slate-500 dark:text-slate-200 uppercase tracking-wider block mb-2">Background Color</label>
                                                     <div className="flex items-center gap-2">
                                                         <input type="color" value={slide.bgColor} onChange={e => { const n = [...data.heroSlides]; n[index].bgColor = e.target.value; set("heroSlides", n); }} className="w-10 h-10 rounded-lg cursor-pointer border border-slate-200 dark:border-slate-700" />
                                                         <input type="text" value={slide.bgColor} onChange={e => { const n = [...data.heroSlides]; n[index].bgColor = e.target.value; set("heroSlides", n); }}
@@ -427,7 +427,7 @@ export default function CMSHomepage() {
                                                     </div>
                                                 </div>
                                                 <div>
-                                                    <label className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider block mb-2">Text Color</label>
+                                                    <label className="text-xs font-bold text-slate-500 dark:text-slate-200 uppercase tracking-wider block mb-2">Text Color</label>
                                                     <div className="flex items-center gap-2">
                                                         <input type="color" value={slide.textColor || "#ffffff"} onChange={e => { const n = [...data.heroSlides]; n[index].textColor = e.target.value; set("heroSlides", n); }} className="w-10 h-10 rounded-lg cursor-pointer border border-slate-200 dark:border-slate-700" />
                                                         <input type="text" value={slide.textColor || "#ffffff"} onChange={e => { const n = [...data.heroSlides]; n[index].textColor = e.target.value; set("heroSlides", n); }}
@@ -582,7 +582,7 @@ export default function CMSHomepage() {
                                             />
                                             {/* Gradient bg input */}
                                             <div>
-                                                <label className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider block mb-2">Background Gradient (CSS)</label>
+                                                <label className="text-xs font-bold text-slate-500 dark:text-slate-200 uppercase tracking-wider block mb-2">Background Gradient (CSS)</label>
                                                 <input
                                                     type="text"
                                                     value={banner.bg}
@@ -805,7 +805,7 @@ export default function CMSHomepage() {
                         <Field label="Section Title" value={data.clientSectionTitle} onChange={v => set("clientSectionTitle", v)} placeholder="e.g. Trusted By" />
                         
                         <div className="space-y-4">
-                            <label className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider block">Client Logos</label>
+                            <label className="text-xs font-bold text-slate-500 dark:text-slate-200 uppercase tracking-wider block">Client Logos</label>
                             <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
                                 {(data.clientLogos || []).map((logo, idx) => (
                                     <div key={idx} className="relative group rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 p-2 flex items-center justify-center aspect-video">
@@ -851,7 +851,7 @@ export default function CMSHomepage() {
                             <p className="text-xs text-slate-400 uppercase font-semibold tracking-wider mb-3">Google Snippet Preview</p>
                             <p className="text-[#1a0dab] dark:text-[#8ab4f8] text-lg hover:underline cursor-pointer font-medium leading-snug">{data.metaTitle || "IndianRentals – Get Tech on Demand"}</p>
                             <p className="text-[#006621] dark:text-[#4caf50] text-sm">https://indianrentals.com</p>
-                            <p className="text-[#545454] dark:text-slate-400 text-sm leading-snug">{data.metaDescription || "Default website description goes here to entice users..."}</p>
+                            <p className="text-[#545454] dark:text-slate-200 text-sm leading-snug">{data.metaDescription || "Default website description goes here to entice users..."}</p>
                         </div>
                     </div>
                 </motion.div>

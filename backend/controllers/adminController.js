@@ -520,8 +520,11 @@ const getReturnedInventory = asyncHandler(async (req, res) => {
                 _id: `${rental._id}-${item._id}`,
                 item: item.name,
                 returnedBy: rental.user?.name || 'Unknown',
-                condition: 'Pending Inspection',
-                processed: false,
+                condition: item.condition || 'Pending Inspection',
+                processed: item.processed || false,
+                rentalId: rental._id,
+                itemId: item._id,
+                inspectionNotes: item.inspectionNotes || '',
                 date: rental.returnedAt
                     ? new Date(rental.returnedAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })
                     : new Date(rental.updatedAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })
@@ -529,6 +532,61 @@ const getReturnedInventory = asyncHandler(async (req, res) => {
         });
     });
     res.json(returned);
+});
+
+// @desc    Process/verify returned item inspection
+// @route   PUT /api/admin/inventory/returned/:rentalId/:itemId
+// @access  Private/Admin
+const processReturnedInspection = asyncHandler(async (req, res) => {
+    const { rentalId, itemId } = req.params;
+    const { condition, inspectionNotes } = req.body;
+
+    if (!['Excellent', 'Good', 'Fair', 'Poor'].includes(condition)) {
+        res.status(400);
+        throw new Error('Invalid condition. Must be Excellent, Good, Fair, or Poor');
+    }
+
+    const rental = await Rental.findById(rentalId);
+    if (!rental) {
+        res.status(404);
+        throw new Error('Rental record not found');
+    }
+
+    const orderItem = rental.orderItems.find(item => item._id.toString() === itemId);
+    if (!orderItem) {
+        res.status(404);
+        throw new Error('Order item not found in this rental');
+    }
+
+    orderItem.processed = true;
+    orderItem.condition = condition;
+    orderItem.inspectionNotes = inspectionNotes || '';
+
+    await rental.save();
+
+    // If marked as Fair or Poor, update product condition/stock
+    if (orderItem.product) {
+        const product = await Product.findById(orderItem.product);
+        if (product) {
+            if (condition === 'Fair') {
+                product.condition = 'Fair';
+                await product.save();
+            } else if (condition === 'Poor') {
+                product.stock = Math.max(0, product.stock - 1);
+                product.condition = 'Fair';
+                await product.save();
+            }
+        }
+    }
+
+    res.json({
+        message: 'Inspection submitted successfully',
+        rentalId,
+        itemId,
+        processed: true,
+        condition,
+        inspectionNotes
+    });
 });
 
 // @desc    Get damaged inventory (products with condition Fair or manually flagged)
@@ -751,6 +809,7 @@ module.exports = {
     getAvailableStock,
     getAssignedInventory,
     getReturnedInventory,
+    processReturnedInspection,
     getDamagedInventory,
     getStockAlerts,
     adjustStock,

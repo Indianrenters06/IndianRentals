@@ -161,9 +161,9 @@ export default function BulkUpload() {
             <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
                 <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }}>
                     <h1 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-slate-100 mb-1">
-                        Bulk <span className="text-transparent bg-clip-text bg-linear-to-r from-indigo-500 to-purple-500">Upload</span>
+                        Bulk <span className="text-indigo-600 dark:text-indigo-400 font-extrabold">Upload</span>
                     </h1>
-                    <p className="text-slate-600 dark:text-slate-400">Import products natively from CSV and optionally bulk upload images to get their URLs.</p>
+                    <p className="text-slate-600 dark:text-slate-200">Import products natively from CSV and optionally bulk upload images to get their URLs.</p>
                 </motion.div>
             </div>
 
@@ -239,19 +239,19 @@ export default function BulkUpload() {
                                     </h3>
                                     <Divider className="opacity-50" />
                                     <ul className="space-y-4">
-                                        <li className="flex gap-3 text-sm text-slate-600 dark:text-slate-400">
+                                        <li className="flex gap-3 text-sm text-slate-600 dark:text-slate-200">
                                             <CheckCircle className="text-emerald-500 shrink-0 mt-0.5" weight="bold" />
                                             <span>Download the latest template below.</span>
                                         </li>
-                                        <li className="flex gap-3 text-sm text-slate-600 dark:text-slate-400">
+                                        <li className="flex gap-3 text-sm text-slate-600 dark:text-slate-200">
                                             <CheckCircle className="text-emerald-500 shrink-0 mt-0.5" weight="bold" />
                                             <span>Separate multiple images with commas.</span>
                                         </li>
-                                        <li className="flex gap-3 text-sm text-slate-600 dark:text-slate-400">
+                                        <li className="flex gap-3 text-sm text-slate-600 dark:text-slate-200">
                                             <CheckCircle className="text-emerald-500 shrink-0 mt-0.5" weight="bold" />
                                             <span>Include city/state information.</span>
                                         </li>
-                                        <li className="flex gap-3 text-sm text-slate-600 dark:text-slate-400">
+                                        <li className="flex gap-3 text-sm text-slate-600 dark:text-slate-200">
                                             <WarningCircle className="text-rose-500 shrink-0 mt-0.5" weight="bold" />
                                             <span>Maximum 500 rows per file.</span>
                                         </li>
@@ -309,7 +309,7 @@ export default function BulkUpload() {
                                                 <div key={idx} className="flex items-center gap-4 bg-slate-50 dark:bg-slate-950 p-2 pr-4 rounded-xl border border-slate-200 dark:border-slate-800">
                                                     <img src={url} alt="Uploaded preview" className="w-12 h-12 rounded object-cover border border-slate-200 dark:border-slate-700" />
                                                     <div className="flex-1 truncate">
-                                                        <p className="text-xs truncate font-mono text-slate-600 dark:text-slate-400">{url}</p>
+                                                        <p className="text-xs truncate font-mono text-slate-600 dark:text-slate-200">{url}</p>
                                                     </div>
                                                     <Button size="sm" isIconOnly variant="flat" color="primary" onPress={() => copyToClipboard(url)} title="Copy URL">
                                                         <Copy size={16} />
@@ -327,3 +327,4 @@ export default function BulkUpload() {
         </div>
     );
 }
+

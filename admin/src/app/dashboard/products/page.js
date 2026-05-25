@@ -209,9 +209,9 @@ export default function AllProducts() {
             <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
                 <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }}>
                     <h1 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-slate-100 mb-1">
-                        Inventory <span className="text-transparent bg-clip-text bg-linear-to-r from-indigo-500 to-purple-500">Catalogue</span>
+                        Inventory <span className="text-indigo-600 dark:text-indigo-400 font-extrabold">Catalogue</span>
                     </h1>
-                    <p className="text-slate-600 dark:text-slate-400 text-sm">Manage all products actively listed on your platform.</p>
+                    <p className="text-slate-600 dark:text-slate-200 text-sm">Manage all products actively listed on your platform.</p>
                 </motion.div>
 
                 <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="flex items-center gap-3">
@@ -319,7 +319,7 @@ export default function AllProducts() {
                                     onClick={() => setFilter(f)}
                                     className={`px-4 py-2 rounded-xl text-xs font-bold capitalize transition-all whitespace-nowrap ${filter === f
                                         ? "bg-indigo-600 text-white shadow-md shadow-indigo-500/20"
-                                        : "bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700 hover:border-indigo-300 hover:bg-indigo-50 dark:hover:bg-indigo-900/20"
+                                        : "bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-200 border border-slate-200 dark:border-slate-700 hover:border-indigo-300 hover:bg-indigo-50 dark:hover:bg-indigo-900/20"
                                         }`}
                                 >
                                     {f === "all" ? `All (${products.length})` : f === "active" ? `Active (${totalActive})` : `Draft (${totalDraft})`}
@@ -597,7 +597,7 @@ export default function AllProducts() {
                                                 {bulkResult.failed.map((fail, index) => (
                                                     <div key={index} className="p-3 text-[11px] flex flex-col gap-0.5">
                                                         <span className="font-bold text-amber-600 dark:text-amber-400">Row {fail.rowNum}</span>
-                                                        <span className="text-slate-600 dark:text-slate-400 font-medium">{fail.error}</span>
+                                                        <span className="text-slate-600 dark:text-slate-200 font-medium">{fail.error}</span>
                                                     </div>
                                                 ))}
                                             </div>

@@ -19,7 +19,7 @@ const TextInput = ({ label, value, onChange, placeholder }) => (
         <input
             type="text" value={value || ''} onChange={e => onChange(e.target.value)}
             placeholder={placeholder}
-            className="w-full h-10 px-3 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-400 transition-all"
+            className="w-full h-10 px-3 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-base text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-400 transition-all"
         />
     </div>
 );
@@ -107,7 +107,7 @@ function ProductVariantEditor({ product, onClose, onSaved }) {
                                         <ListDashes size={14} className="text-indigo-400" />
                                     </span>
                                     <button onClick={() => removeVariant(i)}
-                                        className="p-1.5 text-slate-400 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-500/10 rounded-lg transition-all opacity-0 group-hover:opacity-100">
+                                        className="p-1.5 text-slate-400 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-500/10 rounded-lg transition-all">
                                         <Trash size={15} />
                                     </button>
                                 </div>
@@ -247,7 +247,7 @@ export default function ProductVariantManager() {
                 <div>
                     <h1 className="text-3xl font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2">
                         <ListDashes size={28} className="text-indigo-500" />
-                        Product <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-500 to-purple-500">Variants</span>
+                        Product <span className="text-indigo-600 dark:text-indigo-400 font-extrabold">Variants</span>
                     </h1>
                     <p className="text-sm text-slate-500 mt-1">Manage variants like Color or Storage directly on each product.</p>
                 </div>
@@ -255,12 +255,12 @@ export default function ProductVariantManager() {
             </div>
 
             {/* Search */}
-            <div className="relative max-w-sm">
-                <MagnifyingGlass size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+            <div className="relative group max-w-sm">
+                <MagnifyingGlass size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-indigo-500 transition-colors" />
                 <input
                     type="text" value={search} onChange={e => setSearch(e.target.value)}
                     placeholder="Search by product or category…"
-                    className="w-full h-10 pl-9 pr-3 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-400 transition-all"
+                    className="w-full h-10 pl-10 pr-3 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-base text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-400 transition-all"
                 />
             </div>
 

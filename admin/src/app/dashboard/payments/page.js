@@ -54,9 +54,9 @@ export default function AllTransactions() {
             <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
                 <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }}>
                     <h1 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-slate-100 mb-1">
-                        All <span className="text-transparent bg-clip-text bg-linear-to-r from-indigo-500 to-purple-500">Transactions</span>
+                        All <span className="text-indigo-600 dark:text-indigo-400 font-extrabold">Transactions</span>
                     </h1>
-                    <p className="text-slate-600 dark:text-slate-400">Complete financial audit log across all payment methods.</p>
+                    <p className="text-slate-600 dark:text-slate-200">Complete financial audit log across all payment methods.</p>
                 </motion.div>
                 <div className="flex items-center gap-3">
                     {!loading && <div className="inline-flex items-center gap-2 bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-500/20 rounded-full px-3 py-1.5 font-bold text-sm">₹{total.toLocaleString("en-IN")} Collected</div>}

@@ -177,7 +177,7 @@ export default function SingleProductPageCMS() {
                 <div key={b.id}>
                     <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Tile {i+1}</label>
                     <input value={b.title} onChange={e => upd('benefits', b.id, 'title', e.target.value)}
-                        className="w-full h-9 px-3 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400/40" />
+                        className="w-full h-9 px-3 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-base focus:outline-none focus:ring-2 focus:ring-indigo-400/40" />
                 </div>
             ))}
         </div>
@@ -188,12 +188,12 @@ export default function SingleProductPageCMS() {
             <div>
                 <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Deposit Label</label>
                 <input value={td.depositLabel} onChange={e => set('depositLabel', e.target.value)}
-                    className="w-full h-9 px-3 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400/40" />
+                    className="w-full h-9 px-3 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-base focus:outline-none focus:ring-2 focus:ring-indigo-400/40" />
             </div>
             <div>
                 <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">KYC Notice Text</label>
                 <input value={td.kycNote} onChange={e => set('kycNote', e.target.value)}
-                    className="w-full h-9 px-3 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400/40" />
+                    className="w-full h-9 px-3 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-base focus:outline-none focus:ring-2 focus:ring-indigo-400/40" />
             </div>
         </div>
     );
@@ -205,12 +205,12 @@ export default function SingleProductPageCMS() {
                     <div className="col-span-2">
                         <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Policy {i+1} Text</label>
                         <input value={p.question} onChange={e => upd('policyLinks', p.id, 'question', e.target.value)}
-                            className="w-full h-9 px-3 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400/40" />
+                            className="w-full h-9 px-3 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-base focus:outline-none focus:ring-2 focus:ring-indigo-400/40" />
                     </div>
                     <div>
                         <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Link Text</label>
                         <input value={p.linkText} onChange={e => upd('policyLinks', p.id, 'linkText', e.target.value)}
-                            className="w-full h-9 px-3 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400/40" />
+                            className="w-full h-9 px-3 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-base focus:outline-none focus:ring-2 focus:ring-indigo-400/40" />
                     </div>
                 </div>
             ))}
@@ -223,18 +223,18 @@ export default function SingleProductPageCMS() {
                 <div>
                     <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Section Title</label>
                     <input value={td.reviewsTitle} onChange={e => set('reviewsTitle', e.target.value)}
-                        className="w-full h-9 px-3 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400/40" />
+                        className="w-full h-9 px-3 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-base focus:outline-none focus:ring-2 focus:ring-indigo-400/40" />
                 </div>
                 <div className="grid grid-cols-2 gap-2">
                     <div>
                         <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Review Count</label>
                         <input value={td.googleReviewCount} onChange={e => set('googleReviewCount', e.target.value)}
-                            className="w-full h-9 px-3 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400/40" />
+                            className="w-full h-9 px-3 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-base focus:outline-none focus:ring-2 focus:ring-indigo-400/40" />
                     </div>
                     <div>
                         <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Rating</label>
                         <input value={td.googleRating} onChange={e => set('googleRating', e.target.value)}
-                            className="w-full h-9 px-3 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400/40" />
+                            className="w-full h-9 px-3 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-base focus:outline-none focus:ring-2 focus:ring-indigo-400/40" />
                     </div>
                 </div>
             </div>
@@ -260,22 +260,22 @@ export default function SingleProductPageCMS() {
                             </div>
                             <div className="grid grid-cols-2 gap-2">
                                 <input value={r.name} onChange={e => upd('reviews', r.id, 'name', e.target.value)} placeholder="Name"
-                                    className="h-8 px-2 rounded-lg border border-slate-200 bg-white text-xs focus:outline-none focus:ring-1 focus:ring-indigo-400" />
+                                    className="h-8 px-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-1 focus:ring-indigo-400" />
                                 <input value={r.role} onChange={e => upd('reviews', r.id, 'role', e.target.value)} placeholder="Role"
-                                    className="h-8 px-2 rounded-lg border border-slate-200 bg-white text-xs focus:outline-none focus:ring-1 focus:ring-indigo-400" />
+                                    className="h-8 px-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-1 focus:ring-indigo-400" />
                             </div>
                             <textarea value={r.text} onChange={e => upd('reviews', r.id, 'text', e.target.value)} placeholder="Review text" rows={2}
-                                className="w-full px-2 py-1.5 rounded-lg border border-slate-200 bg-white text-xs resize-none focus:outline-none focus:ring-1 focus:ring-indigo-400" />
+                                className="w-full px-2 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs text-slate-900 dark:text-slate-100 resize-none focus:outline-none focus:ring-1 focus:ring-indigo-400" />
                             <div className="grid grid-cols-2 gap-2">
                                 <div className="flex items-center gap-1.5">
                                     <span className="text-[10px] text-slate-400 font-bold">Stars:</span>
                                     <input type="number" min={1} max={5} value={r.stars}
                                         onChange={e => upd('reviews', r.id, 'stars', Math.min(5, Math.max(1, Number(e.target.value))))}
-                                        className="w-12 h-8 px-2 rounded-lg border border-slate-200 bg-white text-xs focus:outline-none focus:ring-1 focus:ring-indigo-400" />
+                                        className="w-12 h-8 px-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-1 focus:ring-indigo-400" />
                                     <Stars count={r.stars} size={10} />
                                 </div>
                                 <select value={r.color} onChange={e => upd('reviews', r.id, 'color', e.target.value)}
-                                    className="h-8 px-2 rounded-lg border border-slate-200 bg-white text-xs focus:outline-none focus:ring-1 focus:ring-indigo-400 capitalize">
+                                    className="h-8 px-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-1 focus:ring-indigo-400 capitalize">
                                     {REVIEW_COLORS.map(c => <option key={c} value={c}>{c}</option>)}
                                 </select>
                             </div>
@@ -292,12 +292,12 @@ export default function SingleProductPageCMS() {
                 <div>
                     <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">FAQ Title</label>
                     <input value={td.faqTitle} onChange={e => set('faqTitle', e.target.value)}
-                        className="w-full h-9 px-3 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400/40" />
+                        className="w-full h-9 px-3 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-base focus:outline-none focus:ring-2 focus:ring-indigo-400/40" />
                 </div>
                 <div>
                     <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">FAQ Subtitle</label>
                     <input value={td.faqSubtitle} onChange={e => set('faqSubtitle', e.target.value)}
-                        className="w-full h-9 px-3 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400/40" />
+                        className="w-full h-9 px-3 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-base focus:outline-none focus:ring-2 focus:ring-indigo-400/40" />
                 </div>
             </div>
             <div className="border-t border-slate-100 dark:border-slate-800 pt-4">
@@ -316,9 +316,9 @@ export default function SingleProductPageCMS() {
                                 <button onClick={() => del('faqs', f.id)} className="text-rose-400 hover:text-rose-600 transition-colors"><Trash weight="bold" size={12} /></button>
                             </div>
                             <input value={f.question} onChange={e => upd('faqs', f.id, 'question', e.target.value)} placeholder="Question"
-                                className="w-full h-8 px-2 rounded-lg border border-slate-200 bg-white text-xs focus:outline-none focus:ring-1 focus:ring-indigo-400" />
+                                className="w-full h-8 px-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-1 focus:ring-indigo-400" />
                             <textarea value={f.answer} onChange={e => upd('faqs', f.id, 'answer', e.target.value)} placeholder="Answer" rows={2}
-                                className="w-full px-2 py-1.5 rounded-lg border border-slate-200 bg-white text-xs resize-none focus:outline-none focus:ring-1 focus:ring-indigo-400" />
+                                className="w-full px-2 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs text-slate-900 dark:text-slate-100 resize-none focus:outline-none focus:ring-1 focus:ring-indigo-400" />
                         </div>
                     ))}
                 </div>
@@ -331,12 +331,12 @@ export default function SingleProductPageCMS() {
             <div>
                 <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Section Title</label>
                 <input value={td.bestProductsTitle} onChange={e => set('bestProductsTitle', e.target.value)}
-                    className="w-full h-9 px-3 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400/40" />
+                    className="w-full h-9 px-3 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-base focus:outline-none focus:ring-2 focus:ring-indigo-400/40" />
             </div>
             <div>
                 <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Button Text</label>
                 <input value={td.bestProductsButtonText} onChange={e => set('bestProductsButtonText', e.target.value)}
-                    className="w-full h-9 px-3 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400/40" />
+                    className="w-full h-9 px-3 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-base focus:outline-none focus:ring-2 focus:ring-indigo-400/40" />
             </div>
         </div>
     );
@@ -348,13 +348,13 @@ export default function SingleProductPageCMS() {
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div>
                     <h1 className="text-3xl font-bold text-slate-900 dark:text-white tracking-tight">
-                        Single Product <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-500 to-purple-500">Page CMS</span>
+                        Single Product <span className="text-indigo-600 dark:text-indigo-400 font-extrabold">Page CMS</span>
                     </h1>
                     <p className="text-slate-500 text-sm mt-1">Hover over any highlighted section and click the pencil to edit template content.</p>
                 </div>
                 <div className="flex items-center gap-3 flex-wrap">
                     <select value={selId} onChange={e => setSelId(e.target.value)}
-                        className="h-10 px-3 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-indigo-500/30 min-w-[180px]">
+                        className="h-10 px-3 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-base font-medium focus:outline-none focus:ring-2 focus:ring-indigo-500/30 min-w-[180px]">
                         {products.map(p => <option key={p._id} value={p._id}>{p.name}</option>)}
                         {products.length === 0 && <option value="">No products found</option>}
                     </select>

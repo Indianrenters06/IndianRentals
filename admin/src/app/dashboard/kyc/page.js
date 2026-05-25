@@ -145,9 +145,9 @@ export default function KYCManagement() {
             <div className="flex flex-col items-start gap-6">
                 <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }}>
                     <h1 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-slate-100 mb-1">
-                        KYC <span className="text-transparent bg-clip-text bg-linear-to-r from-indigo-500 to-purple-500">Verification Center</span>
+                        KYC <span className="text-indigo-600 dark:text-indigo-400 font-extrabold">Verification Center</span>
                     </h1>
-                    <p className="text-slate-600 dark:text-slate-400">
+                    <p className="text-slate-600 dark:text-slate-200">
                         Review and manage all user documentation for platform trust & safety.
                     </p>
                 </motion.div>
@@ -384,7 +384,7 @@ export default function KYCManagement() {
                                                     value={rejectionReason}
                                                     onValueChange={setRejectionReason}
                                                     variant="bordered"
-                                                    classNames={{ input: "text-sm", inputWrapper: "bg-white dark:bg-slate-900" }}
+                                                    classNames={{ input: "text-base", inputWrapper: "bg-white dark:bg-slate-900" }}
                                                 />
                                                 <div className="flex gap-2 mt-4">
                                                     <Button size="sm" color="danger" className="font-bold px-6" onPress={() => handleUpdateStatus(selectedKyc._id, 'rejected')}>Confirm Rejection</Button>

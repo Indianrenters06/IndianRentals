@@ -2,8 +2,8 @@
 
 import { useState, useEffect, useMemo, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Card, CardBody, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Chip, Button, Skeleton, Pagination, Spinner } from "@heroui/react";
-import { ArrowsClockwise, CheckCircle, WarningCircle, MagnifyingGlass, XCircle } from "@phosphor-icons/react";
+import { Card, CardBody, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Chip, Button, Skeleton, Pagination, Spinner, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, useDisclosure, Textarea } from "@heroui/react";
+import { ArrowsClockwise, CheckCircle, WarningCircle, MagnifyingGlass, XCircle, CaretLeft, CaretRight } from "@phosphor-icons/react";
 
 // ── Toast Notification ────────────────────────────────────────────────────────
 function Toast({ toasts }) {
@@ -38,7 +38,6 @@ export default function ReturnedInventory() {
     const [returned, setReturned] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    const [processing, setProcessing] = useState({});
     const [search, setSearch] = useState("");
     const [page, setPage] = useState(1);
     const [rowsPerPage] = useState(10);
@@ -48,43 +47,78 @@ export default function ReturnedInventory() {
     });
     const [toasts, setToasts] = useState([]);
 
+    // Modal & Inspection states
+    const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure();
+    const [selectedItem, setSelectedItem] = useState(null);
+    const [selectedCondition, setSelectedCondition] = useState("Good");
+    const [inspectionNotes, setInspectionNotes] = useState("");
+    const [submitting, setSubmitting] = useState(false);
+
     const addToast = useCallback((message, type = "success") => {
         const id = Date.now();
         setToasts((prev) => [...prev, { id, message, type }]);
         setTimeout(() => setToasts((prev) => prev.filter((t) => t.id !== id)), 3500);
     }, []);
 
-    useEffect(() => {
-        const fetchReturned = async () => {
-            try {
-                const token = localStorage.getItem("adminToken");
-                const res = await fetch(`${API}/api/admin/inventory/returned`, {
-                    headers: { Authorization: `Bearer ${token}` },
-                });
-                if (!res.ok) throw new Error("Failed to fetch returned inventory");
-                const data = await res.json();
-                setReturned(data);
-            } catch (err) {
-                setError(err.message);
-            } finally {
-                setLoading(false);
-            }
-        };
-        fetchReturned();
+    const fetchReturned = useCallback(async () => {
+        try {
+            setLoading(true);
+            const token = localStorage.getItem("adminToken");
+            const res = await fetch(`${API}/api/admin/inventory/returned`, {
+                headers: { Authorization: `Bearer ${token}` },
+            });
+            if (!res.ok) throw new Error("Failed to fetch returned inventory");
+            const data = await res.json();
+            setReturned(data);
+        } catch (err) {
+            setError(err.message);
+        } finally {
+            setLoading(false);
+        }
     }, []);
 
-    const handleProcess = (id) => {
-        setProcessing((prev) => ({ ...prev, [id]: true }));
-        // Mock processing update
-        setTimeout(() => {
-            setReturned((prev) =>
-                prev.map((item) =>
-                    item._id === id ? { ...item, processed: true, condition: "Inspected" } : item
-                )
-            );
-            setProcessing((prev) => ({ ...prev, [id]: false }));
-            addToast("Inspection completed successfully", "success");
-        }, 1000);
+    useEffect(() => {
+        fetchReturned();
+    }, [fetchReturned]);
+
+    const handleStartInspection = (item) => {
+        setSelectedItem(item);
+        setSelectedCondition("Good");
+        setInspectionNotes(item.inspectionNotes || "");
+        onOpen();
+    };
+
+    const handleProcessSubmit = async () => {
+        if (!selectedItem) return;
+        setSubmitting(true);
+        try {
+            const token = localStorage.getItem("adminToken");
+            const { rentalId, itemId } = selectedItem;
+            const res = await fetch(`${API}/api/admin/inventory/returned/${rentalId}/${itemId}`, {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${token}`
+                },
+                body: JSON.stringify({
+                    condition: selectedCondition,
+                    inspectionNotes
+                })
+            });
+
+            if (!res.ok) {
+                const errData = await res.json();
+                throw new Error(errData.message || "Failed to submit inspection");
+            }
+
+            addToast(`Inspection submitted successfully!`, "success");
+            onClose();
+            fetchReturned();
+        } catch (err) {
+            addToast(err.message || "Something went wrong", "error");
+        } finally {
+            setSubmitting(false);
+        }
     };
 
     const sortedItems = useMemo(() => {
@@ -120,9 +154,9 @@ export default function ReturnedInventory() {
             <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
                 <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }}>
                     <h1 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-slate-100 mb-1">
-                        Returned <span className="text-transparent bg-clip-text bg-linear-to-r from-indigo-500 to-purple-500">Items</span>
+                        Returned <span className="text-indigo-600 dark:text-indigo-400 font-extrabold">Items</span>
                     </h1>
-                    <p className="text-slate-600 dark:text-slate-400">Process and inspect items returned by customers.</p>
+                    <p className="text-slate-600 dark:text-slate-200">Process and inspect items returned by customers.</p>
                 </motion.div>
                 <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }}>
                     <Chip
@@ -174,18 +208,44 @@ export default function ReturnedInventory() {
                                         <span className="text-sm text-slate-500">
                                             Showing {items.length} of {sortedItems.length} returns
                                         </span>
-                                        <Pagination
-                                            radius="md" variant="flat"
-                                            showControls
+                                        <div className="flex items-center gap-1.5">
+                                            <button
+                                                type="button"
+                                                disabled={page === 1}
+                                                onClick={() => setPage(p => Math.max(p - 1, 1))}
+                                                className="flex items-center justify-center w-8 h-8 rounded-lg border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 bg-white dark:bg-slate-900 hover:!bg-slate-50 dark:hover:!bg-slate-800/50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                                            >
+                                                <CaretLeft size={16} weight="bold" />
+                                            </button>
                                             
-                                            color="primary"
-                                            page={page}
-                                            total={Math.ceil(sortedItems.length / rowsPerPage)}
-                                            onChange={(page) => setPage(page)}
-                                            classNames={{
-                                                cursor: "bg-indigo-500 shadow-indigo-500/30",
-                                            }}
-                                        />
+                                            {Array.from({ length: Math.ceil(sortedItems.length / rowsPerPage) }).map((_, idx) => {
+                                                const pageNum = idx + 1;
+                                                const isActive = pageNum === page;
+                                                return (
+                                                    <button
+                                                        key={pageNum}
+                                                        type="button"
+                                                        onClick={() => setPage(pageNum)}
+                                                        className={`flex items-center justify-center w-8 h-8 text-xs font-bold rounded-lg transition-all ${
+                                                            isActive
+                                                                ? "!bg-indigo-600 text-white shadow-lg shadow-indigo-500/25"
+                                                                : "border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 hover:!bg-slate-50 dark:hover:!bg-slate-800/50"
+                                                        }`}
+                                                    >
+                                                        {pageNum}
+                                                    </button>
+                                                );
+                                            })}
+
+                                            <button
+                                                type="button"
+                                                disabled={page === Math.ceil(sortedItems.length / rowsPerPage)}
+                                                onClick={() => setPage(p => Math.min(p + 1, Math.ceil(sortedItems.length / rowsPerPage)))}
+                                                className="flex items-center justify-center w-8 h-8 rounded-lg border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 bg-white dark:bg-slate-900 hover:!bg-slate-50 dark:hover:!bg-slate-800/50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                                            >
+                                                <CaretRight size={16} weight="bold" />
+                                            </button>
+                                        </div>
                                     </div>
                                 ) : null
                             }
@@ -211,7 +271,11 @@ export default function ReturnedInventory() {
                                             <Chip
                                                 size="sm"
                                                 variant="flat"
-                                                color={item.condition === 'Inspected' ? 'success' : item.condition === 'Excellent' ? 'success' : 'warning'}
+                                                color={
+                                                    item.condition === 'Excellent' || item.condition === 'Good' ? 'success' :
+                                                    item.condition === 'Fair' ? 'warning' :
+                                                    item.condition === 'Poor' ? 'danger' : 'default'
+                                                }
                                                 className="font-bold"
                                             >
                                                 {item.condition}
@@ -221,16 +285,21 @@ export default function ReturnedInventory() {
                                         <TableCell>
                                             <div className="flex justify-center">
                                                 {item.processed ? (
-                                                    <Chip size="sm" color="success" variant="shadow" className="bg-emerald-600 font-bold" startContent={<CheckCircle weight="bold" />}>
-                                                        QC Passed
-                                                    </Chip>
+                                                    item.condition === 'Poor' ? (
+                                                        <Chip size="sm" color="danger" variant="shadow" className="bg-red-600 font-bold" startContent={<XCircle weight="bold" />}>
+                                                            QC Failed
+                                                        </Chip>
+                                                    ) : (
+                                                        <Chip size="sm" color="success" variant="shadow" className="bg-emerald-600 font-bold" startContent={<CheckCircle weight="bold" />}>
+                                                            QC Passed
+                                                        </Chip>
+                                                    )
                                                 ) : (
                                                     <Button
                                                         size="sm"
-                                                        isLoading={processing[item._id]}
                                                         className="font-bold h-9 px-6 rounded-xl !bg-indigo-600 text-white shadow-md border-none"
-                                                        startContent={!processing[item._id] && <ArrowsClockwise weight="bold" />}
-                                                        onPress={() => handleProcess(item._id)}
+                                                        startContent={<ArrowsClockwise weight="bold" />}
+                                                        onPress={() => handleStartInspection(item)}
                                                     >
                                                         Start Inspection
                                                     </Button>
@@ -244,6 +313,92 @@ export default function ReturnedInventory() {
                     )}
                 </CardBody>
             </Card>
+
+            <Modal 
+                isOpen={isOpen} 
+                onOpenChange={onOpenChange} 
+                size="md" 
+                scrollBehavior="inside"
+                placement="center"
+                classNames={{
+                    backdrop: "bg-slate-900/50 backdrop-blur-sm",
+                    base: "bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xl rounded-2xl max-h-[90vh]"
+                }}
+            >
+                <ModalContent>
+                    <ModalHeader className="flex flex-col gap-1">
+                        <h3 className="text-xl font-bold">Item Inspection Report</h3>
+                        <p className="text-xs text-slate-500 font-normal">Verify and document the quality check of the returned product.</p>
+                    </ModalHeader>
+                    <ModalBody className="space-y-4">
+                        <div className="p-3 bg-slate-50 dark:bg-slate-950/40 rounded-xl space-y-1.5 border border-slate-100 dark:border-slate-800/60">
+                            <div className="text-xs font-bold text-slate-400 uppercase">Product Name</div>
+                            <div className="text-sm font-semibold text-slate-900 dark:text-slate-100">{selectedItem?.item}</div>
+                            <div className="text-xs text-slate-500">Returned by: <span className="font-semibold text-slate-700 dark:text-slate-300">{selectedItem?.returnedBy}</span></div>
+                        </div>
+
+                        <div className="space-y-2">
+                            <label className="text-xs font-bold text-slate-400 uppercase tracking-wider">Select Verified Condition</label>
+                            <div className="grid grid-cols-2 gap-2">
+                                {[
+                                    { key: "Excellent", label: "Excellent", desc: "No signs of usage / Mint" },
+                                    { key: "Good", label: "Good", desc: "Minor usage / No issues" },
+                                    { key: "Fair", label: "Fair (Damaged)", desc: "Wear & Tear / Needs repair" },
+                                    { key: "Poor", label: "Poor (Severe)", desc: "Broken / Scrap item" }
+                                ].map((cond) => {
+                                    const isSelected = selectedCondition === cond.key;
+                                    return (
+                                        <button
+                                            key={cond.key}
+                                            type="button"
+                                            onClick={() => setSelectedCondition(cond.key)}
+                                            className={`p-3 text-left border rounded-xl transition-all flex flex-col justify-between ${
+                                                isSelected
+                                                    ? "border-indigo-600 bg-indigo-50/50 dark:bg-indigo-950/20 text-indigo-600 dark:text-indigo-400"
+                                                    : "border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800/40 text-slate-700 dark:text-slate-300"
+                                            }`}
+                                        >
+                                            <span className="text-sm font-bold">{cond.label}</span>
+                                            <span className="text-[10px] text-slate-500 font-medium leading-normal mt-0.5">{cond.desc}</span>
+                                        </button>
+                                    );
+                                })}
+                            </div>
+                        </div>
+
+                        <div className="space-y-2">
+                            <label className="text-xs font-bold text-slate-400 uppercase tracking-wider">Inspection & QC Notes</label>
+                            <Textarea
+                                value={inspectionNotes}
+                                onChange={(e) => setInspectionNotes(e.target.value)}
+                                placeholder="Document any minor/major scratches, malfunctions, missing accessories, or general remarks..."
+                                classNames={{
+                                    input: "text-sm",
+                                    inputWrapper: "bg-slate-50 dark:bg-slate-900/40 border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 focus-within:!border-indigo-500 rounded-xl"
+                                }}
+                                minRows={3}
+                            />
+                        </div>
+                    </ModalBody>
+                    <ModalFooter className="gap-2 border-t border-slate-100 dark:border-slate-800/80 pt-4">
+                        <Button
+                            variant="flat"
+                            color="default"
+                            onPress={onClose}
+                            className="font-bold rounded-xl"
+                        >
+                            Cancel
+                        </Button>
+                        <Button
+                            isLoading={submitting}
+                            onPress={handleProcessSubmit}
+                            className="font-bold rounded-xl bg-indigo-600 text-white shadow-md shadow-indigo-500/25"
+                        >
+                            Submit QC Report
+                        </Button>
+                    </ModalFooter>
+                </ModalContent>
+            </Modal>
         </div>
     );
 }
