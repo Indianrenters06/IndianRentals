@@ -19,7 +19,7 @@ import {
   CheckboxGroup,
   Spinner
 } from "@heroui/react";
-import { ShieldCheck, Plus, Trash } from "@phosphor-icons/react";
+import { ShieldCheck, Plus, Trash, PencilSimple } from "@phosphor-icons/react";
 import { toast } from "react-hot-toast";
 
 const AVAILABLE_PERMISSIONS = [
@@ -41,6 +41,9 @@ export default function RolesPermissionsPage() {
   const [loading, setLoading] = useState(true);
   const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSuperAdmin, setIsSuperAdmin] = useState(false);
+  const [isEdit, setIsEdit] = useState(false);
+  const [editId, setEditId] = useState(null);
   
   const [formData, setFormData] = useState({
     name: "",
@@ -68,7 +71,35 @@ export default function RolesPermissionsPage() {
 
   useEffect(() => {
     fetchRoles();
+    const storedInfo = localStorage.getItem("adminInfo");
+    if (storedInfo) {
+      try {
+        const parsed = JSON.parse(storedInfo);
+        const info = parsed.user || parsed.admin || parsed;
+        if (info && info.role === 'super_admin') {
+          setIsSuperAdmin(true);
+        }
+      } catch (err) {}
+    }
   }, []);
+
+  const handleCreateNew = () => {
+    setIsEdit(false);
+    setEditId(null);
+    setFormData({ name: "", description: "", permissions: [] });
+    onOpen();
+  };
+
+  const handleEditRole = (role) => {
+    setIsEdit(true);
+    setEditId(role._id);
+    setFormData({
+      name: role.name,
+      description: role.description,
+      permissions: role.permissions
+    });
+    onOpen();
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -80,8 +111,12 @@ export default function RolesPermissionsPage() {
     setIsSubmitting(true);
     try {
       const token = localStorage.getItem("adminToken");
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000"}/api/admin/roles`, {
-        method: "POST",
+      const url = isEdit 
+        ? `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000"}/api/admin/roles/${editId}`
+        : `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000"}/api/admin/roles`;
+
+      const res = await fetch(url, {
+        method: isEdit ? "PUT" : "POST",
         headers: { 
           "Content-Type": "application/json",
           "Authorization": `Bearer ${token}` 
@@ -91,12 +126,12 @@ export default function RolesPermissionsPage() {
       
       const data = await res.json();
       if (res.ok) {
-        toast.success("Custom role created");
+        toast.success(isEdit ? "Custom role updated" : "Custom role created");
         setFormData({ name: "", description: "", permissions: [] });
         fetchRoles();
         onClose();
       } else {
-        toast.error(data.message || "Failed to create role");
+        toast.error(data.message || (isEdit ? "Failed to update role" : "Failed to create role"));
       }
     } catch (error) {
       toast.error("Something went wrong");
@@ -133,15 +168,17 @@ export default function RolesPermissionsPage() {
           <h1 className="text-2xl font-bold text-slate-800 dark:text-slate-100">Roles & Permissions</h1>
           <p className="text-slate-500 text-sm mt-1">Manage predefined roles and create custom access levels for your team.</p>
         </div>
-        <Button 
-          color="primary" 
-          variant="shadow"
-          className="h-12 px-8 rounded-xl !bg-indigo-600 hover:!bg-indigo-700 text-white font-bold text-sm shadow-lg shadow-indigo-500/30 transition-all" 
-          startContent={<Plus weight="bold" />}
-          onPress={onOpen}
-        >
-          Create Custom Role
-        </Button>
+        {isSuperAdmin && (
+          <Button 
+            color="primary" 
+            variant="shadow"
+            className="h-12 px-8 rounded-xl !bg-indigo-600 hover:!bg-indigo-700 text-white font-bold text-sm shadow-lg shadow-indigo-500/30 transition-all" 
+            startContent={<Plus weight="bold" />}
+            onPress={handleCreateNew}
+          >
+            Create Custom Role
+          </Button>
+        )}
       </div>
 
       {loading ? (
@@ -159,17 +196,29 @@ export default function RolesPermissionsPage() {
                 <div className="flex flex-col flex-1">
                   <div className="flex items-center justify-between">
                     <p className="text-md font-bold text-slate-900 dark:text-slate-100">{role.name}</p>
-                    {!role.isPredefined && (
-                      <Button 
-                        isIconOnly 
-                        size="sm" 
-                        variant="light" 
-                        color="danger" 
-                        className="opacity-20 hover:opacity-100 transition-opacity"
-                        onPress={() => handleDeleteRole(role._id)}
-                      >
-                        <Trash weight="bold" />
-                      </Button>
+                    {isSuperAdmin && !role.isPredefined && (
+                      <div className="flex gap-1">
+                        <Button 
+                          isIconOnly 
+                          size="sm" 
+                          variant="light" 
+                          color="primary" 
+                          className="opacity-40 hover:opacity-100 transition-opacity"
+                          onPress={() => handleEditRole(role)}
+                        >
+                          <PencilSimple weight="bold" />
+                        </Button>
+                        <Button 
+                          isIconOnly 
+                          size="sm" 
+                          variant="light" 
+                          color="danger" 
+                          className="opacity-40 hover:opacity-100 transition-opacity"
+                          onPress={() => handleDeleteRole(role._id)}
+                        >
+                          <Trash weight="bold" />
+                        </Button>
+                      </div>
                     )}
                   </div>
                   <p className="text-xs text-slate-500">{role.permissions.length} modules accessible</p>
@@ -211,8 +260,8 @@ export default function RolesPermissionsPage() {
           {(onClose) => (
             <form onSubmit={handleSubmit}>
               <ModalHeader className="flex flex-col gap-1 py-5 px-6">
-                <h2 className="text-xl font-bold text-slate-900 dark:text-slate-100">Create Custom Role</h2>
-                <p className="text-sm text-slate-500 font-normal">Define a unique role and assign specific module permissions.</p>
+                <h2 className="text-xl font-bold text-slate-900 dark:text-slate-100">{isEdit ? "Edit Custom Role" : "Create Custom Role"}</h2>
+                <p className="text-sm text-slate-500 font-normal">{isEdit ? "Modify this role's module permissions." : "Define a unique role and assign specific module permissions."}</p>
               </ModalHeader>
               <ModalBody className="py-6 px-6 max-h-[60vh] overflow-y-auto">
                 <div className="space-y-4">
@@ -264,7 +313,7 @@ export default function RolesPermissionsPage() {
                   variant="shadow"
                   className="h-12 px-10 rounded-xl !bg-indigo-600 hover:!bg-indigo-700 text-white font-bold text-sm shadow-lg shadow-indigo-500/30 transition-all"
                 >
-                  Create Role
+                  {isEdit ? "Update Role" : "Create Role"}
                 </Button>
               </ModalFooter>
             </form>

@@ -39,9 +39,9 @@ const {
     getPricingPlans,
     createPricingPlan,
     deletePricingPlan,
-    // Roles
     getRoles,
     createRole,
+    updateRole,
     deleteRole,
 } = require('../controllers/adminController');
 const { protect, admin } = require('../middleware/authMiddleware');
@@ -218,7 +218,9 @@ router.route('/roles')
     .get(protect, admin, getRoles)
     .post(protect, admin, createRole);
 
-router.delete('/roles/:id', protect, admin, deleteRole);
+router.route('/roles/:id')
+    .put(protect, admin, updateRole)
+    .delete(protect, admin, deleteRole);
 
 module.exports = router;
 

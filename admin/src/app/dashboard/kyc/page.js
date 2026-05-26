@@ -360,9 +360,9 @@ export default function KYCManagement() {
                                                             // Image: show thumbnail with zoom
                                                             <div key={key} className="group relative rounded-2xl overflow-hidden border border-slate-200 dark:border-slate-800 bg-slate-100 dark:bg-slate-950 aspect-video">
                                                                 <img src={url} alt={label} className="w-full h-full object-cover" />
-                                                                <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center gap-2">
-                                                                    <p className="text-white text-xs font-bold uppercase tracking-widest">{label}</p>
-                                                                    <Button size="sm" color="primary" variant="solid" startContent={<MagnifyingGlassPlus weight="bold" />} onPress={() => setZoomedDoc(url)}>Zoom & View</Button>
+                                                                <div className="absolute inset-0 bg-black/40 group-hover:bg-black/60 transition-colors flex flex-col items-center justify-center gap-2">
+                                                                    <p className="text-white text-xs font-bold uppercase tracking-widest drop-shadow-md">{label}</p>
+                                                                    <Button size="sm" color="primary" variant="solid" className="shadow-lg" startContent={<MagnifyingGlassPlus weight="bold" />} onPress={() => setZoomedDoc(url)}>Zoom & View</Button>
                                                                 </div>
                                                                 <div className="absolute top-2 left-2 px-2 py-1 bg-black/40 backdrop-blur-md rounded-lg text-[10px] text-white font-bold uppercase tracking-tighter">
                                                                     {label}

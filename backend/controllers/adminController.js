@@ -753,6 +753,11 @@ const getRoles = asyncHandler(async (req, res) => {
 // @route   POST /api/admin/roles
 // @access  Private/Admin
 const createRole = asyncHandler(async (req, res) => {
+    if (req.user.role !== 'super_admin') {
+        res.status(403);
+        throw new Error('Only Super Admin can create roles');
+    }
+
     const { name, id, description, permissions } = req.body;
 
     const roleExists = await Role.findOne({ $or: [{ name }, { id }] });
@@ -772,10 +777,43 @@ const createRole = asyncHandler(async (req, res) => {
     res.status(201).json(role);
 });
 
+const updateRole = asyncHandler(async (req, res) => {
+    if (req.user.role !== 'super_admin') {
+        res.status(403);
+        throw new Error('Only Super Admin can edit roles');
+    }
+
+    const role = await Role.findById(req.params.id);
+
+    if (!role) {
+        res.status(404);
+        throw new Error('Role not found');
+    }
+
+    if (role.isPredefined) {
+        res.status(400);
+        throw new Error('Predefined roles cannot be edited');
+    }
+
+    const { name, description, permissions } = req.body;
+    
+    if (name) role.name = name;
+    if (description !== undefined) role.description = description;
+    if (permissions) role.permissions = permissions;
+
+    const updatedRole = await role.save();
+    res.json(updatedRole);
+});
+
 // @desc    Delete a custom role
 // @route   DELETE /api/admin/roles/:id
 // @access  Private/Admin
 const deleteRole = asyncHandler(async (req, res) => {
+    if (req.user.role !== 'super_admin') {
+        res.status(403);
+        throw new Error('Only Super Admin can delete roles');
+    }
+
     const role = await Role.findById(req.params.id);
 
     if (!role) {
@@ -835,5 +873,6 @@ module.exports = {
     // Roles
     getRoles,
     createRole,
+    updateRole,
     deleteRole,
 };

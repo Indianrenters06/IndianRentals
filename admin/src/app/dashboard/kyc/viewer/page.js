@@ -115,7 +115,7 @@ export default function KYCViewer() {
                                         className="w-full h-full object-cover transition-transform group-hover:scale-110 duration-500"
                                         onError={(e) => { e.target.src = 'https://placehold.co/600x400/1a1a1a/ffffff?text=Image+Not+Found'; }}
                                     />
-                                    <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center duration-300 backdrop-blur-sm">
+                                    <div className="absolute inset-0 bg-black/40 flex items-center justify-center duration-300 backdrop-blur-[2px]">
                                         <Button 
                                             size="sm" 
                                             variant="solid" 
