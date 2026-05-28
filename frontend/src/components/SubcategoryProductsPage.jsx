@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { FaArrowLeft } from 'react-icons/fa';
 import { FiPackage } from 'react-icons/fi';
-import { ChevronRightIcon } from '@heroicons/react/24/outline';
+import { ChevronRightIcon, ArrowsUpDownIcon, FunnelIcon, XMarkIcon } from '@heroicons/react/24/outline';
 import { getProductsBySubcategory, getProducts } from '../services/productService';
 import ProductCard from './ProductCard';
 import Sidebar from './Sidebar';
@@ -18,6 +18,9 @@ export default function SubcategoryProductsPage({ subcategoryId, subcategoryName
     const [error, setError] = useState(null);
     const [selectedDuration, setSelectedDuration] = useState("3 months");
     const [selectedSort, setSelectedSort] = useState("Most Popular");
+    const [showSortModal, setShowSortModal] = useState(false);
+    const [showFilterModal, setShowFilterModal] = useState(false);
+    const [isMobile, setIsMobile] = useState(true);
 
     useEffect(() => {
         const fetchProducts = async () => {
@@ -44,11 +47,9 @@ export default function SubcategoryProductsPage({ subcategoryId, subcategoryName
             try {
                 const { getSubcategoriesByParentName } = await import('../services/categoryService');
 
-                // Try different name variants to handle naming mismatches between DB and component props
-                // e.g. parentName='Apple' but DB might have 'Apple' or 'Apple Products'
                 const namesToTry = [
                     parentName,
-                    parentName?.replace(/\s*Products?\s*/i, '').trim(), // strip 'Products' suffix
+                    parentName?.replace(/\s*Products?\s*/i, '').trim(),
                     `${parentName} Products`,
                 ].filter(Boolean);
 
@@ -89,6 +90,13 @@ export default function SubcategoryProductsPage({ subcategoryId, subcategoryName
         fetchProducts();
         fetchSubcategories();
     }, [subcategoryId, parentName]);
+
+    useEffect(() => {
+        const check = () => setIsMobile(window.innerWidth < 1024);
+        check();
+        window.addEventListener('resize', check);
+        return () => window.removeEventListener('resize', check);
+    }, []);
 
     const getDurationMultiplier = (duration) => {
         switch (duration) {
@@ -141,42 +149,51 @@ export default function SubcategoryProductsPage({ subcategoryId, subcategoryName
 
     return (
         <div className="min-h-screen bg-white">
-            {/* Breadcrumbs Bar */}
-            <div className="px-4 md:px-8 max-w-[1200px] mx-auto py-4">
-                <div className="flex items-center gap-3">
-                    <button onClick={() => router.back()} className="p-1 hover:bg-gray-100 rounded-full transition-colors">
-                        <FaArrowLeft size={18} className="text-gray-800" />
-                    </button>
-                    <p className="text-xs text-gray-500">
-                        <Link href="/" className="hover:underline">Home</Link>
-                        {' › '}
-                        <Link href={parentHref || '#'} className="hover:underline">{parentName}</Link>
-                        {' › '}
-                        <span className="text-gray-800">{subcategoryName}</span>
-                    </p>
-                </div>
-            </div>
 
-            {/* Subcategory Slider Navigation */}
-            {subcategories.length > 0 && (
-                <div className="bg-white relative z-10">
+            {/* ── Mobile Header ── */}
+            {isMobile && (
+                <div style={{ padding: '24px 16px 16px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                        <button
+                            onClick={() => router.back()}
+                            style={{ flexShrink: 0, width: '36px', height: '36px', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', background: 'none', border: 'none', cursor: 'pointer' }}
+                        >
+                            <FaArrowLeft size={16} style={{ color: '#1f2937' }} />
+                        </button>
+                        <h1 style={{ fontFamily: "'Mona Sans', sans-serif", fontSize: '26px', fontWeight: 600, letterSpacing: '-0.01em', color: 'hsla(0, 0%, 12%, 1)', lineHeight: '1.2', margin: 0 }}>
+                            {subcategoryName}
+                        </h1>
+                    </div>
+                </div>
+            )}
+
+            {/* ── Desktop Breadcrumbs ── */}
+            {!isMobile && (
+                <div style={{ padding: '16px 32px', maxWidth: '1200px', margin: '0 auto' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                        <button onClick={() => router.back()} style={{ padding: '4px', background: 'none', border: 'none', cursor: 'pointer', borderRadius: '50%' }}>
+                            <FaArrowLeft size={18} style={{ color: '#1f2937' }} />
+                        </button>
+                        <p style={{ fontSize: '12px', color: '#6b7280', margin: 0 }}>
+                            <Link href="/" style={{ textDecoration: 'none', color: 'inherit' }}>Home</Link>
+                            {' › '}
+                            <Link href={parentHref || '#'} style={{ textDecoration: 'none', color: 'inherit' }}>{parentName}</Link>
+                            {' › '}
+                            <span style={{ color: '#1f2937' }}>{subcategoryName}</span>
+                        </p>
+                    </div>
+                </div>
+            )}
+
+            {/* ── Subcategory Slider — desktop only ── */}
+            {!isMobile && subcategories.length > 0 && (
+                <div style={{ background: 'white', position: 'relative', zIndex: 10 }}>
                     <div
-                        className="relative mx-auto group/subslider flex items-center max-w-[1200px] w-full px-4 md:px-8"
-                        style={{
-                            height: '167px',
-                            paddingTop: '20px',
-                            gap: '24px'
-                        }}
+                        style={{ position: 'relative', margin: '0 auto', display: 'flex', alignItems: 'center', maxWidth: '1200px', width: '100%', padding: '20px 32px 0', height: '167px', gap: '24px', boxSizing: 'border-box' }}
                     >
                         <div
                             id="subcat-slider-dynamic"
-                            className="flex overflow-x-auto snap-x snap-mandatory scroll-smooth w-full"
-                            style={{
-                                height: '147px',
-                                gap: '16px',
-                                msOverflowStyle: 'none',
-                                scrollbarWidth: 'none',
-                            }}
+                            style={{ display: 'flex', overflowX: 'auto', scrollSnapType: 'x mandatory', scrollBehavior: 'smooth', width: '100%', height: '147px', gap: '16px', msOverflowStyle: 'none', scrollbarWidth: 'none' }}
                         >
                             <style dangerouslySetInnerHTML={{ __html: `#subcat-slider-dynamic::-webkit-scrollbar { display: none; }` }} />
                             {subcategories.map((sub) => {
@@ -185,39 +202,29 @@ export default function SubcategoryProductsPage({ subcategoryId, subcategoryName
                                     <Link
                                         key={sub.href}
                                         href={sub.href}
-                                        className="group flex flex-col outline-none shrink-0 snap-start"
-                                        style={{
-                                            height: '147.09px',
-                                            width: '157.71px',
-                                            boxSizing: 'border-box',
-                                            gap: '7px',
-                                            textDecoration: 'none'
-                                        }}
+                                        className="group"
+                                        style={{ display: 'flex', flexDirection: 'column', outline: 'none', flexShrink: 0, scrollSnapAlign: 'start', height: '147.09px', width: '157.71px', boxSizing: 'border-box', gap: '7px', textDecoration: 'none' }}
                                     >
                                         <div
-                                            className="rounded-lg flex items-center justify-center overflow-hidden transition-all duration-300"
                                             style={{
-                                                height: '120.09px',
-                                                width: '100%',
-                                                boxSizing: 'border-box',
-                                                border: isSubActive
-                                                    ? '2px solid hsla(47, 100%, 76%, 1)'
-                                                    : '2px solid hsla(0, 0%, 93%, 1)',
+                                                height: '120.09px', width: '100%', boxSizing: 'border-box',
+                                                border: isSubActive ? '2px solid hsla(47, 100%, 76%, 1)' : '2px solid hsla(0, 0%, 93%, 1)',
                                                 backgroundColor: isSubActive ? 'hsla(43,100%,95%,1)' : 'hsla(0, 0%, 100%, 1)',
-                                                boxShadow: '0px 1px 3px 0px hsla(0, 0%, 87%, 0.08), 0px 6px 6px 0px hsla(0, 0%, 87%, 0.07), 0px 13px 8px 0px hsla(0, 0%, 87%, 0.04), 0px 23px 9px 0px hsla(0, 0%, 87%, 0.01), 0px 36px 10px 0px hsla(0, 0%, 87%, 0)',
+                                                boxShadow: '0px 1px 3px 0px hsla(0, 0%, 87%, 0.08), 0px 6px 6px 0px hsla(0, 0%, 87%, 0.07)',
+                                                borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', transition: 'all 0.3s',
                                             }}
                                         >
-                                            <div className={`w-[100px] h-[100px] relative transform transition-transform duration-500 ${isSubActive ? 'scale-105' : 'group-hover:scale-105'}`}>
+                                            <div style={{ width: '100px', height: '100px', position: 'relative' }}>
                                                 {sub.image ? (
                                                     <Image src={sub.image} alt={sub.name} fill className="object-contain" sizes="100px" />
                                                 ) : (
-                                                    <div className="w-full h-full flex items-center justify-center">
-                                                        <FiPackage size={24} className="text-gray-300" />
+                                                    <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                                        <FiPackage size={24} style={{ color: '#d1d5db' }} />
                                                     </div>
                                                 )}
                                             </div>
                                         </div>
-                                        <p style={{ fontFamily: "'Mona Sans', sans-serif", fontWeight: 600, fontSize: '12px', lineHeight: '20px', letterSpacing: '-0.01em', color: '#1D1D1F' }} className="text-center transition-colors duration-300 w-full truncate">
+                                        <p style={{ fontFamily: "'Mona Sans', sans-serif", fontWeight: 600, fontSize: '12px', lineHeight: '20px', letterSpacing: '-0.01em', color: '#1D1D1F', textAlign: 'center', width: '100%', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', margin: 0 }}>
                                             {sub.name}
                                         </p>
                                     </Link>
@@ -230,97 +237,197 @@ export default function SubcategoryProductsPage({ subcategoryId, subcategoryName
                                     const slider = document.getElementById('subcat-slider-dynamic');
                                     if (slider) slider.scrollBy({ left: 300, behavior: 'smooth' });
                                 }}
-                                className="absolute right-0 top-[50%] translate-y-[-50%] flex items-center justify-center group/caret transition-all z-10 hidden md:flex hover:brightness-95 active:scale-95"
-                                style={{
-                                    width: '26px',
-                                    height: '40px',
-                                    borderRadius: '9px',
-                                    background: 'hsla(0, 0%, 93%, 1)',
-                                    boxShadow: '0px 0px 1px 0px hsla(0, 0%, 58%, 0.31), 0px 0px 1px 0px hsla(0, 0%, 58%, 0.18), 0px 0px 1px 0px hsla(0, 0%, 58%, 0.05), 0px 0px 1px 0px hsla(0, 0%, 58%, 0.01)',
-                                }}
+                                style={{ position: 'absolute', right: 0, top: '50%', transform: 'translateY(-50%)', width: '26px', height: '40px', borderRadius: '9px', background: 'hsla(0, 0%, 93%, 1)', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 10 }}
                             >
-                                <ChevronRightIcon className="w-4 h-4 text-gray-600 transition-colors" strokeWidth={2} />
+                                <ChevronRightIcon style={{ width: '16px', height: '16px', color: '#4b5563' }} strokeWidth={2} />
                             </button>
                         )}
                     </div>
                 </div>
             )}
 
-            {/* Main Content Area */}
+            {/* ── Mobile Sort / Filter Bar ── */}
+            {isMobile && (
+                <div style={{ borderTop: '1px solid #f3f4f6', borderBottom: '1px solid #f3f4f6' }}>
+                    <div style={{ display: 'flex' }}>
+                        <button
+                            onClick={() => setShowSortModal(true)}
+                            style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', padding: '12px 0', color: '#6b7280', fontSize: '14px', fontWeight: 500, background: 'none', border: 'none', cursor: 'pointer' }}
+                        >
+                            <ArrowsUpDownIcon style={{ width: '16px', height: '16px' }} />
+                            Sort By
+                        </button>
+                        <div style={{ width: '1px', background: '#e5e7eb', margin: '8px 0' }} />
+                        <button
+                            onClick={() => setShowFilterModal(true)}
+                            style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', padding: '12px 0', color: '#6b7280', fontSize: '14px', fontWeight: 500, background: 'none', border: 'none', cursor: 'pointer' }}
+                        >
+                            <FunnelIcon style={{ width: '16px', height: '16px' }} />
+                            Filter
+                        </button>
+                    </div>
+                </div>
+            )}
+
+            {/* ── Main Content Area ── */}
             <div
-                className="mx-auto flex flex-col max-w-[1200px] w-full px-4 md:px-8"
                 style={{
-                    paddingTop: '40px',
-                    paddingBottom: '40px',
-                    gap: '30px',
-                    minHeight: '2091px'
+                    maxWidth: '1200px', width: '100%', margin: '0 auto',
+                    padding: isMobile ? '16px 12px 40px' : '40px 32px 40px',
+                    display: 'flex', flexDirection: 'column', gap: '30px',
+                    minHeight: isMobile ? 'auto' : '2091px',
+                    boxSizing: 'border-box',
                 }}
             >
-                <h1
-                    style={{
-                        fontFamily: "'Mona Sans', sans-serif",
-                        fontWeight: 600,
-                        fontSize: '44px',
-                        lineHeight: '58px',
-                        letterSpacing: '-0.01em',
-                        color: 'hsla(0, 0%, 12%, 1)',
-                        maxWidth: '589px',
-                        opacity: 1,
-                    }}
-                >
-                    {subcategoryName}
-                </h1>
+                {/* Desktop title */}
+                {!isMobile && (
+                    <h1
+                        style={{
+                            fontFamily: "'Mona Sans', sans-serif",
+                            fontWeight: 600,
+                            fontSize: '44px',
+                            lineHeight: '58px',
+                            letterSpacing: '-0.01em',
+                            color: 'hsla(0, 0%, 12%, 1)',
+                            maxWidth: '589px',
+                            margin: 0,
+                        }}
+                    >
+                        {subcategoryName}
+                    </h1>
+                )}
 
-                <div className="flex w-full" style={{ gap: '30px' }}>
-                    <Sidebar
-                        selectedDuration={selectedDuration}
-                        setSelectedDuration={setSelectedDuration}
-                        selectedSort={selectedSort}
-                        setSelectedSort={setSelectedSort}
-                    />
-
-                <div className="flex-1">
-                    {/* Loading */}
-                    {loading && (
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-[24px]">
-                            {[1, 2, 3, 4, 5, 6].map((n) => (
-                                <div key={n} className="animate-pulse">
-                                    <div className="bg-gray-100 rounded-2xl aspect-4/3 mb-2" />
-                                    <div className="h-4 bg-gray-100 rounded w-3/4 mx-auto" />
-                                </div>
-                            ))}
-                        </div>
+                <div style={{ display: 'flex', width: '100%', gap: '30px' }}>
+                    {!isMobile && (
+                        <Sidebar
+                            selectedDuration={selectedDuration}
+                            setSelectedDuration={setSelectedDuration}
+                            selectedSort={selectedSort}
+                            setSelectedSort={setSelectedSort}
+                        />
                     )}
 
-                    {/* Error */}
-                    {!loading && error && (
-                        <div className="text-center py-16">
-                            <p className="text-gray-500 text-sm">{error}</p>
-                            <button onClick={() => window.location.reload()} className="mt-4 px-4 py-2 bg-gray-900 text-white rounded-lg text-sm hover:bg-gray-800">Retry</button>
-                        </div>
-                    )}
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                        {/* Loading skeleton */}
+                        {loading && (
+                            <div style={{ display: 'grid', gridTemplateColumns: isMobile ? 'repeat(2, minmax(0, 1fr))' : 'repeat(3, minmax(0, 1fr))', gap: isMobile ? '8px' : '24px' }}>
+                                {[1, 2, 3, 4, 5, 6].map((n) => (
+                                    <div key={n} style={{ animation: 'pulse 2s infinite' }}>
+                                        <div style={{ background: '#f3f4f6', borderRadius: '16px', aspectRatio: '1/1', marginBottom: '8px' }} />
+                                        <div style={{ height: '16px', background: '#f3f4f6', borderRadius: '4px', width: '75%', margin: '0 auto' }} />
+                                    </div>
+                                ))}
+                            </div>
+                        )}
 
-                    {/* Empty or Results */}
-                    {!loading && !error && processedProducts.length === 0 ? (
-                        <div className="text-center py-20">
-                            <FiPackage size={48} className="mx-auto text-gray-300 mb-4" />
-                            <h2 className="text-lg font-semibold text-gray-700">No products available</h2>
-                        </div>
-                    ) : (
-                        !loading && !error && (
+                        {/* Error */}
+                        {!loading && error && (
+                            <div style={{ textAlign: 'center', padding: '64px 0' }}>
+                                <p style={{ color: '#6b7280', fontSize: '14px' }}>{error}</p>
+                                <button onClick={() => window.location.reload()} style={{ marginTop: '16px', padding: '8px 16px', background: '#111827', color: 'white', borderRadius: '8px', fontSize: '14px', border: 'none', cursor: 'pointer' }}>Retry</button>
+                            </div>
+                        )}
+
+                        {/* Empty */}
+                        {!loading && !error && processedProducts.length === 0 && (
+                            <div style={{ textAlign: 'center', padding: '80px 0' }}>
+                                <FiPackage size={48} style={{ margin: '0 auto 16px', color: '#d1d5db', display: 'block' }} />
+                                <h2 style={{ fontSize: '18px', fontWeight: 600, color: '#374151' }}>No products available</h2>
+                            </div>
+                        )}
+
+                        {/* Products grid */}
+                        {!loading && !error && processedProducts.length > 0 && (
                             <>
-                                <p className="text-xs text-gray-400 mb-6 font-sans uppercase tracking-widest">{processedProducts.length} PRODUCTS FOUND</p>
-                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-[30px]">
+                                {!isMobile && (
+                                    <p style={{ fontSize: '12px', color: '#9ca3af', marginBottom: '24px', fontFamily: "'Mona Sans', sans-serif", textTransform: 'uppercase', letterSpacing: '0.1em' }}>
+                                        {processedProducts.length} PRODUCTS FOUND
+                                    </p>
+                                )}
+
+                                <div style={{ display: 'grid', gridTemplateColumns: isMobile ? 'repeat(2, minmax(0, 1fr))' : 'repeat(3, minmax(0, 1fr))', gap: isMobile ? '8px' : '30px' }}>
                                     {processedProducts.map((product) => (
-                                        <ProductCard key={product.id} product={product} />
+                                        <ProductCard key={product.id} product={product} mobile={isMobile} />
                                     ))}
                                 </div>
+
+                                {isMobile && (
+                                    <p style={{ fontSize: '12px', color: '#9ca3af', marginTop: '16px', textAlign: 'right' }}>
+                                        {processedProducts.length} products
+                                    </p>
+                                )}
                             </>
-                        )
-                    )}
-                </div>
+                        )}
+                    </div>
                 </div>
             </div>
+
+            {/* ── Mobile Sort Bottom Sheet ── */}
+            {showSortModal && isMobile && (
+                <div style={{ position: 'fixed', inset: 0, zIndex: 50, display: 'flex', alignItems: 'flex-end' }}>
+                    <div className="absolute inset-0 bg-black/40" onClick={() => setShowSortModal(false)} />
+                    <div className="relative w-full bg-white rounded-t-2xl px-5 pt-5 pb-10 shadow-2xl">
+                        <div className="flex items-center justify-between mb-5">
+                            <h2 className="text-base font-semibold" style={{ fontFamily: "'Mona Sans', sans-serif" }}>Sort By</h2>
+                            <button onClick={() => setShowSortModal(false)} className="p-1 rounded-full hover:bg-gray-100">
+                                <XMarkIcon className="w-5 h-5 text-gray-500" />
+                            </button>
+                        </div>
+                        {["Most Popular", "Price (low to high)", "Price (high to low)", "New Arrivals"].map(option => (
+                            <button
+                                key={option}
+                                onClick={() => { setSelectedSort(option); setShowSortModal(false); }}
+                                className="w-full flex items-center gap-3 py-3.5 border-b border-gray-100 last:border-0"
+                            >
+                                <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 ${selectedSort === option ? 'border-black' : 'border-gray-300'}`}>
+                                    {selectedSort === option && <div className="w-2.5 h-2.5 rounded-full bg-black" />}
+                                </div>
+                                <span className={`text-sm ${selectedSort === option ? 'font-semibold text-black' : 'text-gray-700'}`}>
+                                    {option}
+                                </span>
+                            </button>
+                        ))}
+                    </div>
+                </div>
+            )}
+
+            {/* ── Mobile Filter Bottom Sheet ── */}
+            {showFilterModal && isMobile && (
+                <div style={{ position: 'fixed', inset: 0, zIndex: 50, display: 'flex', alignItems: 'flex-end' }}>
+                    <div className="absolute inset-0 bg-black/40" onClick={() => setShowFilterModal(false)} />
+                    <div className="relative w-full bg-white rounded-t-2xl px-5 pt-5 pb-10 shadow-2xl">
+                        <div className="flex items-center justify-between mb-5">
+                            <h2 className="text-base font-semibold" style={{ fontFamily: "'Mona Sans', sans-serif" }}>Filter</h2>
+                            <button onClick={() => setShowFilterModal(false)} className="p-1 rounded-full hover:bg-gray-100">
+                                <XMarkIcon className="w-5 h-5 text-gray-500" />
+                            </button>
+                        </div>
+                        <h3 className="text-xs font-bold text-orange-500 uppercase tracking-wider mb-3">Rent For</h3>
+                        <div className="grid grid-cols-3 gap-2 mb-6">
+                            {["1 month", "3 months", "6 months", "9 months", "18 months", "24 months"].map(duration => (
+                                <button
+                                    key={duration}
+                                    onClick={() => setSelectedDuration(duration)}
+                                    className={`py-2 px-3 rounded-lg border text-xs font-semibold transition-all ${
+                                        selectedDuration === duration
+                                            ? 'border-black text-black bg-gray-50'
+                                            : 'border-gray-300 text-gray-600'
+                                    }`}
+                                >
+                                    {duration}
+                                </button>
+                            ))}
+                        </div>
+                        <button
+                            onClick={() => setShowFilterModal(false)}
+                            className="w-full py-3 rounded-full text-sm font-semibold text-gray-900"
+                            style={{ background: 'hsla(44,100%,64%,1)' }}
+                        >
+                            Apply Filters
+                        </button>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }

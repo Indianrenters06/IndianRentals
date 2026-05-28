@@ -10,6 +10,14 @@ export default function ProductsPage() {
     const [selectedDuration, setSelectedDuration] = useState("3 months");
     const [selectedSort, setSelectedSort] = useState("Most Popular");
     const [cmsConfig, setCmsConfig] = useState({ title: "Most Rented Products" });
+    const [isMobile, setIsMobile] = useState(true);
+
+    useEffect(() => {
+        const check = () => setIsMobile(window.innerWidth < 1024);
+        check();
+        window.addEventListener('resize', check);
+        return () => window.removeEventListener('resize', check);
+    }, []);
 
     useEffect(() => {
         const fetchCMSAndProducts = async () => {
@@ -167,9 +175,9 @@ export default function ProductsPage() {
                                     <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-500" />
                                 </div>
                             ) : (
-                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-[30px] justify-items-center sm:justify-items-start">
+                                <div className={`grid gap-[30px] ${isMobile ? 'grid-cols-2 gap-[8px]' : 'grid-cols-2 lg:grid-cols-3'}`}>
                                     {processedProducts.map((product, idx) => (
-                                        <ProductCard key={`${product.id}-${idx}`} product={product} />
+                                        <ProductCard key={`${product.id}-${idx}`} product={product} mobile={isMobile} />
                                     ))}
                                 </div>
                             )}

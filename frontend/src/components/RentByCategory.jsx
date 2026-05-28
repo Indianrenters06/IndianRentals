@@ -60,68 +60,64 @@ const RentByCategory = () => {
             try {
                 const rawData = await getCategories();
 
-                // Flatten categories to include both parents and subcategories
-                let data = [];
+                // Preferred subcategory names in display order
+                const preferredSubNames = [
+                    "MacBook", "DSLR", "All In One", "iPad", "SmartPhone", "Desktop",
+                    "iPhone", "MacBook Pro", "Camera"
+                ];
+
+                // Pick up to 2 subcategories per parent (preferred names first)
+                let selectedCategories = [];
                 if (Array.isArray(rawData)) {
                     rawData.forEach(parent => {
-                        const parentSlug = parent.slug || parent.name.toLowerCase().replace(/\s+/g, '-');
-                        data.push({ ...parent, calculatedRoute: `/category/${parentSlug}` });
+                        const subs = parent.subcategories || [];
+                        if (subs.length === 0) return;
 
-                        if (parent.subcategories && Array.isArray(parent.subcategories)) {
-                            parent.subcategories.forEach(sub => {
-                                const subSlug = sub.slug || sub.name.toLowerCase().replace(/\s+/g, '-');
-                                // Pass subId parameter to support the DynamicCategoryPage layout logic
-                                data.push({ ...sub, calculatedRoute: `/category/${parentSlug}/${subSlug}?subId=${sub._id}` });
+                        const parentSlug = parent.slug || parent.name.toLowerCase().replace(/\s+/g, '-');
+
+                        // Sort subs by preferred name rank
+                        const ranked = [...subs].sort((a, b) => {
+                            const aIdx = preferredSubNames.findIndex(n => a.name.toLowerCase().includes(n.toLowerCase()));
+                            const bIdx = preferredSubNames.findIndex(n => b.name.toLowerCase().includes(n.toLowerCase()));
+                            return (aIdx === -1 ? 999 : aIdx) - (bIdx === -1 ? 999 : bIdx);
+                        });
+
+                        // Take top 2 from each parent
+                        ranked.slice(0, 2).forEach(picked => {
+                            const subSlug = picked.slug || picked.name.toLowerCase().replace(/\s+/g, '-');
+                            selectedCategories.push({
+                                ...picked,
+                                calculatedRoute: `/category/${parentSlug}/${subSlug}?subId=${picked._id}`
                             });
-                        }
+                        });
                     });
                 }
 
-                // Define the specific order requested
-                const targetOrder = ["MacBook", "DSLR", "All In One", "iPad", "SmartPhone", "Desktop"];
+                // Sort by preferred order, append the rest, limit to 9
+                let matched = preferredSubNames.map(name =>
+                    selectedCategories.find(c => c.name.toLowerCase().includes(name.toLowerCase())) || null
+                ).filter(Boolean);
 
-                // 1. Strict Match
-                let sortedCategories = targetOrder.map(name => {
-                    const found = data.find(c => c.name.toLowerCase() === name.toLowerCase());
-                    if (found) {
-                        // Override name with the target name for consistent casing/manrope look
-                        return { ...found, name };
-                    }
-                    return null;
-                }).filter(item => item !== null);
+                const matchedIds = new Set(matched.map(c => c._id));
+                const rest = selectedCategories.filter(c => !matchedIds.has(c._id));
 
-                // 2. Loose Match (if strict match yields nothing)
-                if (sortedCategories.length === 0 && data.length > 0) {
-                    sortedCategories = targetOrder.map(name => {
-                        const found = data.find(c => c.name.toLowerCase().includes(name.toLowerCase()));
-                        if (found) {
-                            return { ...found, name };
-                        }
-                        return null;
-                    }).filter(item => item !== null);
-                }
-                // ... (rest of search logic)
-                // Deduplicate based on ID
-                sortedCategories = Array.from(new Map(sortedCategories.map(item => [item._id, item])).values());
+                let sortedCategories = Array.from(
+                    new Map([...matched, ...rest].map(c => [c._id, c])).values()
+                ).slice(0, 9);
 
-                // Clean up dummy images and provide high-quality local fallbacks
+                // Use DB image if available, otherwise fall back to local assets
                 sortedCategories = sortedCategories.map(cat => {
-                    const lowerName = cat.name.toLowerCase();
                     const hasDatabaseImage = cat.image && cat.image.length > 5 && !cat.image.includes('unsplash') && !cat.image.includes('placeholder');
+                    if (hasDatabaseImage) return cat;
 
-                    // If database has an image, use it! 
-                    // No more hardcoded overrides for MacBook etc.
-                    if (hasDatabaseImage) {
-                        return cat;
-                    }
-
-                    // Fallbacks for empty database images
+                    const lowerName = cat.name.toLowerCase();
                     if (lowerName.includes('macbook')) return { ...cat, image: "https://res.cloudinary.com/dpu9ikeqe/image/upload/v1769200258/WhatsApp_Image_2026-01-23_at_23.58._j7jcoq.jpg" };
                     if (lowerName.includes('ipad')) return { ...cat, image: '/ipad-new.jpg' };
+                    if (lowerName.includes('iphone')) return { ...cat, image: '/ipad-new.jpg' };
                     if (lowerName.includes('desktop')) return { ...cat, image: '/mac-pro-new.jpg' };
                     if (lowerName.includes('all in one')) return { ...cat, image: '/it-products-new.jpg' };
                     if (lowerName.includes('dslr') || lowerName.includes('camera')) return { ...cat, image: '/office-equipment-new.jpg' };
-
+                    if (lowerName.includes('smartphone') || lowerName.includes('phone')) return { ...cat, image: '/ipad-new.jpg' };
                     return cat;
                 });
 
@@ -150,10 +146,9 @@ const RentByCategory = () => {
         const lowerName = name.toLowerCase();
         if (lowerName.includes('macbook')) return <Laptop size={40} weight="fill" />;
         if (lowerName.includes('dslr') || lowerName.includes('camera')) return <Camera size={40} weight="fill" />;
-        if (lowerName.includes('all in one')) return <Desktop size={40} weight="fill" />;
-        if (lowerName.includes('ipad')) return <DeviceTablet size={40} weight="fill" />;
+        if (lowerName.includes('all in one') || lowerName.includes('desktop')) return <Desktop size={40} weight="fill" />;
+        if (lowerName.includes('ipad') || lowerName.includes('tablet')) return <DeviceTablet size={40} weight="fill" />;
         if (lowerName.includes('smartphone') || lowerName.includes('phone')) return <DeviceMobile size={40} weight="fill" />;
-        if (lowerName.includes('desktop')) return <Desktop size={40} weight="fill" />;
         return <Laptop size={40} weight="fill" />;
     };
 

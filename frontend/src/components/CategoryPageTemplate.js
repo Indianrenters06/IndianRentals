@@ -1,6 +1,7 @@
 "use client";
 import React, { useState, useEffect } from 'react';
 import { FaChevronDown, FaArrowLeft } from 'react-icons/fa';
+import { ArrowLeft } from '@phosphor-icons/react';
 import { ChevronRightIcon } from '@heroicons/react/24/outline';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
@@ -47,8 +48,16 @@ const CategoryPageTemplate = ({ productNamePrefix, productDescription, basePrice
 
     const [selectedDuration, setSelectedDuration] = useState("3 months");
     const [selectedSort, setSelectedSort] = useState("Most Popular");
+    const [isMobile, setIsMobile] = useState(true);
 
     const activeCatSlug = getActiveSlug(title);
+
+    useEffect(() => {
+        const check = () => setIsMobile(window.innerWidth < 1024);
+        check();
+        window.addEventListener('resize', check);
+        return () => window.removeEventListener('resize', check);
+    }, []);
 
     useEffect(() => {
         setIsClient(true);
@@ -177,110 +186,145 @@ const CategoryPageTemplate = ({ productNamePrefix, productDescription, basePrice
     return (
         <div className="min-h-screen bg-white">
 
-            {/* ── Figma Nav Bar: full-width grey-50, 62px, breadcrumb + category pills ── */}
-            <div style={{ width: '100%', background: 'hsla(0, 0%, 96%, 1)', height: '62px' }}>
-                <div
-                    style={{
-                        maxWidth: '1200px',
-                        width: '100%',
-                        height: '62px',
-                        margin: '0 auto',
-                        padding: '0 32px',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'space-between',
-                        gap: '10px',
-                        boxSizing: 'border-box',
-                    }}
-                >
-                    {/* Breadcrumb */}
-                    <div style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '8px',
-                        fontSize: '12px',
-                        fontWeight: 500,
-                        color: '#64748B',
-                        whiteSpace: 'nowrap',
-                        overflow: 'hidden',
-                    }}>
-                        <Link href="/" style={{ color: 'inherit', textDecoration: 'none' }} className="hover:text-black transition-colors">
-                            Homepage
-                        </Link>
-                        <span style={{ color: '#9CA3AF' }}>›</span>
-                        <Link href="/categories" style={{ color: 'inherit', textDecoration: 'none' }} className="hover:text-black transition-colors">
-                            All Categories
-                        </Link>
-                        <span style={{ color: '#9CA3AF' }}>›</span>
-                        {activeCatSlug && (
-                            <>
-                                <Link
-                                    href={`/category/${activeCatSlug}`}
-                                    style={{ color: 'inherit', textDecoration: 'none' }}
-                                    className="hover:text-black transition-colors"
-                                >
-                                    {CATEGORY_PILLS.find(p => p.slug === activeCatSlug)?.label || activeCatSlug}
-                                </Link>
-                                <span style={{ color: '#9CA3AF' }}>›</span>
-                            </>
-                        )}
-                        <span style={{ color: '#1D1D1F', fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '220px' }}>
-                            {title}
-                        </span>
-                    </div>
+            {/* ── Mobile: pills-only in 3+2 grid (hidden on lg+) ── */}
+            <div className="block lg:hidden" style={{ width: '100%', background: 'hsla(0, 0%, 96%, 1)', padding: '10px 14px', borderBottom: '1px solid hsla(0, 0%, 93%, 1)', boxSizing: 'border-box' }}>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', justifyContent: 'center' }}>
+                    {CATEGORY_PILLS.map((cat) => {
+                        const isActive = activeCatSlug === cat.slug;
+                        return (
+                            <Link
+                                key={cat.slug}
+                                href={`/category/${cat.slug}`}
+                                style={{
+                                    flex: '0 0 calc((100% - 16px) / 3)',
+                                    height: '34px',
+                                    borderRadius: '68px',
+                                    border: isActive ? '1px solid hsla(44, 100%, 64%, 1)' : '1px solid hsla(0, 0%, 89%, 1)',
+                                    background: isActive ? 'hsla(43, 100%, 95%, 1)' : 'hsla(0, 0%, 100%, 1)',
+                                    textDecoration: 'none',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    transition: 'all 0.15s',
+                                    boxSizing: 'border-box',
+                                    overflow: 'hidden',
+                                }}
+                            >
+                                <span style={{ fontFamily: "'Mona Sans', sans-serif", fontWeight: 600, fontSize: '11px', lineHeight: '16px', letterSpacing: '-0.01em', color: 'hsla(0, 0%, 0%, 1)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', padding: '0 6px' }}>
+                                    {cat.label}
+                                </span>
+                            </Link>
+                        );
+                    })}
+                </div>
+            </div>
 
-                    {/* Category filter pills */}
+            {/* ── Desktop: Figma Nav Bar — breadcrumb + pills in one row (hidden below lg) ── */}
+            <div className="hidden lg:block">
+                <div style={{ width: '100%', background: 'hsla(0, 0%, 96%, 1)', height: '62px' }}>
                     <div
                         style={{
+                            maxWidth: '1200px',
+                            width: '100%',
+                            height: '62px',
+                            margin: '0 auto',
+                            padding: '0 32px',
                             display: 'flex',
                             alignItems: 'center',
-                            gap: '8px',
-                            height: '62px',
-                            paddingTop: '12px',
-                            paddingBottom: '12px',
-                            borderBottom: '1px solid hsla(0, 0%, 93%, 1)',
-                            flexShrink: 0,
+                            justifyContent: 'space-between',
+                            gap: '10px',
                             boxSizing: 'border-box',
                         }}
                     >
-                        {CATEGORY_PILLS.map((cat) => {
-                            const isActive = activeCatSlug === cat.slug;
-                            return (
-                                <Link
-                                    key={cat.slug}
-                                    href={`/category/${cat.slug}`}
-                                    style={{
-                                        height: '38px',
-                                        padding: '8px 16px',
-                                        borderRadius: '68px',
-                                        border: isActive
-                                            ? '1px solid hsla(44, 100%, 64%, 1)'
-                                            : '1px solid hsla(0, 0%, 89%, 1)',
-                                        background: isActive
-                                            ? 'hsla(43, 100%, 95%, 1)'
-                                            : 'hsla(0, 0%, 100%, 1)',
-                                        textDecoration: 'none',
-                                        whiteSpace: 'nowrap',
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        justifyContent: 'center',
-                                        transition: 'all 0.15s',
-                                        boxSizing: 'border-box',
-                                    }}
-                                >
-                                    <span style={{
-                                        fontFamily: "'Mona Sans', sans-serif",
-                                        fontWeight: 600,
-                                        fontSize: '14px',
-                                        lineHeight: '20px',
-                                        letterSpacing: '-0.01em',
-                                        color: 'hsla(0, 0%, 0%, 1)',
-                                    }}>
-                                        {cat.label}
-                                    </span>
-                                </Link>
-                            );
-                        })}
+                        {/* Breadcrumb */}
+                        <div style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '8px',
+                            fontSize: '12px',
+                            fontWeight: 500,
+                            color: '#64748B',
+                            whiteSpace: 'nowrap',
+                            overflow: 'hidden',
+                        }}>
+                            <Link href="/" style={{ color: 'inherit', textDecoration: 'none' }} className="hover:text-black transition-colors">
+                                Homepage
+                            </Link>
+                            <span style={{ color: '#9CA3AF' }}>›</span>
+                            <Link href="/categories" style={{ color: 'inherit', textDecoration: 'none' }} className="hover:text-black transition-colors">
+                                All Categories
+                            </Link>
+                            <span style={{ color: '#9CA3AF' }}>›</span>
+                            {activeCatSlug && (
+                                <>
+                                    <Link
+                                        href={`/category/${activeCatSlug}`}
+                                        style={{ color: 'inherit', textDecoration: 'none' }}
+                                        className="hover:text-black transition-colors"
+                                    >
+                                        {CATEGORY_PILLS.find(p => p.slug === activeCatSlug)?.label || activeCatSlug}
+                                    </Link>
+                                    <span style={{ color: '#9CA3AF' }}>›</span>
+                                </>
+                            )}
+                            <span style={{ color: '#1D1D1F', fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '220px' }}>
+                                {title}
+                            </span>
+                        </div>
+
+                        {/* Category filter pills */}
+                        <div
+                            style={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '8px',
+                                height: '62px',
+                                paddingTop: '12px',
+                                paddingBottom: '12px',
+                                borderBottom: '1px solid hsla(0, 0%, 93%, 1)',
+                                flexShrink: 0,
+                                boxSizing: 'border-box',
+                            }}
+                        >
+                            {CATEGORY_PILLS.map((cat) => {
+                                const isActive = activeCatSlug === cat.slug;
+                                return (
+                                    <Link
+                                        key={cat.slug}
+                                        href={`/category/${cat.slug}`}
+                                        style={{
+                                            height: '38px',
+                                            padding: '8px 16px',
+                                            borderRadius: '68px',
+                                            border: isActive
+                                                ? '1px solid hsla(44, 100%, 64%, 1)'
+                                                : '1px solid hsla(0, 0%, 89%, 1)',
+                                            background: isActive
+                                                ? 'hsla(43, 100%, 95%, 1)'
+                                                : 'hsla(0, 0%, 100%, 1)',
+                                            textDecoration: 'none',
+                                            whiteSpace: 'nowrap',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            justifyContent: 'center',
+                                            transition: 'all 0.15s',
+                                            boxSizing: 'border-box',
+                                        }}
+                                    >
+                                        <span style={{
+                                            fontFamily: "'Mona Sans', sans-serif",
+                                            fontWeight: 600,
+                                            fontSize: '14px',
+                                            lineHeight: '20px',
+                                            letterSpacing: '-0.01em',
+                                            color: 'hsla(0, 0%, 0%, 1)',
+                                        }}>
+                                            {cat.label}
+                                        </span>
+                                    </Link>
+                                );
+                            })}
+                        </div>
                     </div>
                 </div>
             </div>
@@ -401,10 +445,24 @@ const CategoryPageTemplate = ({ productNamePrefix, productDescription, basePrice
                     paddingTop: '40px',
                     paddingBottom: '40px',
                     gap: '30px',
-                    minHeight: '2091px'
                 }}
             >
+                {/* Mobile: back arrow + title */}
+                <div className="flex lg:hidden items-center gap-3">
+                    <button
+                        onClick={() => router.back()}
+                        style={{ flexShrink: 0, width: '36px', height: '36px', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', background: 'none', border: 'none', cursor: 'pointer' }}
+                    >
+                        <ArrowLeft size={32} color="#1f2937" />
+                    </button>
+                    <h1 style={{ fontFamily: "'Mona Sans', sans-serif", fontWeight: 600, fontSize: '24px', lineHeight: '1.2', letterSpacing: '-0.01em', color: 'hsla(0, 0%, 12%, 1)', margin: 0 }}>
+                        {title}
+                    </h1>
+                </div>
+
+                {/* Desktop title */}
                 <h1
+                    className="hidden lg:block"
                     style={{
                         fontFamily: "'Mona Sans', sans-serif",
                         fontWeight: 600,
@@ -420,17 +478,19 @@ const CategoryPageTemplate = ({ productNamePrefix, productDescription, basePrice
                 </h1>
 
                 <div className="flex w-full relative" style={{ gap: '30px' }}>
-                    <Sidebar
-                        selectedDuration={selectedDuration}
-                        setSelectedDuration={setSelectedDuration}
-                        selectedSort={selectedSort}
-                        setSelectedSort={setSelectedSort}
-                    />
-                    <div className="flex-1 mt-0">
+                    <div className="hidden lg:block">
+                        <Sidebar
+                            selectedDuration={selectedDuration}
+                            setSelectedDuration={setSelectedDuration}
+                            selectedSort={selectedSort}
+                            setSelectedSort={setSelectedSort}
+                        />
+                    </div>
+                    <div className="flex-1 mt-0" style={{ minWidth: 0 }}>
 
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-[30px]">
+                    <div className={`grid ${isMobile ? 'grid-cols-2 gap-[8px]' : 'grid-cols-2 lg:grid-cols-3 gap-[30px]'}`}>
                         {processedProducts.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage).map((product) => (
-                            <ProductCard key={product.id} product={product} />
+                            <ProductCard key={product.id} product={product} mobile={isMobile} />
                         ))}
                     </div>
                     {processedProducts.length > itemsPerPage && (

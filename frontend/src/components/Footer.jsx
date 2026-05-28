@@ -138,50 +138,50 @@ const Footer = () => {
             </footer>
 
             {/* ── Mobile Footer ── */}
-            <footer 
-                className={`${viewType === 'mobile' ? 'block' : 'hidden'} w-full font-sans overflow-hidden`}
-                style={{ 
-                    background: 'hsla(0, 0%, 96%, 1)', 
+            <footer
+                className={`${viewType === 'mobile' ? 'block' : 'hidden'} w-full font-sans`}
+                style={{
+                    background: 'hsla(0, 0%, 96%, 1)',
                     borderTop: '1px solid hsla(0, 0%, 89%, 1)',
                     paddingTop: '36px',
-                    paddingBottom: '24px',
-                    minHeight: '575px'
+                    paddingBottom: '32px',
                 }}
             >
-                <div className="mx-auto" style={{ width: '350px' }}>
+                <div className="mx-auto w-full max-w-[390px] px-5">
                     {/* Logo Area */}
-                    <div className="flex flex-col mb-8" style={{ width: '137px', gap: '10px' }}>
+                    <div className="flex flex-col mb-8" style={{ gap: '10px' }}>
                         <Link href="/" className="inline-block">
-                            <Image src={siteLogo} alt={siteName} width={137} height={40} className="h-[40px] w-auto object-contain" />
+                            <Image src={siteLogo} alt={siteName} width={160} height={44} className="h-[44px] w-auto object-contain" />
                         </Link>
-                        <p className="text-[#1D1D1F] text-[10px] font-medium leading-none tracking-tight">
+                        <p className="text-[#1D1D1F] text-[12px] font-medium leading-snug tracking-tight">
                             {settings?.footerDescription || "Rent Anything, Anytime, Anywhere"}
                         </p>
                     </div>
+
                     {/* Primary Links */}
-                    <div className="flex flex-col mb-8" style={{ gap: '8px' }}>
-                        <Link href="/about" className="text-black font-semibold text-[14px] leading-tight transition-opacity hover:opacity-70">About Us</Link>
-                        <Link href="/rental-process" className="text-black font-semibold text-[14px] leading-tight transition-opacity hover:opacity-70">How It Works</Link>
-                        <Link href="/careers" className="text-black font-semibold text-[14px] leading-tight transition-opacity hover:opacity-70">Jobs &amp; Careers</Link>
-                        <Link href="/contact" className="text-black font-semibold text-[14px] leading-tight transition-opacity hover:opacity-70">Contact</Link>
-                        <Link href="/b2b" className="text-black font-semibold text-[14px] leading-tight transition-opacity hover:opacity-70">IndianRenters (B2B Link)</Link>
+                    <div className="flex flex-col mb-8" style={{ gap: '12px' }}>
+                        <Link href="/about" className="text-black font-bold text-[15px] leading-tight transition-opacity hover:opacity-70">About Us</Link>
+                        <Link href="/rental-process" className="text-black font-bold text-[15px] leading-tight transition-opacity hover:opacity-70">How It Works</Link>
+                        <Link href="/careers" className="text-black font-bold text-[15px] leading-tight transition-opacity hover:opacity-70">Jobs &amp; Careers</Link>
+                        <Link href="/contact" className="text-black font-bold text-[15px] leading-tight transition-opacity hover:opacity-70">Contact</Link>
+                        <Link href="/b2b" className="text-black font-bold text-[15px] leading-tight transition-opacity hover:opacity-70">IndianRenters (B2B Link)</Link>
                     </div>
 
                     <div className="h-[1px] w-full bg-[#E5E5EA] mb-8"></div>
 
                     {/* Secondary Links */}
-                    <div className="grid grid-cols-2 mb-8" style={{ gap: '24px' }}>
+                    <div className="grid grid-cols-2 mb-8" style={{ gap: '20px' }}>
                         <div className="flex flex-col gap-3 text-black text-[13px] font-medium tracking-tight">
                             <Link href="/kyc-policy" className="hover:opacity-70">KYC Policy</Link>
                             <Link href="/shipping-policy" className="hover:opacity-70">Shipping Policy</Link>
                             <Link href="/return-policy" className="hover:opacity-70">Return Policy</Link>
                             <Link href="/privacy" className="hover:opacity-70">Privacy Policy</Link>
-                            <Link href="/terms" className="hover:opacity-70">Rental Terms</Link>
+                            <Link href="/terms" className="hover:opacity-70">Rental Terms &amp; Conditions</Link>
                         </div>
                         <div className="flex flex-col gap-3 text-black text-[13px] font-medium tracking-tight">
                             <Link href="/faq" className="hover:opacity-70">FAQs</Link>
-                            <Link href="/ticket" className="hover:opacity-70">Raise Ticket</Link>
-                            <Link href="/reviews" className="hover:opacity-70">Reviews</Link>
+                            <Link href="/ticket" className="hover:opacity-70">Raise a Ticket</Link>
+                            <Link href="/reviews" className="hover:opacity-70">Customer Reviews</Link>
                             <Link href="/blog" className="hover:opacity-70">Blog</Link>
                         </div>
                     </div>
@@ -191,26 +191,31 @@ const Footer = () => {
                     {/* Socials */}
                     <div className="flex items-center gap-4 mb-8">
                         <a href={`https://wa.me/${sitePhone.replace(/[^\d]/g, '')}`} className="transition-opacity hover:opacity-70" target="_blank" rel="noopener noreferrer">
-                            <WhatsappLogo size={32} weight="fill" className="text-[#25D366]" />
+                            <WhatsappLogo size={40} weight="fill" className="text-[#25D366]" />
                         </a>
                         <a href={settings?.socialLinks?.facebook || "#"} className="transition-opacity hover:opacity-70">
-                            <FacebookLogo size={32} weight="fill" className="text-[#1877F2]" />
+                            <FacebookLogo size={40} weight="fill" className="text-[#1877F2]" />
                         </a>
                         <a href={settings?.socialLinks?.instagram || "#"} className="transition-opacity hover:opacity-70">
-                            <InstagramLogo size={32} weight="fill" className="text-[#E4405F]" />
+                            <InstagramLogo size={40} weight="fill" className="text-[#E4405F]" />
                         </a>
                         <a href={settings?.socialLinks?.linkedin || "#"} className="transition-opacity hover:opacity-70">
-                            <LinkedinLogo size={32} weight="fill" className="text-[#0A66C2]" />
+                            <LinkedinLogo size={40} weight="fill" className="text-[#0A66C2]" />
                         </a>
                     </div>
 
-                    <div className="flex flex-col gap-4 pt-4 border-t border-gray-100">
+                    <div className="h-[1px] w-full bg-[#E5E5EA] mb-6"></div>
+
+                    {/* Copyright + Payment */}
+                    <div className="flex flex-col gap-4">
                         <p className="text-[#86868B] text-[12px] font-medium">
                             © {currentYear} {copyrightName}. All Rights Reserved
                         </p>
-                        <div className="flex gap-2">
+                        <div className="flex items-center gap-2">
                             {paymentLogos.map((url, i) => (
-                                <img key={i} src={url} alt={`payment-${i}`} className="h-8 w-auto object-contain" />
+                                <div key={i} className="bg-white rounded-xl flex items-center justify-center" style={{ width: '54px', height: '36px', boxShadow: '0 1px 3px rgba(0,0,0,0.08)' }}>
+                                    <img src={url} alt={`payment-${i}`} className="h-5 w-auto object-contain" />
+                                </div>
                             ))}
                         </div>
                     </div>
