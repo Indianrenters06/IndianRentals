@@ -222,13 +222,20 @@ const FULL_ACCESS_ROLES = ['admin', 'super_admin'];
 const createTeamMember = asyncHandler(async (req, res) => {
     const { name, email, password, phone, role, adminPermissions } = req.body;
 
+    const finalRole = role || 'staff';
+
+    // Only super_admin can create another super_admin
+    if (finalRole === 'super_admin' && req.user.role !== 'super_admin') {
+        res.status(403);
+        throw new Error('Only Super Admin can assign the Super Admin role');
+    }
+
     const userExists = await User.findOne({ email });
     if (userExists) {
         res.status(400);
         throw new Error('User already exists');
     }
 
-    const finalRole = role || 'staff';
     const finalPermissions = FULL_ACCESS_ROLES.includes(finalRole) ? ALL_PERMISSIONS : (adminPermissions || []);
 
     const member = await User.create({
@@ -262,7 +269,19 @@ const updateTeamMember = asyncHandler(async (req, res) => {
         throw new Error('Team member not found');
     }
 
+    // Non-superadmin cannot edit a super_admin account
+    if (user.role === 'super_admin' && req.user.role !== 'super_admin') {
+        res.status(403);
+        throw new Error('Only Super Admin can edit a Super Admin account');
+    }
+
     const { name, email, password, phone, role, adminPermissions } = req.body;
+
+    // Non-superadmin cannot assign the super_admin role
+    if (role === 'super_admin' && req.user.role !== 'super_admin') {
+        res.status(403);
+        throw new Error('Only Super Admin can assign the Super Admin role');
+    }
 
     if (name) user.name = name;
     if (email) user.email = email;
@@ -297,6 +316,18 @@ const deleteTeamMember = asyncHandler(async (req, res) => {
     if (!user) {
         res.status(404);
         throw new Error('Team member not found');
+    }
+
+    // Non-superadmin cannot delete a super_admin account
+    if (user.role === 'super_admin' && req.user.role !== 'super_admin') {
+        res.status(403);
+        throw new Error('Only Super Admin can remove a Super Admin account');
+    }
+
+    // Prevent deleting yourself
+    if (user._id.toString() === req.user._id.toString()) {
+        res.status(400);
+        throw new Error('You cannot remove your own account');
     }
 
     await User.findByIdAndDelete(req.params.id);

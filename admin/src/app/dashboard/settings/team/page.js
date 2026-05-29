@@ -24,14 +24,23 @@ import {
   useDisclosure,
   Spinner
 } from "@heroui/react";
-import { Plus, PencilSimple, Trash, ShieldCheck, User, Phone, EnvelopeSimple, Lock } from "@phosphor-icons/react";
+import { Plus, PencilSimple, Trash, ShieldCheck, User, Phone, EnvelopeSimple, Lock, Crown } from "@phosphor-icons/react";
 import { toast } from "react-hot-toast";
+
+const getCurrentUserRole = () => {
+  try {
+    const info = typeof window !== "undefined" ? localStorage.getItem("adminInfo") : null;
+    return info ? JSON.parse(info)?.role : null;
+  } catch { return null; }
+};
 
 export default function TeamMembersPage() {
   const [teamMembers, setTeamMembers] = useState([]);
   const [roles, setRoles] = useState([]);
   const [loading, setLoading] = useState(true);
   const [sortDescriptor, setSortDescriptor] = useState({ column: "name", direction: "ascending" });
+  const currentUserRole = getCurrentUserRole();
+  const isSuperAdmin = currentUserRole === 'super_admin';
   const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isEdit, setIsEdit] = useState(false);
@@ -112,6 +121,10 @@ export default function TeamMembersPage() {
   };
 
   const handleEdit = (member) => {
+    if (member.role === 'super_admin' && !isSuperAdmin) {
+      toast.error("Only Super Admin can edit a Super Admin account");
+      return;
+    }
     setIsEdit(true);
     setEditId(member._id);
     setFormData({
@@ -168,6 +181,11 @@ export default function TeamMembersPage() {
   };
 
   const handleDeleteTeamMember = async (id) => {
+    const target = teamMembers.find(m => m._id === id);
+    if (target?.role === 'super_admin' && !isSuperAdmin) {
+      toast.error("Only Super Admin can remove a Super Admin account");
+      return;
+    }
     if (!confirm("Remove this team member?")) return;
     try {
       const token = localStorage.getItem("adminToken");
@@ -218,59 +236,82 @@ export default function TeamMembersPage() {
             emptyContent={loading ? <Spinner /> : "No team members found"}
             items={sortedMembers}
           >
-            {(item) => (
-              <TableRow key={item._id}>
-                <TableCell>
-                  <div className="flex flex-col">
-                    <span className="font-medium text-slate-900 dark:text-slate-100">{item.name}</span>
-                    <span className="text-xs text-slate-500">{item.email}</span>
-                  </div>
-                </TableCell>
-                <TableCell>
-                  <Chip size="sm" color={(item.role === 'admin' || item.role === 'super_admin') ? 'secondary' : 'primary'} variant="flat" className="capitalize">
-                    {item.role.replace('_', ' ')}
-                  </Chip>
-                </TableCell>
-                <TableCell>
-                  {(item.role === 'admin' || item.role === 'super_admin') ? (
-                    <span className="text-xs text-slate-500 italic">Full Access</span>
-                  ) : (
-                    <div className="flex gap-1 flex-wrap max-w-xs">
-                      {item.adminPermissions?.map((perm, idx) => (
-                        <Chip key={idx} size="sm" variant="faded" className="text-[10px] h-5 capitalize">
-                          {perm}
-                        </Chip>
-                      ))}
+            {(item) => {
+              const isTargetSuperAdmin = item.role === 'super_admin';
+              const canManage = isSuperAdmin || !isTargetSuperAdmin;
+              return (
+                <TableRow key={item._id}>
+                  <TableCell>
+                    <div className="flex flex-col">
+                      <div className="flex items-center gap-1.5">
+                        <span className="font-medium text-slate-900 dark:text-slate-100">{item.name}</span>
+                        {isTargetSuperAdmin && (
+                          <Crown size={13} weight="fill" className="text-amber-500" title="Super Admin" />
+                        )}
+                      </div>
+                      <span className="text-xs text-slate-500">{item.email}</span>
                     </div>
-                  )}
-                </TableCell>
-                <TableCell>
-                  <Chip size="sm" color="success" variant="dot">Active</Chip>
-                </TableCell>
-                <TableCell>
-                  <div className="flex items-center gap-2 justify-center">
-                    <Button 
-                      isIconOnly 
-                      size="sm" 
-                      variant="light" 
-                      className="text-slate-500 hover:text-indigo-500"
-                      onPress={() => handleEdit(item)}
+                  </TableCell>
+                  <TableCell>
+                    <Chip
+                      size="sm"
+                      color={isTargetSuperAdmin ? 'warning' : (item.role === 'admin') ? 'secondary' : 'primary'}
+                      variant="flat"
+                      className="capitalize"
                     >
-                      <PencilSimple className="w-4 h-4" />
-                    </Button>
-                    <Button 
-                      isIconOnly 
-                      size="sm" 
-                      variant="light" 
-                      className="text-slate-500 hover:text-red-500"
-                      onPress={() => handleDeleteTeamMember(item._id)}
-                    >
-                      <Trash className="w-4 h-4" />
-                    </Button>
-                  </div>
-                </TableCell>
-              </TableRow>
-            )}
+                      {item.role.replace('_', ' ')}
+                    </Chip>
+                  </TableCell>
+                  <TableCell>
+                    {(item.role === 'admin' || isTargetSuperAdmin) ? (
+                      <span className="text-xs text-slate-500 italic">Full Access</span>
+                    ) : (
+                      <div className="flex gap-1 flex-wrap max-w-xs">
+                        {item.adminPermissions?.map((perm, idx) => (
+                          <Chip key={idx} size="sm" variant="faded" className="text-[10px] h-5 capitalize">
+                            {perm}
+                          </Chip>
+                        ))}
+                      </div>
+                    )}
+                  </TableCell>
+                  <TableCell>
+                    <Chip size="sm" color="success" variant="dot">Active</Chip>
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex items-center gap-2 justify-center">
+                      {canManage ? (
+                        <>
+                          <Button
+                            isIconOnly
+                            size="sm"
+                            variant="light"
+                            className="text-slate-500 hover:text-indigo-500"
+                            onPress={() => handleEdit(item)}
+                          >
+                            <PencilSimple className="w-4 h-4" />
+                          </Button>
+                          <Button
+                            isIconOnly
+                            size="sm"
+                            variant="light"
+                            className="text-slate-500 hover:text-red-500"
+                            onPress={() => handleDeleteTeamMember(item._id)}
+                          >
+                            <Trash className="w-4 h-4" />
+                          </Button>
+                        </>
+                      ) : (
+                        <div className="flex items-center gap-1.5 text-xs text-amber-600 dark:text-amber-400 font-semibold px-2 py-1 rounded-lg bg-amber-50 dark:bg-amber-500/10">
+                          <Crown size={12} weight="fill" />
+                          Protected
+                        </div>
+                      )}
+                    </div>
+                  </TableCell>
+                </TableRow>
+              );
+            }}
           </TableBody>
         </Table>
       </Card>
@@ -341,9 +382,9 @@ export default function TeamMembersPage() {
                 </div>
 
                 <div className="mt-4">
-                  <Select 
-                    label="Assign Role" 
-                    variant="bordered" 
+                  <Select
+                    label="Assign Role"
+                    variant="bordered"
                     radius="xl"
                     isRequired
                     selectedKeys={[formData.role]}
@@ -365,7 +406,7 @@ export default function TeamMembersPage() {
                     }}
                     description="Roles automatically determine which dashboard sections are accessible."
                   >
-                    {roles.map((role) => (
+                    {roles.filter(r => isSuperAdmin || r.id !== 'super_admin').map((role) => (
                       <SelectItem key={role.id} value={role.id} textValue={role.name}>
                         <div className="flex flex-col">
                           <span className="font-semibold">{role.name}</span>
