@@ -118,7 +118,7 @@ export default function GeneralSettings() {
 
                     {/* ── Platform Identity ── */}
                     <p className="text-xs font-bold uppercase tracking-widest text-indigo-500 flex items-center gap-2">
-                        <Globe weight="bold" /> Platform Identity
+                        <Globe size={14} weight="bold" /> Platform Identity
                     </p>
                     <p className="text-xs text-slate-400 -mt-4">
                         These values are used across the Navbar, Footer, PDF invoices, and email templates automatically.
@@ -132,7 +132,7 @@ export default function GeneralSettings() {
                             onValueChange={v => set("siteName", v)}
                             variant="bordered"
                             radius="xl"
-                            startContent={<Globe className="text-slate-400" />}
+                            startContent={<Globe size={16} className="text-slate-400 shrink-0" />}
                             classNames={{ inputWrapper: "bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 h-[60px]" }}
                             description="Shown in the browser tab, Navbar alt text, and Footer copyright."
                         />
@@ -144,7 +144,7 @@ export default function GeneralSettings() {
                             onValueChange={v => set("siteEmail", v)}
                             variant="bordered"
                             radius="xl"
-                            startContent={<EnvelopeSimple className="text-slate-400" />}
+                            startContent={<EnvelopeSimple size={16} className="text-slate-400 shrink-0" />}
                             classNames={{ inputWrapper: "bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 h-[60px]" }}
                             description="Used on the Contact page and in transactional emails."
                         />
@@ -155,7 +155,7 @@ export default function GeneralSettings() {
                             onValueChange={v => set("sitePhone", v)}
                             variant="bordered"
                             radius="xl"
-                            startContent={<Phone className="text-slate-400" />}
+                            startContent={<Phone size={16} className="text-slate-400 shrink-0" />}
                             classNames={{ inputWrapper: "bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 h-[60px]" }}
                             description="Displayed in the Footer and Contact page."
                         />
@@ -166,7 +166,7 @@ export default function GeneralSettings() {
                             onValueChange={v => set("address", v)}
                             variant="bordered"
                             radius="xl"
-                            startContent={<MapPin className="text-slate-400" />}
+                            startContent={<MapPin size={16} className="text-slate-400 shrink-0" />}
                             classNames={{ inputWrapper: "bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 h-[60px]" }}
                             description="Used in invoices and the Contact page."
                         />
@@ -177,8 +177,8 @@ export default function GeneralSettings() {
                             onSelectionChange={keys => set("currency", [...keys][0] || "INR")}
                             variant="bordered"
                             radius="xl"
-                            startContent={<CurrencyInr className="text-slate-400" />}
-                            classNames={{ trigger: "bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 h-[60px]" }}
+                            startContent={<CurrencyInr size={16} className="text-slate-400 shrink-0" />}
+                            classNames={{ trigger: "bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 h-[60px]", value: "text-slate-900 dark:text-white" }}
                             description="Affects price display across the entire platform."
                         >
                             {CURRENCIES.map(c => <SelectItem key={c.key}>{c.label}</SelectItem>)}
@@ -190,8 +190,8 @@ export default function GeneralSettings() {
                             onSelectionChange={keys => set("timezone", [...keys][0] || "Asia/Kolkata")}
                             variant="bordered"
                             radius="xl"
-                            startContent={<Globe className="text-slate-400" />}
-                            classNames={{ trigger: "bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 h-[60px]" }}
+                            startContent={<Globe size={16} className="text-slate-400 shrink-0" />}
+                            classNames={{ trigger: "bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 h-[60px]", value: "text-slate-900 dark:text-white" }}
                             description="Used for scheduling, order timestamps, and reports."
                         >
                             {TIMEZONES.map(t => <SelectItem key={t.key}>{t.label}</SelectItem>)}
@@ -201,7 +201,7 @@ export default function GeneralSettings() {
                     {/* ── Site Logo ── */}
                     <div className="space-y-2">
                         <p className="text-xs font-bold text-slate-500 dark:text-slate-300 uppercase tracking-wider flex items-center gap-2">
-                            <PhosphorImage size={13} /> Site Logo
+                            <PhosphorImage size={13} weight="bold" className="shrink-0" /> Site Logo
                         </p>
                         <p className="text-xs text-slate-400">
                             This logo appears in the Navbar, Footer, and PDF invoices. Upload a PNG/WebP with a transparent background for best results.
@@ -235,7 +235,7 @@ export default function GeneralSettings() {
 
                     {/* ── Platform Behaviour ── */}
                     <p className="text-xs font-bold uppercase tracking-widest text-indigo-500 flex items-center gap-2">
-                        <Gear weight="bold" /> Platform Behaviour
+                        <Gear size={14} weight="bold" className="shrink-0" /> Platform Behaviour
                     </p>
 
                     {form.maintenanceMode && (
