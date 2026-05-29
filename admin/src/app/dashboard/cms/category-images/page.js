@@ -86,8 +86,7 @@ export default function CategoryImagesCMS() {
         <div className="space-y-6 pb-16">
             {/* Header */}
             <div>
-                <h1 className="text-3xl font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2">
-                    <Images className="text-indigo-500" size={32} weight="duotone" />
+                <h1 className="text-3xl font-bold text-slate-900 dark:text-slate-100">
                     Category <span className="text-indigo-600 dark:text-indigo-400 font-extrabold">Images</span>
                 </h1>
                 <p className="text-sm text-slate-500 mt-1">

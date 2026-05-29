@@ -182,8 +182,8 @@ export default function ProductPageCMS() {
             {/* Toolbar */}
             <div className="sticky top-0 z-50 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 p-4 -mx-6 px-6 mb-6 flex items-center justify-between shadow-sm">
                 <div className="flex items-center gap-4">
-                    <h1 className="text-xl font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2">
-                        <Monitor size={24} className="text-indigo-500" /> Visual Page Builder
+                    <h1 className="text-xl font-bold text-slate-900 dark:text-slate-100">
+                        Visual Page Builder
                     </h1>
                     <div className="h-6 w-[1px] bg-slate-300 dark:bg-slate-700 mx-2"></div>
                     <select

@@ -114,8 +114,7 @@ export default function BrandingSettings() {
             {/* Header */}
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div>
-                    <h1 className="text-3xl font-bold text-slate-900 dark:text-white tracking-tight flex items-center gap-3">
-                        <Palette weight="duotone" className="text-indigo-500" size={32} />
+                    <h1 className="text-3xl font-bold text-slate-900 dark:text-white tracking-tight">
                         Logo & Branding
                     </h1>
                     <p className="text-slate-500 text-sm mt-1">

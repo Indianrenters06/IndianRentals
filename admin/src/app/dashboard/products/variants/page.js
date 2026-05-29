@@ -245,8 +245,7 @@ export default function ProductVariantManager() {
             {/* Header */}
             <div className="flex items-center justify-between flex-wrap gap-3">
                 <div>
-                    <h1 className="text-3xl font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2">
-                        <ListDashes size={28} className="text-indigo-500" />
+                    <h1 className="text-3xl font-bold text-slate-900 dark:text-slate-100">
                         Product <span className="text-indigo-600 dark:text-indigo-400 font-extrabold">Variants</span>
                     </h1>
                     <p className="text-sm text-slate-500 mt-1">Manage variants like Color or Storage directly on each product.</p>
