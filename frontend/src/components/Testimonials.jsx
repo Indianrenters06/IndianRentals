@@ -43,6 +43,7 @@ const Testimonials = ({ overrideBg, overridePadding, overrideHeight }) => {
     const [viewType, setViewType] = useState('mobile');
     const [reviewsData, setReviewsData] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [enabled, setEnabled] = useState(true);
 
     useEffect(() => {
         const checkRes = () => {
@@ -59,7 +60,15 @@ const Testimonials = ({ overrideBg, overridePadding, overrideHeight }) => {
     useEffect(() => {
         const fetchAll = async () => {
             try {
-                const tData = await getTestimonials();
+                const [tData, cmsRes] = await Promise.all([
+                    getTestimonials(),
+                    fetch(`${API}/api/cms/homepage`).then(r => r.ok ? r.json() : null).catch(() => null),
+                ]);
+                if (cmsRes && cmsRes.testimonialsEnabled === false) {
+                    setEnabled(false);
+                    setLoading(false);
+                    return;
+                }
                 const processed = (tData && tData.length > 0 ? tData : staticReviews).map((rev, idx) => {
                     const template = staticReviews[idx % staticReviews.length];
                     return {
@@ -120,7 +129,7 @@ const Testimonials = ({ overrideBg, overridePadding, overrideHeight }) => {
         </div>
     );
 
-    if (loading) return null;
+    if (loading || !enabled) return null;
 
     // Row 1: Bright Sky Blue, Soft Teal Green, Vivid Violet
     const row1 = [
