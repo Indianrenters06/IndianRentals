@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { motion } from "framer-motion";
 import {
     Card, CardBody, Button, Table, TableHeader, TableColumn, TableBody,
@@ -16,6 +16,20 @@ export default function PushNotifications() {
     const [notifications, setNotifications] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [sortDescriptor, setSortDescriptor] = useState({ column: "createdAt", direction: "descending" });
+
+    const sortedNotifications = useMemo(() => {
+        return [...notifications].sort((a, b) => {
+            let first = a[sortDescriptor.column] ?? '';
+            let second = b[sortDescriptor.column] ?? '';
+            if (sortDescriptor.column === 'createdAt') {
+                first = new Date(first).getTime();
+                second = new Date(second).getTime();
+            }
+            const cmp = first < second ? -1 : first > second ? 1 : 0;
+            return sortDescriptor.direction === "descending" ? -cmp : cmp;
+        });
+    }, [notifications, sortDescriptor]);
     const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure();
     const [form, setForm] = useState({ title: "", message: "", type: "order", target: "all" });
     const [sending, setSending] = useState(false);
@@ -128,15 +142,15 @@ export default function PushNotifications() {
                     ) : loading ? (
                         <div className="p-6 space-y-4">{[...Array(5)].map((_, i) => <Skeleton key={i} className="h-12 w-full rounded-xl" />)}</div>
                     ) : (
-                        <Table aria-label="Notifications table" classNames={{ wrapper: "p-0 rounded-none shadow-none bg-transparent", th: "bg-slate-50 dark:bg-slate-950/80 uppercase text-xs font-bold h-12 pt-0 px-6", td: "py-4 px-6 border-b border-slate-100 dark:border-slate-800/50" }}>
+                        <Table aria-label="Notifications table" sortDescriptor={sortDescriptor} onSortChange={setSortDescriptor} classNames={{ wrapper: "p-0 rounded-none shadow-none bg-transparent", th: "bg-slate-50 dark:bg-slate-950/80 uppercase text-xs font-bold h-12 pt-0 px-6", td: "py-4 px-6 border-b border-slate-100 dark:border-slate-800/50" }}>
                             <TableHeader>
-                                <TableColumn>TITLE</TableColumn>
-                                <TableColumn>MESSAGE</TableColumn>
-                                <TableColumn>TYPE</TableColumn>
-                                <TableColumn>SENT AT</TableColumn>
-                                <TableColumn align="center">STATUS</TableColumn>
+                                <TableColumn key="title" allowsSorting>TITLE</TableColumn>
+                                <TableColumn key="message">MESSAGE</TableColumn>
+                                <TableColumn key="type" allowsSorting>TYPE</TableColumn>
+                                <TableColumn key="createdAt" allowsSorting>SENT AT</TableColumn>
+                                <TableColumn key="isRead" allowsSorting align="center">STATUS</TableColumn>
                             </TableHeader>
-                            <TableBody items={notifications} emptyContent="No notifications yet. Click 'New Notification' to send one.">
+                            <TableBody items={sortedNotifications} emptyContent="No notifications yet. Click 'New Notification' to send one.">
                                 {(item) => (
                                     <TableRow key={item._id}>
                                         <TableCell className="font-semibold text-slate-900 dark:text-slate-100">{item.title}</TableCell>

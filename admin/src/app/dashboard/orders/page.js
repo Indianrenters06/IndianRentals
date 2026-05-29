@@ -180,16 +180,29 @@ export default function OrdersManagement() {
 
     const openModal = (order) => { setSelected(order); onOpen(); };
 
+    const [sortCol, setSortCol] = useState("createdAt");
+    const [sortDir, setSortDir] = useState("descending");
+
     const filtered = useMemo(() => {
-        if (!search.trim()) return orders;
-        const q = search.toLowerCase();
-        return orders.filter(o =>
-            o._id?.toLowerCase().includes(q) ||
-            o.user?.name?.toLowerCase().includes(q) ||
-            o.user?.email?.toLowerCase().includes(q) ||
-            o.orderItems?.some(i => i.name?.toLowerCase().includes(q))
-        );
-    }, [orders, search]);
+        let list = orders;
+        if (search.trim()) {
+            const q = search.toLowerCase();
+            list = list.filter(o =>
+                o._id?.toLowerCase().includes(q) ||
+                o.user?.name?.toLowerCase().includes(q) ||
+                o.user?.email?.toLowerCase().includes(q) ||
+                o.orderItems?.some(i => i.name?.toLowerCase().includes(q))
+            );
+        }
+        return [...list].sort((a, b) => {
+            let first, second;
+            if (sortCol === 'user') { first = a.user?.name ?? ''; second = b.user?.name ?? ''; }
+            else if (sortCol === 'createdAt') { first = new Date(a.createdAt).getTime(); second = new Date(b.createdAt).getTime(); }
+            else { first = a[sortCol] ?? ''; second = b[sortCol] ?? ''; }
+            const cmp = first < second ? -1 : first > second ? 1 : 0;
+            return sortDir === "descending" ? -cmp : cmp;
+        });
+    }, [orders, search, sortCol, sortDir]);
 
     return (
         <div className="w-full space-y-6 pb-12">
@@ -226,6 +239,19 @@ export default function OrdersManagement() {
                             className="w-full h-10 pl-10 pr-4 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-sm text-slate-900 dark:text-slate-200 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 shadow-sm transition-all"
                         />
                     </div>
+                    <select
+                        value={`${sortCol}:${sortDir}`}
+                        onChange={e => { const [col, dir] = e.target.value.split(':'); setSortCol(col); setSortDir(dir); }}
+                        className="h-10 px-3 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-sm text-slate-700 dark:text-slate-200 font-medium focus:outline-none focus:ring-2 focus:ring-indigo-500/30 shadow-sm"
+                    >
+                        <option value="createdAt:descending">Newest first</option>
+                        <option value="createdAt:ascending">Oldest first</option>
+                        <option value="user:ascending">Customer A–Z</option>
+                        <option value="user:descending">Customer Z–A</option>
+                        <option value="totalPrice:descending">Highest total</option>
+                        <option value="totalPrice:ascending">Lowest total</option>
+                        <option value="status:ascending">Status</option>
+                    </select>
                 </div>
             </div>
 

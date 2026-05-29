@@ -1,7 +1,7 @@
 'use client';
 import toast from 'react-hot-toast';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { motion, AnimatePresence } from "framer-motion";
 import { Chip, Spinner, Avatar } from "@heroui/react";
 import {
@@ -281,6 +281,21 @@ export default function BlogManagement() {
     const [loading, setLoading] = useState(true);
     const [editing, setEditing] = useState(null);
     const [deleting, setDeleting] = useState(null);
+    const [sortCol, setSortCol] = useState("createdAt");
+    const [sortDir, setSortDir] = useState("descending");
+
+    const sortedPosts = useMemo(() => {
+        return [...posts].sort((a, b) => {
+            let first = a[sortCol] ?? '';
+            let second = b[sortCol] ?? '';
+            if (sortCol === 'createdAt') {
+                first = new Date(first).getTime();
+                second = new Date(second).getTime();
+            }
+            const cmp = first < second ? -1 : first > second ? 1 : 0;
+            return sortDir === "descending" ? -cmp : cmp;
+        });
+    }, [posts, sortCol, sortDir]);
 
     const fetchPosts = useCallback(async () => {
         try {
@@ -361,7 +376,21 @@ export default function BlogManagement() {
                                 <span className="text-xs font-bold uppercase tracking-wider text-slate-500">Article Title</span>
                                 <span className="text-xs font-bold uppercase tracking-wider text-slate-500">Author</span>
                                 <span className="text-xs font-bold uppercase tracking-wider text-slate-500">Status</span>
-                                <span className="text-xs font-bold uppercase tracking-wider text-slate-500 hidden md:block">Date</span>
+                                <div className="hidden md:flex items-center gap-2">
+                                    <span className="text-xs font-bold uppercase tracking-wider text-slate-500">Date</span>
+                                    <select
+                                        value={`${sortCol}:${sortDir}`}
+                                        onChange={e => { const [col, dir] = e.target.value.split(':'); setSortCol(col); setSortDir(dir); }}
+                                        className="text-xs border border-slate-200 dark:border-slate-700 rounded-lg px-2 py-1 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 font-medium focus:outline-none focus:ring-1 focus:ring-indigo-400"
+                                    >
+                                        <option value="createdAt:descending">Newest first</option>
+                                        <option value="createdAt:ascending">Oldest first</option>
+                                        <option value="title:ascending">Title A–Z</option>
+                                        <option value="title:descending">Title Z–A</option>
+                                        <option value="author:ascending">Author A–Z</option>
+                                        <option value="status:ascending">Status</option>
+                                    </select>
+                                </div>
                                 <span className="text-xs font-bold uppercase tracking-wider text-slate-500 text-center">Actions</span>
                             </div>
 
@@ -380,7 +409,7 @@ export default function BlogManagement() {
                                 </div>
                             ) : (
                                 <div className="divide-y divide-slate-100 dark:divide-slate-800/60">
-                                    {posts.map((post, i) => (
+                                    {sortedPosts.map((post, i) => (
                                         <motion.div key={post._id} initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.04 }}
                                             className="grid grid-cols-[1fr_auto_auto_auto_auto] gap-4 items-center px-6 py-4 hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors group">
                                             <div className="flex items-center gap-3 min-w-0">
