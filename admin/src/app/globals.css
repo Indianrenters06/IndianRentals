@@ -107,7 +107,7 @@ summary,
   top: 50% !important;
   left: 12px !important;
   transform: translateY(-50%) !important;
-  font-size: 0.875rem !important;
+  font-size: 0.9375rem !important;
   color: #94a3b8 !important;
   z-index: 10 !important;
   line-height: 1 !important;
@@ -119,9 +119,9 @@ summary,
 [data-focus="true"] [data-slot="label"],
 :focus-within>[data-slot="label"],
 [data-has-value="true"] [data-slot="label"] {
-  top: 8px !important;
-  transform: translateY(0) scale(0.8) !important;
-  font-size: 0.75rem !important;
+  top: 7px !important;
+  transform: translateY(0) scale(0.85) !important;
+  font-size: 0.875rem !important;
   color: var(--color-indigo-500) !important;
 }
 
@@ -137,9 +137,9 @@ summary,
 [data-slot="input-wrapper"]:has(textarea:focus) [data-slot="label"],
 [data-has-value="true"] [data-slot="input-wrapper"]:has(textarea) [data-slot="label"] {
   top: 6px !important;
-  transform: scale(0.8) !important;
+  transform: scale(0.85) !important;
   transform-origin: top left !important;
-  font-size: 0.75rem !important;
+  font-size: 0.875rem !important;
   color: var(--color-indigo-500) !important;
 }
 
