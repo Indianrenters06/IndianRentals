@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { motion } from "framer-motion";
 import {
     Card, CardBody, Button, Table, TableHeader, TableColumn, TableBody,
@@ -15,6 +15,7 @@ export default function AllTransactions() {
     const [transactions, setTransactions] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [sortDescriptor, setSortDescriptor] = useState({ column: "createdAt", direction: "descending" });
 
     useEffect(() => {
         const fetch_ = async () => {
@@ -32,6 +33,7 @@ export default function AllTransactions() {
                     method: r.paymentMethod || "Razorpay",
                     status: r.isPaid ? "Success" : "Pending",
                     date: new Date(r.createdAt).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" }),
+                    createdAt: new Date(r.createdAt).getTime(),
                 })));
             } catch (err) { setError(err.message); }
             finally { setLoading(false); }
@@ -40,6 +42,15 @@ export default function AllTransactions() {
     }, []);
 
     const total = transactions.filter(t => t.status === "Success").reduce((s, t) => s + t.amount, 0);
+
+    const sortedItems = useMemo(() => {
+        return [...transactions].sort((a, b) => {
+            const first = a[sortDescriptor.column] ?? '';
+            const second = b[sortDescriptor.column] ?? '';
+            const cmp = first < second ? -1 : first > second ? 1 : 0;
+            return sortDescriptor.direction === "descending" ? -cmp : cmp;
+        });
+    }, [transactions, sortDescriptor]);
 
     const exportPDF = () => {
         const headers = ["TXN ID", "User", "Email", "Amount", "Method", "Status", "Date"];
@@ -97,16 +108,16 @@ export default function AllTransactions() {
                     ) : loading ? (
                         <div className="p-6 space-y-4">{[...Array(6)].map((_, i) => <Skeleton key={i} className="h-12 w-full rounded-xl" />)}</div>
                     ) : (
-                        <Table aria-label="Transactions table" classNames={{ wrapper: "p-0 rounded-none shadow-none bg-transparent", th: "bg-slate-50 dark:bg-slate-950/80 uppercase text-xs font-bold h-12 pt-0 px-6", td: "py-[1.2rem] px-6 border-b border-slate-100 dark:border-slate-800/50" }}>
+                        <Table aria-label="Transactions table" sortDescriptor={sortDescriptor} onSortChange={setSortDescriptor} classNames={{ wrapper: "p-0 rounded-none shadow-none bg-transparent", th: "bg-slate-50 dark:bg-slate-950/80 uppercase text-xs font-bold h-12 pt-0 px-6", td: "py-[1.2rem] px-6 border-b border-slate-100 dark:border-slate-800/50" }}>
                             <TableHeader>
-                                <TableColumn>TXN ID</TableColumn>
-                                <TableColumn>CUSTOMER</TableColumn>
-                                <TableColumn>AMOUNT</TableColumn>
-                                <TableColumn>METHOD</TableColumn>
-                                <TableColumn>DATE</TableColumn>
-                                <TableColumn align="center">STATUS</TableColumn>
+                                <TableColumn key="txnId" allowsSorting>TXN ID</TableColumn>
+                                <TableColumn key="user" allowsSorting>CUSTOMER</TableColumn>
+                                <TableColumn key="amount" allowsSorting>AMOUNT</TableColumn>
+                                <TableColumn key="method" allowsSorting>METHOD</TableColumn>
+                                <TableColumn key="createdAt" allowsSorting>DATE</TableColumn>
+                                <TableColumn key="status" allowsSorting align="center">STATUS</TableColumn>
                             </TableHeader>
-                            <TableBody items={transactions} emptyContent="No transactions found.">
+                            <TableBody items={sortedItems} emptyContent="No transactions found.">
                                 {(item) => (
                                     <TableRow key={item._id}>
                                         <TableCell><span className="font-mono text-xs font-bold text-slate-500">{item.txnId}</span></TableCell>

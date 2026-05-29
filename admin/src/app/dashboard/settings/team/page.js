@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import {
   Card,
   CardHeader,
@@ -31,6 +31,7 @@ export default function TeamMembersPage() {
   const [teamMembers, setTeamMembers] = useState([]);
   const [roles, setRoles] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [sortDescriptor, setSortDescriptor] = useState({ column: "name", direction: "ascending" });
   const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isEdit, setIsEdit] = useState(false);
@@ -82,6 +83,15 @@ export default function TeamMembersPage() {
     fetchTeamMembers();
     fetchRoles();
   }, []);
+
+  const sortedMembers = useMemo(() => {
+    return [...teamMembers].sort((a, b) => {
+      const first = a[sortDescriptor.column] ?? '';
+      const second = b[sortDescriptor.column] ?? '';
+      const cmp = first < second ? -1 : first > second ? 1 : 0;
+      return sortDescriptor.direction === "descending" ? -cmp : cmp;
+    });
+  }, [teamMembers, sortDescriptor]);
 
   const handleRoleChange = (e) => {
     const selectedRoleId = e.target.value;
@@ -196,17 +206,17 @@ export default function TeamMembersPage() {
       </div>
 
       <Card className="bg-white dark:bg-slate-900 border-none shadow-sm">
-        <Table aria-label="Team Members" removeWrapper>
+        <Table aria-label="Team Members" removeWrapper sortDescriptor={sortDescriptor} onSortChange={setSortDescriptor}>
           <TableHeader>
-            <TableColumn>NAME</TableColumn>
-            <TableColumn>ROLE</TableColumn>
-            <TableColumn>PERMISSIONS</TableColumn>
-            <TableColumn>STATUS</TableColumn>
-            <TableColumn align="center">ACTIONS</TableColumn>
+            <TableColumn key="name" allowsSorting>NAME</TableColumn>
+            <TableColumn key="role" allowsSorting>ROLE</TableColumn>
+            <TableColumn key="adminPermissions">PERMISSIONS</TableColumn>
+            <TableColumn key="status">STATUS</TableColumn>
+            <TableColumn key="actions" align="center">ACTIONS</TableColumn>
           </TableHeader>
-          <TableBody 
+          <TableBody
             emptyContent={loading ? <Spinner /> : "No team members found"}
-            items={teamMembers}
+            items={sortedMembers}
           >
             {(item) => (
               <TableRow key={item._id}>

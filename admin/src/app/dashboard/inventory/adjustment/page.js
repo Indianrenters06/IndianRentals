@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { motion } from "framer-motion";
 import {
     Card, CardBody, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Chip, Button,
@@ -18,6 +18,16 @@ export default function StockAdjustment() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [submitting, setSubmitting] = useState(false);
+    const [sortDescriptor, setSortDescriptor] = useState({ column: "date", direction: "descending" });
+
+    const sortedLogs = useMemo(() => {
+        return [...logs].sort((a, b) => {
+            const first = a[sortDescriptor.column] ?? '';
+            const second = b[sortDescriptor.column] ?? '';
+            const cmp = first < second ? -1 : first > second ? 1 : 0;
+            return sortDescriptor.direction === "descending" ? -cmp : cmp;
+        });
+    }, [logs, sortDescriptor]);
     const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure();
 
     // Form state
@@ -152,6 +162,8 @@ export default function StockAdjustment() {
                     ) : (
                         <Table
                             aria-label="Stock adjustment table"
+                            sortDescriptor={sortDescriptor}
+                            onSortChange={setSortDescriptor}
                             classNames={{
                                 wrapper: "p-0 rounded-none shadow-none bg-transparent",
                                 th: "bg-slate-50 dark:bg-slate-950/80 uppercase text-xs font-bold h-12 pt-0 px-6",
@@ -159,13 +171,13 @@ export default function StockAdjustment() {
                             }}
                         >
                             <TableHeader>
-                                <TableColumn>PRODUCT</TableColumn>
-                                <TableColumn>METHOD</TableColumn>
-                                <TableColumn>QUANTITY CHANGE</TableColumn>
-                                <TableColumn>REASON / NOTE</TableColumn>
-                                <TableColumn align="center">DATE</TableColumn>
+                                <TableColumn key="item" allowsSorting>PRODUCT</TableColumn>
+                                <TableColumn key="type">METHOD</TableColumn>
+                                <TableColumn key="change" allowsSorting>QUANTITY CHANGE</TableColumn>
+                                <TableColumn key="reason">REASON / NOTE</TableColumn>
+                                <TableColumn key="date" allowsSorting align="center">DATE</TableColumn>
                             </TableHeader>
-                            <TableBody items={logs} emptyContent="No adjustments logged yet. Click 'New Adjustment' to begin.">
+                            <TableBody items={sortedLogs} emptyContent="No adjustments logged yet. Click 'New Adjustment' to begin.">
                                 {(item) => (
                                     <TableRow key={item._id}>
                                         <TableCell className="font-semibold text-slate-900 dark:text-slate-100">{item.item}</TableCell>

@@ -1,7 +1,7 @@
 'use client';
 import toast from 'react-hot-toast';
-import React, { useEffect, useState } from 'react';
-import { ChartBar, Download, User, Calendar, Tag, CurrencyInr, CheckCircle, Clock } from '@phosphor-icons/react';
+import React, { useEffect, useState, useMemo } from 'react';
+import { ChartBar, Download, User, Calendar, Tag, CurrencyInr, CheckCircle, Clock, ArrowUp, ArrowDown, ArrowsDownUp } from '@phosphor-icons/react';
 import { Spinner } from '@heroui/react';
 import { downloadPDFReport } from "@/utils/pdfReport";
 
@@ -11,6 +11,37 @@ const getToken = () => typeof window !== 'undefined' ? localStorage.getItem('adm
 export default function ReportPage() {
     const [report, setReport] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [sortField, setSortField] = useState("date");
+    const [sortDir, setSortDir] = useState("descending");
+
+    const toggleSort = (field) => {
+        if (sortField === field) {
+            setSortDir(d => d === "ascending" ? "descending" : "ascending");
+        } else {
+            setSortField(field);
+            setSortDir("ascending");
+        }
+    };
+
+    const SortIcon = ({ field }) => {
+        if (sortField !== field) return <ArrowsDownUp size={13} className="text-slate-300 ml-1 inline" />;
+        return sortDir === "ascending"
+            ? <ArrowUp size={13} className="text-indigo-500 ml-1 inline" />
+            : <ArrowDown size={13} className="text-indigo-500 ml-1 inline" />;
+    };
+
+    const sortedReport = useMemo(() => {
+        return [...report].sort((a, b) => {
+            let first = a[sortField];
+            let second = b[sortField];
+            if (sortField === 'date') {
+                first = new Date(first).getTime();
+                second = new Date(second).getTime();
+            }
+            const cmp = (first ?? '') < (second ?? '') ? -1 : (first ?? '') > (second ?? '') ? 1 : 0;
+            return sortDir === "descending" ? -cmp : cmp;
+        });
+    }, [report, sortField, sortDir]);
 
     useEffect(() => {
         const fetchReport = async () => {
@@ -92,23 +123,35 @@ export default function ReportPage() {
                     <table className="w-full text-left text-sm text-slate-600">
                         <thead className="bg-slate-50 border-b border-slate-200 text-slate-500">
                             <tr>
-                                <th className="px-6 py-4 font-semibold">Order / Date</th>
-                                <th className="px-6 py-4 font-semibold">Customer</th>
-                                <th className="px-6 py-4 font-semibold">Coupon Used</th>
-                                <th className="px-6 py-4 font-semibold text-right">Discount</th>
-                                <th className="px-6 py-4 font-semibold text-right">Order Total</th>
-                                <th className="px-6 py-4 font-semibold text-center">Order Status</th>
+                                <th className="px-6 py-4 font-semibold cursor-pointer select-none hover:text-indigo-600 transition-colors" onClick={() => toggleSort("date")}>
+                                    Order / Date <SortIcon field="date" />
+                                </th>
+                                <th className="px-6 py-4 font-semibold cursor-pointer select-none hover:text-indigo-600 transition-colors" onClick={() => toggleSort("user")}>
+                                    Customer <SortIcon field="user" />
+                                </th>
+                                <th className="px-6 py-4 font-semibold cursor-pointer select-none hover:text-indigo-600 transition-colors" onClick={() => toggleSort("couponCode")}>
+                                    Coupon Used <SortIcon field="couponCode" />
+                                </th>
+                                <th className="px-6 py-4 font-semibold text-right cursor-pointer select-none hover:text-indigo-600 transition-colors" onClick={() => toggleSort("discount")}>
+                                    Discount <SortIcon field="discount" />
+                                </th>
+                                <th className="px-6 py-4 font-semibold text-right cursor-pointer select-none hover:text-indigo-600 transition-colors" onClick={() => toggleSort("orderTotal")}>
+                                    Order Total <SortIcon field="orderTotal" />
+                                </th>
+                                <th className="px-6 py-4 font-semibold text-center cursor-pointer select-none hover:text-indigo-600 transition-colors" onClick={() => toggleSort("status")}>
+                                    Order Status <SortIcon field="status" />
+                                </th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-slate-100">
-                            {report.length === 0 ? (
+                            {sortedReport.length === 0 ? (
                                 <tr>
                                     <td colSpan="6" className="px-6 py-12 text-center text-slate-400">
                                         No coupon usage data found yet.
                                     </td>
                                 </tr>
                             ) : (
-                                report.map((item, idx) => (
+                                sortedReport.map((item, idx) => (
                                     <tr key={idx} className="hover:bg-slate-50 transition-colors">
                                         <td className="px-6 py-4 whitespace-nowrap">
                                             <div className="font-mono text-xs text-slate-400 mb-1">#{item.orderId?.slice(-6).toUpperCase()}</div>

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { motion } from "framer-motion";
 import {
     Card, CardBody, Table, TableHeader, TableColumn, TableBody,
@@ -16,6 +16,7 @@ export default function ExpiredCoupons() {
     const [coupons, setCoupons] = useState([]);
     const [loading, setLoading] = useState(true);
     const [search, setSearch] = useState("");
+    const [sortDescriptor, setSortDescriptor] = useState({ column: "expiryDate", direction: "descending" });
     const [deleting, setDeleting] = useState(null);
 
     // ── Fetch ──────────────────────────────────────────────────────────────────
@@ -45,6 +46,19 @@ export default function ExpiredCoupons() {
         (c.code?.toLowerCase().includes(search.toLowerCase()) ||
         c.description?.toLowerCase().includes(search.toLowerCase()))
     );
+
+    const sortedItems = useMemo(() => {
+        return [...filtered].sort((a, b) => {
+            let first = a[sortDescriptor.column];
+            let second = b[sortDescriptor.column];
+            if (sortDescriptor.column === 'expiryDate') {
+                first = first ? new Date(first).getTime() : 0;
+                second = second ? new Date(second).getTime() : 0;
+            }
+            const cmp = (first ?? '') < (second ?? '') ? -1 : (first ?? '') > (second ?? '') ? 1 : 0;
+            return sortDescriptor.direction === "descending" ? -cmp : cmp;
+        });
+    }, [filtered, sortDescriptor]);
 
     // ── Delete ─────────────────────────────────────────────────────────────────
     const handleDelete = async (id) => {
@@ -111,17 +125,17 @@ export default function ExpiredCoupons() {
                     {loading ? (
                         <div className="p-6 space-y-4">{[...Array(4)].map((_, i) => <Skeleton key={i} className="h-12 w-full rounded-xl" />)}</div>
                     ) : (
-                        <Table aria-label="Expired Coupons table" classNames={{ wrapper: "p-0 rounded-none shadow-none bg-transparent", th: "bg-slate-50 dark:bg-slate-950/80 uppercase text-xs font-bold h-12 pt-0 px-6", td: "py-4 px-6 border-b border-slate-100 dark:border-slate-800/50" }}>
+                        <Table aria-label="Expired Coupons table" sortDescriptor={sortDescriptor} onSortChange={setSortDescriptor} classNames={{ wrapper: "p-0 rounded-none shadow-none bg-transparent", th: "bg-slate-50 dark:bg-slate-950/80 uppercase text-xs font-bold h-12 pt-0 px-6", td: "py-4 px-6 border-b border-slate-100 dark:border-slate-800/50" }}>
                             <TableHeader>
-                                <TableColumn>CODE</TableColumn>
-                                <TableColumn>DISCOUNT</TableColumn>
-                                <TableColumn>MIN ORDER</TableColumn>
-                                <TableColumn>EXPIRED ON</TableColumn>
-                                <TableColumn>USES</TableColumn>
-                                <TableColumn align="center">STATUS</TableColumn>
-                                <TableColumn align="center">ACTIONS</TableColumn>
+                                <TableColumn key="code" allowsSorting>CODE</TableColumn>
+                                <TableColumn key="discountAmount" allowsSorting>DISCOUNT</TableColumn>
+                                <TableColumn key="minOrderAmount">MIN ORDER</TableColumn>
+                                <TableColumn key="expiryDate" allowsSorting>EXPIRED ON</TableColumn>
+                                <TableColumn key="usageCount" allowsSorting>USES</TableColumn>
+                                <TableColumn key="status" align="center">STATUS</TableColumn>
+                                <TableColumn key="actions" align="center">ACTIONS</TableColumn>
                             </TableHeader>
-                            <TableBody items={filtered} emptyContent="No expired coupons found.">
+                            <TableBody items={sortedItems} emptyContent="No expired coupons found.">
                                 {(item) => (
                                     <TableRow key={item._id}>
                                         <TableCell>
