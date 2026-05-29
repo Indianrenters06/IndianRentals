@@ -784,9 +784,9 @@ const getRoles = asyncHandler(async (req, res) => {
 // @route   POST /api/admin/roles
 // @access  Private/Admin
 const createRole = asyncHandler(async (req, res) => {
-    if (req.user.role !== 'super_admin') {
+    if (!['super_admin', 'admin'].includes(req.user.role)) {
         res.status(403);
-        throw new Error('Only Super Admin can create roles');
+        throw new Error('Only Admin or Super Admin can create roles');
     }
 
     const { name, id, description, permissions } = req.body;
@@ -809,11 +809,6 @@ const createRole = asyncHandler(async (req, res) => {
 });
 
 const updateRole = asyncHandler(async (req, res) => {
-    if (req.user.role !== 'super_admin') {
-        res.status(403);
-        throw new Error('Only Super Admin can edit roles');
-    }
-
     const role = await Role.findById(req.params.id);
 
     if (!role) {
@@ -821,13 +816,21 @@ const updateRole = asyncHandler(async (req, res) => {
         throw new Error('Role not found');
     }
 
-    if (role.isPredefined) {
-        res.status(400);
-        throw new Error('Predefined roles cannot be edited');
+    // Only super_admin can edit the super_admin or admin core roles
+    const coreRoles = ['super_admin', 'admin'];
+    if (coreRoles.includes(role.id) && req.user.role !== 'super_admin') {
+        res.status(403);
+        throw new Error('Only Super Admin can edit core system roles');
+    }
+
+    // Must be at least admin to edit any role
+    if (!['super_admin', 'admin'].includes(req.user.role)) {
+        res.status(403);
+        throw new Error('Only Admin or Super Admin can edit roles');
     }
 
     const { name, description, permissions } = req.body;
-    
+
     if (name) role.name = name;
     if (description !== undefined) role.description = description;
     if (permissions) role.permissions = permissions;
@@ -840,11 +843,6 @@ const updateRole = asyncHandler(async (req, res) => {
 // @route   DELETE /api/admin/roles/:id
 // @access  Private/Admin
 const deleteRole = asyncHandler(async (req, res) => {
-    if (req.user.role !== 'super_admin') {
-        res.status(403);
-        throw new Error('Only Super Admin can delete roles');
-    }
-
     const role = await Role.findById(req.params.id);
 
     if (!role) {
@@ -852,9 +850,17 @@ const deleteRole = asyncHandler(async (req, res) => {
         throw new Error('Role not found');
     }
 
-    if (role.isPredefined) {
+    // Core system roles can never be deleted
+    const undeletableRoles = ['super_admin', 'admin'];
+    if (undeletableRoles.includes(role.id)) {
         res.status(400);
-        throw new Error('Predefined roles cannot be deleted');
+        throw new Error('Core system roles (Super Admin, Admin) cannot be deleted');
+    }
+
+    // Must be at least admin to delete roles
+    if (!['super_admin', 'admin'].includes(req.user.role)) {
+        res.status(403);
+        throw new Error('Only Admin or Super Admin can delete roles');
     }
 
     await Role.findByIdAndDelete(req.params.id);
