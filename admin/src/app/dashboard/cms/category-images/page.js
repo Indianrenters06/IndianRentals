@@ -163,7 +163,7 @@ export default function CategoryImagesCMS() {
                                                 <p className="font-semibold text-slate-800 dark:text-slate-200 text-sm truncate">{sub.name}</p>
                                                 <p className="text-xs text-slate-400 font-mono">/{sub.slug}</p>
                                                 {sub.image && (
-                                                    <p className="text-[10px] text-emerald-500 font-semibold mt-0.5">✓ Has image</p>
+                                                    <p className="text-[10px] text-emerald-500 font-semibold mt-0.5 flex items-center gap-0.5"><CheckCircle size={10} weight="fill" /> Has image</p>
                                                 )}
                                             </div>
 

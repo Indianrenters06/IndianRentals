@@ -6,7 +6,7 @@ import { motion } from 'framer-motion';
 import { Spinner } from '@heroui/react';
 import {
     FloppyDisk, CheckCircle, ArrowLeft, Image as PhosphorImage,
-    TextT, BookOpen, Eye, Star, Handshake, Target, ChartBar,
+    TextT, BookOpen, Eye, Star, Handshake, Target, ChartBar, Lightning, Smiley,
 } from '@phosphor-icons/react';
 import ImageUploader from '@/components/ImageUploader';
 
@@ -226,7 +226,7 @@ export default function AboutCMSPage() {
                         {[['aboutStat1Value', 'aboutStat1Label'], ['aboutStat2Value', 'aboutStat2Label']].map(([vk, lk], i) => (
                             <div key={i} className="flex flex-col">
                                 <div className="w-14 h-14 bg-orange-400 rounded-xl flex items-center justify-center text-white mb-2">
-                                    <span className="text-xl">{i === 0 ? '⚡' : '😊'}</span>
+                                    {i === 0 ? <Lightning size={24} weight="fill" /> : <Smiley size={24} weight="fill" />}
                                 </div>
                                 <p className="font-bold text-slate-800 dark:text-slate-100 text-lg">{data[vk]}</p>
                                 <p className="text-xs text-slate-500">{data[lk]}</p>

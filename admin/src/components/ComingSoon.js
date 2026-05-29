@@ -21,7 +21,7 @@ export default function ComingSoon({ title, subtitle, icon: Icon = Wrench }) {
                             <h3 className="text-xl font-bold text-slate-900 dark:text-slate-100 mb-2">Coming Soon</h3>
                             <p className="text-slate-500 max-w-sm">This section is currently being built. Check back shortly for the full feature.</p>
                         </div>
-                        <Chip color="warning" variant="flat" className="font-bold mt-2">🚧 Under Development</Chip>
+                        <Chip color="warning" variant="flat" className="font-bold mt-2">Under Development</Chip>
                     </CardBody>
                 </Card>
             </motion.div>

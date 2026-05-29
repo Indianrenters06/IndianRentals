@@ -224,7 +224,7 @@ export default function RentalProcessCMSPage() {
                         </div>
                     </Card>
 
-                    <Card icon="🚀" title="Feature Grid Items" accent="emerald">
+                    <Card title="Feature Grid Items" accent="emerald">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             {(data.rentalFeatures || []).map((feature, i) => (
                                 <motion.div key={i} initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }}
