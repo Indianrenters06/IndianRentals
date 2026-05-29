@@ -23,6 +23,27 @@ body {
   @apply bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-slate-100 antialiased min-h-screen selection:bg-brand-500 selection:text-white transition-colors duration-300;
 }
 
+button,
+a,
+[role="button"],
+[role="tab"],
+[role="option"],
+[role="menuitem"],
+[role="checkbox"],
+[role="radio"],
+[role="switch"],
+label[for],
+select,
+summary,
+[data-slot="trigger"],
+[data-slot="item"],
+[data-slot="prev"],
+[data-slot="next"],
+[data-slot="cursor"],
+[tabindex]:not([tabindex="-1"]) {
+  cursor: pointer !important;
+}
+
 /* Custom scrollbar */
 ::-webkit-scrollbar {
   width: 8px;
@@ -55,7 +76,7 @@ body {
 
 /* HeroUI theme — use light defaults so inputs look white in light mode */
 :root {
-  --heroui-colors-primary: #6366f1;
+  --heroui-colors-primary: var(--color-indigo-500);
   --heroui-colors-secondary: #a855f7;
   --heroui-colors-background: #ffffff;
   --heroui-colors-foreground: #0f172a;
@@ -101,7 +122,7 @@ body {
   top: 8px !important;
   transform: translateY(0) scale(0.8) !important;
   font-size: 0.75rem !important;
-  color: #6366f1 !important;
+  color: var(--color-indigo-500) !important;
 }
 
 /* Textarea label fix — full height wrappers need top-aligned label by default */
@@ -119,7 +140,7 @@ body {
   transform: scale(0.8) !important;
   transform-origin: top left !important;
   font-size: 0.75rem !important;
-  color: #6366f1 !important;
+  color: var(--color-indigo-500) !important;
 }
 
 /* Push the actual input text down so it doesn't overlap the floated label */
@@ -166,7 +187,7 @@ body {
 
 /* Primary colour switch when ON */
 [role="switch"][data-selected="true"][data-color="primary"] [data-slot="wrapper"] {
-  background-color: #6366f1 !important;
+  background-color: var(--color-indigo-500) !important;
 }
 
 /* Secondary colour when ON */
@@ -375,8 +396,8 @@ nav[data-slot="base"]:has(ul[data-slot="wrapper"]) [data-slot="item"][data-activ
 /* Active sliding cursor styling */
 nav[data-slot="base"]:has(ul[data-slot="wrapper"]) [data-slot="cursor"] {
   border-radius: 8px !important;
-  background-color: #6366f1 !important; /* brand-500 indigo */
-  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3) !important;
+  background-color: var(--color-indigo-500) !important;
+  box-shadow: 0 4px 12px color-mix(in srgb, var(--color-indigo-500) 30%, transparent) !important;
   transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
 }
 
