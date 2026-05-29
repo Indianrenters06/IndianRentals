@@ -85,6 +85,7 @@ const cmsSchema = new mongoose.Schema({
     testimonialGoogleRating: { type: String, default: '4.9' },
 
     // ── Why Choose Us (homepage) ──────────────────────────────────────────────
+    whyChooseUsEnabled: { type: Boolean, default: true },
     whyChooseUsTitle: { type: String, default: 'Why Choose Us?' },
     whyChooseUsSubtitle: { type: String, default: "Join thousands who've switched to the flexible, affordable way to access high-end tech. IndianRenters delivers AI-ready workstations, laptops, and IT gear with zero ownership hassle and instant support." },
     whyChooseUsImage: { type: String, default: 'https://res.cloudinary.com/dgkckcdk8/image/upload/v1769961565/indian-rentals/anmpufdlxxxblkxqxpds.jpg' },
