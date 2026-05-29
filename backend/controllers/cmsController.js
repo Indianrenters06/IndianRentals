@@ -97,6 +97,9 @@ const updatePage = asyncHandler(async (req, res) => {
         'aboutWhyTitle', 'aboutWhyText', 'aboutWhyImage',
         'aboutWhyStat1Value', 'aboutWhyStat1Label', 'aboutWhyStat2Value', 'aboutWhyStat2Label', 'aboutWhyStat3Value', 'aboutWhyStat3Label',
 
+        // Homepage FAQ
+        'homepageFaqEnabled', 'homepageFaqTitle', 'homepageFaqSubtitle', 'homepageFaqItems',
+
         // FAQ Page
         'faqTitle', 'faqSubtitle', 'faqItems', 'faqSectionEnabled',
 

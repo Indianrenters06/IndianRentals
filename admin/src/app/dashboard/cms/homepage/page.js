@@ -255,6 +255,10 @@ const DEFAULTS = {
     statsDevices: "90k+", statsCustomers: "30k+", statsCities: "401+",
     clientSectionEnabled: true, clientSectionTitle: "Trusted By", clientLogos: [],
     faqSectionEnabled: true,
+    homepageFaqEnabled: true,
+    homepageFaqTitle: "Frequently Asked Questions",
+    homepageFaqSubtitle: "Everything you need to know about renting with us.",
+    homepageFaqItems: [],
     featuredShowcaseEnabled: true,
     featuredShowcaseProductIds: [],
     featuredShowcaseBanners: [
@@ -310,6 +314,8 @@ export default function CMSHomepage() {
                 if (d.whyChooseUsEnabled === undefined) d.whyChooseUsEnabled = true;
                 if (d.clientSectionEnabled === undefined) d.clientSectionEnabled = true;
                 if (d.faqSectionEnabled === undefined) d.faqSectionEnabled = true;
+                if (d.homepageFaqEnabled === undefined) d.homepageFaqEnabled = true;
+                if (!d.homepageFaqItems) d.homepageFaqItems = [];
                 setData({ ...DEFAULTS, ...d });
             }
         } catch (err) { console.error(err); }
@@ -823,15 +829,54 @@ export default function CMSHomepage() {
                         </div>
                     </div>
 
-                    {/* Global FAQ Toggle */}
+                    {/* Homepage FAQ */}
                     <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 shadow-sm space-y-6">
                         <SectionRow
                             icon={<ChatText weight="fill" className="text-violet-500" />}
-                            title="Global FAQ Section"
-                            desc="Show or hide the Global FAQ section on the homepage."
-                            toggle={data.faqSectionEnabled}
-                            onToggle={v => set("faqSectionEnabled", v)}
+                            title="FAQ Section"
+                            desc="Manage the FAQ block shown on the homepage."
+                            toggle={data.homepageFaqEnabled}
+                            onToggle={v => set("homepageFaqEnabled", v)}
                         />
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <Field label="Section Title" value={data.homepageFaqTitle} onChange={v => set("homepageFaqTitle", v)} placeholder="Frequently Asked Questions" />
+                            <Field label="Section Subtitle" value={data.homepageFaqSubtitle} onChange={v => set("homepageFaqSubtitle", v)} placeholder="Everything you need to know..." />
+                        </div>
+                        <div className="space-y-3">
+                            <label className="text-xs font-bold text-slate-500 dark:text-slate-200 uppercase tracking-wider block">Questions & Answers</label>
+                            {(data.homepageFaqItems || []).map((item, idx) => (
+                                <div key={idx} className="border border-slate-200 dark:border-slate-700 rounded-xl p-4 space-y-3 bg-slate-50 dark:bg-slate-950">
+                                    <div className="flex items-center justify-between">
+                                        <span className="text-xs font-semibold text-slate-400">FAQ #{idx + 1}</span>
+                                        <button
+                                            onClick={() => { const n = [...data.homepageFaqItems]; n.splice(idx, 1); set("homepageFaqItems", n); }}
+                                            className="text-red-400 hover:text-red-600 transition-colors p-1 rounded-lg hover:bg-red-50 dark:hover:bg-red-500/10"
+                                        >
+                                            <Trash size={15} />
+                                        </button>
+                                    </div>
+                                    <Field
+                                        label="Question"
+                                        value={item.question}
+                                        onChange={v => { const n = [...data.homepageFaqItems]; n[idx] = { ...n[idx], question: v }; set("homepageFaqItems", n); }}
+                                        placeholder="e.g. What is the minimum rental period?"
+                                    />
+                                    <Field
+                                        label="Answer"
+                                        value={item.answer}
+                                        onChange={v => { const n = [...data.homepageFaqItems]; n[idx] = { ...n[idx], answer: v }; set("homepageFaqItems", n); }}
+                                        placeholder="e.g. The minimum rental period is 1 month."
+                                        rows={2}
+                                    />
+                                </div>
+                            ))}
+                            <button
+                                onClick={() => set("homepageFaqItems", [...(data.homepageFaqItems || []), { question: '', answer: '' }])}
+                                className="w-full py-4 border-2 border-dashed border-slate-200 dark:border-slate-700 rounded-2xl flex items-center justify-center gap-2 text-slate-400 hover:text-indigo-500 hover:border-indigo-400 transition-all"
+                            >
+                                <Plus size={18} /> Add FAQ
+                            </button>
+                        </div>
                     </div>
                 </motion.div>
             )}

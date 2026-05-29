@@ -35,6 +35,18 @@ const FaqSection = ({ cmsData, limit, pageName }) => {
             return;
         }
 
+        if (pageName === 'homepage') {
+            window.fetch(`${API}/api/cms/homepage?t=${Date.now()}`)
+                .then(res => res.ok ? res.json() : null)
+                .then(data => {
+                    setCms(data);
+                    if (data && data.homepageFaqEnabled === false) setEnabled(false);
+                    setLoading(false);
+                })
+                .catch(() => setLoading(false));
+            return;
+        }
+
         const fetches = [
             window.fetch(`${API}/api/cms/faq?t=${Date.now()}`).then(res => res.ok ? res.json() : null)
         ];
@@ -56,7 +68,13 @@ const FaqSection = ({ cmsData, limit, pageName }) => {
             .catch(() => setLoading(false));
     }, [cmsData, pageName]);
 
-    let displayFaqs = cms?.faqItems && cms.faqItems.length > 0 ? cms.faqItems : faqs;
+    const isHomepage = pageName === 'homepage';
+    let displayFaqs;
+    if (isHomepage) {
+        displayFaqs = cms?.homepageFaqItems && cms.homepageFaqItems.length > 0 ? cms.homepageFaqItems : faqs;
+    } else {
+        displayFaqs = cms?.faqItems && cms.faqItems.length > 0 ? cms.faqItems : faqs;
+    }
     if (limit) {
         displayFaqs = displayFaqs.slice(0, limit);
     }
@@ -67,8 +85,12 @@ const FaqSection = ({ cmsData, limit, pageName }) => {
         setActiveIndices(displayFaqs.map((_, i) => i));
     }, [displayFaqs.length]);
 
-    const title = cms?.faqTitle || "Everything you need to know about renting with IndianRenters.com";
-    const subtitle = cms?.faqSubtitle || "Welcome to FAQ!";
+    const title = isHomepage
+        ? (cms?.homepageFaqTitle || "Frequently Asked Questions")
+        : (cms?.faqTitle || "Everything you need to know about renting with IndianRenters.com");
+    const subtitle = isHomepage
+        ? (cms?.homepageFaqSubtitle || "")
+        : (cms?.faqSubtitle || "Welcome to FAQ!");
 
     const toggleFaq = (index) => {
         if (activeIndices.includes(index)) {
