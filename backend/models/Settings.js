@@ -48,6 +48,10 @@ const settingsSchema = new mongoose.Schema({
         ]
     },
 
+    // Platform Identity extras
+    currency: { type: String, default: 'INR' },
+    timezone: { type: String, default: 'Asia/Kolkata' },
+
     // Platform behaviour flags
     maintenanceMode: { type: Boolean, default: false },
     allowRegistrations: { type: Boolean, default: true },

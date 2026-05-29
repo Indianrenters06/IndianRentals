@@ -3,10 +3,27 @@ import toast from 'react-hot-toast';
 
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Card, CardBody, Input, Button, Switch, Divider, Chip } from "@heroui/react";
-import { Gear, FloppyDisk, Globe, Phone, MapPin, CurrencyInr, WarningCircle, CheckCircle } from "@phosphor-icons/react";
+import { Card, CardBody, Input, Switch, Divider, Select, SelectItem } from "@heroui/react";
+import { Gear, FloppyDisk, Globe, Phone, MapPin, CurrencyInr, WarningCircle, CheckCircle, EnvelopeSimple, Image as PhosphorImage } from "@phosphor-icons/react";
+import ImageUploader from "@/components/ImageUploader";
 
 const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+
+const CURRENCIES = [
+    { key: "INR", label: "INR — Indian Rupee (₹)" },
+    { key: "USD", label: "USD — US Dollar ($)" },
+    { key: "EUR", label: "EUR — Euro (€)" },
+    { key: "GBP", label: "GBP — British Pound (£)" },
+];
+
+const TIMEZONES = [
+    { key: "Asia/Kolkata",    label: "Asia/Kolkata (IST, UTC+5:30)" },
+    { key: "UTC",             label: "UTC (UTC+0:00)" },
+    { key: "Asia/Dubai",      label: "Asia/Dubai (GST, UTC+4:00)" },
+    { key: "Asia/Singapore",  label: "Asia/Singapore (SGT, UTC+8:00)" },
+    { key: "Europe/London",   label: "Europe/London (GMT/BST)" },
+    { key: "America/New_York",label: "America/New_York (ET)" },
+];
 
 export default function GeneralSettings() {
     const [form, setForm] = useState({
@@ -23,9 +40,7 @@ export default function GeneralSettings() {
     });
     const [saving, setSaving] = useState(false);
     const [saved, setSaved] = useState(false);
-    const [loadError, setLoadError] = useState(false);
 
-    // ── Load from backend ──────────────────────────────────────────────────────
     useEffect(() => {
         const fetchSettings = async () => {
             try {
@@ -37,27 +52,27 @@ export default function GeneralSettings() {
                     const d = await res.json();
                     setForm(prev => ({
                         ...prev,
-                        siteName: d.siteName || "",
-                        siteLogo: d.siteLogo || "",
-                        siteEmail: d.contactEmail || "",
-                        sitePhone: d.contactPhone || "",
-                        address: d.address || "",
-                        currency: d.currency || "INR",
-                        timezone: d.timezone || "Asia/Kolkata",
-                        maintenanceMode: d.maintenanceMode ?? false,
+                        siteName:           d.siteName        || "",
+                        siteLogo:           d.siteLogo        || "",
+                        siteEmail:          d.contactEmail    || "",
+                        sitePhone:          d.contactPhone    || "",
+                        address:            d.address         || "",
+                        currency:           d.currency        || "INR",
+                        timezone:           d.timezone        || "Asia/Kolkata",
+                        maintenanceMode:    d.maintenanceMode  ?? false,
                         allowRegistrations: d.allowRegistrations ?? true,
-                        requireKYC: d.requireKYC ?? true,
+                        requireKYC:         d.requireKYC       ?? true,
                     }));
                 }
             } catch (err) {
                 console.error("Failed to load settings", err);
-                setLoadError(true);
             }
         };
         fetchSettings();
     }, []);
 
-    // ── Save to backend ────────────────────────────────────────────────────────
+    const set = (key, val) => setForm(f => ({ ...f, [key]: val }));
+
     const handleSave = async () => {
         setSaving(true);
         try {
@@ -66,14 +81,16 @@ export default function GeneralSettings() {
                 method: "PUT",
                 headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
                 body: JSON.stringify({
-                    siteName: form.siteName,
-                    siteLogo: form.siteLogo,
-                    contactEmail: form.siteEmail,
-                    contactPhone: form.sitePhone,
-                    address: form.address,
-                    maintenanceMode: form.maintenanceMode,
+                    siteName:           form.siteName,
+                    siteLogo:           form.siteLogo,
+                    contactEmail:       form.siteEmail,
+                    contactPhone:       form.sitePhone,
+                    address:            form.address,
+                    currency:           form.currency,
+                    timezone:           form.timezone,
+                    maintenanceMode:    form.maintenanceMode,
                     allowRegistrations: form.allowRegistrations,
-                    requireKYC: form.requireKYC,
+                    requireKYC:         form.requireKYC,
                 }),
             });
             if (!res.ok) throw new Error((await res.json()).message || "Failed to save");
@@ -97,141 +114,163 @@ export default function GeneralSettings() {
             </motion.div>
 
             <Card className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm">
-                <CardBody className="p-6 space-y-5">
-                    <p className="text-xs font-bold uppercase tracking-widest text-indigo-500 flex items-center gap-2"><Globe weight="bold" /> Platform Identity</p>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-6">
+                <CardBody className="p-6 space-y-6">
+
+                    {/* ── Platform Identity ── */}
+                    <p className="text-xs font-bold uppercase tracking-widest text-indigo-500 flex items-center gap-2">
+                        <Globe weight="bold" /> Platform Identity
+                    </p>
+                    <p className="text-xs text-slate-400 -mt-4">
+                        These values are used across the Navbar, Footer, PDF invoices, and email templates automatically.
+                    </p>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-5">
                         <Input
                             label="Site Name"
                             placeholder="IndianRentals"
                             value={form.siteName}
-                            onValueChange={v => setForm(f => ({ ...f, siteName: v }))}
+                            onValueChange={v => set("siteName", v)}
                             variant="bordered"
                             radius="xl"
                             startContent={<Globe className="text-slate-400" />}
                             classNames={{ inputWrapper: "bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 h-[60px]" }}
+                            description="Shown in the browser tab, Navbar alt text, and Footer copyright."
                         />
                         <Input
                             label="Support Email"
                             type="email"
                             placeholder="support@example.com"
                             value={form.siteEmail}
-                            onValueChange={v => setForm(f => ({ ...f, siteEmail: v }))}
+                            onValueChange={v => set("siteEmail", v)}
                             variant="bordered"
                             radius="xl"
-                            startContent={<Globe className="text-slate-400" />}
+                            startContent={<EnvelopeSimple className="text-slate-400" />}
                             classNames={{ inputWrapper: "bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 h-[60px]" }}
+                            description="Used on the Contact page and in transactional emails."
                         />
-                        <div className="md:col-span-2">
-                            <Input
-                                label="Site Logo URL"
-                                placeholder="https://res.cloudinary.com/..."
-                                value={form.siteLogo}
-                                onValueChange={v => setForm(f => ({ ...f, siteLogo: v }))}
-                                variant="bordered"
-                                radius="xl"
-                                description="Provide a Cloudinary or direct image link for the logo."
-                                classNames={{ 
-                                    inputWrapper: "bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 h-[60px]",
-                                    input: "font-mono text-xs"
-                                }}
-                            />
-                        </div>
                         <Input
                             label="Phone Number"
                             placeholder="+91 9876543210"
                             value={form.sitePhone}
-                            onValueChange={v => setForm(f => ({ ...f, sitePhone: v }))}
+                            onValueChange={v => set("sitePhone", v)}
                             variant="bordered"
                             radius="xl"
                             startContent={<Phone className="text-slate-400" />}
                             classNames={{ inputWrapper: "bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 h-[60px]" }}
+                            description="Displayed in the Footer and Contact page."
                         />
                         <Input
                             label="Address"
                             placeholder="Mumbai, Maharashtra, India"
                             value={form.address}
-                            onValueChange={v => setForm(f => ({ ...f, address: v }))}
+                            onValueChange={v => set("address", v)}
                             variant="bordered"
                             radius="xl"
                             startContent={<MapPin className="text-slate-400" />}
                             classNames={{ inputWrapper: "bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 h-[60px]" }}
+                            description="Used in invoices and the Contact page."
                         />
-                        <Input
+
+                        <Select
                             label="Currency"
-                            value={form.currency}
+                            selectedKeys={[form.currency]}
+                            onSelectionChange={keys => set("currency", [...keys][0] || "INR")}
                             variant="bordered"
                             radius="xl"
-                            isReadOnly
                             startContent={<CurrencyInr className="text-slate-400" />}
-                            classNames={{ inputWrapper: "bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 h-[60px] opacity-60" }}
-                        />
-                        <Input
+                            classNames={{ trigger: "bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 h-[60px]" }}
+                            description="Affects price display across the entire platform."
+                        >
+                            {CURRENCIES.map(c => <SelectItem key={c.key}>{c.label}</SelectItem>)}
+                        </Select>
+
+                        <Select
                             label="Timezone"
-                            value={form.timezone}
+                            selectedKeys={[form.timezone]}
+                            onSelectionChange={keys => set("timezone", [...keys][0] || "Asia/Kolkata")}
                             variant="bordered"
                             radius="xl"
-                            isReadOnly
                             startContent={<Globe className="text-slate-400" />}
-                            classNames={{ inputWrapper: "bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 h-[60px] opacity-60" }}
-                        />
+                            classNames={{ trigger: "bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 h-[60px]" }}
+                            description="Used for scheduling, order timestamps, and reports."
+                        >
+                            {TIMEZONES.map(t => <SelectItem key={t.key}>{t.label}</SelectItem>)}
+                        </Select>
                     </div>
 
-                    <Divider className="bg-slate-200 dark:bg-slate-800 my-2" />
+                    {/* ── Site Logo ── */}
+                    <div className="space-y-2">
+                        <p className="text-xs font-bold text-slate-500 dark:text-slate-300 uppercase tracking-wider flex items-center gap-2">
+                            <PhosphorImage size={13} /> Site Logo
+                        </p>
+                        <p className="text-xs text-slate-400">
+                            This logo appears in the Navbar, Footer, and PDF invoices. Upload a PNG/WebP with a transparent background for best results.
+                        </p>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-start">
+                            <ImageUploader
+                                label="Upload Logo"
+                                existingUrl={form.siteLogo}
+                                onUpload={url => set("siteLogo", url)}
+                            />
+                            {form.siteLogo && (
+                                <div className="flex flex-col gap-2">
+                                    <p className="text-xs text-slate-400 font-medium">Preview</p>
+                                    <div className="border border-slate-200 dark:border-slate-700 rounded-xl p-4 bg-white dark:bg-slate-800 flex items-center justify-center h-24">
+                                        <img
+                                            src={form.siteLogo}
+                                            alt="Site Logo Preview"
+                                            className="max-h-16 max-w-full object-contain"
+                                            onError={e => { e.target.style.display = 'none'; }}
+                                        />
+                                    </div>
+                                    <div className="flex items-center gap-2 p-3 bg-slate-50 dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-700">
+                                        <span className="text-[10px] font-mono text-slate-400 break-all line-clamp-2">{form.siteLogo}</span>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                    </div>
 
-                    <p className="text-xs font-bold uppercase tracking-widest text-indigo-500 flex items-center gap-2"><Gear weight="bold" /> Platform Behaviour</p>
+                    <Divider className="bg-slate-200 dark:bg-slate-800" />
+
+                    {/* ── Platform Behaviour ── */}
+                    <p className="text-xs font-bold uppercase tracking-widest text-indigo-500 flex items-center gap-2">
+                        <Gear weight="bold" /> Platform Behaviour
+                    </p>
 
                     {form.maintenanceMode && (
                         <div className="flex items-center gap-3 p-3 rounded-xl bg-rose-50 dark:bg-rose-500/10 border border-rose-200 dark:border-rose-500/30 text-rose-700 dark:text-rose-400">
                             <WarningCircle weight="bold" size={18} className="shrink-0" />
-                            <p className="text-sm font-semibold">Maintenance mode is currently <span className="underline">active</span>. The platform is offline for regular users. Remember to save and disable it when done.</p>
+                            <p className="text-sm font-semibold">Maintenance mode is currently <span className="underline">active</span>. The platform is offline for regular users.</p>
                         </div>
                     )}
 
-                    <div className="space-y-4">
+                    <div className="space-y-3">
                         {[
-                            { key: "maintenanceMode", label: "Maintenance Mode", desc: "Temporarily take the site offline for regular users. Admins retain full access.", color: "danger" },
-                            { key: "allowRegistrations", label: "Allow New Registrations", desc: "Let new users sign up on the platform. Disable to freeze new sign-ups.", color: "success" },
-                            { key: "requireKYC", label: "Require KYC Before Checkout", desc: "Block rental orders until KYC documents are approved by an admin.", color: "warning" },
+                            { key: "maintenanceMode",    label: "Maintenance Mode",             desc: "Temporarily take the site offline for regular users. Admins retain full access.", color: "danger",  badge: { on: "● SITE OFFLINE", off: "● SITE ONLINE", onCls: "bg-rose-100 text-rose-700 dark:bg-rose-500/20 dark:text-rose-400", offCls: "bg-emerald-100 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-400" } },
+                            { key: "allowRegistrations", label: "Allow New Registrations",      desc: "Let new users sign up. Disable to freeze new sign-ups.",                         color: "success", badge: { on: "● REGISTRATIONS OPEN", off: "● REGISTRATIONS CLOSED", onCls: "bg-emerald-100 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-400", offCls: "bg-amber-100 text-amber-700 dark:bg-amber-500/20 dark:text-amber-400" } },
+                            { key: "requireKYC",         label: "Require KYC Before Checkout",  desc: "Block rental orders until KYC documents are approved by an admin.",              color: "warning", badge: { on: "● KYC REQUIRED", off: "● KYC OPTIONAL", onCls: "bg-amber-100 text-amber-700 dark:bg-amber-500/20 dark:text-amber-400", offCls: "bg-slate-100 text-slate-500 dark:bg-slate-700/50" } },
                         ].map(item => (
                             <div key={item.key} className={`flex items-center justify-between p-4 rounded-xl border transition-colors ${
-                                item.key === "maintenanceMode" && form[item.key]
-                                    ? "bg-rose-50 dark:bg-rose-500/10 border-rose-200 dark:border-rose-500/30"
-                                    : item.key === "allowRegistrations" && !form[item.key]
-                                    ? "bg-amber-50 dark:bg-amber-500/10 border-amber-200 dark:border-amber-500/30"
-                                    : "bg-slate-50 dark:bg-slate-800/40 border-slate-200 dark:border-slate-700/50"
+                                item.key === "maintenanceMode" && form[item.key] ? "bg-rose-50 dark:bg-rose-500/10 border-rose-200 dark:border-rose-500/30"
+                                : item.key === "allowRegistrations" && !form[item.key] ? "bg-amber-50 dark:bg-amber-500/10 border-amber-200 dark:border-amber-500/30"
+                                : "bg-slate-50 dark:bg-slate-800/40 border-slate-200 dark:border-slate-700/50"
                             }`}>
                                 <div className="flex-1 mr-6">
                                     <p className="text-sm font-semibold text-slate-900 dark:text-slate-100">{item.label}</p>
                                     <p className="text-xs text-slate-500 mt-0.5">{item.desc}</p>
-                                    <div className="mt-2">
-                                        {item.key === "maintenanceMode" && (
-                                            <span className={`inline-flex items-center gap-1 text-[11px] font-bold px-2 py-0.5 rounded-full ${form[item.key] ? "bg-rose-100 dark:bg-rose-500/20 text-rose-700 dark:text-rose-400" : "bg-emerald-100 dark:bg-emerald-500/20 text-emerald-700 dark:text-emerald-400"}`}>
-                                                {form[item.key] ? "● SITE OFFLINE" : "● SITE ONLINE"}
-                                            </span>
-                                        )}
-                                        {item.key === "allowRegistrations" && (
-                                            <span className={`inline-flex items-center gap-1 text-[11px] font-bold px-2 py-0.5 rounded-full ${form[item.key] ? "bg-emerald-100 dark:bg-emerald-500/20 text-emerald-700 dark:text-emerald-400" : "bg-amber-100 dark:bg-amber-500/20 text-amber-700 dark:text-amber-400"}`}>
-                                                {form[item.key] ? "● REGISTRATIONS OPEN" : "● REGISTRATIONS CLOSED"}
-                                            </span>
-                                        )}
-                                        {item.key === "requireKYC" && (
-                                            <span className={`inline-flex items-center gap-1 text-[11px] font-bold px-2 py-0.5 rounded-full ${form[item.key] ? "bg-amber-100 dark:bg-amber-500/20 text-amber-700 dark:text-amber-400" : "bg-slate-100 dark:bg-slate-700/50 text-slate-500"}`}>
-                                                {form[item.key] ? "● KYC REQUIRED" : "● KYC OPTIONAL"}
-                                            </span>
-                                        )}
-                                    </div>
+                                    <span className={`inline-flex items-center gap-1 text-[11px] font-bold px-2 py-0.5 rounded-full mt-2 ${form[item.key] ? item.badge.onCls : item.badge.offCls}`}>
+                                        {form[item.key] ? item.badge.on : item.badge.off}
+                                    </span>
                                 </div>
-                                <Switch
-                                    color={item.color}
-                                    isSelected={form[item.key]}
-                                    onValueChange={v => setForm(f => ({ ...f, [item.key]: v }))}
-                                />
+                                <Switch color={item.color} isSelected={form[item.key]} onValueChange={v => set(item.key, v)} />
                             </div>
                         ))}
                     </div>
                 </CardBody>
             </Card>
 
+            {/* Save Button */}
             <div className="flex items-center gap-4">
                 <button
                     type="button"
@@ -241,12 +280,10 @@ export default function GeneralSettings() {
                 >
                     {saving ? (
                         <svg className="animate-spin w-4 h-4" viewBox="0 0 24 24" fill="none"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" /></svg>
-                    ) : saved ? (
-                        <CheckCircle weight="bold" size={18} />
                     ) : (
                         <FloppyDisk weight="bold" size={18} />
                     )}
-                    {saving ? "Saving…" : saved ? "Saved!" : "Save Changes"}
+                    {saving ? "Saving…" : "Save Changes"}
                 </button>
                 {saved && (
                     <div className="inline-flex items-center gap-1.5 text-emerald-600 dark:text-emerald-400 text-sm font-semibold bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/20 rounded-full px-3 py-1.5">

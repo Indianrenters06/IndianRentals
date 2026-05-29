@@ -26,6 +26,7 @@ const updateSettings = asyncHandler(async (req, res) => {
 
     const {
         siteName, siteLogo, contactEmail, contactPhone, address,
+        currency, timezone,
         navbarAnnouncements, navbarLinks, footerDescription, socialLinks, footerQuickLinks,
         maintenanceMode, allowRegistrations, requireKYC,
         paymentGatewaySecret, theme
@@ -36,6 +37,8 @@ const updateSettings = asyncHandler(async (req, res) => {
     if (contactEmail !== undefined) settings.contactEmail = contactEmail;
     if (contactPhone !== undefined) settings.contactPhone = contactPhone;
     if (address !== undefined) settings.address = address;
+    if (currency !== undefined) settings.currency = currency;
+    if (timezone !== undefined) settings.timezone = timezone;
     if (maintenanceMode !== undefined) settings.maintenanceMode = maintenanceMode;
     if (allowRegistrations !== undefined) settings.allowRegistrations = allowRegistrations;
     if (requireKYC !== undefined) settings.requireKYC = requireKYC;
