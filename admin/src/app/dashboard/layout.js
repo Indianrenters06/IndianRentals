@@ -147,7 +147,7 @@ export default function DashboardLayout({ children }) {
         root.style.setProperty('--color-indigo-700', t[700]);
       };
 
-      const loadBranding = () => {
+      const loadBranding = (skipRemote = false) => {
         try {
           const cached = localStorage.getItem('adminBranding');
           if (cached) {
@@ -156,6 +156,7 @@ export default function DashboardLayout({ children }) {
             applyBrandingTheme(parsed);
           }
         } catch {}
+        if (skipRemote) return;
         const token = localStorage.getItem('adminToken');
         if (!token) return;
         fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/settings`, {
@@ -170,8 +171,9 @@ export default function DashboardLayout({ children }) {
         }).catch(() => {});
       };
 
+      const handleBrandingUpdated = () => loadBranding(true);
       loadBranding();
-      window.addEventListener('branding-updated', loadBranding);
+      window.addEventListener('branding-updated', handleBrandingUpdated);
 
       const interval = setInterval(() => {
         fetchNotifications();
@@ -180,7 +182,7 @@ export default function DashboardLayout({ children }) {
       return () => {
         clearInterval(interval);
         window.removeEventListener('resize', checkMobile);
-        window.removeEventListener('branding-updated', loadBranding);
+        window.removeEventListener('branding-updated', handleBrandingUpdated);
       };
     }
   }, []);
