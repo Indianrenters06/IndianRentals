@@ -375,6 +375,67 @@ const verifyLoginOtp = asyncHandler(async (req, res) => {
     });
 });
 
+const adminForgotPassword = asyncHandler(async (req, res) => {
+    const { email } = req.body;
+    if (!email) { res.status(400); throw new Error('Please provide your email'); }
+
+    const user = await User.findOne({ email });
+    if (!user || user.role === 'customer') {
+        // Return a generic message so email enumeration is not possible
+        return res.json({ message: 'If that email belongs to an admin account, an OTP has been sent.' });
+    }
+
+    const otp = generateOTP();
+    user.emailOtp = otp;
+    user.otpExpires = Date.now() + 10 * 60 * 1000; // 10 minutes
+    await user.save();
+
+    try {
+        await sendEmail({
+            email: user.email,
+            subject: 'IndianRentals Admin – Password Reset OTP',
+            message: `Your password reset OTP is: ${otp}\n\nThis OTP is valid for 10 minutes. Do not share it with anyone.`,
+        });
+    } catch (err) {
+        console.error('Failed to send reset OTP email:', err);
+        res.status(500);
+        throw new Error('Failed to send OTP email. Please try again.');
+    }
+
+    res.json({ message: 'OTP sent to your email address.' });
+});
+
+const adminResetPassword = asyncHandler(async (req, res) => {
+    const { email, otp, newPassword } = req.body;
+    if (!email || !otp || !newPassword) {
+        res.status(400);
+        throw new Error('Please provide email, OTP, and new password');
+    }
+
+    const user = await User.findOne({ email }).select('+password');
+    if (!user || user.role === 'customer') {
+        res.status(404);
+        throw new Error('Admin account not found');
+    }
+
+    if (!user.emailOtp || user.otpExpires < Date.now()) {
+        res.status(400);
+        throw new Error('OTP expired. Please request a new one.');
+    }
+
+    if (user.emailOtp !== otp) {
+        res.status(400);
+        throw new Error('Invalid OTP');
+    }
+
+    user.password = newPassword;
+    user.emailOtp = undefined;
+    user.otpExpires = undefined;
+    await user.save();
+
+    res.json({ message: 'Password reset successfully. You can now log in.' });
+});
+
 module.exports = {
     registerUser,
     loginUser,
@@ -383,4 +444,6 @@ module.exports = {
     sendLoginOtp,
     verifyLoginOtp,
     adminLogin,
+    adminForgotPassword,
+    adminResetPassword,
 };
