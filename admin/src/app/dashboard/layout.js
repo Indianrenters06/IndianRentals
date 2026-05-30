@@ -163,7 +163,8 @@ export default function DashboardLayout({ children }) {
           headers: { Authorization: `Bearer ${token}` }
         }).then(res => res.ok ? res.json() : null).then(data => {
           if (!data) return;
-          const bd = { siteLogo: data.siteLogo, siteName: data.siteName, theme: data.theme };
+          const cached = (() => { try { return JSON.parse(localStorage.getItem('adminBranding') || '{}'); } catch { return {}; } })();
+          const bd = { siteLogo: data.siteLogo, siteName: data.siteName, theme: data.theme || cached.theme };
           setBranding(bd);
           applyBrandingTheme(bd);
           localStorage.setItem('adminBranding', JSON.stringify(bd));

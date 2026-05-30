@@ -157,6 +157,7 @@ const Hero = () => {
                     scrollbarWidth: "none",
                     msOverflowStyle: "none"
                 }}
+
             >
                 <div className="hide-scrollbar overflow-auto"></div>
                 {slides.map((s, i) => (

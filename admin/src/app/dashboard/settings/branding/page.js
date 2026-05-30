@@ -53,7 +53,7 @@ export default function BrandingSettings() {
 
     const fetchSettings = async () => {
         try {
-            const res = await window.fetch(`${API}/api/admin/settings`, {
+            const res = await window.fetch(`${API}/api/settings`, {
                 headers: { Authorization: `Bearer ${getToken()}` }
             });
             if (res.ok) {
@@ -77,7 +77,7 @@ export default function BrandingSettings() {
         window.dispatchEvent(new Event('branding-updated'));
 
         try {
-            const res = await window.fetch(`${API}/api/admin/settings`, {
+            const res = await window.fetch(`${API}/api/settings`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
