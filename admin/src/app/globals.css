@@ -147,15 +147,43 @@ summary,
   top: 6px !important;
   transform: scale(0.85) !important;
   transform-origin: top left !important;
-  font-size: 0.875rem !important;
+  font-size: 1rem !important;
   color: var(--color-indigo-500) !important;
 }
 
-/* Push the actual input text down so it doesn't overlap the floated label */
+/* Textarea: push content down when label floats */
+[data-filled="true"] [data-slot="textarea"],
+[data-filled-within="true"] [data-slot="textarea"],
+[data-focus="true"] [data-slot="textarea"],
+[data-has-value="true"] [data-slot="textarea"] {
+  padding-top: 1.375rem !important;
+}
+
+/* Default (empty, unfocused): no extra padding — icon and placeholder sit at center together */
 [data-slot="input"],
 [data-slot="textarea"] {
-  padding-top: 1.375rem !important;
+  padding-top: 0.25rem !important;
   padding-bottom: 0.25rem !important;
+}
+
+/* When label floats: push input text down below the label */
+[data-filled="true"] [data-slot="input"],
+[data-filled-within="true"] [data-slot="input"],
+[data-focus="true"] [data-slot="input"],
+:focus-within > [data-slot="input-wrapper"] [data-slot="input"],
+[data-has-value="true"] [data-slot="input"] {
+  padding-top: 1.375rem !important;
+  padding-bottom: 0.125rem !important;
+}
+
+/* Shift startContent / endContent icons down by the same amount so they stay aligned with the text */
+[data-filled="true"] [data-slot="inner-wrapper"] > :not([data-slot="input"]):not([data-slot="textarea"]),
+[data-filled-within="true"] [data-slot="inner-wrapper"] > :not([data-slot="input"]):not([data-slot="textarea"]),
+[data-focus="true"] [data-slot="inner-wrapper"] > :not([data-slot="input"]):not([data-slot="textarea"]),
+:focus-within > [data-slot="input-wrapper"] [data-slot="inner-wrapper"] > :not([data-slot="input"]):not([data-slot="textarea"]),
+[data-has-value="true"] [data-slot="inner-wrapper"] > :not([data-slot="input"]):not([data-slot="textarea"]) {
+  margin-top: 1.375rem !important;
+  align-self: flex-start !important;
 }
 
 /* ── HeroUI Switch Fix ────────────────────────────────────────────────────────
