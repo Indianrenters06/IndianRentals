@@ -236,6 +236,126 @@ const getCancellationReport = asyncHandler(async (req, res) => {
     });
 });
 
+// ── 8. Refund Report  GET /api/reports/refunds ────────────────────────────────
+const getRefundReport = asyncHandler(async (req, res) => {
+    const year = parseInt(req.query.year) || new Date().getFullYear();
+
+    const [monthlyRaw, refundTotals, allRevenue, topRefunded] = await Promise.all([
+        Rental.aggregate([
+            { $match: { isPaid: true, status: 'Cancelled', createdAt: yearRange(year) } },
+            { $group: { _id: { month: { $month: '$createdAt' } }, amount: { $sum: '$totalPrice' }, count: { $sum: 1 } } },
+            { $sort: { '_id.month': 1 } },
+        ]),
+        Rental.aggregate([
+            { $match: { isPaid: true, status: 'Cancelled' } },
+            { $group: { _id: null, totalAmount: { $sum: '$totalPrice' }, totalCount: { $sum: 1 } } },
+        ]),
+        Rental.aggregate([
+            { $match: { isPaid: true } },
+            { $group: { _id: null, total: { $sum: '$totalPrice' }, count: { $sum: 1 } } },
+        ]),
+        Rental.aggregate([
+            { $match: { isPaid: true, status: 'Cancelled' } },
+            { $unwind: '$orderItems' },
+            { $lookup: { from: 'products', localField: 'orderItems.product', foreignField: '_id', as: 'prod' } },
+            { $unwind: { path: '$prod', preserveNullAndEmptyArrays: true } },
+            { $group: {
+                _id: '$orderItems.product',
+                name: { $first: { $ifNull: ['$prod.name', 'Unknown'] } },
+                amount: { $sum: { $multiply: ['$orderItems.price', { $ifNull: ['$orderItems.qty', 1] }] } },
+                count: { $sum: 1 },
+            }},
+            { $sort: { amount: -1 } },
+            { $limit: 10 },
+        ]),
+    ]);
+
+    const monthly = MONTHS.map((label, i) => {
+        const found = monthlyRaw.find(d => d._id?.month === i + 1);
+        return { month: label, amount: found?.amount || 0, count: found?.count || 0 };
+    });
+
+    const rt = refundTotals[0] || {};
+    const ar = allRevenue[0] || {};
+
+    res.json({
+        monthly,
+        totalRefunds: rt.totalAmount || 0,
+        refundCount: rt.totalCount || 0,
+        totalRevenue: ar.total || 0,
+        paidOrders: ar.count || 0,
+        refundRate: ar.count > 0 ? +((rt.totalCount / ar.count) * 100).toFixed(1) : 0,
+        topRefunded: topRefunded.map(p => ({ name: p.name, amount: p.amount, count: p.count })),
+        year,
+    });
+});
+
+// ── 9. Vendor (Brand) Performance  GET /api/reports/vendors ───────────────────
+const getVendorReport = asyncHandler(async (req, res) => {
+    const [byBrand, topProducts] = await Promise.all([
+        Rental.aggregate([
+            { $match: { isPaid: true } },
+            { $unwind: '$orderItems' },
+            { $lookup: { from: 'products', localField: 'orderItems.product', foreignField: '_id', as: 'prod' } },
+            { $unwind: { path: '$prod', preserveNullAndEmptyArrays: true } },
+            { $group: {
+                _id: { $ifNull: ['$prod.brand', 'Unbranded'] },
+                revenue: { $sum: { $multiply: ['$orderItems.price', { $ifNull: ['$orderItems.qty', 1] }] } },
+                orders: { $sum: 1 },
+                items: { $sum: { $ifNull: ['$orderItems.qty', 1] } },
+            }},
+            { $sort: { revenue: -1 } },
+            { $limit: 15 },
+        ]),
+        Rental.aggregate([
+            { $match: { isPaid: true } },
+            { $unwind: '$orderItems' },
+            { $lookup: { from: 'products', localField: 'orderItems.product', foreignField: '_id', as: 'prod' } },
+            { $unwind: { path: '$prod', preserveNullAndEmptyArrays: true } },
+            { $group: {
+                _id: '$orderItems.product',
+                name: { $first: { $ifNull: ['$prod.name', 'Unknown'] } },
+                brand: { $first: { $ifNull: ['$prod.brand', 'Unbranded'] } },
+                category: { $first: { $ifNull: ['$prod.category', 'Uncategorized'] } },
+                revenue: { $sum: { $multiply: ['$orderItems.price', { $ifNull: ['$orderItems.qty', 1] }] } },
+                orders: { $sum: 1 },
+            }},
+            { $sort: { revenue: -1 } },
+            { $limit: 10 },
+        ]),
+    ]);
+
+    res.json({ byBrand, topProducts });
+});
+
+// ── 10. Location Analytics  GET /api/reports/location ─────────────────────────
+const getLocationReport = asyncHandler(async (req, res) => {
+    const [byCity, totals] = await Promise.all([
+        Rental.aggregate([
+            { $group: {
+                _id: '$shippingAddress.city',
+                orders: { $sum: 1 },
+                revenue: { $sum: { $cond: ['$isPaid', '$totalPrice', 0] } },
+                customers: { $addToSet: '$user' },
+            }},
+            { $project: { city: { $ifNull: ['$_id', 'Unknown'] }, orders: 1, revenue: 1, customers: { $size: '$customers' } } },
+            { $sort: { revenue: -1 } },
+            { $limit: 15 },
+        ]),
+        Rental.aggregate([
+            { $group: {
+                _id: null,
+                cities: { $addToSet: '$shippingAddress.city' },
+                totalOrders: { $sum: 1 },
+                totalRevenue: { $sum: { $cond: ['$isPaid', '$totalPrice', 0] } },
+            }},
+            { $project: { citiesCount: { $size: '$cities' }, totalOrders: 1, totalRevenue: 1 } },
+        ]),
+    ]);
+
+    res.json({ byCity, totals: totals[0] || {} });
+});
+
 module.exports = {
     getRevenueReport,
     getRentalDurationReport,
@@ -244,4 +364,7 @@ module.exports = {
     getChurnReport,
     getInventoryReport,
     getCancellationReport,
+    getRefundReport,
+    getVendorReport,
+    getLocationReport,
 };

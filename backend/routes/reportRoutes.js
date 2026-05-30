@@ -9,6 +9,9 @@ const {
     getChurnReport,
     getInventoryReport,
     getCancellationReport,
+    getRefundReport,
+    getVendorReport,
+    getLocationReport,
 } = require('../controllers/reportController');
 
 router.get('/revenue',               protect, admin, getRevenueReport);
@@ -18,5 +21,8 @@ router.get('/customer-ltv',          protect, admin, getCustomerLTVReport);
 router.get('/churn',                 protect, admin, getChurnReport);
 router.get('/inventory-utilization', protect, admin, getInventoryReport);
 router.get('/cancellations',         protect, admin, getCancellationReport);
+router.get('/refunds',               protect, admin, getRefundReport);
+router.get('/vendors',               protect, admin, getVendorReport);
+router.get('/location',              protect, admin, getLocationReport);
 
 module.exports = router;

@@ -326,6 +326,10 @@ export default function DashboardLayout({ children }) {
         { name: 'Customer LTV', path: '/dashboard/reports/ltv' },
         { name: 'Churn Report', path: '/dashboard/reports/churn' },
         { name: 'Inventory Utilization', path: '/dashboard/reports/inventory' },
+        { name: 'Cancellation Report', path: '/dashboard/reports/cancellation' },
+        { name: 'Refund Report', path: '/dashboard/reports/refund' },
+        { name: 'Vendor Performance', path: '/dashboard/reports/vendor' },
+        { name: 'Location Analytics', path: '/dashboard/reports/location' },
       ]
     },
     {
@@ -337,6 +341,10 @@ export default function DashboardLayout({ children }) {
         { name: 'Payment Reminders', path: '/dashboard/notifications/payment' },
         { name: 'Offer Campaigns', path: '/dashboard/notifications/offers' },
         { name: 'Renewal Reminders', path: '/dashboard/notifications/renewal' },
+        { name: 'Booking Confirmation', path: '/dashboard/notifications/booking' },
+        { name: 'Cancellation Alerts', path: '/dashboard/notifications/cancellation' },
+        { name: 'Return Reminders', path: '/dashboard/notifications/return' },
+        { name: 'OTP Verification', path: '/dashboard/notifications/otp' },
       ]
     },
     {

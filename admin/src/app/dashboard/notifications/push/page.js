@@ -39,7 +39,7 @@ export default function PushNotifications() {
         const fetchNotifications = async () => {
             try {
                 const token = localStorage.getItem("adminToken");
-                const res = await fetch(`${API}/api/notifications`, {
+                const res = await fetch(`${API}/api/alerts`, {
                     headers: { Authorization: `Bearer ${token}` },
                 });
                 if (!res.ok) throw new Error("Failed to fetch notifications");
@@ -61,7 +61,7 @@ export default function PushNotifications() {
         setSending(true);
         try {
             const token = localStorage.getItem("adminToken");
-            const res = await fetch(`${API}/api/notifications`, {
+            const res = await fetch(`${API}/api/alerts`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
                 body: JSON.stringify(form),
