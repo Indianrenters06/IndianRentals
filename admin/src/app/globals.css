@@ -91,9 +91,17 @@ summary,
    ─────────────────────────────────────────────────────────────────────────── */
 
 /* Ensure the input wrapper is positioned so the label can float correctly */
-[data-slot="input-wrapper"],
+[data-slot="input-wrapper"] {
+  position: relative !important;
+}
+
+/* Restore flex row layout for inner-wrapper so startContent icon and input text stay aligned */
 [data-slot="inner-wrapper"] {
   position: relative !important;
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  width: 100% !important;
 }
 
 /* The floating label: start it inside the input field */
