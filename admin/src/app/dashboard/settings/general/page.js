@@ -132,8 +132,8 @@ export default function GeneralSettings() {
                             onValueChange={v => set("siteName", v)}
                             variant="bordered"
                             radius="xl"
-                            startContent={<Globe size={16} className="text-slate-400 shrink-0 mb-0.5" />}
-                            classNames={{ inputWrapper: "bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 h-[60px]", innerWrapper: "items-end pb-2", label: "text-sm font-medium" }}
+                            startContent={<Globe size={16} className="text-slate-400 shrink-0" />}
+                            classNames={{ inputWrapper: "bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 h-[60px]", label: "text-sm font-medium" }}
                             description="Shown in the browser tab, Navbar alt text, and Footer copyright."
                         />
                         <Input
@@ -144,8 +144,8 @@ export default function GeneralSettings() {
                             onValueChange={v => set("siteEmail", v)}
                             variant="bordered"
                             radius="xl"
-                            startContent={<EnvelopeSimple size={16} className="text-slate-400 shrink-0 mb-0.5" />}
-                            classNames={{ inputWrapper: "bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 h-[60px]", innerWrapper: "items-end pb-2", label: "text-sm font-medium" }}
+                            startContent={<EnvelopeSimple size={16} className="text-slate-400 shrink-0" />}
+                            classNames={{ inputWrapper: "bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 h-[60px]", label: "text-sm font-medium" }}
                             description="Used on the Contact page and in transactional emails."
                         />
                         <Input
@@ -155,8 +155,8 @@ export default function GeneralSettings() {
                             onValueChange={v => set("sitePhone", v)}
                             variant="bordered"
                             radius="xl"
-                            startContent={<Phone size={16} className="text-slate-400 shrink-0 mb-0.5" />}
-                            classNames={{ inputWrapper: "bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 h-[60px]", innerWrapper: "items-end pb-2", label: "text-sm font-medium" }}
+                            startContent={<Phone size={16} className="text-slate-400 shrink-0" />}
+                            classNames={{ inputWrapper: "bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 h-[60px]", label: "text-sm font-medium" }}
                             description="Displayed in the Footer and Contact page."
                         />
                         <Input
@@ -166,8 +166,8 @@ export default function GeneralSettings() {
                             onValueChange={v => set("address", v)}
                             variant="bordered"
                             radius="xl"
-                            startContent={<MapPin size={16} className="text-slate-400 shrink-0 mb-0.5" />}
-                            classNames={{ inputWrapper: "bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 h-[60px]", innerWrapper: "items-end pb-2", label: "text-sm font-medium" }}
+                            startContent={<MapPin size={16} className="text-slate-400 shrink-0" />}
+                            classNames={{ inputWrapper: "bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 h-[60px]", label: "text-sm font-medium" }}
                             description="Used in invoices and the Contact page."
                         />
 
