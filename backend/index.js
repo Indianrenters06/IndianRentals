@@ -154,6 +154,9 @@ app.use('/api/alerts', notificationRoutes);
 const addonRoutes = require('./routes/addonRoutes');
 app.use('/api/addons', addonRoutes);
 
+const reportRoutes = require('./routes/reportRoutes');
+app.use('/api/reports', reportRoutes);
+
 app.get('/', (req, res) => {
   res.send('API is running...');
 });
