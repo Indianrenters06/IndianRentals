@@ -125,51 +125,32 @@ export default function GeneralSettings() {
                     </p>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-5">
-                        <Input
-                            label="Site Name"
-                            placeholder="IndianRentals"
-                            value={form.siteName}
-                            onValueChange={v => set("siteName", v)}
-                            variant="bordered"
-                            radius="xl"
-                            startContent={<Globe size={16} className="text-slate-400 shrink-0" />}
-                            classNames={{ inputWrapper: "bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 h-[60px]", label: "text-sm font-medium" }}
-                            description="Shown in the browser tab, Navbar alt text, and Footer copyright."
-                        />
-                        <Input
-                            label="Support Email"
-                            type="email"
-                            placeholder="support@example.com"
-                            value={form.siteEmail}
-                            onValueChange={v => set("siteEmail", v)}
-                            variant="bordered"
-                            radius="xl"
-                            startContent={<EnvelopeSimple size={16} className="text-slate-400 shrink-0" />}
-                            classNames={{ inputWrapper: "bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 h-[60px]", label: "text-sm font-medium" }}
-                            description="Used on the Contact page and in transactional emails."
-                        />
-                        <Input
-                            label="Phone Number"
-                            placeholder="+91 9876543210"
-                            value={form.sitePhone}
-                            onValueChange={v => set("sitePhone", v)}
-                            variant="bordered"
-                            radius="xl"
-                            startContent={<Phone size={16} className="text-slate-400 shrink-0" />}
-                            classNames={{ inputWrapper: "bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 h-[60px]", label: "text-sm font-medium" }}
-                            description="Displayed in the Footer and Contact page."
-                        />
-                        <Input
-                            label="Address"
-                            placeholder="Mumbai, Maharashtra, India"
-                            value={form.address}
-                            onValueChange={v => set("address", v)}
-                            variant="bordered"
-                            radius="xl"
-                            startContent={<MapPin size={16} className="text-slate-400 shrink-0" />}
-                            classNames={{ inputWrapper: "bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 h-[60px]", label: "text-sm font-medium" }}
-                            description="Used in invoices and the Contact page."
-                        />
+                        {[
+                            { field: "siteName",  label: "Site Name",     icon: Globe,          placeholder: "IndianRentals",            type: "text",  desc: "Shown in the browser tab, Navbar alt text, and Footer copyright." },
+                            { field: "siteEmail", label: "Support Email", icon: EnvelopeSimple, placeholder: "support@example.com",       type: "email", desc: "Used on the Contact page and in transactional emails." },
+                            { field: "sitePhone", label: "Phone Number",  icon: Phone,          placeholder: "+91 9876543210",            type: "tel",   desc: "Displayed in the Footer and Contact page." },
+                            { field: "address",   label: "Address",       icon: MapPin,         placeholder: "Mumbai, Maharashtra, India", type: "text",  desc: "Used in invoices and the Contact page." },
+                        ].map(({ field, label, icon: Icon, placeholder, type, desc }) => (
+                            <div key={field} className="flex flex-col gap-1.5">
+                                <div
+                                    className="relative bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-2xl h-[60px] px-3 flex flex-col justify-end pb-2.5 focus-within:border-indigo-500/50 focus-within:ring-2 focus-within:ring-indigo-500/20 transition-all cursor-text"
+                                    onClick={e => e.currentTarget.querySelector('input')?.focus()}
+                                >
+                                    <span className="absolute top-2 left-3 text-[13px] font-medium text-indigo-400 dark:text-indigo-400 pointer-events-none select-none">{label}</span>
+                                    <div className="flex items-center gap-2">
+                                        <Icon size={15} className="text-slate-400 dark:text-slate-500 shrink-0" />
+                                        <input
+                                            type={type}
+                                            value={form[field]}
+                                            onChange={e => set(field, e.target.value)}
+                                            placeholder={placeholder}
+                                            className="flex-1 bg-transparent text-sm text-slate-900 dark:text-white outline-none placeholder:text-slate-400 dark:placeholder:text-slate-600"
+                                        />
+                                    </div>
+                                </div>
+                                <p className="text-xs text-slate-400 dark:text-slate-500 px-0.5">{desc}</p>
+                            </div>
+                        ))}
 
                         <Select
                             label="Currency"
