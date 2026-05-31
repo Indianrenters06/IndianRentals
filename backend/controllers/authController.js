@@ -5,6 +5,7 @@ const { createNotification } = require('./notificationController');
 
 const sendEmail = require('../utils/sendEmail');
 const sendSMS = require('../utils/sendSMS');
+const { sendTemplatedEmail } = require('../utils/sendTemplatedEmail');
 
 // Generate 6-digit OTP
 const generateOTP = () => {
@@ -79,14 +80,22 @@ const registerUser = asyncHandler(async (req, res) => {
     });
 
     if (user) {
-        // Send Email
-        const message = `Your Email OTP for IndianRentals is: ${emailOtp}`;
+        // Send Email OTP — try the admin "OTP Verification" template first,
+        // fall back to a plain message so the OTP always reaches the user.
         try {
-            await sendEmail({
-                email: user.email,
-                subject: 'IndianRentals - Verify your Email',
-                message,
+            const sentViaTemplate = await sendTemplatedEmail('OTP Verification', user.email, {
+                USER_NAME: user.name,
+                OTP_CODE: emailOtp,
+                EXPIRY_MINUTES: 10,
+                purpose: 'verify your email address',
             });
+            if (!sentViaTemplate) {
+                await sendEmail({
+                    email: user.email,
+                    subject: 'IndianRentals - Verify your Email',
+                    message: `Your Email OTP for IndianRentals is: ${emailOtp}`,
+                });
+            }
         } catch (error) {
             console.error('Email send failed:', error);
             // Don't fail the registration, just let them resend or handle it
@@ -161,6 +170,12 @@ const verifyOtp = asyncHandler(async (req, res) => {
     user.otpExpires = undefined;
     await user.save();
 
+    // Send the Welcome email now that the account is fully verified.
+    sendTemplatedEmail('Welcome Email', user.email, {
+        userName: user.name,
+        email: user.email,
+    });
+
     const token = generateToken(res, user._id);
 
     res.json({
@@ -199,11 +214,19 @@ const loginUser = asyncHandler(async (req, res) => {
 
         // Send Email
         try {
-            await sendEmail({
-                email: user.email,
-                subject: 'IndianRentals - Login OTP',
-                message: `Your Login OTP is: ${emailOtp}`,
+            const sentViaTemplate = await sendTemplatedEmail('OTP Verification', user.email, {
+                USER_NAME: user.name,
+                OTP_CODE: emailOtp,
+                EXPIRY_MINUTES: 10,
+                purpose: 'log in to your account',
             });
+            if (!sentViaTemplate) {
+                await sendEmail({
+                    email: user.email,
+                    subject: 'IndianRentals - Login OTP',
+                    message: `Your Login OTP is: ${emailOtp}`,
+                });
+            }
         } catch (error) {
             console.error('Email send failed:', error);
         }
@@ -274,16 +297,20 @@ const sendLoginOtp = asyncHandler(async (req, res) => {
 
         await user.save();
 
-        const message = `Your Login OTP for IndianRentals is: ${otp}`;
         try {
-            // Making email sending asynchronous but not blocking the response if it takes too long
-            // or we could await it with a timeout. 
-            // Better: await it but catch error so flow continues.
-            await sendEmail({
-                email: user.email,
-                subject: 'IndianRentals - Login OTP',
-                message,
+            const sentViaTemplate = await sendTemplatedEmail('OTP Verification', user.email, {
+                USER_NAME: user.name,
+                OTP_CODE: otp,
+                EXPIRY_MINUTES: 10,
+                purpose: 'log in to your account',
             });
+            if (!sentViaTemplate) {
+                await sendEmail({
+                    email: user.email,
+                    subject: 'IndianRentals - Login OTP',
+                    message: `Your Login OTP for IndianRentals is: ${otp}`,
+                });
+            }
         } catch (error) {
             console.error('Email send failed (Network Error?):', error);
             // Non-blocking failure: proceed so user can still login using Network Tab OTP

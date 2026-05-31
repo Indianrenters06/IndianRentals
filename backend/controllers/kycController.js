@@ -2,6 +2,17 @@ const KYC = require('../models/KYC');
 const User = require('../models/User');
 const { createNotification } = require('./notificationController');
 const { uploadToCloudinary } = require('../middleware/uploadMiddleware');
+const { sendTemplatedEmail } = require('../utils/sendTemplatedEmail');
+
+// Map raw document keys to friendly labels for the KYC email
+const DOC_LABELS = {
+    identityProof: 'Identity Proof',
+    addressProof: 'Address Proof',
+    bankStatement: 'Bank Statement',
+    aadhaar: 'Aadhaar Card',
+    pan: 'PAN Card',
+    photo: 'Photograph',
+};
 
 // @desc    Get All KYC Requests (Admin)
 // @route   GET /api/kyc/admin/all
@@ -99,6 +110,17 @@ exports.createOrUpdateKYC = async (req, res) => {
                     : `User ${req.user.name} has re-submitted their KYC after rejection.`,
                 type: 'kyc',
                 relatedId: kyc._id
+            });
+
+            // Confirm receipt to the customer (non-blocking).
+            const docKeys = Object.keys(kyc.documents?.toObject?.() ?? kyc.documents ?? {})
+                .filter(k => (kyc.documents?.[k]));
+            const docList = docKeys.length
+                ? `Other documents received: ${docKeys.map(k => DOC_LABELS[k] || k).join(', ')}.`
+                : '';
+            sendTemplatedEmail('KYC Submitted — Under Review', req.user.email, {
+                CUSTOMER_NAME: req.user.name || 'Customer',
+                SUBMITTED_DOCS: docList,
             });
         }
 

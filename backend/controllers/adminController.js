@@ -6,6 +6,7 @@ const KYC = require('../models/KYC');
 const Notification = require('../models/Notification');
 const PricingPlan = require('../models/PricingPlan');
 const Role = require('../models/Role');
+const { sendTemplatedEmail } = require('../utils/sendTemplatedEmail');
 
 // @desc    Get admin dashboard statistics
 // @route   GET /api/admin/stats
@@ -417,6 +418,21 @@ const updateKYCStatus = asyncHandler(async (req, res) => {
 
     // Populate user data for response
     await kyc.populate('user', 'name email phone');
+
+    // Notify the customer of the decision (non-blocking).
+    const custName = kyc.user?.name || kyc.personalDetails?.name || 'Customer';
+    const custEmail = kyc.user?.email || kyc.personalDetails?.email;
+    if (status === 'approved') {
+        sendTemplatedEmail('KYC Approved', custEmail, {
+            CUSTOMER_NAME: custName,
+            RENTAL_LIMIT: (kyc.rentalLimit ? Number(kyc.rentalLimit).toLocaleString('en-IN') : '50,000'),
+        });
+    } else if (status === 'rejected') {
+        sendTemplatedEmail('KYC Rejected — Action Required', custEmail, {
+            CUSTOMER_NAME: custName,
+            REJECTION_REASON: remarks || 'Your documents could not be verified. Please resubmit clear, valid documents.',
+        });
+    }
 
     res.json({
         message: `KYC ${status} successfully`,
