@@ -5,8 +5,9 @@ import toast from 'react-hot-toast';
 import {
     EnvelopeSimple, Plus, PencilSimple, Trash, X, FloppyDisk,
     MagnifyingGlass, Tag, CheckCircle, XCircle, Eye, Code, Info,
-    UploadSimple
+    UploadSimple, Lightning
 } from '@phosphor-icons/react';
+import { EMAIL_PRESETS } from './presets';
 
 const API = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
 const getToken = () => typeof window !== 'undefined' ? localStorage.getItem('adminToken') : null;
@@ -299,10 +300,29 @@ export default function EmailTemplatesPage() {
                     </h1>
                     <p className="text-slate-500 text-sm mt-1">Manage transactional and marketing email templates.</p>
                 </div>
-                <button onClick={() => setModal('new')}
-                    className="flex items-center gap-2 h-10 px-5 rounded-xl bg-indigo-600 text-white text-sm font-bold shadow-lg shadow-indigo-500/20">
-                    <Plus size={16} weight="bold" /> New Template
-                </button>
+                <div className="flex items-center gap-2">
+                    <div className="relative group">
+                        <button className="flex items-center gap-2 h-10 px-4 rounded-xl border border-indigo-200 dark:border-indigo-500/30 bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 text-sm font-bold">
+                            <Lightning size={15} weight="fill" /> Presets
+                        </button>
+                        <div className="absolute right-0 top-12 z-30 w-64 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-2xl shadow-2xl p-2 hidden group-hover:block">
+                            {EMAIL_PRESETS.map((preset, i) => (
+                                <button key={i} onClick={() => setModal({ ...preset, _id: null })}
+                                    className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-left hover:bg-indigo-50 dark:hover:bg-indigo-500/10 transition-colors">
+                                    <EnvelopeSimple size={14} className="text-indigo-500 shrink-0" weight="bold" />
+                                    <div className="min-w-0">
+                                        <p className="text-sm font-semibold text-slate-800 dark:text-slate-200 truncate">{preset.name}</p>
+                                        <p className="text-[11px] text-slate-400 truncate">{preset.type}</p>
+                                    </div>
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+                    <button onClick={() => setModal('new')}
+                        className="flex items-center gap-2 h-10 px-5 rounded-xl bg-indigo-600 text-white text-sm font-bold shadow-lg shadow-indigo-500/20">
+                        <Plus size={16} weight="bold" /> New Template
+                    </button>
+                </div>
             </div>
 
             {/* Filters */}
@@ -321,6 +341,37 @@ export default function EmailTemplatesPage() {
                     ))}
                 </div>
             </div>
+
+            {/* Preset Templates */}
+            {templates.length === 0 && (
+                <div className="bg-gradient-to-br from-indigo-50 to-orange-50 dark:from-indigo-500/5 dark:to-orange-500/5 border border-indigo-100 dark:border-indigo-500/20 rounded-2xl p-5">
+                    <div className="flex items-center gap-2 mb-4">
+                        <Lightning size={16} weight="fill" className="text-indigo-600 dark:text-indigo-400" />
+                        <span className="text-sm font-bold text-slate-800 dark:text-slate-200">Preset Templates</span>
+                        <span className="text-xs text-slate-400 ml-1">— load a ready-made template instantly</span>
+                    </div>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                        {EMAIL_PRESETS.map((preset, i) => (
+                            <button key={i} onClick={() => setModal({ ...preset, _id: null })}
+                                className="flex items-start gap-3 p-4 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-left hover:border-indigo-300 dark:hover:border-indigo-500 transition-colors group">
+                                <div className="w-9 h-9 rounded-lg bg-indigo-50 dark:bg-indigo-500/10 flex items-center justify-center shrink-0">
+                                    <EnvelopeSimple size={16} className="text-indigo-600 dark:text-indigo-400" weight="bold" />
+                                </div>
+                                <div className="flex-1 min-w-0">
+                                    <p className="text-sm font-bold text-slate-800 dark:text-slate-200 truncate group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">{preset.name}</p>
+                                    <p className="text-xs text-slate-400 mt-0.5 truncate">{preset.subject}</p>
+                                    <div className="flex items-center gap-1.5 mt-2 flex-wrap">
+                                        <span className={`text-[10px] font-bold uppercase px-2 py-0.5 rounded-full ${TYPE_COLORS[preset.type] || TYPE_COLORS.other}`}>{preset.type}</span>
+                                        {preset.variables.map(v => (
+                                            <span key={v} className="text-[10px] font-mono text-slate-400 bg-slate-100 dark:bg-slate-700 px-1.5 py-0.5 rounded">{v}</span>
+                                        ))}
+                                    </div>
+                                </div>
+                            </button>
+                        ))}
+                    </div>
+                </div>
+            )}
 
             {/* Templates list */}
             {loading ? (
