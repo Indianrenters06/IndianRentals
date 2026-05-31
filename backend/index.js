@@ -157,6 +157,12 @@ app.use('/api/addons', addonRoutes);
 const reportRoutes = require('./routes/reportRoutes');
 app.use('/api/reports', reportRoutes);
 
+const emailTemplateRoutes = require('./routes/emailTemplateRoutes');
+app.use('/api/email-templates', emailTemplateRoutes);
+
+const smsTemplateRoutes = require('./routes/smsTemplateRoutes');
+app.use('/api/sms-templates', smsTemplateRoutes);
+
 app.get('/', (req, res) => {
   res.send('API is running...');
 });
