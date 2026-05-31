@@ -398,7 +398,7 @@ export default function AdminDashboard() {
                         <p className="text-sm font-semibold text-slate-900 dark:text-slate-200 line-clamp-1">{note.title}</p>
                         <p className="text-xs text-slate-500 dark:text-slate-200 line-clamp-1">{note.message}</p>
                       </div>
-                      <span className="text-[10px] text-slate-400 whitespace-nowrap">{new Date(note.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                      <span className="text-[10px] text-slate-400 whitespace-nowrap">{(() => { const d = new Date(note.createdAt); const today = new Date(); const isToday = d.toDateString() === today.toDateString(); return isToday ? d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : d.toLocaleDateString([], { month: 'short', day: 'numeric' }) + ' ' + d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }); })()}</span>
                     </div>
                   ))}
                 </div>

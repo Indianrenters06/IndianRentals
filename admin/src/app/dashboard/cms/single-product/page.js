@@ -11,6 +11,11 @@ const API = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
 const getToken = () => typeof window !== 'undefined' ? localStorage.getItem('adminToken') : null;
 
 const DEFAULTS = {
+    deliveryDays: '2-4 days',
+    rentalPeriodLabel: 'Select your minimum rental period',
+    tenureOptions: ['1+', '3+', '6+', '9+', '12+'],
+    priceBreakdownText: 'price breakdown',
+    compareTeuresText: 'compare all tenures',
     benefits: [
         { id: 1, title: 'Fully Functional' },
         { id: 2, title: 'Accessories Included' },
@@ -43,6 +48,7 @@ const DEFAULTS = {
     ],
     bestProductsTitle: 'Best Rented Products',
     bestProductsButtonText: 'View All',
+    bestProductIds: [],
 };
 
 const REVIEW_COLORS = ['yellow', 'blue', 'green', 'pink', 'purple', 'white'];
@@ -118,6 +124,9 @@ export default function SingleProductPageCMS() {
     const [activeEdit, setActiveEdit] = useState(null);
     const [activeTab, setActiveTab] = useState('details');
     const [openFaq, setOpenFaq] = useState(null);
+    const [productEdit, setProductEdit] = useState(null);
+    const [productSaving, setProductSaving] = useState(false);
+    const [newImgUrl, setNewImgUrl] = useState('');
 
     const set = (key, val) => setTd(prev => ({ ...prev, [key]: val }));
     const upd = (key, id, field, val) =>
@@ -137,12 +146,38 @@ export default function SingleProductPageCMS() {
                 if (prodRes.ok) {
                     const prods = await prodRes.json();
                     setProducts(prods);
-                    if (prods.length > 0) setSelId(prods[0]._id);
+                    if (prods.length > 0) {
+                        setSelId(prods[0]._id);
+                        const p = prods[0];
+                        setProductEdit({ images: [...(p.images || [])], rentPrice: p.rentPrice || p.price || 5000, originalPrice: p.originalPrice || p.mrp || 0, stock: p.stock ?? p.quantity ?? 0 });
+                    }
                 }
             } catch {}
             finally { setLoading(false); }
         })();
     }, []);
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    useEffect(() => {
+        const p = products.find(x => x._id === selId);
+        if (p) setProductEdit({ images: [...(p.images || [])], rentPrice: p.rentPrice || p.price || 5000, originalPrice: p.originalPrice || p.mrp || 0, stock: p.stock ?? p.quantity ?? 0 });
+    }, [selId]);
+
+    const saveProduct = async () => {
+        if (!selId || !productEdit) return;
+        setProductSaving(true);
+        try {
+            const res = await fetch(`${API}/api/admin/products/${selId}`, {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${getToken()}` },
+                body: JSON.stringify(productEdit),
+            });
+            if (!res.ok) throw new Error('Failed to save product');
+            setProducts(prev => prev.map(p => p._id === selId ? { ...p, ...productEdit } : p));
+            toast.success('Product updated!');
+        } catch(e) { toast.error(e.message); }
+        finally { setProductSaving(false); }
+    };
 
     const save = async () => {
         setSaving(true);
@@ -170,7 +205,108 @@ export default function SingleProductPageCMS() {
     const images = product?.images || [];
     const specs = product?.specifications || product?.specs || [];
 
+    const isHeroEdit = activeEdit === 'hero';
+    const displayImages = (isHeroEdit && productEdit) ? productEdit.images : images;
+    const displayPrice = (isHeroEdit && productEdit) ? productEdit.rentPrice : price;
+    const displayOrigPrice = (isHeroEdit && productEdit) ? productEdit.originalPrice : origPrice;
+    const displayDisc = displayOrigPrice > 0 ? Math.round((1 - displayPrice / displayOrigPrice) * 100) : disc;
+    const displayStock = (isHeroEdit && productEdit) ? productEdit.stock : (product?.stock ?? product?.quantity ?? 0);
+
     // ── Edit panels ────────────────────────────────────────────────────────────
+    const heroPanel = (
+        <div className="space-y-5">
+            <div>
+                <p className="text-[10px] font-bold text-indigo-500 uppercase tracking-widest mb-3">Template Text</p>
+                <div className="grid grid-cols-2 gap-3">
+                    <div>
+                        <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Delivery Badge Text</label>
+                        <input value={td.deliveryDays} onChange={e => set('deliveryDays', e.target.value)}
+                            className="w-full h-9 px-3 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400/40" />
+                    </div>
+                    <div>
+                        <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Rental Period Label</label>
+                        <input value={td.rentalPeriodLabel} onChange={e => set('rentalPeriodLabel', e.target.value)}
+                            className="w-full h-9 px-3 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400/40" />
+                    </div>
+                    <div>
+                        <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Price Breakdown Link Text</label>
+                        <input value={td.priceBreakdownText} onChange={e => set('priceBreakdownText', e.target.value)}
+                            className="w-full h-9 px-3 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400/40" />
+                    </div>
+                    <div>
+                        <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Compare Tenures Link Text</label>
+                        <input value={td.compareTeuresText} onChange={e => set('compareTeuresText', e.target.value)}
+                            className="w-full h-9 px-3 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400/40" />
+                    </div>
+                </div>
+                <div className="mt-3">
+                    <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Tenure Option Labels</label>
+                    <div className="grid grid-cols-5 gap-2">
+                        {(td.tenureOptions || ['1+','3+','6+','9+','12+']).map((t, i) => (
+                            <input key={i} value={t} onChange={e => { const arr = [...(td.tenureOptions || ['1+','3+','6+','9+','12+'])]; arr[i] = e.target.value; set('tenureOptions', arr); }}
+                                className="h-9 px-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-sm text-center focus:outline-none focus:ring-2 focus:ring-indigo-400/40" />
+                        ))}
+                    </div>
+                </div>
+            </div>
+            {productEdit && (
+                <div className="border-t border-slate-100 dark:border-slate-800 pt-4 space-y-3">
+                    <div className="flex items-center justify-between">
+                        <p className="text-[10px] font-bold text-orange-500 uppercase tracking-widest">Product Data — {product?.name}</p>
+                        <button onClick={saveProduct} disabled={productSaving}
+                            className="inline-flex items-center gap-1.5 h-7 px-3 rounded-lg !bg-orange-500 text-white text-[11px] font-bold disabled:opacity-60">
+                            {productSaving ? <Spinner size="sm" color="white" /> : <FloppyDisk size={11} weight="bold" />} Save Product
+                        </button>
+                    </div>
+                    <div className="grid grid-cols-3 gap-3">
+                        <div>
+                            <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Rent Price (₹/month)</label>
+                            <input type="number" value={productEdit.rentPrice}
+                                onChange={e => setProductEdit(prev => ({ ...prev, rentPrice: Number(e.target.value) }))}
+                                className="w-full h-9 px-3 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400/40" />
+                        </div>
+                        <div>
+                            <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Original Price (₹)</label>
+                            <input type="number" value={productEdit.originalPrice}
+                                onChange={e => setProductEdit(prev => ({ ...prev, originalPrice: Number(e.target.value) }))}
+                                className="w-full h-9 px-3 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400/40" />
+                        </div>
+                        <div>
+                            <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Quantity in Stock</label>
+                            <input type="number" value={productEdit.stock}
+                                onChange={e => setProductEdit(prev => ({ ...prev, stock: Number(e.target.value) }))}
+                                className="w-full h-9 px-3 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400/40" />
+                        </div>
+                    </div>
+                    <div>
+                        <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2">Product Images</label>
+                        <div className="flex flex-wrap gap-2 mb-2">
+                            {productEdit.images.map((img, i) => (
+                                <div key={i} className="relative group">
+                                    <div className="w-16 h-16 rounded-lg border border-slate-200 bg-slate-50 overflow-hidden flex items-center justify-center">
+                                        <img src={img} alt="" className="max-h-full max-w-full object-contain p-1" onError={e => { e.target.style.display='none'; }} />
+                                    </div>
+                                    <button onClick={() => setProductEdit(prev => ({ ...prev, images: prev.images.filter((_, idx) => idx !== i) }))}
+                                        className="absolute -top-1.5 -right-1.5 w-4 h-4 rounded-full bg-rose-500 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                                        <X size={8} weight="bold" />
+                                    </button>
+                                </div>
+                            ))}
+                        </div>
+                        <div className="flex gap-2">
+                            <input value={newImgUrl} onChange={e => setNewImgUrl(e.target.value)} placeholder="Paste image URL to add…"
+                                className="flex-1 h-9 px-3 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400/40" />
+                            <button onClick={() => { if (newImgUrl.trim()) { setProductEdit(prev => ({ ...prev, images: [...prev.images, newImgUrl.trim()] })); setNewImgUrl(''); }}}
+                                className="inline-flex items-center gap-1 h-9 px-3 rounded-lg !bg-indigo-600 text-white text-xs font-bold">
+                                <Plus weight="bold" size={11} /> Add
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+        </div>
+    );
+
     const benefitsPanel = (
         <div className="grid grid-cols-2 gap-3">
             {td.benefits.map((b, i) => (
@@ -326,17 +462,61 @@ export default function SingleProductPageCMS() {
         </div>
     );
 
+    const bestProductIds = td.bestProductIds || [];
+    const toggleBestProduct = (id) => {
+        const current = td.bestProductIds || [];
+        if (current.includes(id)) {
+            set('bestProductIds', current.filter(x => x !== id));
+        } else if (current.length < 4) {
+            set('bestProductIds', [...current, id]);
+        }
+    };
+
     const bestPanel = (
-        <div className="grid grid-cols-2 gap-3">
-            <div>
-                <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Section Title</label>
-                <input value={td.bestProductsTitle} onChange={e => set('bestProductsTitle', e.target.value)}
-                    className="w-full h-9 px-3 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-base focus:outline-none focus:ring-2 focus:ring-indigo-400/40" />
+        <div className="space-y-4">
+            <div className="grid grid-cols-2 gap-3">
+                <div>
+                    <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Section Title</label>
+                    <input value={td.bestProductsTitle} onChange={e => set('bestProductsTitle', e.target.value)}
+                        className="w-full h-9 px-3 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-base focus:outline-none focus:ring-2 focus:ring-indigo-400/40" />
+                </div>
+                <div>
+                    <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Button Text</label>
+                    <input value={td.bestProductsButtonText} onChange={e => set('bestProductsButtonText', e.target.value)}
+                        className="w-full h-9 px-3 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-base focus:outline-none focus:ring-2 focus:ring-indigo-400/40" />
+                </div>
             </div>
-            <div>
-                <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Button Text</label>
-                <input value={td.bestProductsButtonText} onChange={e => set('bestProductsButtonText', e.target.value)}
-                    className="w-full h-9 px-3 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-base focus:outline-none focus:ring-2 focus:ring-indigo-400/40" />
+            <div className="border-t border-slate-100 dark:border-slate-800 pt-4">
+                <div className="flex items-center justify-between mb-2">
+                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+                        Featured Products <span className="text-indigo-500">({bestProductIds.length}/4 selected)</span>
+                    </span>
+                    {bestProductIds.length > 0 && (
+                        <button onClick={() => set('bestProductIds', [])} className="text-[10px] text-rose-400 hover:text-rose-600 font-bold">Clear all</button>
+                    )}
+                </div>
+                <p className="text-[10px] text-slate-400 mb-3">Select up to 4 products to feature. If none selected, first 4 products are shown.</p>
+                <div className="space-y-1.5 max-h-64 overflow-y-auto pr-1">
+                    {products.map(p => {
+                        const selected = bestProductIds.includes(p._id);
+                        const disabled = !selected && bestProductIds.length >= 4;
+                        return (
+                            <button key={p._id} onClick={() => !disabled && toggleBestProduct(p._id)}
+                                className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl border text-left transition-colors ${selected ? 'border-indigo-400 bg-indigo-50 dark:bg-indigo-950/40' : disabled ? 'border-slate-100 bg-slate-50 opacity-40 cursor-not-allowed' : 'border-slate-200 bg-white dark:bg-slate-800 hover:border-indigo-300'}`}>
+                                <div className={`w-4 h-4 rounded flex items-center justify-center shrink-0 border-2 ${selected ? 'border-indigo-500 bg-indigo-500' : 'border-slate-300'}`}>
+                                    {selected && <CheckCircle size={10} weight="fill" className="text-white" />}
+                                </div>
+                                {p.images?.[0] && (
+                                    <div className="w-8 h-8 rounded-lg border border-slate-100 bg-slate-50 overflow-hidden shrink-0 flex items-center justify-center">
+                                        <img src={p.images[0]} alt="" className="max-h-full max-w-full object-contain" />
+                                    </div>
+                                )}
+                                <span className="text-xs font-semibold text-slate-800 dark:text-slate-200 truncate flex-1">{p.name}</span>
+                                <span className="text-xs text-orange-500 font-bold shrink-0">₹{(p.rentPrice || p.price || 0).toLocaleString('en-IN')}</span>
+                            </button>
+                        );
+                    })}
+                </div>
             </div>
         </div>
     );
@@ -383,19 +563,20 @@ export default function SingleProductPageCMS() {
                 </div>
 
                 {/* Hero */}
+                <EditableSection sectionId="hero" activeEdit={activeEdit} setActiveEdit={setActiveEdit} label="Product Hero" panel={heroPanel}>
                 <div className="bg-white px-6 lg:px-12 py-8">
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 max-w-6xl mx-auto">
 
                         {/* Left — images */}
                         <div>
                             <div className="rounded-2xl border border-slate-100 bg-white flex items-center justify-center h-72 overflow-hidden">
-                                {images[0]
-                                    ? <img src={images[0]} alt={product?.name} className="max-h-full max-w-full object-contain p-4" />
+                                {displayImages[0]
+                                    ? <img src={displayImages[0]} alt={product?.name} className="max-h-full max-w-full object-contain p-4" />
                                     : <Package size={72} weight="thin" className="text-slate-300" />}
                             </div>
-                            {images.length > 1 && (
+                            {displayImages.length > 1 && (
                                 <div className="flex gap-3 mt-3">
-                                    {images.slice(1, 4).map((img, i) => (
+                                    {displayImages.slice(1, 4).map((img, i) => (
                                         <div key={i} className="w-20 h-20 rounded-xl border-2 border-slate-200 bg-white flex items-center justify-center overflow-hidden cursor-pointer hover:border-orange-400 transition-colors">
                                             <img src={img} alt="" className="max-h-full max-w-full object-contain p-2" />
                                         </div>
@@ -422,38 +603,41 @@ export default function SingleProductPageCMS() {
                                     <span className="text-xs font-semibold text-amber-700">{product?.rating || '4.5'} ({product?.numReviews || 12})</span>
                                 </div>
                                 <div className="flex items-center gap-1.5 bg-green-50 border border-green-200 rounded-full px-3 py-1 text-xs font-semibold text-green-700">
-                                    <Truck size={12} /> 2-4 days
+                                    <Truck size={12} /> {td.deliveryDays || '2-4 days'}
                                 </div>
                             </div>
 
-                            {/* Rental period slider (visual only) */}
+                            {/* Rental period slider (visual) */}
                             <div className="bg-slate-50 rounded-2xl p-4 border border-slate-100">
                                 <div className="flex items-center justify-between mb-2">
-                                    <span className="text-sm text-slate-700">Select your <u className="cursor-pointer">minimum rental period</u></span>
+                                    <span className="text-sm text-slate-700"><u className="cursor-pointer">{td.rentalPeriodLabel || 'Select your minimum rental period'}</u></span>
                                     <span className="text-sm font-bold text-slate-900">1 Month</span>
                                 </div>
                                 <div className="relative h-1 bg-slate-200 rounded-full my-4">
                                     <div className="absolute left-0 top-1/2 -translate-y-1/2 w-4 h-4 rounded-full bg-orange-500 border-2 border-white shadow-md" />
                                 </div>
                                 <div className="flex justify-between text-xs text-slate-500 font-medium">
-                                    {['1+','3+','6+','9+','12+'].map(t => <span key={t}>{t}</span>)}
+                                    {(td.tenureOptions || ['1+','3+','6+','9+','12+']).map(t => <span key={t}>{t}</span>)}
                                 </div>
                                 <div className="flex justify-between mt-2">
-                                    <span className="text-xs text-orange-500 underline cursor-pointer">price breakdown</span>
-                                    <span className="text-xs text-orange-500 underline cursor-pointer">compare all tenures</span>
+                                    <span className="text-xs text-orange-500 underline cursor-pointer">{td.priceBreakdownText || 'price breakdown'}</span>
+                                    <span className="text-xs text-orange-500 underline cursor-pointer">{td.compareTeuresText || 'compare all tenures'}</span>
                                 </div>
                             </div>
 
                             {/* Price row */}
                             <div className="flex items-center justify-between">
                                 <div className="flex items-baseline gap-2 flex-wrap">
-                                    <span className="text-2xl font-black text-orange-500">₹{price.toLocaleString('en-IN')}</span>
+                                    <span className="text-2xl font-black text-orange-500">₹{displayPrice.toLocaleString('en-IN')}</span>
                                     <span className="text-sm text-slate-400">/month</span>
-                                    <span className="text-sm text-slate-400 line-through">₹{origPrice.toLocaleString('en-IN')}</span>
-                                    <span className="bg-orange-500 text-white text-xs font-bold px-2 py-0.5 rounded-full">{disc}% off</span>
+                                    <span className="text-sm text-slate-400 line-through">₹{displayOrigPrice.toLocaleString('en-IN')}</span>
+                                    <span className="bg-orange-500 text-white text-xs font-bold px-2 py-0.5 rounded-full">{displayDisc}% off</span>
                                 </div>
                                 <div className="flex items-center gap-2 text-sm font-semibold text-slate-700 shrink-0">
-                                    <span>Quantity</span>
+                                    <div className="flex flex-col items-end gap-0.5">
+                                        <span>Quantity</span>
+                                        {displayStock > 0 && <span className="text-[10px] text-slate-400 font-normal">{displayStock} left</span>}
+                                    </div>
                                     <div className="flex items-center gap-2 border border-slate-200 rounded-full px-3 py-1">
                                         <button className="text-slate-400 font-bold">−</button>
                                         <span className="font-bold">1</span>
@@ -520,6 +704,7 @@ export default function SingleProductPageCMS() {
                         </div>
                     </div>
                 </div>
+                </EditableSection>
 
                 {/* Product Details Tabs */}
                 <div className="bg-white mt-2 px-6 lg:px-12 py-8">
@@ -633,7 +818,10 @@ export default function SingleProductPageCMS() {
                                 </button>
                             </div>
                             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                                {(products.length > 0 ? products : Array(4).fill(null)).slice(0, 4).map((p, i) => (
+                                {(bestProductIds.length > 0
+                                    ? bestProductIds.map(id => products.find(p => p._id === id)).filter(Boolean)
+                                    : products.slice(0, 4)
+                                ).map((p, i) => (
                                     <div key={p?._id || i} className="rounded-2xl border border-slate-100 bg-white overflow-hidden">
                                         <div className="relative">
                                             <div className="absolute top-2 left-2 flex gap-1">
