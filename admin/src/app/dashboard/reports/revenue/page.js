@@ -12,7 +12,7 @@ const API = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
 const YEARS = Array.from({ length: 4 }, (_, i) => String(new Date().getFullYear() - i));
 
 const STATUS_COLORS = {
-    Active: '#6366f1', Delivered: '#22c55e', Returned: '#94a3b8',
+    Active: '#f08c00', Delivered: '#22c55e', Returned: '#94a3b8',
     Pending: '#f59e0b', Approved: '#3b82f6', Shipped: '#8b5cf6',
     Cancelled: '#ef4444',
 };
@@ -41,7 +41,7 @@ export default function RevenueReport() {
     const barData = data ? {
         labels: data.monthly.map(m => m.month),
         datasets: [
-            { label: 'Revenue (₹)', data: data.monthly.map(m => m.revenue), backgroundColor: 'rgba(99,102,241,0.75)', borderRadius: 6 },
+            { label: 'Revenue (₹)', data: data.monthly.map(m => m.revenue), backgroundColor: 'rgba(240,140,0,0.75)', borderRadius: 6 },
             { label: 'Orders',       data: data.monthly.map(m => m.orders),  backgroundColor: 'rgba(34,197,94,0.65)',  borderRadius: 6, yAxisID: 'y1' },
         ],
     } : null;

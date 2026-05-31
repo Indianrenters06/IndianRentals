@@ -3,10 +3,13 @@
 @custom-variant dark (&:is(.dark, .dark *));
 
 @theme {
-  --color-brand-50: #eef2ff;
-  --color-brand-500: #6366f1;
-  --color-brand-600: #4f46e5;
-  --color-brand-900: #312e81;
+  --color-brand-50:  #fffaeb;
+  --color-brand-100: #fff0cc;
+  --color-brand-200: #ffe099;
+  --color-brand-400: #ffb91b;
+  --color-brand-500: #f08c00;
+  --color-brand-600: #e07800;
+  --color-brand-900: #b35e00;
 
   --color-dark-900: #0f172a;
   --color-dark-800: #1e293b;
@@ -74,10 +77,22 @@ summary,
   scrollbar-width: none !important;
 }
 
-/* HeroUI theme — use light defaults so inputs look white in light mode */
+/* Override Tailwind's built-in indigo scale — map it to the brand orange palette
+   so all existing text-indigo-*, bg-indigo-*, border-indigo-* etc. render as
+   the homepage's primary orange. applyBrandingTheme() also overrides these at
+   runtime for dynamic theme switching. */
 :root {
-  --heroui-colors-primary: var(--color-indigo-500);
-  --heroui-colors-secondary: #a855f7;
+  --color-indigo-50:  #fffaeb;
+  --color-indigo-100: #fff0cc;
+  --color-indigo-200: #ffe099;
+  --color-indigo-400: #ffb91b;
+  --color-indigo-500: #f08c00;
+  --color-indigo-600: #e07800;
+  --color-indigo-700: #b35e00;
+
+  /* HeroUI theme — use light defaults so inputs look white in light mode */
+  --heroui-colors-primary: var(--color-brand-500);
+  --heroui-colors-secondary: #356cff;
   --heroui-colors-background: #ffffff;
   --heroui-colors-foreground: #0f172a;
   --heroui-colors-content1: #ffffff;
@@ -130,7 +145,7 @@ summary,
   top: 6px !important;
   transform: translateY(0) scale(0.85) !important;
   font-size: 1rem !important;
-  color: var(--color-indigo-500) !important;
+  color: var(--color-brand-500) !important;
 }
 
 /* Textarea label fix — full height wrappers need top-aligned label by default */
@@ -148,7 +163,7 @@ summary,
   transform: scale(0.85) !important;
   transform-origin: top left !important;
   font-size: 1rem !important;
-  color: var(--color-indigo-500) !important;
+  color: var(--color-brand-500) !important;
 }
 
 /* Textarea: push content down when label floats */
@@ -223,7 +238,7 @@ summary,
 
 /* Primary colour switch when ON */
 [role="switch"][data-selected="true"][data-color="primary"] [data-slot="wrapper"] {
-  background-color: var(--color-indigo-500) !important;
+  background-color: var(--color-brand-500) !important;
 }
 
 /* Secondary colour when ON */
@@ -432,8 +447,8 @@ nav[data-slot="base"]:has(ul[data-slot="wrapper"]) [data-slot="item"][data-activ
 /* Active sliding cursor styling */
 nav[data-slot="base"]:has(ul[data-slot="wrapper"]) [data-slot="cursor"] {
   border-radius: 8px !important;
-  background-color: var(--color-indigo-500) !important;
-  box-shadow: 0 4px 12px color-mix(in srgb, var(--color-indigo-500) 30%, transparent) !important;
+  background-color: var(--color-brand-500) !important;
+  box-shadow: 0 4px 12px color-mix(in srgb, var(--color-brand-500) 30%, transparent) !important;
   transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
 }
 

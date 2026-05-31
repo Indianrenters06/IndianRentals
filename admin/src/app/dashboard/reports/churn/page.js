@@ -37,7 +37,7 @@ export default function ChurnReport() {
     const lineData = data ? {
         labels: data.newUsers.map(m => m.month),
         datasets: [
-            { label: 'New Users',     data: data.newUsers.map(m => m.count),      borderColor: '#6366f1', backgroundColor: 'rgba(99,102,241,0.1)', tension: 0.4, fill: true, pointRadius: 4 },
+            { label: 'New Users',     data: data.newUsers.map(m => m.count),      borderColor: '#f08c00', backgroundColor: 'rgba(240,140,0,0.1)', tension: 0.4, fill: true, pointRadius: 4 },
             { label: 'Monthly Active', data: data.monthlyActive.map(m => m.count), borderColor: '#22c55e', backgroundColor: 'rgba(34,197,94,0.1)',  tension: 0.4, fill: true, pointRadius: 4 },
         ],
     } : null;

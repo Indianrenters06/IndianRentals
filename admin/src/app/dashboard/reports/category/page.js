@@ -37,7 +37,7 @@ export default function CategoryReport() {
     const barData = data ? {
         labels: cats.map(c => c.name),
         datasets: [
-            { label: 'Revenue (₹)', data: cats.map(c => c.revenue), backgroundColor: 'rgba(99,102,241,0.75)', borderRadius: 6 },
+            { label: 'Revenue (₹)', data: cats.map(c => c.revenue), backgroundColor: 'rgba(240,140,0,0.75)', borderRadius: 6 },
             { label: 'Orders',      data: cats.map(c => c.orders),  backgroundColor: 'rgba(34,197,94,0.65)',  borderRadius: 6 },
         ],
     } : null;

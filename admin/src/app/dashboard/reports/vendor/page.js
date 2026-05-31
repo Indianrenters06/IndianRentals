@@ -13,7 +13,7 @@ ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend)
 const API = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
 
 const BRAND_COLORS = [
-    'rgba(99,102,241,0.8)', 'rgba(34,197,94,0.8)', 'rgba(245,158,11,0.8)',
+    'rgba(240,140,0,0.8)', 'rgba(34,197,94,0.8)', 'rgba(245,158,11,0.8)',
     'rgba(239,68,68,0.8)', 'rgba(59,130,246,0.8)', 'rgba(139,92,246,0.8)',
     'rgba(20,184,166,0.8)', 'rgba(249,115,22,0.8)', 'rgba(236,72,153,0.8)', 'rgba(16,185,129,0.8)',
 ];

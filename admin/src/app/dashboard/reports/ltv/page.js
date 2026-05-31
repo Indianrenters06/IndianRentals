@@ -40,7 +40,7 @@ export default function CustomerLTVReport() {
         datasets: [{
             label: 'Total Spend (₹)',
             data: customers.map(c => c.totalSpend),
-            backgroundColor: customers.map((_, i) => i === 0 ? 'rgba(99,102,241,0.9)' : 'rgba(99,102,241,0.55)'),
+            backgroundColor: customers.map((_, i) => i === 0 ? 'rgba(240,140,0,0.9)' : 'rgba(240,140,0,0.55)'),
             borderRadius: 6,
         }],
     } : null;

@@ -43,7 +43,7 @@ export default function InventoryReport() {
             backgroundColor: items.slice(0, 12).map(i =>
                 i.utilization >= 80 ? 'rgba(239,68,68,0.75)' :
                 i.utilization >= 50 ? 'rgba(245,158,11,0.75)' :
-                                      'rgba(99,102,241,0.75)'
+                                      'rgba(240,140,0,0.75)'
             ),
             borderRadius: 6,
         }],

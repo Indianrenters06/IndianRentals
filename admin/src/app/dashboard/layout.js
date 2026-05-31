@@ -122,7 +122,7 @@ export default function DashboardLayout({ children }) {
       const applyBrandingTheme = (data) => {
         if (!data?.theme?.activeTheme) return;
         const THEMES = {
-          default:  { 50: '#eef2ff', 100: '#e0e7ff', 200: '#c7d2fe', 400: '#818cf8', 500: '#6366f1', 600: '#4f46e5', 700: '#4338ca' },
+          default:  { 50: '#fffaeb', 100: '#fff0cc', 200: '#ffe099', 400: '#ffb91b', 500: '#f08c00', 600: '#e07800', 700: '#b35e00' },
           oceanic:  { 50: '#e0f2fe', 100: '#bae6fd', 200: '#7dd3fc', 400: '#38bdf8', 500: '#0ea5e9', 600: '#0284c7', 700: '#0369a1' },
           forest:   { 50: '#dcfce7', 100: '#bbf7d0', 200: '#86efac', 400: '#4ade80', 500: '#22c55e', 600: '#16a34a', 700: '#15803d' },
           sunset:   { 50: '#fff1f2', 100: '#ffe4e6', 200: '#fecdd3', 400: '#fb7185', 500: '#f43f5e', 600: '#e11d48', 700: '#be123c' },

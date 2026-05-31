@@ -34,7 +34,7 @@ export default function RentalDurationReport() {
     const barData = data ? {
         labels: data.durations.map(d => d.label),
         datasets: [
-            { label: 'Rentals', data: data.durations.map(d => d.count), backgroundColor: 'rgba(99,102,241,0.75)', borderRadius: 6 },
+            { label: 'Rentals', data: data.durations.map(d => d.count), backgroundColor: 'rgba(240,140,0,0.75)', borderRadius: 6 },
             { label: 'Revenue (₹)', data: data.durations.map(d => d.revenue), backgroundColor: 'rgba(34,197,94,0.65)', borderRadius: 6, yAxisID: 'y1' },
         ],
     } : null;

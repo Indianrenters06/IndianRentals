@@ -156,14 +156,14 @@ export default function AdminDashboard() {
       {
         label: 'Revenue (₹)',
         data: [0, 0, 0, 0, 0, 0, 0],
-        borderColor: '#818cf8', // Indigo 400
-        backgroundColor: 'rgba(129, 140, 248, 0.2)',
+        borderColor: '#f08c00',
+        backgroundColor: 'rgba(240, 140, 0, 0.15)',
         fill: true,
         tension: 0.4,
-        pointBackgroundColor: '#818cf8',
+        pointBackgroundColor: '#f08c00',
         pointBorderColor: '#fff',
         pointHoverBackgroundColor: '#fff',
-        pointHoverBorderColor: '#818cf8',
+        pointHoverBorderColor: '#f08c00',
         borderWidth: 3,
       }
     ]
