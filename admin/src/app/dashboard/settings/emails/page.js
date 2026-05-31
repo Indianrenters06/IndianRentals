@@ -290,6 +290,15 @@ export default function EmailTemplatesPage() {
         } catch {}
     };
 
+    // Presets filtered by the active type tab + search box.
+    // "all" shows everything; any other type shows only that category.
+    const q = search.trim().toLowerCase();
+    const filteredPresets = EMAIL_PRESETS.filter(p => {
+        const matchType = typeFilter === 'all' || p.type === typeFilter;
+        const matchSearch = !q || p.name.toLowerCase().includes(q) || (p.subject || '').toLowerCase().includes(q);
+        return matchType && matchSearch;
+    });
+
     return (
         <div className="w-full pb-12 space-y-6">
             {/* Page header */}
@@ -305,14 +314,14 @@ export default function EmailTemplatesPage() {
                         <button className="flex items-center gap-2 h-10 px-4 rounded-xl border border-indigo-200 dark:border-indigo-500/30 bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 text-sm font-bold">
                             <Lightning size={15} weight="fill" /> Presets
                         </button>
-                        <div className="absolute right-0 top-12 z-30 w-64 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-2xl shadow-2xl p-2 hidden group-hover:block">
+                        <div className="absolute right-0 top-12 z-30 w-64 max-h-96 overflow-y-auto bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-2xl shadow-2xl p-2 hidden group-hover:block">
                             {EMAIL_PRESETS.map((preset, i) => (
                                 <button key={i} onClick={() => setModal({ ...preset, _id: null })}
                                     className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-left hover:bg-indigo-50 dark:hover:bg-indigo-500/10 transition-colors">
                                     <EnvelopeSimple size={14} className="text-indigo-500 shrink-0" weight="bold" />
                                     <div className="min-w-0">
                                         <p className="text-sm font-semibold text-slate-800 dark:text-slate-200 truncate">{preset.name}</p>
-                                        <p className="text-[11px] text-slate-400 truncate">{preset.type}</p>
+                                        <p className="text-[11px] text-slate-400 truncate capitalize">{preset.type}</p>
                                     </div>
                                 </button>
                             ))}
@@ -342,16 +351,20 @@ export default function EmailTemplatesPage() {
                 </div>
             </div>
 
-            {/* Preset Templates */}
-            {templates.length === 0 && (
-                <div className="bg-gradient-to-br from-indigo-50 to-orange-50 dark:from-indigo-500/5 dark:to-orange-500/5 border border-indigo-100 dark:border-indigo-500/20 rounded-2xl p-5">
-                    <div className="flex items-center gap-2 mb-4">
-                        <Lightning size={16} weight="fill" className="text-indigo-600 dark:text-indigo-400" />
-                        <span className="text-sm font-bold text-slate-800 dark:text-slate-200">Preset Templates</span>
-                        <span className="text-xs text-slate-400 ml-1">— load a ready-made template instantly</span>
-                    </div>
+            {/* Preset Templates — always shown, filtered by the active type tab */}
+            <div className="bg-gradient-to-br from-indigo-50 to-orange-50 dark:from-indigo-500/5 dark:to-orange-500/5 border border-indigo-100 dark:border-indigo-500/20 rounded-2xl p-5">
+                <div className="flex items-center gap-2 mb-4">
+                    <Lightning size={16} weight="fill" className="text-indigo-600 dark:text-indigo-400" />
+                    <span className="text-sm font-bold text-slate-800 dark:text-slate-200">Preset Templates</span>
+                    <span className="text-xs text-slate-400 ml-1">
+                        {typeFilter === 'all' ? '— all ready-made templates' : `— ${typeFilter} templates`} ({filteredPresets.length})
+                    </span>
+                </div>
+                {filteredPresets.length === 0 ? (
+                    <p className="text-sm text-slate-400 py-4 text-center">No preset templates for this category.</p>
+                ) : (
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-                        {EMAIL_PRESETS.map((preset, i) => (
+                        {filteredPresets.map((preset, i) => (
                             <button key={i} onClick={() => setModal({ ...preset, _id: null })}
                                 className="flex items-start gap-3 p-4 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-left hover:border-indigo-300 dark:hover:border-indigo-500 transition-colors group">
                                 <div className="w-9 h-9 rounded-lg bg-indigo-50 dark:bg-indigo-500/10 flex items-center justify-center shrink-0">
@@ -370,8 +383,8 @@ export default function EmailTemplatesPage() {
                             </button>
                         ))}
                     </div>
-                </div>
-            )}
+                )}
+            </div>
 
             {/* Templates list */}
             {loading ? (
