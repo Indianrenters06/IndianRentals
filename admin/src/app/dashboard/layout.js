@@ -387,10 +387,17 @@ export default function DashboardLayout({ children }) {
           } transition-all duration-300 border-r border-slate-200 dark:border-slate-800/60 bg-white dark:bg-slate-950 flex flex-col overflow-hidden`}
       >
         <div className="h-16 flex items-center px-5 border-b border-slate-200 dark:border-slate-800/60 shrink-0 bg-transparent">
+          {/* Light-mode logo */}
           <img
             src={branding.siteLogo || "https://res.cloudinary.com/dgkckcdk8/image/upload/v1776892240/1d1f7c4e3c0490bcddb69ceb328c67be2f7cf361_6_kufcee.png"}
             alt={branding.siteName || "Logo"}
-            className="h-8 w-auto object-contain"
+            className="h-8 w-auto object-contain block dark:hidden"
+          />
+          {/* Dark-mode (white) logo */}
+          <img
+            src={branding.siteLogoDark || "https://res.cloudinary.com/dgkckcdk8/image/upload/v1780249784/white_indianrenters_nnqhiu.png"}
+            alt={branding.siteName || "Logo"}
+            className="h-8 w-auto object-contain hidden dark:block"
           />
         </div>
 
