@@ -1,10 +1,11 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { Spinner, Button } from "@heroui/react";
+import { Spinner, Button, Pagination } from "@heroui/react";
 import {
-    Plus, Tag, Trash, PencilSimple, Warning, CheckCircle, XCircle, Check, X
+    Plus, Tag, Trash, PencilSimple, Warning, CheckCircle, XCircle, Check, X,
+    CaretUp, CaretDown
 } from "@phosphor-icons/react";
 import ImageUploader from "@/components/ImageUploader";
 
@@ -339,6 +340,22 @@ export default function SubcategoriesManagement() {
     const [selectedParent, setSelectedParent] = useState("");
     const [addingSub, setAddingSub] = useState(false);
 
+    // Sorting & pagination
+    const [sortKey, setSortKey] = useState("name"); // 'name' | 'status'
+    const [sortDir, setSortDir] = useState("asc");   // 'asc' | 'desc'
+    const [page, setPage] = useState(1);
+    const rowsPerPage = 8;
+
+    const toggleSort = (key) => {
+        if (sortKey === key) {
+            setSortDir(d => (d === "asc" ? "desc" : "asc"));
+        } else {
+            setSortKey(key);
+            setSortDir("asc");
+        }
+        setPage(1);
+    };
+
     // Confirm modal state
     const [confirmOpen, setConfirmOpen] = useState(false);
     const [deleteTarget, setDeleteTarget] = useState(null); // { id, name }
@@ -391,6 +408,46 @@ export default function SubcategoriesManagement() {
 
     useEffect(() => { fetchCategories(); }, []);
     useEffect(() => { if (selectedParent) fetchSubcategories(selectedParent); }, [selectedParent]);
+
+    // Reset to first page whenever the parent changes or a new list loads
+    useEffect(() => { setPage(1); }, [selectedParent]);
+
+    // ── Sorting & pagination ──────────────────────────────────────────────────
+    const sorted = useMemo(() => {
+        const list = [...subcategories];
+        const dir = sortDir === "asc" ? 1 : -1;
+        list.sort((a, b) => {
+            let cmp = 0;
+            if (sortKey === "name") {
+                cmp = (a.name || "").localeCompare(b.name || "");
+            } else if (sortKey === "status") {
+                cmp = (a.isActive ? 1 : 0) - (b.isActive ? 1 : 0);
+            }
+            return cmp * dir;
+        });
+        return list;
+    }, [subcategories, sortKey, sortDir]);
+
+    const totalPages = Math.max(1, Math.ceil(sorted.length / rowsPerPage));
+    useEffect(() => { if (page > totalPages) setPage(totalPages); }, [page, totalPages]);
+
+    const paginated = useMemo(() => {
+        const start = (page - 1) * rowsPerPage;
+        return sorted.slice(start, start + rowsPerPage);
+    }, [sorted, page]);
+
+    const SortHeader = ({ label, sortKey: key, className }) => (
+        <button
+            type="button"
+            onClick={() => toggleSort(key)}
+            className={`flex items-center justify-center gap-1 text-xs font-semibold uppercase tracking-wider transition-colors ${sortKey === key ? "text-indigo-500" : "text-slate-500 hover:text-slate-700 dark:hover:text-slate-300"} ${className || ""}`}
+        >
+            {label}
+            {sortKey === key
+                ? (sortDir === "asc" ? <CaretUp size={11} weight="bold" /> : <CaretDown size={11} weight="bold" />)
+                : <CaretDown size={11} className="opacity-30" />}
+        </button>
+    );
 
     // ── Delete flow ───────────────────────────────────────────────────────────
     const askDelete = (sub) => {
@@ -488,8 +545,10 @@ export default function SubcategoriesManagement() {
                 {/* Table header */}
                 <div className="flex items-center px-5 py-3 bg-slate-50 dark:bg-slate-950/80 border-b border-slate-200 dark:border-slate-800 gap-3">
                     <span className="w-10" />
-                    <span className="flex-1 text-xs font-semibold uppercase tracking-wider text-slate-500">Subcategory</span>
-                    <span className="text-xs font-semibold uppercase tracking-wider text-slate-500 w-16 text-center">Status</span>
+                    <div className="flex-1">
+                        <SortHeader label="Subcategory" sortKey="name" />
+                    </div>
+                    <SortHeader label="Status" sortKey="status" className="w-16" />
                     <span className="text-xs font-semibold uppercase tracking-wider text-slate-500 w-20 text-center">Actions</span>
                 </div>
 
@@ -521,17 +580,38 @@ export default function SubcategoriesManagement() {
                         <p>No subcategories yet. Click "Add Subcategory" to get started.</p>
                     </div>
                 ) : (
-                    <div>
-                        {subcategories.map(sub => (
-                            <SubRow
-                                key={sub._id}
-                                sub={sub}
-                                onDelete={askDelete}
-                                onRefresh={() => fetchSubcategories(selectedParent)}
-                                addToast={addToast}
-                            />
-                        ))}
-                    </div>
+                    <>
+                        <div>
+                            {paginated.map(sub => (
+                                <SubRow
+                                    key={sub._id}
+                                    sub={sub}
+                                    onDelete={askDelete}
+                                    onRefresh={() => fetchSubcategories(selectedParent)}
+                                    addToast={addToast}
+                                />
+                            ))}
+                        </div>
+
+                        {/* Pagination footer */}
+                        <div className="flex w-full flex-col sm:flex-row gap-3 justify-between items-center py-4 px-5 border-t border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950/30">
+                            <span className="text-sm text-slate-500">
+                                Showing {(page - 1) * rowsPerPage + 1}–{Math.min(page * rowsPerPage, sorted.length)} of {sorted.length} subcategor{sorted.length !== 1 ? "ies" : "y"}
+                            </span>
+                            {totalPages > 1 && (
+                                <Pagination
+                                    radius="md"
+                                    variant="flat"
+                                    showControls
+                                    color="primary"
+                                    page={page}
+                                    total={totalPages}
+                                    onChange={setPage}
+                                    classNames={{ cursor: "bg-indigo-500 shadow-indigo-500/30" }}
+                                />
+                            )}
+                        </div>
+                    </>
                 )}
             </div>
         </div>

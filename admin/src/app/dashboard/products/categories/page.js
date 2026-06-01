@@ -1,11 +1,11 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { Spinner } from "@heroui/react";
+import { Spinner, Pagination } from "@heroui/react";
 import {
     Plus, Folder, FolderPlus, FolderOpen, Trash, PencilSimple,
-    CaretDown, CaretRight, TreeStructure, Tag, Check, X, FloppyDisk,
+    CaretDown, CaretUp, CaretRight, TreeStructure, Tag, Check, X, FloppyDisk,
     Warning, CheckCircle, XCircle, MagnifyingGlass
 } from "@phosphor-icons/react";
 import ImageUploader from "@/components/ImageUploader";
@@ -284,6 +284,22 @@ export default function CategoriesPage() {
     const [addingCat, setAddingCat] = useState(false);
     const [mounted, setMounted] = useState(false);
 
+    // Sorting & pagination
+    const [sortKey, setSortKey] = useState("name"); // 'name' | 'subs' | 'status'
+    const [sortDir, setSortDir] = useState("asc");   // 'asc' | 'desc'
+    const [page, setPage] = useState(1);
+    const rowsPerPage = 8;
+
+    const toggleSort = (key) => {
+        if (sortKey === key) {
+            setSortDir(d => (d === "asc" ? "desc" : "asc"));
+        } else {
+            setSortKey(key);
+            setSortDir("asc");
+        }
+        setPage(1);
+    };
+
     // Confirm modal state
     const [confirmOpen, setConfirmOpen] = useState(false);
     const [deleteTarget, setDeleteTarget] = useState(null); // { id, name, type: 'category' | 'subcategory' }
@@ -346,12 +362,50 @@ export default function CategoriesPage() {
         }
     };
 
-    const filtered = search.trim()
-        ? categories.filter(c => c.name.toLowerCase().includes(search.toLowerCase()))
-        : categories;
+    const filtered = useMemo(() => {
+        const list = search.trim()
+            ? categories.filter(c => c.name.toLowerCase().includes(search.toLowerCase()))
+            : [...categories];
+
+        const dir = sortDir === "asc" ? 1 : -1;
+        list.sort((a, b) => {
+            let cmp = 0;
+            if (sortKey === "name") {
+                cmp = (a.name || "").localeCompare(b.name || "");
+            } else if (sortKey === "subs") {
+                cmp = (a.subcategories?.length || 0) - (b.subcategories?.length || 0);
+            } else if (sortKey === "status") {
+                cmp = (a.isActive ? 1 : 0) - (b.isActive ? 1 : 0);
+            }
+            return cmp * dir;
+        });
+        return list;
+    }, [categories, search, sortKey, sortDir]);
+
+    // Reset to first page when the filtered set shrinks below the current page
+    const totalPages = Math.max(1, Math.ceil(filtered.length / rowsPerPage));
+    useEffect(() => { if (page > totalPages) setPage(totalPages); }, [page, totalPages]);
+
+    const paginated = useMemo(() => {
+        const start = (page - 1) * rowsPerPage;
+        return filtered.slice(start, start + rowsPerPage);
+    }, [filtered, page]);
 
     const totalSubs = categories.reduce((a, c) => a + (c.subcategories?.length || 0), 0);
     const activeCount = categories.filter(c => c.isActive).length;
+
+    const SortHeader = ({ label, sortKey: key, className }) => (
+        <button
+            type="button"
+            onClick={() => toggleSort(key)}
+            className={`flex items-center justify-center gap-1 text-xs font-semibold uppercase tracking-wider transition-colors ${sortKey === key ? "text-indigo-500" : "text-slate-500 hover:text-slate-700 dark:hover:text-slate-300"} ${className || ""}`}
+        >
+            {label}
+            {sortKey === key
+                ? (sortDir === "asc" ? <CaretUp size={11} weight="bold" /> : <CaretDown size={11} weight="bold" />)
+                : <CaretDown size={11} className="opacity-30" />}
+        </button>
+    );
 
     if (!mounted) return null;
 
@@ -393,7 +447,7 @@ export default function CategoriesPage() {
                         <input
                             type="text"
                             value={search}
-                            onChange={e => setSearch(e.target.value)}
+                            onChange={e => { setSearch(e.target.value); setPage(1); }}
                             placeholder="Search categories…"
                             className="h-10 pl-10 pr-4 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 transition-all w-52 dark:text-white"
                         />
@@ -426,9 +480,11 @@ export default function CategoriesPage() {
                 {/* Table header */}
                 <div className="flex items-center px-5 py-3 bg-slate-50 dark:bg-slate-950/80 border-b border-slate-200 dark:border-slate-800 gap-3">
                     <span className="w-10" />
-                    <span className="flex-1 text-xs font-semibold uppercase tracking-wider text-slate-500">Category</span>
-                    <span className="text-xs font-semibold uppercase tracking-wider text-slate-500 w-24 text-center">Subcats</span>
-                    <span className="text-xs font-semibold uppercase tracking-wider text-slate-500 w-16 text-center">Status</span>
+                    <div className="flex-1">
+                        <SortHeader label="Category" sortKey="name" />
+                    </div>
+                    <SortHeader label="Subcats" sortKey="subs" className="w-24" />
+                    <SortHeader label="Status" sortKey="status" className="w-16" />
                     <span className="text-xs font-semibold uppercase tracking-wider text-slate-500 w-20 text-center">Actions</span>
                 </div>
 
@@ -454,17 +510,38 @@ export default function CategoriesPage() {
                         <p>{search ? "No categories match your search." : "No categories yet. Click \"Add Category\" to get started."}</p>
                     </div>
                 ) : (
-                    <div>
-                        {filtered.map(cat => (
-                            <CatRow
-                                key={cat._id}
-                                cat={cat}
-                                onDelete={askDeleteCategory}
-                                onRefresh={fetchCategories}
-                                addToast={addToast}
-                            />
-                        ))}
-                    </div>
+                    <>
+                        <div>
+                            {paginated.map(cat => (
+                                <CatRow
+                                    key={cat._id}
+                                    cat={cat}
+                                    onDelete={askDeleteCategory}
+                                    onRefresh={fetchCategories}
+                                    addToast={addToast}
+                                />
+                            ))}
+                        </div>
+
+                        {/* Pagination footer */}
+                        <div className="flex w-full flex-col sm:flex-row gap-3 justify-between items-center py-4 px-5 border-t border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950/30">
+                            <span className="text-sm text-slate-500">
+                                Showing {(page - 1) * rowsPerPage + 1}–{Math.min(page * rowsPerPage, filtered.length)} of {filtered.length} categor{filtered.length !== 1 ? "ies" : "y"}
+                            </span>
+                            {totalPages > 1 && (
+                                <Pagination
+                                    radius="md"
+                                    variant="flat"
+                                    showControls
+                                    color="primary"
+                                    page={page}
+                                    total={totalPages}
+                                    onChange={setPage}
+                                    classNames={{ cursor: "bg-indigo-500 shadow-indigo-500/30" }}
+                                />
+                            )}
+                        </div>
+                    </>
                 )}
             </div>
         </div>
