@@ -1,5 +1,5 @@
 import jsPDF from "jspdf";
-import "jspdf-autotable";
+import autoTable from "jspdf-autotable";
 
 export function downloadPDFInvoice(order) {
     if (!order) return;
@@ -58,7 +58,7 @@ export function downloadPDFInvoice(order) {
         `Rs. ${item.securityDeposit?.toLocaleString("en-IN")}`
     ]);
     
-    doc.autoTable({
+    autoTable(doc, {
         startY: periodY + 15,
         head: [['#', 'Item', 'Qty', 'Monthly Rate', 'Security Deposit']],
         body: tableData,

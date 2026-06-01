@@ -1,5 +1,5 @@
 import jsPDF from "jspdf";
-import "jspdf-autotable";
+import autoTable from "jspdf-autotable";
 
 const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
 
@@ -40,7 +40,7 @@ export async function downloadCustomerReport(user) {
     doc.setFontSize(11);
     doc.setFont("helvetica", "bold");
     doc.text("1.  Customer Profile", 14, 44);
-    doc.autoTable({
+    autoTable(doc, {
         startY: 48,
         head: [["Field", "Details"]],
         body: [
@@ -74,7 +74,7 @@ export async function downloadCustomerReport(user) {
     ];
     if (user.isBlocked) kycRows.push(["Blocked Reason", user.blockedReason || "Not specified"]);
     if (user.kyc?.rejectionReason) kycRows.push(["KYC Rejection Reason", user.kyc.rejectionReason]);
-    doc.autoTable({
+    autoTable(doc, {
         startY: y2 + 4,
         head: [["Field", "Details"]],
         body: kycRows,
@@ -97,7 +97,7 @@ export async function downloadCustomerReport(user) {
         doc.text("No rental records found for this customer.", 14, y3 + 8);
         doc.setTextColor(0, 0, 0);
     } else {
-        doc.autoTable({
+        autoTable(doc, {
             startY: y3 + 4,
             head: [["Order ID", "Items", "Amount", "Method", "Paid", "Status", "Start Date", "End Date"]],
             body: orders.map(o => [
@@ -125,7 +125,7 @@ export async function downloadCustomerReport(user) {
     doc.setFont("helvetica", "bold");
     doc.setTextColor(0, 0, 0);
     doc.text("4.  Payment Summary", 14, y4);
-    doc.autoTable({
+    autoTable(doc, {
         startY: y4 + 4,
         head: [["Metric", "Value"]],
         body: [

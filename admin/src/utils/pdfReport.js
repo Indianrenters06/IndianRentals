@@ -1,5 +1,5 @@
 import jsPDF from "jspdf";
-import "jspdf-autotable";
+import autoTable from "jspdf-autotable";
 
 export function downloadPDFReport(title, headers, data, filename) {
     const doc = new jsPDF("landscape");
@@ -18,7 +18,7 @@ export function downloadPDFReport(title, headers, data, filename) {
     doc.text(`Generated on: ${new Date().toLocaleDateString("en-IN")} at ${new Date().toLocaleTimeString("en-IN")}`, 14, 34);
     
     // Table
-    doc.autoTable({
+    autoTable(doc, {
         startY: 40,
         head: [headers],
         body: data,

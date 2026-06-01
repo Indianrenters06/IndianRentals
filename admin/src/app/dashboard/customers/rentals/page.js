@@ -6,7 +6,7 @@ import { Card, CardBody, Table, TableHeader, TableColumn, TableBody, TableRow, T
 import { ShoppingCart, WarningCircle, CheckCircle, Clock, MagnifyingGlass, DownloadSimple } from "@phosphor-icons/react";
 import { downloadPDFReport } from "@/utils/pdfReport";
 import jsPDF from "jspdf";
-import "jspdf-autotable";
+import autoTable from "jspdf-autotable";
 
 const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
 
@@ -82,7 +82,7 @@ export default function RentalHistory() {
         doc.setFontSize(11);
         doc.setFont("helvetica", "bold");
         doc.text("1.  Order Summary", 14, 44);
-        doc.autoTable({
+        autoTable(doc, {
             startY: 48,
             head: [["Field", "Details"]],
             body: [
@@ -105,7 +105,7 @@ export default function RentalHistory() {
         doc.setFont("helvetica", "bold");
         doc.setTextColor(0, 0, 0);
         doc.text("2.  Customer & Delivery Details", 14, y2);
-        doc.autoTable({
+        autoTable(doc, {
             startY: y2 + 4,
             head: [["Field", "Details"]],
             body: [
@@ -131,7 +131,7 @@ export default function RentalHistory() {
         doc.setFont("helvetica", "bold");
         doc.setTextColor(0, 0, 0);
         doc.text("3.  Rental Period", 14, y3);
-        doc.autoTable({
+        autoTable(doc, {
             startY: y3 + 4,
             head: [["Field", "Details"]],
             body: [
@@ -152,7 +152,7 @@ export default function RentalHistory() {
         doc.setTextColor(0, 0, 0);
         doc.text(`4.  Ordered Items  (${rental.orderItems?.length || 0} item${rental.orderItems?.length !== 1 ? "s" : ""})`, 14, y4);
         if (rental.orderItems?.length > 0) {
-            doc.autoTable({
+            autoTable(doc, {
                 startY: y4 + 4,
                 head: [["Product Name", "Qty", "Price/mo", "Security Deposit", "Condition"]],
                 body: rental.orderItems.map(item => [
@@ -191,7 +191,7 @@ export default function RentalHistory() {
             finRows.push(["Coupon Discount", `-Rs.${parseFloat(rental.couponDiscount || 0).toLocaleString("en-IN")}`]);
         }
         finRows.push(["TOTAL PAYABLE", `Rs.${parseFloat(rental.totalPrice || 0).toLocaleString("en-IN")}`]);
-        doc.autoTable({
+        autoTable(doc, {
             startY: y5 + 4,
             head: [["Description", "Amount"]],
             body: finRows,
