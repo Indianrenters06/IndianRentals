@@ -8,6 +8,7 @@ import {
     Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, useDisclosure, Skeleton, Switch
 } from "@heroui/react";
 import { Bell, BellRinging, Plus, PaperPlaneTilt, WarningCircle, CheckCircle, Users, Package, Tag } from "@phosphor-icons/react";
+import SortSelect from "@/components/SortSelect";
 import toast from 'react-hot-toast';
 
 const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
@@ -20,11 +21,18 @@ export default function PushNotifications() {
 
     const sortedNotifications = useMemo(() => {
         return [...notifications].sort((a, b) => {
-            let first = a[sortDescriptor.column] ?? '';
-            let second = b[sortDescriptor.column] ?? '';
-            if (sortDescriptor.column === 'createdAt') {
-                first = new Date(first).getTime();
-                second = new Date(second).getTime();
+            const col = sortDescriptor.column;
+            let first = a[col] ?? '';
+            let second = b[col] ?? '';
+            if (col === 'createdAt') {
+                first = new Date(first).getTime() || 0;
+                second = new Date(second).getTime() || 0;
+            } else if (col === 'isRead') {
+                first = a.isRead ? 1 : 0;
+                second = b.isRead ? 1 : 0;
+            } else {
+                first = first.toString().toLowerCase();
+                second = second.toString().toLowerCase();
             }
             const cmp = first < second ? -1 : first > second ? 1 : 0;
             return sortDescriptor.direction === "descending" ? -cmp : cmp;
@@ -134,6 +142,19 @@ export default function PushNotifications() {
 
             <Card className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
                 <CardBody className="p-0">
+                    <div className="p-4 border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950/30 flex justify-end">
+                        <SortSelect
+                            value={`${sortDescriptor.column}:${sortDescriptor.direction}`}
+                            onChange={(column, direction) => setSortDescriptor({ column, direction })}
+                            options={[
+                                { value: "createdAt:descending", label: "Newest first" },
+                                { value: "createdAt:ascending", label: "Oldest first" },
+                                { value: "title:ascending", label: "Title A–Z" },
+                                { value: "type:ascending", label: "Type A–Z" },
+                                { value: "isRead:ascending", label: "Unread first" },
+                            ]}
+                        />
+                    </div>
                     {error ? (
                         <div className="flex flex-col items-center justify-center py-20 gap-3 text-rose-500">
                             <WarningCircle size={40} weight="bold" />
@@ -142,13 +163,13 @@ export default function PushNotifications() {
                     ) : loading ? (
                         <div className="p-6 space-y-4">{[...Array(5)].map((_, i) => <Skeleton key={i} className="h-12 w-full rounded-xl" />)}</div>
                     ) : (
-                        <Table aria-label="Notifications table" sortDescriptor={sortDescriptor} onSortChange={setSortDescriptor} classNames={{ wrapper: "p-0 rounded-none shadow-none bg-transparent", th: "bg-slate-50 dark:bg-slate-950/80 uppercase text-xs font-bold h-12 pt-0 px-6", td: "py-4 px-6 border-b border-slate-100 dark:border-slate-800/50" }}>
+                        <Table aria-label="Notifications table" classNames={{ wrapper: "p-0 rounded-none shadow-none bg-transparent", th: "bg-slate-50 dark:bg-slate-950/80 uppercase text-xs font-bold h-12 pt-0 px-6", td: "py-4 px-6 border-b border-slate-100 dark:border-slate-800/50" }}>
                             <TableHeader>
-                                <TableColumn key="title" allowsSorting>TITLE</TableColumn>
+                                <TableColumn key="title">TITLE</TableColumn>
                                 <TableColumn key="message">MESSAGE</TableColumn>
-                                <TableColumn key="type" allowsSorting>TYPE</TableColumn>
-                                <TableColumn key="createdAt" allowsSorting>SENT AT</TableColumn>
-                                <TableColumn key="isRead" allowsSorting align="center">STATUS</TableColumn>
+                                <TableColumn key="type">TYPE</TableColumn>
+                                <TableColumn key="createdAt">SENT AT</TableColumn>
+                                <TableColumn key="isRead" align="center">STATUS</TableColumn>
                             </TableHeader>
                             <TableBody items={sortedNotifications} emptyContent="No notifications yet. Click 'New Notification' to send one.">
                                 {(item) => (

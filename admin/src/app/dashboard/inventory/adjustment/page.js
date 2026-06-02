@@ -8,6 +8,7 @@ import {
     Select, SelectItem, Input, Textarea, Skeleton, useDisclosure
 } from "@heroui/react";
 import { Plus, WarningCircle, ArrowUp, ArrowDown } from "@phosphor-icons/react";
+import SortSelect from "@/components/SortSelect";
 import toast from 'react-hot-toast';
 
 const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
@@ -22,8 +23,11 @@ export default function StockAdjustment() {
 
     const sortedLogs = useMemo(() => {
         return [...logs].sort((a, b) => {
-            const first = a[sortDescriptor.column] ?? '';
-            const second = b[sortDescriptor.column] ?? '';
+            const col = sortDescriptor.column;
+            let first, second;
+            if (col === "change") { first = Number(a.change) || 0; second = Number(b.change) || 0; }
+            else if (col === "date") { first = new Date(a.date).getTime() || 0; second = new Date(b.date).getTime() || 0; }
+            else { first = (a[col] ?? '').toString().toLowerCase(); second = (b[col] ?? '').toString().toLowerCase(); }
             const cmp = first < second ? -1 : first > second ? 1 : 0;
             return sortDescriptor.direction === "descending" ? -cmp : cmp;
         });
@@ -147,6 +151,20 @@ export default function StockAdjustment() {
 
             <Card className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
                 <CardBody className="p-0">
+                    <div className="p-4 border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950/30 flex justify-end">
+                        <SortSelect
+                            className="h-11"
+                            value={`${sortDescriptor.column}:${sortDescriptor.direction}`}
+                            onChange={(column, direction) => setSortDescriptor({ column, direction })}
+                            options={[
+                                { value: "date:descending", label: "Newest first" },
+                                { value: "date:ascending", label: "Oldest first" },
+                                { value: "change:descending", label: "Largest change" },
+                                { value: "change:ascending", label: "Smallest change" },
+                                { value: "item:ascending", label: "Product A–Z" },
+                            ]}
+                        />
+                    </div>
                     {error ? (
                         <div className="flex flex-col items-center justify-center py-20 gap-3 text-rose-500">
                             <WarningCircle size={40} weight="bold" />
@@ -162,8 +180,6 @@ export default function StockAdjustment() {
                     ) : (
                         <Table
                             aria-label="Stock adjustment table"
-                            sortDescriptor={sortDescriptor}
-                            onSortChange={setSortDescriptor}
                             classNames={{
                                 wrapper: "p-0 rounded-none shadow-none bg-transparent",
                                 th: "bg-slate-50 dark:bg-slate-950/80 uppercase text-xs font-bold h-12 pt-0 px-6",
@@ -171,11 +187,11 @@ export default function StockAdjustment() {
                             }}
                         >
                             <TableHeader>
-                                <TableColumn key="item" allowsSorting>PRODUCT</TableColumn>
+                                <TableColumn key="item">PRODUCT</TableColumn>
                                 <TableColumn key="type">METHOD</TableColumn>
-                                <TableColumn key="change" allowsSorting>QUANTITY CHANGE</TableColumn>
+                                <TableColumn key="change">QUANTITY CHANGE</TableColumn>
                                 <TableColumn key="reason">REASON / NOTE</TableColumn>
-                                <TableColumn key="date" allowsSorting align="center">DATE</TableColumn>
+                                <TableColumn key="date" align="center">DATE</TableColumn>
                             </TableHeader>
                             <TableBody items={sortedLogs} emptyContent="No adjustments logged yet. Click 'New Adjustment' to begin.">
                                 {(item) => (

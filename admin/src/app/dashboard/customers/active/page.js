@@ -9,6 +9,7 @@ import {
 } from "@heroui/react";
 import { Users, ArrowRight, WarningCircle, CheckCircle, XCircle, MagnifyingGlass, DownloadSimple, Eye, Phone, MapPin } from "@phosphor-icons/react";
 import { downloadCustomerReport } from "@/utils/customerReport";
+import SortSelect from "@/components/SortSelect";
 
 const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
 
@@ -93,7 +94,10 @@ export default function ActiveUsers() {
             list = list.filter(u => u.name?.toLowerCase().includes(q) || u.email?.toLowerCase().includes(q) || u.city?.toLowerCase().includes(q));
         }
         return list.sort((a, b) => {
-            const first = a[sortDescriptor.column]; const second = b[sortDescriptor.column];
+            const col = sortDescriptor.column;
+            let first, second;
+            if (col === "lastLogin") { first = new Date(a.lastLogin).getTime() || 0; second = new Date(b.lastLogin).getTime() || 0; }
+            else { first = (a[col] || "").toString().toLowerCase(); second = (b[col] || "").toString().toLowerCase(); }
             const cmp = first < second ? -1 : first > second ? 1 : 0;
             return sortDescriptor.direction === "descending" ? -cmp : cmp;
         });
@@ -124,12 +128,24 @@ export default function ActiveUsers() {
 
             <Card className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
                 <CardBody className="p-0">
-                    <div className="p-6 border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950/30">
-                        <div className="relative group max-w-md">
+                    <div className="p-6 border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950/30 flex flex-col sm:flex-row gap-4 sm:items-center sm:justify-between">
+                        <div className="relative group max-w-md flex-1">
                             <MagnifyingGlass className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-indigo-500 transition-colors" />
                             <input type="text" value={search} onChange={e => setSearch(e.target.value)} placeholder="Search by name, email or city..."
                                 className="w-full bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 rounded-xl pl-10 pr-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/50 h-11" />
                         </div>
+                        <SortSelect
+                            className="h-11"
+                            value={`${sortDescriptor.column}:${sortDescriptor.direction}`}
+                            onChange={(column, direction) => { setSortDescriptor({ column, direction }); setPage(1); }}
+                            options={[
+                                { value: "lastLogin:descending", label: "Recently active" },
+                                { value: "lastLogin:ascending", label: "Least recent" },
+                                { value: "name:ascending", label: "Name A–Z" },
+                                { value: "name:descending", label: "Name Z–A" },
+                                { value: "city:ascending", label: "Location A–Z" },
+                            ]}
+                        />
                     </div>
 
                     {error ? (
@@ -139,7 +155,7 @@ export default function ActiveUsers() {
                     ) : loading ? (
                         <div className="p-6 space-y-4">{[...Array(5)].map((_, i) => <Skeleton key={i} className="h-12 w-full rounded-xl" />)}</div>
                     ) : (
-                        <Table aria-label="Active users table" sortDescriptor={sortDescriptor} onSortChange={setSortDescriptor}
+                        <Table aria-label="Active users table"
                             bottomContent={sortedItems.length > 0 ? (
                                 <div className="flex w-full justify-between items-center py-4 px-6 border-t border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950/30">
                                     <span className="text-sm text-slate-500">Showing {items.length} of {sortedItems.length} active users</span>
@@ -148,10 +164,10 @@ export default function ActiveUsers() {
                             ) : null}
                             classNames={{ wrapper: "p-0 rounded-none shadow-none bg-transparent", th: "bg-slate-50 dark:bg-slate-950/80 uppercase text-xs font-bold h-12 pt-0 px-6", td: "py-4 px-6 border-b border-slate-100 dark:border-slate-800/50" }}>
                             <TableHeader>
-                                <TableColumn key="name" allowsSorting>USER</TableColumn>
-                                <TableColumn key="email" allowsSorting>EMAIL</TableColumn>
-                                <TableColumn key="city" allowsSorting>LOCATION</TableColumn>
-                                <TableColumn key="lastLogin" allowsSorting>LAST LOGIN</TableColumn>
+                                <TableColumn key="name">USER</TableColumn>
+                                <TableColumn key="email">EMAIL</TableColumn>
+                                <TableColumn key="city">LOCATION</TableColumn>
+                                <TableColumn key="lastLogin">LAST LOGIN</TableColumn>
                                 <TableColumn align="center">STATUS</TableColumn>
                                 <TableColumn align="center">ACTIONS</TableColumn>
                             </TableHeader>

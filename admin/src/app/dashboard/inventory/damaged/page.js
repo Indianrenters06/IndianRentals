@@ -4,6 +4,7 @@ import { useState, useEffect, useMemo, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Card, CardBody, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Chip, Button, Skeleton, Pagination, Spinner } from "@heroui/react";
 import { Warning, Wrench, WarningCircle, CheckCircle, XCircle, MagnifyingGlass } from "@phosphor-icons/react";
+import SortSelect from "@/components/SortSelect";
 
 // ── Toast Notification ────────────────────────────────────────────────────────
 function Toast({ toasts }) {
@@ -84,8 +85,10 @@ export default function DamagedInventory() {
         }
 
         return list.sort((a, b) => {
-            const first = a[sortDescriptor.column];
-            const second = b[sortDescriptor.column];
+            const col = sortDescriptor.column;
+            let first, second;
+            if (col === "estimate") { first = Number(a.estimate) || 0; second = Number(b.estimate) || 0; }
+            else { first = (a[col] || "").toString().toLowerCase(); second = (b[col] || "").toString().toLowerCase(); }
             const cmp = first < second ? -1 : first > second ? 1 : 0;
 
             return sortDescriptor.direction === "descending" ? -cmp : cmp;
@@ -134,6 +137,18 @@ export default function DamagedInventory() {
                                 className="w-full bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 rounded-xl pl-10 pr-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/50 h-11"
                             />
                         </div>
+                        <SortSelect
+                            className="h-11"
+                            value={`${sortDescriptor.column}:${sortDescriptor.direction}`}
+                            onChange={(column, direction) => { setSortDescriptor({ column, direction }); setPage(1); }}
+                            options={[
+                                { value: "severity:descending", label: "Severity (high first)" },
+                                { value: "severity:ascending", label: "Severity (low first)" },
+                                { value: "estimate:descending", label: "Repair cost (high)" },
+                                { value: "estimate:ascending", label: "Repair cost (low)" },
+                                { value: "item:ascending", label: "Product A–Z" },
+                            ]}
+                        />
                     </div>
 
                     {error ? (
@@ -151,8 +166,6 @@ export default function DamagedInventory() {
                     ) : (
                         <Table
                             aria-label="Damaged items table"
-                            sortDescriptor={sortDescriptor}
-                            onSortChange={setSortDescriptor}
                             bottomContent={
                                 sortedItems.length > 0 ? (
                                     <div className="flex w-full justify-between items-center py-4 px-6 border-t border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950/30">
@@ -181,10 +194,10 @@ export default function DamagedInventory() {
                             }}
                         >
                             <TableHeader>
-                                <TableColumn key="item" allowsSorting>DAMAGED PRODUCT</TableColumn>
-                                <TableColumn key="issue" allowsSorting>NATURE OF ISSUE</TableColumn>
-                                <TableColumn key="severity" allowsSorting>SEVERITY</TableColumn>
-                                <TableColumn key="estimate" allowsSorting>EST. REPAIR COST</TableColumn>
+                                <TableColumn key="item">DAMAGED PRODUCT</TableColumn>
+                                <TableColumn key="issue">NATURE OF ISSUE</TableColumn>
+                                <TableColumn key="severity">SEVERITY</TableColumn>
+                                <TableColumn key="estimate">EST. REPAIR COST</TableColumn>
                                 <TableColumn align="center">REPAIR STATUS</TableColumn>
                             </TableHeader>
                             <TableBody items={items} emptyContent="No damaged items recorded. All inventory is in good condition.">

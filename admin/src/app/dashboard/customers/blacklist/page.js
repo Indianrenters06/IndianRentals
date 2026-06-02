@@ -8,6 +8,7 @@ import {
     ModalFooter, Input, Select, SelectItem, useDisclosure, Skeleton, Pagination
 } from "@heroui/react";
 import { ShieldSlash, WarningCircle, Warning, Plus, Trash, MagnifyingGlass } from "@phosphor-icons/react";
+import SortSelect from "@/components/SortSelect";
 import toast from 'react-hot-toast';
 
 const LOCAL_KEY = "admin_blacklist";
@@ -64,7 +65,10 @@ export default function BlacklistManagement() {
             list = list.filter(b => b.identifier?.toLowerCase().includes(q) || b.reason?.toLowerCase().includes(q) || b.type?.toLowerCase().includes(q));
         }
         return list.sort((a, b) => {
-            const first = a[sortDescriptor.column]; const second = b[sortDescriptor.column];
+            const col = sortDescriptor.column;
+            let first, second;
+            if (col === "date") { first = new Date(a.date).getTime() || 0; second = new Date(b.date).getTime() || 0; }
+            else { first = (a[col] || "").toString().toLowerCase(); second = (b[col] || "").toString().toLowerCase(); }
             const cmp = first < second ? -1 : first > second ? 1 : 0;
             return sortDescriptor.direction === "descending" ? -cmp : cmp;
         });
@@ -99,18 +103,29 @@ export default function BlacklistManagement() {
 
             <Card className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
                 <CardBody className="p-0">
-                    <div className="p-6 border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950/30">
-                        <div className="relative group max-w-md">
+                    <div className="p-6 border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950/30 flex flex-col sm:flex-row gap-4 sm:items-center sm:justify-between">
+                        <div className="relative group max-w-md flex-1">
                             <MagnifyingGlass className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-rose-500 transition-colors" />
                             <input type="text" value={search} onChange={e => setSearch(e.target.value)} placeholder="Search by identifier or reason..."
                                 className="w-full bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 rounded-xl pl-10 pr-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-rose-500/30 h-11" />
                         </div>
+                        <SortSelect
+                            className="h-11"
+                            value={`${sortDescriptor.column}:${sortDescriptor.direction}`}
+                            onChange={(column, direction) => { setSortDescriptor({ column, direction }); setPage(1); }}
+                            options={[
+                                { value: "date:descending", label: "Newest first" },
+                                { value: "date:ascending", label: "Oldest first" },
+                                { value: "identifier:ascending", label: "Identifier A–Z" },
+                                { value: "type:ascending", label: "Type A–Z" },
+                            ]}
+                        />
                     </div>
 
                     {loading ? (
                         <div className="p-6 space-y-4">{[...Array(3)].map((_, i) => <Skeleton key={i} className="h-12 w-full rounded-xl" />)}</div>
                     ) : (
-                        <Table aria-label="Blacklist table" sortDescriptor={sortDescriptor} onSortChange={setSortDescriptor}
+                        <Table aria-label="Blacklist table"
                             bottomContent={sortedItems.length > 0 ? (
                                 <div className="flex w-full justify-between items-center py-4 px-6 border-t border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950/30">
                                     <span className="text-sm text-slate-500">Showing {items.length} of {sortedItems.length} blacklisted entries</span>
@@ -119,10 +134,10 @@ export default function BlacklistManagement() {
                             ) : null}
                             classNames={{ wrapper: "p-0 rounded-none shadow-none bg-transparent", th: "bg-slate-50 dark:bg-slate-950/80 uppercase text-xs font-bold h-12 pt-0 px-6", td: "py-4 px-6 border-b border-slate-100 dark:border-slate-800/50" }}>
                             <TableHeader>
-                                <TableColumn key="identifier" allowsSorting>BLOCKED IDENTIFIER</TableColumn>
-                                <TableColumn key="type" allowsSorting>TYPE</TableColumn>
-                                <TableColumn key="reason" allowsSorting>REASON</TableColumn>
-                                <TableColumn key="date" allowsSorting>LISTED ON</TableColumn>
+                                <TableColumn key="identifier">BLOCKED IDENTIFIER</TableColumn>
+                                <TableColumn key="type">TYPE</TableColumn>
+                                <TableColumn key="reason">REASON</TableColumn>
+                                <TableColumn key="date">LISTED ON</TableColumn>
                                 <TableColumn align="center">ACTION</TableColumn>
                             </TableHeader>
                             <TableBody items={items} emptyContent="Security perimeter clear. No active blacklists.">

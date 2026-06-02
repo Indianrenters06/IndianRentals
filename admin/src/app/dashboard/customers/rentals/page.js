@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import { Card, CardBody, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Chip, Avatar, Skeleton, Pagination, Button } from "@heroui/react";
 import { ShoppingCart, WarningCircle, CheckCircle, Clock, MagnifyingGlass, DownloadSimple } from "@phosphor-icons/react";
 import { downloadPDFReport } from "@/utils/pdfReport";
+import SortSelect from "@/components/SortSelect";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 
@@ -232,7 +233,12 @@ export default function RentalHistory() {
         }
         if (statusFilter !== "All") list = list.filter(r => r.status === statusFilter);
         return list.sort((a, b) => {
-            const first = a[sortDescriptor.column]; const second = b[sortDescriptor.column];
+            const col = sortDescriptor.column;
+            let first, second;
+            if (col === "totalPrice") { first = Number(a.totalPrice) || 0; second = Number(b.totalPrice) || 0; }
+            else if (col === "createdAt") { first = new Date(a.createdAt).getTime() || 0; second = new Date(b.createdAt).getTime() || 0; }
+            else if (col === "user") { first = (a.user?.name || "").toLowerCase(); second = (b.user?.name || "").toLowerCase(); }
+            else { first = (a[col] || "").toString().toLowerCase(); second = (b[col] || "").toString().toLowerCase(); }
             const cmp = first < second ? -1 : first > second ? 1 : 0;
             return sortDescriptor.direction === "descending" ? -cmp : cmp;
         });
@@ -273,13 +279,25 @@ export default function RentalHistory() {
                             <input type="text" value={search} onChange={e => setSearch(e.target.value)} placeholder="Search by customer or order ID..."
                                 className="w-full bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 rounded-xl pl-10 pr-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/50 h-11" />
                         </div>
-                        <div className="flex gap-2 flex-wrap">
+                        <div className="flex gap-2 flex-wrap items-center">
                             {statuses.map(s => (
                                 <button key={s} type="button" onClick={() => { setStatusFilter(s); setPage(1); }}
                                     className={`px-3 py-1.5 rounded-lg text-xs font-bold border transition-all ${statusFilter === s ? "bg-indigo-600 text-white border-indigo-600 shadow-md" : "bg-white dark:bg-slate-900 text-slate-500 border-slate-200 dark:border-slate-700 hover:border-indigo-400"}`}>
                                     {s}
                                 </button>
                             ))}
+                            <SortSelect
+                                className="h-11"
+                                value={`${sortDescriptor.column}:${sortDescriptor.direction}`}
+                                onChange={(column, direction) => { setSortDescriptor({ column, direction }); setPage(1); }}
+                                options={[
+                                    { value: "createdAt:descending", label: "Newest first" },
+                                    { value: "createdAt:ascending", label: "Oldest first" },
+                                    { value: "totalPrice:descending", label: "Highest amount" },
+                                    { value: "totalPrice:ascending", label: "Lowest amount" },
+                                    { value: "user:ascending", label: "Customer A–Z" },
+                                ]}
+                            />
                         </div>
                     </div>
 
@@ -291,7 +309,7 @@ export default function RentalHistory() {
                     ) : loading ? (
                         <div className="p-6 space-y-4">{[...Array(5)].map((_, i) => <Skeleton key={i} className="h-12 w-full rounded-xl" />)}</div>
                     ) : (
-                        <Table aria-label="Rental history table" sortDescriptor={sortDescriptor} onSortChange={setSortDescriptor}
+                        <Table aria-label="Rental history table"
                             bottomContent={sortedItems.length > 0 ? (
                                 <div className="flex w-full justify-between items-center py-4 px-6 border-t border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950/30">
                                     <span className="text-sm text-slate-500">Showing {items.length} of {sortedItems.length} rentals</span>
@@ -300,12 +318,12 @@ export default function RentalHistory() {
                             ) : null}
                             classNames={{ wrapper: "p-0 rounded-none shadow-none bg-transparent", th: "bg-slate-50 dark:bg-slate-950/80 uppercase text-xs font-bold h-12 pt-0 px-6", td: "py-4 px-6 border-b border-slate-100 dark:border-slate-800/50" }}>
                             <TableHeader>
-                                <TableColumn key="_id" allowsSorting>ORDER ID</TableColumn>
-                                <TableColumn key="user" allowsSorting>CUSTOMER</TableColumn>
+                                <TableColumn key="_id">ORDER ID</TableColumn>
+                                <TableColumn key="user">CUSTOMER</TableColumn>
                                 <TableColumn>ITEMS</TableColumn>
                                 <TableColumn key="rentalPeriod">RENTAL PERIOD</TableColumn>
-                                <TableColumn key="totalPrice" allowsSorting>AMOUNT</TableColumn>
-                                <TableColumn key="status" align="center" allowsSorting>STATUS</TableColumn>
+                                <TableColumn key="totalPrice">AMOUNT</TableColumn>
+                                <TableColumn key="status" align="center">STATUS</TableColumn>
                                 <TableColumn align="center">DOWNLOAD</TableColumn>
                             </TableHeader>
                             <TableBody items={items} emptyContent="No rental records found.">

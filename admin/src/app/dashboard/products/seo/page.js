@@ -9,6 +9,7 @@ import {
     useDisclosure, Textarea, Divider, Pagination
 } from "@heroui/react";
 import { MagnifyingGlass, FloppyDisk, Tag, Browser, Globe, Info, CheckCircle, WarningCircle, CaretLeft, CaretRight } from "@phosphor-icons/react";
+import SortSelect from "@/components/SortSelect";
 import { toast } from "react-hot-toast";
 
 const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
@@ -145,8 +146,8 @@ export default function SEOManagement() {
 
             <Card className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
                 <CardBody className="p-0">
-                    <div className="p-6 border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/50">
-                        <div className="relative group max-w-md">
+                    <div className="p-6 border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/50 flex flex-col sm:flex-row gap-4 sm:items-center sm:justify-between">
+                        <div className="relative group max-w-md flex-1">
                             <MagnifyingGlass className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-indigo-500 transition-colors" size={18} />
                             <input
                                 type="text"
@@ -156,11 +157,21 @@ export default function SEOManagement() {
                                 className="w-full bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 rounded-xl pl-10 pr-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/50 dark:text-white h-11"
                             />
                         </div>
+                        <SortSelect
+                            className="h-11"
+                            value={`${sortDescriptor.column}:${sortDescriptor.direction}`}
+                            onChange={(column, direction) => { setSortDescriptor({ column, direction }); setPage(1); }}
+                            options={[
+                                { value: "name:ascending", label: "Name A–Z" },
+                                { value: "name:descending", label: "Name Z–A" },
+                                { value: "category:ascending", label: "Category A–Z" },
+                                { value: "seoTitle:descending", label: "SEO: Optimized first" },
+                                { value: "seoTitle:ascending", label: "SEO: Pending first" },
+                            ]}
+                        />
                     </div>
                     <Table
                         aria-label="SEO management table"
-                        sortDescriptor={sortDescriptor}
-                        onSortChange={setSortDescriptor}
                         bottomContent={sortedItems.length > 0 ? (
                             <div className="flex w-full justify-between items-center py-4 px-6 border-t border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950/30">
                                 <span className="text-sm text-slate-500">Showing {paginatedItems.length} of {sortedItems.length} products</span>
@@ -211,9 +222,9 @@ export default function SEOManagement() {
                         }}
                     >
                         <TableHeader>
-                            <TableColumn key="name" allowsSorting>PRODUCT</TableColumn>
-                            <TableColumn key="category" allowsSorting>CATEGORY</TableColumn>
-                            <TableColumn key="seoTitle" allowsSorting>SEO STATUS</TableColumn>
+                            <TableColumn key="name">PRODUCT</TableColumn>
+                            <TableColumn key="category">CATEGORY</TableColumn>
+                            <TableColumn key="seoTitle">SEO STATUS</TableColumn>
                             <TableColumn align="center">ACTIONS</TableColumn>
                         </TableHeader>
                         <TableBody items={paginatedItems} isLoading={loading} emptyContent={loading ? <Spinner /> : "No products found."}>

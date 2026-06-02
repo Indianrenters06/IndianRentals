@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Card, CardBody, Button, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Chip, Avatar, Skeleton, Pagination } from "@heroui/react";
 import { Prohibit, WarningCircle, ArrowCounterClockwise, MagnifyingGlass, CheckCircle, XCircle, DownloadSimple } from "@phosphor-icons/react";
 import { downloadCustomerReport } from "@/utils/customerReport";
+import SortSelect from "@/components/SortSelect";
 
 const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
 
@@ -93,7 +94,11 @@ export default function BlockedUsers() {
             list = list.filter(u => u.name?.toLowerCase().includes(q) || u.email?.toLowerCase().includes(q));
         }
         return list.sort((a, b) => {
-            const first = a[sortDescriptor.column]; const second = b[sortDescriptor.column];
+            const col = sortDescriptor.column;
+            let first, second;
+            if (col === "createdAt") { first = new Date(a.createdAt).getTime() || 0; second = new Date(b.createdAt).getTime() || 0; }
+            else if (col === "isBlocked") { first = a.isBlocked ? 1 : 0; second = b.isBlocked ? 1 : 0; }
+            else { first = (a[col] || "").toString().toLowerCase(); second = (b[col] || "").toString().toLowerCase(); }
             const cmp = first < second ? -1 : first > second ? 1 : 0;
             return sortDescriptor.direction === "descending" ? -cmp : cmp;
         });
@@ -124,12 +129,23 @@ export default function BlockedUsers() {
 
             <Card className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
                 <CardBody className="p-0">
-                    <div className="p-6 border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950/30">
-                        <div className="relative group max-w-md">
+                    <div className="p-6 border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950/30 flex flex-col sm:flex-row gap-4 sm:items-center sm:justify-between">
+                        <div className="relative group max-w-md flex-1">
                             <MagnifyingGlass className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-indigo-500 transition-colors" />
                             <input type="text" value={search} onChange={e => setSearch(e.target.value)} placeholder="Search by name or email..."
                                 className="w-full bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 rounded-xl pl-10 pr-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/50 h-11" />
                         </div>
+                        <SortSelect
+                            className="h-11"
+                            value={`${sortDescriptor.column}:${sortDescriptor.direction}`}
+                            onChange={(column, direction) => { setSortDescriptor({ column, direction }); setPage(1); }}
+                            options={[
+                                { value: "createdAt:descending", label: "Newest first" },
+                                { value: "createdAt:ascending", label: "Oldest first" },
+                                { value: "name:ascending", label: "Name A–Z" },
+                                { value: "name:descending", label: "Name Z–A" },
+                            ]}
+                        />
                     </div>
 
                     {error ? (
@@ -139,7 +155,7 @@ export default function BlockedUsers() {
                     ) : loading ? (
                         <div className="p-6 space-y-4">{[...Array(4)].map((_, i) => <Skeleton key={i} className="h-12 w-full rounded-xl" />)}</div>
                     ) : (
-                        <Table aria-label="Blocked users table" sortDescriptor={sortDescriptor} onSortChange={setSortDescriptor}
+                        <Table aria-label="Blocked users table"
                             bottomContent={sortedItems.length > 0 ? (
                                 <div className="flex w-full justify-between items-center py-4 px-6 border-t border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950/30">
                                     <span className="text-sm text-slate-500">Showing {items.length} of {sortedItems.length} blocked accounts</span>
@@ -148,10 +164,10 @@ export default function BlockedUsers() {
                             ) : null}
                             classNames={{ wrapper: "p-0 rounded-none shadow-none bg-transparent", th: "bg-slate-50 dark:bg-slate-950/80 uppercase text-xs font-bold h-12 pt-0 px-6", td: "py-4 px-6 border-b border-slate-100 dark:border-slate-800/50" }}>
                             <TableHeader>
-                                <TableColumn key="name" allowsSorting>RESTRICTED USER</TableColumn>
-                                <TableColumn key="email" allowsSorting>EMAIL</TableColumn>
-                                <TableColumn key="isBlocked" allowsSorting>STATUS</TableColumn>
-                                <TableColumn key="createdAt" allowsSorting>JOINED</TableColumn>
+                                <TableColumn key="name">RESTRICTED USER</TableColumn>
+                                <TableColumn key="email">EMAIL</TableColumn>
+                                <TableColumn key="isBlocked">STATUS</TableColumn>
+                                <TableColumn key="createdAt">JOINED</TableColumn>
                                 <TableColumn align="center">ACTIONS</TableColumn>
                             </TableHeader>
                             <TableBody items={items} emptyContent="No blocked accounts. Platform is fully open.">

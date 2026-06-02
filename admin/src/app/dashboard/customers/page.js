@@ -6,6 +6,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { downloadPDFReport } from "@/utils/pdfReport";
 import { downloadCustomerReport } from "@/utils/customerReport";
+import SortSelect from "@/components/SortSelect";
 import {
     MagnifyingGlass, Funnel, DownloadSimple, PencilSimple, Trash,
     Phone, MapPin, DotsThreeVertical, EnvelopeSimple,
@@ -278,8 +279,11 @@ export default function CustomersManagement() {
                 user.email?.toLowerCase().includes(searchTerm.toLowerCase());
         });
         return list.sort((a, b) => {
-            const first = a[sortDescriptor.column];
-            const second = b[sortDescriptor.column];
+            const col = sortDescriptor.column;
+            let first, second;
+            if (col === 'name') { first = (a.name || '').toLowerCase(); second = (b.name || '').toLowerCase(); }
+            else if (col === 'createdAt') { first = new Date(a.createdAt).getTime() || 0; second = new Date(b.createdAt).getTime() || 0; }
+            else { first = a[col]; second = b[col]; }
             const cmp = first < second ? -1 : first > second ? 1 : 0;
             return sortDescriptor.direction === 'descending' ? -cmp : cmp;
         });
@@ -457,12 +461,21 @@ export default function CustomersManagement() {
                                 />
                             </div>
                         </div>
+                        <SortSelect
+                            className="h-[50px]"
+                            value={`${sortDescriptor.column}:${sortDescriptor.direction}`}
+                            onChange={(column, direction) => { setSortDescriptor({ column, direction }); setPage(1); }}
+                            options={[
+                                { value: "createdAt:descending", label: "Newest first" },
+                                { value: "createdAt:ascending", label: "Oldest first" },
+                                { value: "name:ascending", label: "Name A–Z" },
+                                { value: "name:descending", label: "Name Z–A" },
+                            ]}
+                        />
                     </div>
 
                     <Table
                         aria-label="Customers management table"
-                        sortDescriptor={sortDescriptor}
-                        onSortChange={setSortDescriptor}
                         bottomContent={
                             filteredUsers.length > 0 ? (
                                 <div className="flex w-full justify-between items-center py-4 px-6 border-t border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950/30">
@@ -493,10 +506,10 @@ export default function CustomersManagement() {
                         }}
                     >
                         <TableHeader>
-                            <TableColumn key="user" allowsSorting>USER INFO</TableColumn>
-                            <TableColumn key="status" allowsSorting>STATUS</TableColumn>
+                            <TableColumn key="user">USER INFO</TableColumn>
+                            <TableColumn key="status">STATUS</TableColumn>
                             <TableColumn key="contact">CONTACT & LOCATION</TableColumn>
-                            <TableColumn key="joined" allowsSorting>JOINED DATE</TableColumn>
+                            <TableColumn key="joined">JOINED DATE</TableColumn>
                             <TableColumn key="actions" align="center">ACTIONS</TableColumn>
                         </TableHeader>
                         <TableBody

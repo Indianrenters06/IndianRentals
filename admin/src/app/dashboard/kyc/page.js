@@ -10,6 +10,7 @@ import { Eye, CheckCircle, WarningCircle, User, IdentificationCard, FileText, In
 import toast from 'react-hot-toast';
 import { DownloadSimple, MagnifyingGlassPlus, X } from "@phosphor-icons/react";
 import jsPDF from "jspdf";
+import SortSelect from "@/components/SortSelect";
 
 export default function KYCManagement() {
     const [statusFilter, setStatusFilter] = useState("all");
@@ -101,20 +102,13 @@ export default function KYCManagement() {
 
 
         return [...filteredRequests].sort((a, b) => {
-
-
-            const first = a[sortDescriptor.column];
-
-
-            const second = b[sortDescriptor.column];
-
-
+            const col = sortDescriptor.column;
+            let first, second;
+            if (col === "createdAt") { first = new Date(a.createdAt).getTime() || 0; second = new Date(b.createdAt).getTime() || 0; }
+            else if (col === "user") { first = (a.user?.name || "").toLowerCase(); second = (b.user?.name || "").toLowerCase(); }
+            else { first = (a[col] || "").toString().toLowerCase(); second = (b[col] || "").toString().toLowerCase(); }
             const cmp = first < second ? -1 : first > second ? 1 : 0;
-
-
             return sortDescriptor.direction === "descending" ? -cmp : cmp;
-
-
         });
 
 
@@ -175,12 +169,24 @@ export default function KYCManagement() {
                 </div>
             </div>
 
+            <div className="flex justify-end">
+                <SortSelect
+                    value={`${sortDescriptor.column}:${sortDescriptor.direction}`}
+                    onChange={(column, direction) => { setSortDescriptor({ column, direction }); setPage(1); }}
+                    options={[
+                        { value: "createdAt:descending", label: "Newest first" },
+                        { value: "createdAt:ascending", label: "Oldest first" },
+                        { value: "user:ascending", label: "Name A–Z" },
+                        { value: "user:descending", label: "Name Z–A" },
+                        { value: "status:ascending", label: "Status" },
+                    ]}
+                />
+            </div>
+
             <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>
                 <Card className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm">
                     <CardBody className="p-0">
                         <Table
-                            sortDescriptor={sortDescriptor}
-                            onSortChange={setSortDescriptor}
                             bottomContent={
                                 filteredRequests.length > 0 ? (
                                     <div className="flex w-full justify-center mt-4 mb-4">

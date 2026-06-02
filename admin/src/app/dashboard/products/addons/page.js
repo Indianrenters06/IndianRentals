@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { 
     Card, CardBody, Button, Table, TableHeader, TableColumn, 
@@ -11,6 +11,7 @@ import {
 } from "@heroui/react";
 import { Plus, Package, Trash, PencilSimple, PlusCircle, Info, ShieldCheck } from "@phosphor-icons/react";
 import { toast } from "react-hot-toast";
+import SortSelect from "@/components/SortSelect";
 
 const ADDON_CATEGORIES = [
     { label: "Delivery", value: "Delivery" },
@@ -27,6 +28,18 @@ export default function AddonsManagement() {
     const [modalType, setModalType] = useState("add"); // "add" or "edit"
     const [selectedAddon, setSelectedAddon] = useState(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [sortDescriptor, setSortDescriptor] = useState({ column: "name", direction: "ascending" });
+
+    const sortedAddons = useMemo(() => {
+        return [...addons].sort((a, b) => {
+            const col = sortDescriptor.column;
+            let first, second;
+            if (col === "price") { first = Number(a.price) || 0; second = Number(b.price) || 0; }
+            else { first = (a[col] ?? "").toString().toLowerCase(); second = (b[col] ?? "").toString().toLowerCase(); }
+            const cmp = first < second ? -1 : first > second ? 1 : 0;
+            return sortDescriptor.direction === "descending" ? -cmp : cmp;
+        });
+    }, [addons, sortDescriptor]);
 
     const [formData, setFormData] = useState({
         name: "",
@@ -150,15 +163,28 @@ export default function AddonsManagement() {
                     <p className="text-slate-600 dark:text-slate-200">Manage accessories, express delivery, and special services.</p>
                 </motion.div>
 
-                <Button 
-                    color="primary" 
-                    variant="shadow" 
-                    className="h-12 px-8 rounded-xl !bg-indigo-600 hover:!bg-indigo-700 text-white font-bold text-sm shadow-lg shadow-indigo-500/30 transition-all" 
-                    startContent={<PlusCircle weight="bold" size={20} />}
-                    onClick={() => handleOpenModal("add")}
-                >
-                    Add New Service
-                </Button>
+                <div className="flex items-center gap-3">
+                    <SortSelect
+                        value={`${sortDescriptor.column}:${sortDescriptor.direction}`}
+                        onChange={(column, direction) => setSortDescriptor({ column, direction })}
+                        options={[
+                            { value: "name:ascending", label: "Name A–Z" },
+                            { value: "name:descending", label: "Name Z–A" },
+                            { value: "category:ascending", label: "Category A–Z" },
+                            { value: "price:descending", label: "Price high → low" },
+                            { value: "price:ascending", label: "Price low → high" },
+                        ]}
+                    />
+                    <Button
+                        color="primary"
+                        variant="shadow"
+                        className="h-12 px-8 rounded-xl !bg-indigo-600 hover:!bg-indigo-700 text-white font-bold text-sm shadow-lg shadow-indigo-500/30 transition-all"
+                        startContent={<PlusCircle weight="bold" size={20} />}
+                        onClick={() => handleOpenModal("add")}
+                    >
+                        Add New Service
+                    </Button>
+                </div>
             </div>
 
             {loading ? (
@@ -185,7 +211,7 @@ export default function AddonsManagement() {
                                 <TableColumn>STOCK</TableColumn>
                                 <TableColumn align="center">ACTIONS</TableColumn>
                             </TableHeader>
-                            <TableBody items={addons} emptyContent="No add-ons found. Click 'Add New Service' to get started.">
+                            <TableBody items={sortedAddons} emptyContent="No add-ons found. Click 'Add New Service' to get started.">
                                 {(item) => (
                                     <TableRow key={item._id}>
                                         <TableCell>

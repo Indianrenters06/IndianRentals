@@ -25,6 +25,7 @@ import {
   Spinner
 } from "@heroui/react";
 import { Plus, PencilSimple, Trash, ShieldCheck, User, Phone, EnvelopeSimple, Lock, Crown } from "@phosphor-icons/react";
+import SortSelect from "@/components/SortSelect";
 import { toast } from "react-hot-toast";
 
 const getCurrentUserRole = () => {
@@ -95,8 +96,9 @@ export default function TeamMembersPage() {
 
   const sortedMembers = useMemo(() => {
     return [...teamMembers].sort((a, b) => {
-      const first = a[sortDescriptor.column] ?? '';
-      const second = b[sortDescriptor.column] ?? '';
+      const col = sortDescriptor.column;
+      const first = (a[col] ?? '').toString().toLowerCase();
+      const second = (b[col] ?? '').toString().toLowerCase();
       const cmp = first < second ? -1 : first > second ? 1 : 0;
       return sortDescriptor.direction === "descending" ? -cmp : cmp;
     });
@@ -212,22 +214,33 @@ export default function TeamMembersPage() {
           <h1 className="text-2xl font-bold text-slate-800 dark:text-slate-100">Team Members</h1>
           <p className="text-slate-500 text-sm mt-1">Manage your company staff.</p>
         </div>
-        <Button 
-          color="primary" 
-          variant="shadow" 
-          className="h-12 px-8 rounded-xl !bg-indigo-600 hover:!bg-indigo-700 text-white font-bold text-sm shadow-lg shadow-indigo-500/30 transition-all" 
-          startContent={<Plus weight="bold" />}
-          onPress={handleAdd}
-        >
-          Add Member
-        </Button>
+        <div className="flex items-center gap-3">
+          <SortSelect
+            value={`${sortDescriptor.column}:${sortDescriptor.direction}`}
+            onChange={(column, direction) => setSortDescriptor({ column, direction })}
+            options={[
+              { value: "name:ascending", label: "Name A–Z" },
+              { value: "name:descending", label: "Name Z–A" },
+              { value: "role:ascending", label: "Role A–Z" },
+            ]}
+          />
+          <Button
+            color="primary"
+            variant="shadow"
+            className="h-12 px-8 rounded-xl !bg-indigo-600 hover:!bg-indigo-700 text-white font-bold text-sm shadow-lg shadow-indigo-500/30 transition-all"
+            startContent={<Plus weight="bold" />}
+            onPress={handleAdd}
+          >
+            Add Member
+          </Button>
+        </div>
       </div>
 
       <Card className="bg-white dark:bg-slate-900 border-none shadow-sm">
-        <Table aria-label="Team Members" removeWrapper sortDescriptor={sortDescriptor} onSortChange={setSortDescriptor}>
+        <Table aria-label="Team Members" removeWrapper>
           <TableHeader>
-            <TableColumn key="name" allowsSorting>NAME</TableColumn>
-            <TableColumn key="role" allowsSorting>ROLE</TableColumn>
+            <TableColumn key="name">NAME</TableColumn>
+            <TableColumn key="role">ROLE</TableColumn>
             <TableColumn key="adminPermissions">PERMISSIONS</TableColumn>
             <TableColumn key="status">STATUS</TableColumn>
             <TableColumn key="actions" align="center">ACTIONS</TableColumn>

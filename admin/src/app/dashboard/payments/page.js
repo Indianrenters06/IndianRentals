@@ -8,6 +8,7 @@ import {
 } from "@heroui/react";
 import { CurrencyInr, CheckCircle, XCircle, Clock, WarningCircle, DownloadSimple } from "@phosphor-icons/react";
 import { downloadPDFReport } from "@/utils/pdfReport";
+import SortSelect from "@/components/SortSelect";
 
 const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
 
@@ -45,8 +46,11 @@ export default function AllTransactions() {
 
     const sortedItems = useMemo(() => {
         return [...transactions].sort((a, b) => {
-            const first = a[sortDescriptor.column] ?? '';
-            const second = b[sortDescriptor.column] ?? '';
+            const col = sortDescriptor.column;
+            let first, second;
+            if (col === "amount") { first = Number(a.amount) || 0; second = Number(b.amount) || 0; }
+            else if (col === "createdAt") { first = new Date(a.createdAt).getTime() || 0; second = new Date(b.createdAt).getTime() || 0; }
+            else { first = (a[col] ?? '').toString().toLowerCase(); second = (b[col] ?? '').toString().toLowerCase(); }
             const cmp = first < second ? -1 : first > second ? 1 : 0;
             return sortDescriptor.direction === "descending" ? -cmp : cmp;
         });
@@ -71,6 +75,17 @@ export default function AllTransactions() {
                 </motion.div>
                 <div className="flex items-center gap-3">
                     {!loading && <div className="inline-flex items-center gap-2 bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-500/20 rounded-full px-3 py-1.5 font-bold text-sm">₹{total.toLocaleString("en-IN")} Collected</div>}
+                    <SortSelect
+                        value={`${sortDescriptor.column}:${sortDescriptor.direction}`}
+                        onChange={(column, direction) => setSortDescriptor({ column, direction })}
+                        options={[
+                            { value: "createdAt:descending", label: "Newest first" },
+                            { value: "createdAt:ascending", label: "Oldest first" },
+                            { value: "amount:descending", label: "Highest amount" },
+                            { value: "amount:ascending", label: "Lowest amount" },
+                            { value: "user:ascending", label: "Customer A–Z" },
+                        ]}
+                    />
                     <button type="button" onClick={exportPDF} className="inline-flex items-center gap-2 h-10 px-4 rounded-xl border border-indigo-500 text-indigo-600 dark:text-indigo-400 font-bold text-sm hover:!bg-indigo-50 dark:hover:!bg-indigo-500/10 transition-colors">
                         <DownloadSimple size={15} />
                         Export PDF
@@ -108,14 +123,14 @@ export default function AllTransactions() {
                     ) : loading ? (
                         <div className="p-6 space-y-4">{[...Array(6)].map((_, i) => <Skeleton key={i} className="h-12 w-full rounded-xl" />)}</div>
                     ) : (
-                        <Table aria-label="Transactions table" sortDescriptor={sortDescriptor} onSortChange={setSortDescriptor} classNames={{ wrapper: "p-0 rounded-none shadow-none bg-transparent", th: "bg-slate-50 dark:bg-slate-950/80 uppercase text-xs font-bold h-12 pt-0 px-6", td: "py-[1.2rem] px-6 border-b border-slate-100 dark:border-slate-800/50" }}>
+                        <Table aria-label="Transactions table" classNames={{ wrapper: "p-0 rounded-none shadow-none bg-transparent", th: "bg-slate-50 dark:bg-slate-950/80 uppercase text-xs font-bold h-12 pt-0 px-6", td: "py-[1.2rem] px-6 border-b border-slate-100 dark:border-slate-800/50" }}>
                             <TableHeader>
-                                <TableColumn key="txnId" allowsSorting>TXN ID</TableColumn>
-                                <TableColumn key="user" allowsSorting>CUSTOMER</TableColumn>
-                                <TableColumn key="amount" allowsSorting>AMOUNT</TableColumn>
-                                <TableColumn key="method" allowsSorting>METHOD</TableColumn>
-                                <TableColumn key="createdAt" allowsSorting>DATE</TableColumn>
-                                <TableColumn key="status" allowsSorting align="center">STATUS</TableColumn>
+                                <TableColumn key="txnId">TXN ID</TableColumn>
+                                <TableColumn key="user">CUSTOMER</TableColumn>
+                                <TableColumn key="amount">AMOUNT</TableColumn>
+                                <TableColumn key="method">METHOD</TableColumn>
+                                <TableColumn key="createdAt">DATE</TableColumn>
+                                <TableColumn key="status" align="center">STATUS</TableColumn>
                             </TableHeader>
                             <TableBody items={sortedItems} emptyContent="No transactions found.">
                                 {(item) => (

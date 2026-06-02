@@ -4,6 +4,7 @@ import { useState, useEffect, useMemo, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Card, CardBody, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Chip, Button, Skeleton, Pagination, Spinner, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, useDisclosure, Textarea } from "@heroui/react";
 import { ArrowsClockwise, CheckCircle, WarningCircle, MagnifyingGlass, XCircle, CaretLeft, CaretRight } from "@phosphor-icons/react";
+import SortSelect from "@/components/SortSelect";
 
 // ── Toast Notification ────────────────────────────────────────────────────────
 function Toast({ toasts }) {
@@ -134,8 +135,10 @@ export default function ReturnedInventory() {
         }
 
         return list.sort((a, b) => {
-            const first = a[sortDescriptor.column];
-            const second = b[sortDescriptor.column];
+            const col = sortDescriptor.column;
+            let first, second;
+            if (col === "date") { first = new Date(a.date).getTime() || 0; second = new Date(b.date).getTime() || 0; }
+            else { first = (a[col] || "").toString().toLowerCase(); second = (b[col] || "").toString().toLowerCase(); }
             const cmp = first < second ? -1 : first > second ? 1 : 0;
 
             return sortDescriptor.direction === "descending" ? -cmp : cmp;
@@ -183,6 +186,17 @@ export default function ReturnedInventory() {
                                 className="w-full bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 rounded-xl pl-10 pr-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/50 h-11"
                             />
                         </div>
+                        <SortSelect
+                            className="h-11"
+                            value={`${sortDescriptor.column}:${sortDescriptor.direction}`}
+                            onChange={(column, direction) => { setSortDescriptor({ column, direction }); setPage(1); }}
+                            options={[
+                                { value: "date:descending", label: "Newest first" },
+                                { value: "date:ascending", label: "Oldest first" },
+                                { value: "item:ascending", label: "Product A–Z" },
+                                { value: "returnedBy:ascending", label: "Customer A–Z" },
+                            ]}
+                        />
                     </div>
 
                     {error ? (
@@ -200,8 +214,6 @@ export default function ReturnedInventory() {
                     ) : (
                         <Table
                             aria-label="Returned items table"
-                            sortDescriptor={sortDescriptor}
-                            onSortChange={setSortDescriptor}
                             bottomContent={
                                 sortedItems.length > 0 ? (
                                     <div className="flex w-full justify-between items-center py-4 px-6 border-t border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950/30">
@@ -256,10 +268,10 @@ export default function ReturnedInventory() {
                             }}
                         >
                             <TableHeader>
-                                <TableColumn key="item" allowsSorting>PRODUCT</TableColumn>
-                                <TableColumn key="returnedBy" allowsSorting>RETURNED BY</TableColumn>
-                                <TableColumn key="condition" allowsSorting>REPORTED CONDITION</TableColumn>
-                                <TableColumn key="date" allowsSorting>RETURN DATE</TableColumn>
+                                <TableColumn key="item">PRODUCT</TableColumn>
+                                <TableColumn key="returnedBy">RETURNED BY</TableColumn>
+                                <TableColumn key="condition">REPORTED CONDITION</TableColumn>
+                                <TableColumn key="date">RETURN DATE</TableColumn>
                                 <TableColumn align="center">STATUS</TableColumn>
                             </TableHeader>
                             <TableBody items={items} emptyContent="No recent returns documented.">

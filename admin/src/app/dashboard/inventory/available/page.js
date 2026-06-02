@@ -4,6 +4,7 @@ import { useState, useEffect, useMemo } from "react";
 import { motion } from "framer-motion";
 import { Card, CardBody, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Chip, Skeleton, Pagination } from "@heroui/react";
 import { Package, MagnifyingGlass, WarningCircle } from "@phosphor-icons/react";
+import SortSelect from "@/components/SortSelect";
 
 const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
 
@@ -51,10 +52,11 @@ export default function AvailableStock() {
         }
 
         return list.sort((a, b) => {
-            const first = a[sortDescriptor.column];
-            const second = b[sortDescriptor.column];
+            const col = sortDescriptor.column;
+            let first, second;
+            if (col === "stock") { first = Number(a.stock) || 0; second = Number(b.stock) || 0; }
+            else { first = (a[col] || "").toString().toLowerCase(); second = (b[col] || "").toString().toLowerCase(); }
             const cmp = first < second ? -1 : first > second ? 1 : 0;
-
             return sortDescriptor.direction === "descending" ? -cmp : cmp;
         });
     }, [stock, search, sortDescriptor]);
@@ -100,6 +102,18 @@ export default function AvailableStock() {
                                 className="w-full bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 rounded-xl pl-10 pr-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/50 h-11"
                             />
                         </div>
+                        <SortSelect
+                            className="h-11"
+                            value={`${sortDescriptor.column}:${sortDescriptor.direction}`}
+                            onChange={(column, direction) => { setSortDescriptor({ column, direction }); setPage(1); }}
+                            options={[
+                                { value: "name:ascending", label: "Name A–Z" },
+                                { value: "name:descending", label: "Name Z–A" },
+                                { value: "stock:descending", label: "Stock high → low" },
+                                { value: "stock:ascending", label: "Stock low → high" },
+                                { value: "location:ascending", label: "Location A–Z" },
+                            ]}
+                        />
                     </div>
 
                     {error ? (
@@ -117,8 +131,6 @@ export default function AvailableStock() {
                     ) : (
                         <Table
                             aria-label="Available stock table"
-                            sortDescriptor={sortDescriptor}
-                            onSortChange={setSortDescriptor}
                             bottomContent={
                                 sortedItems.length > 0 ? (
                                     <div className="flex w-full justify-between items-center py-4 px-6 border-t border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950/30">
@@ -147,12 +159,12 @@ export default function AvailableStock() {
                             }}
                         >
                             <TableHeader>
-                                <TableColumn key="name" allowsSorting>ITEM NAME</TableColumn>
-                                <TableColumn key="sku" allowsSorting>SKU ID</TableColumn>
-                                <TableColumn key="location" allowsSorting>LOCATION</TableColumn>
-                                <TableColumn key="stock" allowsSorting>STOCK</TableColumn>
-                                <TableColumn key="condition" allowsSorting>CONDITION</TableColumn>
-                                <TableColumn key="status" align="center" allowsSorting>STATUS</TableColumn>
+                                <TableColumn key="name">ITEM NAME</TableColumn>
+                                <TableColumn key="sku">SKU ID</TableColumn>
+                                <TableColumn key="location">LOCATION</TableColumn>
+                                <TableColumn key="stock">STOCK</TableColumn>
+                                <TableColumn key="condition">CONDITION</TableColumn>
+                                <TableColumn key="status" align="center">STATUS</TableColumn>
                             </TableHeader>
                             <TableBody items={items} emptyContent="No available items found.">
                                 {(item) => (

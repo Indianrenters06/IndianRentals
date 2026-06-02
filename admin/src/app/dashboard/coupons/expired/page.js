@@ -7,6 +7,7 @@ import {
     TableRow, TableCell, Input, Skeleton, Spinner
 } from "@heroui/react";
 import { Tag, Trash, Clock, MagnifyingGlass, ArrowClockwise } from "@phosphor-icons/react";
+import SortSelect from "@/components/SortSelect";
 import toast from 'react-hot-toast';
 
 const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
@@ -49,13 +50,20 @@ export default function ExpiredCoupons() {
 
     const sortedItems = useMemo(() => {
         return [...filtered].sort((a, b) => {
-            let first = a[sortDescriptor.column];
-            let second = b[sortDescriptor.column];
-            if (sortDescriptor.column === 'expiryDate') {
+            const col = sortDescriptor.column;
+            let first = a[col];
+            let second = b[col];
+            if (col === 'expiryDate') {
                 first = first ? new Date(first).getTime() : 0;
                 second = second ? new Date(second).getTime() : 0;
+            } else if (col === 'discountAmount' || col === 'usageCount' || col === 'minOrderAmount') {
+                first = Number(first) || 0;
+                second = Number(second) || 0;
+            } else {
+                first = (first ?? '').toString().toLowerCase();
+                second = (second ?? '').toString().toLowerCase();
             }
-            const cmp = (first ?? '') < (second ?? '') ? -1 : (first ?? '') > (second ?? '') ? 1 : 0;
+            const cmp = first < second ? -1 : first > second ? 1 : 0;
             return sortDescriptor.direction === "descending" ? -cmp : cmp;
         });
     }, [filtered, sortDescriptor]);
@@ -103,20 +111,34 @@ export default function ExpiredCoupons() {
                 </div>
             </div>
 
-            {/* Search */}
-            <div className="relative group max-w-sm">
-                <MagnifyingGlass className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 z-10" />
-                <Input
-                    type="text"
-                    placeholder="Search expired coupons..."
-                    value={search}
-                    onValueChange={setSearch}
-                    variant="bordered"
-                    radius="xl"
-                    classNames={{ 
-                        inputWrapper: "bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 pl-10 h-11",
-                        input: "text-sm placeholder:text-slate-500"
-                    }}
+            {/* Search + Sort */}
+            <div className="flex flex-col sm:flex-row gap-3 sm:items-center justify-between">
+                <div className="relative group max-w-sm w-full">
+                    <MagnifyingGlass className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 z-10" />
+                    <Input
+                        type="text"
+                        placeholder="Search expired coupons..."
+                        value={search}
+                        onValueChange={setSearch}
+                        variant="bordered"
+                        radius="xl"
+                        classNames={{
+                            inputWrapper: "bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 pl-10 h-11",
+                            input: "text-sm placeholder:text-slate-500"
+                        }}
+                    />
+                </div>
+                <SortSelect
+                    className="h-11"
+                    value={`${sortDescriptor.column}:${sortDescriptor.direction}`}
+                    onChange={(column, direction) => setSortDescriptor({ column, direction })}
+                    options={[
+                        { value: "expiryDate:descending", label: "Recently expired" },
+                        { value: "expiryDate:ascending", label: "Oldest expired" },
+                        { value: "code:ascending", label: "Code A–Z" },
+                        { value: "discountAmount:descending", label: "Highest discount" },
+                        { value: "usageCount:descending", label: "Most used" },
+                    ]}
                 />
             </div>
 
@@ -125,13 +147,13 @@ export default function ExpiredCoupons() {
                     {loading ? (
                         <div className="p-6 space-y-4">{[...Array(4)].map((_, i) => <Skeleton key={i} className="h-12 w-full rounded-xl" />)}</div>
                     ) : (
-                        <Table aria-label="Expired Coupons table" sortDescriptor={sortDescriptor} onSortChange={setSortDescriptor} classNames={{ wrapper: "p-0 rounded-none shadow-none bg-transparent", th: "bg-slate-50 dark:bg-slate-950/80 uppercase text-xs font-bold h-12 pt-0 px-6", td: "py-4 px-6 border-b border-slate-100 dark:border-slate-800/50" }}>
+                        <Table aria-label="Expired Coupons table" classNames={{ wrapper: "p-0 rounded-none shadow-none bg-transparent", th: "bg-slate-50 dark:bg-slate-950/80 uppercase text-xs font-bold h-12 pt-0 px-6", td: "py-4 px-6 border-b border-slate-100 dark:border-slate-800/50" }}>
                             <TableHeader>
-                                <TableColumn key="code" allowsSorting>CODE</TableColumn>
-                                <TableColumn key="discountAmount" allowsSorting>DISCOUNT</TableColumn>
+                                <TableColumn key="code">CODE</TableColumn>
+                                <TableColumn key="discountAmount">DISCOUNT</TableColumn>
                                 <TableColumn key="minOrderAmount">MIN ORDER</TableColumn>
-                                <TableColumn key="expiryDate" allowsSorting>EXPIRED ON</TableColumn>
-                                <TableColumn key="usageCount" allowsSorting>USES</TableColumn>
+                                <TableColumn key="expiryDate">EXPIRED ON</TableColumn>
+                                <TableColumn key="usageCount">USES</TableColumn>
                                 <TableColumn key="status" align="center">STATUS</TableColumn>
                                 <TableColumn key="actions" align="center">ACTIONS</TableColumn>
                             </TableHeader>

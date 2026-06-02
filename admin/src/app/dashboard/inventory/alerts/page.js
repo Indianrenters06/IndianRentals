@@ -4,6 +4,7 @@ import { useState, useEffect, useMemo, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Card, CardBody, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Chip, Button, Skeleton, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Input, useDisclosure, Spinner, Pagination } from "@heroui/react";
 import { WarningCircle, TrendDown, ShoppingCart, Package, ArrowUp, CheckCircle, MagnifyingGlass, XCircle } from "@phosphor-icons/react";
+import SortSelect from "@/components/SortSelect";
 import toast from "react-hot-toast";
 
 const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
@@ -102,10 +103,11 @@ export default function InventoryAlerts() {
         }
 
         return list.sort((a, b) => {
-            const first = a[sortDescriptor.column];
-            const second = b[sortDescriptor.column];
+            const col = sortDescriptor.column;
+            let first, second;
+            if (col === "stock") { first = Number(a.stock) || 0; second = Number(b.stock) || 0; }
+            else { first = (a[col] || "").toString().toLowerCase(); second = (b[col] || "").toString().toLowerCase(); }
             const cmp = first < second ? -1 : first > second ? 1 : 0;
-
             return sortDescriptor.direction === "descending" ? -cmp : cmp;
         });
     }, [alerts, search, sortDescriptor]);
@@ -159,6 +161,17 @@ export default function InventoryAlerts() {
                                 className="w-full bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 rounded-xl pl-10 pr-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/50 h-11"
                             />
                         </div>
+                        <SortSelect
+                            className="h-11"
+                            value={`${sortDescriptor.column}:${sortDescriptor.direction}`}
+                            onChange={(column, direction) => { setSortDescriptor({ column, direction }); setPage(1); }}
+                            options={[
+                                { value: "priority:descending", label: "Priority (high first)" },
+                                { value: "priority:ascending", label: "Priority (low first)" },
+                                { value: "stock:ascending", label: "Stock low → high" },
+                                { value: "item:ascending", label: "Item A–Z" },
+                            ]}
+                        />
                     </div>
 
                     {error ? (
@@ -176,8 +189,6 @@ export default function InventoryAlerts() {
                     ) : (
                         <Table
                             aria-label="Inventory alerts table"
-                            sortDescriptor={sortDescriptor}
-                            onSortChange={setSortDescriptor}
                             bottomContent={
                                 sortedItems.length > 0 ? (
                                     <div className="flex w-full justify-between items-center py-4 px-6 border-t border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950/30">
@@ -206,11 +217,11 @@ export default function InventoryAlerts() {
                             }}
                         >
                             <TableHeader>
-                                <TableColumn key="item" allowsSorting>ITEM UNDER ALERT</TableColumn>
-                                <TableColumn key="type" allowsSorting>ALERT TYPE</TableColumn>
-                                <TableColumn key="message" allowsSorting>DESCRIPTION</TableColumn>
-                                <TableColumn key="stock" allowsSorting>STOCK</TableColumn>
-                                <TableColumn key="priority" align="center" allowsSorting>PRIORITY</TableColumn>
+                                <TableColumn key="item">ITEM UNDER ALERT</TableColumn>
+                                <TableColumn key="type">ALERT TYPE</TableColumn>
+                                <TableColumn key="message">DESCRIPTION</TableColumn>
+                                <TableColumn key="stock">STOCK</TableColumn>
+                                <TableColumn key="priority" align="center">PRIORITY</TableColumn>
                                 <TableColumn align="center">ACTION</TableColumn>
                             </TableHeader>
                             <TableBody items={items} emptyContent="System healthy. No active alerts.">
