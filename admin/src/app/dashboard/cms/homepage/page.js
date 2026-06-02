@@ -799,32 +799,66 @@ export default function CMSHomepage() {
 
                     {/* Client Logos */}
                     <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 shadow-sm space-y-6">
-                        <div className="flex justify-between items-center border-b border-slate-100 dark:border-slate-800 pb-4">
-                            <SectionRow
-                                icon={<Layout weight="fill" className="text-pink-500" />}
-                                title="Client Logos (Trusted By)"
-                                desc="Show or hide the infinite scrolling client logos section."
-                                toggle={data.clientSectionEnabled}
-                                onToggle={v => set("clientSectionEnabled", v)}
-                            />
-                        </div>
+                        <SectionRow
+                            icon={<Layout weight="fill" className="text-pink-500" />}
+                            title="Client Logos (Trusted By)"
+                            desc="Upload client/partner logos. The section is hidden on the website until at least one logo is added."
+                            toggle={data.clientSectionEnabled}
+                            onToggle={v => set("clientSectionEnabled", v)}
+                        />
+
                         <Field label="Section Title" value={data.clientSectionTitle} onChange={v => set("clientSectionTitle", v)} placeholder="e.g. Trusted By" />
-                        
-                        <div className="space-y-4">
-                            <label className="text-xs font-bold text-slate-500 dark:text-slate-200 uppercase tracking-wider block">Client Logos</label>
-                            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
-                                {(data.clientLogos || []).map((logo, idx) => (
-                                    <div key={idx} className="relative group rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 p-2 flex items-center justify-center aspect-video">
-                                        <img src={logo} className="max-w-full max-h-full object-contain grayscale opacity-60 hover:grayscale-0 hover:opacity-100 transition-all" alt="Client Logo" />
-                                        <button onClick={() => { const n = [...data.clientLogos]; n.splice(idx, 1); set("clientLogos", n); }}
-                                            className="absolute -top-2 -right-2 bg-red-500 text-white w-6 h-6 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                                            ×
-                                        </button>
-                                    </div>
-                                ))}
-                                <div className="col-span-2 md:col-span-2 lg:col-span-2">
-                                    <ImageUploader label="Upload New Logo" existingUrl="" onUpload={url => { if(url) set("clientLogos", [...(data.clientLogos || []), url]) }} />
+
+                        {/* Uploaded logos grid */}
+                        {(data.clientLogos || []).length > 0 ? (
+                            <div className="space-y-3">
+                                <label className="text-xs font-bold text-slate-500 dark:text-slate-200 uppercase tracking-wider block">
+                                    Uploaded Logos ({data.clientLogos.length})
+                                </label>
+                                <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-3">
+                                    {data.clientLogos.map((logo, idx) => (
+                                        <div key={idx} className="relative group rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 p-3 flex items-center justify-center aspect-square">
+                                            <img
+                                                src={logo}
+                                                className="max-w-full max-h-full object-contain"
+                                                alt={`Client logo ${idx + 1}`}
+                                            />
+                                            <button
+                                                onClick={() => {
+                                                    const n = [...data.clientLogos];
+                                                    n.splice(idx, 1);
+                                                    set("clientLogos", n);
+                                                }}
+                                                className="absolute -top-2 -right-2 bg-red-500 hover:bg-red-600 text-white w-6 h-6 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity text-xs font-bold shadow-md"
+                                                title="Remove logo"
+                                            >
+                                                ×
+                                            </button>
+                                        </div>
+                                    ))}
                                 </div>
+                            </div>
+                        ) : (
+                            <div className="flex items-center gap-3 p-4 rounded-xl bg-amber-50 dark:bg-amber-500/10 border border-amber-200 dark:border-amber-500/20 text-amber-700 dark:text-amber-400 text-sm">
+                                <Layout size={18} weight="bold" className="shrink-0" />
+                                <p>No logos uploaded yet. The section will be hidden on the website until you add at least one logo below.</p>
+                            </div>
+                        )}
+
+                        {/* Upload new logo */}
+                        <div className="space-y-2">
+                            <label className="text-xs font-bold text-slate-500 dark:text-slate-200 uppercase tracking-wider block">
+                                Add Logo
+                            </label>
+                            <p className="text-xs text-slate-400 -mt-1">Upload PNG with transparent background for best results. You can add multiple logos one by one.</p>
+                            <div className="max-w-xs">
+                                <ImageUploader
+                                    label=""
+                                    existingUrl=""
+                                    onUpload={url => {
+                                        if (url) set("clientLogos", [...(data.clientLogos || []), url]);
+                                    }}
+                                />
                             </div>
                         </div>
                     </div>

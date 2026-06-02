@@ -8,16 +8,6 @@ import "swiper/css";
 import "swiper/css/pagination";
 import { API } from '@/services/apiConfig';
 
-// Placeholder client logos — replace with real logos/images as needed
-const defaultClients = [
-    { id: 1, name: "Reliance", logo: "RELIANCE", link: "/products" },
-    { id: 2, name: "Tata", logo: "TATA", link: "/products" },
-    { id: 3, name: "Adani", logo: "ADANI", link: "/products" },
-    { id: 4, name: "Mahindra", logo: "MAHINDRA", link: "/products" },
-    { id: 5, name: "Infosys", logo: "INFOSYS", link: "/products" },
-    { id: 6, name: "Wipro", logo: "WIPRO", link: "/products" },
-];
-
 const ClientSection = () => {
     const prevRef = useRef(null);
     const nextRef = useRef(null);
@@ -32,10 +22,13 @@ const ClientSection = () => {
     }, []);
 
     if (loading) return null;
-    if (cms && cms.clientSectionEnabled === false) return null;
 
-    const useDynamic = cms?.clientLogos && cms.clientLogos.length > 0;
-    const clients = useDynamic ? cms.clientLogos.map((url, i) => ({ id: i, image: url })) : defaultClients;
+    // Hidden by admin toggle
+    if (cms?.clientSectionEnabled === false) return null;
+
+    // No logos uploaded yet — don't show dummy data, hide the section
+    const clients = (cms?.clientLogos || []).map((url, i) => ({ id: i, image: url }));
+    if (clients.length === 0) return null;
 
     return (
         <section className="py-24 bg-white">
@@ -86,40 +79,17 @@ const ClientSection = () => {
                     >
                         {clients.map((client) => (
                             <SwiperSlide key={client.id}>
-                                {useDynamic ? (
-                                    <div
-                                        className="flex items-center justify-center select-none shadow-sm block bg-white"
-                                        style={{ 
-                                            height: "280px",
-                                            borderRadius: "24px",
-                                            border: "1px solid hsla(0, 0%, 93%, 1)",
-                                            padding: "32px"
-                                        }}
-                                    >
-                                        <img src={client.image} alt="Client Logo" className="w-full h-full object-contain grayscale hover:grayscale-0 transition-all duration-300" />
-                                    </div>
-                                ) : (
-                                    <Link
-                                        href={client.link || "/products"}
-                                        className="flex items-center justify-center select-none transition-all hover:scale-[1.01] duration-300 shadow-sm block"
-                                        style={{ 
-                                            height: "280px",
-                                            borderRadius: "24px",
-                                            background: "hsla(44, 100%, 64%, 1)",
-                                            opacity: 1,
-                                            textDecoration: 'none'
-                                        }}
-                                    >
-                                        <div className="flex flex-col items-center gap-4">
-                                            <div className="w-16 h-16 rounded-full bg-black/10 flex items-center justify-center text-black font-black text-2xl border border-black/5">
-                                                {client.logo[0]}
-                                            </div>
-                                            <span className="text-black font-sans font-extrabold text-[28px] tracking-tight">
-                                                {client.name}
-                                            </span>
-                                        </div>
-                                    </Link>
-                                )}
+                                <div
+                                    className="flex items-center justify-center select-none shadow-sm bg-white"
+                                    style={{
+                                        height: "280px",
+                                        borderRadius: "24px",
+                                        border: "1px solid hsla(0, 0%, 93%, 1)",
+                                        padding: "32px"
+                                    }}
+                                >
+                                    <img src={client.image} alt="Client Logo" className="w-full h-full object-contain grayscale hover:grayscale-0 transition-all duration-300" />
+                                </div>
                             </SwiperSlide>
                         ))}
                     </Swiper>
