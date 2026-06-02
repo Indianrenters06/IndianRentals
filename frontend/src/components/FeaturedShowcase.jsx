@@ -309,18 +309,43 @@ const ShowcaseProductCard = ({ product, index, isDesktop, handleAddToCart }) => 
 // ─── Main Component ───────────────────────────────────────────────────────────
 const FeaturedShowcase = () => {
     const dispatch = useDispatch();
-    const [cms, setCms] = useState({ enabled: true, banners: FALLBACK_BANNERS });
+    const [cms, setCms] = useState(null); // null = still loading CMS
+    const [pinnedProductIds, setPinnedProductIds] = useState([]);
     const [products, setProducts] = useState([]);
     const [loading, setLoading] = useState(true);
     const [isDesktop, setIsDesktop] = useState(false);
     const [currentBanner, setCurrentBanner] = useState(0);
-    const [fetchingProducts, setFetchingProducts] = useState(false);
 
     useEffect(() => {
         const checkRes = () => setIsDesktop(window.innerWidth >= 1024);
         checkRes();
         window.addEventListener('resize', checkRes);
         return () => window.removeEventListener('resize', checkRes);
+    }, []);
+
+    // Fetch CMS settings first
+    useEffect(() => {
+        const fetchCms = async () => {
+            try {
+                const res = await fetch(`${API}/api/cms/homepage`);
+                if (res.ok) {
+                    const d = await res.json();
+                    const banners = d.featuredShowcaseBanners?.length
+                        ? d.featuredShowcaseBanners
+                        : FALLBACK_BANNERS;
+                    setCms({
+                        enabled: d.featuredShowcaseEnabled !== false,
+                        banners,
+                    });
+                    setPinnedProductIds(d.featuredShowcaseProductIds || []);
+                } else {
+                    setCms({ enabled: true, banners: FALLBACK_BANNERS });
+                }
+            } catch {
+                setCms({ enabled: true, banners: FALLBACK_BANNERS });
+            }
+        };
+        fetchCms();
     }, []);
 
     const handleAddToCart = (e, product) => {
@@ -337,53 +362,65 @@ const FeaturedShowcase = () => {
         }));
     };
 
-    // Sync products when banner changes
+    // Load products — pinned IDs take priority, then fall back to category/general
     useEffect(() => {
-        const activeCategory = cms.banners[currentBanner]?.category;
+        if (!cms) return;
 
         const loadProducts = async () => {
-            setFetchingProducts(true);
             try {
-                // 1. Try fetching products filtered by category
-                let url = activeCategory
-                    ? `${API}/api/products?category=${activeCategory}&limit=2`
-                    : `${API}/api/products?limit=2`;
+                let fetchedProducts = [];
 
-                let res = await fetch(url).catch(() => ({ ok: false }));
-                let data = res.ok ? await res.json() : { products: [] };
+                if (pinnedProductIds.length >= 2) {
+                    // Fetch the two pinned products by ID
+                    const results = await Promise.all(
+                        pinnedProductIds.slice(0, 2).map(id =>
+                            fetch(`${API}/api/products/${id}`).then(r => r.ok ? r.json() : null).catch(() => null)
+                        )
+                    );
+                    fetchedProducts = results.filter(Boolean);
+                }
 
-                // 2. Fallback: If no products found for category, fetch general 'Best Rented' products
-                if (data.products.length === 0 && activeCategory) {
-                    const fallbackRes = await fetch(`${API}/api/products?limit=2`).catch(() => ({ ok: false }));
-                    if (fallbackRes.ok) {
-                        data = await fallbackRes.json();
+                if (fetchedProducts.length < 2) {
+                    const activeCategory = cms.banners[currentBanner]?.category;
+                    let url = activeCategory
+                        ? `${API}/api/products?category=${activeCategory}&limit=2`
+                        : `${API}/api/products?limit=2`;
+
+                    let res = await fetch(url).catch(() => ({ ok: false }));
+                    let data = res.ok ? await res.json() : { products: [] };
+
+                    if (data.products?.length === 0 && activeCategory) {
+                        const fallbackRes = await fetch(`${API}/api/products?limit=2`).catch(() => ({ ok: false }));
+                        if (fallbackRes.ok) data = await fallbackRes.json();
                     }
+                    fetchedProducts = data.products || [];
                 }
 
-                if (data.products) {
-                    setProducts(data.products.map(p => ({
-                        id: p._id,
-                        name: p.name,
-                        image: p.images?.[0] || "/images/placeholder.png",
-                        rating: p.rating || 4.5,
-                        reviews: p.numReviews || 12,
-                        originalPrice: p.rentalPrice ? Math.round(p.rentalPrice * 1.5) : 8999,
-                        rentPrice: p.rentalPrice || 5000,
-                        isNew: p.isNew || false
-                    })));
-                }
+                setProducts(fetchedProducts.map(p => ({
+                    id: p._id,
+                    name: p.name,
+                    image: p.images?.[0] || "/images/placeholder.png",
+                    rating: p.rating || 4.5,
+                    reviews: p.numReviews || 12,
+                    originalPrice: p.rentalPrice ? Math.round(p.rentalPrice * 1.5) : 8999,
+                    rentPrice: p.rentalPrice || 5000,
+                    isNew: p.isNew || false,
+                })));
             } catch (err) {
                 console.error("Showcase fetch error:", err);
             } finally {
-                setFetchingProducts(false);
                 setLoading(false);
             }
         };
 
         loadProducts();
-    }, [currentBanner, cms.banners]);
+    }, [currentBanner, cms, pinnedProductIds]);
 
-    if (loading) return null;
+    // Still fetching CMS or products
+    if (!cms || loading) return null;
+
+    // Hidden by admin toggle
+    if (!cms.enabled) return null;
 
     return (
         <section className="bg-white py-24 overflow-hidden">

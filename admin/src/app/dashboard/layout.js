@@ -98,7 +98,6 @@ export default function DashboardLayout({ children }) {
           const parsed = JSON.parse(storedInfo);
           // Support multiple API response shapes: { user: {...} }, { admin: {...} }, or flat
           const info = parsed.user || parsed.admin || parsed;
-          console.log('[AdminPanel] adminInfo loaded:', info); // temp debug — remove after confirming
           setAdminInfo(info);
         } catch (err) {
           console.error("Failed to parse admin data", err);
@@ -365,6 +364,9 @@ export default function DashboardLayout({ children }) {
   const menuItems = allMenuItems.filter(item => !item.permission || can(item.permission));
 
   const handleLogout = () => {
+    localStorage.removeItem("adminToken");
+    localStorage.removeItem("adminInfo");
+    localStorage.removeItem("adminBranding");
     router.push("/");
   };
 

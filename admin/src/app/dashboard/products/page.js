@@ -68,6 +68,9 @@ export default function AllProducts() {
 
     useEffect(() => { fetchProducts(); }, [fetchProducts]);
 
+    // Reset to page 1 when search or filter changes
+    useEffect(() => { setPage(1); }, [search, filter, sortCol, sortDir]);
+
     const handleBulkUpload = async (e) => {
         e.preventDefault();
         if (!bulkFile) {

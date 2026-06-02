@@ -12,8 +12,8 @@ import { DownloadSimple, MagnifyingGlassPlus, X } from "@phosphor-icons/react";
 import jsPDF from "jspdf";
 import SortSelect from "@/components/SortSelect";
 
-export default function KYCManagement() {
-    const [statusFilter, setStatusFilter] = useState("all");
+export default function KYCManagement({ initialFilter = "all" }) {
+    const [statusFilter, setStatusFilter] = useState(initialFilter);
     const [zoomedDoc, setZoomedDoc] = useState(null);
     const [kycRequests, setKycRequests] = useState([]);
     const [loading, setLoading] = useState(true);
