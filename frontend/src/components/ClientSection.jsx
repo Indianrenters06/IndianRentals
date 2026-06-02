@@ -26,9 +26,16 @@ const ClientSection = () => {
     // Hidden by admin toggle
     if (cms?.clientSectionEnabled === false) return null;
 
-    // No logos uploaded yet — don't show dummy data, hide the section
-    const clients = (cms?.clientLogos || []).map((url, i) => ({ id: i, image: url }));
-    if (clients.length === 0) return null;
+    // No logos uploaded yet — hide the section
+    const rawLogos = cms?.clientLogos || [];
+    if (rawLogos.length === 0) return null;
+
+    // Swiper loop needs enough slides to fill the viewport.
+    // Duplicate logos until we have at least 6 so loop always works.
+    const MIN_SLIDES = 6;
+    const clients = rawLogos.length < MIN_SLIDES
+        ? Array.from({ length: MIN_SLIDES }, (_, i) => ({ id: i, image: rawLogos[i % rawLogos.length] }))
+        : rawLogos.map((url, i) => ({ id: i, image: url }));
 
     return (
         <section className="py-24 bg-white">
