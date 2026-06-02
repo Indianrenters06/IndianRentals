@@ -2,28 +2,62 @@
 @source "../../node_modules/@heroui/theme/dist";
 @custom-variant dark (&:is(.dark, .dark *));
 
-@theme {
-  --color-brand-50:  #fffaeb;
-  --color-brand-100: #fff0cc;
-  --color-brand-200: #ffe099;
-  --color-brand-400: #ffb91b;
-  --color-brand-500: #f08c00;
-  --color-brand-600: #e07800;
-  --color-brand-900: #b35e00;
+/* ── HeroUI Pro Design System — Color Tokens ─────────────────────────────────
+   Electric blue accent (#006FEE), deep dark surfaces, Inter typography.
+   These tokens are referenced throughout the admin panel via CSS variables.
+   ─────────────────────────────────────────────────────────────────────────── */
 
-  --color-dark-900: #0f172a;
-  --color-dark-800: #1e293b;
-  --color-dark-700: #334155;
+@theme {
+  /* HeroUI Pro electric-blue brand scale */
+  --color-brand-50:  #e8f2fe;
+  --color-brand-100: #bdd9fd;
+  --color-brand-200: #7ec0ff;
+  --color-brand-400: #3d97ff;
+  --color-brand-500: #006FEE;
+  --color-brand-600: #0055be;
+  --color-brand-900: #003a7e;
+
+  /* Dark surface scale */
+  --color-dark-900: #050506;
+  --color-dark-800: #111117;
+  --color-dark-700: #1e1e26;
 }
 
 @layer utilities {
   .glass {
-    @apply bg-slate-100/10 dark:bg-slate-900/50 backdrop-blur-xl border border-slate-200/20 dark:border-white/10 shadow-xl dark:shadow-2xl transition-all duration-300;
+    @apply bg-slate-100/10 dark:bg-[#1e1e26]/80 backdrop-blur-xl border border-slate-200/20 dark:border-white/5 shadow-xl transition-all duration-300;
+  }
+
+  /* Skeleton shimmer — use .skeleton class on placeholder elements */
+  .skeleton {
+    background: linear-gradient(
+      90deg,
+      var(--surface-secondary, #1e1e26) 25%,
+      var(--surface-tertiary, #232329) 50%,
+      var(--surface-secondary, #1e1e26) 75%
+    );
+    background-size: 200% 100%;
+    animation: shimmer 1.5s ease-in-out infinite;
+    border-radius: var(--radius-lg, 8px);
   }
 }
 
+/* ── Skeleton shimmer keyframe ─────────────────────────────────────────────── */
+@keyframes shimmer {
+  0%   { background-position: -200% 0; }
+  100% { background-position:  200% 0; }
+}
+
 body {
-  @apply bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-slate-100 antialiased min-h-screen selection:bg-brand-500 selection:text-white transition-colors duration-300;
+  @apply antialiased min-h-screen transition-colors duration-300;
+  background-color: var(--background, #f6f6f7);
+  color: var(--foreground, #111113);
+  font-family: "Inter", "Inter Fallback", ui-sans-serif, system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  selection {
+    background-color: var(--accent, #006FEE);
+    color: #ffffff;
+  }
 }
 
 button,
@@ -54,15 +88,24 @@ summary,
 }
 
 ::-webkit-scrollbar-track {
-  @apply bg-slate-100 dark:bg-slate-900;
+  background-color: var(--surface-secondary, #f1f1f3);
 }
 
 ::-webkit-scrollbar-thumb {
-  @apply bg-slate-300 dark:bg-slate-700 rounded-full;
+  background-color: var(--border-secondary, #d4d4d8);
+  border-radius: 9999px;
+}
+
+.dark ::-webkit-scrollbar-track {
+  background-color: var(--surface-secondary, #1e1e26);
+}
+
+.dark ::-webkit-scrollbar-thumb {
+  background-color: var(--border-secondary, #3f3f46);
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  @apply bg-slate-400 dark:bg-slate-600;
+  background-color: var(--muted, #71717a);
 }
 
 /* Force hide all horizontal scrollbars on tables or generic overflowing divs */
@@ -77,26 +120,105 @@ summary,
   scrollbar-width: none !important;
 }
 
-/* Override Tailwind's built-in indigo scale — map it to the brand orange palette
-   so all existing text-indigo-*, bg-indigo-*, border-indigo-* etc. render as
-   the homepage's primary orange. applyBrandingTheme() also overrides these at
-   runtime for dynamic theme switching. */
+/* ── HeroUI Pro Design Tokens ────────────────────────────────────────────────
+   Light mode (default). Dark mode overrides follow in .dark {}.
+   applyBrandingTheme() in layout.js can override --color-indigo-* at runtime
+   for dynamic theme switching.
+   ─────────────────────────────────────────────────────────────────────────── */
 :root {
-  --color-indigo-50:  #fffaeb;
-  --color-indigo-100: #fff0cc;
-  --color-indigo-200: #ffe099;
-  --color-indigo-400: #ffb91b;
-  --color-indigo-500: #f08c00;
-  --color-indigo-600: #e07800;
-  --color-indigo-700: #b35e00;
+  /* ── Surfaces ── */
+  --background:         #f6f6f7;
+  --surface:            #ffffff;
+  --surface-secondary:  #f1f1f3;
+  --surface-tertiary:   #ececee;
+  --overlay:            #ffffff;
 
-  /* HeroUI theme — use light defaults so inputs look white in light mode */
-  --heroui-colors-primary: var(--color-brand-500);
-  --heroui-colors-secondary: #356cff;
+  /* ── Text ── */
+  --foreground:         #111113;
+  --muted:              #71717a;
+
+  /* ── Structure ── */
+  --border:             #e4e4e7;
+  --border-secondary:   #d4d4d8;
+
+  /* ── Accent (electric blue) ── */
+  --accent:             #006FEE;
+  --accent-foreground:  #ffffff;
+  --accent-soft:        rgba(0, 111, 238, 0.12);
+
+  /* ── Semantic ── */
+  --danger:             #f31260;
+  --danger-soft:        rgba(243, 18, 96, 0.12);
+  --success:            #17c964;
+  --success-soft:       rgba(23, 201, 100, 0.12);
+  --warning:            #f5a524;
+  --warning-soft:       rgba(245, 165, 36, 0.12);
+
+  /* ── Radius ── */
+  --radius-sm:   4px;
+  --radius-md:   6px;
+  --radius-lg:   8px;
+  --radius-xl:   12px;
+  --radius-2xl:  16px;
+  --radius-3xl:  24px;
+
+  /* ── Shadows (light) ── */
+  --shadow-surface: 0 2px 4px 0 rgba(0,0,0,0.04), 0 1px 2px 0 rgba(0,0,0,0.06), 0 0 1px 0 rgba(0,0,0,0.06);
+  --shadow-overlay: 0 2px 8px 0 rgba(0,0,0,0.06), 0 14px 28px 0 rgba(0,0,0,0.08);
+
+  /* ── Animation easings ── */
+  --ease-fluid:     cubic-bezier(0.32, 0.72, 0, 1);
+  --ease-snap:      cubic-bezier(0.165, 0.84, 0.44, 1);
+  --ease-standard:  cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-quad:      cubic-bezier(0.25, 0.46, 0.45, 0.94);
+
+  /* ── Durations ── */
+  --duration-fast:       150ms;
+  --duration-standard:   200ms;
+  --duration-deliberate: 300ms;
+
+  /* ── Tailwind indigo scale → HeroUI Pro electric blue
+       (applyBrandingTheme() can override these at runtime) ── */
+  --color-indigo-50:  #e8f2fe;
+  --color-indigo-100: #bdd9fd;
+  --color-indigo-200: #7ec0ff;
+  --color-indigo-400: #3d97ff;
+  --color-indigo-500: #006FEE;
+  --color-indigo-600: #0055be;
+  --color-indigo-700: #003a7e;
+
+  /* ── HeroUI component theme ── */
+  --heroui-colors-primary:    #006FEE;
+  --heroui-colors-secondary:  #7828c8;
   --heroui-colors-background: #ffffff;
-  --heroui-colors-foreground: #0f172a;
-  --heroui-colors-content1: #ffffff;
-  --heroui-colors-content2: #f8fafc;
+  --heroui-colors-foreground: #111113;
+  --heroui-colors-content1:   #ffffff;
+  --heroui-colors-content2:   #f1f1f3;
+}
+
+/* ── Dark Mode Token Overrides ──────────────────────────────────────────────── */
+.dark {
+  --background:         #050506;
+  --surface:            #111117;
+  --surface-secondary:  #1e1e26;
+  --surface-tertiary:   #232329;
+  --overlay:            #111117;
+
+  --foreground:         #fafafa;
+  --muted:              #a1a1aa;
+
+  --border:             #27272e;
+  --border-secondary:   #3f3f46;
+
+  /* Dark mode: no box-shadow on surfaces — depth from bg layering */
+  --shadow-surface: none;
+  --shadow-overlay: 0 0 1px 0 rgba(255, 255, 255, 0.3) inset;
+
+  /* HeroUI dark overrides */
+  --heroui-colors-background: #111117;
+  --heroui-colors-foreground: #fafafa;
+  --heroui-colors-content1:   #111117;
+  --heroui-colors-content2:   #1e1e26;
 }
 
 /* ── HeroUI + Tailwind v4 Compatibility Fix ──────────────────────────────────
@@ -145,7 +267,7 @@ summary,
   top: 6px !important;
   transform: translateY(0) scale(0.85) !important;
   font-size: 1rem !important;
-  color: var(--color-brand-500) !important;
+  color: var(--accent, #006FEE) !important;
 }
 
 /* Textarea label fix — full height wrappers need top-aligned label by default */
@@ -163,7 +285,7 @@ summary,
   transform: scale(0.85) !important;
   transform-origin: top left !important;
   font-size: 1rem !important;
-  color: var(--color-brand-500) !important;
+  color: var(--accent, #006FEE) !important;
 }
 
 /* Textarea: push content down when label floats */
@@ -238,7 +360,7 @@ summary,
 
 /* Primary colour switch when ON */
 [role="switch"][data-selected="true"][data-color="primary"] [data-slot="wrapper"] {
-  background-color: var(--color-brand-500) !important;
+  background-color: var(--accent, #006FEE) !important;
 }
 
 /* Secondary colour when ON */
@@ -289,34 +411,34 @@ summary,
 
 /* ── React Quill Dark Mode Fix ── */
 .dark .ql-toolbar {
-  background-color: #1e293b !important;
-  border-color: #334155 !important;
+  background-color: var(--surface-secondary, #1e1e26) !important;
+  border-color: var(--border, #27272e) !important;
 }
 
 .dark .ql-container {
-  background-color: #0f172a !important;
-  border-color: #334155 !important;
+  background-color: var(--surface, #111117) !important;
+  border-color: var(--border, #27272e) !important;
 }
 
 .dark .ql-editor {
-  color: #f8fafc !important;
+  color: var(--foreground, #fafafa) !important;
 }
 
 .dark .ql-picker {
-  color: #f8fafc !important;
+  color: var(--foreground, #fafafa) !important;
 }
 
 .dark .ql-stroke {
-  stroke: #f8fafc !important;
+  stroke: var(--foreground, #fafafa) !important;
 }
 
 .dark .ql-fill {
-  fill: #f8fafc !important;
+  fill: var(--foreground, #fafafa) !important;
 }
 
 .dark .ql-picker-options {
-  background-color: #1e293b !important;
-  border-color: #334155 !important;
+  background-color: var(--surface-secondary, #1e1e26) !important;
+  border-color: var(--border, #27272e) !important;
 }
 
 /* ── HeroUI v2 + Tailwind v4 Portal/Popover Fix ──────────────────────────────
@@ -335,14 +457,13 @@ summary,
 [role="dialog"]:is(.heroui-popover),
 .heroui-dropdown-menu,
 .heroui-popover-content {
-  background-color: #ffffff !important;
-  color: #0f172a !important;
-  border: 1px solid #e2e8f0 !important;
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05) !important;
+  background-color: var(--surface, #ffffff) !important;
+  color: var(--foreground, #111113) !important;
+  border: 1px solid var(--border, #e4e4e7) !important;
+  box-shadow: var(--shadow-overlay) !important;
   opacity: 1 !important;
 }
 
-/* Dark mode overrides */
 .dark [data-slot="content"],
 .dark [data-slot="listbox"],
 .dark [data-slot="popover"],
@@ -353,26 +474,26 @@ summary,
 .dark [role="dialog"]:is(.heroui-popover),
 .dark .heroui-dropdown-menu,
 .dark .heroui-popover-content {
-  background-color: #0f172a !important;
-  color: #f8fafc !important;
-  border: 1px solid #1e293b !important;
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5) !important;
+  background-color: var(--surface, #111117) !important;
+  color: var(--foreground, #fafafa) !important;
+  border: 1px solid var(--border, #27272e) !important;
+  box-shadow: var(--shadow-overlay) !important;
   opacity: 1 !important;
 }
 
-/* Fix for SelectItem/DropdownItem hover and selected states */
+/* SelectItem/DropdownItem hover and selected states */
 [role="option"]:hover,
 [role="menuitem"]:hover,
 [data-hover="true"],
 [data-selectable="true"][data-selected="true"] {
-  background-color: #f1f5f9 !important;
+  background-color: var(--surface-secondary, #f1f1f3) !important;
 }
 
 .dark [role="option"]:hover,
 .dark [role="menuitem"]:hover,
 .dark [data-hover="true"],
 .dark [data-selectable="true"][data-selected="true"] {
-  background-color: #1e293b !important;
+  background-color: var(--surface-secondary, #1e1e26) !important;
 }
 
 /* Ensure the portal container has a high z-index and is not transparent */
@@ -447,8 +568,8 @@ nav[data-slot="base"]:has(ul[data-slot="wrapper"]) [data-slot="item"][data-activ
 /* Active sliding cursor styling */
 nav[data-slot="base"]:has(ul[data-slot="wrapper"]) [data-slot="cursor"] {
   border-radius: 8px !important;
-  background-color: var(--color-brand-500) !important;
-  box-shadow: 0 4px 12px color-mix(in srgb, var(--color-brand-500) 30%, transparent) !important;
-  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  background-color: var(--accent, #006FEE) !important;
+  box-shadow: 0 4px 12px rgba(0, 111, 238, 0.35) !important;
+  transition: all 0.25s var(--ease-standard, cubic-bezier(0.4, 0, 0.2, 1)) !important;
 }
 
