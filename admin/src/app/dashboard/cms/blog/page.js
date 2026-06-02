@@ -283,9 +283,14 @@ export default function BlogManagement() {
     const [deleting, setDeleting] = useState(null);
     const [sortCol, setSortCol] = useState("createdAt");
     const [sortDir, setSortDir] = useState("descending");
+    const [statusFilter, setStatusFilter] = useState("published"); // default: hide drafts
 
     const sortedPosts = useMemo(() => {
-        return [...posts].sort((a, b) => {
+        const filtered = statusFilter === "all"
+            ? posts
+            : posts.filter(p => p.status === statusFilter);
+
+        return [...filtered].sort((a, b) => {
             let first = a[sortCol] ?? '';
             let second = b[sortCol] ?? '';
             if (sortCol === 'createdAt') {
@@ -295,7 +300,7 @@ export default function BlogManagement() {
             const cmp = first < second ? -1 : first > second ? 1 : 0;
             return sortDir === "descending" ? -cmp : cmp;
         });
-    }, [posts, sortCol, sortDir]);
+    }, [posts, sortCol, sortDir, statusFilter]);
 
     const fetchPosts = useCallback(async () => {
         try {
@@ -353,20 +358,28 @@ export default function BlogManagement() {
                             </div>
                         </div>
 
-                        {/* Stats */}
+                        {/* Stats — clickable to filter */}
                         <div className="grid grid-cols-3 gap-4">
                             {[
-                                { label: "Total Posts", value: posts.length, color: "text-indigo-500", bg: "bg-indigo-50 dark:bg-indigo-500/10", icon: <FileText size={20} weight="duotone" /> },
-                                { label: "Published", value: totalPublished, color: "text-emerald-500", bg: "bg-emerald-50 dark:bg-emerald-500/10", icon: <Globe size={20} weight="duotone" /> },
-                                { label: "Drafts", value: totalDraft, color: "text-amber-500", bg: "bg-amber-50 dark:bg-amber-500/10", icon: <PencilSimple size={20} weight="duotone" /> },
+                                { label: "Total Posts",  value: posts.length,    filter: "all",       color: "text-indigo-500", bg: "bg-indigo-50 dark:bg-indigo-500/10",   ring: "ring-indigo-400",  icon: <FileText size={20} weight="duotone" /> },
+                                { label: "Published",    value: totalPublished,  filter: "published", color: "text-emerald-500", bg: "bg-emerald-50 dark:bg-emerald-500/10", ring: "ring-emerald-400", icon: <Globe size={20} weight="duotone" /> },
+                                { label: "Drafts",       value: totalDraft,      filter: "draft",     color: "text-amber-500",  bg: "bg-amber-50 dark:bg-amber-500/10",     ring: "ring-amber-400",   icon: <PencilSimple size={20} weight="duotone" /> },
                             ].map(s => (
-                                <div key={s.label} className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-sm p-4 flex items-center gap-3">
+                                <button
+                                    key={s.label}
+                                    onClick={() => setStatusFilter(s.filter)}
+                                    className={`bg-white dark:bg-slate-900 border rounded-2xl shadow-sm p-4 flex items-center gap-3 transition-all text-left w-full hover:shadow-md ${
+                                        statusFilter === s.filter
+                                            ? `border-transparent ring-2 ${s.ring}`
+                                            : 'border-slate-200 dark:border-slate-800'
+                                    }`}
+                                >
                                     <div className={`p-2.5 rounded-xl ${s.bg} ${s.color}`}>{s.icon}</div>
                                     <div>
                                         <p className="text-2xl font-black text-slate-900 dark:text-white">{s.value}</p>
                                         <p className="text-xs text-slate-500">{s.label}</p>
                                     </div>
-                                </div>
+                                </button>
                             ))}
                         </div>
 
@@ -398,14 +411,20 @@ export default function BlogManagement() {
                                 <div className="flex items-center justify-center gap-3 py-16 text-slate-400">
                                     <Spinner size="sm" color="secondary" /> Loading posts…
                                 </div>
-                            ) : posts.length === 0 ? (
+                            ) : sortedPosts.length === 0 ? (
                                 <div className="text-center py-16 text-slate-400">
                                     <FileText size={48} className="mx-auto mb-3 opacity-30" />
-                                    <p className="text-sm">No blog posts yet.</p>
-                                    <button onClick={() => setEditing("new")}
-                                        className="mt-4 h-8 px-4 rounded-lg text-xs font-semibold text-indigo-500 hover:bg-indigo-50 dark:hover:bg-indigo-500/10 transition-all">
-                                        Create your first post
-                                    </button>
+                                    <p className="text-sm font-medium">
+                                        {statusFilter === "draft"     ? "No drafts found."
+                                        : statusFilter === "published" ? "No published posts yet."
+                                        : "No blog posts yet."}
+                                    </p>
+                                    {statusFilter === "published" && (
+                                        <button onClick={() => setEditing("new")}
+                                            className="mt-4 h-8 px-4 rounded-lg text-xs font-semibold text-indigo-500 hover:bg-indigo-50 dark:hover:bg-indigo-500/10 transition-all">
+                                            Create your first post
+                                        </button>
+                                    )}
                                 </div>
                             ) : (
                                 <div className="divide-y divide-slate-100 dark:divide-slate-800/60">
