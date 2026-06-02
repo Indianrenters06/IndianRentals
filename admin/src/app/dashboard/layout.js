@@ -245,7 +245,7 @@ export default function DashboardLayout({ children }) {
         { name: 'Single Product Page', path: '/dashboard/cms/single-product' },
         { name: 'Category Images', path: '/dashboard/cms/category-images' },
         { name: 'Static Pages', path: '/dashboard/cms/pages' },
-        { name: 'Product FAQs', path: '/dashboard/cms/faq' },
+        { name: 'FAQ Page', path: '/dashboard/cms/faq' },
       ]
     },
     {
