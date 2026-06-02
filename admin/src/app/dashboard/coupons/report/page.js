@@ -64,10 +64,10 @@ export default function ReportPage() {
 
     const getStatusColor = (status) => {
         switch (status?.toLowerCase()) {
-            case 'active': case 'delivered': return 'bg-green-100 text-green-700';
-            case 'pending': return 'bg-yellow-100 text-yellow-700';
-            case 'cancelled': return 'bg-red-100 text-red-700';
-            default: return 'bg-slate-100 text-slate-700';
+            case 'active': case 'delivered': return 'bg-green-100 text-green-700 dark:bg-green-500/15 dark:text-green-400';
+            case 'pending': return 'bg-yellow-100 text-yellow-700 dark:bg-yellow-500/15 dark:text-yellow-400';
+            case 'cancelled': return 'bg-red-100 text-red-700 dark:bg-red-500/15 dark:text-red-400';
+            default: return 'bg-slate-100 text-slate-700 dark:bg-slate-700 dark:text-slate-300';
         }
     };
 
@@ -102,26 +102,26 @@ export default function ReportPage() {
         <div className="space-y-6 pb-12">
             <div className="flex items-center justify-between mb-8">
                 <div className="flex items-center gap-3">
-                    <div className="w-12 h-12 rounded-xl bg-orange-100 flex items-center justify-center text-orange-600">
+                    <div className="w-12 h-12 rounded-xl bg-orange-100 dark:bg-orange-500/10 flex items-center justify-center text-orange-600 dark:text-orange-400">
                         <ChartBar size={24} weight="bold" />
                     </div>
                     <div>
-                        <h1 className="text-2xl font-bold text-slate-900">Coupon Usage Report</h1>
-                        <p className="text-sm text-slate-500">Detailed list of all orders that applied a discount code.</p>
+                        <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-100">Coupon Usage Report</h1>
+                        <p className="text-sm text-slate-500 dark:text-slate-400">Detailed list of all orders that applied a discount code.</p>
                     </div>
                 </div>
-                <button 
+                <button
                     onClick={exportPDF}
-                    className="flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 text-slate-700 font-medium rounded-lg shadow-sm hover:bg-slate-50"
+                    className="flex items-center gap-2 px-4 py-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 font-medium rounded-lg shadow-sm hover:bg-slate-50 dark:hover:bg-slate-800"
                 >
                     <Download size={18} /> Export PDF
                 </button>
             </div>
 
-            <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+            <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
                 <div className="overflow-x-auto">
-                    <table className="w-full text-left text-sm text-slate-600">
-                        <thead className="bg-slate-50 border-b border-slate-200 text-slate-500">
+                    <table className="w-full text-left text-sm text-slate-600 dark:text-slate-300">
+                        <thead className="bg-slate-50 dark:bg-slate-950/80 border-b border-slate-200 dark:border-slate-800 text-slate-500 dark:text-slate-400">
                             <tr>
                                 <th className="px-6 py-4 font-semibold cursor-pointer select-none hover:text-indigo-600 transition-colors" onClick={() => toggleSort("date")}>
                                     Order / Date <SortIcon field="date" />
@@ -143,36 +143,36 @@ export default function ReportPage() {
                                 </th>
                             </tr>
                         </thead>
-                        <tbody className="divide-y divide-slate-100">
+                        <tbody className="divide-y divide-slate-100 dark:divide-slate-800/60">
                             {sortedReport.length === 0 ? (
                                 <tr>
-                                    <td colSpan="6" className="px-6 py-12 text-center text-slate-400">
+                                    <td colSpan="6" className="px-6 py-12 text-center text-slate-400 dark:text-slate-500">
                                         No coupon usage data found yet.
                                     </td>
                                 </tr>
                             ) : (
                                 sortedReport.map((item, idx) => (
-                                    <tr key={idx} className="hover:bg-slate-50 transition-colors">
+                                    <tr key={idx} className="hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors">
                                         <td className="px-6 py-4 whitespace-nowrap">
-                                            <div className="font-mono text-xs text-slate-400 mb-1">#{item.orderId?.slice(-6).toUpperCase()}</div>
-                                            <div className="flex items-center gap-1.5 text-slate-700">
-                                                <Calendar size={14} /> 
+                                            <div className="font-mono text-xs text-slate-400 dark:text-slate-500 mb-1">#{item.orderId?.slice(-6).toUpperCase()}</div>
+                                            <div className="flex items-center gap-1.5 text-slate-700 dark:text-slate-200">
+                                                <Calendar size={14} />
                                                 {new Date(item.date).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
                                             </div>
                                         </td>
                                         <td className="px-6 py-4">
-                                            <div className="font-medium text-slate-800">{item.user}</div>
-                                            <div className="text-xs text-slate-400">{item.email}</div>
+                                            <div className="font-medium text-slate-800 dark:text-slate-100">{item.user}</div>
+                                            <div className="text-xs text-slate-400 dark:text-slate-500">{item.email}</div>
                                         </td>
                                         <td className="px-6 py-4">
-                                            <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-indigo-50 border border-indigo-100 text-indigo-700 font-bold text-xs">
+                                            <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-indigo-50 dark:bg-indigo-500/10 border border-indigo-100 dark:border-indigo-500/20 text-indigo-700 dark:text-indigo-400 font-bold text-xs">
                                                 <Tag size={12} weight="fill" /> {item.couponCode}
                                             </div>
                                         </td>
-                                        <td className="px-6 py-4 text-right font-semibold text-[#00B200]">
+                                        <td className="px-6 py-4 text-right font-semibold text-[#00B200] dark:text-emerald-400">
                                             -₹{item.discount?.toLocaleString()}
                                         </td>
-                                        <td className="px-6 py-4 text-right font-bold text-slate-800">
+                                        <td className="px-6 py-4 text-right font-bold text-slate-800 dark:text-slate-100">
                                             ₹{item.orderTotal?.toLocaleString()}
                                         </td>
                                         <td className="px-6 py-4 text-center">
