@@ -7,7 +7,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import {
     Card, CardBody, Button, Chip, Dropdown, DropdownTrigger,
     DropdownMenu, DropdownItem, Spinner, Modal, ModalContent,
-    ModalHeader, ModalBody, ModalFooter, useDisclosure, Divider, Input
+    ModalHeader, ModalBody, ModalFooter, useDisclosure, Divider, Input, Pagination
 } from "@heroui/react";
 import {
     DotsThreeVertical, Eye, Truck, ArrowCounterClockwise, XCircle,
@@ -182,6 +182,8 @@ export default function OrdersManagement() {
 
     const [sortCol, setSortCol] = useState("createdAt");
     const [sortDir, setSortDir] = useState("descending");
+    const [page, setPage] = useState(1);
+    const rowsPerPage = 10;
 
     const filtered = useMemo(() => {
         let list = orders;
@@ -203,6 +205,17 @@ export default function OrdersManagement() {
             return sortDir === "descending" ? -cmp : cmp;
         });
     }, [orders, search, sortCol, sortDir]);
+
+    // Reset to page 1 when filters/sort change
+    useEffect(() => { setPage(1); }, [search, sortCol, sortDir]);
+
+    const totalPages = Math.max(1, Math.ceil(filtered.length / rowsPerPage));
+    useEffect(() => { if (page > totalPages) setPage(totalPages); }, [page, totalPages]);
+
+    const paginated = useMemo(() => {
+        const start = (page - 1) * rowsPerPage;
+        return filtered.slice(start, start + rowsPerPage);
+    }, [filtered, page]);
 
     return (
         <div className="w-full space-y-6 pb-12">
@@ -288,7 +301,7 @@ export default function OrdersManagement() {
                 ) : filtered.length === 0 ? (
                     <div className="py-20 text-center text-slate-400 text-sm">No orders found.</div>
                 ) : (
-                    filtered.map((order, i) => (
+                    paginated.map((order, i) => (
                         <motion.div key={order._id}
                             initial={{ opacity: 0, y: 8 }}
                             animate={{ opacity: 1, y: 0 }}
@@ -389,6 +402,22 @@ export default function OrdersManagement() {
                     ))
                 )}
             </div>
+
+            {/* Pagination */}
+            {!loading && filtered.length > 0 && (
+                <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-2">
+                    <span className="text-sm text-slate-500">
+                        Showing {(page - 1) * rowsPerPage + 1}–{Math.min(page * rowsPerPage, filtered.length)} of {filtered.length} order{filtered.length !== 1 ? "s" : ""}
+                    </span>
+                    {totalPages > 1 && (
+                        <Pagination
+                            radius="md" variant="flat" showControls color="primary"
+                            page={page} total={totalPages} onChange={setPage}
+                            classNames={{ cursor: "bg-indigo-500 shadow-indigo-500/30" }}
+                        />
+                    )}
+                </div>
+            )}
 
             <OrderModal order={selected} isOpen={isOpen} onClose={onOpenChange} onAction={handleStatusUpdate}/>
         </div>

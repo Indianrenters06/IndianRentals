@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import {
     Card, CardBody, Button, Chip, Dropdown, DropdownTrigger,
     DropdownMenu, DropdownItem, Spinner, Modal, ModalContent,
-    ModalHeader, ModalBody, ModalFooter, useDisclosure, Divider, Input
+    ModalHeader, ModalBody, ModalFooter, useDisclosure, Divider, Input, Pagination
 } from "@heroui/react";
 import {
     DotsThreeVertical, Eye, Truck, ArrowCounterClockwise, XCircle,
@@ -178,6 +178,11 @@ export default function OrdersTable({ initialStatus = "all", title = "Orders" })
 
     const openModal = (order) => { setSelected(order); onOpen(); };
 
+    const [sortCol, setSortCol] = useState("createdAt");
+    const [sortDir, setSortDir] = useState("descending");
+    const [page, setPage] = useState(1);
+    const rowsPerPage = 10;
+
     const filtered = useMemo(() => {
         let list = orders;
         if (initialStatus !== "all") {
@@ -192,8 +197,26 @@ export default function OrdersTable({ initialStatus = "all", title = "Orders" })
                 o.orderItems?.some(i => i.name?.toLowerCase().includes(q))
             );
         }
-        return list;
-    }, [orders, search, initialStatus]);
+        return [...list].sort((a, b) => {
+            let first, second;
+            if (sortCol === 'user') { first = a.user?.name ?? ''; second = b.user?.name ?? ''; }
+            else if (sortCol === 'createdAt') { first = new Date(a.createdAt).getTime(); second = new Date(b.createdAt).getTime(); }
+            else { first = a[sortCol] ?? ''; second = b[sortCol] ?? ''; }
+            const cmp = first < second ? -1 : first > second ? 1 : 0;
+            return sortDir === "descending" ? -cmp : cmp;
+        });
+    }, [orders, search, initialStatus, sortCol, sortDir]);
+
+    // Reset to page 1 when filters/sort change
+    useEffect(() => { setPage(1); }, [search, sortCol, sortDir]);
+
+    const totalPages = Math.max(1, Math.ceil(filtered.length / rowsPerPage));
+    useEffect(() => { if (page > totalPages) setPage(totalPages); }, [page, totalPages]);
+
+    const paginated = useMemo(() => {
+        const start = (page - 1) * rowsPerPage;
+        return filtered.slice(start, start + rowsPerPage);
+    }, [filtered, page]);
 
     return (
         <div className="w-full space-y-6 pb-12">
@@ -229,6 +252,19 @@ export default function OrdersTable({ initialStatus = "all", title = "Orders" })
                             className="w-full h-10 pl-10 pr-4 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-sm text-slate-900 dark:text-slate-200 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 shadow-sm transition-all"
                         />
                     </div>
+                    <select
+                        value={`${sortCol}:${sortDir}`}
+                        onChange={e => { const [col, dir] = e.target.value.split(':'); setSortCol(col); setSortDir(dir); }}
+                        className="h-10 px-3 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-sm text-slate-700 dark:text-slate-200 font-medium focus:outline-none focus:ring-2 focus:ring-indigo-500/30 shadow-sm"
+                    >
+                        <option value="createdAt:descending">Newest first</option>
+                        <option value="createdAt:ascending">Oldest first</option>
+                        <option value="user:ascending">Customer A–Z</option>
+                        <option value="user:descending">Customer Z–A</option>
+                        <option value="totalPrice:descending">Highest total</option>
+                        <option value="totalPrice:ascending">Lowest total</option>
+                        <option value="status:ascending">Status</option>
+                    </select>
                 </div>
             </div>
 
@@ -247,7 +283,7 @@ export default function OrdersTable({ initialStatus = "all", title = "Orders" })
                     <div className="flex justify-center py-20"><Spinner color="secondary" label="Loading orders..."/></div>
                 ) : filtered.length === 0 ? (
                     <div className="py-20 text-center text-slate-400 text-sm">No {title.toLowerCase()} orders found.</div>
-                ) : filtered.map((order, i) => (
+                ) : paginated.map((order, i) => (
                     <motion.div key={order._id} initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.03 }}>
                         <Card className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm hover:border-indigo-300 dark:hover:border-indigo-700 transition-colors">
                             <CardBody className="p-4 sm:p-5">
@@ -328,6 +364,22 @@ export default function OrdersTable({ initialStatus = "all", title = "Orders" })
                     </motion.div>
                 ))}
             </div>
+
+            {/* Pagination */}
+            {!loading && filtered.length > 0 && (
+                <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-2">
+                    <span className="text-sm text-slate-500">
+                        Showing {(page - 1) * rowsPerPage + 1}–{Math.min(page * rowsPerPage, filtered.length)} of {filtered.length} order{filtered.length !== 1 ? "s" : ""}
+                    </span>
+                    {totalPages > 1 && (
+                        <Pagination
+                            radius="md" variant="flat" showControls color="primary"
+                            page={page} total={totalPages} onChange={setPage}
+                            classNames={{ cursor: "bg-indigo-500 shadow-indigo-500/30" }}
+                        />
+                    )}
+                </div>
+            )}
 
             <OrderModal order={selected} isOpen={isOpen} onClose={onOpenChange} onAction={handleStatusChange}/>
         </div>
