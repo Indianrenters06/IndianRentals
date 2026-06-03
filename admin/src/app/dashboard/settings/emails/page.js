@@ -5,7 +5,7 @@ import toast from 'react-hot-toast';
 import {
     EnvelopeSimple, Plus, PencilSimple, Trash, X, FloppyDisk,
     MagnifyingGlass, Tag, CheckCircle, XCircle, Eye, Code, Info,
-    UploadSimple, Lightning
+    UploadSimple, Lightning, PaperPlaneTilt
 } from '@phosphor-icons/react';
 import { EMAIL_PRESETS } from './presets';
 
@@ -28,11 +28,33 @@ const SUGGESTED_VARS = ['{{userName}}', '{{email}}', '{{otp}}', '{{orderId}}', '
 
 const EMPTY_FORM = { name: '', type: 'auth', subject: '', body: '', variables: [], isActive: true };
 
+// Realistic sample values used to fill {{variables}} when sending a test email.
+const SAMPLE_VALUES = {
+    username: 'John Doe', name: 'John Doe', email: 'sample@indianrentals.com',
+    otp: '123456', orderid: 'ORD-2024-0042', productname: 'Canon EOS R5 Camera',
+    amount: '₹1,999', link: 'https://indianrentals.com/verify/abc123',
+    date: new Date().toLocaleDateString('en-IN'), sitename: 'IndianRentals',
+    phonenumber: '+91 98765 43210',
+};
+
+// Build a { varName: sampleValue } map from a template's variables list.
+function buildSampleData(variables = []) {
+    const data = {};
+    for (const v of variables) {
+        const key = v.replace(/[{}]/g, '').trim();
+        if (!key) continue;
+        data[key] = SAMPLE_VALUES[key.toLowerCase()] || key;
+    }
+    return data;
+}
+
 function TemplateModal({ template, onClose, onSave }) {
     const [form, setForm] = useState(template ? { ...template, variables: template.variables || [] } : { ...EMPTY_FORM });
     const [saving, setSaving] = useState(false);
     const [preview, setPreview] = useState(false);
     const [varInput, setVarInput] = useState('');
+    const [testEmail, setTestEmail] = useState('');
+    const [sendingTest, setSendingTest] = useState(false);
 
     const set = (k, v) => setForm(p => ({ ...p, [k]: v }));
 
@@ -65,6 +87,37 @@ function TemplateModal({ template, onClose, onSave }) {
 
     const insertVar = (v) => {
         set('body', form.body + v);
+    };
+
+    const handleSendTest = async () => {
+        const to = testEmail.trim();
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(to)) {
+            toast.error('Enter a valid recipient email');
+            return;
+        }
+        if (!form.subject.trim() || !form.body.trim()) {
+            toast.error('Subject and body are required to send a test');
+            return;
+        }
+        setSendingTest(true);
+        try {
+            const res = await fetch(`${API}/api/email-templates/test`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${getToken()}` },
+                body: JSON.stringify({
+                    to,
+                    subject: form.subject,
+                    body: form.body,
+                    sampleData: buildSampleData(form.variables),
+                }),
+            });
+            if (!res.ok) throw new Error((await res.json()).message || 'Failed to send');
+            toast.success(`Test email sent to ${to}`);
+        } catch (e) {
+            toast.error(e.message);
+        } finally {
+            setSendingTest(false);
+        }
     };
 
     const handleSave = async () => {
@@ -217,7 +270,21 @@ function TemplateModal({ template, onClose, onSave }) {
                 </div>
 
                 {/* Footer */}
-                <div className="flex items-center justify-end gap-3 px-6 py-4 border-t border-slate-100 dark:border-slate-800 shrink-0">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 px-6 py-4 border-t border-slate-100 dark:border-slate-800 shrink-0">
+                    {/* Send test email */}
+                    <div className="flex items-center gap-2">
+                        <input value={testEmail} onChange={e => setTestEmail(e.target.value)} type="email"
+                            placeholder="you@example.com"
+                            onKeyDown={e => e.key === 'Enter' && (e.preventDefault(), handleSendTest())}
+                            className="h-10 w-44 sm:w-52 px-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-sm text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-400/40" />
+                        <button onClick={handleSendTest} disabled={sendingTest} title="Sends the current draft with sample variable values"
+                            className="h-10 px-3.5 rounded-xl border border-indigo-200 dark:border-indigo-500/30 bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 text-sm font-bold disabled:opacity-60 flex items-center gap-1.5 whitespace-nowrap">
+                            {sendingTest ? <Spinner size="sm" color="primary" /> : <PaperPlaneTilt size={15} weight="bold" />}
+                            Send test
+                        </button>
+                    </div>
+
+                    <div className="flex items-center justify-end gap-3">
                     <button onClick={onClose} className="h-10 px-5 rounded-xl border border-slate-200 dark:border-slate-700 text-sm font-semibold text-slate-600 dark:text-slate-300">
                         Cancel
                     </button>
@@ -226,6 +293,7 @@ function TemplateModal({ template, onClose, onSave }) {
                         {saving ? <Spinner size="sm" color="white" /> : <FloppyDisk size={15} weight="bold" />}
                         {template?._id ? 'Update Template' : 'Create Template'}
                     </button>
+                    </div>
                 </div>
             </div>
         </div>
