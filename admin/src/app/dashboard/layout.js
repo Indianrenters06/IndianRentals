@@ -357,6 +357,7 @@ export default function DashboardLayout({ children }) {
         { name: 'Payment Gateway', path: '/dashboard/settings/payment-gateway' },
         { name: 'Email Templates', path: '/dashboard/settings/emails' },
         { name: 'SMS Templates', path: '/dashboard/settings/sms' },
+        { name: 'SEO & robots.txt', path: '/dashboard/settings/seo' },
       ]
     },
   ];

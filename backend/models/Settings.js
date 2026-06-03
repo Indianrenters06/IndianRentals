@@ -60,6 +60,84 @@ const settingsSchema = new mongoose.Schema({
     // Gateway Keys (Mock)
     paymentGatewaySecret: { type: String, default: '' },
 
+    // SEO — served by the public frontend at /robots.txt and /llms.txt
+    // robots.txt: controls search-engine + AI/LLM crawlers. Default ALLOWS the
+    // major LLM bots so the brand can surface in AI answers (ChatGPT, Claude,
+    // Perplexity, Gemini), while blocking private/transactional routes.
+    robotsTxt: {
+        type: String,
+        default: `# robots.txt — IndianRenters.com
+
+User-agent: *
+Allow: /
+Disallow: /checkout
+Disallow: /cart
+Disallow: /profile
+Disallow: /login
+Disallow: /register
+Disallow: /order-confirmation
+
+# --- AI / LLM crawlers (allowed for AI SEO / GEO) ---
+User-agent: GPTBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: OAI-SearchBot
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: anthropic-ai
+Allow: /
+
+User-agent: Claude-Web
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+User-agent: Applebot-Extended
+Allow: /
+
+User-agent: CCBot
+Allow: /
+
+Sitemap: https://indianrenters.com/sitemap.xml`,
+    },
+
+    // llms.txt: an LLM-friendly markdown summary of the site (the emerging
+    // llms.txt standard) so AI assistants can understand and cite the brand.
+    llmsTxt: {
+        type: String,
+        default: `# IndianRenters.com
+
+> India's largest tech rental platform. Rent laptops, MacBooks, servers, DSLR cameras, AV equipment and office furniture for business and events — delivered to your door, without the full ownership cost.
+
+## Key Pages
+- [Home](https://indianrenters.com/): Overview of rental categories and featured products.
+- [Products](https://indianrenters.com/products): Full catalogue of rentable tech and equipment.
+- [Categories](https://indianrenters.com/categories): Browse by category (Apple, IT, AV, Office Equipment, DSLR Cameras).
+
+## Categories
+- [Apple Products](https://indianrenters.com/category/apple)
+- [IT Products](https://indianrenters.com/category/it-products)
+- [AV Products](https://indianrenters.com/category/av-products)
+- [Office Equipment](https://indianrenters.com/category/office-equipment)
+- [DSLR Cameras](https://indianrenters.com/category/dslr)
+
+## Company
+- [About Us](https://indianrenters.com/about)
+- [Contact](https://indianrenters.com/contact)
+- [Rental Process](https://indianrenters.com/rental-process)
+- [Blog](https://indianrenters.com/blog)`,
+    },
+
 }, {
     timestamps: true
 });
