@@ -1,8 +1,8 @@
 "use client";
 import toast from 'react-hot-toast';
 
-import { useState, useEffect } from "react";
-import { motion } from "framer-motion";
+import { useState, useEffect, useRef } from "react";
+import { motion, useInView } from "framer-motion";
 import { useRouter } from "next/navigation";
 import {
   Users, TrendUp, TrendDown, CurrencyInr,
@@ -32,7 +32,8 @@ import {
   DropdownTrigger,
   DropdownMenu,
   DropdownItem,
-  Divider
+  Divider,
+  Skeleton
 } from "@heroui/react";
 
 import {
@@ -63,6 +64,100 @@ ChartJS.register(
   Legend,
   Filler
 );
+
+// ── Animated number that counts up to its value once it scrolls into view.
+// Easing is easeOutExpo so it decelerates naturally, like a real metric settling.
+function CountUp({ value = 0, prefix = "", suffix = "", duration = 1.4, decimals = 0 }) {
+  const ref = useRef(null);
+  const inView = useInView(ref, { once: true, margin: "-40px" });
+  const [display, setDisplay] = useState(0);
+
+  useEffect(() => {
+    if (!inView) return;
+    const to = Number(value) || 0;
+    let raf;
+    const start = performance.now();
+    const tick = (now) => {
+      const t = Math.min((now - start) / (duration * 1000), 1);
+      const eased = t === 1 ? 1 : 1 - Math.pow(2, -10 * t); // easeOutExpo
+      setDisplay(to * eased);
+      if (t < 1) raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, [inView, value, duration]);
+
+  const formatted = display.toLocaleString("en-IN", {
+    minimumFractionDigits: decimals,
+    maximumFractionDigits: decimals,
+  });
+  return <span ref={ref}>{prefix}{formatted}{suffix}</span>;
+}
+
+// Spring-based stagger so the grid "settles" rather than fading uniformly.
+const gridContainer = {
+  hidden: {},
+  show: { transition: { staggerChildren: 0.09, delayChildren: 0.05 } },
+};
+const gridItem = {
+  hidden: { opacity: 0, y: 24, scale: 0.96 },
+  show: {
+    opacity: 1, y: 0, scale: 1,
+    transition: { type: "spring", stiffness: 320, damping: 26, mass: 0.7 },
+  },
+};
+
+// A skeleton block that mirrors the real layout — what a polished product shows
+// while data loads, instead of a bare spinner.
+function DashboardSkeleton() {
+  return (
+    <div className="space-y-6 max-w-[1600px] mx-auto w-full pb-10 animate-in fade-in duration-300">
+      <div className="flex items-center justify-between gap-4">
+        <div className="space-y-2">
+          <Skeleton className="h-8 w-72 rounded-lg" />
+          <Skeleton className="h-4 w-96 rounded-lg" />
+        </div>
+        <div className="hidden sm:flex gap-3">
+          <Skeleton className="h-10 w-36 rounded-xl" />
+          <Skeleton className="h-12 w-32 rounded-xl" />
+        </div>
+      </div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
+        {[...Array(4)].map((_, i) => (
+          <div key={i} className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 space-y-4">
+            <div className="flex justify-between">
+              <Skeleton className="w-11 h-11 rounded-xl" />
+              <Skeleton className="w-16 h-6 rounded-full" />
+            </div>
+            <Skeleton className="h-8 w-28 rounded-lg" />
+            <Skeleton className="h-4 w-20 rounded-lg" />
+          </div>
+        ))}
+      </div>
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="lg:col-span-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 space-y-4">
+          <Skeleton className="h-6 w-48 rounded-lg" />
+          <Skeleton className="h-[260px] w-full rounded-xl" />
+        </div>
+        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 space-y-4">
+          <Skeleton className="h-6 w-32 rounded-lg" />
+          <Skeleton className="h-[180px] w-[180px] rounded-full mx-auto" />
+          <div className="space-y-2.5">
+            {[...Array(4)].map((_, i) => <Skeleton key={i} className="h-4 w-full rounded-lg" />)}
+          </div>
+        </div>
+      </div>
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="lg:col-span-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 space-y-3">
+          {[...Array(5)].map((_, i) => <Skeleton key={i} className="h-12 w-full rounded-lg" />)}
+        </div>
+        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 space-y-3">
+          {[...Array(4)].map((_, i) => <Skeleton key={i} className="h-14 w-full rounded-lg" />)}
+        </div>
+      </div>
+    </div>
+  );
+}
 
 export default function AdminDashboard() {
   const [loading, setLoading] = useState(true);
@@ -115,10 +210,10 @@ export default function AdminDashboard() {
 
   // Derived stats using Real Data
   const stats = [
-    { label: "Total Revenue", value: `₹${parseFloat(dashboardData?.totalRevenue || 0).toLocaleString()}`, change: "0%", isPositive: true, icon: CurrencyInr, color: "success" },
-    { label: "Total Orders", value: (dashboardData?.totalRentals || 0).toLocaleString(), change: "0%", isPositive: true, icon: Package, color: "primary" },
-    { label: "Active Users", value: (dashboardData?.activeNow || 0).toLocaleString(), change: "0%", isPositive: true, icon: Users, color: "secondary" },
-    { label: "Pending KYC", value: (dashboardData?.pendingKYC || 0).toLocaleString(), change: "0%", isPositive: false, icon: ShieldCheck, color: "warning" },
+    { label: "Total Revenue", raw: parseFloat(dashboardData?.totalRevenue || 0), prefix: "₹", change: "0%", isPositive: true, icon: CurrencyInr, color: "success" },
+    { label: "Total Orders", raw: dashboardData?.totalRentals || 0, change: "0%", isPositive: true, icon: Package, color: "primary" },
+    { label: "Active Users", raw: dashboardData?.activeNow || 0, change: "0%", isPositive: true, icon: Users, color: "secondary" },
+    { label: "Pending KYC", raw: dashboardData?.pendingKYC || 0, change: "0%", isPositive: false, icon: ShieldCheck, color: "warning" },
   ];
 
   const recentRentals = dashboardData?.recentRentals?.map(rental => ({
@@ -236,6 +331,12 @@ export default function AdminDashboard() {
     responsive: true,
     maintainAspectRatio: false,
     cutout: '72%',
+    animation: {
+      animateRotate: true,
+      animateScale: true,
+      duration: 1200,
+      easing: 'easeOutQuart',
+    },
     plugins: {
       legend: { display: false },
       tooltip: {
@@ -297,6 +398,13 @@ export default function AdminDashboard() {
       mode: 'index',
       intersect: false,
     },
+    animation: {
+      duration: 1400,
+      easing: 'easeOutQuart',
+    },
+    animations: {
+      tension: { duration: 1400, easing: 'easeOutQuart', from: 0.5, to: 0.4 },
+    },
   };
 
   const renderStatusChip = (status) => {
@@ -310,11 +418,7 @@ export default function AdminDashboard() {
   };
 
   if (loading) {
-    return (
-      <div className="flex flex-col items-center justify-center min-h-[80vh] w-full">
-        <Spinner size="lg" color="secondary" label="Loading Dashboard Context..." classNames={{ label: "text-slate-400 mt-4" }} />
-      </div>
-    );
+    return <DashboardSkeleton />;
   }
 
   return (
@@ -350,20 +454,27 @@ export default function AdminDashboard() {
       </div>
 
       {/* KPI Stats Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
+      <motion.div
+        variants={gridContainer}
+        initial="hidden"
+        animate="show"
+        className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6"
+      >
         {stats.map((stat, index) => {
           const Icon = stat.icon;
           return (
             <motion.div
               key={index}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.1, duration: 0.5 }}
+              variants={gridItem}
+              whileHover={{ y: -4, transition: { type: "spring", stiffness: 400, damping: 20 } }}
+              className="group"
             >
-              <Card className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm hover:border-slate-300 dark:hover:border-slate-700 hover:-translate-y-0.5 transition-all duration-200 w-full">
+              <Card className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm hover:border-slate-300 dark:hover:border-slate-700 hover:shadow-lg hover:shadow-slate-200/50 dark:hover:shadow-black/20 transition-[border-color,box-shadow] duration-300 w-full relative overflow-hidden">
+                {/* sheen that sweeps across on hover */}
+                <div className="pointer-events-none absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-700 ease-out bg-gradient-to-r from-transparent via-white/5 dark:via-white/[0.04] to-transparent" />
                 <CardBody className="p-5 flex flex-col gap-4">
                   <div className="flex justify-between items-start">
-                    <div className={`w-11 h-11 rounded-xl flex items-center justify-center bg-${stat.color}-500/10 text-${stat.color}-500`}>
+                    <div className={`w-11 h-11 rounded-xl flex items-center justify-center bg-${stat.color}-500/10 text-${stat.color}-500 transition-transform duration-300 group-hover:scale-110 group-hover:rotate-3`}>
                       <Icon className="w-[22px] h-[22px]" weight="bold" />
                     </div>
                     <span
@@ -378,7 +489,9 @@ export default function AdminDashboard() {
                     </span>
                   </div>
                   <div>
-                    <h3 className="text-[28px] leading-none font-bold tracking-tight text-slate-800 dark:text-slate-100 tabular-nums">{stat.value}</h3>
+                    <h3 className="text-[28px] leading-none font-bold tracking-tight text-slate-800 dark:text-slate-100 tabular-nums">
+                      <CountUp value={stat.raw} prefix={stat.prefix || ""} />
+                    </h3>
                     <p className="text-slate-500 dark:text-slate-300 text-sm font-medium mt-1.5">{stat.label}</p>
                   </div>
                 </CardBody>
@@ -386,7 +499,7 @@ export default function AdminDashboard() {
             </motion.div>
           );
         })}
-      </div>
+      </motion.div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Main Revenue Chart */}
@@ -423,7 +536,7 @@ export default function AdminDashboard() {
             <CardBody className="px-6 py-6 overflow-hidden">
               <div className="flex items-baseline gap-3 mb-4">
                 <span className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white tabular-nums">
-                  ₹{parseFloat(dashboardData?.totalRevenue || 0).toLocaleString()}
+                  <CountUp value={parseFloat(dashboardData?.totalRevenue || 0)} prefix="₹" />
                 </span>
                 <span className="text-sm text-slate-500 dark:text-slate-300">total paid revenue</span>
               </div>
@@ -449,7 +562,7 @@ export default function AdminDashboard() {
               <div className="relative h-[180px] w-full flex items-center justify-center">
                 <Doughnut data={donutChartData} options={donutOptions} />
                 <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-                  <span className="text-2xl font-bold text-slate-900 dark:text-white tabular-nums">{donutTotal}</span>
+                  <span className="text-2xl font-bold text-slate-900 dark:text-white tabular-nums"><CountUp value={donutTotal} duration={1} /></span>
                   <span className="text-xs text-slate-500 dark:text-slate-300">Orders</span>
                 </div>
               </div>

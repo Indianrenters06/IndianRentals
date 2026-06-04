@@ -13,6 +13,7 @@ import {
   DropdownTrigger,
   DropdownMenu,
   DropdownItem,
+  Tooltip,
 } from "@heroui/react";
 import {
   House, Users, Package, ShoppingCart, FileText,
@@ -371,6 +372,13 @@ export default function DashboardLayout({ children }) {
     router.push("/");
   };
 
+  // Sidebar display modes:
+  //  - mobileOverlay: full sidebar floating over content (mobile, opened via hamburger)
+  //  - collapsed: slim icon-only rail (default when not open)
+  //  - else: full sidebar docked in flow (desktop, opened)
+  const mobileOverlay = isMobile && isSidebarOpen;
+  const collapsed = !isSidebarOpen;
+
   return (
     <div className="flex bg-slate-50 dark:bg-slate-900 border-none m-0 p-0 text-slate-800 dark:text-slate-100 h-screen overflow-hidden relative z-10 w-full transition-colors duration-300">
       {/* Mobile Backdrop */}
@@ -383,33 +391,75 @@ export default function DashboardLayout({ children }) {
 
       {/* Sidebar */}
       <aside
-        className={`${isMobile ? "fixed h-full z-50 left-0" : "sticky top-0 h-screen"
-          } ${isSidebarOpen
-            ? (isMobile ? "translate-x-0 w-72" : "w-72")
-            : (isMobile ? "-translate-x-full w-72" : "w-0")
-          } transition-all duration-300 border-r border-slate-200 dark:border-slate-800/60 bg-white dark:bg-slate-950 flex flex-col overflow-hidden`}
+        className={`${mobileOverlay ? "fixed h-full z-50 left-0 translate-x-0 w-72 shadow-2xl" : "sticky top-0 h-screen"
+          } ${!mobileOverlay && (isSidebarOpen ? "w-72" : "w-20")
+          } transition-[width,transform] duration-300 ease-in-out border-r border-slate-200 dark:border-slate-800/60 bg-white dark:bg-slate-950 flex flex-col overflow-hidden shrink-0`}
       >
-        <div className="h-16 flex items-center px-5 border-b border-slate-200 dark:border-slate-800/60 shrink-0 bg-transparent">
-          {/* Light-mode logo */}
-          <img
-            src={branding.siteLogo || "https://res.cloudinary.com/dgkckcdk8/image/upload/v1776892240/1d1f7c4e3c0490bcddb69ceb328c67be2f7cf361_6_kufcee.png"}
-            alt={branding.siteName || "Logo"}
-            className="h-8 w-auto object-contain block dark:hidden"
-          />
-          {/* Dark-mode (white) logo */}
-          <img
-            src={branding.siteLogoDark || "https://res.cloudinary.com/dgkckcdk8/image/upload/v1780249784/white_indianrenters_nnqhiu.png"}
-            alt={branding.siteName || "Logo"}
-            className="h-8 w-auto object-contain hidden dark:block"
-          />
+        <div className={`h-16 flex items-center border-b border-slate-200 dark:border-slate-800/60 shrink-0 bg-transparent ${collapsed ? "justify-center px-0" : "px-5"}`}>
+          {collapsed ? (
+            // Compact mark for the rail — crop the wide logo to just its icon.
+            <>
+              <img
+                src={branding.siteLogo || "https://res.cloudinary.com/dgkckcdk8/image/upload/v1776892240/1d1f7c4e3c0490bcddb69ceb328c67be2f7cf361_6_kufcee.png"}
+                alt={branding.siteName || "Logo"}
+                className="h-9 w-9 object-cover object-left rounded-lg block dark:hidden"
+              />
+              <img
+                src={branding.siteLogoDark || "https://res.cloudinary.com/dgkckcdk8/image/upload/v1780249784/white_indianrenters_nnqhiu.png"}
+                alt={branding.siteName || "Logo"}
+                className="h-9 w-9 object-cover object-left rounded-lg hidden dark:block"
+              />
+            </>
+          ) : (
+            <>
+              {/* Light-mode logo */}
+              <img
+                src={branding.siteLogo || "https://res.cloudinary.com/dgkckcdk8/image/upload/v1776892240/1d1f7c4e3c0490bcddb69ceb328c67be2f7cf361_6_kufcee.png"}
+                alt={branding.siteName || "Logo"}
+                className="h-8 w-auto object-contain block dark:hidden"
+              />
+              {/* Dark-mode (white) logo */}
+              <img
+                src={branding.siteLogoDark || "https://res.cloudinary.com/dgkckcdk8/image/upload/v1780249784/white_indianrenters_nnqhiu.png"}
+                alt={branding.siteName || "Logo"}
+                className="h-8 w-auto object-contain hidden dark:block"
+              />
+            </>
+          )}
         </div>
 
-        <nav className="flex-1 overflow-y-auto px-4 py-6 scrollbar-hide">
+        <nav className={`flex-1 overflow-y-auto py-6 scrollbar-hide ${collapsed ? "px-2.5" : "px-4"}`}>
           <div className="space-y-1.5">
             {menuItems.map((item) => {
               const isActive = pathname === item.path || (item.path !== '/dashboard' && pathname?.startsWith(item.path + '/'));
               const isSubmenuOpen = openMenus[item.name] || isActive;
               const hasSubmenu = item.submenu && item.submenu.length > 0;
+
+              // ── Collapsed rail: icon-only with a hover tooltip. Clicking a parent
+              // item navigates to its base route (submenu only shows when expanded).
+              if (collapsed) {
+                return (
+                  <Tooltip
+                    key={item.name}
+                    content={item.name}
+                    placement="right"
+                    delay={150}
+                    closeDelay={0}
+                    classNames={{ content: "bg-slate-900 dark:bg-slate-800 text-white text-xs font-medium px-2.5 py-1.5 rounded-lg shadow-lg" }}
+                  >
+                    <Link
+                      href={item.path}
+                      onClick={() => { if (isMobile) setIsSidebarOpen(false); }}
+                      className={`flex items-center justify-center w-12 h-12 mx-auto rounded-xl transition-all duration-200 ${isActive
+                        ? 'bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-500/20'
+                        : 'text-slate-500 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/50 hover:text-slate-800 dark:hover:text-white'
+                        }`}
+                    >
+                      <item.icon className="w-[22px] h-[22px] shrink-0" weight={isActive ? "fill" : "regular"} />
+                    </Link>
+                  </Tooltip>
+                );
+              }
 
               return (
                 <div key={item.name}>
@@ -474,14 +524,31 @@ export default function DashboardLayout({ children }) {
         </nav>
 
         {/* Sidebar Footer with Sign Out */}
-        <div className="mt-auto px-4 py-2 border-t border-slate-200 dark:border-slate-800/60 bg-slate-50 dark:bg-slate-950/40">
-          <button
-            onClick={handleLogout}
-            className="w-full flex items-center px-4 py-3 text-slate-500 dark:text-slate-300 dark:hover:text-red-400 dark:hover:!bg-red-500/10 rounded-xl transition-colors text-sm font-bold tracking-wide"
-          >
-            <SignOut className="w-5 h-5 mr-3" />
-            Sign Out
-          </button>
+        <div className={`mt-auto py-2 border-t border-slate-200 dark:border-slate-800/60 bg-slate-50 dark:bg-slate-950/40 ${collapsed ? "px-2.5" : "px-4"}`}>
+          {collapsed ? (
+            <Tooltip
+              content="Sign Out"
+              placement="right"
+              delay={150}
+              closeDelay={0}
+              classNames={{ content: "bg-slate-900 dark:bg-slate-800 text-white text-xs font-medium px-2.5 py-1.5 rounded-lg shadow-lg" }}
+            >
+              <button
+                onClick={handleLogout}
+                className="flex items-center justify-center w-12 h-12 mx-auto text-slate-500 dark:text-slate-300 hover:text-red-500 dark:hover:text-red-400 hover:bg-red-50 dark:hover:!bg-red-500/10 rounded-xl transition-colors"
+              >
+                <SignOut className="w-[22px] h-[22px]" />
+              </button>
+            </Tooltip>
+          ) : (
+            <button
+              onClick={handleLogout}
+              className="w-full flex items-center px-4 py-3 text-slate-500 dark:text-slate-300 dark:hover:text-red-400 dark:hover:!bg-red-500/10 rounded-xl transition-colors text-sm font-bold tracking-wide"
+            >
+              <SignOut className="w-5 h-5 mr-3" />
+              Sign Out
+            </button>
+          )}
         </div>
       </aside>
 
