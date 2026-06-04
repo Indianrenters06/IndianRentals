@@ -9,7 +9,7 @@
 
 @theme {
   /* HeroUI Pro electric-blue brand scale */
-  --color-brand-50:  #e8f2fe;
+  --color-brand-50: #e8f2fe;
   --color-brand-100: #bdd9fd;
   --color-brand-200: #7ec0ff;
   --color-brand-400: #3d97ff;
@@ -30,12 +30,10 @@
 
   /* Skeleton shimmer — use .skeleton class on placeholder elements */
   .skeleton {
-    background: linear-gradient(
-      90deg,
-      var(--surface-secondary, #1e1e26) 25%,
-      var(--surface-tertiary, #232329) 50%,
-      var(--surface-secondary, #1e1e26) 75%
-    );
+    background: linear-gradient(90deg,
+        var(--surface-secondary, #1e1e26) 25%,
+        var(--surface-tertiary, #232329) 50%,
+        var(--surface-secondary, #1e1e26) 75%);
     background-size: 200% 100%;
     animation: shimmer 1.5s ease-in-out infinite;
     border-radius: var(--radius-lg, 8px);
@@ -44,8 +42,13 @@
 
 /* ── Skeleton shimmer keyframe ─────────────────────────────────────────────── */
 @keyframes shimmer {
-  0%   { background-position: -200% 0; }
-  100% { background-position:  200% 0; }
+  0% {
+    background-position: -200% 0;
+  }
+
+  100% {
+    background-position: 200% 0;
+  }
 }
 
 body {
@@ -54,6 +57,7 @@ body {
   color: var(--foreground, #111113);
   font-family: "Inter", "Inter Fallback", ui-sans-serif, system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
+
   selection {
     background-color: var(--accent, #006FEE);
     color: #ffffff;
@@ -84,7 +88,8 @@ summary,
 /* Custom scrollbar */
 ::-webkit-scrollbar {
   width: 8px;
-  height: 0px; /* Hide horizontal scrollbar globally */
+  height: 0px;
+  /* Hide horizontal scrollbar globally */
 }
 
 ::-webkit-scrollbar-track {
@@ -127,59 +132,59 @@ summary,
    ─────────────────────────────────────────────────────────────────────────── */
 :root {
   /* ── Surfaces ── */
-  --background:         #f6f6f7;
-  --surface:            #ffffff;
-  --surface-secondary:  #f1f1f3;
-  --surface-tertiary:   #ececee;
-  --overlay:            #ffffff;
+  --background: #f6f6f7;
+  --surface: #ffffff;
+  --surface-secondary: #f1f1f3;
+  --surface-tertiary: #ececee;
+  --overlay: #ffffff;
 
   /* ── Text ── */
-  --foreground:         #111113;
-  --muted:              #71717a;
+  --foreground: #111113;
+  --muted: #71717a;
 
   /* ── Structure ── */
-  --border:             #e4e4e7;
-  --border-secondary:   #d4d4d8;
+  --border: #e4e4e7;
+  --border-secondary: #d4d4d8;
 
   /* ── Accent (electric blue) ── */
-  --accent:             #006FEE;
-  --accent-foreground:  #ffffff;
-  --accent-soft:        rgba(0, 111, 238, 0.12);
+  --accent: #006FEE;
+  --accent-foreground: #ffffff;
+  --accent-soft: rgba(0, 111, 238, 0.12);
 
   /* ── Semantic ── */
-  --danger:             #f31260;
-  --danger-soft:        rgba(243, 18, 96, 0.12);
-  --success:            #17c964;
-  --success-soft:       rgba(23, 201, 100, 0.12);
-  --warning:            #f5a524;
-  --warning-soft:       rgba(245, 165, 36, 0.12);
+  --danger: #f31260;
+  --danger-soft: rgba(243, 18, 96, 0.12);
+  --success: #17c964;
+  --success-soft: rgba(23, 201, 100, 0.12);
+  --warning: #f5a524;
+  --warning-soft: rgba(245, 165, 36, 0.12);
 
   /* ── Radius ── */
-  --radius-sm:   4px;
-  --radius-md:   6px;
-  --radius-lg:   8px;
-  --radius-xl:   12px;
-  --radius-2xl:  16px;
-  --radius-3xl:  24px;
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 8px;
+  --radius-xl: 12px;
+  --radius-2xl: 16px;
+  --radius-3xl: 24px;
 
   /* ── Shadows (light) ── */
-  --shadow-surface: 0 2px 4px 0 rgba(0,0,0,0.04), 0 1px 2px 0 rgba(0,0,0,0.06), 0 0 1px 0 rgba(0,0,0,0.06);
-  --shadow-overlay: 0 2px 8px 0 rgba(0,0,0,0.06), 0 14px 28px 0 rgba(0,0,0,0.08);
+  --shadow-surface: 0 2px 4px 0 rgba(0, 0, 0, 0.04), 0 1px 2px 0 rgba(0, 0, 0, 0.06), 0 0 1px 0 rgba(0, 0, 0, 0.06);
+  --shadow-overlay: 0 2px 8px 0 rgba(0, 0, 0, 0.06), 0 14px 28px 0 rgba(0, 0, 0, 0.08);
 
   /* ── Animation easings ── */
-  --ease-fluid:     cubic-bezier(0.32, 0.72, 0, 1);
-  --ease-snap:      cubic-bezier(0.165, 0.84, 0.44, 1);
-  --ease-standard:  cubic-bezier(0.4, 0, 0.2, 1);
-  --ease-quad:      cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  --ease-fluid: cubic-bezier(0.32, 0.72, 0, 1);
+  --ease-snap: cubic-bezier(0.165, 0.84, 0.44, 1);
+  --ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-quad: cubic-bezier(0.25, 0.46, 0.45, 0.94);
 
   /* ── Durations ── */
-  --duration-fast:       150ms;
-  --duration-standard:   200ms;
+  --duration-fast: 150ms;
+  --duration-standard: 200ms;
   --duration-deliberate: 300ms;
 
   /* ── Tailwind indigo scale → HeroUI Pro electric blue
        (applyBrandingTheme() can override these at runtime) ── */
-  --color-indigo-50:  #e8f2fe;
+  --color-indigo-50: #e8f2fe;
   --color-indigo-100: #bdd9fd;
   --color-indigo-200: #7ec0ff;
   --color-indigo-400: #3d97ff;
@@ -188,27 +193,27 @@ summary,
   --color-indigo-700: #003a7e;
 
   /* ── HeroUI component theme ── */
-  --heroui-colors-primary:    #006FEE;
-  --heroui-colors-secondary:  #7828c8;
+  --heroui-colors-primary: #006FEE;
+  --heroui-colors-secondary: #7828c8;
   --heroui-colors-background: #ffffff;
   --heroui-colors-foreground: #111113;
-  --heroui-colors-content1:   #ffffff;
-  --heroui-colors-content2:   #f1f1f3;
+  --heroui-colors-content1: #ffffff;
+  --heroui-colors-content2: #f1f1f3;
 }
 
 /* ── Dark Mode Token Overrides ──────────────────────────────────────────────── */
 .dark {
-  --background:         #050506;
-  --surface:            #111117;
-  --surface-secondary:  #1e1e26;
-  --surface-tertiary:   #232329;
-  --overlay:            #111117;
+  --background: #050506;
+  --surface: #111117;
+  --surface-secondary: #1e1e26;
+  --surface-tertiary: #232329;
+  --overlay: #111117;
 
-  --foreground:         #fafafa;
-  --muted:              #a1a1aa;
+  --foreground: #fafafa;
+  --muted: #a1a1aa;
 
-  --border:             #27272e;
-  --border-secondary:   #3f3f46;
+  --border: #27272e;
+  --border-secondary: #3f3f46;
 
   /* Dark mode: no box-shadow on surfaces — depth from bg layering */
   --shadow-surface: none;
@@ -217,8 +222,8 @@ summary,
   /* HeroUI dark overrides */
   --heroui-colors-background: #111117;
   --heroui-colors-foreground: #fafafa;
-  --heroui-colors-content1:   #111117;
-  --heroui-colors-content2:   #1e1e26;
+  --heroui-colors-content1: #111117;
+  --heroui-colors-content2: #1e1e26;
 }
 
 /* ── HeroUI + Tailwind v4 Compatibility Fix ──────────────────────────────────
@@ -307,18 +312,18 @@ summary,
 [data-filled="true"] [data-slot="input"],
 [data-filled-within="true"] [data-slot="input"],
 [data-focus="true"] [data-slot="input"],
-:focus-within > [data-slot="input-wrapper"] [data-slot="input"],
+:focus-within>[data-slot="input-wrapper"] [data-slot="input"],
 [data-has-value="true"] [data-slot="input"] {
   padding-top: 1.375rem !important;
   padding-bottom: 0.125rem !important;
 }
 
 /* Shift startContent / endContent icons down by the same amount so they stay aligned with the text */
-[data-filled="true"] [data-slot="inner-wrapper"] > :not([data-slot="input"]):not([data-slot="textarea"]),
-[data-filled-within="true"] [data-slot="inner-wrapper"] > :not([data-slot="input"]):not([data-slot="textarea"]),
-[data-focus="true"] [data-slot="inner-wrapper"] > :not([data-slot="input"]):not([data-slot="textarea"]),
-:focus-within > [data-slot="input-wrapper"] [data-slot="inner-wrapper"] > :not([data-slot="input"]):not([data-slot="textarea"]),
-[data-has-value="true"] [data-slot="inner-wrapper"] > :not([data-slot="input"]):not([data-slot="textarea"]) {
+[data-filled="true"] [data-slot="inner-wrapper"]> :not([data-slot="input"]):not([data-slot="textarea"]),
+[data-filled-within="true"] [data-slot="inner-wrapper"]> :not([data-slot="input"]):not([data-slot="textarea"]),
+[data-focus="true"] [data-slot="inner-wrapper"]> :not([data-slot="input"]):not([data-slot="textarea"]),
+:focus-within>[data-slot="input-wrapper"] [data-slot="inner-wrapper"]> :not([data-slot="input"]):not([data-slot="textarea"]),
+[data-has-value="true"] [data-slot="inner-wrapper"]> :not([data-slot="input"]):not([data-slot="textarea"]) {
   margin-top: 1.375rem !important;
   align-self: flex-start !important;
 }
@@ -547,7 +552,8 @@ nav[data-slot="base"]:has(ul[data-slot="wrapper"]) [data-slot="next"] {
   border-radius: 8px !important;
   transition: background-color 0.2s ease, color 0.2s ease !important;
   background-color: transparent !important;
-  color: #94a3b8 !important; /* text-slate-400 */
+  color: #94a3b8 !important;
+  /* text-slate-400 */
 }
 
 /* Inactive button hovers */
@@ -556,7 +562,8 @@ nav[data-slot="base"]:has(ul[data-slot="wrapper"]) [data-slot="item"]:hover,
 nav[data-slot="base"]:has(ul[data-slot="wrapper"]) [data-slot="prev"]:hover,
 nav[data-slot="base"]:has(ul[data-slot="wrapper"]) [data-slot="next"]:hover {
   background-color: rgba(148, 163, 184, 0.1) !important;
-  color: #f8fafc !important; /* text-slate-50 */
+  color: #f8fafc !important;
+  /* text-slate-50 */
 }
 
 /* Active page button text */
@@ -572,4 +579,3 @@ nav[data-slot="base"]:has(ul[data-slot="wrapper"]) [data-slot="cursor"] {
   box-shadow: 0 4px 12px rgba(0, 111, 238, 0.35) !important;
   transition: all 0.25s var(--ease-standard, cubic-bezier(0.4, 0, 0.2, 1)) !important;
 }
-

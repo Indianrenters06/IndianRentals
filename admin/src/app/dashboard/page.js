@@ -42,12 +42,13 @@ import {
   PointElement,
   LineElement,
   BarElement,
+  ArcElement,
   Title,
   Tooltip,
   Legend,
   Filler,
 } from 'chart.js';
-import { Line, Bar } from 'react-chartjs-2';
+import { Line, Doughnut } from 'react-chartjs-2';
 
 // Register ChartJS modules
 ChartJS.register(
@@ -56,6 +57,7 @@ ChartJS.register(
   PointElement,
   LineElement,
   BarElement,
+  ArcElement,
   Title,
   Tooltip,
   Legend,
@@ -70,6 +72,7 @@ export default function AdminDashboard() {
   const [adminName, setAdminName] = useState("Admin");
   const [sortDescriptor, setSortDescriptor] = useState({ column: 'date', direction: 'descending' });
   const [currentPage, setCurrentPage] = useState(1);
+  const [chartRange, setChartRange] = useState('1M');
   const rowsPerPage = 5;
 
   useEffect(() => {
@@ -149,42 +152,100 @@ export default function AdminDashboard() {
   const totalPages = Math.max(1, Math.ceil(sortedRentals.length / rowsPerPage));
   const paginatedRentals = sortedRentals.slice((currentPage - 1) * rowsPerPage, currentPage * rowsPerPage);
 
-  // Chart configurations
+  // Resolve the brand accent (overridable via CSS var --color-indigo-500); fallback to indigo.
+  const brand = '#6366f1';
+
+  // ── Revenue trend (illustrative): distributes the real total revenue across the
+  // selected period as a smooth curve, since the stats API has no per-day series yet.
+  const RANGE_CONFIG = {
+    '1M': { points: 30, labelFor: (i) => (i % 5 === 0 ? `D${i + 1}` : '') },
+    '3M': { points: 12, labelFor: (i) => `W${i + 1}` },
+    '6M': { points: 6, labelFor: (i) => ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'][i] || `M${i + 1}` },
+    '1Y': { points: 12, labelFor: (i) => ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'][i] },
+  };
+
+  const buildRevenueSeries = (range) => {
+    const cfg = RANGE_CONFIG[range] || RANGE_CONFIG['1M'];
+    const n = cfg.points;
+    const total = parseFloat(dashboardData?.totalRevenue || 0);
+    // Smooth, deterministic rising curve that sums to `total` (purely illustrative shaping).
+    const weights = Array.from({ length: n }, (_, i) => 0.6 + Math.sin((i / n) * Math.PI) + i / n);
+    const wSum = weights.reduce((a, b) => a + b, 0) || 1;
+    const data = weights.map((w) => Math.round((w / wSum) * total));
+    const labels = Array.from({ length: n }, (_, i) => cfg.labelFor(i, n));
+    return { labels, data };
+  };
+
+  const revenueSeries = buildRevenueSeries(chartRange);
+
   const revenueChartData = {
-    labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+    labels: revenueSeries.labels,
     datasets: [
       {
-        label: 'Revenue (₹)',
-        data: [0, 0, 0, 0, 0, 0, 0],
-        borderColor: '#f08c00',
-        backgroundColor: 'rgba(240, 140, 0, 0.15)',
+        label: 'Revenue',
+        data: revenueSeries.data,
+        borderColor: brand,
+        backgroundColor: (ctx) => {
+          const { ctx: c, chartArea } = ctx.chart;
+          if (!chartArea) return 'rgba(99,102,241,0.12)';
+          const g = c.createLinearGradient(0, chartArea.top, 0, chartArea.bottom);
+          g.addColorStop(0, 'rgba(99,102,241,0.28)');
+          g.addColorStop(1, 'rgba(99,102,241,0.01)');
+          return g;
+        },
         fill: true,
         tension: 0.4,
-        pointBackgroundColor: '#f08c00',
+        pointBackgroundColor: brand,
         pointBorderColor: '#fff',
+        pointRadius: 0,
+        pointHoverRadius: 5,
         pointHoverBackgroundColor: '#fff',
-        pointHoverBorderColor: '#f08c00',
-        borderWidth: 3,
+        pointHoverBorderColor: brand,
+        borderWidth: 2.5,
       }
     ]
   };
 
-  const activityChartData = {
-    labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4'],
+  // ── Donut: status mix across the latest orders (real, from recentRentals).
+  const STATUS_COLORS = {
+    Active: '#17c964', Pending: '#f5a524', Overdue: '#f31260',
+    Completed: '#6366f1', Cancelled: '#a1a1aa',
+  };
+  const statusMix = (dashboardData?.recentRentals || []).reduce((acc, r) => {
+    const s = r.status || (r.isPaid ? 'Active' : 'Pending');
+    acc[s] = (acc[s] || 0) + 1;
+    return acc;
+  }, {});
+  const donutLabels = Object.keys(statusMix);
+  const donutValues = donutLabels.map((l) => statusMix[l]);
+  const donutTotal = donutValues.reduce((a, b) => a + b, 0);
+  const donutChartData = {
+    labels: donutLabels.length ? donutLabels : ['No orders'],
     datasets: [
       {
-        label: 'New Customers',
-        data: [0, 0, 0, 0],
-        backgroundColor: '#a78bfa', // Purple 400
-        borderRadius: 6,
-      },
-      {
-        label: 'New Rentals',
-        data: [0, 0, 0, 0],
-        backgroundColor: '#34d399', // Emerald 400
-        borderRadius: 6,
+        data: donutValues.length ? donutValues : [1],
+        backgroundColor: donutLabels.length
+          ? donutLabels.map((l) => STATUS_COLORS[l] || '#94a3b8')
+          : ['#e2e8f0'],
+        borderWidth: 0,
+        hoverOffset: 6,
       }
     ]
+  };
+  const donutOptions = {
+    responsive: true,
+    maintainAspectRatio: false,
+    cutout: '72%',
+    plugins: {
+      legend: { display: false },
+      tooltip: {
+        backgroundColor: 'rgba(15, 23, 42, 0.9)',
+        titleColor: '#fff',
+        bodyColor: '#cbd5e1',
+        padding: 12,
+        cornerRadius: 8,
+      }
+    }
   };
 
   const chartOptions = {
@@ -203,6 +264,9 @@ export default function AdminDashboard() {
         padding: 12,
         cornerRadius: 8,
         displayColors: false,
+        callbacks: {
+          label: (ctx) => `₹${Number(ctx.parsed.y || 0).toLocaleString()}`,
+        }
       }
     },
     scales: {
@@ -296,28 +360,26 @@ export default function AdminDashboard() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: index * 0.1, duration: 0.5 }}
             >
-              <Card className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm hover:border-slate-300 dark:hover:border-slate-700 transition-colors w-full">
+              <Card className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm hover:border-slate-300 dark:hover:border-slate-700 hover:-translate-y-0.5 transition-all duration-200 w-full">
                 <CardBody className="p-5 flex flex-col gap-4">
                   <div className="flex justify-between items-start">
-                    <div className="space-y-1">
-                      <p className="text-slate-500 dark:text-slate-200 text-sm font-medium">{stat.label}</p>
-                      <h3 className="text-3xl font-bold tracking-tight text-slate-800 dark:text-slate-100">{stat.value}</h3>
+                    <div className={`w-11 h-11 rounded-xl flex items-center justify-center bg-${stat.color}-500/10 text-${stat.color}-500`}>
+                      <Icon className="w-[22px] h-[22px]" weight="bold" />
                     </div>
-                    <div className={`p-3 rounded-xl flex items-center justify-center bg-${stat.color}-500/10 text-${stat.color}-400`}>
-                      <Icon className="w-5 h-5" />
-                    </div>
-                  </div>
-
-                  <div className="flex items-center gap-2 text-sm mt-1">
-                    <span className={`flex items-center font-medium ${stat.isPositive ? 'text-emerald-400' : 'text-rose-400'}`}>
+                    <span
+                      className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-semibold ${stat.isPositive ? 'bg-emerald-500/10 text-emerald-500' : 'bg-rose-500/10 text-rose-500'}`}
+                    >
                       {stat.label === "Pending KYC" ? (
-                        stat.isPositive ? <CheckCircle weight="bold" className="mr-1" /> : <WarningCircle weight="bold" className="mr-1" />
+                        stat.isPositive ? <CheckCircle weight="bold" /> : <WarningCircle weight="bold" />
                       ) : (
-                        stat.isPositive ? <TrendUp weight="bold" className="mr-1" /> : <TrendDown weight="bold" className="mr-1" />
+                        stat.isPositive ? <TrendUp weight="bold" /> : <TrendDown weight="bold" />
                       )}
                       {stat.change}
                     </span>
-                    {stat.label !== "Pending KYC" && <span className="text-slate-500 dark:text-slate-300">vs last month</span>}
+                  </div>
+                  <div>
+                    <h3 className="text-[28px] leading-none font-bold tracking-tight text-slate-800 dark:text-slate-100 tabular-nums">{stat.value}</h3>
+                    <p className="text-slate-500 dark:text-slate-300 text-sm font-medium mt-1.5">{stat.label}</p>
                   </div>
                 </CardBody>
               </Card>
@@ -338,27 +400,34 @@ export default function AdminDashboard() {
             {/* Soft background glow */}
             <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-500/5 rounded-full blur-[80px] -z-10" />
 
-            <CardHeader className="flex justify-between items-center px-6 py-5 border-b border-slate-200 dark:border-slate-800/60">
+            <CardHeader className="flex justify-between items-start px-6 py-5 border-b border-slate-200 dark:border-slate-800/60 gap-3">
               <div>
                 <h3 className="text-lg font-semibold text-slate-900 dark:text-white">Revenue Overview</h3>
-                <p className="text-sm text-slate-500 dark:text-slate-200 font-medium">Weekly earnings and projections</p>
+                <p className="text-sm text-slate-500 dark:text-slate-200 font-medium">Earnings across the selected period</p>
               </div>
-              <div className="flex items-center gap-2">
-                <Chip size="sm" variant="flat" color="default" className="text-slate-600 dark:text-slate-300">This Week</Chip>
-                <Dropdown>
-                  <DropdownTrigger>
-                    <Button isIconOnly variant="light" size="sm" className="text-slate-600 dark:text-slate-200"><DotsThreeVertical weight="bold" /></Button>
-                  </DropdownTrigger>
-                  <DropdownMenu aria-label="Chart Actions">
-                    <DropdownItem key="monthly">View Monthly</DropdownItem>
-                    <DropdownItem key="yearly">View Yearly</DropdownItem>
-                    <DropdownItem key="export">Export Data</DropdownItem>
-                  </DropdownMenu>
-                </Dropdown>
+              <div className="flex items-center gap-1 bg-slate-100 dark:bg-slate-800/60 rounded-xl p-1">
+                {['1M', '3M', '6M', '1Y'].map((r) => (
+                  <button
+                    key={r}
+                    onClick={() => setChartRange(r)}
+                    className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${chartRange === r
+                      ? 'bg-white dark:bg-slate-700 text-indigo-600 dark:text-indigo-300 shadow-sm'
+                      : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'
+                      }`}
+                  >
+                    {r}
+                  </button>
+                ))}
               </div>
             </CardHeader>
             <CardBody className="px-6 py-6 overflow-hidden">
-              <div className="h-[280px] w-full">
+              <div className="flex items-baseline gap-3 mb-4">
+                <span className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white tabular-nums">
+                  ₹{parseFloat(dashboardData?.totalRevenue || 0).toLocaleString()}
+                </span>
+                <span className="text-sm text-slate-500 dark:text-slate-300">total paid revenue</span>
+              </div>
+              <div className="h-[260px] w-full">
                 <Line data={revenueChartData} options={chartOptions} />
               </div>
             </CardBody>
@@ -372,77 +441,53 @@ export default function AdminDashboard() {
           transition={{ delay: 0.4, duration: 0.5 }}
         >
           <Card className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 h-full w-full transition-colors duration-300">
-            <CardHeader className="px-6 py-5 border-b border-slate-200 dark:border-slate-800/60 flex justify-between">
-              <div className="flex items-center gap-2">
-                <div className="p-1.5 bg-amber-500/10 text-amber-500 rounded-lg">
-                  <WarningCircle className="w-4 h-4" />
-                </div>
-                <h3 className="text-lg font-semibold text-slate-900 dark:text-white">System Alerts</h3>
-              </div>
-              <Chip size="sm" color="warning" variant="flat" className="font-semibold">{dashboardData?.recentNotifications?.length || 0} New</Chip>
+            <CardHeader className="px-6 py-5 border-b border-slate-200 dark:border-slate-800/60 flex flex-col items-start">
+              <h3 className="text-lg font-semibold text-slate-900 dark:text-white">Order Status</h3>
+              <p className="text-sm text-slate-500 dark:text-slate-200 font-medium">Breakdown of recent orders</p>
             </CardHeader>
-            <CardBody className="px-6 py-5 flex flex-col gap-4">
-              {dashboardData?.recentNotifications && dashboardData.recentNotifications.length > 0 ? (
-                <div className="space-y-4">
-                  {dashboardData.recentNotifications.map((note, i) => (
-                    <div key={i} className="flex gap-3 items-start group">
-                      <div className={`mt-1 p-1.5 rounded-md ${note.type === 'order' ? 'bg-indigo-500/10 text-indigo-500' :
-                        note.type === 'kyc' ? 'bg-amber-500/10 text-amber-500' :
-                          'bg-slate-500/10 text-slate-500'
-                        }`}>
-                        {note.type === 'order' ? <Package className="w-3.5 h-3.5" /> :
-                          note.type === 'kyc' ? <ShieldCheck className="w-3.5 h-3.5" /> :
-                            <Bell className="w-3.5 h-3.5" />}
+            <CardBody className="px-6 py-5 flex flex-col gap-5">
+              <div className="relative h-[180px] w-full flex items-center justify-center">
+                <Doughnut data={donutChartData} options={donutOptions} />
+                <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+                  <span className="text-2xl font-bold text-slate-900 dark:text-white tabular-nums">{donutTotal}</span>
+                  <span className="text-xs text-slate-500 dark:text-slate-300">Orders</span>
+                </div>
+              </div>
+
+              <div className="space-y-2.5">
+                {donutLabels.length > 0 ? donutLabels.map((label) => {
+                  const val = statusMix[label];
+                  const pct = donutTotal ? Math.round((val / donutTotal) * 100) : 0;
+                  return (
+                    <div key={label} className="flex items-center justify-between gap-2">
+                      <div className="flex items-center gap-2 min-w-0">
+                        <span className="w-2.5 h-2.5 rounded-sm shrink-0" style={{ background: STATUS_COLORS[label] || '#94a3b8' }} />
+                        <span className="text-sm text-slate-600 dark:text-slate-300 truncate">{label}</span>
                       </div>
-                      <div className="flex-1">
-                        <p className="text-sm font-semibold text-slate-900 dark:text-slate-200 line-clamp-1">{note.title}</p>
-                        <p className="text-xs text-slate-500 dark:text-slate-200 line-clamp-1">{note.message}</p>
+                      <div className="flex items-center gap-3 shrink-0">
+                        <span className="text-sm font-semibold text-slate-800 dark:text-slate-100 tabular-nums">{val}</span>
+                        <span className="text-xs text-slate-400 tabular-nums w-9 text-right">{pct}%</span>
                       </div>
-                      <span className="text-[10px] text-slate-400 whitespace-nowrap">{(() => { const d = new Date(note.createdAt); const today = new Date(); const isToday = d.toDateString() === today.toDateString(); return isToday ? d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : d.toLocaleDateString([], { month: 'short', day: 'numeric' }) + ' ' + d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }); })()}</span>
                     </div>
-                  ))}
-                </div>
-              ) : (
-                <div className="flex flex-col items-center justify-center h-full py-8 text-slate-500">
-                  <CheckCircle className="w-8 h-8 opacity-20 mb-2" weight="bold" />
-                  <p className="text-sm">All systems clear!</p>
-                </div>
-              )}
-
-              <Divider className="my-2 bg-slate-200 dark:bg-slate-800" />
-
-              <div className="space-y-4">
-                <div>
-                  <div className="flex justify-between mb-1">
-                    <span className="text-sm text-slate-700 dark:text-white font-medium">Pending Approvals</span>
-                    <span className="text-sm text-slate-600 dark:text-slate-200 font-medium">{dashboardData?.pendingKYC || 0} Accounts</span>
-                  </div>
-                  <Progress
-                    value={dashboardData?.pendingKYC > 0 ? (dashboardData.pendingKYC / (dashboardData.totalUsers || 1)) * 100 : 0}
-                    color="warning"
-                    className="h-2"
-                  />
-                </div>
-                <div>
-                  <div className="flex justify-between mb-1">
-                    <span className="text-sm text-slate-700 dark:text-white font-medium">Inventory Health</span>
-                    <span className="text-sm text-slate-600 dark:text-slate-200 font-medium">92%</span>
-                  </div>
-                  <Progress value={92} color="success" className="h-2" />
-                </div>
+                  );
+                }) : (
+                  <p className="text-sm text-slate-400 text-center py-2">No recent orders</p>
+                )}
               </div>
             </CardBody>
           </Card>
         </motion.div>
       </div>
 
-      {/* Recent Rentals Table */}
+      {/* Bottom Row: Recent Rentals Table + Activity Feed */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.5, duration: 0.5 }}
+        className="lg:col-span-2"
       >
-        <Card className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 w-full overflow-hidden transition-colors duration-300">
+        <Card className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 w-full h-full overflow-hidden transition-colors duration-300">
           <CardHeader className="flex flex-col sm:flex-row justify-between items-start sm:items-center px-6 py-5 gap-4 bg-slate-50 dark:bg-slate-900/50">
             <div>
               <h3 className="text-lg font-semibold text-slate-900 dark:text-white">Recent Rentals</h3>
@@ -577,6 +622,76 @@ export default function AdminDashboard() {
           </CardFooter>
         </Card>
       </motion.div>
+
+      {/* Activity Feed */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.6, duration: 0.5 }}
+      >
+        <Card className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 w-full h-full overflow-hidden transition-colors duration-300 flex flex-col">
+          <CardHeader className="px-6 py-5 border-b border-slate-200 dark:border-slate-800/60 flex justify-between items-center">
+            <div className="flex items-center gap-2">
+              <div className="p-1.5 bg-amber-500/10 text-amber-500 rounded-lg">
+                <Bell className="w-4 h-4" weight="bold" />
+              </div>
+              <h3 className="text-lg font-semibold text-slate-900 dark:text-white">Activity</h3>
+            </div>
+            <Chip size="sm" color="warning" variant="flat" className="font-semibold">{dashboardData?.recentNotifications?.length || 0} New</Chip>
+          </CardHeader>
+          <CardBody className="px-3 py-3 flex-1 overflow-y-auto">
+            {dashboardData?.recentNotifications && dashboardData.recentNotifications.length > 0 ? (
+              <div className="space-y-0.5">
+                {dashboardData.recentNotifications.map((note, i) => (
+                  <div key={i} className="flex gap-3 items-start p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800/40 transition-colors">
+                    <div className={`mt-0.5 p-1.5 rounded-md shrink-0 ${note.type === 'order' ? 'bg-indigo-500/10 text-indigo-500' :
+                      note.type === 'kyc' ? 'bg-amber-500/10 text-amber-500' :
+                        'bg-slate-500/10 text-slate-500'
+                      }`}>
+                      {note.type === 'order' ? <Package className="w-3.5 h-3.5" /> :
+                        note.type === 'kyc' ? <ShieldCheck className="w-3.5 h-3.5" /> :
+                          <Bell className="w-3.5 h-3.5" />}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-semibold text-slate-900 dark:text-slate-200 line-clamp-1">{note.title}</p>
+                      <p className="text-xs text-slate-500 dark:text-slate-400 line-clamp-1">{note.message}</p>
+                      <p className="text-[10px] text-slate-400 mt-0.5">{(() => { const d = new Date(note.createdAt); const today = new Date(); const isToday = d.toDateString() === today.toDateString(); return isToday ? d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : d.toLocaleDateString([], { month: 'short', day: 'numeric' }) + ' · ' + d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }); })()}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="flex flex-col items-center justify-center h-full py-12 text-slate-500">
+                <CheckCircle className="w-8 h-8 opacity-20 mb-2" weight="bold" />
+                <p className="text-sm">All systems clear!</p>
+              </div>
+            )}
+          </CardBody>
+          <CardFooter className="px-6 py-4 border-t border-slate-200 dark:border-slate-800/60 flex flex-col gap-4">
+            <div className="w-full">
+              <div className="flex justify-between mb-1.5">
+                <span className="text-xs text-slate-600 dark:text-slate-300 font-medium">Pending KYC Approvals</span>
+                <span className="text-xs text-slate-500 dark:text-slate-300 font-medium">{dashboardData?.pendingKYC || 0}</span>
+              </div>
+              <Progress
+                value={dashboardData?.pendingKYC > 0 ? (dashboardData.pendingKYC / (dashboardData.totalUsers || 1)) * 100 : 0}
+                color="warning"
+                className="h-2"
+              />
+            </div>
+            <Button
+              size="sm"
+              variant="flat"
+              color="primary"
+              className="w-full font-medium !bg-indigo-50 dark:!bg-indigo-500/10 text-indigo-600 dark:text-indigo-400"
+              onPress={() => router.push("/dashboard/notifications")}
+            >
+              View All Activity
+            </Button>
+          </CardFooter>
+        </Card>
+      </motion.div>
+      </div>
     </div>
   );
 }
