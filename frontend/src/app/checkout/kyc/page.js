@@ -2,10 +2,11 @@
 
 import React, { useState, useRef } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useSelector } from 'react-redux';
 import { FaFingerprint } from 'react-icons/fa';
-import { PiCheckCircleFill, PiCheckCircle } from 'react-icons/pi';
+import { PiCheckCircleFill, PiCheckCircle, PiCaretLeftBold } from 'react-icons/pi';
 import { saveKYCData, uploadKYCFiles } from '../../../services/kycService';
 import { selectCartTotals } from '../../../redux/features/cartSlice';
 import OrderSummary from '../../../components/OrderSummary';
@@ -245,7 +246,7 @@ export default function KYCPage() {
                 opacity: 1
             }}
         >
-            <div className="max-w-[1200px] mx-auto px-4">
+            <div className="max-w-[1200px] mx-auto px-5 md:px-8">
                 {/* Breadcrumb */}
                 {currentStep !== 5 && (
                     <div className="text-xs text-gray-500 mb-6 flex items-center gap-2">
@@ -260,16 +261,40 @@ export default function KYCPage() {
                 )}
 
                 {currentStep === 5 ? (
-                    <div className="flex justify-center items-center min-h-[60vh] px-4">
-                        <div className="relative w-full max-w-lg bg-white rounded-2xl shadow-lg px-8 py-12 text-center">
-                            <h2 className="text-4xl font-semibold text-[#0B5ED7] mb-4">KYC in Progress</h2>
-                            <p className="text-gray-900 text-[15px] font-medium mb-6">Reviewing your documents typically takes 24–48 hours.</p>
-                            <Link href="/profile/orders" className="bg-[#3B82F6] text-white px-6 py-2 rounded-3xl font-normal shadow-lg">Go To My Orders</Link>
+                    <div className="flex justify-center items-start min-h-[60vh] py-4">
+                        <div className="relative w-full max-w-lg bg-white rounded-2xl shadow-lg p-6 md:px-10 md:py-12">
+                            {/* Back */}
+                            <button
+                                onClick={() => router.push('/')}
+                                className="inline-flex items-center gap-1 border border-[#FE5B47] text-[#FE5B47] text-sm font-medium pl-2 pr-4 py-1.5 rounded-full hover:bg-[#FE5B47]/5 transition-colors mb-6"
+                            >
+                                <PiCaretLeftBold size={14} /> Back
+                            </button>
+
+                            {/* Illustration */}
+                            <div className="relative w-[220px] max-w-full aspect-square mx-auto mb-6">
+                                <Image src="https://res.cloudinary.com/dgkckcdk8/image/upload/v1780663926/dd1c2084f2fcb139d03760ae3129fe37c22c3085_uorqis.png" alt="KYC in progress" fill className="object-contain" priority />
+                            </div>
+
+                            <div className="text-center">
+                                <h2 className="text-[28px] md:text-4xl font-bold text-[#1877F2] mb-3">KYC in Progress</h2>
+                                <p className="text-gray-800 text-[14px] md:text-[15px] font-medium mb-8 max-w-md mx-auto leading-relaxed">
+                                    We are now reviewing your documents. This typically takes 24-48 hours. We will notify you via email as soon its complete.
+                                </p>
+                                <div className="flex flex-col gap-3">
+                                    <Link href="/profile/orders" className="bg-[#1877F2] hover:bg-[#1465d8] text-white font-medium py-3 rounded-full transition-colors text-center shadow-sm">
+                                        Go To My Orders
+                                    </Link>
+                                    <Link href="/profile/kyc" className="border border-gray-300 text-gray-800 font-medium py-3 rounded-full transition-colors text-center hover:bg-gray-50">
+                                        KYC Documentation
+                                    </Link>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 ) : (
                     <div
-                        className="flex flex-row items-start"
+                        className="flex flex-row items-start max-lg:!flex-col max-lg:!w-full"
                         style={{
                             width: '1200px',
                             minHeight: '1205px',
@@ -279,7 +304,7 @@ export default function KYCPage() {
                     >
                         {/* Left Column: KYC Verification Form */}
                         <div
-                            className="flex flex-col"
+                            className="flex flex-col max-lg:!w-full"
                             style={{
                                 width: '726px',
                                 minHeight: '1165px',
@@ -287,7 +312,7 @@ export default function KYCPage() {
                             }}
                         >
                             <div
-                                className="flex flex-col"
+                                className="flex flex-col max-lg:!w-full max-lg:!h-auto"
                                 style={{
                                     width: '726px',
                                     height: '86px',
@@ -295,7 +320,7 @@ export default function KYCPage() {
                                 }}
                             >
                                 <div
-                                    className="flex flex-col"
+                                    className="flex flex-col max-lg:!w-full"
                                     style={{
                                         width: '372px',
                                         height: '86px',
@@ -303,6 +328,7 @@ export default function KYCPage() {
                                     }}
                                 >
                                     <h1
+                                        className="max-lg:!w-full"
                                         style={{
                                             width: '372px',
                                             height: '35px',
@@ -318,7 +344,7 @@ export default function KYCPage() {
                                     </h1>
 
                                     <div
-                                        className="flex"
+                                        className="flex max-lg:!w-full"
                                         style={{
                                             width: '372px',
                                             height: '39px',
@@ -327,7 +353,7 @@ export default function KYCPage() {
                                     >
                                         <button
                                             onClick={() => setCustomerType('Customer')}
-                                            className="transition-all"
+                                            className="transition-all max-lg:!flex-1"
                                             style={{
                                                 width: '180px',
                                                 height: '39px',
@@ -358,7 +384,7 @@ export default function KYCPage() {
                                         </button>
                                         <button
                                             onClick={() => setCustomerType('Company')}
-                                            className="transition-all"
+                                            className="transition-all max-lg:!flex-1"
                                             style={{
                                                 width: '180px',
                                                 height: '39px',
@@ -397,7 +423,7 @@ export default function KYCPage() {
                             </div>
 
                             <div
-                                className="flex flex-col"
+                                className="flex flex-col max-lg:!w-full max-lg:!h-auto"
                                 style={{
                                     width: '726px',
                                     height: '112px',
@@ -457,6 +483,7 @@ export default function KYCPage() {
                             </div>
 
                             <div
+                                className="max-lg:!w-full"
                                 style={{
                                     width: '726px',
                                     height: '0px',
@@ -465,7 +492,7 @@ export default function KYCPage() {
                             />
 
                             <div
-                                className="bg-white flex flex-col"
+                                className="bg-white flex flex-col max-lg:!w-full max-lg:!h-auto"
                                 style={{
                                     width: '726px',
                                     height: '920px',
@@ -478,7 +505,7 @@ export default function KYCPage() {
                                 }}
                             >
                                 <div
-                                    className="flex flex-col"
+                                    className="flex flex-col max-lg:!w-full"
                                     style={{
                                         width: '686px',
                                         gap: '21px'
@@ -486,7 +513,7 @@ export default function KYCPage() {
                                 >
                                     {/* Progress Stepper */}
                                     <div
-                                        className="flex items-center justify-center bg-white"
+                                        className="flex items-center justify-center bg-white max-lg:!w-full"
                                         style={{
                                             width: '686px',
                                             height: '72px',
@@ -511,7 +538,7 @@ export default function KYCPage() {
                                                 >
                                                     {currentStep > step ? <PiCheckCircleFill size={20} /> : <span className="font-semibold text-xs">{step}</span>}
                                                 </div>
-                                                {step < 4 && <div className={`w-20 h-0.5 transition-all ${currentStep > step ? 'bg-[#1D1D1F]' : 'bg-gray-300'}`} />}
+                                                {step < 4 && <div className={`w-8 md:w-20 h-0.5 transition-all ${currentStep > step ? 'bg-[#1D1D1F]' : 'bg-gray-300'}`} />}
                                             </React.Fragment>
                                         ))}
                                     </div>
@@ -526,6 +553,7 @@ export default function KYCPage() {
                                             }}
                                         >
                                             <h2
+                                                className="max-lg:!w-full"
                                                 style={{
                                                     width: '686px',
                                                     height: '36px',
@@ -545,18 +573,18 @@ export default function KYCPage() {
                                             </h2>
                                             <div className="flex flex-col gap-[21px]">
                                                 <TextInput label="Name" required error={errors.name} placeholder="Enter Your Full Name" value={formData.personal.name} onChange={(e) => handleTextChange('personal', 'name', e.target.value)} />
-                                                <div className="grid grid-cols-2 gap-[21px]">
+                                                <div className="grid grid-cols-1 md:grid-cols-2 gap-[21px]">
                                                     <TextInput label="Father's / Mother's Name" required placeholder="Placeholder" value={formData.personal.fatherName} onChange={(e) => handleTextChange('personal', 'fatherName', e.target.value)} />
                                                     <TextInput label="Father's / Mother's Number" required isSelect options={['Father', 'Mother']} placeholder="Placeholder" value={formData.personal.fatherPhone} onChange={(e) => handleTextChange('personal', 'fatherPhone', e.target.value)} />
                                                 </div>
                                                 <TextInput label="Personal Email" required placeholder="Placeholder" value={formData.personal.email} onChange={(e) => handleTextChange('personal', 'email', e.target.value)} />
                                                 <TextInput label="Mobile Number" required placeholder="Placeholder" value={formData.personal.phone} onChange={(e) => handleTextChange('personal', 'phone', e.target.value)} />
                                                 <TextInput label="Permanent Address" required placeholder="Placeholder" value={formData.personal.address} onChange={(e) => handleTextChange('personal', 'address', e.target.value)} />
-                                                <div className="grid grid-cols-2 gap-[21px]">
+                                                <div className="grid grid-cols-1 md:grid-cols-2 gap-[21px]">
                                                     <TextInput label="City" required placeholder="Placeholder" value={formData.personal.city} onChange={(e) => handleCityChange('personal', e.target.value)} />
                                                     <TextInput label="State" required isSelect options={INDIAN_STATES} value={formData.personal.state} onChange={(e) => handleStateChange('personal', e.target.value)} />
                                                 </div>
-                                                <div className="grid grid-cols-2 gap-[21px]">
+                                                <div className="grid grid-cols-1 md:grid-cols-2 gap-[21px]">
                                                     <TextInput label="Pincode" required placeholder="Placeholder" value={formData.personal.pincode} onChange={(e) => handlePincodeChange('personal', e.target.value)} />
                                                     <TextInput label="Country" required value="India" readOnly />
                                                 </div>
@@ -598,6 +626,7 @@ export default function KYCPage() {
                                     {currentStep === 2 && (
                                         <div className="flex flex-col pr-2" style={{ width: '100%' }}>
                                             <h2
+                                                className="max-lg:!w-full"
                                                 style={{
                                                     width: '686px', height: '36px', fontFamily: 'Mona Sans, sans-serif',
                                                     fontWeight: '600', fontSize: '20px', color: 'hsla(0, 0%, 20%, 1)',
@@ -609,21 +638,21 @@ export default function KYCPage() {
                                             </h2>
                                             <div className="flex flex-col gap-[21px]">
                                                 <TextInput label="Company Name" required error={errors.companyName} placeholder="Placeholder" value={formData.company.companyName} onChange={(e) => handleTextChange('company', 'companyName', e.target.value)} />
-                                                <div className="grid grid-cols-2 gap-[21px]">
+                                                <div className="grid grid-cols-1 md:grid-cols-2 gap-[21px]">
                                                     <TextInput label="Type of Company" required isSelect options={['Proprietorship', 'Partnership', 'Private Limited', 'Public Limited', 'LLP', 'Other']} error={errors.companyType} placeholder="Placeholder" value={formData.company.companyType} onChange={(e) => handleTextChange('company', 'companyType', e.target.value)} />
                                                     <TextInput label="Approx no. of employee" required error={errors.employees} placeholder="Placeholder" value={formData.company.employees} onChange={(e) => handleTextChange('company', 'employees', e.target.value)} />
                                                 </div>
                                                 <TextInput label="Your Designation" required error={errors.designation} placeholder="Placeholder" value={formData.company.designation} onChange={(e) => handleTextChange('company', 'designation', e.target.value)} />
-                                                <div className="grid grid-cols-2 gap-[21px]">
+                                                <div className="grid grid-cols-1 md:grid-cols-2 gap-[21px]">
                                                     <TextInput label="Duration of Service in the company" required error={errors.duration} placeholder="Placeholder" value={formData.company.duration} onChange={(e) => handleTextChange('company', 'duration', e.target.value)} />
                                                     <TextInput label="Official Company email" required error={errors.email} placeholder="Placeholder" value={formData.company.email} onChange={(e) => handleTextChange('company', 'email', e.target.value)} />
                                                 </div>
                                                 <TextInput label="Company Address" required error={errors.address} placeholder="Placeholder" value={formData.company.address} onChange={(e) => handleTextChange('company', 'address', e.target.value)} />
-                                                <div className="grid grid-cols-2 gap-[21px]">
+                                                <div className="grid grid-cols-1 md:grid-cols-2 gap-[21px]">
                                                     <TextInput label="City" required error={errors.city} placeholder="Placeholder" value={formData.company.city} onChange={(e) => handleCityChange('company', e.target.value)} />
                                                     <TextInput label="State" required isSelect options={INDIAN_STATES} error={errors.state} value={formData.company.state} onChange={(e) => handleStateChange('company', e.target.value)} />
                                                 </div>
-                                                <div className="grid grid-cols-2 gap-[21px]">
+                                                <div className="grid grid-cols-1 md:grid-cols-2 gap-[21px]">
                                                     <TextInput label="Pincode" required error={errors.pincode} placeholder="Placeholder" value={formData.company.pincode} onChange={(e) => handlePincodeChange('company', e.target.value)} />
                                                     <TextInput label="Country" required value="India" readOnly />
                                                 </div>
@@ -660,6 +689,7 @@ export default function KYCPage() {
                                     {currentStep === 3 && (
                                         <div className="flex flex-col pr-2" style={{ width: '100%' }}>
                                             <h2
+                                                className="max-lg:!w-full"
                                                 style={{
                                                     width: '686px', height: '36px', fontFamily: 'Mona Sans, sans-serif',
                                                     fontWeight: '600', fontSize: '20px', color: 'hsla(0, 0%, 20%, 1)',
@@ -675,11 +705,11 @@ export default function KYCPage() {
                                                 <TextInput label="Mobile No." required error={errors.phone} placeholder="Placeholder" value={formData.reference.phone} onChange={(e) => handleTextChange('reference', 'phone', e.target.value)} />
                                                 <TextInput label="Reference Address" required error={errors.address} placeholder="Placeholder" value={formData.reference.address} onChange={(e) => handleTextChange('reference', 'address', e.target.value)} />
                                                 
-                                                <div className="grid grid-cols-2 gap-[21px]">
+                                                <div className="grid grid-cols-1 md:grid-cols-2 gap-[21px]">
                                                     <TextInput label="City" required error={errors.city} placeholder="Placeholder" value={formData.reference.city} onChange={(e) => handleCityChange('reference', e.target.value)} />
                                                     <TextInput label="State" required isSelect options={INDIAN_STATES} error={errors.state} value={formData.reference.state} onChange={(e) => handleStateChange('reference', e.target.value)} />
                                                 </div>
-                                                <div className="grid grid-cols-2 gap-[21px]">
+                                                <div className="grid grid-cols-1 md:grid-cols-2 gap-[21px]">
                                                     <TextInput label="Pincode" required error={errors.pincode} placeholder="Placeholder" value={formData.reference.pincode} onChange={(e) => handlePincodeChange('reference', e.target.value)} />
                                                     <TextInput label="Country" required value="India" readOnly />
                                                 </div>
@@ -716,6 +746,7 @@ export default function KYCPage() {
                                     {currentStep === 4 && (
                                         <div className="flex flex-col pr-2" style={{ width: '100%' }}>
                                             <h2
+                                                className="max-lg:!w-full"
                                                 style={{
                                                     width: '686px', height: '36px', fontFamily: 'Mona Sans, sans-serif',
                                                     fontWeight: '600', fontSize: '20px', color: 'hsla(0, 0%, 20%, 1)',
@@ -794,7 +825,7 @@ export default function KYCPage() {
                                                 </div>
 
                                                 <div 
-                                                    className="flex items-start bg-white"
+                                                    className="flex items-start bg-white max-lg:!w-full"
                                                     style={{
                                                         width: '560px',
                                                         height: '48px',
@@ -815,7 +846,8 @@ export default function KYCPage() {
                                                             border: '1px solid hsla(0, 0%, 69%, 1)'
                                                         }}
                                                     />
-                                                    <p 
+                                                    <p
+                                                        className="max-lg:!w-full"
                                                         style={{
                                                             width: '532px',
                                                             height: '48px',
@@ -854,7 +886,7 @@ export default function KYCPage() {
                         </div>
 
                         {/* Right Column */}
-                        <div className="w-[402px] shrink-0">
+                        <div className="w-full lg:w-[402px] shrink-0">
                             <OrderSummary
                                 securityAmount={securityAmount}
                                 deliveryCharges={deliveryCharges}

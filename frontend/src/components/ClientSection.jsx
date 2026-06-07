@@ -38,7 +38,7 @@ const ClientSection = () => {
         : rawLogos.map((url, i) => ({ id: i, image: url }));
 
     return (
-        <section className="py-24 bg-white">
+        <section className="py-12 bg-white">
             <style jsx global>{`
                 .client-pagination .swiper-pagination-bullet {
                     width: 7px;

@@ -58,7 +58,7 @@ const WhyChooseUs = ({ cmsData = null, overrideBg, overridePaddingTop, hideBorde
                 borderBottom: hideBorder ? 'none' : (viewType !== 'mobile' ? '1px solid var(--color-grey-grey-200, hsla(0, 0%, 89%, 1))' : 'none')
             }}
         >
-            <div className={`max-w-[1200px] mx-auto ${viewType === 'tablet' ? 'px-8' : 'px-4 sm:px-6'}`}>
+            <div className="max-w-[1200px] mx-auto px-4 sm:px-6">
                 <div className={`grid ${viewType === 'desktop' ? 'grid-cols-2' : 'grid-cols-1'} gap-[10px] items-center`}>
 
                     {/* Text Content - always first on mobile */}

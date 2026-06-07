@@ -53,10 +53,8 @@ const AddressModal = ({ isOpen, onClose, onSave, initialData }) => {
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
             <div
-                className="bg-white shadow-2xl overflow-hidden flex flex-col md:flex-row relative"
+                className="bg-white shadow-2xl flex flex-col md:flex-row relative w-full max-w-[808px] h-auto md:h-[480px] max-h-[90vh] overflow-y-auto md:overflow-hidden"
                 style={{
-                    width: '808px',
-                    height: '480px',
                     borderRadius: '18px',
                     border: '1px solid hsla(0, 0%, 93%, 1)',
                     padding: '8px',
@@ -72,8 +70,8 @@ const AddressModal = ({ isOpen, onClose, onSave, initialData }) => {
                     <AiOutlineClose size={14} />
                 </button>
 
-                {/* Left Side: Map */}
-                <div className="flex-1 bg-gray-100 rounded-[12px] overflow-hidden relative">
+                {/* Left Side: Map (desktop only) */}
+                <div className="hidden md:block flex-1 bg-gray-100 rounded-[12px] overflow-hidden relative">
                     <iframe
                         width="100%"
                         height="100%"
@@ -94,17 +92,13 @@ const AddressModal = ({ isOpen, onClose, onSave, initialData }) => {
                 </div>
 
                 {/* Right Side: Form */}
-                <div 
-                    className="flex flex-col pr-2 py-2 overflow-y-auto"
-                    style={{
-                        width: '381px',
-                        height: '464px'
-                    }}
+                <div
+                    className="flex flex-col px-2.5 md:pr-2 md:px-0 py-2 overflow-y-auto w-full md:w-[381px] h-auto md:h-[464px]"
                 >
                     <form onSubmit={handleSubmit} className="flex flex-col" style={{ height: '430px' }}>
                         {/* Fields Container */}
-                        <div className="flex flex-col" style={{ width: '381px', gap: '28px', marginTop: '35px' }}>
-                            <div className="flex flex-col" style={{ width: '381px', gap: '4px' }}>
+                        <div className="flex flex-col w-full" style={{ gap: '28px', marginTop: '35px' }}>
+                            <div className="flex flex-col w-full" style={{ gap: '4px' }}>
                                 <label className="text-sm font-medium text-[#1D1D1F]">Full Name</label>
                                 <input
                                     type="text"
@@ -112,9 +106,8 @@ const AddressModal = ({ isOpen, onClose, onSave, initialData }) => {
                                     value={formData.name}
                                     onChange={handleChange}
                                     placeholder="Enter you full name"
-                                    className="px-4 rounded-[6px] border outline-none transition-all placeholder-gray-300 text-[15px]"
+                                    className="w-full px-4 rounded-[6px] border outline-none transition-all placeholder-gray-300 text-[15px]"
                                     style={{
-                                        width: '381px',
                                         height: '39px',
                                         borderColor: 'hsla(0, 0%, 89%, 1)',
                                         background: 'hsla(0, 0%, 100%, 1)'
@@ -122,7 +115,7 @@ const AddressModal = ({ isOpen, onClose, onSave, initialData }) => {
                                 />
                             </div>
 
-                            <div className="flex gap-4">
+                            <div className="flex flex-col md:flex-row gap-4">
                                 <div className="flex-1 flex flex-col" style={{ gap: '4px' }}>
                                     <label className="text-sm font-medium text-[#1D1D1F]">Street Address <span className="text-red-500">*</span></label>
                                     <input
@@ -159,7 +152,7 @@ const AddressModal = ({ isOpen, onClose, onSave, initialData }) => {
                                 </div>
                             </div>
 
-                            <div className="flex gap-4">
+                            <div className="flex flex-col md:flex-row gap-4">
                                 <div className="flex-1 flex flex-col" style={{ gap: '4px' }}>
                                     <label className="text-sm font-medium text-[#1D1D1F]">Zip Code <span className="text-red-500">*</span></label>
                                     <input
@@ -196,7 +189,7 @@ const AddressModal = ({ isOpen, onClose, onSave, initialData }) => {
                                 </div>
                             </div>
 
-                            <div className="flex flex-col" style={{ width: '381px', gap: '4px' }}>
+                            <div className="flex flex-col w-full" style={{ gap: '4px' }}>
                                 <label className="text-sm font-medium text-[#1D1D1F]">Phone No. <span className="text-red-500">*</span></label>
                                 <input
                                     type="tel"
@@ -205,9 +198,8 @@ const AddressModal = ({ isOpen, onClose, onSave, initialData }) => {
                                     value={formData.phone}
                                     onChange={handleChange}
                                     placeholder="Placeholder"
-                                    className="px-4 rounded-[6px] border outline-none transition-all placeholder-gray-300 text-[15px]"
+                                    className="w-full px-4 rounded-[6px] border outline-none transition-all placeholder-gray-300 text-[15px]"
                                     style={{
-                                        width: '381px',
                                         height: '39px',
                                         borderColor: 'hsla(0, 0%, 89%, 1)',
                                         background: 'hsla(0, 0%, 100%, 1)'
@@ -216,7 +208,7 @@ const AddressModal = ({ isOpen, onClose, onSave, initialData }) => {
                             </div>
                         </div>
 
-                            <div className="flex items-center mt-6" style={{ width: '381px', height: '16px', gap: '12px' }}>
+                            <div className="flex items-center mt-6 w-full" style={{ gap: '12px' }}>
                                 <input
                                     type="checkbox"
                                     id="billing"
@@ -231,9 +223,8 @@ const AddressModal = ({ isOpen, onClose, onSave, initialData }) => {
                         <div className="pt-2">
                             <button
                                 type="submit"
-                                className="flex justify-center items-center transition-all text-black font-medium text-[15px] font-sans"
+                                className="flex justify-center items-center transition-all text-black font-medium text-[15px] font-sans w-full"
                                 style={{
-                                    width: '381px',
                                     height: '35px',
                                     gap: '2px',
                                     borderRadius: '28px', // rounded-4xl approx

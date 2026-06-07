@@ -87,7 +87,7 @@ export default function AddressPage() {
             {/* For now, we assume layout handles the main nav, but we might need the Steps Header */}
 
             {/* Main Content */}
-            <div className="max-w-[1200px] mx-auto px-4 md:px-8 py-[48px]">
+            <div className="max-w-[1200px] mx-auto px-5 md:px-8 pt-5 md:pt-[48px] pb-12 md:pb-[48px]">
                 {/* Breadcrumb - Mocked based on image */}
                 <div className="text-xs text-gray-500 mb-6 flex items-center gap-2">
                     <Link href="/" className="hover:text-black font-medium font-sans">Product-Page</Link>
@@ -100,9 +100,8 @@ export default function AddressPage() {
                 <div className="flex flex-col lg:flex-row items-start w-full min-h-[535px]" style={{ gap: '20px' }}>
                     {/* Left Column: Addresses */}
                     <div
-                        className="relative bg-gray-50/50 flex flex-col transition-all duration-300"
+                        className="relative bg-gray-50/50 flex flex-col transition-all duration-300 w-full lg:w-[746px]"
                         style={{
-                            width: '746px',
                             minHeight: addresses.length > 0 ? '487px' : '200px',
                             borderRadius: '8px', // rounded-md
                             border: '1px dashed hsla(0, 0%, 80%, 1)',
@@ -178,10 +177,9 @@ export default function AddressPage() {
                                 <div
                                     key={addr.id}
                                     onClick={() => setSelectedAddressId(addr.id)}
-                                    className="relative flex items-center justify-between transition-all cursor-pointer hover:shadow-md shrink-0 mb-1"
+                                    className="relative flex items-center justify-between transition-all cursor-pointer hover:shadow-md shrink-0 mb-1 w-full"
                                     style={{
-                                        width: '700px',
-                                        height: '121px',
+                                        minHeight: '121px',
                                         background: 'hsla(0, 0%, 100%, 1)',
                                         borderRadius: '12px',
                                         border: selectedAddressId === addr.id
@@ -211,18 +209,17 @@ export default function AddressPage() {
                                         <div className="flex-shrink-0">
                                             <UserCircleIcon className="w-8 h-8 text-gray-800" />
                                         </div>
-                                        <div className="flex flex-col" style={{ width: '487px', height: '81px', gap: '6px' }}>
-                                            <h3 className="text-[17px] font-semibold text-gray-800 leading-tight">{addr.name}</h3>
-                                            <div className="flex items-center text-[14px] text-gray-700 font-medium overflow-hidden text-ellipsis whitespace-nowrap">
-                                                <span>{addr.addressLine}</span>
-                                                <span className="mx-2 text-gray-300">|</span>
+                                        <div className="flex flex-col flex-1 min-w-0" style={{ minHeight: '81px', gap: '6px' }}>
+                                            <h3 className="text-[15px] md:text-[17px] font-semibold text-gray-800 leading-tight">{addr.name}</h3>
+                                            <p className="text-[12px] md:text-[14px] text-gray-700 font-medium truncate">{addr.addressLine}</p>
+                                            <div className="flex items-center flex-wrap gap-x-2 text-[12px] md:text-[14px] text-gray-700 font-medium">
                                                 <span>{addr.city}</span>
-                                                <span className="mx-2 text-gray-300">|</span>
+                                                <span className="text-gray-300">|</span>
                                                 <span>{addr.pincode}</span>
-                                                <span className="mx-2 text-gray-300">|</span>
+                                                <span className="text-gray-300">|</span>
                                                 <span>{addr.country || 'India'}</span>
                                             </div>
-                                            <p className="text-gray-500 text-[14px] font-medium">{addr.phone}</p>
+                                            <p className="text-gray-500 text-[12px] md:text-[14px] font-medium">{addr.phone}</p>
                                         </div>
                                     </div>
 
@@ -285,7 +282,7 @@ export default function AddressPage() {
                     </div>
 
                     {/* Right Column: Order Summary (Fixed Width: 402px) */}
-                    <div className="w-[402px] shrink-0 min-h-[535px]">
+                    <div className="w-full lg:w-[402px] shrink-0 lg:min-h-[535px]">
                         <OrderSummary
                             securityAmount={securityAmount}
                             deliveryCharges={deliveryCharges}

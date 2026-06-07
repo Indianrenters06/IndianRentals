@@ -102,9 +102,9 @@ const ProductCard = ({ product, index, isDesktop, handleAddToCart }) => {
                         )}
                     </div>
                     <button className="absolute z-20 flex items-center justify-center rounded-full hover:scale-110 transition-all duration-300"
-                        style={{ width: "36px", height: "36px", top: "10.57px", right: "12.51px", backgroundColor: "hsla(0, 0%, 96%, 1)", border: "0.2px solid hsla(0, 0%, 80%, 1)", borderRadius: "100%", padding: "4px" }}
+                        style={{ width: "33px", height: "33px", top: "10.57px", right: "12.51px", backgroundColor: "#F6F6F6", border: "1px solid #EEEEEE", borderRadius: "100%" }}
                         onClick={(e) => { e.preventDefault(); e.stopPropagation(); }}>
-                        <HeartIcon className="w-[32px] h-[32px] text-black" strokeWidth={1} />
+                        <Heart size={21} weight="regular" className="text-black" />
                     </button>
                     <div className="relative w-full h-full p-4 flex items-center justify-center">
                         <motion.img variants={{ initial: { scale: 1 }, hover: { scale: 1.05 } }} src={product.image} alt={product.name} className="max-w-full max-h-full object-contain mix-blend-multiply transition-transform duration-700 ease-out" />
@@ -280,7 +280,7 @@ const BestRentedProducts = ({ type = "bestRented", defaultTitle = "Curated Produ
         <section
             className="w-full overflow-visible bg-white py-10 lg:py-24"
         >
-            <div className="max-w-[1200px] mx-auto px-4 md:px-8">
+            <div className="max-w-[1200px] mx-auto px-4 sm:px-6">
                 <div className="flex flex-col mb-[40px] max-w-[350px] md:max-w-none w-full mx-auto md:mx-0">
                     <div className="flex items-center justify-between">
                         <h2 className="font-manrope tracking-tight whitespace-nowrap text-[24px] md:text-[36px] font-semibold text-[#333] leading-tight md:leading-[48px]">
@@ -298,7 +298,7 @@ const BestRentedProducts = ({ type = "bestRented", defaultTitle = "Curated Produ
                 <div className="hidden md:block relative">
                     <Swiper
                         modules={[Navigation, Autoplay, Scrollbar]}
-                        spaceBetween={24}
+                        spaceBetween={20}
                         slidesPerView={'auto'}
                         navigation={{
                             nextEl: `.swiper-next-${sectionSuffix}`,
@@ -313,7 +313,7 @@ const BestRentedProducts = ({ type = "bestRented", defaultTitle = "Curated Produ
                             delay: 4000,
                             disableOnInteraction: false,
                         }}
-                        className="!pt-6 !pb-[65px] -mt-6 -mb-[65px] !overflow-visible"
+                        className="!pt-6 !pb-[65px] -mt-6 -mb-[65px] !overflow-x-clip !overflow-y-visible"
                     >
                         {products.map((product, index) => (
                             <SwiperSlide key={product.id || index} style={{ width: '285px' }}>

@@ -21,8 +21,99 @@ const CartItem = ({ item, onUpdate, onRemove }) => {
     const [isDurationOpen, setIsDurationOpen] = useState(false);
     const tenureOptions = [1, 3, 6, 9, 12];
 
+    const mobileMonthlyRent = (item.monthlyRent || item.price) * item.quantity;
+    const mobileRefundable = item.refundableAmount * item.quantity;
+
     return (
-        <div className="bg-white p-5 rounded-[12px] border border-[#E3E3E3] shadow-[0px_2px_4px_rgba(0,0,0,0.02)] relative transition-all hover:shadow-md">
+        <>
+        {/* ─────────────── MOBILE CARD (Figma 23788:12072) ─────────────── */}
+        <div className="md:hidden bg-white border-2 border-[#EEEEEE] rounded-[12px] px-3 py-4 flex flex-col gap-2 w-full">
+            {/* Image + Trash */}
+            <div className="flex items-start justify-between w-full">
+                <div className="w-12 h-12 relative shrink-0 rounded-[5px] overflow-hidden bg-white">
+                    {item.image ? (
+                        <Image src={item.image} alt={item.name} fill className="object-contain p-0.5" />
+                    ) : (
+                        <div className="w-full h-full flex items-center justify-center text-gray-300 bg-gray-50 text-[9px]">No Img</div>
+                    )}
+                </div>
+                <button onClick={() => onRemove(item.id)} className="text-gray-700 hover:text-red-500 transition-colors">
+                    <RiDeleteBin6Line size={20} />
+                </button>
+            </div>
+
+            {/* Title + Description */}
+            <div className="flex flex-col w-full text-[#333] tracking-[-0.4px]">
+                <p className="font-bold text-[12px] leading-[18px]">{item.name}</p>
+                <p className="font-semibold text-[10px] leading-[16px]">{item.description}</p>
+            </div>
+
+            <div className="h-px bg-gray-200 w-full" />
+
+            {/* Duration + Quantity */}
+            <div className="flex items-center justify-between w-full">
+                <div className="relative">
+                    <button
+                        onClick={() => setIsDurationOpen(!isDurationOpen)}
+                        className="flex items-center gap-1.5 px-3 py-1.5 bg-white border border-[#CBCBCB] rounded-[8px] text-[14px] text-[#333]"
+                    >
+                        <span>{item.duration} months</span>
+                        <IoIosArrowDown className={`text-gray-500 text-xs transition-transform ${isDurationOpen ? 'rotate-180' : ''}`} />
+                    </button>
+                    {isDurationOpen && (
+                        <div className="absolute top-full left-0 mt-1 w-full min-w-[120px] bg-white border border-gray-200 rounded-lg shadow-lg z-10 overflow-hidden">
+                            {tenureOptions.map((months) => (
+                                <button
+                                    key={months}
+                                    onClick={() => { onUpdate(item.id, { duration: months }); setIsDurationOpen(false); }}
+                                    className="w-full text-left px-3 py-2 text-sm hover:bg-gray-50 flex items-center justify-between"
+                                >
+                                    <span>{months} Months</span>
+                                    {item.duration === months && <BsCheckCircleFill className="text-[#00C853] text-xs" />}
+                                </button>
+                            ))}
+                        </div>
+                    )}
+                </div>
+
+                <div className="h-9 w-px bg-gray-200" />
+
+                <div className="flex items-center gap-2 border border-[#CBCBCB] rounded-[8px] px-3 py-1.5 bg-white">
+                    <button
+                        onClick={() => onUpdate(item.id, { quantity: Math.max(1, item.quantity - 1) })}
+                        disabled={item.quantity <= 1}
+                        className="text-gray-600 hover:text-black disabled:opacity-30"
+                    >
+                        <span className="text-base leading-none block">–</span>
+                    </button>
+                    <span className="text-[10px] font-semibold text-[#333] min-w-[14px] text-center">{item.quantity}</span>
+                    <button
+                        onClick={() => onUpdate(item.id, { quantity: item.quantity + 1 })}
+                        className="text-gray-600 hover:text-black"
+                    >
+                        <span className="text-base leading-none block">+</span>
+                    </button>
+                </div>
+            </div>
+
+            <div className="h-px bg-gray-200 w-full" />
+
+            {/* Monthly Rent | Refundable Amount */}
+            <div className="flex items-center justify-between w-full">
+                <div className="flex flex-col items-center gap-0.5 flex-1">
+                    <p className="text-[10px] text-[#545454] font-medium">Monthly Rent</p>
+                    <p className="text-[14px] font-bold text-[#333]">₹{mobileMonthlyRent}</p>
+                </div>
+                <div className="h-9 w-px bg-gray-200" />
+                <div className="flex flex-col items-center gap-0.5 flex-1">
+                    <p className="text-[10px] text-[#545454] font-medium">Refundable Amount</p>
+                    <p className="text-[14px] font-bold text-[#333]">₹{mobileRefundable}</p>
+                </div>
+            </div>
+        </div>
+
+        {/* ─────────────── DESKTOP CARD ─────────────── */}
+        <div className="hidden md:block bg-white p-5 rounded-[12px] border border-[#E3E3E3] shadow-[0px_2px_4px_rgba(0,0,0,0.02)] relative transition-all hover:shadow-md">
             {/* Top Section: Image and Details */}
             <div className="flex items-start gap-4 mb-4">
                 {/* Image */}
@@ -129,6 +220,7 @@ const CartItem = ({ item, onUpdate, onRemove }) => {
                 </div>
             </div>
         </div>
+        </>
     );
 };
 
@@ -216,13 +308,13 @@ export default function CartPage() {
     }
     return (
         <div className="w-full bg-[#F5F5F5] min-h-screen font-sans" style={{ opacity: 1 }}>
-            <div className="max-w-[1200px] mx-auto px-4 md:px-8 pt-[48px] pb-[48px]">
+            <div className="max-w-[1200px] mx-auto px-5 md:px-8 pt-5 md:pt-[48px] pb-12 md:pb-[48px]">
                 <div
                     className="flex flex-col gap-[16px]"
                 >
                     {/* Breadcrumb */}
                     <nav
-                        className="text-[12px] text-[#808080] flex items-center gap-[8px] mb-[16px]"
+                        className="text-[10px] md:text-[12px] text-[#808080] flex items-center gap-[8px] mb-[16px]"
                     >
                         <span>$[Product-Page]</span>
                         <span className="text-[#808080] text-[12px]">›</span>
@@ -240,18 +332,25 @@ export default function CartPage() {
                         <div
                             className="flex-1 flex flex-col w-full"
                         >
-                            <h1 className="text-[32px] font-bold text-gray-900 flex items-center gap-3 mb-4">
+                            {/* Desktop title (above the box) */}
+                            <h1 className="hidden md:flex text-[32px] font-bold text-gray-900 items-center gap-3 mb-4">
                                 Your Cart <ShoppingCartSimple className="text-[#333C4E]" size={32} weight="fill" />
                             </h1>
-                            <div className="flex flex-col gap-[12px] p-[20px] bg-white rounded-[12px] border border-[#F0F0F0] shadow-sm">
+                            {/* Wrapper: dashed border on mobile, white box on desktop */}
+                            <div className="flex flex-col gap-3 border border-dashed border-[#CBCBCB] rounded-[8px] pt-5 pb-[30px] px-3 bg-transparent md:border-solid md:border-[#F0F0F0] md:rounded-[12px] md:p-[20px] md:bg-white md:shadow-sm">
+                                {/* Mobile title (inside dashed box) */}
+                                <div className="flex md:hidden items-center gap-2">
+                                    <p className="text-[20px] font-semibold text-[#545454] tracking-[-0.8px]">Your Cart</p>
+                                    <ShoppingCartSimple className="text-[#333C4E]" size={24} weight="fill" />
+                                </div>
                                 {cartItems.map(item => (
-                                <CartItem
-                                    key={item.id}
-                                    item={item}
-                                    onUpdate={updateItem}
-                                    onRemove={removeItem}
-                                />
-                            ))}
+                                    <CartItem
+                                        key={item.id}
+                                        item={item}
+                                        onUpdate={updateItem}
+                                        onRemove={removeItem}
+                                    />
+                                ))}
                             </div>
                         </div>
 
@@ -261,9 +360,9 @@ export default function CartPage() {
                         >
                             {/* Coupon Section */}
                             <div className="bg-white p-5 rounded-2xl border border-[#E3E3E3] shadow-sm">
-                                <div 
-                                    className="flex mb-4"
-                                    style={{ width: '362px', height: '39px', gap: '11px' }}
+                                <div
+                                    className="flex mb-4 w-full"
+                                    style={{ height: '39px', gap: '11px' }}
                                 >
                                     <input
                                         type="text"

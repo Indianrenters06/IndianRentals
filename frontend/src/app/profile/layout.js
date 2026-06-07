@@ -55,11 +55,11 @@ export default function ProfileLayout({ children }) {
     const isActive = (path) => pathname === path;
 
     return (
-        <div className="w-full bg-[#F5F5F5] min-h-screen" style={{ opacity: 1 }}>
-            <div className="max-w-[1440px] mx-auto flex items-start justify-center py-[10px]" style={{ height: '818px' }}>
-                <div className="max-w-[1200px] w-full mx-auto px-4 md:px-8 flex flex-col lg:flex-row gap-[20px] h-full">
-                    {/* Sidebar */}
-                    <div className="lg:w-[245px] flex-shrink-0 h-full">
+        <div className="w-full bg-white lg:bg-[#F5F5F5] min-h-screen" style={{ opacity: 1 }}>
+            <div className="max-w-[1440px] mx-auto flex items-start justify-center py-0 lg:py-[10px] h-auto lg:h-[818px]">
+                <div className="max-w-[1200px] w-full mx-auto px-5 md:px-8 flex flex-col lg:flex-row gap-[20px] h-full">
+                    {/* Sidebar (desktop only) */}
+                    <div className="hidden lg:block lg:w-[245px] flex-shrink-0 h-full">
                         <div className="bg-white border border-[#E3E3E3] rounded-[10px] p-6 h-full flex flex-col">
                             <div className="flex items-center gap-3 mb-8">
                                 <div className="w-[60px] h-[60px] rounded-full bg-gray-100 flex items-center justify-center text-gray-400 overflow-hidden ring-1 ring-gray-100">
@@ -113,9 +113,9 @@ export default function ProfileLayout({ children }) {
                     </div>
 
                     {/* Main Content */}
-                    <div className="flex-1 bg-white border border-[#E3E3E3] rounded-[9px] p-10 h-full relative overflow-y-auto overflow-hidden">
-                        {/* The dashed border inner wrapper as seen in screenshot */}
-                        <div className="absolute inset-4 pointer-events-none rounded-[16px]">
+                    <div className="flex-1 bg-white lg:border lg:border-[#E3E3E3] rounded-none lg:rounded-[9px] py-5 lg:p-10 h-auto lg:h-full relative overflow-visible lg:overflow-y-auto">
+                        {/* The dashed border inner wrapper (desktop only) */}
+                        <div className="hidden lg:block absolute inset-4 pointer-events-none rounded-[16px]">
                             <svg className="w-full h-full overflow-visible">
                                 <rect
                                     x="0.5" y="0.5"

@@ -15,10 +15,10 @@ import {
 import { API } from '../services/apiConfig';
 
 const FALLBACK_STEPS = [
-    { title: "Choose Your Tech", description: "Browse our curated selection of premium, performance\ntested devices. Use the search or categories to find the\nperfect tool for your needs.", icon: "Dot", highlight: true },
-    { title: "Complete KYC", description: "Pick a flexible rental tenure from 1 to 12 months. Then, complete our KYC process online with your basic documents (PAN and Address Proof).", icon: "IdentificationCard", highlight: false },
-    { title: "Secure Your Order", description: "Confirm your rental and complete the payment online. This includes the first month's rent and a fully refundable security deposit.", icon: "ShoppingCart", highlight: false },
-    { title: "Receive & Create", description: "We deliver your tech right to your doorstep, typically within 2-3 business days. It arrives fully charged, sanitized, and ready to use straight out of the box. Now, go build something amazing!", icon: "https://res.cloudinary.com/dgkckcdk8/image/upload/v1776112294/package_snga2a.svg", highlight: false }
+    { title: "Choose Your Tech", description: "Browse our curated selection of premium, performance\ntested devices. Use the search or categories to find the\nperfect tool for your needs.", icon: "https://res.cloudinary.com/dgkckcdk8/image/upload/v1780664193/Layer_1_zh0doe.svg", highlight: true },
+    { title: "Complete KYC", description: "Pick a flexible rental tenure from 1 to 12 months. Then, complete our KYC process online with your basic documents (PAN and Address Proof).", icon: "https://res.cloudinary.com/dgkckcdk8/image/upload/v1780664193/Group_hss8ee.svg", highlight: false },
+    { title: "Secure Your Order", description: "Confirm your rental and complete the payment online. This includes the first month's rent and a fully refundable security deposit.", icon: "https://res.cloudinary.com/dgkckcdk8/image/upload/v1780664191/Layer_1_2_glmfc6.svg", highlight: false },
+    { title: "Receive & Create", description: "We deliver your tech right to your doorstep, typically within 2-3 business days. It arrives fully charged, sanitized, and ready to use straight out of the box. Now, go build something amazing!", icon: "https://res.cloudinary.com/dgkckcdk8/image/upload/v1780664543/Layer_1_3_nxnmvx.svg", highlight: false }
 ];
 
 const ICON_MAP = {
@@ -286,8 +286,8 @@ const RentalProcess = ({ cmsData = null }) => {
             className="w-full overflow-hidden bg-white"
             style={{
                 width: '100%',
-                paddingTop: '96px',
-                paddingBottom: '96px',
+                paddingTop: '48px',
+                paddingBottom: '48px',
                 background: '#FFFFFF',
             }}
         >

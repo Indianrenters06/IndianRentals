@@ -1,7 +1,8 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { PiInfo, PiUserCircleFill, PiCaretRightBold, PiSpinnerGap } from 'react-icons/pi';
+import Link from 'next/link';
+import { PiInfo, PiUserCircleFill, PiCaretRightBold, PiSpinnerGap, PiArrowLeft } from 'react-icons/pi';
 import { GoChevronDown } from 'react-icons/go';
 import axios from 'axios';
 
@@ -55,8 +56,13 @@ export default function ProfileSettingsPage() {
     };
 
     return (
-        <div className="bg-white min-h-screen rounded-2xl p-8 border border-gray-100">
-            <h1 className="text-3xl font-medium text-gray-800 mb-6">Profile Settings</h1>
+        <div className="bg-white min-h-screen rounded-2xl p-5 lg:p-8 border border-gray-100">
+            <div className="flex items-center gap-3 mb-6">
+                <Link href="/profile" aria-label="Back to menu" className="lg:hidden text-gray-800 shrink-0">
+                    <PiArrowLeft size={24} />
+                </Link>
+                <h1 className="text-3xl font-medium text-gray-800">Profile Settings</h1>
+            </div>
 
             <div className="h-px bg-gray-200 w-full mb-6"></div>
 
@@ -70,13 +76,13 @@ export default function ProfileSettingsPage() {
             </div>
 
             {/* Profile Picture Section */}
-            <div className="flex items-center gap-6 mb-10">
-                <div className="w-20 h-20 text-gray-600 rounded-full overflow-hidden">
+            <div className="flex items-center gap-4 mb-10">
+                <div className="w-16 h-16 lg:w-20 lg:h-20 text-gray-600 rounded-full overflow-hidden shrink-0">
                     <PiUserCircleFill className="w-full h-full" />
                 </div>
-                <div className="flex items-center gap-4">
-                    <span className="text-gray-600 font-medium">Profile Picture</span>
-                    <button className="bg-[#333] hover:bg-black text-white px-6 py-2 rounded-full text-sm font-medium transition-colors">
+                <div className="flex items-center gap-3">
+                    <span className="text-gray-600 font-medium text-sm lg:text-base">Change Profile Pic</span>
+                    <button className="bg-[#333] hover:bg-black text-white px-5 py-2 rounded-full text-sm font-medium transition-colors shrink-0">
                         Update
                     </button>
                 </div>

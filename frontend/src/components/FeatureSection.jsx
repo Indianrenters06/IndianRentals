@@ -42,8 +42,8 @@ const FeatureSection = () => {
     const stats = cms.featureSectionStats || [];
 
     return (
-        <section className="w-full bg-white overflow-hidden text-black py-16 lg:py-24">
-            <div className="w-full max-w-[1200px] mx-auto px-4 md:px-8">
+        <section className="w-full bg-white overflow-hidden text-black py-0">
+            <div className="w-full max-w-[1200px] mx-auto px-4 sm:px-6">
                 {/* Inner radial gradient container */}
                 <div
                     className="w-full relative flex flex-col lg:flex-row items-center justify-between overflow-hidden"

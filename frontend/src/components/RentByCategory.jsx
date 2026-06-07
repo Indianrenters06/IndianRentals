@@ -160,7 +160,7 @@ const RentByCategory = () => {
 
     return (
         <section
-            className="py-6 md:py-16 relative overflow-hidden"
+            className="py-6 md:pt-12 md:pb-24 relative overflow-hidden"
             style={{
                 background: 'var(--color-grey-grey-50, hsla(0, 0%, 96%, 1))'
             }}

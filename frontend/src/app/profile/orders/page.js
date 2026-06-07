@@ -103,7 +103,7 @@ export default function MyOrdersPage() {
             <div className="flex gap-4 mb-6">
                 <button
                     onClick={() => handleViewChange('orders')}
-                    className={`px-8 py-1 rounded-full text-lg font-normal transition-all ${viewType === 'orders'
+                    className={`flex-1 md:flex-none px-8 py-1 rounded-full text-lg font-normal transition-all ${viewType === 'orders'
                         ? 'bg-[#333] text-white shadow-md'
                         : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                         }`}
@@ -112,7 +112,7 @@ export default function MyOrdersPage() {
                 </button>
                 <button
                     onClick={() => handleViewChange('subscriptions')}
-                    className={`px-8 py-1 rounded-full text-lg font-normal transition-all ${viewType === 'subscriptions'
+                    className={`flex-1 md:flex-none px-8 py-1 rounded-full text-lg font-normal transition-all ${viewType === 'subscriptions'
                         ? 'bg-[#333] text-white shadow-md'
                         : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                         }`}
@@ -122,7 +122,7 @@ export default function MyOrdersPage() {
             </div>
 
             {/* Tabs */}
-            <div className="flex items-center gap-8 border-b border-gray-200 mb-2 overflow-x-auto pb-1 scrollbar-hide">
+            <div className="flex flex-wrap items-center gap-x-6 gap-y-2 md:gap-8 border-b border-gray-200 mb-2 pb-1 md:overflow-x-auto md:flex-nowrap scrollbar-hide">
                 {currentTabs.map((tab) => (
                     <button
                         key={tab}
@@ -227,7 +227,7 @@ export default function MyOrdersPage() {
                             </div>
 
                             {/* Action Buttons */}
-                            <div className="flex flex-col gap-3 min-w-[140px] items-end justify-center">
+                            <div className="flex flex-col gap-3 w-full md:w-auto md:min-w-[140px] items-stretch md:items-end justify-center mt-2 md:mt-0">
                                 {viewType === 'subscriptions' ? (
                                     order.status === 'Inactive' ? (
                                         <>
@@ -258,10 +258,10 @@ export default function MyOrdersPage() {
                                     </button>
                                 ) : (
                                     <>
-                                        <button className="bg-[#007bff] hover:bg-[#0069d9] text-white text-sm font-medium py-1 px-2 rounded-full transition-colors shadow-sm w-full">
+                                        <button className="bg-[#007bff] hover:bg-[#0069d9] text-white text-sm font-medium py-2.5 md:py-1 px-2 rounded-full transition-colors shadow-sm w-full">
                                             Invoices
                                         </button>
-                                        <button className="text-gray-800 text-xs font-semibold underline text-center w-full">
+                                        <button className="text-gray-800 text-sm md:text-xs font-semibold underline text-center w-full">
                                             Cancel My Order
                                         </button>
                                     </>

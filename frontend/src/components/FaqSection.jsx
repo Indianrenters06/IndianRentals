@@ -114,124 +114,65 @@ const FaqSection = ({ cmsData, limit, pageName }) => {
                 alignItems: 'center'
             }}
         >
-            <div 
-                className="max-w-[1200px] mx-auto px-4 md:px-8 w-full flex flex-col lg:flex-row justify-between items-start gap-[100px]"
+            <div
+                className="max-w-[1200px] mx-auto px-5 sm:px-6 w-full flex flex-col lg:flex-row justify-between items-start gap-6 lg:gap-[100px]"
             >
                 {/* Left Column */}
-                <div 
-                    className="w-full lg:max-w-[442px] flex flex-col gap-[20px]"
-                    style={{
-                        minHeight: '190px'
-                    }}
+                <div
+                    className="w-full lg:max-w-[442px] flex flex-col gap-[20px] lg:min-h-[190px]"
                 >
-                    <h2 
-                        style={{
-                            width: 'auto',
-                            maxWidth: '442px',
-                            height: 'auto',
-                            fontFamily: "'Mona Sans', sans-serif",
-                            fontWeight: 600,
-                            fontSize: '36px',
-                            lineHeight: '45px',
-                            letterSpacing: '-0.02em',
-                            color: 'hsla(0, 0%, 20%, 1)',
-                            margin: 0,
-                            marginBottom: '12px'
-                        }}
+                    {/* Heading — on mobile the eyebrow (subtitle) sits above the title */}
+                    <h2
+                        className="order-2 md:order-1 m-0 font-semibold text-[#333] tracking-[-0.02em] max-w-[442px] text-[25px] leading-[31px] md:text-[36px] md:leading-[45px]"
+                        style={{ fontFamily: "'Mona Sans', sans-serif" }}
                     >
                         {title}
                     </h2>
-                    <span 
-                        className="block"
-                        style={{
-                            width: 'auto',
-                            maxWidth: '442px',
-                            height: 'auto',
-                            fontFamily: "'Mona Sans', sans-serif",
-                            fontWeight: 500,
-                            fontSize: '36px',
-                            lineHeight: '45px',
-                            letterSpacing: '-0.02em',
-                            color: 'hsla(0, 0%, 20%, 1)'
-                        }}
-                    >
-                        {subtitle}
-                    </span>
+                    {subtitle && (
+                        <span
+                            className="order-1 md:order-2 block text-[#333] tracking-[-0.02em] max-w-[442px] font-semibold md:font-medium text-[20px] leading-[26px] md:text-[36px] md:leading-[45px]"
+                            style={{ fontFamily: "'Mona Sans', sans-serif" }}
+                        >
+                            {subtitle}
+                        </span>
+                    )}
                 </div>
 
                 {/* Right Column - Accordion */}
-                <div 
-                    className="w-full lg:flex-1 lg:max-w-[758px]"
-                    style={{
-                        minHeight: '568px',
-                        borderBottom: '1px solid hsla(0, 0%, 69%, 1)'
-                    }}
+                <div
+                    className="w-full lg:flex-1 lg:max-w-[758px] lg:min-h-[568px] border-b border-[hsla(0,0%,69%,1)]"
                 >
                     <div className="space-y-0">
                         {displayFaqs.map((faq, index) => (
-                            <div 
-                                key={index} 
-                                className="w-full"
-                                style={{
-                                    borderTop: '1px solid hsla(0, 0%, 69%, 1)',
-                                    height: activeIndices.includes(index) ? 'auto' : '72px',
-                                    minHeight: activeIndices.includes(index) ? '142px' : '72px',
-                                    overflow: 'hidden'
-                                }}
+                            <div
+                                key={index}
+                                className={`w-full overflow-hidden border-t border-[hsla(0,0%,69%,1)] ${activeIndices.includes(index) ? 'h-auto md:min-h-[142px]' : 'h-auto md:h-[72px]'}`}
                             >
                                 <button
-                                    className="w-full flex items-center justify-between text-left focus:outline-none group gap-[24px]"
-                                    style={{
-                                        height: '72px',
-                                        paddingTop: '20px',
-                                        paddingBottom: '20px'
-                                    }}
+                                    className="w-full flex items-center justify-between text-left focus:outline-none group gap-[24px] py-2 md:py-5 md:h-[72px]"
                                     onClick={() => toggleFaq(index)}
                                 >
-                                    <span 
-                                        className="group-hover:text-blue-600 transition-colors"
-                                        style={{
-                                            width: 'auto',
-                                            maxWidth: '702px',
-                                            height: '25px',
-                                            fontFamily: "'Mona Sans', sans-serif",
-                                            fontWeight: 700,
-                                            fontSize: '18px',
-                                            lineHeight: '25px',
-                                            letterSpacing: '0.01em',
-                                            color: 'hsla(0, 0%, 20%, 1)'
-                                        }}
+                                    <span
+                                        className="group-hover:text-blue-600 transition-colors font-bold text-[#333] tracking-[0.01em] max-w-[702px] text-sm md:text-[18px] leading-[20px] md:leading-[25px]"
+                                        style={{ fontFamily: "'Mona Sans', sans-serif" }}
                                     >
                                         {faq.question}
                                     </span>
-                                    <span className="flex-shrink-0 text-gray-400 group-hover:text-blue-600 transition-colors">
+                                    <span className="flex-shrink-0 text-gray-400 group-hover:text-blue-600 transition-colors text-[20px] md:text-[24px]">
                                         {activeIndices.includes(index) ? (
-                                            <PiCaretUp size={24} />
+                                            <PiCaretUp />
                                         ) : (
-                                            <PiCaretDown size={24} />
+                                            <PiCaretDown />
                                         )}
                                     </span>
                                 </button>
                                 <div
-                                    className={`overflow-hidden transition-all duration-300 ease-in-out ${activeIndices.includes(index) ? 'max-h-[500px] opacity-100' : 'max-h-0 opacity-0'
+                                    className={`overflow-hidden transition-all duration-300 ease-in-out ${activeIndices.includes(index) ? 'max-h-[500px] opacity-100 pb-3 md:pb-6' : 'max-h-0 opacity-0'
                                         }`}
-                                    style={{
-                                        paddingBottom: activeIndices.includes(index) ? '24px' : '0'
-                                    }}
                                 >
-                                    <p 
-                                        style={{
-                                            width: 'auto',
-                                            maxWidth: '758px',
-                                            height: 'auto',
-                                            fontFamily: "'Mona Sans', sans-serif",
-                                            fontWeight: 400,
-                                            fontSize: '14px',
-                                            lineHeight: '23px',
-                                            letterSpacing: '0.01em',
-                                            color: 'hsla(0, 0%, 33%, 1)',
-                                            margin: 0
-                                        }}
+                                    <p
+                                        className="m-0 font-normal text-[hsla(0,0%,33%,1)] tracking-[0.01em] max-w-[758px] text-xs md:text-[14px] leading-[18px] md:leading-[23px]"
+                                        style={{ fontFamily: "'Mona Sans', sans-serif" }}
                                     >
                                         {faq.answer}
                                     </p>

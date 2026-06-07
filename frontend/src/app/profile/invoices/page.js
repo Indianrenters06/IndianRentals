@@ -1,7 +1,8 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { PiDownloadSimpleBold, PiSpinnerGap, PiReceipt } from 'react-icons/pi';
+import Link from 'next/link';
+import { PiDownloadSimpleBold, PiSpinnerGap, PiReceipt, PiArrowLeft } from 'react-icons/pi';
 import axios from 'axios';
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
@@ -45,10 +46,15 @@ export default function MyInvoicesPage() {
     }, []);
 
     return (
-        <div className="bg-white min-h-screen rounded-2xl p-8 relative">
+        <div className="bg-white min-h-screen rounded-2xl p-5 lg:p-8 relative">
             {/* Header */}
             <div className="mb-8">
-                <h1 className="text-3xl font-medium text-gray-800 mb-2">My Invoices</h1>
+                <div className="flex items-center gap-3 mb-2">
+                    <Link href="/profile" aria-label="Back to menu" className="lg:hidden text-gray-800 shrink-0">
+                        <PiArrowLeft size={24} />
+                    </Link>
+                    <h1 className="text-3xl font-medium text-gray-800">My Invoices</h1>
+                </div>
                 <p className="text-gray-500 text-sm">All your rental invoices are listed below.</p>
             </div>
 
@@ -64,7 +70,8 @@ export default function MyInvoicesPage() {
                     <p className="text-xs mt-1">Once you place a rental order, invoices will appear here.</p>
                 </div>
             ) : (
-                <>
+                <div className="overflow-x-auto -mx-5 px-5 lg:mx-0 lg:px-0">
+                  <div className="min-w-[720px]">
                     {/* Table Header */}
                     <div className="grid grid-cols-7 gap-4 mb-4 text-sm font-medium text-gray-900 px-4">
                         <div className="col-span-1">Invoice Date</div>
@@ -97,7 +104,8 @@ export default function MyInvoicesPage() {
                             </div>
                         ))}
                     </div>
-                </>
+                  </div>
+                </div>
             )}
         </div>
     );

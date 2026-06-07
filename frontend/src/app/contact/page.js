@@ -67,416 +67,203 @@ export default function ContactPage() {
         }
     };
 
+    // Shared contact-detail row — icon badge + label/value
+    const ContactRow = ({ Icon, label, children }) => (
+        <div className="flex items-center gap-5 w-full">
+            <div className="rounded-full flex items-center justify-center shrink-0 w-[45px] h-[45px] bg-[#d6f1ff]">
+                <div className="rounded-full flex items-center justify-center w-[34px] h-[34px] bg-[#edfaff]">
+                    <Icon className="w-4 h-4 text-[#0d4e9b]" strokeWidth={2} />
+                </div>
+            </div>
+            <div className="flex-1 min-w-0">
+                <h3 className="font-sans font-semibold text-[#333] text-[10px] md:text-[12px] leading-4 mb-1">{label}</h3>
+                {children}
+            </div>
+        </div>
+    );
+
     return (
         <div className="font-sans text-gray-800 bg-white">
             {/* Outer Page Wrapper */}
-            <div
-                className="w-full flex flex-col"
-                style={{
-                    paddingTop: '28px',
-                    gap: '0px',
-                    background: 'var(--Color-Scheme-1-Background, hsla(0, 0%, 100%, 1))',
-                    opacity: 1
-                }}
-            >
-                {/* Banner Wrapper (Centered grid with responsive protection) */}
-                <div className="w-full max-w-[1200px] mx-auto px-4 md:px-8">
-                    {/* Inner Banner Container */}
-                    <div
-                        className="relative overflow-hidden flex items-center justify-center shrink-0 w-full mx-auto"
-                        style={{
-                            height: '500px',
-                            gap: '10px',
-                            borderRadius: '32px',
-                            opacity: 1
-                        }}
-                    >
-                        <Image
-                            src={bannerImage}
-                            alt={bannerTitle}
-                            fill
-                            className="object-cover object-top"
-                        />
-                        <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                            <h1
-                                className="text-white drop-shadow-md relative z-10"
-                                style={{
-                                    fontFamily: '"Mona Sans", sans-serif',
-                                    fontWeight: 600,
-                                    fontSize: '48px',
-                                    lineHeight: '1.2'
-                                }}
-                            >
-                                {bannerTitle}
-                            </h1>
-                        </div>
+            <div className="w-full flex flex-col pt-5 md:pt-7 bg-white">
+
+                {/* Banner */}
+                <div className="w-full max-w-[1200px] mx-auto px-5 md:px-8">
+                    <div className="relative overflow-hidden flex items-center justify-center w-full mx-auto rounded-2xl md:rounded-[32px] h-[197px] md:h-[500px]">
+                        <Image src={bannerImage} alt={bannerTitle} fill className="object-cover object-top" />
+                        <div className="absolute inset-0 bg-black/20 md:bg-transparent" />
+                        <h1 className="relative z-10 text-white drop-shadow-md font-semibold font-sans text-base md:text-5xl">
+                            {bannerTitle}
+                        </h1>
                     </div>
                 </div>
 
-                {/* Contact Content Section (1440px Outer Wrapper) */}
-                <section
-                    className="w-full relative mx-auto"
-                    style={{
-                        maxWidth: '1440px',
-                        height: '676px',
-                        paddingTop: '48px',
-                        paddingBottom: '96px',
-                        background: 'hsla(0, 0%, 100%, 1)',
-                        opacity: 1,
-                        angle: '0deg'
-                    }}
-                >
-                    {/* Inner Alignment Wrapper (1200px Content Boundary with side gaps) */}
-                    <div className="max-w-[1200px] mx-auto w-full px-4 md:px-8">
-                        {/* Grid Layer */}
-                        <div
-                            className="flex flex-col lg:flex-row"
-                            style={{
-                                minHeight: '532px',
-                                gap: '48px'
-                            }}
-                        >
+                {/* Contact Content Section */}
+                <section className="w-full mx-auto max-w-[1440px] pt-12 pb-12 md:pb-24 bg-white">
+                    <div className="max-w-[1200px] mx-auto w-full px-5 md:px-8">
+                        <div className="flex flex-col lg:flex-row gap-8 lg:gap-12">
+
                             {/* Left Column: Contact Info */}
-                            <div
-                                className="flex flex-col shrink-0"
-                                style={{
-                                    maxWidth: '576px',
-                                    width: '100%',
-                                    height: '516.900390625px',
-                                    gap: '20px',
-                                    paddingTop: '16px',
-                                    paddingBottom: '16px',
-                                    opacity: 1,
-                                    angle: '0deg'
-                                }}
-                            >
+                            <div className="flex flex-col w-full lg:max-w-[576px] gap-5 py-4">
                                 {/* City Pills */}
-                                <div className="grid grid-cols-4" style={{ maxWidth: '576px', width: '100%', height: '78px', rowGap: '10px', columnGap: '4px', opacity: 1 }}>
+                                <div className="grid grid-cols-4 gap-x-1 gap-y-2.5 w-full">
                                     {Object.keys(cityDetails).map((city) => (
                                         <button
                                             key={city}
                                             onClick={() => setSelectedCity(city)}
-                                            className={`flex items-center justify-center font-sans font-light text-[13px] transition-all whitespace-nowrap ${selectedCity === city ? 'text-white' : 'text-black hover:bg-gray-200'
-                                                }`}
-                                            style={{
-                                                width: '141px',
-                                                height: '34px',
-                                                gap: '10px',
-                                                paddingTop: '7px',
-                                                paddingRight: '40px',
-                                                paddingBottom: '7px',
-                                                paddingLeft: '40px',
-                                                borderRadius: '59px',
-                                                background: selectedCity === city ? 'hsla(0, 0%, 20%, 1)' : 'var(--color-grey-grey-100, #F3F4F6)',
-                                                opacity: 1
-                                            }}
+                                            className={`flex items-center justify-center rounded-[59px] font-sans font-light whitespace-nowrap overflow-hidden transition-all text-[10px] md:text-[13px] px-1 md:px-10 py-[7px] ${selectedCity === city ? 'bg-[#333] text-white' : 'bg-[#eee] text-black hover:bg-gray-200'}`}
                                         >
                                             {city}
                                         </button>
                                     ))}
                                 </div>
 
-                                {/* Contact Details Wrapper */}
-                                <div
-                                    className="flex flex-col flex-1"
-                                    style={{
-                                        width: '576px',
-                                        height: '282px',
-                                        gap: '20px',
-                                        opacity: 1,
-                                        angle: '0deg'
-                                    }}
-                                >
-                                    {/* Address */}
-                                    <div className="flex items-center" style={{ maxWidth: '576px', width: '100%', height: '66px', gap: '20px', marginTop: '14px', opacity: 1, angle: '0deg' }}>
-                                        <div className="rounded-full flex items-center justify-center shrink-0 relative" style={{ width: '45px', height: '45px', background: 'hsla(200, 100%, 92%, 1)', opacity: 1, angle: '0deg' }}>
-                                            <div className="rounded-full flex items-center justify-center text-[#024E82]" style={{ width: '34px', height: '34px', background: 'hsla(197, 100%, 96%, 1)', position: 'absolute', top: '6px', left: '6px', opacity: 1, angle: '0deg' }}>
-                                                <MapPinIcon
-                                                    className="text-[hsla(213, 85%, 33%, 1)]"
-                                                    style={{
-                                                        width: '16px',
-                                                        height: '16px',
-                                                        position: 'absolute',
-                                                        top: '9px',
-                                                        left: '9px',
-                                                        strokeWidth: '2'
-                                                    }}
-                                                />
-                                            </div>
-                                        </div>
-                                        <div style={{ width: '511px', height: '46px', opacity: 1 }}>
-                                            <h3 className="font-sans" style={{ width: '511px', height: '20px', fontSize: '12px', lineHeight: '16px', fontWeight: 600, color: 'hsla(0, 0%, 20%, 1)', marginBottom: '4px' }}>Address</h3>
-                                            <p className="font-sans" style={{ fontSize: '14px', lineHeight: '20px', color: 'hsla(213, 85%, 33%, 1)', fontWeight: 400 }}>
-                                                {cms?.contactAddress || cityDetails[selectedCity].address}
-                                            </p>
-                                        </div>
-                                    </div>
+                                {/* Contact Details */}
+                                <div className="flex flex-col gap-5 w-full mt-2 md:mt-3.5">
+                                    <ContactRow Icon={MapPinIcon} label="Address">
+                                        <p className="font-sans font-normal text-[#0d4e9b] text-xs md:text-[14px] leading-[18px] md:leading-5">
+                                            {cms?.contactAddress || cityDetails[selectedCity].address}
+                                        </p>
+                                    </ContactRow>
 
-                                    {/* Phone */}
-                                    <div className="flex gap-6 items-center" style={{ maxWidth: '576px', width: '100%', minHeight: '66px', gap: '20px' }}>
-                                        <div className="rounded-full flex items-center justify-center shrink-0 relative" style={{ width: '45px', height: '45px', background: 'hsla(200, 100%, 92%, 1)', opacity: 1, angle: '0deg' }}>
-                                            <div className="rounded-full flex items-center justify-center text-[#024E82]" style={{ width: '34px', height: '34px', background: 'hsla(197, 100%, 96%, 1)', position: 'absolute', top: '6px', left: '6px', opacity: 1, angle: '0deg' }}>
-                                                <PhoneIcon
-                                                    className="text-[hsla(213, 85%, 33%, 1)]"
-                                                    style={{
-                                                        width: '16px',
-                                                        height: '16px',
-                                                        position: 'absolute',
-                                                        top: '9px',
-                                                        left: '9px',
-                                                        strokeWidth: '2'
-                                                    }}
-                                                />
-                                            </div>
-                                        </div>
-                                        <div style={{ width: '511px', height: '46px', opacity: 1 }}>
-                                            <h3 className="font-sans" style={{ width: '511px', height: '20px', fontSize: '12px', lineHeight: '16px', fontWeight: 600, color: 'hsla(0, 0%, 20%, 1)', marginBottom: '6px' }}>Phone</h3>
-                                            <p className="font-sans" style={{ fontSize: '14px', lineHeight: '20px', color: 'hsla(213, 85%, 33%, 1)', fontWeight: 400 }}>
-                                                {cms?.contactPhone || cityDetails[selectedCity].phone} (Support)
-                                            </p>
-                                        </div>
-                                    </div>
+                                    <ContactRow Icon={PhoneIcon} label="Phone">
+                                        <p className="font-sans font-normal text-[#0d4e9b] text-xs md:text-[14px] leading-[18px] md:leading-5">
+                                            {cms?.contactPhone || cityDetails[selectedCity].phone} (Support)
+                                        </p>
+                                    </ContactRow>
 
-                                    {/* Email */}
-                                    <div className="flex gap-6 items-center" style={{ maxWidth: '576px', width: '100%', minHeight: '66px', gap: '20px' }}>
-                                        <div className="rounded-full flex items-center justify-center shrink-0 relative" style={{ width: '45px', height: '45px', background: 'hsla(200, 100%, 92%, 1)', opacity: 1, angle: '0deg' }}>
-                                            <div className="rounded-full flex items-center justify-center text-[#024E82]" style={{ width: '34px', height: '34px', background: 'hsla(197, 100%, 96%, 1)', position: 'absolute', top: '6px', left: '6px', opacity: 1, angle: '0deg' }}>
-                                                <EnvelopeIcon
-                                                    className="text-[hsla(213, 85%, 33%, 1)]"
-                                                    style={{
-                                                        width: '16px',
-                                                        height: '16px',
-                                                        position: 'absolute',
-                                                        top: '9px',
-                                                        left: '9px',
-                                                        strokeWidth: '2'
-                                                    }}
-                                                />
-                                            </div>
-                                        </div>
-                                        <div style={{ width: '511px', height: '46px', opacity: 1 }}>
-                                            <h3 className="font-sans" style={{ width: '511px', height: '20px', fontSize: '12px', lineHeight: '16px', fontWeight: 600, color: 'hsla(0, 0%, 20%, 1)', marginBottom: '4px' }}>Email</h3>
-                                            <a href={`mailto:${cms?.contactEmail || cityDetails[selectedCity].email}`} className="font-sans hover:underline" style={{ fontSize: '14px', lineHeight: '20px', color: 'hsla(213, 85%, 33%, 1)', fontWeight: 400, display: 'block' }}>
-                                                {cms?.contactEmail || cityDetails[selectedCity].email}
-                                            </a>
-                                        </div>
-                                    </div>
+                                    <ContactRow Icon={EnvelopeIcon} label="Email">
+                                        <a href={`mailto:${cms?.contactEmail || cityDetails[selectedCity].email}`} className="block font-sans font-normal text-[#0d4e9b] hover:underline text-xs md:text-[14px] leading-[18px] md:leading-5 break-all">
+                                            {cms?.contactEmail || cityDetails[selectedCity].email}
+                                        </a>
+                                    </ContactRow>
 
-                                    {/* Timings */}
-                                    <div className="flex gap-6 items-center" style={{ maxWidth: '576px', width: '100%', minHeight: '66px', gap: '20px' }}>
-                                        <div className="rounded-full flex items-center justify-center shrink-0 relative" style={{ width: '45px', height: '45px', background: 'hsla(200, 100%, 92%, 1)', opacity: 1, angle: '0deg' }}>
-                                            <div className="rounded-full flex items-center justify-center text-[#024E82]" style={{ width: '34px', height: '34px', background: 'hsla(197, 100%, 96%, 1)', position: 'absolute', top: '6px', left: '6px', opacity: 1, angle: '0deg' }}>
-                                                <ClockIcon
-                                                    className="text-[hsla(213, 85%, 33%, 1)]"
-                                                    style={{
-                                                        width: '16px',
-                                                        height: '16px',
-                                                        position: 'absolute',
-                                                        top: '9px',
-                                                        left: '9px',
-                                                        strokeWidth: '2'
-                                                    }}
-                                                />
-                                            </div>
-                                        </div>
-                                        <div style={{ width: '511px', height: '46px', opacity: 1 }}>
-                                            <h3 className="font-sans" style={{ width: '511px', height: '20px', fontSize: '12px', lineHeight: '16px', fontWeight: 600, color: 'hsla(0, 0%, 20%, 1)', marginBottom: '4px' }}>Timings</h3>
-                                            <p className="font-sans" style={{ fontSize: '14px', lineHeight: '20px', color: 'hsla(213, 85%, 33%, 1)', fontWeight: 400 }}>
-                                                <span style={{ fontWeight: 700 }}>Monday – Saturday:</span> 10:00 AM – 07:30 PM
-                                            </p>
-                                            <p className="font-sans" style={{ fontSize: '14px', lineHeight: '20px', color: 'hsla(213, 85%, 33%, 1)', fontWeight: 400 }}>
-                                                <span style={{ fontWeight: 700 }}>Sunday:</span> Closed
-                                            </p>
-                                        </div>
-                                    </div>
+                                    <ContactRow Icon={ClockIcon} label="Timings">
+                                        <p className="font-sans font-normal text-[#0d4e9b] text-xs md:text-[14px] leading-[18px] md:leading-5">
+                                            <span className="font-bold">Monday – Saturday:</span> 10:00 AM – 07:30 PM
+                                        </p>
+                                        <p className="font-sans font-normal text-[#0d4e9b] text-xs md:text-[14px] leading-[18px] md:leading-5">
+                                            <span className="font-bold">Sunday:</span> Closed
+                                        </p>
+                                    </ContactRow>
                                 </div>
 
                                 {/* Social Icons */}
-                                <div
-                                    className="flex items-center"
-                                    style={{
-                                        width: '576px',
-                                        height: '34.90039825439453px',
-                                        gap: '10px',
-                                        paddingLeft: '1px',
-                                        marginTop: '80px',
-                                        opacity: 1,
-                                        angle: '0deg'
-                                    }}
-                                >
-                                    <span className="text-gray-600 font-medium">Follow Us</span>
-                                    <a href={`https://wa.me/${cms?.contactWhatsApp || '911234567890'}`} className="w-10 h-10 rounded-full bg-white shadow border border-gray-100 flex items-center justify-center text-green-500 hover:scale-110 transition-transform">
-                                        <FaWhatsapp size={20} />
+                                <div className="flex items-center gap-2.5 mt-4 md:mt-20">
+                                    <span className="text-gray-500 font-bold text-xs">Follow Us</span>
+                                    <a href={`https://wa.me/${cms?.contactWhatsApp || '911234567890'}`} className="w-9 h-9 rounded-full bg-white shadow border border-gray-100 flex items-center justify-center text-green-500 hover:scale-110 transition-transform">
+                                        <FaWhatsapp size={18} />
                                     </a>
-                                    <a href="#" className="w-10 h-10 rounded-full bg-white shadow border border-gray-100 flex items-center justify-center text-blue-600 hover:scale-110 transition-transform">
-                                        <FaFacebookF size={18} />
+                                    <a href="#" className="w-9 h-9 rounded-full bg-white shadow border border-gray-100 flex items-center justify-center text-blue-600 hover:scale-110 transition-transform">
+                                        <FaFacebookF size={16} />
                                     </a>
-                                    <a href="#" className="w-10 h-10 rounded-full bg-white shadow border border-gray-100 flex items-center justify-center text-pink-600 hover:scale-110 transition-transform">
-                                        <FaInstagram size={20} />
+                                    <a href="#" className="w-9 h-9 rounded-full bg-white shadow border border-gray-100 flex items-center justify-center text-pink-600 hover:scale-110 transition-transform">
+                                        <FaInstagram size={18} />
                                     </a>
-                                    <a href="#" className="w-10 h-10 rounded-full bg-white shadow border border-gray-100 flex items-center justify-center text-blue-700 hover:scale-110 transition-transform">
-                                        <FaLinkedinIn size={18} />
+                                    <a href="#" className="w-9 h-9 rounded-full bg-white shadow border border-gray-100 flex items-center justify-center text-blue-700 hover:scale-110 transition-transform">
+                                        <FaLinkedinIn size={16} />
                                     </a>
                                 </div>
                             </div>
 
                             {/* Right Column: Form */}
-                            <div
-                                className="flex flex-col flex-1"
-                                style={{
-                                    maxWidth: '576px',
-                                    width: '100%',
-                                    height: '532px',
-                                    gap: '24px',
-                                    opacity: 1,
-                                    angle: '0deg'
-                                }}
-                            >
+                            <div className="flex flex-col flex-1 w-full lg:max-w-[576px] gap-6">
                                 {/* Headers */}
-                                <div
-                                    className="flex flex-col w-full"
-                                    style={{
-                                        maxWidth: '576px',
-                                        height: '103px',
-                                        gap: '12px',
-                                        opacity: 1
-                                    }}
-                                >
-                                    <h1 className="text-[40px] leading-[48px] font-semibold text-[#1A1A1A] tracking-[-0.02em] font-sans">
+                                <div className="flex flex-col w-full gap-3">
+                                    <h2 className="font-semibold text-[#1A1A1A] tracking-[-0.02em] font-sans text-xl md:text-[40px] leading-[26px] md:leading-[48px]">
                                         {contactTitle}
-                                    </h1>
-                                    <p className="text-[#4D4D4D] text-[16px] leading-[24px] max-w-[500px] font-sans font-normal">
+                                    </h2>
+                                    <p className="text-[#4D4D4D] font-sans font-normal max-w-[500px] text-[10px] md:text-[16px] leading-[14px] md:leading-6">
                                         {contactSubtitle}
                                     </p>
                                 </div>
 
-                                <form className="flex flex-col flex-1" style={{ gap: '24px' }}>
-                                    <div
-                                        className="flex flex-col"
-                                        style={{
-                                            maxWidth: '576px',
-                                            width: '100%',
-                                            minHeight: '330px',
-                                            gap: '24px',
-                                            opacity: 1
-                                        }}
-                                    >
-                                        <div className="flex flex-col w-full" style={{ height: '59px', gap: '4px', opacity: 1, angle: '0deg' }}>
-                                            <label
-                                                className="text-[12px] leading-[16px] font-[600] h-[16px]"
-                                                style={{ fontFamily: '"Mona Sans", sans-serif', color: 'hsla(0, 0%, 33%, 1)' }}
-                                            >
+                                <form className="flex flex-col gap-6">
+                                    <div className="flex flex-col gap-4 md:gap-6 w-full">
+                                        <div className="flex flex-col w-full gap-1">
+                                            <label className="text-[10px] md:text-[12px] leading-[16px] font-semibold text-[#545454] font-sans">
                                                 Full Name <span className="text-red-500">*</span>
                                             </label>
                                             <input
                                                 type="text"
                                                 placeholder="Enter Your Name"
-                                                className="w-full rounded-md px-4 h-[39px] text-sm font-sans focus:outline-none focus:border-blue-500 transition-colors"
-                                                style={{ border: '1px solid hsla(0, 0%, 89%, 1)', background: 'hsla(0, 0%, 100%, 1)', opacity: 1 }}
+                                                className="w-full rounded-md px-4 h-[39px] text-xs md:text-sm font-sans border border-[#e2e2e2] bg-white focus:outline-none focus:border-blue-500 transition-colors"
                                             />
                                         </div>
 
-                                        <div className="grid grid-cols-1 md:grid-cols-2" style={{ gap: '24px' }}>
-                                            <div className="flex flex-col w-full" style={{ height: '59px', gap: '4px' }}>
-                                                <label
-                                                    className="text-[12px] leading-[16px] font-[600] h-[16px]"
-                                                    style={{ fontFamily: '"Mona Sans", sans-serif', color: 'hsla(0, 0%, 33%, 1)' }}
-                                                >
+                                        <div className="grid grid-cols-2 gap-4 md:gap-6">
+                                            <div className="flex flex-col w-full gap-1">
+                                                <label className="text-[10px] md:text-[12px] leading-[16px] font-semibold text-[#545454] font-sans">
                                                     Mobile No. <span className="text-red-500">*</span>
                                                 </label>
                                                 <input
                                                     type="text"
                                                     placeholder="+91-9XXXXXXX"
-                                                    className="w-full rounded-md font-sans px-4 h-[39px] text-sm focus:outline-none focus:border-blue-500 transition-colors"
-                                                    style={{ border: '1px solid hsla(0, 0%, 89%, 1)', background: 'hsla(0, 0%, 100%, 1)', opacity: 1 }}
+                                                    className="w-full rounded-md px-4 h-[39px] text-xs md:text-sm font-sans border border-[#e2e2e2] bg-white focus:outline-none focus:border-blue-500 transition-colors"
                                                 />
                                             </div>
-                                            <div className="flex flex-col w-full" style={{ height: '59px', gap: '4px' }}>
-                                                <label
-                                                    className="text-[12px] leading-[16px] font-[600] h-[16px]"
-                                                    style={{ fontFamily: '"Mona Sans", sans-serif', color: 'hsla(0, 0%, 33%, 1)' }}
-                                                >
+                                            <div className="flex flex-col w-full gap-1">
+                                                <label className="text-[10px] md:text-[12px] leading-[16px] font-semibold text-[#545454] font-sans">
                                                     Email ID <span className="text-red-500">*</span>
                                                 </label>
                                                 <input
                                                     type="email"
                                                     placeholder="hemxxx@gmail.com"
-                                                    className="w-full rounded-md font-sans px-4 h-[39px] text-sm focus:outline-none focus:border-blue-500 transition-colors"
-                                                    style={{ border: '1px solid hsla(0, 0%, 89%, 1)', background: 'hsla(0, 0%, 100%, 1)', opacity: 1 }}
+                                                    className="w-full rounded-md px-4 h-[39px] text-xs md:text-sm font-sans border border-[#e2e2e2] bg-white focus:outline-none focus:border-blue-500 transition-colors"
                                                 />
                                             </div>
                                         </div>
 
-                                        <div className="grid grid-cols-1 md:grid-cols-2" style={{ gap: '24px' }}>
-                                            <div className="flex flex-col w-full" style={{ height: '59px', gap: '4px' }}>
-                                                <label
-                                                    className="text-[12px] leading-[16px] font-[600] h-[16px]"
-                                                    style={{ fontFamily: '"Mona Sans", sans-serif', color: 'hsla(0, 0%, 33%, 1)' }}
-                                                >
+                                        <div className="grid grid-cols-2 gap-4 md:gap-6">
+                                            <div className="flex flex-col w-full gap-1">
+                                                <label className="text-[10px] md:text-[12px] leading-[16px] font-semibold text-[#545454] font-sans">
                                                     Rental Product <span className="text-red-500">*</span>
                                                 </label>
-                                                <div className="relative w-full h-[39px]" style={{ opacity: 1 }}>
-                                                    <select
-                                                        className="w-full h-full rounded-md px-4 text-sm text-gray-400 focus:outline-none focus:border-blue-500 font-sans transition-colors appearance-none"
-                                                        style={{ border: '1px solid hsla(0, 0%, 89%, 1)', background: 'hsla(0, 0%, 100%, 1)' }}
-                                                    >
+                                                <div className="relative w-full h-[39px]">
+                                                    <select className="w-full h-full rounded-md px-4 text-xs md:text-sm text-gray-400 font-sans border border-[#e2e2e2] bg-white focus:outline-none focus:border-blue-500 transition-colors appearance-none">
                                                         <option>macbook pro m4</option>
                                                     </select>
-                                                    <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400">
+                                                    <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400">
                                                         <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg>
                                                     </div>
                                                 </div>
                                             </div>
-                                            <div className="flex flex-col w-full" style={{ height: '59px', gap: '4px' }}>
-                                                <label
-                                                    className="text-[12px] leading-[16px] font-[600] h-[16px]"
-                                                    style={{ fontFamily: '"Mona Sans", sans-serif', color: 'hsla(0, 0%, 33%, 1)' }}
-                                                >
+                                            <div className="flex flex-col w-full gap-1">
+                                                <label className="text-[10px] md:text-[12px] leading-[16px] font-semibold text-[#545454] font-sans">
                                                     Requirement City <span className="text-red-500">*</span>
                                                 </label>
-                                                <div className="relative w-full h-[39px]" style={{ opacity: 1 }}>
-                                                    <select
-                                                        className="w-full h-full rounded-md px-4 text-sm text-gray-400 focus:outline-none focus:border-blue-500 font-sans transition-colors appearance-none"
-                                                        style={{ border: '1px solid hsla(0, 0%, 89%, 1)', background: 'hsla(0, 0%, 100%, 1)' }}
-                                                    >
+                                                <div className="relative w-full h-[39px]">
+                                                    <select className="w-full h-full rounded-md px-4 text-xs md:text-sm text-gray-400 font-sans border border-[#e2e2e2] bg-white focus:outline-none focus:border-blue-500 transition-colors appearance-none">
                                                         <option>Delhi....</option>
                                                     </select>
-                                                    <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400">
+                                                    <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400">
                                                         <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg>
                                                     </div>
                                                 </div>
                                             </div>
                                         </div>
 
-                                        <div className="flex flex-col" style={{ maxWidth: '576px', width: '100%', height: '93px', gap: '4px', opacity: 1, angle: '0deg' }}>
-                                            <label
-                                                className="text-[12px] leading-[16px] font-[600] h-[16px]"
-                                                style={{ fontFamily: '"Mona Sans", sans-serif', color: 'hsla(0, 0%, 33%, 1)' }}
-                                            >
+                                        <div className="flex flex-col w-full gap-1">
+                                            <label className="text-[10px] md:text-[12px] leading-[16px] font-semibold text-[#545454] font-sans">
                                                 Message
                                             </label>
                                             <textarea
                                                 placeholder="Write to us......"
-                                                className="w-full h-[73px] rounded-md text-sm font-sans focus:outline-none focus:border-blue-500 transition-colors resize-none"
-                                                style={{ border: '1px solid hsla(0, 0%, 89%, 1)', background: 'hsla(0, 0%, 100%, 1)', opacity: 1, paddingTop: '12px', paddingLeft: '8px' }}
+                                                className="w-full h-[74px] rounded-md px-2 pt-3 text-xs md:text-sm font-sans border border-[#cbcbcb] bg-white focus:outline-none focus:border-blue-500 transition-colors resize-none"
                                             ></textarea>
                                         </div>
                                     </div>
 
                                     <div className="flex items-center gap-2">
                                         <input type="checkbox" id="privacy" className="rounded border-gray-300 text-blue-600 focus:ring-blue-500" />
-                                        <label htmlFor="privacy" className="text-xs text-gray-700">
-                                            You agree to our friendly <span className="font-bold">privacy policy</span>
+                                        <label htmlFor="privacy" className="text-[10px] md:text-xs text-gray-600">
+                                            You agree to our friendly <span className="font-bold underline">privacy policy</span>
                                         </label>
                                     </div>
 
                                     <button
-                                        className="w-full bg-[#007bff] hover:bg-[#0069d9] text-white font-normal transition-colors shadow-lg text-[16px]"
-                                        style={{
-                                            padding: '6px 20px',
-                                            borderRadius: '32px',
-                                            opacity: 1
-                                        }}
+                                        type="submit"
+                                        className="w-full bg-[#0075ff] hover:bg-[#0069d9] text-white font-normal transition-colors shadow-lg rounded-[28px] md:rounded-[32px] py-1.5 px-5 text-xs md:text-[16px]"
                                     >
                                         Submit
                                     </button>

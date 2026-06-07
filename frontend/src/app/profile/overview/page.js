@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { BsCart3, BsPaperclip } from 'react-icons/bs';
+import { BsCart3, BsPaperclip, BsArrowLeft } from 'react-icons/bs';
 import { PiMapPin, PiIdentificationBadge } from 'react-icons/pi';
 import { RiHandCoinLine } from 'react-icons/ri';
 import { GoInfo } from 'react-icons/go';
@@ -87,7 +87,12 @@ export default function OverviewPage() {
 
     return (
         <div className="bg-white/50 min-h-full">
-            <h1 className="text-3xl font-medium text-gray-800 mb-8">Overview</h1>
+            <div className="flex items-center gap-3 mb-8">
+                <Link href="/profile" aria-label="Back to menu" className="lg:hidden text-gray-800 shrink-0">
+                    <BsArrowLeft size={24} />
+                </Link>
+                <h1 className="text-3xl font-medium text-gray-800">Overview</h1>
+            </div>
 
             <div className="h-px bg-gray-200 w-full mb-8"></div>
 

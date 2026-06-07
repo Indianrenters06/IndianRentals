@@ -232,10 +232,10 @@ const ShowcaseProductCard = ({ product, index, isDesktop, handleAddToCart }) => 
 
                     <button
                         className="absolute z-20 flex items-center justify-center rounded-full hover:scale-110 transition-all duration-300"
-                        style={{ width: "36px", height: "36px", top: "10.57px", right: "12.51px", backgroundColor: "hsla(0, 0%, 96%, 1)", border: "0.2px solid hsla(0, 0%, 80%, 1)", borderRadius: "100%", padding: "4px" }}
+                        style={{ width: "33px", height: "33px", top: "10.57px", right: "12.51px", backgroundColor: "#F6F6F6", border: "1px solid #EEEEEE", borderRadius: "100%" }}
                         onClick={(e) => { e.preventDefault(); e.stopPropagation(); }}
                     >
-                        <HeartIcon className="w-[32px] h-[32px] text-black" strokeWidth={1} />
+                        <Heart size={21} weight="regular" className="text-black" />
                     </button>
 
                     <div className="relative w-full h-full p-4 flex items-center justify-center">

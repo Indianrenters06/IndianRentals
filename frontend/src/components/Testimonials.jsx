@@ -164,11 +164,11 @@ const Testimonials = ({ overrideBg, overridePadding, overrideHeight }) => {
             }}
         >
             <div
-                className="w-full h-full mx-auto flex flex-col items-center px-4 md:px-8"
+                className="w-full h-full mx-auto flex flex-col items-center px-4 sm:px-6"
                 style={{
                     maxWidth: '1200px',
-                    paddingTop: overridePadding || (viewType === 'desktop' ? '96px' : (viewType === 'tablet' ? '96px' : '48px')),
-                    paddingBottom: overridePadding || (viewType === 'desktop' ? '96px' : (viewType === 'tablet' ? '96px' : '48px')),
+                    paddingTop: overridePadding || '40px',
+                    paddingBottom: overridePadding || '40px',
                     gap: viewType === 'desktop' ? '24px' : (viewType === 'tablet' ? '16px' : '10px'),
                     position: 'relative',
                     zIndex: 1
@@ -245,7 +245,9 @@ const Testimonials = ({ overrideBg, overridePadding, overrideHeight }) => {
                         maxWidth: viewType === 'mobile' ? '350px' : undefined,
                         margin: viewType === 'mobile' ? '0 auto' : undefined,
                         gap: viewType === 'desktop' ? '24px' : '20px',
-                        opacity: 1
+                        opacity: 1,
+                        maskImage: viewType === 'desktop' ? 'linear-gradient(to bottom, #000 60%, transparent 100%)' : undefined,
+                        WebkitMaskImage: viewType === 'desktop' ? 'linear-gradient(to bottom, #000 60%, transparent 100%)' : undefined
                     }}
                 >
                     {/* Column 1 */}

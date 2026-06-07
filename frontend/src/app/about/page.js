@@ -70,83 +70,90 @@ export default function AboutPage() {
     return (
         <div className="text-gray-800 pb-20">
 
-            {/* ── 1. Banner ─────────────────────────────────────────────────── */}
-            <section className="w-full max-w-[1440px] mx-auto mt-8 mb-16">
-                <div className="max-w-[1200px] mx-auto px-4 md:px-8">
-                    <div className="w-full h-[500px] relative bg-gray-200 overflow-hidden rounded-3xl">
-                        <Image src={c.bannerImage} alt={c.bannerTitle} fill className="object-cover object-center" />
-                        <div className="absolute inset-0 flex items-center justify-center">
-                            <h1 className="text-white text-4xl md:text-6xl font-semibold drop-shadow-lg font-sans">
-                                {c.bannerTitle}
-                            </h1>
+            {/* On mobile, the banner + story + vision/mission sit on a continuous
+                grey surface (#f6f6f6), matching the Figma mobile design. */}
+            <div className="bg-[#f6f6f6] md:bg-transparent pt-5 md:pt-0">
+
+                {/* ── 1. Banner ─────────────────────────────────────────────────── */}
+                <section className="w-full max-w-[1440px] mx-auto mb-6 md:mt-8 md:mb-16">
+                    <div className="max-w-[1200px] mx-auto px-5 md:px-8">
+                        <div className="w-full h-[197px] md:h-[500px] relative bg-gray-200 overflow-hidden rounded-2xl md:rounded-3xl">
+                            <Image src={c.bannerImage} alt={c.bannerTitle} fill className="object-cover object-center" />
+                            <div className="absolute inset-0 bg-black/25 md:bg-transparent" />
+                            <div className="absolute inset-0 flex items-center justify-center">
+                                <h1 className="text-white text-base md:text-6xl font-semibold drop-shadow-lg font-sans">
+                                    {c.bannerTitle}
+                                </h1>
+                            </div>
                         </div>
                     </div>
-                </div>
-            </section>
+                </section>
 
-            {/* ── 2. Our Story ──────────────────────────────────────────────── */}
-            <section className="w-full max-w-[1440px] mx-auto mb-24">
-                <div className="max-w-[1200px] mx-auto px-4 md:px-8 grid grid-cols-1 lg:grid-cols-2 gap-[57px] items-center">
-                    {/* Left */}
-                    <div className="flex flex-col gap-[27px]">
-                        <h2 className="text-4xl md:text-5xl font-semibold leading-tight font-sans text-gray-900">
-                            {c.aboutStoryTitle}
-                        </h2>
-                        <div className="text-gray-900 font-sans font-normal flex flex-col gap-6">
-                            <p className="leading-relaxed text-[16px]">{c.aboutStoryPara1}</p>
-                            <p className="leading-relaxed text-[16px]">{c.aboutStoryPara2}</p>
-                        </div>
-                        {/* Stats */}
-                        <div className="flex flex-wrap gap-8 md:gap-12 mt-4">
-                            {[
-                                { value: c.aboutStat1Value, label: c.aboutStat1Label, Icon: PiGauge },
-                                { value: c.aboutStat2Value, label: c.aboutStat2Label, Icon: PiSmiley },
-                            ].map(({ value, label, Icon }) => (
-                                <div key={label} className="flex flex-col">
-                                    <div className="w-[76px] h-[76px] bg-[#FF8A00] rounded-xl flex items-center justify-center text-white mb-3 shadow-sm">
-                                        <Icon size={50} />
+                {/* ── 2. Our Story ──────────────────────────────────────────────── */}
+                <section className="w-full max-w-[1440px] mx-auto mb-6 md:mb-24">
+                    <div className="max-w-[1200px] mx-auto px-5 md:px-8 grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-[57px] items-center">
+                        {/* Left */}
+                        <div className="flex flex-col gap-3 md:gap-[27px]">
+                            <h2 className="text-[25px] md:text-5xl font-semibold leading-tight font-sans text-gray-900">
+                                {c.aboutStoryTitle}
+                            </h2>
+                            <div className="text-gray-600 md:text-gray-900 font-sans font-normal flex flex-col gap-4 md:gap-6">
+                                <p className="leading-relaxed text-xs md:text-[16px]">{c.aboutStoryPara1}</p>
+                                <p className="leading-relaxed text-xs md:text-[16px]">{c.aboutStoryPara2}</p>
+                            </div>
+                            {/* Stats */}
+                            <div className="flex flex-wrap gap-12 mt-2 md:mt-4">
+                                {[
+                                    { value: c.aboutStat1Value, label: c.aboutStat1Label, Icon: PiGauge },
+                                    { value: c.aboutStat2Value, label: c.aboutStat2Label, Icon: PiSmiley },
+                                ].map(({ value, label, Icon }) => (
+                                    <div key={label} className="flex flex-col">
+                                        <div className="w-[76px] h-[76px] bg-[#FF8A00] rounded-[10px] md:rounded-xl flex items-center justify-center text-white mb-2 md:mb-3 shadow-sm">
+                                            <Icon size={50} />
+                                        </div>
+                                        <h3 className="text-xl md:text-3xl font-bold font-sans text-gray-900">{value}</h3>
+                                        <p className="text-[10px] md:text-sm font-medium text-gray-500 font-sans mt-1">{label}</p>
                                     </div>
-                                    <h3 className="text-3xl font-bold font-sans text-gray-900">{value}</h3>
-                                    <p className="text-sm font-medium text-gray-500 font-sans mt-1">{label}</p>
-                                </div>
-                            ))}
+                                ))}
+                            </div>
+                        </div>
+                        {/* Right Image */}
+                        <div className="relative w-full aspect-[581/625] max-h-[625px] rounded-2xl md:rounded-3xl overflow-hidden bg-gray-100 shadow-sm">
+                            <Image src={c.aboutStoryImage} alt={c.aboutStoryTitle} fill className="object-cover object-center" />
                         </div>
                     </div>
-                    {/* Right Image */}
-                    <div className="relative w-full aspect-[581/625] max-h-[625px] rounded-3xl overflow-hidden bg-gray-100 shadow-sm">
-                        <Image src={c.aboutStoryImage} alt={c.aboutStoryTitle} fill className="object-cover object-center" />
-                    </div>
-                </div>
-            </section>
+                </section>
 
-            {/* ── 3. Vision / Mission Tabs ──────────────────────────────────── */}
-            <section className="w-full max-w-[1440px] mx-auto mb-24">
-                <div className="max-w-[1200px] mx-auto px-4 md:px-8">
-                    <div className="w-full bg-[#FDE68A] rounded-3xl pt-10 pb-14 px-10 flex flex-col lg:flex-row gap-12 items-start">
-                        {/* Tab Buttons */}
-                        <div className="flex gap-4 w-full lg:w-[350px] shrink-0">
-                            {[
-                                { key: 'vision',  label: c.aboutVisionTabLabel },
-                                { key: 'mission', label: c.aboutMissionTabLabel },
-                            ].map(({ key, label }) => (
-                                <button key={key} onClick={() => setActiveTab(key)}
-                                    className={`h-[45px] px-8 rounded-full font-medium font-sans text-lg transition-all hover:scale-[1.02] active:scale-95 ${activeTab === key ? 'bg-black text-white shadow-lg' : 'border-2 border-black/10 text-gray-800 hover:bg-black/5'}`}>
-                                    {label}
-                                </button>
-                            ))}
-                        </div>
-                        {/* Content Items */}
-                        <div className="flex-1 flex flex-col gap-8">
-                            {activeItems.map(({ title, text }, i) => (
-                                <div key={i} className={`flex flex-col md:flex-row items-start gap-4 ${i < activeItems.length - 1 ? 'border-b border-black/10 pb-6' : ''}`}>
-                                    <h3 className="text-[20px] font-bold text-gray-900 font-sans md:w-[220px] shrink-0">{title}</h3>
-                                    <p className="text-gray-800 font-sans leading-relaxed text-[15px]">{text}</p>
-                                </div>
-                            ))}
+                {/* ── 3. Vision / Mission Tabs ──────────────────────────────────── */}
+                <section className="w-full max-w-[1440px] mx-auto mb-10 md:mb-24">
+                    <div className="max-w-[1200px] mx-auto px-5 md:px-8">
+                        <div className="w-full bg-[#FFE485] md:bg-[#FDE68A] rounded-2xl md:rounded-3xl pt-5 md:pt-10 pb-6 md:pb-14 px-5 md:px-10 flex flex-col lg:flex-row gap-7 md:gap-12 items-start">
+                            {/* Tab Buttons */}
+                            <div className="flex gap-3 md:gap-4 w-full lg:w-[350px] shrink-0">
+                                {[
+                                    { key: 'vision',  label: c.aboutVisionTabLabel },
+                                    { key: 'mission', label: c.aboutMissionTabLabel },
+                                ].map(({ key, label }) => (
+                                    <button key={key} onClick={() => setActiveTab(key)}
+                                        className={`h-[36px] md:h-[45px] px-4 md:px-8 rounded-full font-medium font-sans text-sm md:text-lg transition-all hover:scale-[1.02] active:scale-95 ${activeTab === key ? 'bg-black text-white shadow-lg' : 'border-2 border-black/10 text-gray-800 hover:bg-black/5'}`}>
+                                        {label}
+                                    </button>
+                                ))}
+                            </div>
+                            {/* Content Items */}
+                            <div className="flex-1 flex flex-col gap-4 md:gap-8">
+                                {activeItems.map(({ title, text }, i) => (
+                                    <div key={i} className={`flex flex-col md:flex-row items-start gap-1 md:gap-4 ${i < activeItems.length - 1 ? 'border-b border-black/10 pb-4 md:pb-6' : ''}`}>
+                                        <h3 className="text-sm md:text-[20px] font-bold text-gray-900 font-sans md:w-[220px] shrink-0">{title}</h3>
+                                        <p className="text-gray-800 font-sans leading-relaxed text-[10px] md:text-[15px]">{text}</p>
+                                    </div>
+                                ))}
+                            </div>
                         </div>
                     </div>
-                </div>
-            </section>
+                </section>
+
+            </div>
 
             {/* ── 4. Why Choose Us ──────────────────────────────────────────── */}
             <WhyChooseUs cmsData={c} />
