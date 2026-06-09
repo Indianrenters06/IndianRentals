@@ -5,11 +5,34 @@ import Image from 'next/image';
 import { FacebookLogo, InstagramLogo, LinkedinLogo, WhatsappLogo } from '@phosphor-icons/react';
 import { useSettings } from '../context/SettingsContext';
 
-const paymentLogos = [
+const DEFAULT_PAYMENT_LOGOS = [
     "https://res.cloudinary.com/dpu9ikeqe/image/upload/v1774477006/1ea1887d77efce07ed8c13aecef4c18d75fddf84_oq3qmc.png",
     "https://res.cloudinary.com/dpu9ikeqe/image/upload/v1774477006/43e892522e4d7cd8b9640d32b817ce5d99b2fd18_gfptzj.png",
     "https://res.cloudinary.com/dpu9ikeqe/image/upload/v1774477005/b5f5de03b48b1e4460cf20fd295ad96cc3c1fa35_sitcbh.png",
     "https://res.cloudinary.com/dpu9ikeqe/image/upload/v1774477006/2a84eda31c8a80fed3b9bc10e13d0243d2047d84_ewds3r.png"
+];
+
+const DEFAULT_FOOTER_COLUMNS = [
+    { title: "Company", links: [
+        { name: "About Us", href: "/about" },
+        { name: "How It Works", href: "/rental-process" },
+        { name: "Jobs & Careers", href: "/careers" },
+        { name: "Contact", href: "/contact" },
+        { name: "IndianRenters (B2B Link)", href: "/b2b" },
+    ] },
+    { title: "Policies", links: [
+        { name: "KYC Policy", href: "/kyc-policy" },
+        { name: "Shipping Policy", href: "/shipping-policy" },
+        { name: "Return Policy", href: "/return-policy" },
+        { name: "Privacy Policy", href: "/privacy" },
+        { name: "Rental Terms & Conditions", href: "/terms" },
+    ] },
+    { title: "Support", links: [
+        { name: "FAQs", href: "/faq" },
+        { name: "Raise a Ticket", href: "/ticket" },
+        { name: "Customer Reviews", href: "/reviews" },
+        { name: "Blog", href: "/blog" },
+    ] },
 ];
 
 const Footer = () => {
@@ -18,7 +41,12 @@ const Footer = () => {
     const siteName = settings?.siteName || "Indian Renters";
     const sitePhone = settings?.contactPhone || "+91 9999999999";
     const currentYear = new Date().getFullYear();
-    const copyrightName = settings?.siteName || "AAA Rental LLP";
+    const copyrightName = settings?.footerCopyright || "AAA Rental LLP";
+
+    const footerColumns = (settings?.footerColumns?.length ? settings.footerColumns : DEFAULT_FOOTER_COLUMNS);
+    const paymentLogos = (settings?.paymentLogos?.length ? settings.paymentLogos : DEFAULT_PAYMENT_LOGOS);
+    const primaryColumn = footerColumns[0];
+    const secondaryColumns = footerColumns.slice(1);
 
     const [viewType, setViewType] = useState('mobile');
 
@@ -84,33 +112,19 @@ const Footer = () => {
                         </div>
 
                         {/* Links — Columns */}
-                        <div 
+                        <div
                             className="flex flex-row justify-between"
                             style={{ width: viewType === 'desktop' ? '600px' : '480px', maxWidth: '600px', height: viewType === 'desktop' ? '176px' : 'auto', gap: viewType === 'tablet' ? '12px' : '30px' }}
                         >
-                            {/* Column 1 */}
-                            <ul className="flex flex-col gap-[18px] text-[hsla(0,0%,0%,1)] font-sans font-medium text-[13px] tracking-tight leading-none">
-                                <li><Link href="/about" className="hover:opacity-70 transition-opacity">About Us</Link></li>
-                                <li><Link href="/rental-process" className="hover:opacity-70 transition-opacity">How It Works</Link></li>
-                                <li><Link href="/careers" className="hover:opacity-70 transition-opacity">Jobs &amp; Careers</Link></li>
-                                <li><Link href="/contact" className="hover:opacity-70 transition-opacity">Contact</Link></li>
-                                <li><Link href="/b2b" className="hover:opacity-70 transition-opacity">IndianRenters (B2B Link)</Link></li>
-                            </ul>
-                            {/* Column 2 */}
-                            <ul className="flex flex-col gap-[18px] text-[hsla(0,0%,0%,1)] font-sans font-medium text-[13px] tracking-tight leading-none">
-                                <li><Link href="/kyc-policy" className="hover:opacity-70 transition-opacity">KYC Policy</Link></li>
-                                <li><Link href="/shipping-policy" className="hover:opacity-70 transition-opacity">Shipping Policy</Link></li>
-                                <li><Link href="/return-policy" className="hover:opacity-70 transition-opacity">Return Policy</Link></li>
-                                <li><Link href="/privacy" className="hover:opacity-70 transition-opacity">Privacy Policy</Link></li>
-                                <li><Link href="/terms" className="hover:opacity-70 transition-opacity">Rental Terms &amp; Conditions</Link></li>
-                            </ul>
-                            {/* Column 3 */}
-                            <ul className="flex flex-col gap-[18px] text-[hsla(0,0%,0%,1)] font-sans font-medium text-[13px] tracking-tight leading-none">
-                                <li><Link href="/faq" className="hover:opacity-70 transition-opacity">FAQs</Link></li>
-                                <li><Link href="/ticket" className="hover:opacity-70 transition-opacity">Raise a Ticket</Link></li>
-                                <li><Link href="/reviews" className="hover:opacity-70 transition-opacity">Customer Reviews</Link></li>
-                                <li><Link href="/blog" className="hover:opacity-70 transition-opacity">Blog</Link></li>
-                            </ul>
+                            {footerColumns.map((col, ci) => (
+                                <ul key={ci} className="flex flex-col gap-[18px] text-[hsla(0,0%,0%,1)] font-sans font-medium text-[13px] tracking-tight leading-none">
+                                    {(col.links || []).map((link, li) => (
+                                        <li key={li}>
+                                            <Link href={link.href || "#"} className="hover:opacity-70 transition-opacity">{link.name}</Link>
+                                        </li>
+                                    ))}
+                                </ul>
+                            ))}
                         </div>
                     </div>
                 </div>
@@ -158,33 +172,29 @@ const Footer = () => {
                         </p>
                     </div>
 
-                    {/* Primary Links */}
-                    <div className="flex flex-col mb-8" style={{ gap: '12px' }}>
-                        <Link href="/about" className="text-black font-bold text-[15px] leading-tight transition-opacity hover:opacity-70">About Us</Link>
-                        <Link href="/rental-process" className="text-black font-bold text-[15px] leading-tight transition-opacity hover:opacity-70">How It Works</Link>
-                        <Link href="/careers" className="text-black font-bold text-[15px] leading-tight transition-opacity hover:opacity-70">Jobs &amp; Careers</Link>
-                        <Link href="/contact" className="text-black font-bold text-[15px] leading-tight transition-opacity hover:opacity-70">Contact</Link>
-                        <Link href="/b2b" className="text-black font-bold text-[15px] leading-tight transition-opacity hover:opacity-70">IndianRenters (B2B Link)</Link>
-                    </div>
-
-                    <div className="h-[1px] w-full bg-[#E5E5EA] mb-8"></div>
-
-                    {/* Secondary Links */}
-                    <div className="grid grid-cols-2 mb-8" style={{ gap: '20px' }}>
-                        <div className="flex flex-col gap-3 text-black text-[13px] font-medium tracking-tight">
-                            <Link href="/kyc-policy" className="hover:opacity-70">KYC Policy</Link>
-                            <Link href="/shipping-policy" className="hover:opacity-70">Shipping Policy</Link>
-                            <Link href="/return-policy" className="hover:opacity-70">Return Policy</Link>
-                            <Link href="/privacy" className="hover:opacity-70">Privacy Policy</Link>
-                            <Link href="/terms" className="hover:opacity-70">Rental Terms &amp; Conditions</Link>
+                    {/* Primary Links (first column) */}
+                    {primaryColumn && (
+                        <div className="flex flex-col mb-8" style={{ gap: '12px' }}>
+                            {(primaryColumn.links || []).map((link, li) => (
+                                <Link key={li} href={link.href || "#"} className="text-black font-bold text-[15px] leading-tight transition-opacity hover:opacity-70">{link.name}</Link>
+                            ))}
                         </div>
-                        <div className="flex flex-col gap-3 text-black text-[13px] font-medium tracking-tight">
-                            <Link href="/faq" className="hover:opacity-70">FAQs</Link>
-                            <Link href="/ticket" className="hover:opacity-70">Raise a Ticket</Link>
-                            <Link href="/reviews" className="hover:opacity-70">Customer Reviews</Link>
-                            <Link href="/blog" className="hover:opacity-70">Blog</Link>
+                    )}
+
+                    {secondaryColumns.length > 0 && <div className="h-[1px] w-full bg-[#E5E5EA] mb-8"></div>}
+
+                    {/* Secondary Links (remaining columns) */}
+                    {secondaryColumns.length > 0 && (
+                        <div className="grid grid-cols-2 mb-8" style={{ gap: '20px' }}>
+                            {secondaryColumns.map((col, ci) => (
+                                <div key={ci} className="flex flex-col gap-3 text-black text-[13px] font-medium tracking-tight">
+                                    {(col.links || []).map((link, li) => (
+                                        <Link key={li} href={link.href || "#"} className="hover:opacity-70">{link.name}</Link>
+                                    ))}
+                                </div>
+                            ))}
                         </div>
-                    </div>
+                    )}
 
                     <div className="h-[1px] w-full bg-[#E5E5EA] mb-8"></div>
 

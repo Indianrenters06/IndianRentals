@@ -28,6 +28,7 @@ const updateSettings = asyncHandler(async (req, res) => {
         siteName, siteLogo, contactEmail, contactPhone, address,
         currency, timezone,
         navbarAnnouncements, navbarLinks, footerDescription, socialLinks, footerQuickLinks,
+        footerColumns, footerCopyright, paymentLogos,
         maintenanceMode, allowRegistrations, requireKYC,
         paymentGatewaySecret, theme,
         robotsTxt, llmsTxt
@@ -53,6 +54,9 @@ const updateSettings = asyncHandler(async (req, res) => {
     if (footerDescription !== undefined) settings.footerDescription = footerDescription;
     if (socialLinks !== undefined) settings.socialLinks = { ...settings.socialLinks, ...socialLinks };
     if (footerQuickLinks !== undefined) settings.footerQuickLinks = footerQuickLinks;
+    if (footerColumns !== undefined) settings.footerColumns = footerColumns;
+    if (footerCopyright !== undefined) settings.footerCopyright = footerCopyright;
+    if (paymentLogos !== undefined) settings.paymentLogos = paymentLogos;
 
     const updatedSettings = await settings.save();
     res.json(updatedSettings);

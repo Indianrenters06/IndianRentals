@@ -8,7 +8,7 @@ import {
     FloppyDisk, Plus, Trash, CheckCircle,
     MegaphoneSimple, Link as LinkIcon, Layout, ShareNetwork,
     FacebookLogo, TwitterLogo, InstagramLogo, LinkedinLogo,
-    Globe, NavigationArrow
+    Globe, NavigationArrow, Columns, Copyright, CreditCard, Image as ImageIcon
 } from "@phosphor-icons/react";
 
 const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
@@ -80,6 +80,9 @@ export default function LayoutCMSPage() {
         footerDescription: "",
         socialLinks: { facebook: "", twitter: "", instagram: "", linkedin: "" },
         footerQuickLinks: [],
+        footerColumns: [],
+        footerCopyright: "",
+        paymentLogos: [],
     });
 
     const set = (key, value) => setData(prev => ({ ...prev, [key]: value }));
@@ -98,6 +101,9 @@ export default function LayoutCMSPage() {
                         footerDescription: d.footerDescription || "",
                         socialLinks: d.socialLinks || { facebook: "", twitter: "", instagram: "", linkedin: "" },
                         footerQuickLinks: d.footerQuickLinks || [],
+                        footerColumns: d.footerColumns || [],
+                        footerCopyright: d.footerCopyright || "",
+                        paymentLogos: d.paymentLogos || [],
                     });
                 }
             } catch (err) {
@@ -334,50 +340,163 @@ export default function LayoutCMSPage() {
                         />
                     </div>
 
-                    {/* Footer Quick Links */}
+                    {/* Footer Link Columns */}
                     <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 shadow-sm space-y-5">
                         <SectionRow
-                            icon={<LinkIcon weight="bold" size={18} className="text-amber-500" />}
-                            title="Footer Quick Links"
-                            desc="Navigation links shown in the footer's Quick Links column."
+                            icon={<Columns weight="bold" size={18} className="text-amber-500" />}
+                            title="Footer Link Columns"
+                            desc="The link columns shown beside the brand block in the footer. Add or remove columns and links freely."
                         />
 
-                        <div className="hidden md:grid grid-cols-[1fr_1fr_auto] gap-3 px-1">
-                            <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Link Label</span>
-                            <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">URL Path</span>
-                            <span className="w-9" />
+                        <div className="space-y-5">
+                            {data.footerColumns.map((col, ci) => (
+                                <div key={ci} className="rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 p-4 space-y-3">
+                                    {/* Column header: title + remove column */}
+                                    <div className="flex items-center gap-2">
+                                        <input
+                                            placeholder="Column Title (e.g. Company)"
+                                            value={col.title || ""}
+                                            onChange={e => {
+                                                const n = [...data.footerColumns];
+                                                n[ci] = { ...n[ci], title: e.target.value };
+                                                set("footerColumns", n);
+                                            }}
+                                            className="flex-1 h-9 px-3 rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-sm font-bold text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/40 transition-all"
+                                        />
+                                        <button
+                                            onClick={() => {
+                                                const n = [...data.footerColumns];
+                                                n.splice(ci, 1);
+                                                set("footerColumns", n);
+                                            }}
+                                            className="h-9 px-3 flex items-center gap-1.5 rounded-lg text-red-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors text-xs font-semibold shrink-0"
+                                            title="Remove column"
+                                        >
+                                            <Trash size={15} weight="bold" /> Column
+                                        </button>
+                                    </div>
+
+                                    {/* Links inside this column */}
+                                    <div className="space-y-2 pl-1">
+                                        {(col.links || []).map((link, li) => (
+                                            <div key={li} className="grid grid-cols-[1fr_1fr_auto] gap-2 items-center">
+                                                <input
+                                                    placeholder="Link Name"
+                                                    value={link.name}
+                                                    onChange={e => {
+                                                        const n = [...data.footerColumns];
+                                                        const links = [...(n[ci].links || [])];
+                                                        links[li] = { ...links[li], name: e.target.value };
+                                                        n[ci] = { ...n[ci], links };
+                                                        set("footerColumns", n);
+                                                    }}
+                                                    className="h-9 px-3 rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-sm text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/40 transition-all"
+                                                />
+                                                <input
+                                                    placeholder="/about"
+                                                    value={link.href}
+                                                    onChange={e => {
+                                                        const n = [...data.footerColumns];
+                                                        const links = [...(n[ci].links || [])];
+                                                        links[li] = { ...links[li], href: e.target.value };
+                                                        n[ci] = { ...n[ci], links };
+                                                        set("footerColumns", n);
+                                                    }}
+                                                    className="h-9 px-3 rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-sm text-slate-900 dark:text-white font-mono placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/40 transition-all"
+                                                />
+                                                <button
+                                                    onClick={() => {
+                                                        const n = [...data.footerColumns];
+                                                        const links = [...(n[ci].links || [])];
+                                                        links.splice(li, 1);
+                                                        n[ci] = { ...n[ci], links };
+                                                        set("footerColumns", n);
+                                                    }}
+                                                    className="w-9 h-9 flex items-center justify-center rounded-lg text-red-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors"
+                                                    title="Remove link"
+                                                >
+                                                    <Trash size={15} weight="bold" />
+                                                </button>
+                                            </div>
+                                        ))}
+
+                                        <button
+                                            onClick={() => {
+                                                const n = [...data.footerColumns];
+                                                n[ci] = { ...n[ci], links: [...(n[ci].links || []), { name: "", href: "/" }] };
+                                                set("footerColumns", n);
+                                            }}
+                                            className="w-full py-2 border-2 border-dashed border-slate-200 dark:border-slate-700 rounded-lg flex items-center justify-center gap-2 text-slate-400 hover:text-indigo-500 hover:border-indigo-400 transition-all text-xs font-semibold"
+                                        >
+                                            <Plus size={14} weight="bold" /> Add Link
+                                        </button>
+                                    </div>
+                                </div>
+                            ))}
+
+                            {data.footerColumns.length === 0 && (
+                                <div className="text-center py-8 text-slate-400 text-sm border-2 border-dashed border-slate-200 dark:border-slate-700 rounded-xl">
+                                    No footer columns yet. Add one below.
+                                </div>
+                            )}
+
+                            <button
+                                onClick={() => set("footerColumns", [...data.footerColumns, { title: "", links: [{ name: "", href: "/" }] }])}
+                                className="w-full py-3 border-2 border-dashed border-slate-200 dark:border-slate-700 rounded-xl flex items-center justify-center gap-2 text-slate-400 hover:text-indigo-500 hover:border-indigo-400 transition-all text-sm font-semibold"
+                            >
+                                <Plus size={16} weight="bold" /> Add Column
+                            </button>
                         </div>
+                    </div>
+
+                    {/* Footer Copyright */}
+                    <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 shadow-sm space-y-5">
+                        <SectionRow
+                            icon={<Copyright weight="fill" size={18} className="text-emerald-500" />}
+                            title="Copyright"
+                            desc="Owner name shown in the footer's bottom bar. Displayed as “© {year} {name}. All Rights Reserved”."
+                        />
+                        <Field
+                            label="Copyright Owner"
+                            value={data.footerCopyright}
+                            onChange={v => set("footerCopyright", v)}
+                            placeholder="AAA Rental LLP"
+                        />
+                    </div>
+
+                    {/* Payment Logos */}
+                    <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 shadow-sm space-y-5">
+                        <SectionRow
+                            icon={<CreditCard weight="fill" size={18} className="text-sky-500" />}
+                            title="Payment Logos"
+                            desc="Payment method logos shown in the footer's bottom bar. Paste image URLs (e.g. Cloudinary)."
+                        />
 
                         <div className="space-y-2">
-                            {data.footerQuickLinks.map((link, idx) => (
-                                <div key={idx} className="grid grid-cols-1 md:grid-cols-[1fr_1fr_auto] gap-2 items-center p-3 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700">
+                            {data.paymentLogos.map((url, idx) => (
+                                <div key={idx} className="flex items-center gap-2 p-2 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700">
+                                    <div className="w-11 h-11 shrink-0 rounded-lg bg-white border border-slate-200 dark:border-slate-700 flex items-center justify-center overflow-hidden">
+                                        {url
+                                            ? <img src={url} alt={`payment-${idx}`} className="w-full h-full object-contain p-1" />
+                                            : <ImageIcon size={18} className="text-slate-300" />}
+                                    </div>
                                     <input
-                                        placeholder="Link Name"
-                                        value={link.name}
+                                        placeholder="https://…/logo.png"
+                                        value={url}
                                         onChange={e => {
-                                            const n = [...data.footerQuickLinks];
-                                            n[idx] = { ...n[idx], name: e.target.value };
-                                            set("footerQuickLinks", n);
+                                            const n = [...data.paymentLogos];
+                                            n[idx] = e.target.value;
+                                            set("paymentLogos", n);
                                         }}
-                                        className="h-9 px-3 rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-sm text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/40 transition-all"
-                                    />
-                                    <input
-                                        placeholder="/about"
-                                        value={link.href}
-                                        onChange={e => {
-                                            const n = [...data.footerQuickLinks];
-                                            n[idx] = { ...n[idx], href: e.target.value };
-                                            set("footerQuickLinks", n);
-                                        }}
-                                        className="h-9 px-3 rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-sm text-slate-900 dark:text-white font-mono placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/40 transition-all"
+                                        className="flex-1 h-9 px-3 rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-sm text-slate-900 dark:text-white font-mono placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/40 transition-all"
                                     />
                                     <button
                                         onClick={() => {
-                                            const n = [...data.footerQuickLinks];
+                                            const n = [...data.paymentLogos];
                                             n.splice(idx, 1);
-                                            set("footerQuickLinks", n);
+                                            set("paymentLogos", n);
                                         }}
-                                        className="w-9 h-9 flex items-center justify-center rounded-xl text-red-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors"
+                                        className="w-9 h-9 flex items-center justify-center rounded-lg text-red-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors shrink-0"
                                         title="Remove"
                                     >
                                         <Trash size={16} weight="bold" />
@@ -385,17 +504,17 @@ export default function LayoutCMSPage() {
                                 </div>
                             ))}
 
-                            {data.footerQuickLinks.length === 0 && (
+                            {data.paymentLogos.length === 0 && (
                                 <div className="text-center py-8 text-slate-400 text-sm border-2 border-dashed border-slate-200 dark:border-slate-700 rounded-xl">
-                                    No quick links yet. Add one below.
+                                    No payment logos yet. Add one below.
                                 </div>
                             )}
 
                             <button
-                                onClick={() => set("footerQuickLinks", [...data.footerQuickLinks, { name: "", href: "/" }])}
+                                onClick={() => set("paymentLogos", [...data.paymentLogos, ""])}
                                 className="w-full py-3 border-2 border-dashed border-slate-200 dark:border-slate-700 rounded-xl flex items-center justify-center gap-2 text-slate-400 hover:text-indigo-500 hover:border-indigo-400 transition-all text-sm font-semibold"
                             >
-                                <Plus size={16} weight="bold" /> Add Quick Link
+                                <Plus size={16} weight="bold" /> Add Payment Logo
                             </button>
                         </div>
                     </div>

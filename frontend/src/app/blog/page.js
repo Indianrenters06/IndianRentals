@@ -92,92 +92,76 @@ export default function BlogPage() {
     const gridPosts = filteredPosts.length > 1 ? filteredPosts.slice(1) : (filteredPosts.length === 1 ? [] : defaultGridPosts);
 
     return (
-        <div 
-            className="w-full flex justify-center"
-            style={{ 
-                background: 'hsla(0, 0%, 100%, 1)', 
-                paddingTop: '20px',
-                minHeight: '2141px' // outer section height
-            }}
-        >
-            <div 
-                className="w-full max-w-[1440px] px-[80px]"
-                style={{
-                    background: 'var(--Color-Scheme-1-Background, hsla(0, 0%, 100%, 1))',
-                    paddingTop: '28px',
-                    paddingBottom: '28px',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    gap: '48px',
-                    minHeight: '2121px' // inner section height
-                }}
-            >
+        <div className="w-full flex justify-center bg-white pt-3 md:pt-5">
+            <div className="w-full max-w-[1440px] px-5 md:px-[80px] flex flex-col gap-6 md:gap-[48px] bg-[var(--Color-Scheme-1-Background,#fff)] py-5 md:py-7">
                 {/* Header Section */}
-                <div className="flex flex-col gap-2">
-                    <h1 className="text-[40px] font-bold text-[#1D1D1F] font-['Mona_Sans',sans-serif] tracking-tight">
+                <div className="flex flex-col gap-3 md:gap-2">
+                    <h1 className="text-[20px] md:text-[40px] font-bold text-[#1D1D1F] font-['Mona_Sans',sans-serif] tracking-tight leading-tight">
                         {cmsData?.blogTitle || 'Latest News & Resources'}
                     </h1>
-                    <p className="text-[16px] text-gray-500 font-['Mona_Sans',sans-serif]">
+                    <p className="text-[12px] md:text-[16px] text-gray-500 font-['Mona_Sans',sans-serif]">
                         {cmsData?.blogSubtitle || 'The latest industry news, interviews, technologies, and resources.'}
                     </p>
                 </div>
 
                 {/* Featured Hero Post */}
-                <div className="flex flex-col gap-4">
-                    <Link href={`/blog/${featuredPost.slug || featuredPost._id}`} className="group flex flex-col gap-4">
-                        <span className="text-[#0B5ED7] text-[12px] font-semibold bg-[#E7F0FC] px-3 py-1 rounded-full w-fit">
-                            {featuredPost.tags && featuredPost.tags.length > 0 ? featuredPost.tags[0] : featuredPost.category || "Category"}
-                        </span>
-                        
-                        <div className="w-full h-[540px] rounded-[24px] overflow-hidden relative">
-                            {featuredPost.coverImage ? (
-                                <img
-                                    src={featuredPost.coverImage}
-                                    alt={featuredPost.title}
-                                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                                />
-                            ) : (
-                                <div className="w-full h-full bg-slate-100 flex items-center justify-center text-slate-300">
-                                    <span>Image Placeholder</span>
-                                </div>
-                            )}
+                <Link href={`/blog/${featuredPost.slug || featuredPost._id}`} className="group flex flex-col gap-3 md:gap-4">
+                    <span className="text-[#0B5ED7] text-[10px] md:text-[12px] font-medium md:font-semibold md:bg-[#E7F0FC] md:px-3 md:py-1 rounded-full w-fit">
+                        {featuredPost.tags && featuredPost.tags.length > 0 ? featuredPost.tags[0] : featuredPost.category || "Category"}
+                    </span>
+
+                    <div className="w-full h-[210px] md:h-[540px] rounded-[12px] md:rounded-[24px] overflow-hidden relative bg-[#cdcdcd]">
+                        {featuredPost.coverImage ? (
+                            <img
+                                src={featuredPost.coverImage}
+                                alt={featuredPost.title}
+                                className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                            />
+                        ) : (
+                            <div className="w-full h-full bg-slate-100 flex items-center justify-center text-slate-300">
+                                <span>Image Placeholder</span>
+                            </div>
+                        )}
+                    </div>
+
+                    {/* On mobile: author on the left, text on the right. On desktop: text on top, author below. */}
+                    <div className="flex flex-row md:flex-col md:max-w-[800px] gap-6 md:gap-0 mt-1 md:mt-2">
+                        <div className="flex items-center gap-2 md:gap-3 shrink-0 order-1 md:order-2 md:mt-0">
+                            <div className="w-[34px] h-[34px] md:w-10 md:h-10 rounded-full overflow-hidden flex items-center justify-center bg-gray-200 shrink-0">
+                                <img src={`https://ui-avatars.com/api/?name=${encodeURIComponent(featuredPost.author || "John Doe")}&background=random`} alt={featuredPost.author || "Admin"} className="w-full h-full object-cover" />
+                            </div>
+                            <div className="flex flex-col justify-center">
+                                <div className="text-[10px] md:text-[14px] font-bold md:font-semibold text-[#1D1D1F] leading-none mb-1">{featuredPost.author || "John Doe"}</div>
+                                <div className="text-[10px] md:text-[12px] text-gray-500 leading-none">{formatDate(featuredPost.createdAt)}</div>
+                            </div>
                         </div>
 
-                        <div className="flex flex-col max-w-[800px] mt-2">
-                            <div className="flex items-center justify-between">
-                                <h2 className="text-[24px] md:text-[32px] font-bold text-[#1D1D1F] group-hover:text-[#0B5ED7] transition-colors leading-tight mb-2">
+                        <div className="flex flex-col flex-1 min-w-0 order-2 md:order-1">
+                            <div className="flex items-start md:items-center justify-between gap-2">
+                                <h2 className="text-[12px] md:text-[32px] font-bold text-[#1D1D1F] group-hover:text-[#0B5ED7] transition-colors leading-tight mb-1 md:mb-2">
                                     {featuredPost.title}
                                 </h2>
-                                <FiArrowUpRight size={28} className="text-gray-400 group-hover:text-[#0B5ED7] transition-colors shrink-0" />
+                                <FiArrowUpRight className="w-4 h-4 md:w-7 md:h-7 text-gray-400 group-hover:text-[#0B5ED7] transition-colors shrink-0" />
                             </div>
                             {featuredPost.excerpt && (
-                                <p className="text-gray-500 text-[16px] mb-6 line-clamp-2">
+                                <p className="text-gray-500 text-[10px] md:text-[16px] mb-0 md:mb-6 line-clamp-2 md:line-clamp-none leading-snug">
                                     {featuredPost.excerpt}
                                 </p>
                             )}
-                            <div className="flex items-center gap-3">
-                                <div className="w-10 h-10 rounded-full overflow-hidden flex items-center justify-center bg-gray-200">
-                                    <img src={`https://ui-avatars.com/api/?name=${encodeURIComponent(featuredPost.author || "John Doe")}&background=random`} alt={featuredPost.author || "Admin"} className="w-full h-full object-cover" />
-                                </div>
-                                <div className="flex flex-col justify-center">
-                                    <div className="text-[14px] font-semibold text-[#1D1D1F] leading-none mb-1">{featuredPost.author || "John Doe"}</div>
-                                    <div className="text-[12px] text-gray-500 leading-none">{formatDate(featuredPost.createdAt)}</div>
-                                </div>
-                            </div>
                         </div>
-                    </Link>
-                </div>
+                    </div>
+                </Link>
 
                 {/* Tabs / Filters */}
                 <div className="w-full border-b border-gray-200">
-                    <div className="flex items-center gap-8 overflow-x-auto no-scrollbar">
+                    <div className="flex items-center gap-6 md:gap-8 overflow-x-auto no-scrollbar">
                         {tabs.map((tab) => (
                             <button
                                 key={tab}
                                 onClick={() => setActiveTab(tab)}
-                                className={`pb-4 text-[15px] font-medium transition-colors relative whitespace-nowrap ${
-                                    activeTab === tab 
-                                        ? 'text-[#0B5ED7]' 
+                                className={`pb-3 md:pb-4 text-[12px] md:text-[15px] font-medium transition-colors relative whitespace-nowrap ${
+                                    activeTab === tab
+                                        ? 'text-[#0B5ED7]'
                                         : 'text-[#1D1D1F] hover:text-[#0B5ED7]'
                                 }`}
                             >
@@ -190,50 +174,50 @@ export default function BlogPage() {
                     </div>
                 </div>
 
-                {/* Grid Posts */}
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-[48px]">
+                {/* Grid Posts — horizontal cards on mobile, vertical on desktop */}
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-5 md:gap-y-[48px]">
                     {gridPosts.map((post) => (
-                        <Link key={post._id} href={`/blog/${post.slug || post._id}`} className="group flex flex-col gap-4">
-                            
-                            <div className="w-full aspect-[4/3] rounded-[16px] overflow-hidden relative">
+                        <Link key={post._id} href={`/blog/${post.slug || post._id}`} className="group flex flex-row md:flex-col gap-3 md:gap-4 items-stretch">
+
+                            <div className="relative w-[42%] md:w-full shrink-0 self-stretch md:self-auto md:aspect-[4/3] rounded-[12px] md:rounded-[16px] overflow-hidden bg-[#cdcdcd]">
                                 {post.coverImage ? (
                                     <img
                                         src={post.coverImage}
                                         alt={post.title}
-                                        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                                        className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                                     />
                                 ) : (
-                                    <div className="w-full h-full bg-slate-100 flex items-center justify-center text-slate-300">
-                                        <span>Image Placeholder</span>
+                                    <div className="absolute inset-0 bg-slate-100 flex items-center justify-center text-slate-300 text-xs">
+                                        <span>Image</span>
                                     </div>
                                 )}
                             </div>
 
-                            <div className="flex flex-col">
-                                <span className="text-[#0B5ED7] text-[12px] font-semibold bg-[#E7F0FC] px-3 py-1 rounded-full w-fit mb-3">
+                            <div className="flex flex-col flex-1 min-w-0">
+                                <span className="text-[#0B5ED7] text-[8px] md:text-[12px] font-medium md:font-semibold bg-[#d6f1ff] md:bg-[#E7F0FC] border-[0.5px] border-[#0689ff] md:border-0 px-2 md:px-3 py-0.5 md:py-1 rounded-full w-fit mb-2 md:mb-3">
                                     {post.tags && post.tags.length > 0 ? post.tags[0] : post.category || "Category"}
                                 </span>
-                                
-                                <div className="flex items-start justify-between gap-4 mb-2">
-                                    <h3 className="text-[18px] font-bold text-[#1D1D1F] group-hover:text-[#0B5ED7] transition-colors line-clamp-2 leading-snug">
+
+                                <div className="flex items-start justify-between gap-2 md:gap-4 mb-1 md:mb-2">
+                                    <h3 className="text-[12px] md:text-[18px] font-semibold md:font-bold text-[#1D1D1F] group-hover:text-[#0B5ED7] transition-colors line-clamp-2 leading-snug">
                                         {post.title}
                                     </h3>
-                                    <FiArrowUpRight size={22} className="text-gray-400 group-hover:text-[#0B5ED7] transition-colors shrink-0 mt-1" />
+                                    <FiArrowUpRight className="w-4 h-4 md:w-[22px] md:h-[22px] text-gray-400 group-hover:text-[#0B5ED7] transition-colors shrink-0 mt-0.5 md:mt-1" />
                                 </div>
-                                
+
                                 {post.excerpt && (
-                                    <p className="text-gray-500 text-[14px] leading-relaxed line-clamp-2 mb-4">
+                                    <p className="text-gray-500 text-[10px] md:text-[14px] leading-snug md:leading-relaxed line-clamp-2 mb-2 md:mb-4">
                                         {post.excerpt}
                                     </p>
                                 )}
-                                
-                                <div className="flex items-center gap-3 mt-auto">
-                                    <div className="w-8 h-8 rounded-full overflow-hidden flex items-center justify-center bg-gray-200">
+
+                                <div className="flex items-center gap-2 md:gap-3 mt-auto">
+                                    <div className="w-8 h-8 rounded-full overflow-hidden flex items-center justify-center bg-gray-200 shrink-0">
                                         <img src={`https://ui-avatars.com/api/?name=${encodeURIComponent(post.author || "John Doe")}&background=random`} alt={post.author || "Admin"} className="w-full h-full object-cover" />
                                     </div>
                                     <div className="flex flex-col justify-center">
-                                        <div className="text-[13px] font-semibold text-[#1D1D1F] leading-none mb-1">{post.author || "John Doe"}</div>
-                                        <div className="text-[11px] text-gray-500 leading-none">{formatDate(post.createdAt)}</div>
+                                        <div className="text-[10px] md:text-[13px] font-bold md:font-semibold text-[#1D1D1F] leading-none mb-1">{post.author || "John Doe"}</div>
+                                        <div className="text-[10px] md:text-[11px] text-gray-500 leading-none">{formatDate(post.createdAt)}</div>
                                     </div>
                                 </div>
                             </div>

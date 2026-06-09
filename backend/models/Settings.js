@@ -47,6 +47,57 @@ const settingsSchema = new mongoose.Schema({
             { name: "Delivery Policy", href: "/delivery-policy" }
         ]
     },
+    // Footer link columns — rendered as the three columns next to the brand block.
+    // Each column has an optional title and a list of links.
+    footerColumns: {
+        type: [{
+            title: { type: String, default: '' },
+            links: [{ name: String, href: String }]
+        }],
+        default: [
+            {
+                title: 'Company',
+                links: [
+                    { name: "About Us", href: "/about" },
+                    { name: "How It Works", href: "/rental-process" },
+                    { name: "Jobs & Careers", href: "/careers" },
+                    { name: "Contact", href: "/contact" },
+                    { name: "IndianRenters (B2B Link)", href: "/b2b" }
+                ]
+            },
+            {
+                title: 'Policies',
+                links: [
+                    { name: "KYC Policy", href: "/kyc-policy" },
+                    { name: "Shipping Policy", href: "/shipping-policy" },
+                    { name: "Return Policy", href: "/return-policy" },
+                    { name: "Privacy Policy", href: "/privacy" },
+                    { name: "Rental Terms & Conditions", href: "/terms" }
+                ]
+            },
+            {
+                title: 'Support',
+                links: [
+                    { name: "FAQs", href: "/faq" },
+                    { name: "Raise a Ticket", href: "/ticket" },
+                    { name: "Customer Reviews", href: "/reviews" },
+                    { name: "Blog", href: "/blog" }
+                ]
+            }
+        ]
+    },
+    // Copyright owner shown in the footer's bottom bar (© {year} {name}).
+    footerCopyright: { type: String, default: 'AAA Rental LLP' },
+    // Payment method logos shown in the footer's bottom bar.
+    paymentLogos: {
+        type: [String],
+        default: [
+            "https://res.cloudinary.com/dpu9ikeqe/image/upload/v1774477006/1ea1887d77efce07ed8c13aecef4c18d75fddf84_oq3qmc.png",
+            "https://res.cloudinary.com/dpu9ikeqe/image/upload/v1774477006/43e892522e4d7cd8b9640d32b817ce5d99b2fd18_gfptzj.png",
+            "https://res.cloudinary.com/dpu9ikeqe/image/upload/v1774477005/b5f5de03b48b1e4460cf20fd295ad96cc3c1fa35_sitcbh.png",
+            "https://res.cloudinary.com/dpu9ikeqe/image/upload/v1774477006/2a84eda31c8a80fed3b9bc10e13d0243d2047d84_ewds3r.png"
+        ]
+    },
 
     // Platform Identity extras
     currency: { type: String, default: 'INR' },
