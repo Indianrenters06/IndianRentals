@@ -402,7 +402,7 @@ export default function KYCManagement({ initialFilter = "all" }) {
                                 )}
                             </ModalBody>
                             <ModalFooter>
-                                {modalMode === 'view' && selectedKyc?.status === 'pending' && (
+                                {modalMode === 'view' && ['pending', 'review'].includes(selectedKyc?.status) && (
                                     <div className="flex gap-2 w-full justify-between items-center">
                                         <div className="flex items-center gap-2 text-amber-600 dark:text-amber-400">
                                             <Info size={18} weight="bold" />
@@ -414,7 +414,7 @@ export default function KYCManagement({ initialFilter = "all" }) {
                                         </div>
                                     </div>
                                 )}
-                                {selectedKyc?.status !== 'pending' && (
+                                {!['pending', 'review'].includes(selectedKyc?.status) && (
                                     <Button variant="flat" onPress={onClose} className="font-bold px-8 rounded-xl">Close Review</Button>
                                 )}
                             </ModalFooter>

@@ -44,6 +44,47 @@ const remove = asyncHandler(async (req, res) => {
     res.json({ message: 'Deleted' });
 });
 
+// POST /api/email-templates/import
+// Bulk-seed preset templates into the DB so the website's email triggers
+// (OTP, KYC, order/payment flows) actually find an active template to send.
+// Inserts only templates whose `name` does not already exist — it NEVER
+// overwrites a template an admin may have customized. Idempotent: safe to
+// run repeatedly; re-running only fills in whatever is missing.
+const importPresets = asyncHandler(async (req, res) => {
+    const { templates } = req.body;
+    if (!Array.isArray(templates) || templates.length === 0) {
+        res.status(400); throw new Error('A non-empty "templates" array is required');
+    }
+
+    const existingNames = new Set(
+        (await EmailTemplate.find({}, 'name').lean()).map(t => t.name)
+    );
+
+    const toInsert = templates
+        .filter(t => t && t.name && t.subject && t.body && !existingNames.has(t.name))
+        .map(t => ({
+            name: t.name,
+            type: t.type || 'other',
+            subject: t.subject,
+            body: t.body,
+            variables: Array.isArray(t.variables) ? t.variables : [],
+            isActive: true,
+        }));
+
+    let created = 0;
+    if (toInsert.length) {
+        try {
+            const inserted = await EmailTemplate.insertMany(toInsert, { ordered: false });
+            created = inserted.length;
+        } catch (err) {
+            // Tolerate duplicate-key races from concurrent imports.
+            created = err?.result?.result?.nInserted ?? err?.insertedDocs?.length ?? 0;
+        }
+    }
+
+    res.json({ created, skipped: templates.length - created });
+});
+
 // POST /api/email-templates/test
 // Sends a one-off test email using the supplied subject/body (a draft does not
 // need to be saved first). `sampleData` provides values for any {{variables}}.
@@ -64,4 +105,4 @@ const sendTest = asyncHandler(async (req, res) => {
     res.json({ message: `Test email sent to ${to}` });
 });
 
-module.exports = { getAll, getOne, create, update, remove, sendTest };
+module.exports = { getAll, getOne, create, update, remove, sendTest, importPresets };

@@ -17,11 +17,19 @@ const userSchema = new mongoose.Schema({
     password: {
         type: String,
         required: [true, 'Please provide a password'],
-        minlength: [8, 'Password must be at least 8 characters long'],
-        match: [
-            /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/,
-            'Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character'
-        ],
+        // Complexity is enforced ONLY when the password is actually being set or
+        // changed (i.e. it's still plaintext). On every other save() the stored
+        // value is a bcrypt hash — which contains '.' and '/' and would always
+        // fail the complexity regex — so we must skip it for unmodified passwords.
+        // Without this guard, saving any existing user (e.g. login's 2FA OTP save,
+        // KYC status sync) throws a validation error and breaks the flow.
+        validate: {
+            validator: function (value) {
+                if (!this.isModified('password')) return true;
+                return /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/.test(value);
+            },
+            message: 'Password must be at least 8 characters and contain an uppercase letter, a lowercase letter, a number, and a special character'
+        },
         select: false // Don't return password by default
     },
     phone: {

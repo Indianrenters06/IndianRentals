@@ -140,10 +140,12 @@ export default function KYCPage() {
         setLoading(true);
         try {
             const docFormData = new FormData();
-            // Append files only if they are File objects (new uploads)
-            if (formData.documents.aadharFront instanceof File) docFormData.append('identityProof', formData.documents.aadharFront);
-            if (formData.documents.aadharBack instanceof File) docFormData.append('addressProof', formData.documents.aadharBack);
-            if (formData.documents.panCard instanceof File) docFormData.append('bankStatement', formData.documents.panCard);
+            // Append files only if they are File objects (new uploads).
+            // Use the real field names so the admin panel labels each document correctly
+            // (PAN no longer shows up under a "Bank Statement" label, etc.).
+            if (formData.documents.aadharFront instanceof File) docFormData.append('aadharFront', formData.documents.aadharFront);
+            if (formData.documents.aadharBack instanceof File) docFormData.append('aadharBack', formData.documents.aadharBack);
+            if (formData.documents.panCard instanceof File) docFormData.append('panCard', formData.documents.panCard);
 
             let uploadedDocs = {};
             if ([...docFormData.entries()].length > 0) {
@@ -155,7 +157,7 @@ export default function KYCPage() {
             // For now assuming backend handles it or we send just new ones.
 
             const kycPayload = {
-                personalDetails: formData.personalDetails,
+                personalDetails: { ...formData.personalDetails, idType: 'Aadhar Card' },
                 companyDetails: customerType === 'Company' ? formData.companyDetails : {},
                 referenceDetails: {},
                 documents: uploadedDocs // Send only new uploads or merged?

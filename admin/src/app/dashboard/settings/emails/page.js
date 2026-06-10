@@ -307,6 +307,7 @@ export default function EmailTemplatesPage() {
     const [typeFilter, setTypeFilter] = useState('all');
     const [modal, setModal] = useState(null); // null | 'new' | template object
     const [deleting, setDeleting] = useState(null);
+    const [importing, setImporting] = useState(false);
 
     const load = useCallback(async () => {
         setLoading(true);
@@ -330,6 +331,33 @@ export default function EmailTemplatesPage() {
             return exists ? prev.map(t => t._id === saved._id ? saved : t) : [saved, ...prev];
         });
         setModal(null);
+    };
+
+    // Seed every preset into the DB in one shot so the website's email
+    // triggers find an active template. Idempotent — existing templates are
+    // left untouched (the backend only inserts missing ones).
+    const handleImportAll = async () => {
+        setImporting(true);
+        try {
+            const res = await fetch(`${API}/api/email-templates/import`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${getToken()}` },
+                body: JSON.stringify({ templates: EMAIL_PRESETS }),
+            });
+            if (!res.ok) throw new Error((await res.json()).message || 'Import failed');
+            const data = await res.json();
+            toast.success(
+                data.created > 0
+                    ? `Imported ${data.created} template${data.created !== 1 ? 's' : ''}` +
+                      (data.skipped ? ` · ${data.skipped} already existed` : '')
+                    : 'All presets are already imported'
+            );
+            load();
+        } catch (e) {
+            toast.error(e.message);
+        } finally {
+            setImporting(false);
+        }
     };
 
     const handleDelete = async (id) => {
@@ -395,6 +423,12 @@ export default function EmailTemplatesPage() {
                             ))}
                         </div>
                     </div>
+                    <button onClick={handleImportAll} disabled={importing}
+                        title="Seed all preset templates into the database so the website can send them"
+                        className="flex items-center gap-2 h-10 px-4 rounded-xl border border-emerald-200 dark:border-emerald-500/30 bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 text-sm font-bold disabled:opacity-60">
+                        {importing ? <Spinner size="sm" color="success" /> : <UploadSimple size={15} weight="bold" />}
+                        Import All
+                    </button>
                     <button onClick={() => setModal('new')}
                         className="flex items-center gap-2 h-10 px-5 rounded-xl bg-indigo-600 text-white text-sm font-bold shadow-lg shadow-indigo-500/20">
                         <Plus size={16} weight="bold" /> New Template

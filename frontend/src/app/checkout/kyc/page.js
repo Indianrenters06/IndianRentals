@@ -182,6 +182,14 @@ export default function KYCPage() {
             if (!validateStep3()) return;
         }
         if (currentStep === 4) {
+            const missingDocs = [];
+            if (!identityProofRef.current?.files?.[0]) missingDocs.push('Identity Proof');
+            if (!addressProofRef.current?.files?.[0]) missingDocs.push('Address Proof');
+            if (!bankStatementRef.current?.files?.[0]) missingDocs.push('Bank Statement');
+            if (missingDocs.length > 0) {
+                Swal.fire({ icon: 'warning', title: 'Documents Required', text: `Please attach: ${missingDocs.join(', ')}.` });
+                return;
+            }
             if (!isDocumentsChecked) {
                 Swal.fire({ icon: 'warning', title: 'Action Required', text: 'Please check the confirmation box.' });
                 return;
@@ -205,7 +213,7 @@ export default function KYCPage() {
                     }
 
                     await saveKYCData({
-                        personalDetails: formData.personal,
+                        personalDetails: { ...formData.personal, idType: formData.documents.identityProof },
                         companyDetails: customerType === 'Company' ? formData.company : {},
                         referenceDetails: formData.reference,
                         documents: { ...uploadedDocs, identityProofType: formData.documents.identityProof, addressProofType: formData.documents.addressProof }
