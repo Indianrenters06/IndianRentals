@@ -2,19 +2,28 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { useRouter } from 'next/navigation';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { addToCart } from '../redux/features/cartSlice';
+import { toggleWishlist, selectIsWishlisted } from '../redux/features/wishlistSlice';
 import { Star, Truck } from '@phosphor-icons/react';
 import { HeartIcon } from '@heroicons/react/24/outline';
+import { HeartIcon as HeartIconSolid } from '@heroicons/react/24/solid';
 import Image from 'next/image';
 
 const ProductCard = ({ product, mobile }) => {
     const router = useRouter();
     const dispatch = useDispatch();
+    const isWishlisted = useSelector(selectIsWishlisted(product.id));
     const [added, setAdded] = React.useState(false);
     const [isHovered, setIsHovered] = React.useState(false);
     const [isTapped, setIsTapped] = React.useState(false);
     const cardRef = React.useRef(null);
+
+    const handleToggleWishlist = (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        dispatch(toggleWishlist(product));
+    };
 
     React.useEffect(() => {
         if (!isTapped) return;
@@ -195,12 +204,12 @@ const ProductCard = ({ product, mobile }) => {
                     style={{ width: `${CARD_W}px`, height: 282, borderRadius: '20px', backgroundColor: isHovered ? 'hsla(0,0%,98%,1)' : 'hsla(0,0%,100%,1)', transition: 'background-color 0.4s', borderBottom: '1px solid hsla(0,0%,93%,1)' }}
                 >
                     {/* Badges */}
-                    <div className="absolute z-20 flex items-center" style={{ top: '14px', left: '14px', gap: '4px' }}>
-                        <span style={{ minWidth: '45px', height: '24px', borderRadius: '27px', padding: '4px 10px', background: 'hsla(3, 86%, 51%, 1)', color: 'hsla(4,100%,97%,1)', fontFamily: "'Mona Sans', sans-serif", fontWeight: 600, fontSize: '10px', letterSpacing: '0.02em', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                            {product.discount || '−20% off'}
+                    <div className="absolute z-20 flex items-center" style={{ top: '14.57px', left: '13.49px', gap: '4px' }}>
+                        <span style={{ height: '24px', borderRadius: '27px', padding: '4px 10px', background: '#ED2115', color: '#FFF2F1', fontFamily: "'Mona Sans', sans-serif", fontWeight: 600, fontSize: '12px', lineHeight: '16px', letterSpacing: '-0.4px', whiteSpace: 'nowrap', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                            {product.discount || '-20% off'}
                         </span>
                         {(product.isNew || product.condition === 'New') && (
-                            <span style={{ width: '45px', height: '24px', borderRadius: '27px', padding: '4px 10px', backgroundColor: 'hsla(122,100%,35%,1)', color: '#fff', fontWeight: 600, fontSize: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                            <span style={{ height: '24px', borderRadius: '27px', padding: '4px 10px', background: '#00B505', color: '#E8FFE4', fontFamily: "'Mona Sans', sans-serif", fontWeight: 600, fontSize: '12px', lineHeight: '16px', letterSpacing: '-0.4px', whiteSpace: 'nowrap', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                                 New
                             </span>
                         )}
@@ -209,10 +218,14 @@ const ProductCard = ({ product, mobile }) => {
                     {/* Heart */}
                     <button
                         className="absolute z-20 flex items-center justify-center rounded-full hover:scale-110 transition-all duration-300"
-                        style={{ width: '36px', height: '36px', top: '11px', right: '12px', backgroundColor: 'hsla(0,0%,96%,1)', border: '0.2px solid hsla(0,0%,80%,1)', borderRadius: '100%', padding: '4px' }}
-                        onClick={(e) => { e.preventDefault(); e.stopPropagation(); }}
+                        style={{ width: '33px', height: '33px', top: '10.57px', right: '11.51px', backgroundColor: '#F6F6F6', border: '1px solid #EEEEEE', borderRadius: '100%', padding: '6px' }}
+                        onClick={handleToggleWishlist}
+                        aria-label={isWishlisted ? 'Remove from wishlist' : 'Add to wishlist'}
+                        aria-pressed={isWishlisted}
                     >
-                        <HeartIcon className="w-[32px] h-[32px] text-black" strokeWidth={1} />
+                        {isWishlisted
+                            ? <HeartIconSolid className="w-5 h-5" style={{ color: '#ED2115' }} />
+                            : <HeartIcon className="w-5 h-5 text-black" strokeWidth={1.5} />}
                     </button>
 
                     {/* Product image */}

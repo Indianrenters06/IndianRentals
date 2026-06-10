@@ -214,9 +214,9 @@ export default function DynamicCategoryPage({
                     <h1 className="hidden lg:block" style={{
                         fontFamily: "'Mona Sans', sans-serif",
                         fontWeight: 600,
-                        fontSize: "44px",
+                        fontSize: "47px",
                         lineHeight: "58px",
-                        letterSpacing: "-0.01em",
+                        letterSpacing: "-1.5px",
                         color: "hsla(0, 0%, 12%, 1)",
                         margin: 0,
                         height: '58px',
@@ -251,28 +251,26 @@ export default function DynamicCategoryPage({
                     {!loading && filtered.length > 0 && (
                         <>
                             <div
-                                className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5"
-                                style={{ gap: '16px', width: '100%' }}
+                                className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 lg:gap-6"
+                                style={{ width: '100%' }}
                             >
                                 {filtered.map((sub) => (
                                     <Link
                                         key={sub.href}
                                         href={sub.href}
-                                        className="group flex flex-col outline-none"
+                                        className="group flex flex-col outline-none h-[187px] lg:h-[208px]"
                                         style={{
-                                            height: '187px',
                                             boxSizing: 'border-box',
                                             gap: '7px',
                                             textDecoration: 'none'
                                         }}
                                     >
                                         <div
-                                            className="rounded-lg flex items-center justify-center overflow-hidden group-hover:border-gray-300 transition-all duration-300"
+                                            className="rounded-lg flex items-center justify-center overflow-hidden group-hover:border-gray-300 transition-all duration-300 h-[160px] lg:h-[173px]"
                                             style={{
-                                                height: '160px',
                                                 width: '100%',
                                                 boxSizing: 'border-box',
-                                                background: 'hsla(0, 0%, 96%, 1)',
+                                                background: 'hsla(0, 0%, 100%, 1)',
                                                 border: '1px solid hsla(0, 0%, 93%, 1)',
                                                 boxShadow: '0px 1px 3px 0px hsla(0,0%,87%,0.08), 0px 6px 6px 0px hsla(0,0%,87%,0.07), 0px 13px 8px 0px hsla(0,0%,87%,0.04), 0px 23px 9px 0px hsla(0,0%,87%,0.01), 0px 36px 10px 0px hsla(0,0%,87%,0)',
                                                 padding: '8px',
@@ -298,12 +296,9 @@ export default function DynamicCategoryPage({
                                             style={{
                                                 fontFamily: "'Mona Sans', sans-serif",
                                                 fontWeight: 600,
-                                                fontSize: '14px',
-                                                lineHeight: '20px',
-                                                letterSpacing: '-0.01em',
-                                                color: '#1D1D1F',
+                                                color: '#333333',
                                             }}
-                                            className="text-center transition-colors duration-300 w-full truncate"
+                                            className="text-center transition-colors duration-300 w-full truncate text-[14px] leading-[20px] tracking-[-0.01em] lg:text-[21px] lg:leading-[28px] lg:tracking-[-0.8px]"
                                         >
                                             {sub.name}
                                         </p>

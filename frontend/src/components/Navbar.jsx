@@ -652,7 +652,7 @@ const Navbar = () => {
                         )}
 
                         {/* Wishlist */}
-                        <Link href="/wishlist" className="flex items-center justify-center hover:opacity-80 transition-opacity shrink-0 ml-1" style={{ width: "30px", height: "30px" }}>
+                        <Link href="/profile/liked" className="flex items-center justify-center hover:opacity-80 transition-opacity shrink-0 ml-1" style={{ width: "30px", height: "30px" }}>
                             <Heart size={26.25} color="#000000" weight="regular" />
                         </Link>
 

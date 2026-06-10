@@ -8,8 +8,9 @@ import { ChevronLeftIcon, ChevronRightIcon, HeartIcon } from "@heroicons/react/2
 import { API } from "@/services/apiConfig";
 
 import { useRouter } from "next/navigation";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { addToCart } from "@/redux/features/cartSlice";
+import { toggleWishlist, selectIsWishlisted } from "@/redux/features/wishlistSlice";
 
 const MobileProductCard = ({ product }) => {
     const router = useRouter();
@@ -62,6 +63,14 @@ const MobileProductCard = ({ product }) => {
 const ProductCard = ({ product, index, isDesktop, handleAddToCart }) => {
     const [isHovered, setIsHovered] = useState(false);
     const router = useRouter();
+    const dispatch = useDispatch();
+    const isWishlisted = useSelector(selectIsWishlisted(product.id));
+
+    const handleToggleWishlist = (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        dispatch(toggleWishlist(product));
+    };
 
     const CARD_W = 285;
     const CARD_H = 387;
@@ -103,8 +112,10 @@ const ProductCard = ({ product, index, isDesktop, handleAddToCart }) => {
                     </div>
                     <button className="absolute z-20 flex items-center justify-center rounded-full hover:scale-110 transition-all duration-300"
                         style={{ width: "33px", height: "33px", top: "10.57px", right: "12.51px", backgroundColor: "#F6F6F6", border: "1px solid #EEEEEE", borderRadius: "100%" }}
-                        onClick={(e) => { e.preventDefault(); e.stopPropagation(); }}>
-                        <Heart size={21} weight="regular" className="text-black" />
+                        onClick={handleToggleWishlist}
+                        aria-label={isWishlisted ? 'Remove from wishlist' : 'Add to wishlist'}
+                        aria-pressed={isWishlisted}>
+                        <Heart size={21} weight={isWishlisted ? "fill" : "regular"} color={isWishlisted ? "#ED2115" : "#000000"} />
                     </button>
                     <div className="relative w-full h-full p-4 flex items-center justify-center">
                         <motion.img variants={{ initial: { scale: 1 }, hover: { scale: 1.05 } }} src={product.image} alt={product.name} className="max-w-full max-h-full object-contain mix-blend-multiply transition-transform duration-700 ease-out" />

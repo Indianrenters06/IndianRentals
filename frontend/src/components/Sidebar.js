@@ -27,7 +27,7 @@ const Sidebar = ({ selectedDuration, setSelectedDuration, selectedSort, setSelec
             className="shrink-0 hidden lg:flex flex-col bg-white"
             style={{
                 fontFamily: "'Mona Sans', sans-serif",
-                width: '260px',
+                width: '250px',
                 minHeight: '754.02px',
                 borderRadius: '20px',
                 border: '1px solid hsla(0, 0%, 89%, 1)',
@@ -54,11 +54,11 @@ const Sidebar = ({ selectedDuration, setSelectedDuration, selectedSort, setSelec
                         display: 'flex',
                         alignItems: 'center',
                         fontSize: '12px',
-                        letterSpacing: '0.08em',
+                        letterSpacing: '-0.4px',
                         margin: 0,
                         opacity: 1
                     }}
-                    className="uppercase text-orange-500"
+                    className="uppercase text-[#F08C00]"
                 >
                     Browse Categories
                 </h3>
@@ -88,10 +88,10 @@ const Sidebar = ({ selectedDuration, setSelectedDuration, selectedSort, setSelec
                                     fontFamily: "'Mona Sans', sans-serif",
                                     fontWeight: isActive || isMore ? 700 : 600,
                                     color: isActive ? 'hsla(0, 0%, 0%, 1)' : isMore ? 'hsla(3, 86%, 51%, 1)' : 'hsla(0, 0%, 20%, 1)',
-                                    fontSize: '13px',
+                                    fontSize: '12px',
                                     lineHeight: '16px',
                                     height: '16px',
-                                    letterSpacing: '0.08em',
+                                    letterSpacing: '-0.4px',
                                     verticalAlign: 'middle',
                                     display: 'inline-block',
                                     textDecoration: isMore ? 'underline' : 'none',
@@ -106,7 +106,7 @@ const Sidebar = ({ selectedDuration, setSelectedDuration, selectedSort, setSelec
                             </span>
                             {!isMore && (
                                 <ChevronRightIcon
-                                    className={`w-4 h-4 transition-transform duration-200 ${isActive ? "text-black translate-x-1" : "text-[hsla(0,0%,20%,1)] group-hover:text-black group-hover:translate-x-1"}`}
+                                    className={`w-3 h-3 transition-transform duration-200 ${isActive ? "text-black translate-x-1" : "text-[hsla(0,0%,20%,1)] group-hover:text-black group-hover:translate-x-1"}`}
                                     strokeWidth={2}
                                 />
                             )}
@@ -128,7 +128,7 @@ const Sidebar = ({ selectedDuration, setSelectedDuration, selectedSort, setSelec
                 }}
             >
                 <div className="flex items-center gap-2">
-                    <h3 className="text-[12px] font-bold text-orange-500 uppercase tracking-wider m-0">Rent For</h3>
+                    <h3 className="text-[12px] font-bold text-[#F08C00] uppercase tracking-[-0.4px] m-0">Rent For</h3>
                 </div>
                 <div
                     className="grid grid-cols-2 m-0"
@@ -163,7 +163,7 @@ const Sidebar = ({ selectedDuration, setSelectedDuration, selectedSort, setSelec
                                     fontWeight: 700,
                                     fontSize: '12px',
                                     lineHeight: '16px',
-                                    letterSpacing: '0.08em',
+                                    letterSpacing: '-0.4px',
                                     verticalAlign: 'middle',
                                     color: isSelected ? 'hsla(0, 0%, 0%, 1)' : 'hsla(0, 0%, 20%, 1)',
                                     display: 'inline-block',
@@ -196,7 +196,7 @@ const Sidebar = ({ selectedDuration, setSelectedDuration, selectedSort, setSelec
                         fontWeight: 700,
                         fontSize: '12px',
                         lineHeight: '16px',
-                        letterSpacing: '0.08em',
+                        letterSpacing: '-0.4px',
                         verticalAlign: 'middle',
                         color: 'hsla(35, 100%, 47%, 1)',
                         textTransform: 'uppercase',
@@ -231,15 +231,15 @@ const Sidebar = ({ selectedDuration, setSelectedDuration, selectedSort, setSelec
                                 opacity: 1
                             }}
                         >
-                            <div className={`w-4 h-4 rounded-full border transition-all duration-200 flex items-center justify-center shrink-0 ${selectedSort === option ? "border-black" : "border-gray-300 group-hover:border-gray-400"}`}>
-                                {selectedSort === option && <div className="w-2 h-2 rounded-full bg-black" />}
+                            <div className={`w-5 h-5 rounded-full border transition-all duration-200 flex items-center justify-center shrink-0 ${selectedSort === option ? "border-black" : "border-gray-300 group-hover:border-gray-400"}`}>
+                                {selectedSort === option && <div className="w-2.5 h-2.5 rounded-full bg-black" />}
                             </div>
                             <span style={{
                                 fontFamily: "'Mona Sans', sans-serif",
                                 fontWeight: selectedSort === option ? 700 : 600,
                                 fontSize: '12px',
                                 lineHeight: '16px',
-                                letterSpacing: '0.08em',
+                                letterSpacing: '-0.4px',
                                 verticalAlign: 'middle',
                                 color: selectedSort === option ? 'hsla(0, 0%, 0%, 1)' : 'hsla(0, 0%, 20%, 1)',
                                 display: 'inline-block',
@@ -264,11 +264,11 @@ const Sidebar = ({ selectedDuration, setSelectedDuration, selectedSort, setSelec
                     opacity: 1
                 }}
             >
-                <h3 className="text-[12px] font-bold text-orange-500 uppercase tracking-wider m-0">Deals</h3>
-                <label className="flex items-center gap-3 cursor-pointer group">
-                    <div className="w-4 h-4 rounded border transition-all duration-200 flex items-center justify-center border-gray-300 group-hover:border-gray-400">
+                <h3 className="text-[12px] font-bold text-[#F08C00] uppercase tracking-[-0.4px] m-0">Deals</h3>
+                <label className="flex items-center gap-2 cursor-pointer group">
+                    <div className="w-3.5 h-3.5 rounded border transition-all duration-200 flex items-center justify-center border-[#AFAFAF] group-hover:border-gray-500">
                     </div>
-                    <span className="text-[13px] text-gray-500 group-hover:text-gray-800 transition-colors duration-200">Deals</span>
+                    <span className="text-[12px] font-semibold text-[#333] tracking-[-0.4px] group-hover:text-black transition-colors duration-200">Deals</span>
                 </label>
             </div>
         </aside>

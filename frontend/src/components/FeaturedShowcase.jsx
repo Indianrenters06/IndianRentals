@@ -5,8 +5,9 @@ import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Heart, Star, Truck, Info } from '@phosphor-icons/react';
 import { ChevronLeftIcon, ChevronRightIcon, HeartIcon } from '@heroicons/react/24/outline';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { addToCart } from '../redux/features/cartSlice';
+import { toggleWishlist, selectIsWishlisted } from '../redux/features/wishlistSlice';
 import { useRouter } from 'next/navigation';
 
 const API = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
@@ -153,6 +154,14 @@ const BannerCarousel = ({ banners, current, setCurrent, height = "387px", produc
 const ShowcaseProductCard = ({ product, index, isDesktop, handleAddToCart }) => {
     const [isHovered, setIsHovered] = useState(false);
     const router = useRouter();
+    const dispatch = useDispatch();
+    const isWishlisted = useSelector(selectIsWishlisted(product.id));
+
+    const handleToggleWishlist = (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        dispatch(toggleWishlist(product));
+    };
 
     const CARD_W = isDesktop ? 285 : 170;
     const CARD_H = isDesktop ? 387 : 256;
@@ -233,9 +242,11 @@ const ShowcaseProductCard = ({ product, index, isDesktop, handleAddToCart }) => 
                     <button
                         className="absolute z-20 flex items-center justify-center rounded-full hover:scale-110 transition-all duration-300"
                         style={{ width: "33px", height: "33px", top: "10.57px", right: "12.51px", backgroundColor: "#F6F6F6", border: "1px solid #EEEEEE", borderRadius: "100%" }}
-                        onClick={(e) => { e.preventDefault(); e.stopPropagation(); }}
+                        onClick={handleToggleWishlist}
+                        aria-label={isWishlisted ? 'Remove from wishlist' : 'Add to wishlist'}
+                        aria-pressed={isWishlisted}
                     >
-                        <Heart size={21} weight="regular" className="text-black" />
+                        <Heart size={21} weight={isWishlisted ? "fill" : "regular"} color={isWishlisted ? "#ED2115" : "#000000"} />
                     </button>
 
                     <div className="relative w-full h-full p-4 flex items-center justify-center">

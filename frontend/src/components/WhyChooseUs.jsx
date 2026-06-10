@@ -54,7 +54,7 @@ const WhyChooseUs = ({ cmsData = null, overrideBg, overridePaddingTop, hideBorde
             style={{
                 paddingTop: overridePaddingTop || (viewType !== 'mobile' ? '80px' : '48px'),
                 paddingBottom: viewType !== 'mobile' ? '80px' : '48px',
-                background: overrideBg || (viewType !== 'mobile' ? 'var(--color-orange-orange-50, hsla(44, 100%, 96%, 1))' : '#FFFDF7'),
+                background: overrideBg || (viewType !== 'mobile' ? '#FFF1C5' : '#FFFDF7'),
                 borderBottom: hideBorder ? 'none' : (viewType !== 'mobile' ? '1px solid var(--color-grey-grey-200, hsla(0, 0%, 89%, 1))' : 'none')
             }}
         >
@@ -111,9 +111,8 @@ const WhyChooseUs = ({ cmsData = null, overrideBg, overridePaddingTop, hideBorde
                             </p>
                         </div>
 
-                        {viewType === 'mobile' && (
-                            <div style={{ width: '350px', height: '1px', background: 'var(--color-grey-grey-200, hsla(0, 0%, 89%, 1))' }} />
-                        )}
+                        <div style={{ width: viewType === 'mobile' ? '350px' : '100%', height: '1px', background: 'var(--color-grey-grey-200, hsla(0, 0%, 89%, 1))' }} />
+
 
                         {/* Stats row */}
                         <div
@@ -142,11 +141,12 @@ const WhyChooseUs = ({ cmsData = null, overrideBg, overridePaddingTop, hideBorde
                                             opacity: 1,
                                             whiteSpace: 'nowrap'
                                         } : {
-                                            fontSize: viewType === 'desktop' ? '48px' : '32px',
-                                            fontWeight: viewType === 'desktop' ? '500' : 'bold',
-                                            lineHeight: viewType === 'desktop' ? '58px' : '40px',
-                                            color: viewType === 'desktop' ? 'hsla(0, 0%, 13%, 1)' : '#111827',
-                                            marginLeft: viewType === 'desktop' ? '4px' : '0',
+                                            fontSize: viewType === 'desktop' ? '27px' : '32px',
+                                            fontWeight: viewType === 'desktop' ? '600' : 'bold',
+                                            lineHeight: viewType === 'desktop' ? '35px' : '40px',
+                                            color: viewType === 'desktop' ? 'hsla(0, 0%, 20%, 1)' : '#111827',
+                                            letterSpacing: viewType === 'desktop' ? '-0.8px' : undefined,
+                                            marginLeft: '0',
                                             opacity: 1
                                         }}
                                     >
@@ -168,10 +168,10 @@ const WhyChooseUs = ({ cmsData = null, overrideBg, overridePaddingTop, hideBorde
                                             overflow: 'hidden',
                                             textOverflow: 'ellipsis'
                                         } : {
-                                            fontSize: viewType === 'desktop' ? '13.5px' : '13px',
+                                            fontSize: viewType === 'desktop' ? '14px' : '13px',
                                             fontWeight: '500',
-                                            lineHeight: '18px',
-                                            letterSpacing: viewType === 'desktop' ? '-0.01em' : undefined
+                                            lineHeight: viewType === 'desktop' ? '20px' : '18px',
+                                            letterSpacing: viewType === 'desktop' ? '-0.4px' : undefined
                                         }}
                                     >
                                         {s.label}

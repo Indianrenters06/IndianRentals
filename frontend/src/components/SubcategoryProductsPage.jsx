@@ -285,9 +285,9 @@ export default function SubcategoryProductsPage({ subcategoryId, subcategoryName
                         style={{
                             fontFamily: "'Mona Sans', sans-serif",
                             fontWeight: 600,
-                            fontSize: '44px',
-                            lineHeight: '58px',
-                            letterSpacing: '-0.01em',
+                            fontSize: '36px',
+                            lineHeight: '45px',
+                            letterSpacing: '-0.8px',
                             color: 'hsla(0, 0%, 12%, 1)',
                             maxWidth: '589px',
                             margin: 0,
@@ -297,7 +297,7 @@ export default function SubcategoryProductsPage({ subcategoryId, subcategoryName
                     </h1>
                 )}
 
-                <div style={{ display: 'flex', width: '100%', gap: '30px' }}>
+                <div style={{ display: 'flex', width: '100%', gap: '20px' }}>
                     {!isMobile && (
                         <Sidebar
                             selectedDuration={selectedDuration}
@@ -345,7 +345,7 @@ export default function SubcategoryProductsPage({ subcategoryId, subcategoryName
                                     </p>
                                 )}
 
-                                <div style={{ display: 'grid', gridTemplateColumns: isMobile ? 'repeat(2, minmax(0, 1fr))' : 'repeat(3, minmax(0, 1fr))', gap: isMobile ? '8px' : '30px' }}>
+                                <div style={{ display: 'grid', gridTemplateColumns: isMobile ? 'repeat(2, minmax(0, 1fr))' : 'repeat(3, minmax(0, 1fr))', columnGap: isMobile ? '8px' : '20px', rowGap: isMobile ? '8px' : '32px' }}>
                                     {processedProducts.map((product) => (
                                         <ProductCard key={product.id} product={product} mobile={isMobile} />
                                     ))}

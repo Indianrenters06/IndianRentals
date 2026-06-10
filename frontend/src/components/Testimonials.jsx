@@ -28,15 +28,15 @@ const GoogleGLogo = () => (
 );
 
 const staticReviews = [
-    { id: 1, name: "John Doe", role: "AI Engineer", text: "Lorem ipsum velit laoreet tincidunt dolor donec at urna vestibulum nunc accumsan porttitor consequat tellus lectus adipiscing risus ultrices pulvinar duis amet sed in fermentum sed sit ut egestas mattis risus amet odio purus neque egestas pellentesque eget egestas pretium orci vel magna vulputate egestas amet vestibulum dictum sapien rhoncus nibh enim lacus a sapien ultrices dui ipsum pharetra odio scelerisque quis felis nibh integer enim eu mauris tellus neque sit.", bgColor: "hsla(46, 100%, 89%, 1)", textColor: "text-[#995D00]", stars: 5 },
-    { id: 2, name: "John Doe", role: "AI Engineer", text: "Lorem ipsum dolor sit amet consectetur. Eget pretium risus odio eu commodo amet pretium. Interdum purus sapien facilisi at senectus tempus nisi nulla. Ultricies condimentum mi ultrices integer.", bgColor: "hsla(250, 100%, 95%, 1)", textColor: "text-[#553C9A]", stars: 5 },
-    { id: 3, name: "John Doe", role: "AI Engineer", text: "Lorem ipsum dolor sit amet consectetur. Eget pretium risus odio eu commodo amet pretium. Interdum purus sapien facilisi at senectus tempus nisi nulla. Ultricies condimentum mi ultrices integer.", bgColor: "hsla(208, 100%, 92%, 1)", textColor: "text-[#0A4BB3]", stars: 5 },
-    { id: 4, name: "John Doe", role: "AI Engineer", text: "Lorem ipsum pharetra a at quam ipsum lobortis vestibulum eu egestas habitant ipsum magna tempus auctor laoreet justo elementum et sit posuere fermentum sed sit ut egestas mattis risus amet odio purus neque egestas pellentesque eget egestas pretium orci vel magna vulputate egestas amet vestibulum dictum sapien rhoncus nibh enim lacus a sapien ultrices dui ipsum pharetra odio scelerisque quis felis nibh integer enim eu mauris tellus neque sit.", bgColor: "hsla(208, 100%, 92%, 1)", textColor: "text-[#0A4BB3]", stars: 5 },
-    { id: 5, name: "John Doe", role: "AI Engineer", text: "Lorem ipsum elementum rhoncus sed vulputate mattis accumsan duis laoreet eu laoreet risus cursus in ridiculus amet sollicitudin lectus sed ullamcorper leo massa risus libero pellentesque pretium ut arcu cursus risus ultrices vulputate volutpat vulputate molestie sagittis aenean faucibus commodo nisi purus enim proin facilisis sed at porttitor posuere morbi morbi in cursus posuere diam a tortor lorem posuere sed.", bgColor: "hsla(322, 93%, 95%, 1)", textColor: "text-[#B83280]", stars: 5 },
-    { id: 6, name: "John Doe", role: "AI Engineer", text: "Lorem ipsum volutpat placerat sem turpis ipsum massa cras non ultrices eu id viverra lectus enim leo adipiscing sem rhoncus ligula augue sit id ante eget eget diam egestas in sit urna hendrerit cum scelerisque tortor pellentesque ut donec diam lacus massa sed fermentum nunc egestas semper tempus augue nunc.", bgColor: "hsla(250, 100%, 95%, 1)", textColor: "text-[#553C9A]", stars: 5 },
-    { id: 7, name: "John Doe", role: "AI Engineer", text: "Lorem ipsum dolor sit amet consectetur. Eget pretium risus odio eu commodo amet pretium. Interdum purus sapien facilisi at senectus tempus nisi nulla. Ultricies condimentum mi ultrices integer.", bgColor: "hsla(167, 85%, 89%, 1)", textColor: "text-[#216436]", stars: 5 },
-    { id: 8, name: "John Doe", role: "AI Engineer", text: "Lorem ipsum quisque gravida volutpat volutpat adipiscing quam senectus aenean semper turpis nulla arcu in mauris augue odio netus tellus aliquet lectus mauris est id eleifend elit sed porta lobortis quis ut tristique ut et dui orci risus tellus nibh fames aliquam odio eget ullamcorper res conconvallis porttitor eu posuere viverra arcu ridiculis in ut ultrices egestas at ac sit enim dolor arcu integer vitae bibindum sit sed mauris est arcu malesuada porta eros eu vel mi pretium habitasse.", bgColor: "hsla(208, 100%, 92%, 1)", textColor: "text-[#0A4BB3]", stars: 5 },
-    { id: 9, name: "John Doe", role: "AI Engineer", text: "Lorem ipsum nunc tortor viverra condimentum faucibus pharetra nunc turpis consequat gravida suspendisse ullamcorper elit ut dignissim mattis egestas odio facilisi sagittis integer morbi dignissim quam risus tellus cras ut ac ornare felis duis et donec et sed tincidunt.", bgColor: "hsla(46, 100%, 89%, 1)", textColor: "text-[#995D00]", stars: 5 },
+    { id: 1, name: "John Doe", role: "AI Engineer", text: "Lorem ipsum velit laoreet tincidunt dolor donec at urna vestibulum nunc accumsan porttitor consequat tellus lectus adipiscing risus ultrices pulvinar duis amet sed in fermentum sed sit ut egestas mattis risus amet odio purus neque egestas pellentesque eget egestas pretium orci vel magna vulputate egestas amet vestibulum dictum sapien rhoncus nibh enim lacus a sapien ultrices dui ipsum pharetra odio scelerisque quis felis nibh integer enim eu mauris tellus neque sit.", bgColor: "hsla(46, 100%, 89%, 1)", textColor: "text-[#BB4A02]", stars: 5 },
+    { id: 2, name: "John Doe", role: "AI Engineer", text: "Lorem ipsum dolor sit amet consectetur. Eget pretium risus odio eu commodo amet pretium. Interdum purus sapien facilisi at senectus tempus nisi nulla. Ultricies condimentum mi ultrices integer.", bgColor: "hsla(250, 100%, 95%, 1)", textColor: "text-[#5718BF]", stars: 5 },
+    { id: 3, name: "John Doe", role: "AI Engineer", text: "Lorem ipsum dolor sit amet consectetur. Eget pretium risus odio eu commodo amet pretium. Interdum purus sapien facilisi at senectus tempus nisi nulla. Ultricies condimentum mi ultrices integer.", bgColor: "hsla(208, 100%, 92%, 1)", textColor: "text-[#13309C]", stars: 5 },
+    { id: 4, name: "John Doe", role: "AI Engineer", text: "Lorem ipsum pharetra a at quam ipsum lobortis vestibulum eu egestas habitant ipsum magna tempus auctor laoreet justo elementum et sit posuere fermentum sed sit ut egestas mattis risus amet odio purus neque egestas pellentesque eget egestas pretium orci vel magna vulputate egestas amet vestibulum dictum sapien rhoncus nibh enim lacus a sapien ultrices dui ipsum pharetra odio scelerisque quis felis nibh integer enim eu mauris tellus neque sit.", bgColor: "hsla(208, 100%, 92%, 1)", textColor: "text-[#13309C]", stars: 5 },
+    { id: 5, name: "John Doe", role: "AI Engineer", text: "Lorem ipsum elementum rhoncus sed vulputate mattis accumsan duis laoreet eu laoreet risus cursus in ridiculus amet sollicitudin lectus sed ullamcorper leo massa risus libero pellentesque pretium ut arcu cursus risus ultrices vulputate volutpat vulputate molestie sagittis aenean faucibus commodo nisi purus enim proin facilisis sed at porttitor posuere morbi morbi in cursus posuere diam a tortor lorem posuere sed.", bgColor: "hsla(322, 93%, 95%, 1)", textColor: "text-[#AD0755]", stars: 5 },
+    { id: 6, name: "John Doe", role: "AI Engineer", text: "Lorem ipsum volutpat placerat sem turpis ipsum massa cras non ultrices eu id viverra lectus enim leo adipiscing sem rhoncus ligula augue sit id ante eget eget diam egestas in sit urna hendrerit cum scelerisque tortor pellentesque ut donec diam lacus massa sed fermentum nunc egestas semper tempus augue nunc.", bgColor: "hsla(250, 100%, 95%, 1)", textColor: "text-[#5718BF]", stars: 5 },
+    { id: 7, name: "John Doe", role: "AI Engineer", text: "Lorem ipsum dolor sit amet consectetur. Eget pretium risus odio eu commodo amet pretium. Interdum purus sapien facilisi at senectus tempus nisi nulla. Ultricies condimentum mi ultrices integer.", bgColor: "hsla(167, 85%, 89%, 1)", textColor: "text-[#115E59]", stars: 5 },
+    { id: 8, name: "John Doe", role: "AI Engineer", text: "Lorem ipsum quisque gravida volutpat volutpat adipiscing quam senectus aenean semper turpis nulla arcu in mauris augue odio netus tellus aliquet lectus mauris est id eleifend elit sed porta lobortis quis ut tristique ut et dui orci risus tellus nibh fames aliquam odio eget ullamcorper res conconvallis porttitor eu posuere viverra arcu ridiculis in ut ultrices egestas at ac sit enim dolor arcu integer vitae bibindum sit sed mauris est arcu malesuada porta eros eu vel mi pretium habitasse.", bgColor: "hsla(208, 100%, 92%, 1)", textColor: "text-[#13309C]", stars: 5 },
+    { id: 9, name: "John Doe", role: "AI Engineer", text: "Lorem ipsum nunc tortor viverra condimentum faucibus pharetra nunc turpis consequat gravida suspendisse ullamcorper elit ut dignissim mattis egestas odio facilisi sagittis integer morbi dignissim quam risus tellus cras ut ac ornare felis duis et donec et sed tincidunt.", bgColor: "hsla(46, 100%, 89%, 1)", textColor: "text-[#BB4A02]", stars: 5 },
 ];
 
 const Testimonials = ({ overrideBg, overridePadding, overrideHeight }) => {
@@ -101,18 +101,18 @@ const Testimonials = ({ overrideBg, overridePadding, overrideHeight }) => {
             }}
         >
             <div className="flex flex-col mb-4">
-                <span className={`text-[18px] font-bold ${review.textColor || "text-[#1D1D1F]"} leading-tight`}>{review.name}</span>
-                <span className={`text-[13px] ${review.textColor || "text-[#86868B]"} opacity-80`}>{review.role || "Verified User"}</span>
+                <span className={`text-[18px] font-medium ${review.textColor || "text-[#1D1D1F]"} leading-[25px]`}>{review.name}</span>
+                <span className={`text-[12px] ${review.textColor || "text-[#86868B]"} opacity-80`}>{review.role || "Verified User"}</span>
             </div>
 
             <p
                 className={`grow mb-auto ${review.textColor || "text-[#1D1D1F]"}`}
                 style={{
                     fontFamily: "'Mona Sans', sans-serif",
-                    fontSize: "12.5px",
+                    fontSize: "14px",
                     fontWeight: 500,
-                    lineHeight: "1.4",
-                    letterSpacing: "0.01em"
+                    lineHeight: "20px",
+                    letterSpacing: "-0.4px"
                 }}
             >
                 {review.message || review.text}
@@ -155,7 +155,7 @@ const Testimonials = ({ overrideBg, overridePadding, overrideHeight }) => {
         <section
             className="w-full flex flex-col items-center mx-auto"
             style={{
-                background: overrideBg || (viewType === 'desktop' ? '#F5F5F5' : (viewType === 'tablet' ? '#FFFFFF' : 'hsla(0, 0%, 96%, 1)')),
+                background: overrideBg || (viewType === 'desktop' ? '#FFFFFF' : (viewType === 'tablet' ? '#FFFFFF' : 'hsla(0, 0%, 96%, 1)')),
                 width: '100%',
                 maxWidth: '1440px',
                 minHeight: overrideHeight || 'auto',
@@ -212,9 +212,9 @@ const Testimonials = ({ overrideBg, overridePadding, overrideHeight }) => {
                                 fontFamily: '"Mona Sans", sans-serif',
                                 fontSize: viewType === 'mobile' ? '14px' : '16px',
                                 fontWeight: 500,
-                                lineHeight: viewType === 'mobile' ? '18px' : '1.5',
-                                letterSpacing: '0.01em',
-                                color: viewType === 'mobile' ? 'hsla(0, 0%, 33%, 1)' : '#86868B',
+                                lineHeight: viewType === 'mobile' ? '18px' : '1.4',
+                                letterSpacing: viewType === 'mobile' ? '0.01em' : '-0.02em',
+                                color: viewType === 'mobile' ? 'hsla(0, 0%, 33%, 1)' : '#545454',
                                 margin: 0
                             }}
                         >
@@ -281,15 +281,16 @@ const Testimonials = ({ overrideBg, overridePadding, overrideHeight }) => {
                         href="/reviews"
                         className="inline-flex items-center justify-center rounded-full transition-all hover:brightness-110 shadow-md active:scale-95"
                         style={{
-                            width: '163px',
-                            height: '35px',
-                            backgroundColor: 'hsla(212, 100%, 50%, 1)',
-                            color: '#FFFFFF',
+                            minWidth: '163px',
+                            height: '40px',
+                            padding: '6px 20px',
+                            backgroundColor: '#0075FF',
+                            color: '#EDFAFF',
                             fontFamily: "'Mona Sans', sans-serif",
-                            fontSize: "14px",
+                            fontSize: "16px",
                             fontWeight: 500,
-                            letterSpacing: "0.01em",
-                            lineHeight: "35px"
+                            letterSpacing: "-0.4px",
+                            lineHeight: "23px"
                         }}
                     >
                         Read All Reviews
