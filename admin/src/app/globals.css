@@ -2,20 +2,22 @@
 @source "../../node_modules/@heroui/theme/dist";
 @custom-variant dark (&:is(.dark, .dark *));
 
-/* ── HeroUI Pro Design System — Color Tokens ─────────────────────────────────
-   Electric blue accent (#006FEE), deep dark surfaces, Inter typography.
-   These tokens are referenced throughout the admin panel via CSS variables.
+/* ── IndianRenters Design System — Color Tokens ──────────────────────────────
+   Saffron-gold brand accent (#f08c00 / Orange-300 #ffcf46 CTA), charcoal-grey
+   structure, Mona Sans typography. Authoritative palette from the IndianRenters
+   Figma file. These tokens are referenced throughout the admin panel via CSS
+   variables and feed the Tailwind indigo-* scale.
    ─────────────────────────────────────────────────────────────────────────── */
 
 @theme {
-  /* HeroUI Pro electric-blue brand scale */
-  --color-brand-50: #e8f2fe;
-  --color-brand-100: #bdd9fd;
-  --color-brand-200: #7ec0ff;
-  --color-brand-400: #3d97ff;
-  --color-brand-500: #006FEE;
-  --color-brand-600: #0055be;
-  --color-brand-900: #003a7e;
+  /* IndianRenters saffron-gold brand scale */
+  --color-brand-50: #fffaeb;
+  --color-brand-100: #fff1c5;
+  --color-brand-200: #ffe485;
+  --color-brand-400: #ffb91b;
+  --color-brand-500: #f08c00;
+  --color-brand-600: #e26e00;
+  --color-brand-900: #7c2f0b;
 
   /* Dark surface scale */
   --color-dark-900: #050506;
@@ -59,7 +61,7 @@ body {
   -webkit-font-smoothing: antialiased;
 
   selection {
-    background-color: var(--accent, #006FEE);
+    background-color: var(--accent, #e26e00);
     color: #ffffff;
   }
 }
@@ -146,10 +148,10 @@ summary,
   --border: #e4e4e7;
   --border-secondary: #d4d4d8;
 
-  /* ── Accent (electric blue) ── */
-  --accent: #006FEE;
+  /* ── Accent (saffron gold) ── */
+  --accent: #e26e00;
   --accent-foreground: #ffffff;
-  --accent-soft: rgba(0, 111, 238, 0.12);
+  --accent-soft: rgba(240, 140, 0, 0.12);
 
   /* ── Semantic ── */
   --danger: #f31260;
@@ -182,18 +184,18 @@ summary,
   --duration-standard: 200ms;
   --duration-deliberate: 300ms;
 
-  /* ── Tailwind indigo scale → HeroUI Pro electric blue
+  /* ── Tailwind indigo scale → IndianRenters saffron gold
        (applyBrandingTheme() can override these at runtime) ── */
-  --color-indigo-50: #e8f2fe;
-  --color-indigo-100: #bdd9fd;
-  --color-indigo-200: #7ec0ff;
-  --color-indigo-400: #3d97ff;
-  --color-indigo-500: #006FEE;
-  --color-indigo-600: #0055be;
-  --color-indigo-700: #003a7e;
+  --color-indigo-50: #fffaeb;
+  --color-indigo-100: #fff1c5;
+  --color-indigo-200: #ffe485;
+  --color-indigo-400: #ffb91b;
+  --color-indigo-500: #f08c00;
+  --color-indigo-600: #e26e00;
+  --color-indigo-700: #bb4a02;
 
   /* ── HeroUI component theme ── */
-  --heroui-colors-primary: #006FEE;
+  --heroui-colors-primary: #f08c00;
   --heroui-colors-secondary: #7828c8;
   --heroui-colors-background: #ffffff;
   --heroui-colors-foreground: #111113;
@@ -272,7 +274,7 @@ summary,
   top: 6px !important;
   transform: translateY(0) scale(0.85) !important;
   font-size: 1rem !important;
-  color: var(--accent, #006FEE) !important;
+  color: var(--accent, #e26e00) !important;
 }
 
 /* Textarea label fix — full height wrappers need top-aligned label by default */
@@ -290,7 +292,7 @@ summary,
   transform: scale(0.85) !important;
   transform-origin: top left !important;
   font-size: 1rem !important;
-  color: var(--accent, #006FEE) !important;
+  color: var(--accent, #e26e00) !important;
 }
 
 /* Textarea: push content down when label floats */
@@ -365,7 +367,7 @@ summary,
 
 /* Primary colour switch when ON */
 [role="switch"][data-selected="true"][data-color="primary"] [data-slot="wrapper"] {
-  background-color: var(--accent, #006FEE) !important;
+  background-color: var(--accent, #e26e00) !important;
 }
 
 /* Secondary colour when ON */
@@ -575,7 +577,7 @@ nav[data-slot="base"]:has(ul[data-slot="wrapper"]) [data-slot="item"][data-activ
 /* Active sliding cursor styling */
 nav[data-slot="base"]:has(ul[data-slot="wrapper"]) [data-slot="cursor"] {
   border-radius: 8px !important;
-  background-color: var(--accent, #006FEE) !important;
-  box-shadow: 0 4px 12px rgba(0, 111, 238, 0.35) !important;
+  background-color: var(--accent, #e26e00) !important;
+  box-shadow: 0 4px 12px rgba(240, 140, 0, 0.35) !important;
   transition: all 0.25s var(--ease-standard, cubic-bezier(0.4, 0, 0.2, 1)) !important;
 }

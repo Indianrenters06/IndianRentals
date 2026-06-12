@@ -118,7 +118,7 @@ export default function BrandingSettings() {
                         Logo & Branding
                     </h1>
                     <p className="text-slate-500 text-sm mt-1">
-                        Manage your site's logo, title, and global color theme.
+                        Manage your site's logo, title, and the admin panel color theme.
                     </p>
                 </div>
                 <Button
@@ -179,7 +179,7 @@ export default function BrandingSettings() {
                         </div>
                         <div>
                             <h2 className="text-lg font-bold text-slate-800 dark:text-white">Color Theme</h2>
-                            <p className="text-sm text-slate-500">Select a global color scheme for the storefront.</p>
+                            <p className="text-sm text-slate-500">Select a color scheme for the admin panel. This does not affect the public website.</p>
                         </div>
                     </div>
 

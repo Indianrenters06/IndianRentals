@@ -82,10 +82,11 @@ export const SettingsProvider = ({ children }) => {
             const data = await getSettings();
             if (data) {
                 setSettings(data);
-                // Apply theme variables dynamically
-                const activeThemeName = data.theme?.activeTheme || 'default';
-                const themeVars = THEMES[activeThemeName] || THEMES.default;
-                
+                // The website always uses its fixed default brand colors.
+                // The admin "Logo & Branding" theme switch is intentionally NOT
+                // applied here — it only themes the admin panel, never the public site.
+                const themeVars = THEMES.default;
+
                 Object.entries(themeVars).forEach(([key, value]) => {
                     document.documentElement.style.setProperty(key, value);
                 });
