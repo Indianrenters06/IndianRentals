@@ -1,10 +1,11 @@
 const express = require('express');
 const router = express.Router();
-const { getCoupons, verifyCoupon, createCoupon, updateCoupon, deleteCoupon, getCouponAnalytics, getCouponReport } = require('../controllers/couponController');
+const { getCoupons, getActiveCoupons, verifyCoupon, createCoupon, updateCoupon, deleteCoupon, getCouponAnalytics, getCouponReport } = require('../controllers/couponController');
 const { protect, admin } = require('../middleware/authMiddleware');
 
-// Public route — verify a coupon code at checkout
-router.post('/verify', verifyCoupon);
+// Public routes — used by the storefront cart
+router.post('/verify', verifyCoupon);   // verify a single code at checkout
+router.get('/active', getActiveCoupons); // list active coupons ("View All Coupons")
 
 // Admin-only routes
 router.get('/analytics', protect, admin, getCouponAnalytics);

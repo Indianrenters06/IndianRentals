@@ -235,8 +235,14 @@ export default function CartPage() {
     const [couponError, setCouponError] = useState('');
     const [couponLoading, setCouponLoading] = useState(false);
 
-    const handleApplyCoupon = async () => {
-        const code = couponCode.trim();
+    // "View All Coupons" modal
+    const [showCoupons, setShowCoupons] = useState(false);
+    const [availableCoupons, setAvailableCoupons] = useState([]);
+    const [couponsLoading, setCouponsLoading] = useState(false);
+    const [couponsError, setCouponsError] = useState('');
+
+    const handleApplyCoupon = async (overrideCode) => {
+        const code = (typeof overrideCode === 'string' ? overrideCode : couponCode).trim();
         if (!code) return;
         setCouponError('');
         setCouponLoading(true);
@@ -254,11 +260,29 @@ export default function CartPage() {
             const data = await res.json();
             if (!res.ok) throw new Error(data.message || 'Invalid coupon');
             dispatch(setCoupon({ code: data.code, discountAmount: data.discountAmount, description: data.description }));
+            setShowCoupons(false);
         } catch (err) {
             setCouponError(err.message);
             dispatch(removeCoupon());
         } finally {
             setCouponLoading(false);
+        }
+    };
+
+    const handleViewAllCoupons = async () => {
+        setShowCoupons(true);
+        setCouponsLoading(true);
+        setCouponsError('');
+        try {
+            const res = await fetch(`${API_BASE_URL}/api/coupons/active`);
+            const data = await res.json();
+            if (!res.ok) throw new Error(data.message || 'Failed to load coupons');
+            setAvailableCoupons(Array.isArray(data) ? data : []);
+        } catch (err) {
+            setCouponsError(err.message || 'Failed to load coupons');
+            setAvailableCoupons([]);
+        } finally {
+            setCouponsLoading(false);
         }
     };
 
@@ -402,9 +426,10 @@ export default function CartPage() {
                                     </p>
                                 )}
 
-                                <button 
-                                    className="w-full rounded-full flex items-center justify-center transition-colors shadow-sm tracking-tight"
-                                    style={{ 
+                                <button
+                                    onClick={handleViewAllCoupons}
+                                    className="w-full rounded-full flex items-center justify-center transition-colors shadow-sm tracking-tight hover:brightness-95"
+                                    style={{
                                         height: '40px',
                                         backgroundColor: 'hsla(44, 100%, 64%, 1)',
                                         padding: '6px 20px',
@@ -460,6 +485,84 @@ export default function CartPage() {
                     </div>
                 </div>
             </div>
+
+            {/* View All Coupons Modal */}
+            {showCoupons && (
+                <div
+                    className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4"
+                    onClick={() => setShowCoupons(false)}
+                >
+                    <div
+                        className="bg-white w-full max-w-[460px] max-h-[80vh] rounded-2xl shadow-2xl flex flex-col overflow-hidden"
+                        onClick={(e) => e.stopPropagation()}
+                    >
+                        {/* Header */}
+                        <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
+                            <h3 className="font-semibold text-gray-900 text-[17px] font-sans flex items-center gap-2">
+                                <HiOutlineSparkles className="text-[#d97706]" /> Available Coupons
+                            </h3>
+                            <button
+                                onClick={() => setShowCoupons(false)}
+                                className="text-gray-400 hover:text-gray-600 p-1"
+                            >
+                                <AiOutlineClose size={18} />
+                            </button>
+                        </div>
+
+                        {/* Body */}
+                        <div className="px-5 py-4 overflow-y-auto flex flex-col gap-3">
+                            {couponsLoading && (
+                                <div className="flex items-center justify-center py-10 text-gray-400">
+                                    <FaSpinner className="animate-spin mr-2" /> Loading coupons…
+                                </div>
+                            )}
+
+                            {!couponsLoading && couponsError && (
+                                <p className="text-red-500 text-sm text-center py-8">{couponsError}</p>
+                            )}
+
+                            {!couponsLoading && !couponsError && availableCoupons.length === 0 && (
+                                <p className="text-gray-500 text-sm text-center py-8">No coupons available right now.</p>
+                            )}
+
+                            {!couponsLoading && !couponsError && availableCoupons.map((c) => {
+                                const discountLabel = c.discountType === 'percentage'
+                                    ? `${c.discountAmount}% OFF`
+                                    : `₹${c.discountAmount} OFF`;
+                                return (
+                                    <div
+                                        key={c.code}
+                                        className="border border-dashed border-[#E3B341] rounded-xl p-4 bg-[#FFFBF0] flex items-start justify-between gap-3"
+                                    >
+                                        <div className="flex flex-col min-w-0">
+                                            <div className="flex items-center gap-2">
+                                                <span className="font-bold text-gray-900 text-[15px] font-sans tracking-wide">{c.code}</span>
+                                                <span className="text-[#007F5F] text-xs font-semibold bg-[#E8F8F0] px-2 py-0.5 rounded-full">{discountLabel}</span>
+                                            </div>
+                                            {c.description && (
+                                                <p className="text-gray-600 text-xs mt-1">{c.description}</p>
+                                            )}
+                                            {c.minOrderAmount > 0 && (
+                                                <p className="text-gray-400 text-[11px] mt-1">Min. order ₹{c.minOrderAmount}</p>
+                                            )}
+                                            {c.expiryDate && (
+                                                <p className="text-gray-400 text-[11px]">Valid till {new Date(c.expiryDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}</p>
+                                            )}
+                                        </div>
+                                        <button
+                                            onClick={() => handleApplyCoupon(c.code)}
+                                            disabled={couponLoading || appliedCouponCode === c.code}
+                                            className="shrink-0 text-sm font-semibold text-[#d97706] hover:text-[#b45309] disabled:opacity-50 disabled:cursor-not-allowed"
+                                        >
+                                            {appliedCouponCode === c.code ? 'Applied' : 'Apply'}
+                                        </button>
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }

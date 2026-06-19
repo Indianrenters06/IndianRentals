@@ -9,6 +9,33 @@ const getCoupons = asyncHandler(async (req, res) => {
     res.json(coupons);
 });
 
+// @desc    Get active, currently-valid coupons (shown to shoppers in the cart)
+// @route   GET /api/coupons/active
+// @access  Public
+const getActiveCoupons = asyncHandler(async (req, res) => {
+    const now = new Date();
+    const coupons = await Coupon.find({
+        isActive: true,
+        expiryDate: { $gte: now },
+    }).sort({ createdAt: -1 });
+
+    // Drop usage-exhausted coupons and expose only customer-safe fields
+    // (no internal usageCount/usageLimit/_id leakage).
+    const visible = coupons
+        .filter((c) => !c.usageLimit || c.usageCount < c.usageLimit)
+        .map((c) => ({
+            code: c.code,
+            discountType: c.discountType,
+            discountAmount: c.discountAmount,
+            minOrderAmount: c.minOrderAmount,
+            maxDiscountAmount: c.maxDiscountAmount,
+            expiryDate: c.expiryDate,
+            description: c.description,
+        }));
+
+    res.json(visible);
+});
+
 // @desc    Verify / Apply a coupon code (for logged-in users at checkout)
 // @route   POST /api/coupons/verify
 // @access  Private (any logged-in user)
@@ -216,6 +243,7 @@ const getCouponReport = asyncHandler(async (req, res) => {
 
 module.exports = {
     getCoupons,
+    getActiveCoupons,
     verifyCoupon,
     createCoupon,
     updateCoupon,
