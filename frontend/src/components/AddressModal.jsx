@@ -1,17 +1,20 @@
 import React, { useState, useEffect } from 'react';
 import { AiOutlineClose } from 'react-icons/ai';
 
-const AddressModal = ({ isOpen, onClose, onSave, initialData }) => {
-    const [formData, setFormData] = useState({
-        name: '',
-        addressLine: '',
-        city: '',
-        state: '',
-        pincode: '',
-        country: '',
-        phone: '',
-        isBillingSame: false
-    });
+const emptyForm = {
+    name: '',
+    addressLine: '',
+    city: '',
+    state: '',
+    pincode: '',
+    country: '',
+    phone: '',
+    isBillingSame: false
+};
+
+const AddressModal = ({ isOpen, onClose, onSave, initialData, isSubmitting = false }) => {
+    const [formData, setFormData] = useState(emptyForm);
+    const [errors, setErrors] = useState({});
 
     useEffect(() => {
         if (initialData) {
@@ -21,18 +24,44 @@ const AddressModal = ({ isOpen, onClose, onSave, initialData }) => {
                 isBillingSame: initialData.isBillingSame || false
             });
         } else {
-            setFormData({
-                name: '',
-                addressLine: '',
-                city: '',
-                state: '',
-                pincode: '',
-                country: '',
-                phone: '',
-                isBillingSame: false
-            });
+            setFormData(emptyForm);
         }
+        setErrors({});
     }, [initialData, isOpen]);
+
+    const validate = (data) => {
+        const next = {};
+
+        if (!data.name.trim()) {
+            next.name = 'Full name is required.';
+        }
+
+        if (!data.addressLine.trim()) {
+            next.addressLine = 'Street address is required.';
+        }
+
+        if (!data.city.trim()) {
+            next.city = 'City / region is required.';
+        }
+
+        if (!data.pincode.trim()) {
+            next.pincode = 'Zip code is required.';
+        } else if (!/^\d{6}$/.test(data.pincode.trim())) {
+            next.pincode = 'Enter a valid 6-digit PIN code.';
+        }
+
+        if (!data.country.trim()) {
+            next.country = 'Country is required.';
+        }
+
+        if (!data.phone.trim()) {
+            next.phone = 'Phone number is required.';
+        } else if (!/^\d{10}$/.test(data.phone.replace(/\s+/g, ''))) {
+            next.phone = 'Enter a valid 10-digit phone number.';
+        }
+
+        return next;
+    };
 
     const handleChange = (e) => {
         const { name, value, type, checked } = e.target;
@@ -40,13 +69,36 @@ const AddressModal = ({ isOpen, onClose, onSave, initialData }) => {
             ...prev,
             [name]: type === 'checkbox' ? checked : value
         }));
+        // Clear the error for this field as the user corrects it
+        setErrors(prev => {
+            if (!prev[name]) return prev;
+            const next = { ...prev };
+            delete next[name];
+            return next;
+        });
     };
 
     const handleSubmit = (e) => {
         e.preventDefault();
+        if (isSubmitting) return;
+        const validationErrors = validate(formData);
+        if (Object.keys(validationErrors).length > 0) {
+            setErrors(validationErrors);
+            return;
+        }
+        setErrors({});
+        // Parent persists the address and closes the modal on success,
+        // so it stays open (with the data intact) if saving fails.
         onSave(formData);
-        onClose();
     };
+
+    // Shared helpers so every field reflects its error state consistently
+    const inputClass = 'w-full px-4 rounded-[6px] border outline-none transition-all placeholder-gray-300 text-[15px]';
+    const inputStyle = (field) => ({
+        height: '39px',
+        borderColor: errors[field] ? 'hsla(0, 84%, 60%, 1)' : 'hsla(0, 0%, 89%, 1)',
+        background: 'hsla(0, 0%, 100%, 1)'
+    });
 
     if (!isOpen) return null;
 
@@ -95,24 +147,21 @@ const AddressModal = ({ isOpen, onClose, onSave, initialData }) => {
                 <div
                     className="flex flex-col px-2.5 md:pr-2 md:px-0 py-2 overflow-y-auto w-full md:w-[381px] h-auto md:h-[464px]"
                 >
-                    <form onSubmit={handleSubmit} className="flex flex-col" style={{ height: '430px' }}>
+                    <form onSubmit={handleSubmit} noValidate className="flex flex-col" style={{ height: '430px' }}>
                         {/* Fields Container */}
                         <div className="flex flex-col w-full" style={{ gap: '28px', marginTop: '35px' }}>
                             <div className="flex flex-col w-full" style={{ gap: '4px' }}>
-                                <label className="text-sm font-medium text-[#1D1D1F]">Full Name</label>
+                                <label className="text-sm font-medium text-[#1D1D1F]">Full Name <span className="text-red-500">*</span></label>
                                 <input
                                     type="text"
                                     name="name"
                                     value={formData.name}
                                     onChange={handleChange}
-                                    placeholder="Enter you full name"
-                                    className="w-full px-4 rounded-[6px] border outline-none transition-all placeholder-gray-300 text-[15px]"
-                                    style={{
-                                        height: '39px',
-                                        borderColor: 'hsla(0, 0%, 89%, 1)',
-                                        background: 'hsla(0, 0%, 100%, 1)'
-                                    }}
+                                    placeholder="Enter your full name"
+                                    className={inputClass}
+                                    style={inputStyle('name')}
                                 />
+                                {errors.name && <span className="text-red-500 text-xs">{errors.name}</span>}
                             </div>
 
                             <div className="flex flex-col md:flex-row gap-4">
@@ -121,34 +170,26 @@ const AddressModal = ({ isOpen, onClose, onSave, initialData }) => {
                                     <input
                                         type="text"
                                         name="addressLine"
-                                        required
                                         value={formData.addressLine}
                                         onChange={handleChange}
                                         placeholder="Placeholder"
-                                        className="w-full px-4 rounded-[6px] border outline-none transition-all placeholder-gray-300 text-[15px]"
-                                        style={{
-                                            height: '39px',
-                                            borderColor: 'hsla(0, 0%, 89%, 1)',
-                                            background: 'hsla(0, 0%, 100%, 1)'
-                                        }}
+                                        className={inputClass}
+                                        style={inputStyle('addressLine')}
                                     />
+                                    {errors.addressLine && <span className="text-red-500 text-xs">{errors.addressLine}</span>}
                                 </div>
                                 <div className="flex-1 flex flex-col" style={{ gap: '4px' }}>
                                     <label className="text-sm font-medium text-[#1D1D1F]">City / Region <span className="text-red-500">*</span></label>
                                     <input
                                         type="text"
                                         name="city"
-                                        required
                                         value={formData.city}
                                         onChange={handleChange}
                                         placeholder="Placeholder"
-                                        className="w-full px-4 rounded-[6px] border outline-none transition-all placeholder-gray-300 text-[15px]"
-                                        style={{
-                                            height: '39px',
-                                            borderColor: 'hsla(0, 0%, 89%, 1)',
-                                            background: 'hsla(0, 0%, 100%, 1)'
-                                        }}
+                                        className={inputClass}
+                                        style={inputStyle('city')}
                                     />
+                                    {errors.city && <span className="text-red-500 text-xs">{errors.city}</span>}
                                 </div>
                             </div>
 
@@ -158,34 +199,28 @@ const AddressModal = ({ isOpen, onClose, onSave, initialData }) => {
                                     <input
                                         type="text"
                                         name="pincode"
-                                        required
+                                        inputMode="numeric"
+                                        maxLength={6}
                                         value={formData.pincode}
                                         onChange={handleChange}
                                         placeholder="Placeholder"
-                                        className="w-full px-4 rounded-[6px] border outline-none transition-all placeholder-gray-300 text-[15px]"
-                                        style={{
-                                            height: '39px',
-                                            borderColor: 'hsla(0, 0%, 89%, 1)',
-                                            background: 'hsla(0, 0%, 100%, 1)'
-                                        }}
+                                        className={inputClass}
+                                        style={inputStyle('pincode')}
                                     />
+                                    {errors.pincode && <span className="text-red-500 text-xs">{errors.pincode}</span>}
                                 </div>
                                 <div className="flex-1 flex flex-col" style={{ gap: '4px' }}>
                                     <label className="text-sm font-medium text-[#1D1D1F]">Country <span className="text-red-500">*</span></label>
                                     <input
                                         type="text"
                                         name="country"
-                                        required
                                         value={formData.country}
                                         onChange={handleChange}
                                         placeholder="Placeholder"
-                                        className="w-full px-4 rounded-[6px] border outline-none transition-all placeholder-gray-300 text-[15px]"
-                                        style={{
-                                            height: '39px',
-                                            borderColor: 'hsla(0, 0%, 89%, 1)',
-                                            background: 'hsla(0, 0%, 100%, 1)'
-                                        }}
+                                        className={inputClass}
+                                        style={inputStyle('country')}
                                     />
+                                    {errors.country && <span className="text-red-500 text-xs">{errors.country}</span>}
                                 </div>
                             </div>
 
@@ -194,17 +229,15 @@ const AddressModal = ({ isOpen, onClose, onSave, initialData }) => {
                                 <input
                                     type="tel"
                                     name="phone"
-                                    required
+                                    inputMode="numeric"
+                                    maxLength={10}
                                     value={formData.phone}
                                     onChange={handleChange}
                                     placeholder="Placeholder"
-                                    className="w-full px-4 rounded-[6px] border outline-none transition-all placeholder-gray-300 text-[15px]"
-                                    style={{
-                                        height: '39px',
-                                        borderColor: 'hsla(0, 0%, 89%, 1)',
-                                        background: 'hsla(0, 0%, 100%, 1)'
-                                    }}
+                                    className={inputClass}
+                                    style={inputStyle('phone')}
                                 />
+                                {errors.phone && <span className="text-red-500 text-xs">{errors.phone}</span>}
                             </div>
                         </div>
 
@@ -217,13 +250,14 @@ const AddressModal = ({ isOpen, onClose, onSave, initialData }) => {
                                     onChange={handleChange}
                                     className="w-4 h-4 rounded border-gray-300 text-black focus:ring-0 accent-black cursor-pointer"
                                 />
-                                <label htmlFor="billing" className="text-xs text-[#1D1D1F] font-medium cursor-pointer">Billing Address is the same as the shipping address <span className="text-red-500">*</span></label>
+                                <label htmlFor="billing" className="text-xs text-[#1D1D1F] font-medium cursor-pointer">Billing Address is the same as the shipping address</label>
                             </div>
 
                         <div className="pt-2">
                             <button
                                 type="submit"
-                                className="flex justify-center items-center transition-all text-black font-medium text-[15px] font-sans w-full"
+                                disabled={isSubmitting}
+                                className="flex justify-center items-center transition-all text-black font-medium text-[15px] font-sans w-full disabled:opacity-50 disabled:cursor-not-allowed"
                                 style={{
                                     height: '35px',
                                     gap: '2px',
@@ -233,7 +267,7 @@ const AddressModal = ({ isOpen, onClose, onSave, initialData }) => {
                                     background: 'transparent'
                                 }}
                             >
-                                Continue to payment
+                                {isSubmitting ? 'Saving…' : 'Continue to payment'}
                             </button>
                         </div>
                     </form>

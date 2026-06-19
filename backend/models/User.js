@@ -1,6 +1,18 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
 
+const addressSchema = new mongoose.Schema({
+    name: { type: String, trim: true, default: '' },
+    addressLine: { type: String, trim: true, default: '' },
+    city: { type: String, trim: true, default: '' },
+    state: { type: String, trim: true, default: '' },
+    pincode: { type: String, trim: true, default: '' },
+    country: { type: String, trim: true, default: '' },
+    phone: { type: String, trim: true, default: '' },
+    isBillingSame: { type: Boolean, default: false },
+    isDefault: { type: Boolean, default: false }
+}, { timestamps: true });
+
 const userSchema = new mongoose.Schema({
     name: {
         type: String,
@@ -97,6 +109,10 @@ const userSchema = new mongoose.Schema({
     },
     otpExpires: {
         type: Date,
+    },
+    addresses: {
+        type: [addressSchema],
+        default: []
     }
 }, {
     timestamps: true

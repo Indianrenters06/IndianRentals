@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useSelector } from 'react-redux';
@@ -12,19 +12,33 @@ import { UserCircleIcon } from '@heroicons/react/24/outline';
 import { selectCartTotals } from '../../../redux/features/cartSlice';
 import OrderSummary from '../../../components/OrderSummary';
 import AddressModal from '../../../components/AddressModal';
-
-// Start with no pre-filled addresses — user must add their own
-const initialAddresses = [];
+import { getAddresses, addAddress, updateAddress, deleteAddress } from '../../../services/addressService';
 
 export default function AddressPage() {
     const router = useRouter();
     const totals = useSelector(selectCartTotals);
     const { securityAmount, deliveryCharges, monthlyRentTotal, totalGST, totalOneTime, payToday, savedAmount, couponDiscount, couponCode } = totals;
 
-    const [addresses, setAddresses] = useState(initialAddresses);
+    const [addresses, setAddresses] = useState([]);
     const [selectedAddressId, setSelectedAddressId] = useState(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingAddress, setEditingAddress] = useState(null);
+    const [isSaving, setIsSaving] = useState(false);
+
+    // Load the user's saved addresses on mount
+    useEffect(() => {
+        let active = true;
+        getAddresses()
+            .then((list) => {
+                if (!active) return;
+                setAddresses(list);
+                // Pre-select the default address if one exists
+                const def = list.find(a => a.isDefault) || list[0];
+                if (def) setSelectedAddressId(def.id);
+            })
+            .catch((err) => console.error('Failed to load addresses:', err));
+        return () => { active = false; };
+    }, []);
 
     const handleAddClick = () => {
         setEditingAddress(null);
@@ -37,34 +51,43 @@ export default function AddressPage() {
         setIsModalOpen(true);
     };
 
-    const handleDeleteClick = (e, id) => {
+    const handleDeleteClick = async (e, id) => {
         e.stopPropagation();
-        if (window.confirm('Are you sure you want to delete this address?')) {
-            setAddresses(prev => prev.filter(addr => addr.id !== id));
+        if (!window.confirm('Are you sure you want to delete this address?')) return;
+        try {
+            const list = await deleteAddress(id);
+            setAddresses(list);
             if (selectedAddressId === id) {
-                setSelectedAddressId(null);
+                setSelectedAddressId(list[0] ? list[0].id : null);
             }
+        } catch (err) {
+            console.error('Failed to delete address:', err);
+            alert('Could not delete the address. Please try again.');
         }
     };
 
-    const handleSaveAddress = (formData) => {
-        if (editingAddress) {
-            // Update existing
-            setAddresses(prev => prev.map(addr =>
-                addr.id === editingAddress.id ? { ...formData, id: addr.id } : addr
-            ));
-        } else {
-            // Add new
-            const newAddress = {
-                ...formData,
-                id: Date.now()
-            };
-            setAddresses(prev => [...prev, newAddress]);
-            // Auto select new address
-            setSelectedAddressId(newAddress.id);
+    const handleSaveAddress = async (formData) => {
+        setIsSaving(true);
+        try {
+            let list;
+            if (editingAddress) {
+                list = await updateAddress(editingAddress.id, formData);
+            } else {
+                const before = new Set(addresses.map(a => a.id));
+                list = await addAddress(formData);
+                // Auto-select the newly added address
+                const added = list.find(a => !before.has(a.id));
+                if (added) setSelectedAddressId(added.id);
+            }
+            setAddresses(list);
+            setIsModalOpen(false);
+            setEditingAddress(null);
+        } catch (err) {
+            console.error('Failed to save address:', err);
+            alert('Could not save the address. Please make sure you are logged in and try again.');
+        } finally {
+            setIsSaving(false);
         }
-        setIsModalOpen(false);
-        setEditingAddress(null);
     };
 
     const handleContinue = () => {
@@ -303,6 +326,7 @@ export default function AddressPage() {
                         onClose={() => setIsModalOpen(false)}
                         onSave={handleSaveAddress}
                         initialData={editingAddress}
+                        isSubmitting={isSaving}
                     />
                 </div>
             </div>

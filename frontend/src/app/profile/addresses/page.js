@@ -1,16 +1,27 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { FaCheck } from 'react-icons/fa';
 import { PiTrash, PiUserCircle, PiPencilSimple, PiPlus } from 'react-icons/pi';
+import { getAddresses, addAddress, updateAddress, deleteAddress } from '../../../services/addressService';
 
 export default function AddressesPage() {
     const [addresses, setAddresses] = useState([]);
     const [showForm, setShowForm] = useState(false);
     const [editId, setEditId] = useState(null);
+    const [saving, setSaving] = useState(false);
     const [form, setForm] = useState({
         name: '', addressLine: '', city: '', pincode: '', state: '', phone: ''
     });
+
+    // Load saved addresses on mount
+    useEffect(() => {
+        let active = true;
+        getAddresses()
+            .then((list) => { if (active) setAddresses(list); })
+            .catch((err) => console.error('Failed to load addresses:', err));
+        return () => { active = false; };
+    }, []);
 
     const openAdd = () => {
         setForm({ name: '', addressLine: '', city: '', pincode: '', state: '', phone: '' });
@@ -24,22 +35,41 @@ export default function AddressesPage() {
         setShowForm(true);
     };
 
-    const handleSave = () => {
+    const handleSave = async () => {
         if (!form.name || !form.addressLine) return;
-        if (editId) {
-            setAddresses(prev => prev.map(a => a.id === editId ? { ...form, id: editId } : a));
-        } else {
-            setAddresses(prev => [...prev, { ...form, id: Date.now(), isDefault: prev.length === 0 }]);
+        setSaving(true);
+        try {
+            const list = editId
+                ? await updateAddress(editId, form)
+                : await addAddress(form);
+            setAddresses(list);
+            setShowForm(false);
+        } catch (err) {
+            console.error('Failed to save address:', err);
+            alert('Could not save the address. Please make sure you are logged in and try again.');
+        } finally {
+            setSaving(false);
         }
-        setShowForm(false);
     };
 
-    const handleDelete = (id) => {
-        setAddresses(prev => prev.filter(a => a.id !== id));
+    const handleDelete = async (id) => {
+        try {
+            const list = await deleteAddress(id);
+            setAddresses(list);
+        } catch (err) {
+            console.error('Failed to delete address:', err);
+            alert('Could not delete the address. Please try again.');
+        }
     };
 
-    const setDefault = (id) => {
-        setAddresses(prev => prev.map(a => ({ ...a, isDefault: a.id === id })));
+    const setDefault = async (id) => {
+        try {
+            const list = await updateAddress(id, { isDefault: true });
+            setAddresses(list);
+        } catch (err) {
+            console.error('Failed to set default address:', err);
+            alert('Could not update the default address. Please try again.');
+        }
     };
 
     return (
@@ -108,9 +138,10 @@ export default function AddressesPage() {
                     <div className="flex gap-3 pt-2">
                         <button
                             onClick={handleSave}
-                            className="bg-[#333] hover:bg-black text-white px-6 py-2.5 rounded-full text-sm font-medium transition-colors"
+                            disabled={saving}
+                            className="bg-[#333] hover:bg-black text-white px-6 py-2.5 rounded-full text-sm font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                         >
-                            Save Address
+                            {saving ? 'Saving…' : 'Save Address'}
                         </button>
                         <button
                             onClick={() => setShowForm(false)}
