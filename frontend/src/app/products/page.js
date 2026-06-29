@@ -1,10 +1,15 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, Suspense } from "react";
+import { useSearchParams } from "next/navigation";
 import Sidebar from "@/components/Sidebar";
 import ProductCard from "@/components/ProductCard";
 import { API } from "@/services/apiConfig";
 
-export default function ProductsPage() {
+export const dynamic = "force-dynamic";
+
+function ProductsPageContent() {
+    const searchParams = useSearchParams();
+    const keyword = (searchParams.get("keyword") || "").trim();
     const [products, setProducts] = useState([]);
     const [loading, setLoading] = useState(true);
     const [selectedDuration, setSelectedDuration] = useState("3 months");
@@ -21,29 +26,41 @@ export default function ProductsPage() {
 
     useEffect(() => {
         const fetchCMSAndProducts = async () => {
+            setLoading(true);
             try {
-                // Fetch CMS
-                const cmsRes = await fetch(`${API}/api/cms/homepage`).catch(() => null);
-                let targetIds = [];
-                let finalTitle = "Most Rented Products";
-                if (cmsRes && cmsRes.ok) {
-                    const cmsData = await cmsRes.json();
-                    targetIds = cmsData.bestRentedProductIds || [];
-                    if (cmsData.bestRentedTitle) finalTitle = cmsData.bestRentedTitle;
-                }
-                setCmsConfig({ title: finalTitle });
-
                 // Fetch Products
                 let fetchedProducts = [];
-                if (targetIds.length > 0) {
-                    const prodPromises = targetIds.map(id => fetch(`${API}/api/products/${id}`).then(r => r.ok ? r.json() : null));
-                    const responses = await Promise.all(prodPromises);
-                    fetchedProducts = responses.filter(p => p !== null);
+
+                if (keyword) {
+                    // Search mode: query the API by keyword, ignore the best-rented CMS list
+                    setCmsConfig({ title: `Search results for "${keyword}"` });
+                    const searchRes = await fetch(`${API}/api/products?keyword=${encodeURIComponent(keyword)}&limit=50`).catch(() => null);
+                    if (searchRes && searchRes.ok) {
+                        const searchData = await searchRes.json();
+                        fetchedProducts = searchData.products || [];
+                    }
                 } else {
-                    const fallBackRes = await fetch(`${API}/api/products?limit=20`).catch(() => null);
-                    if (fallBackRes && fallBackRes.ok) {
-                        const fallbackData = await fallBackRes.json();
-                        fetchedProducts = fallbackData.products || [];
+                    // Default mode: show the CMS-configured "Most Rented Products"
+                    const cmsRes = await fetch(`${API}/api/cms/homepage`).catch(() => null);
+                    let targetIds = [];
+                    let finalTitle = "Most Rented Products";
+                    if (cmsRes && cmsRes.ok) {
+                        const cmsData = await cmsRes.json();
+                        targetIds = cmsData.bestRentedProductIds || [];
+                        if (cmsData.bestRentedTitle) finalTitle = cmsData.bestRentedTitle;
+                    }
+                    setCmsConfig({ title: finalTitle });
+
+                    if (targetIds.length > 0) {
+                        const prodPromises = targetIds.map(id => fetch(`${API}/api/products/${id}`).then(r => r.ok ? r.json() : null));
+                        const responses = await Promise.all(prodPromises);
+                        fetchedProducts = responses.filter(p => p !== null);
+                    } else {
+                        const fallBackRes = await fetch(`${API}/api/products?limit=20`).catch(() => null);
+                        if (fallBackRes && fallBackRes.ok) {
+                            const fallbackData = await fallBackRes.json();
+                            fetchedProducts = fallbackData.products || [];
+                        }
                     }
                 }
 
@@ -66,16 +83,20 @@ export default function ProductsPage() {
                     };
                 });
 
-                // For demo presentation parity with the Figma screenshot context (3x3 grid = 9 cards), 
-                // duplicate products if we don't naturally have enough
                 let items = [...mappedProducts];
-                if (items.length > 0 && items.length < 9) {
-                    while (items.length < 9) {
-                        items = [...items, ...mappedProducts];
+                if (keyword) {
+                    // Search mode: show all real matches, no duplication or capping
+                    setProducts(items);
+                } else {
+                    // Default mode: for demo presentation parity with the Figma screenshot
+                    // context (3x3 grid = 9 cards), duplicate products if we don't have enough
+                    if (items.length > 0 && items.length < 9) {
+                        while (items.length < 9) {
+                            items = [...items, ...mappedProducts];
+                        }
                     }
+                    setProducts(items.slice(0, 9));
                 }
-
-                setProducts(items.slice(0, 9));
                 setLoading(false);
             } catch (error) {
                 console.error("Failed to fetch products", error);
@@ -83,7 +104,7 @@ export default function ProductsPage() {
             }
         };
         fetchCMSAndProducts();
-    }, []);
+    }, [keyword]);
 
     const getDurationMultiplier = (duration) => {
         switch (duration) {
@@ -174,6 +195,11 @@ export default function ProductsPage() {
                                 <div className="w-full flex items-center justify-center h-64">
                                     <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-500" />
                                 </div>
+                            ) : processedProducts.length === 0 ? (
+                                <div className="w-full flex flex-col items-center justify-center h-64 text-center">
+                                    <p className="text-lg font-semibold text-gray-800">No products found</p>
+                                    <p className="text-sm text-gray-500 mt-1">Try a different search term.</p>
+                                </div>
                             ) : (
                                 <div className={`grid gap-[30px] ${isMobile ? 'grid-cols-2 gap-[8px]' : 'grid-cols-2 lg:grid-cols-3'}`}>
                                     {processedProducts.map((product, idx) => (
@@ -186,5 +212,17 @@ export default function ProductsPage() {
                 </div>
             </div>
         </div>
+    );
+}
+
+export default function ProductsPage() {
+    return (
+        <Suspense fallback={
+            <div className="w-full flex items-center justify-center h-screen bg-white">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-500" />
+            </div>
+        }>
+            <ProductsPageContent />
+        </Suspense>
     );
 }

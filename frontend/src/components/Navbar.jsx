@@ -303,7 +303,7 @@ const Navbar = () => {
                             <input
                                 type="text"
                                 placeholder="Search for MacBook Pro, Sony A7III"
-                                className="w-full bg-white text-sm text-gray-600 placeholder-gray-400 outline-none"
+                                className="w-full bg-white text-[#292929] placeholder-[#AFAFAF] outline-none"
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
                                 style={{
@@ -313,7 +313,12 @@ const Navbar = () => {
                                     paddingLeft: "10px",
                                     paddingRight: "34px",
                                     borderRadius: "24px",
-                                    border: "0.7px solid #D1D1D1",
+                                    border: "0.7px solid #AFAFAF",
+                                    fontFamily: "'Mona Sans', sans-serif",
+                                    fontWeight: 600,
+                                    fontSize: "12px",
+                                    lineHeight: "16px",
+                                    letterSpacing: "-0.4px",
                                 }}
                                 onKeyDown={handleSearch}
                             />
@@ -323,7 +328,7 @@ const Navbar = () => {
                                 onClick={handleSearchClick}
                             >
                                 <div style={{ width: "24px", height: "24px", position: "relative" }}>
-                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="text-gray-400" style={{ width: "19.5px", height: "19.5px", position: "absolute", top: "2.23px", left: "2.23px" }}>
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="#AFAFAF" style={{ width: "19.5px", height: "19.5px", position: "absolute", top: "2.23px", left: "2.23px" }}>
                                         <path strokeLinecap="round" strokeLinejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
                                     </svg>
                                 </div>
@@ -888,7 +893,13 @@ const Navbar = () => {
                                 )}
                                 <Link
                                     href={link.href}
-                                    className="text-[13px] font-semibold text-[#4B4B4B] hover:text-black whitespace-nowrap transition-colors"
+                                    className="font-medium text-[#464646] hover:text-black whitespace-nowrap transition-colors"
+                                    style={{
+                                        fontFamily: "'Mona Sans', sans-serif",
+                                        fontSize: "14px",
+                                        lineHeight: "20px",
+                                        letterSpacing: "-0.04em",
+                                    }}
                                 >
                                     {link.name}
                                 </Link>

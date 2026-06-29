@@ -105,18 +105,18 @@ const ClientSection = () => {
                     <div className="client-pagination absolute bottom-0 left-0 right-0 flex justify-center z-10" />
 
                     <button
-                        className="client-prev group absolute left-0 top-[140px] -translate-y-1/2 -translate-x-[calc(100%+12px)] z-10 w-[26px] h-[40px] rounded-[9px] flex items-center justify-center bg-[hsla(0,0%,93%,1)] hover:bg-[hsla(0,0%,20%,1)] hover:scale-110 active:scale-95 shadow-sm hover:shadow-md transition-all"
+                        className="client-prev group absolute left-0 top-[140px] -translate-y-1/2 -translate-x-[calc(100%+12px)] z-10 w-[26px] h-[40px] rounded-[9px] flex items-center justify-center bg-[hsla(0,0%,93%,1)] hover:bg-[hsla(0,0%,85%,1)] hover:scale-110 active:scale-95 shadow-sm hover:shadow-md transition-all"
                         style={{ opacity: 1 }}
                         ref={prevRef}
                     >
-                        <ChevronLeftIcon className="w-5 h-5 text-gray-800 group-hover:text-white transition-colors duration-200" />
+                        <ChevronLeftIcon className="w-5 h-5 text-gray-800 group-hover:text-gray-900 transition-colors duration-200" />
                     </button>
                     <button
-                        className="client-next group absolute right-0 top-[140px] -translate-y-1/2 translate-x-[calc(100%+12px)] z-10 w-[26px] h-[40px] rounded-[9px] flex items-center justify-center bg-[hsla(0,0%,93%,1)] hover:bg-[hsla(0,0%,20%,1)] hover:scale-110 active:scale-95 shadow-sm hover:shadow-md transition-all"
+                        className="client-next group absolute right-0 top-[140px] -translate-y-1/2 translate-x-[calc(100%+12px)] z-10 w-[26px] h-[40px] rounded-[9px] flex items-center justify-center bg-[hsla(0,0%,93%,1)] hover:bg-[hsla(0,0%,85%,1)] hover:scale-110 active:scale-95 shadow-sm hover:shadow-md transition-all"
                         style={{ opacity: 1 }}
                         ref={nextRef}
                     >
-                        <ChevronRightIcon className="w-5 h-5 text-gray-800 group-hover:text-white transition-colors duration-200" />
+                        <ChevronRightIcon className="w-5 h-5 text-gray-800 group-hover:text-gray-900 transition-colors duration-200" />
                     </button>
                 </div>
             </div>

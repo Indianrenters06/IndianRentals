@@ -292,18 +292,18 @@ const RentByCategory = () => {
                         {/* Nav arrows */}
                         <div className="flex items-center gap-3 shrink-0">
                             <button
-                                className="swiper-prev-cat group w-[34px] h-[34px] rounded-[69px] flex items-center justify-center bg-[hsla(0,0%,93%,1)] hover:bg-[hsla(0,0%,20%,1)] transition-all"
+                                className="swiper-prev-cat group w-[34px] h-[34px] rounded-[69px] flex items-center justify-center bg-[hsla(0,0%,93%,1)] hover:bg-[hsla(0,0%,85%,1)] transition-all"
                                 style={{ opacity: 1 }}
                                 aria-label="Previous"
                             >
-                                <ChevronLeftIcon className="w-[18px] h-[18px] text-gray-800 group-hover:text-white transition-colors duration-200" />
+                                <ChevronLeftIcon className="w-[18px] h-[18px] text-gray-800 group-hover:text-gray-900 transition-colors duration-200" />
                             </button>
                             <button
-                                className="swiper-next-cat group w-[34px] h-[34px] rounded-[69px] flex items-center justify-center bg-[hsla(0,0%,93%,1)] hover:bg-[hsla(0,0%,20%,1)] transition-all"
+                                className="swiper-next-cat group w-[34px] h-[34px] rounded-[69px] flex items-center justify-center bg-[hsla(0,0%,93%,1)] hover:bg-[hsla(0,0%,85%,1)] transition-all"
                                 style={{ opacity: 1 }}
                                 aria-label="Next"
                             >
-                                <ChevronRightIcon className="w-[18px] h-[18px] text-gray-800 group-hover:text-white transition-colors duration-200" />
+                                <ChevronRightIcon className="w-[18px] h-[18px] text-gray-800 group-hover:text-gray-900 transition-colors duration-200" />
                             </button>
                         </div>
                     </div>

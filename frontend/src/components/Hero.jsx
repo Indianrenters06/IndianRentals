@@ -301,15 +301,15 @@ const Hero = () => {
                     >
                         <button
                             onClick={prev}
-                            className="pointer-events-auto w-[26px] h-[40px] rounded-[9px] flex items-center justify-center bg-[hsla(0,0%,93%,1)] hover:bg-[hsla(0,0%,20%,1)] active:scale-95 transition-all shadow-sm opacity-100 group/btn"
+                            className="pointer-events-auto w-[26px] h-[40px] rounded-[9px] flex items-center justify-center bg-[hsla(0,0%,93%,1)] hover:bg-[hsla(0,0%,85%,1)] active:scale-95 transition-all shadow-sm opacity-100 group/btn"
                         >
-                            <ChevronLeftIcon className="w-5 h-5 text-gray-800 group-hover/btn:text-white transition-colors" />
+                            <ChevronLeftIcon className="w-5 h-5 text-gray-800 group-hover/btn:text-gray-900 transition-colors" />
                         </button>
                         <button
                             onClick={next}
-                            className="pointer-events-auto w-[26px] h-[40px] rounded-[9px] flex items-center justify-center bg-[hsla(0,0%,93%,1)] hover:bg-[hsla(0,0%,20%,1)] active:scale-95 transition-all shadow-sm opacity-100 group/btn"
+                            className="pointer-events-auto w-[26px] h-[40px] rounded-[9px] flex items-center justify-center bg-[hsla(0,0%,93%,1)] hover:bg-[hsla(0,0%,85%,1)] active:scale-95 transition-all shadow-sm opacity-100 group/btn"
                         >
-                            <ChevronRightIcon className="w-5 h-5 text-gray-800 group-hover/btn:text-white transition-colors" />
+                            <ChevronRightIcon className="w-5 h-5 text-gray-800 group-hover/btn:text-gray-900 transition-colors" />
                         </button>
                     </div>
 
@@ -347,25 +347,26 @@ const SlideItem = ({ slide, isActive, width, viewType, slideHeight }) => {
                 <h1
                     className="tracking-tight"
                     style={{
-                        width: viewType === 'desktop' ? '630px' : '100%',
-                        maxWidth: viewType === 'desktop' ? '630px' : (isTablet ? '420px' : '480px'),
+                        width: viewType === 'desktop' ? '594px' : '100%',
+                        maxWidth: viewType === 'desktop' ? '594px' : (isTablet ? '420px' : '480px'),
                         fontFamily: "'Mona Sans', sans-serif",
-                        fontSize: viewType === 'desktop' ? "48px" : (isTablet ? "32px" : "36px"),
+                        fontSize: viewType === 'desktop' ? "47px" : (isTablet ? "32px" : "36px"),
                         fontWeight: 600,
-                        lineHeight: viewType === 'desktop' ? "56px" : (isTablet ? "38px" : "42px"),
-                        letterSpacing: "-0.01em",
+                        lineHeight: viewType === 'desktop' ? "58px" : (isTablet ? "38px" : "42px"),
+                        letterSpacing: viewType === 'desktop' ? "-1.5px" : "-0.01em",
                     }}
                 >
                     {slide.title}
                 </h1>
                 <p
-                    className="opacity-90 leading-relaxed"
+                    className="leading-relaxed"
                     style={{
                         fontFamily: "'Mona Sans', sans-serif",
-                        fontSize: isTablet ? "12px" : "14px",
-                        fontWeight: 400,
-                        maxWidth: isTablet ? "380px" : "520px",
-                        lineHeight: isTablet ? "18px" : "22px",
+                        fontSize: viewType === 'desktop' ? "18px" : (isTablet ? "12px" : "14px"),
+                        fontWeight: viewType === 'desktop' ? 600 : 400,
+                        maxWidth: viewType === 'desktop' ? "599px" : (isTablet ? "380px" : "520px"),
+                        lineHeight: viewType === 'desktop' ? "25px" : (isTablet ? "18px" : "22px"),
+                        letterSpacing: viewType === 'desktop' ? "-0.8px" : "-0.01em",
                     }}
                 >
                     {slide.subtitle}
@@ -374,13 +375,13 @@ const SlideItem = ({ slide, isActive, width, viewType, slideHeight }) => {
                     <div
                         className={`inline-flex items-center justify-center shadow-lg active:scale-95 transition-transform ${isTablet ? 'px-8 py-2' : 'px-10 py-3'}`}
                         style={{
-                            background: "hsla(44, 100%, 64%, 1)",
-                            borderRadius: "100px",
+                            background: "#FFCF46",
+                            borderRadius: "9999px",
                             fontFamily: "'Mona Sans', sans-serif",
                             fontWeight: 500,
-                            color: "hsla(0, 0%, 20%, 1)",
-                            fontSize: "14px",
-                            lineHeight: "20px"
+                            color: "#333333",
+                            fontSize: viewType === 'desktop' ? "16px" : "14px",
+                            lineHeight: "23px"
                         }}
                     >
                         {(slide.ctaText || "Rent Now").replace(/ [^\w\s]+.*$| [→➔➜]|^.*[→➔➜]$| \->/g, "").trim()}
@@ -388,18 +389,58 @@ const SlideItem = ({ slide, isActive, width, viewType, slideHeight }) => {
                 </div>
             </div>
 
-            {/* Right: Image */}
+            {/* Right: Image with mirrored reflection (Figma) */}
             <div
-                className={`relative w-full transition-all duration-700 ${isActive ? 'opacity-100 scale-105 rotate-0 blur-0' : 'opacity-30 scale-90 -rotate-3 blur-[1px]'}`}
-                style={{ height: isTablet ? '280px' : '420px' }}
+                className={`relative w-full flex flex-col items-center justify-end transition-all duration-700 ${isActive ? 'opacity-100 scale-105 blur-0' : 'opacity-30 scale-90 blur-[1px]'}`}
+                style={{ height: isTablet ? '280px' : '440px' }}
             >
-                <Image
-                    src={slide.image || "https://res.cloudinary.com/dgkckcdk8/image/upload/v1769946716/indian-rentals/fj8ptqbhppbstdd0hs4i.png"}
-                    alt={slide.title}
-                    fill
-                    unoptimized
-                    className="object-contain drop-shadow-[0_35px_35px_rgba(0,0,0,0.3)]"
+                {/* Glow ellipse behind the image */}
+                <div
+                    className="absolute rounded-full pointer-events-none"
+                    style={{
+                        width: isTablet ? '230px' : '343px',
+                        height: isTablet ? '230px' : '343px',
+                        background: '#BAE6FD',
+                        filter: 'blur(97px)',
+                        opacity: 0.75,
+                        bottom: isTablet ? '10px' : '40px',
+                        zIndex: 0,
+                    }}
                 />
+
+                {/* Main image */}
+                <div className="relative w-full" style={{ height: isTablet ? '74%' : '76%', zIndex: 1 }}>
+                    <Image
+                        src={slide.image || "https://res.cloudinary.com/dgkckcdk8/image/upload/v1769946716/indian-rentals/fj8ptqbhppbstdd0hs4i.png"}
+                        alt={slide.title}
+                        fill
+                        unoptimized
+                        className="object-contain object-bottom drop-shadow-[0_25px_25px_rgba(0,0,0,0.25)]"
+                    />
+                </div>
+
+                {/* Reflection: flipped, faded, blurred copy */}
+                <div
+                    className="relative w-full pointer-events-none"
+                    style={{
+                        height: isTablet ? '26%' : '24%',
+                        transform: 'scaleY(-1)',
+                        opacity: 0.59,
+                        filter: 'blur(3px)',
+                        WebkitMaskImage: 'linear-gradient(to bottom, rgba(0,0,0,0.55), rgba(0,0,0,0) 75%)',
+                        maskImage: 'linear-gradient(to bottom, rgba(0,0,0,0.55), rgba(0,0,0,0) 75%)',
+                        zIndex: 1,
+                    }}
+                >
+                    <Image
+                        src={slide.image || "https://res.cloudinary.com/dgkckcdk8/image/upload/v1769946716/indian-rentals/fj8ptqbhppbstdd0hs4i.png"}
+                        alt=""
+                        fill
+                        unoptimized
+                        aria-hidden="true"
+                        className="object-contain object-bottom"
+                    />
+                </div>
             </div>
         </div>
     );

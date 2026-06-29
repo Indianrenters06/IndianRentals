@@ -115,20 +115,20 @@ const BannerCarousel = ({ banners, current, setCurrent, height = "387px", produc
                         <div className="flex items-center justify-center gap-4">
                             <button
                                 onClick={(e) => go(-1, e)}
-                                className="group flex items-center justify-center rounded-full bg-[hsla(0,0%,96%,1)] hover:bg-[hsla(0,0%,20%,1)] hover:scale-110 transition-all duration-200 shrink-0"
+                                className="group flex items-center justify-center rounded-full bg-[hsla(0,0%,96%,1)] hover:bg-[hsla(0,0%,85%,1)] hover:scale-110 transition-all duration-200 shrink-0"
                                 style={{ width: "24px", height: "24px", padding: "2.25px" }}
                             >
-                                <ChevronLeftIcon className="w-[19.5px] h-[19.5px] text-[#1D1D1F] group-hover:text-white transition-colors duration-200" />
+                                <ChevronLeftIcon className="w-[19.5px] h-[19.5px] text-[#1D1D1F] group-hover:text-[#1D1D1F] transition-colors duration-200" />
                             </button>
                             <h3 className="text-white text-[24px] font-bold tracking-tight text-center" style={{ fontFamily: "'Mona Sans', sans-serif" }}>
                                 {slide.title}
                             </h3>
                             <button
                                 onClick={(e) => go(1, e)}
-                                className="group flex items-center justify-center rounded-full bg-[hsla(0,0%,96%,1)] hover:bg-[hsla(0,0%,20%,1)] hover:scale-110 transition-all duration-200 shrink-0"
+                                className="group flex items-center justify-center rounded-full bg-[hsla(0,0%,96%,1)] hover:bg-[hsla(0,0%,85%,1)] hover:scale-110 transition-all duration-200 shrink-0"
                                 style={{ width: "24px", height: "24px", padding: "2.25px" }}
                             >
-                                <ChevronRightIcon className="w-[19.5px] h-[19.5px] text-[#1D1D1F] group-hover:text-white transition-colors duration-200" />
+                                <ChevronRightIcon className="w-[19.5px] h-[19.5px] text-[#1D1D1F] group-hover:text-[#1D1D1F] transition-colors duration-200" />
                             </button>
                         </div>
                         <p className="text-white/80 text-[14px] font-medium leading-tight text-center">
