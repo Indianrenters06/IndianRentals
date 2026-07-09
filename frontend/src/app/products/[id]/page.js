@@ -10,6 +10,7 @@ import { useDispatch } from 'react-redux';
 import { addToCart } from '../../../redux/features/cartSlice';
 import { getProductById } from '../../../services/productService';
 import BestRentedProducts from '../../../components/BestRentedProducts';
+import RentVsBuy from '../../../components/RentVsBuy';
 import FaqSection from '../../../components/FaqSection';
 import Testimonials from '../../../components/Testimonials';
 import CompareTenures from '../../../components/CompareTenures';
@@ -45,6 +46,9 @@ export default function ProductDetailPage() {
     const [isRentHovered, setIsRentHovered] = useState(false);
     const [isCompareOpen, setIsCompareOpen] = useState(false);
     const [isCancellationOpen, setIsCancellationOpen] = useState(false);
+    const [reviewRating, setReviewRating] = useState(0);
+    const [reviewText, setReviewText] = useState('');
+    const [reviewSubmitted, setReviewSubmitted] = useState(false);
     
     // CMS Layout State
     const [pageLayout, setPageLayout] = useState(null);
@@ -1014,28 +1018,29 @@ export default function ProductDetailPage() {
                         }}
                     >
                         {/* Tabs Header */}
-                        <div className="flex items-center gap-[6px] w-full overflow-x-auto no-scrollbar">
-                            {['Product Details', 'Return Policy', 'Shipping Policy'].map((tab) => {
+                        <div className="flex items-center gap-[8px] w-full overflow-x-auto no-scrollbar">
+                            {['Product Details', 'Return Policy', 'Shipping Policy', 'Give us a Review'].map((tab) => {
                                 const isActive = activeTab === tab;
+                                const isReview = tab === 'Give us a Review';
                                 return (
                                     <button
                                         key={tab}
                                         onClick={() => setActiveTab(tab)}
                                         style={{
                                             flex: '0 0 auto',
-                                            height: '34px',
-                                            padding: '6px 10px',
+                                            height: '44px',
+                                            padding: '10px 22px',
                                             borderRadius: '59px',
                                             fontFamily: '"Mona Sans", sans-serif',
                                             fontWeight: 600,
-                                            fontSize: '11.5px',
+                                            fontSize: '15px',
                                             lineHeight: '1',
                                             letterSpacing: '-0.01em',
                                             whiteSpace: 'nowrap',
                                             transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
-                                            background: isActive ? 'hsla(0, 0%, 20%, 1)' : 'hsla(0, 0%, 100%, 1)',
-                                            color: isActive ? 'white' : '#1D1D1F',
-                                            border: isActive ? 'none' : '1px solid hsla(0, 0%, 89%, 1)',
+                                            background: isReview ? 'hsla(44, 100%, 64%, 1)' : (isActive ? 'hsla(0, 0%, 20%, 1)' : 'hsla(0, 0%, 100%, 1)'),
+                                            color: isReview ? '#1D1D1F' : (isActive ? 'white' : '#1D1D1F'),
+                                            border: isReview ? 'none' : (isActive ? 'none' : '1px solid hsla(0, 0%, 89%, 1)'),
                                             cursor: 'pointer',
                                             display: 'flex',
                                             alignItems: 'center',
@@ -1065,7 +1070,8 @@ export default function ProductDetailPage() {
                                             { label: 'OPERATING SYSTEM', value: 'Mac OS' },
                                             { label: 'MEMORY', value: '24GB' },
                                             { label: 'PROCESSOR', value: 'Apple M4 Pro' },
-                                            { label: 'STORAGE', value: '512GB SSD' }
+                                            { label: 'STORAGE', value: '512GB SSD' },
+                                            { label: 'KEYBOARD LANGUAGE', value: 'English (Qwerty)' }
                                         ]).map((item, idx) => (
                                             <div key={idx} style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
                                                 <h4 style={{ fontFamily: '"Mona Sans", sans-serif', fontWeight: 700, fontSize: '12px', lineHeight: '16px', letterSpacing: '0.05em', color: '#000', textTransform: 'uppercase' }}>
@@ -1095,7 +1101,8 @@ export default function ProductDetailPage() {
                                             { label: 'OPERATING SYSTEM', value: 'Mac OS' },
                                             { label: 'MEMORY', value: '24GB' },
                                             { label: 'PROCESSOR', value: 'Apple M4 Pro' },
-                                            { label: 'STORAGE', value: '512GB SSD' }
+                                            { label: 'STORAGE', value: '512GB SSD' },
+                                            { label: 'KEYBOARD LANGUAGE', value: 'English (Qwerty)' }
                                         ]).map((item, idx) => (
                                             <div key={idx} style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
                                                 <h4 style={{ fontFamily: '"Mona Sans", sans-serif', fontWeight: 600, fontSize: '13px', lineHeight: '18px', letterSpacing: '0.02em', color: '#000', textTransform: 'uppercase' }}>
@@ -1121,6 +1128,64 @@ export default function ProductDetailPage() {
                                     {product.shippingPolicy || "Standard shipping policy applies. Delivery usually takes 2-5 business days."}
                                 </div>
                             )}
+
+                            {activeTab === 'Give us a Review' && (
+                                <div className="pt-4 flex flex-col gap-4 max-w-[560px]">
+                                    {reviewSubmitted ? (
+                                        <div style={{ fontFamily: '"Mona Sans", sans-serif', fontSize: '15px', color: 'hsla(122, 100%, 30%, 1)', fontWeight: 600 }}>
+                                            Thanks for your review! 🎉
+                                        </div>
+                                    ) : (
+                                        <>
+                                            <div className="flex flex-col gap-1">
+                                                <span style={{ fontFamily: '"Mona Sans", sans-serif', fontWeight: 600, fontSize: '15px', color: '#1D1D1F' }}>
+                                                    How was your experience?
+                                                </span>
+                                                <div className="flex items-center gap-1">
+                                                    {[1, 2, 3, 4, 5].map((s) => (
+                                                        <button
+                                                            key={s}
+                                                            type="button"
+                                                            onClick={() => setReviewRating(s)}
+                                                            className="transition-transform hover:scale-110"
+                                                            style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 2, lineHeight: 0 }}
+                                                            aria-label={`${s} star${s > 1 ? 's' : ''}`}
+                                                        >
+                                                            <StarIcon style={{ width: 26, height: 26, color: s <= reviewRating ? 'hsla(33, 100%, 52%, 1)' : 'hsla(0, 0%, 85%, 1)' }} />
+                                                        </button>
+                                                    ))}
+                                                </div>
+                                            </div>
+                                            <textarea
+                                                value={reviewText}
+                                                onChange={(e) => setReviewText(e.target.value)}
+                                                placeholder="Tell others what you liked (or didn't)…"
+                                                rows={4}
+                                                style={{ width: '100%', border: '1px solid hsla(0, 0%, 89%, 1)', borderRadius: '12px', padding: '12px', fontFamily: '"Mona Sans", sans-serif', fontSize: '14px', color: '#1D1D1F', outline: 'none', resize: 'vertical' }}
+                                            />
+                                            <button
+                                                type="button"
+                                                disabled={reviewRating === 0}
+                                                onClick={() => setReviewSubmitted(true)}
+                                                style={{
+                                                    alignSelf: 'flex-start',
+                                                    padding: '10px 24px',
+                                                    borderRadius: '9999px',
+                                                    background: reviewRating === 0 ? 'hsla(44, 100%, 80%, 1)' : 'hsla(44, 100%, 64%, 1)',
+                                                    color: '#1D1D1F',
+                                                    fontFamily: '"Mona Sans", sans-serif',
+                                                    fontWeight: 700,
+                                                    fontSize: '14px',
+                                                    border: 'none',
+                                                    cursor: reviewRating === 0 ? 'not-allowed' : 'pointer'
+                                                }}
+                                            >
+                                                Submit Review
+                                            </button>
+                                        </>
+                                    )}
+                                </div>
+                            )}
                         </div>
                     </div>
                 </main>
@@ -1129,19 +1194,21 @@ export default function ProductDetailPage() {
             {pageLayout?.productPageEnableTestimonials !== false && (
                 <div className="hidden lg:block"><Testimonials /></div>
             )}
-            
+
+            {pageLayout?.productPageEnableRelated !== false && (
+                <BestRentedProducts
+                    customProducts={product.pageLayout?.relatedProducts?.length > 0 ? product.pageLayout.relatedProducts : null}
+                />
+            )}
+
+            <RentVsBuy />
+
             {pageLayout?.productPageEnableFaq !== false && (
                 product.faqs && product.faqs.length > 0 ? (
                     <FaqSection cmsData={{ faqItems: product.faqs, faqTitle: "Product FAQs", faqSubtitle: "Specific questions about this product." }} />
                 ) : (
                     <FaqSection limit={5} />
                 )
-            )}
-            
-            {pageLayout?.productPageEnableRelated !== false && (
-                <BestRentedProducts 
-                    customProducts={product.pageLayout?.relatedProducts?.length > 0 ? product.pageLayout.relatedProducts : null} 
-                />
             )}
 
             {/* Side Drawers */}

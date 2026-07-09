@@ -11,6 +11,7 @@ import { SiPaytm, SiGooglepay, SiPhonepe } from 'react-icons/si';
 import { selectCartTotals, selectCartItems, clearCart } from '../../../redux/features/cartSlice';
 import OrderSummary from '../../../components/OrderSummary';
 import { API_BASE_URL } from '../../../services/apiConfig';
+import { getCashfree } from '../../../services/cashfree';
 
 export default function PaymentPage() {
     const dispatch = useDispatch();
@@ -84,6 +85,7 @@ export default function PaymentPage() {
                 }
             };
 
+            // 1) Create the rental (unpaid) in our backend.
             const res = await fetch(`${API_BASE_URL}/api/rentals`, {
                 method: 'POST',
                 headers: {
@@ -98,16 +100,68 @@ export default function PaymentPage() {
                 throw new Error(data.message || 'Failed to create order');
             }
 
-            // Order created successfully!
-            dispatch(clearCart());
-            const params = new URLSearchParams({ 
-                amount: String(netPayToday),
-                orderId: data._id
+            const rentalId = data._id;
+
+            // 2) Create a Cashfree order for this rental.
+            const orderRes = await fetch(`${API_BASE_URL}/api/payments/cashfree/order`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${userInfo.token}`
+                },
+                body: JSON.stringify({ rentalId })
             });
-            router.push(`/order-confirmation?${params.toString()}`);
+            const orderInfo = await orderRes.json();
+            if (!orderRes.ok) {
+                throw new Error(orderInfo.message || 'Failed to start payment');
+            }
+
+            const goToConfirmation = () => {
+                dispatch(clearCart());
+                const params = new URLSearchParams({
+                    amount: String(netPayToday),
+                    orderId: rentalId
+                });
+                router.push(`/order-confirmation?${params.toString()}`);
+            };
+
+            // Rental was already settled (e.g. a retried, already-paid order).
+            if (orderInfo.alreadyPaid) {
+                goToConfirmation();
+                return;
+            }
+
+            // 3) Open the Cashfree checkout modal.
+            const cashfree = await getCashfree(orderInfo.mode);
+            const result = await cashfree.checkout({
+                paymentSessionId: orderInfo.paymentSessionId,
+                redirectTarget: '_modal',
+            });
+
+            if (result?.error) {
+                // User closed the modal or payment failed — keep the cart/order intact.
+                throw new Error(result.error.message || 'Payment was cancelled or failed.');
+            }
+
+            // 4) Confirm the payment server-side (authoritative check with Cashfree).
+            const verifyRes = await fetch(`${API_BASE_URL}/api/payments/cashfree/verify`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${userInfo.token}`
+                },
+                body: JSON.stringify({ rentalId })
+            });
+            const verifyInfo = await verifyRes.json();
+
+            if (verifyRes.ok && verifyInfo.paid) {
+                goToConfirmation();
+            } else {
+                throw new Error('We could not confirm your payment. If money was debited, it will be verified shortly — please check your orders.');
+            }
 
         } catch (err) {
-            console.error('Order creation error:', err);
+            console.error('Payment error:', err);
             setError(err.message);
         } finally {
             setLoading(false);

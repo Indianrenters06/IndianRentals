@@ -99,13 +99,13 @@ const ProductCard = ({ product, index, isDesktop, handleAddToCart }) => {
                     style={{ width: '100%', height: 282, borderRadius: "20px", borderBottom: "1px solid hsla(0, 0%, 93%, 1)", backgroundColor: isHovered ? "hsla(0,0%,98%,1)" : "hsla(0, 0%, 100%, 1)", transition: "background-color 0.4s" }}
                 >
                     <div className="absolute z-20 flex items-center" style={{ top: "14.57px", left: "14.49px", gap: "4px" }}>
-                        <span className="text-white text-[10px] font-bold rounded-full flex items-center justify-center shrink-0"
-                            style={{ height: "24px", background: "hsla(3, 86%, 51%, 1)", fontFamily: "'Mona Sans', sans-serif", fontSize: "10px", fontWeight: 600, paddingLeft: "10px", paddingRight: "10px", borderRadius: "27px" }}>
+                        <span className="rounded-full flex items-center justify-center shrink-0"
+                            style={{ background: "#ed2115", color: "#fff2f1", fontFamily: "'Mona Sans', sans-serif", fontSize: "12px", fontWeight: 600, letterSpacing: "-0.4px", lineHeight: "16px", padding: "4px 10px", borderRadius: "27px", boxShadow: "0px 3px 1px rgba(120,120,120,0.05), 0px 1px 0.5px rgba(120,120,120,0.09), 0px 0px 0.5px rgba(120,120,120,0.1)" }}>
                             -20% off
                         </span>
                         {product.isNew && (
-                            <span className="text-white text-[10px] font-bold rounded-full flex items-center justify-center shrink-0"
-                                style={{ height: "24px", paddingLeft: "10px", paddingRight: "10px", backgroundColor: "hsla(122, 100%, 35%, 1)", fontFamily: "'Mona Sans', sans-serif", fontSize: "10px", fontWeight: 600, borderRadius: "27px" }}>
+                            <span className="rounded-full flex items-center justify-center shrink-0"
+                                style={{ backgroundColor: "#00b505", color: "#e8ffe4", fontFamily: "'Mona Sans', sans-serif", fontSize: "12px", fontWeight: 600, letterSpacing: "-0.4px", lineHeight: "16px", padding: "4px 10px", borderRadius: "27px", boxShadow: "0px 3px 1px rgba(120,120,120,0.05), 0px 1px 0.5px rgba(120,120,120,0.09), 0px 0px 0.5px rgba(120,120,120,0.1)" }}>
                                 New
                             </span>
                         )}
@@ -117,8 +117,8 @@ const ProductCard = ({ product, index, isDesktop, handleAddToCart }) => {
                         aria-pressed={isWishlisted}>
                         <Heart size={21} weight={isWishlisted ? "fill" : "regular"} color={isWishlisted ? "#ED2115" : "#000000"} />
                     </button>
-                    <div className="relative w-full h-full p-4 flex items-center justify-center">
-                        <motion.img variants={{ initial: { scale: 1 }, hover: { scale: 1.05 } }} src={product.image} alt={product.name} className="max-w-full max-h-full object-contain mix-blend-multiply transition-transform duration-700 ease-out" />
+                    <div className="relative w-full h-full flex items-center justify-center">
+                        <motion.img variants={{ initial: { scale: 1 }, hover: { scale: 1.05 } }} src={product.image} alt={product.name} className="w-full h-full object-contain px-3.5 transition-transform duration-700 ease-out" />
                     </div>
                 </div>
                 {/* Text Section */}
@@ -126,7 +126,7 @@ const ProductCard = ({ product, index, isDesktop, handleAddToCart }) => {
                     <h3 className="font-manrope line-clamp-1 shrink-0" style={{ fontSize: "18px", fontWeight: 600, lineHeight: "25px", letterSpacing: "-0.4px", color: "hsla(0, 0%, 16%, 1)" }}>{product.name}</h3>
                     <div className="flex items-center justify-between shrink-0" style={{ height: "16px" }}>
                         <div className="flex items-center gap-1">
-                            <div className="flex text-[#FF9500]">{[1,2,3,4,5].map(s => <Star key={s} size={14} weight="fill" className={s <= Math.round(product.rating || 4) ? "" : "opacity-20"} />)}</div>
+                            <div className="flex text-[#FF9500]">{[1, 2, 3, 4, 5].map(s => <Star key={s} size={14} weight="fill" className={s <= Math.round(product.rating || 4) ? "" : "opacity-20"} />)}</div>
                             <span className="ml-1" style={{ fontFamily: "'Mona Sans', sans-serif", fontSize: "11px", fontWeight: 500, color: "hsla(0, 0%, 33%, 1)", letterSpacing: "-0.01em" }}>{product.rating || "4.5"} ({product.reviews || 12})</span>
                         </div>
                         <div className="flex items-center gap-1.5" style={{ color: "hsla(0, 0%, 65%, 1)" }}>
@@ -135,12 +135,12 @@ const ProductCard = ({ product, index, isDesktop, handleAddToCart }) => {
                         </div>
                     </div>
                     <div className="flex items-center shrink-0" style={{ gap: "3px" }}>
-                        <span style={{ fontFamily: "'Mona Sans', sans-serif", fontSize: "11px", fontWeight: 500, color: "hsla(0, 0%, 33%, 1)", letterSpacing: "-0.01em" }}>from</span>
-                        {product.originalPrice && (<span className="line-through decoration-[1.5px]" style={{ fontFamily: "'Mona Sans', sans-serif", fontSize: "16px", fontWeight: 600, color: "hsla(0, 0%, 46%, 1)", letterSpacing: "-0.04em" }}>₹{product.originalPrice}</span>)}
-                        <span className="font-bold tracking-tight ml-1" style={{ fontFamily: "'Mona Sans', sans-serif", fontSize: "26px", fontWeight: 600, color: "hsla(3, 100%, 56%, 1)", letterSpacing: "-0.04em" }}>₹{product.rentPrice}</span>
-                        <span style={{ fontFamily: "'Mona Sans', sans-serif", fontSize: "11px", fontWeight: 500, color: "hsla(0, 0%, 46%, 1)", letterSpacing: "-0.01em", marginLeft: "2px" }}>/month</span>
+                        <span style={{ fontFamily: "'Mona Sans', sans-serif", fontSize: "12px", fontWeight: 500, color: "#000", letterSpacing: "-0.4px" }}>from</span>
+                        {product.originalPrice && (<span className="line-through decoration-[1.5px]" style={{ fontFamily: "'Mona Sans', sans-serif", fontSize: "16px", fontWeight: 600, color: "hsla(0, 0%, 46%, 1)", letterSpacing: "-0.4px" }}>₹{product.originalPrice}</span>)}
+                        <span className="font-bold ml-1" style={{ fontFamily: "'Mona Sans', sans-serif", fontSize: "21px", fontWeight: 600, color: "#ff2c20", letterSpacing: "-0.8px" }}>₹{product.rentPrice}</span>
+                        <span style={{ fontFamily: "'Mona Sans', sans-serif", fontSize: "12px", fontWeight: 500, color: "hsla(0, 0%, 46%, 1)", letterSpacing: "-0.4px", marginLeft: "2px" }}>/month</span>
                     </div>
-                    <div style={{ overflow: 'hidden', height: isHovered ? '43px' : '0px', opacity: isHovered ? 1 : 0, transition: 'height 0.28s ease, opacity 0.2s ease', display: 'flex', alignItems: 'flex-end' }}>
+                    <div style={{ overflow: 'hidden', height: isHovered ? '43px' : '0px', opacity: isHovered ? 1 : 0, marginTop: isHovered ? 0 : '-8px', transition: 'height 0.28s ease, opacity 0.2s ease, margin-top 0.28s ease', display: 'flex', alignItems: 'flex-end' }}>
                         <button onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleAddToCart(e, product); }} className="btn-primary w-full text-[14px] active:scale-95" style={{ height: '38px', borderRadius: '100px', flexShrink: 0, fontFamily: "'Mona Sans', sans-serif", fontWeight: 500, color: 'hsla(0, 0%, 12%, 1)' }}>Rent Now</button>
                     </div>
                 </div>
@@ -344,18 +344,20 @@ const BestRentedProducts = ({ type = "bestRented", defaultTitle = "Curated Produ
                             className={`swiper-scrollbar-${sectionSuffix} flex-1`}
                             style={{ height: '3.5px', position: 'relative' }}
                         />
-                        <div className="flex items-center gap-3 shrink-0">
+                        <div className="flex items-center gap-4 shrink-0">
                             <button
-                                className={`swiper-prev-${sectionSuffix} w-10 h-10 rounded-full bg-white border border-gray-200 shadow-sm flex items-center justify-center hover:shadow-md hover:border-gray-300 transition-all group`}
+                                className={`swiper-prev-${sectionSuffix} group w-[34px] h-[34px] rounded-[69px] flex items-center justify-center bg-[#eee] hover:bg-[hsla(0,0%,85%,1)] transition-all`}
+                                style={{ boxShadow: '0px 8px 2px 0px rgba(133,133,133,0), 0px 5px 2px 0px rgba(133,133,133,0.01), 0px 3px 2px 0px rgba(133,133,133,0.05), 0px 1px 1px 0px rgba(133,133,133,0.09), 0px 0px 1px 0px rgba(133,133,133,0.1)' }}
                                 aria-label="Previous"
                             >
-                                <ChevronLeftIcon className="w-5 h-5 text-gray-400 group-hover:text-gray-800 transition-colors" />
+                                <ChevronLeftIcon className="w-5 h-5 text-gray-800 group-hover:text-gray-900 transition-colors duration-200" />
                             </button>
                             <button
-                                className={`swiper-next-${sectionSuffix} w-10 h-10 rounded-full bg-white border border-gray-200 shadow-sm flex items-center justify-center hover:shadow-md hover:border-gray-300 transition-all group`}
+                                className={`swiper-next-${sectionSuffix} group w-[34px] h-[34px] rounded-[69px] flex items-center justify-center bg-[#eee] hover:bg-[hsla(0,0%,85%,1)] transition-all`}
+                                style={{ boxShadow: '0px 8px 2px 0px rgba(133,133,133,0), 0px 5px 2px 0px rgba(133,133,133,0.01), 0px 3px 2px 0px rgba(133,133,133,0.05), 0px 1px 1px 0px rgba(133,133,133,0.09), 0px 0px 1px 0px rgba(133,133,133,0.1)' }}
                                 aria-label="Next"
                             >
-                                <ChevronRightIcon className="w-5 h-5 text-gray-400 group-hover:text-gray-800 transition-colors" />
+                                <ChevronRightIcon className="w-5 h-5 text-gray-800 group-hover:text-gray-900 transition-colors duration-200" />
                             </button>
                         </div>
                     </div>

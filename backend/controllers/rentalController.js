@@ -127,6 +127,51 @@ const getRentalById = asyncHandler(async (req, res) => {
     }
 });
 
+// Mark a rental as paid, persist the payment result, and fire the
+// "Payment Successful" email. Idempotent: a rental that is already paid is
+// returned untouched so webhook + client-side verification can't double-send.
+// `rental` must already have its `user` populated (name + email).
+// Returns the saved rental document.
+const markRentalPaid = async (rental, paymentResult = {}) => {
+    if (!rental) return null;
+    if (rental.isPaid) return rental;
+
+    rental.isPaid = true;
+    rental.paidAt = Date.now();
+    rental.paymentResult = {
+        id: paymentResult.id,
+        status: paymentResult.status,
+        update_time: paymentResult.update_time,
+        email_address: paymentResult.email_address,
+    };
+
+    const updatedRental = await rental.save();
+
+    // Send "Payment Successful" email (non-blocking).
+    const depositTotal = (rental.orderItems || []).reduce((s, i) => s + (i.securityDeposit || 0) * (i.qty || 1), 0);
+    const fmtDate = (d) => d ? new Date(d).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : '—';
+    sendTemplatedEmail('Payment Successful', rental.user?.email, {
+        CUSTOMER_NAME: rental.user?.name || 'Customer',
+        AMOUNT_PAID: inr(rental.totalPrice),
+        TRANSACTION_ID: paymentResult.id || rental.paymentResult?.id || '—',
+        PAYMENT_DATE: fmtDate(rental.paidAt),
+        BOOKING_ID: rental._id.toString().slice(-6).toUpperCase(),
+        PRODUCT_NAME: productLabel(rental.orderItems),
+        MONTHLY_RENT: inr(rental.itemsPrice),
+        SECURITY_DEPOSIT: inr(depositTotal),
+        START_DATE: fmtDate(rental.rentalPeriod?.startDate),
+        END_DATE: fmtDate(rental.rentalPeriod?.endDate),
+        NEXT_DUE_DATE: fmtDate(rental.rentalPeriod?.endDate),
+        PAYMENT_METHOD: rental.paymentMethod || 'Online',
+        DELIVERY_ADDRESS: formatAddress(rental.shippingAddress),
+        DELIVERY_DATE: fmtDate(rental.rentalPeriod?.startDate),
+        SAVINGS_AMOUNT: inr(Math.round((rental.itemsPrice || 0) * 10)),
+        SAVINGS_PERCENT: '70',
+    });
+
+    return updatedRental;
+};
+
 // @desc    Update rental to paid
 // @route   PUT /api/rentals/:id/pay
 // @access  Private
@@ -134,39 +179,12 @@ const updateRentalToPaid = asyncHandler(async (req, res) => {
     const rental = await Rental.findById(req.params.id).populate('user', 'name email');
 
     if (rental) {
-        rental.isPaid = true;
-        rental.paidAt = Date.now();
-        rental.paymentResult = {
+        const updatedRental = await markRentalPaid(rental, {
             id: req.body.id,
             status: req.body.status,
             update_time: req.body.update_time,
             email_address: req.body.email_address,
-        };
-
-        const updatedRental = await rental.save();
-
-        // Send "Payment Successful" email (non-blocking).
-        const depositTotal = (rental.orderItems || []).reduce((s, i) => s + (i.securityDeposit || 0) * (i.qty || 1), 0);
-        const fmtDate = (d) => d ? new Date(d).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : '—';
-        sendTemplatedEmail('Payment Successful', rental.user?.email, {
-            CUSTOMER_NAME: rental.user?.name || 'Customer',
-            AMOUNT_PAID: inr(rental.totalPrice),
-            TRANSACTION_ID: req.body.id || rental.paymentResult?.id || '—',
-            PAYMENT_DATE: fmtDate(rental.paidAt),
-            BOOKING_ID: rental._id.toString().slice(-6).toUpperCase(),
-            PRODUCT_NAME: productLabel(rental.orderItems),
-            MONTHLY_RENT: inr(rental.itemsPrice),
-            SECURITY_DEPOSIT: inr(depositTotal),
-            START_DATE: fmtDate(rental.rentalPeriod?.startDate),
-            END_DATE: fmtDate(rental.rentalPeriod?.endDate),
-            NEXT_DUE_DATE: fmtDate(rental.rentalPeriod?.endDate),
-            PAYMENT_METHOD: rental.paymentMethod || 'Online',
-            DELIVERY_ADDRESS: formatAddress(rental.shippingAddress),
-            DELIVERY_DATE: fmtDate(rental.rentalPeriod?.startDate),
-            SAVINGS_AMOUNT: inr(Math.round((rental.itemsPrice || 0) * 10)),
-            SAVINGS_PERCENT: '70',
         });
-
         res.json(updatedRental);
     } else {
         res.status(404);
@@ -272,4 +290,5 @@ module.exports = {
     getMyRentals,
     getRentals,
     updateRentalStatus,
+    markRentalPaid,
 };

@@ -2,7 +2,6 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { FacebookLogo, InstagramLogo, LinkedinLogo, WhatsappLogo } from '@phosphor-icons/react';
 import { useSettings } from '../context/SettingsContext';
 
 const DEFAULT_PAYMENT_LOGOS = [
@@ -95,18 +94,18 @@ const Footer = () => {
                             <p className="text-black text-[14px] font-medium leading-[20px] max-w-[600px]">
                                 {settings?.footerDescription || "Rent Anything, Anytime, Anywhere"}
                             </p>
-                            <div className="flex items-center gap-3 pt-1">
-                                <a href={`https://wa.me/${sitePhone.replace(/[^\d]/g, '')}`} className="transition-opacity hover:opacity-70" target="_blank" rel="noopener noreferrer">
-                                    <WhatsappLogo size={32} weight="fill" className="text-[#25D366]" />
+                            <div className="flex items-center gap-[5px] pt-1">
+                                <a href={`https://wa.me/${sitePhone.replace(/[^\d]/g, '')}`} className="w-[35px] h-[35px] rounded-full bg-white flex items-center justify-center shrink-0 transition-opacity hover:opacity-70" target="_blank" rel="noopener noreferrer" aria-label="WhatsApp">
+                                    <img src="/social/whatsapp.svg" alt="WhatsApp" className="w-5 h-5" />
                                 </a>
-                                <a href={settings?.socialLinks?.facebook || "#"} className="transition-opacity hover:opacity-70">
-                                    <FacebookLogo size={32} weight="fill" className="text-[#1877F2]" />
+                                <a href={settings?.socialLinks?.facebook || "#"} className="w-[35px] h-[35px] rounded-full bg-white flex items-center justify-center shrink-0 transition-opacity hover:opacity-70" aria-label="Facebook">
+                                    <img src="/social/facebook.svg" alt="Facebook" className="w-5 h-5" />
                                 </a>
-                                <a href={settings?.socialLinks?.instagram || "#"} className="transition-opacity hover:opacity-70">
-                                    <InstagramLogo size={32} weight="fill" className="text-[#E4405F]" />
+                                <a href={settings?.socialLinks?.instagram || "#"} className="w-[35px] h-[35px] rounded-full bg-white flex items-center justify-center shrink-0 transition-opacity hover:opacity-70" aria-label="Instagram">
+                                    <img src="/social/instagram.svg" alt="Instagram" className="w-5 h-5" />
                                 </a>
-                                <a href={settings?.socialLinks?.linkedin || "#"} className="transition-opacity hover:opacity-70">
-                                    <LinkedinLogo size={32} weight="fill" className="text-[#0A66C2]" />
+                                <a href={settings?.socialLinks?.linkedin || "#"} className="w-[35px] h-[35px] rounded-full bg-white flex items-center justify-center shrink-0 transition-opacity hover:opacity-70" aria-label="LinkedIn">
+                                    <img src="/social/linkedin.svg" alt="LinkedIn" className="w-5 h-5" />
                                 </a>
                             </div>
                         </div>
@@ -199,18 +198,18 @@ const Footer = () => {
                     <div className="h-[1px] w-full bg-[#E5E5EA] mb-8"></div>
 
                     {/* Socials */}
-                    <div className="flex items-center gap-4 mb-8">
-                        <a href={`https://wa.me/${sitePhone.replace(/[^\d]/g, '')}`} className="transition-opacity hover:opacity-70" target="_blank" rel="noopener noreferrer">
-                            <WhatsappLogo size={40} weight="fill" className="text-[#25D366]" />
+                    <div className="flex items-center gap-[6px] mb-8">
+                        <a href={`https://wa.me/${sitePhone.replace(/[^\d]/g, '')}`} className="w-[40px] h-[40px] rounded-full bg-white flex items-center justify-center shrink-0 transition-opacity hover:opacity-70" target="_blank" rel="noopener noreferrer" aria-label="WhatsApp">
+                            <img src="/social/whatsapp.svg" alt="WhatsApp" className="w-[22px] h-[22px]" />
                         </a>
-                        <a href={settings?.socialLinks?.facebook || "#"} className="transition-opacity hover:opacity-70">
-                            <FacebookLogo size={40} weight="fill" className="text-[#1877F2]" />
+                        <a href={settings?.socialLinks?.facebook || "#"} className="w-[40px] h-[40px] rounded-full bg-white flex items-center justify-center shrink-0 transition-opacity hover:opacity-70" aria-label="Facebook">
+                            <img src="/social/facebook.svg" alt="Facebook" className="w-[22px] h-[22px]" />
                         </a>
-                        <a href={settings?.socialLinks?.instagram || "#"} className="transition-opacity hover:opacity-70">
-                            <InstagramLogo size={40} weight="fill" className="text-[#E4405F]" />
+                        <a href={settings?.socialLinks?.instagram || "#"} className="w-[40px] h-[40px] rounded-full bg-white flex items-center justify-center shrink-0 transition-opacity hover:opacity-70" aria-label="Instagram">
+                            <img src="/social/instagram.svg" alt="Instagram" className="w-[22px] h-[22px]" />
                         </a>
-                        <a href={settings?.socialLinks?.linkedin || "#"} className="transition-opacity hover:opacity-70">
-                            <LinkedinLogo size={40} weight="fill" className="text-[#0A66C2]" />
+                        <a href={settings?.socialLinks?.linkedin || "#"} className="w-[40px] h-[40px] rounded-full bg-white flex items-center justify-center shrink-0 transition-opacity hover:opacity-70" aria-label="LinkedIn">
+                            <img src="/social/linkedin.svg" alt="LinkedIn" className="w-[22px] h-[22px]" />
                         </a>
                     </div>
 

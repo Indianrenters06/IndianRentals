@@ -14,7 +14,11 @@ const app = express();
 const PORT = process.env.PORT || 6000;
 
 // Middleware
-app.use(express.json());
+// Capture the raw request body so the Cashfree webhook can verify its HMAC
+// signature against the exact bytes received (JSON.stringify would re-order keys).
+app.use(express.json({
+  verify: (req, res, buf) => { req.rawBody = buf; },
+}));
 app.use(express.urlencoded({ extended: true }));
 // CORS — allow local dev + deployed frontends
 const allowedOrigins = [
@@ -124,6 +128,8 @@ const categoryRoutes = require('./routes/categoryRoutes');
 app.use('/api/categories', categoryRoutes);
 const rentalRoutes = require('./routes/rentalRoutes');
 app.use('/api/rentals', rentalRoutes);
+const paymentRoutes = require('./routes/paymentRoutes');
+app.use('/api/payments', paymentRoutes);
 const userRoutes = require('./routes/userRoutes');
 app.use('/api/users', userRoutes);
 const uploadRoutes = require('./routes/uploadRoutes');

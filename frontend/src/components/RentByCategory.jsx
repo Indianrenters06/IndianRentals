@@ -226,7 +226,8 @@ const RentByCategory = () => {
                         width: viewType === 'tablet' ? '708px' : '100%',
                         height: viewType === 'tablet' ? '208px' : 'auto',
                         margin: viewType === 'tablet' ? '0 auto' : undefined,
-                        overflow: 'hidden'
+                        overflow: 'hidden',
+                        position: 'relative'
                     }}>
                         <Swiper
                             modules={[Navigation, Autoplay, Scrollbar]}
@@ -245,13 +246,13 @@ const RentByCategory = () => {
                                 delay: 3000,
                                 disableOnInteraction: false,
                             }}
-                            className="!pb-0"
+                            className="!py-3"
                         >
                             {displayCategories.map((cat, index) => (
                                 <SwiperSlide key={cat._id || index} style={{ width: viewType === 'tablet' ? '165px' : '177px' }}>
                                     <Link href={getCategoryRoute(cat)} className="group flex flex-col items-center cursor-pointer">
                                         <div
-                                            className="flex items-center justify-center mb-2 relative bg-white border border-gray-200 rounded-xl group-hover:border-orange-300/20 group-hover:shadow-lg transition-all duration-300 overflow-hidden shadow-md"
+                                            className="cat-card flex items-center justify-center mb-2 relative bg-white border-2 border-[#eee] rounded-xl group-hover:border-orange-300/40 overflow-hidden"
                                             style={{
                                                 width: viewType === 'tablet' ? '165px' : '177px',
                                                 height: viewType === 'tablet' ? '158px' : '173px'
@@ -262,7 +263,7 @@ const RentByCategory = () => {
                                                     src={cat.image}
                                                     alt={cat.name}
                                                     fill
-                                                    className="object-contain mix-blend-multiply brightness-[1.05] contrast-[1.05]"
+                                                    className="object-cover"
                                                 />
                                             ) : (
                                                 <div className="text-gray-400 group-hover:text-orange-300 transition-colors">
@@ -280,6 +281,22 @@ const RentByCategory = () => {
                                 </SwiperSlide>
                             ))}
                         </Swiper>
+
+                        {/* Edge fade — cards being cut at the left/right while sliding melt into the bg */}
+                        <div
+                            className="pointer-events-none absolute inset-y-0 left-0 z-20"
+                            style={{
+                                width: '24px',
+                                background: 'linear-gradient(to right, var(--color-grey-grey-50, hsla(0,0%,96%,1)) 0%, hsla(0,0%,96%,0) 100%)'
+                            }}
+                        />
+                        <div
+                            className="pointer-events-none absolute inset-y-0 right-0 z-20"
+                            style={{
+                                width: '24px',
+                                background: 'linear-gradient(to left, var(--color-grey-grey-50, hsla(0,0%,96%,1)) 0%, hsla(0,0%,96%,0) 100%)'
+                            }}
+                        />
                     </div>
 
                     {/* Figma: scrollbar row — width 1164, height 34, gap 24px from cards */}
@@ -292,18 +309,18 @@ const RentByCategory = () => {
                         {/* Nav arrows */}
                         <div className="flex items-center gap-3 shrink-0">
                             <button
-                                className="swiper-prev-cat group w-[34px] h-[34px] rounded-[69px] flex items-center justify-center bg-[hsla(0,0%,93%,1)] hover:bg-[hsla(0,0%,85%,1)] transition-all"
-                                style={{ opacity: 1 }}
+                                className="swiper-prev-cat group w-[34px] h-[34px] rounded-[69px] flex items-center justify-center bg-[#eee] hover:bg-[hsla(0,0%,85%,1)] transition-all"
+                                style={{ opacity: 1, boxShadow: '0px 8px 2px 0px rgba(133,133,133,0), 0px 5px 2px 0px rgba(133,133,133,0.01), 0px 3px 2px 0px rgba(133,133,133,0.05), 0px 1px 1px 0px rgba(133,133,133,0.09), 0px 0px 1px 0px rgba(133,133,133,0.1)' }}
                                 aria-label="Previous"
                             >
-                                <ChevronLeftIcon className="w-[18px] h-[18px] text-gray-800 group-hover:text-gray-900 transition-colors duration-200" />
+                                <ChevronLeftIcon className="w-5 h-5 text-gray-800 group-hover:text-gray-900 transition-colors duration-200" />
                             </button>
                             <button
-                                className="swiper-next-cat group w-[34px] h-[34px] rounded-[69px] flex items-center justify-center bg-[hsla(0,0%,93%,1)] hover:bg-[hsla(0,0%,85%,1)] transition-all"
-                                style={{ opacity: 1 }}
+                                className="swiper-next-cat group w-[34px] h-[34px] rounded-[69px] flex items-center justify-center bg-[#eee] hover:bg-[hsla(0,0%,85%,1)] transition-all"
+                                style={{ opacity: 1, boxShadow: '0px 8px 2px 0px rgba(133,133,133,0), 0px 5px 2px 0px rgba(133,133,133,0.01), 0px 3px 2px 0px rgba(133,133,133,0.05), 0px 1px 1px 0px rgba(133,133,133,0.09), 0px 0px 1px 0px rgba(133,133,133,0.1)' }}
                                 aria-label="Next"
                             >
-                                <ChevronRightIcon className="w-[18px] h-[18px] text-gray-800 group-hover:text-gray-900 transition-colors duration-200" />
+                                <ChevronRightIcon className="w-5 h-5 text-gray-800 group-hover:text-gray-900 transition-colors duration-200" />
                             </button>
                         </div>
                     </div>
@@ -311,6 +328,23 @@ const RentByCategory = () => {
             </div>
 
             <style>{`
+                /* Category card — flat (Figma) shadow + hover lift */
+                .cat-card {
+                    box-shadow:
+                        0px 58px 16px 0px rgba(222,222,222,0),
+                        0px 37px 15px 0px rgba(222,222,222,0.01),
+                        0px 21px 13px 0px rgba(222,222,222,0.04),
+                        0px 9px 9px 0px rgba(222,222,222,0.07),
+                        0px 2px 5px 0px rgba(222,222,222,0.08);
+                    transition: box-shadow 0.3s ease, border-color 0.3s ease, transform 0.3s ease;
+                    will-change: transform;
+                }
+                .group:hover .cat-card {
+                    box-shadow:
+                        0px 18px 32px -10px rgba(0,0,0,0.14),
+                        0px 8px 14px -6px rgba(0,0,0,0.08);
+                    transform: scale(1.02);
+                }
                 /* Kill Swiper's default ::after arrow injection on all nav buttons */
                 .swiper-prev-cat::after,
                 .swiper-next-cat::after,
