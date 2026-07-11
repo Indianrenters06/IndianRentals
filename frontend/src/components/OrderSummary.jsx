@@ -1,5 +1,4 @@
 import React from "react";
-import { FaArrowRight } from "react-icons/fa";
 import { BsCreditCard } from 'react-icons/bs';
 import { SealCheck } from '@phosphor-icons/react';
 
@@ -20,220 +19,125 @@ const OrderSummary = ({
 }) => {
     const netPayToday = Math.max(0, payToday - couponDiscount);
     return (
-        <div className="w-full bg-white rounded-2xl shadow-[0_6px_24px_rgba(0,0,0,0.08)] px-3.5 py-4 font-sans">
+        <div className="w-full bg-white border-2 border-[#eee] rounded-[16px] px-[18px] py-[20px] font-sans flex flex-col gap-[20px]">
 
-            {/* Header */}
-            <h2 className="text-xl font-semibold text-gray-900 mb-3">
-                Order Summary
-            </h2>
+            {/* Header + summary group (Figma 23226:12509, gap-11) */}
+            <div className="flex flex-col gap-[11px] w-full">
+                <h2 className="text-[21px] font-semibold text-black tracking-[-0.8px] leading-[28px] w-full">
+                    Order Summary
+                </h2>
 
-            {/* Summary Box */}
-            <div className="border border-gray-200 rounded-lg px-3 py-2">
+                <div className="flex flex-col gap-[11px] w-full">
+                    {/* Summary Box */}
+                    <div className="border border-[#e2e2e2] rounded-[8px] px-[18px] py-[20px] flex flex-col gap-[12px] w-full">
 
-                {/* One Time Payment */}
-                <h3 className="text-sm font-semibold text-gray-900 mb-3">
-                    One Time Payment
-                </h3>
-
-                <div className="flex justify-between text-sm text-gray-900 mb-1">
-                    <span>Security Amount</span>
-                    <span>₹{securityAmount}</span>
-                </div>
-
-                <div className="flex justify-between text-sm text-gray-900">
-                    <span>Delivery Charges</span>
-                    <span>₹{deliveryCharges}</span>
-                </div>
-
-                <div className="border-t border-gray-500 my-3" />
-
-                {/* Monthly Rental */}
-                <h3 className="text-sm font-semibold text-gray-900 mb-3">
-                    Monthly Rental Breakdown
-                </h3>
-
-                <div className="flex justify-between text-sm text-gray-900 mb-1">
-                    <span>Monthly Rent</span>
-                    <span>₹{monthlyRentTotal}/mo</span>
-                </div>
-
-                <div className="flex justify-between text-sm text-gray-900">
-                    <span>GST*</span>
-                    <span>₹{totalGST}/mo</span>
-                </div>
-
-                <div className="border-t border-gray-500 my-3" />
-
-                <div className="flex justify-between text-sm font-semibold text-gray-900">
-                    <span>Subtotal (incl. GST)</span>
-                    <span>₹{totalOneTime}</span>
-                </div>
-
-                {/* Coupon Discount Line */}
-                {couponDiscount > 0 && (
-                    <>
-                        <div className="border-t border-dashed border-green-300 my-2" />
-                        <div className="flex justify-between text-sm font-semibold text-green-600">
-                            <span>🎟️ Coupon {couponCode && `(${couponCode})`}</span>
-                            <span>-₹{couponDiscount}</span>
+                        {/* One Time Payment */}
+                        <div className="flex flex-col gap-[2px] w-full">
+                            <p className="font-bold text-[14px] text-[#333] tracking-[-0.4px] leading-[20px]">One Time Payment</p>
+                            <div className="flex flex-col gap-[8px] w-full text-[12px] leading-[16px] tracking-[-0.4px]">
+                                <div className="flex items-center justify-between w-full">
+                                    <span className="font-medium text-[#545454]">Security Amount</span>
+                                    <span className="font-bold text-[#333]">₹{securityAmount}</span>
+                                </div>
+                                <div className="flex items-center justify-between w-full">
+                                    <span className="font-medium text-[#545454]">Delivery Charges</span>
+                                    <span className="font-bold text-[#333]">₹{deliveryCharges}</span>
+                                </div>
+                            </div>
                         </div>
-                        <div className="flex justify-between text-sm font-bold text-gray-900 mt-1">
-                            <span>Net Payable</span>
-                            <span>₹{netPayToday}</span>
+
+                        <div className="h-px w-full bg-[#e2e2e2]" />
+
+                        {/* Monthly Rental Breakdown */}
+                        <div className="flex flex-col gap-[2px] w-full">
+                            <p className="font-bold text-[14px] text-[#333] tracking-[-0.4px] leading-[20px]">Monthly Rental Breakdown</p>
+                            <div className="flex flex-col gap-[8px] w-full text-[12px] leading-[16px] tracking-[-0.4px]">
+                                <div className="flex items-center justify-between w-full">
+                                    <span className="font-medium text-[#545454]">Monthly Rent</span>
+                                    <span className="font-bold text-[#333]">₹{monthlyRentTotal}/mo</span>
+                                </div>
+                                <div className="flex items-center justify-between w-full">
+                                    <span className="font-medium text-[#545454]">GST*</span>
+                                    <span className="font-bold text-[#333]">₹{totalGST}/mo</span>
+                                </div>
+                            </div>
                         </div>
-                    </>
-                )}
+
+                        <div className="h-px w-full bg-[#e2e2e2]" />
+
+                        {/* Subtotal */}
+                        <div className="flex items-start justify-between w-full">
+                            <span className="font-bold text-[14px] text-[#333] tracking-[-0.4px] leading-[20px]">Subtotal (incl. GST)</span>
+                            <span className="font-medium text-[12px] text-[#333] tracking-[-0.4px] leading-[16px]">₹{totalOneTime}</span>
+                        </div>
+
+                        {/* Coupon Discount Line */}
+                        {couponDiscount > 0 && (
+                            <>
+                                <div className="h-px w-full border-t border-dashed border-green-300" />
+                                <div className="flex items-center justify-between w-full text-[12px] font-semibold text-[#028907] tracking-[-0.4px]">
+                                    <span>🎟️ Coupon {couponCode && `(${couponCode})`}</span>
+                                    <span>-₹{couponDiscount}</span>
+                                </div>
+                                <div className="flex items-center justify-between w-full text-[12px] font-bold text-[#333] tracking-[-0.4px]">
+                                    <span>Net Payable</span>
+                                    <span>₹{netPayToday}</span>
+                                </div>
+                            </>
+                        )}
+                    </div>
+
+                    {/* Default: Total Amount To Pay Today + info (hidden when payment confirmed) */}
+                    {!paymentConfirmed && (
+                        <div className="w-full">
+                            {/* White total box — rounded top only so the yellow note stacks below */}
+                            <div className="bg-white border border-[#e2e2e2] rounded-t-[8px] flex items-center justify-between gap-3 w-full px-[18px] py-[20px]">
+                                <div className="flex flex-col gap-[2px] flex-1 min-w-0">
+                                    <div className="flex items-start gap-[3px]">
+                                        <SealCheck size={20} weight="fill" color="#00b505" className="shrink-0" />
+                                        <p className="font-bold text-[16px] text-[#333] tracking-[-0.4px] leading-[23px]">Total Amount To Pay Today</p>
+                                    </div>
+                                    <p className="font-medium text-[12px] text-[#545454] tracking-[-0.4px] leading-[16px]">Partial Monthly Rental Fees</p>
+                                </div>
+                                <span className="font-semibold text-[21px] text-[#00b505] tracking-[-0.8px] leading-[28px] whitespace-nowrap">₹{netPayToday}</span>
+                            </div>
+                            {/* Yellow dashed KYC note */}
+                            <div className="bg-[#ffffe7] border-l border-r border-b border-dashed border-[#d19d00] rounded-b-[8px] flex gap-[8px] pt-[16px] pb-[8px] px-[18px] w-full">
+                                <BsCreditCard size={15} className="shrink-0 mt-0.5 text-[#9A7F40]" />
+                                <p className="font-bold text-[12px] text-[#545454] tracking-[-0.4px] leading-[16px] flex-1">
+                                    By paying this amount, you are securing your order and proceeding to KYC verification. The remaining balance of your monthly rental will be charged only after your KYC is approved.
+                                </p>
+                            </div>
+                        </div>
+                    )}
+                </div>
             </div>
 
-            {/* PAYMENT CONFIRMED */}
+            {/* ── Payment confirmed flow (separate screen) ── */}
             {paymentConfirmed ? (
                 <>
-                    {/* Combined Paid Card + Info Box */}
-                    <div
-                        style={{
-                            width: '366px',
-                            height: '216px',
-                            borderBottomRightRadius: '8px',
-                            borderBottomLeftRadius: '8px',
-                            marginTop: '10px'
-                        }}
-                    >
-                        {/* Paid Card */}
+                    {/* Paid Card + Info Box */}
+                    <div className="w-full">
                         <div
-                            style={{
-                                width: '374px',
-                                height: '81px',
-                                display: 'flex',
-                                justifyContent: 'space-between',
-                                alignItems: 'center',
-                                border: '1px solid hsla(0, 0%, 89%, 1)',
-                                borderRadius: '8px',
-                                padding: '20px 18px',
-                                background: 'hsla(0, 0%, 100%, 1)',
-                                gap: '12px',
-                                boxSizing: 'border-box'
-                            }}
+                            className="bg-white border border-[#e3e3e3] flex justify-between items-center w-full rounded-t-[8px]"
+                            style={{ padding: '20px 18px', gap: '12px' }}
                         >
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                                <div
-                                    style={{
-                                        width: '20px',
-                                        height: '20px',
-                                        position: 'relative',
-                                        flexShrink: 0
-                                    }}
-                                >
-                                    <SealCheck
-                                        size={18}
-                                        weight="fill"
-                                        color="hsla(161, 94%, 30%, 1)"
-                                        style={{
-                                            width: '17.5px',
-                                            height: '17.5px',
-                                            position: 'absolute',
-                                            top: '1.25px',
-                                            left: '1.25px'
-                                        }}
-                                    />
-                                </div>
-                                <div style={{ display: 'flex', flexDirection: 'column' }}>
-                                    <p
-                                        style={{
-                                            width: '139px',
-                                            height: '23px',
-                                            fontFamily: 'Mona Sans, sans-serif',
-                                            fontWeight: '700',
-                                            fontSize: '16px',
-                                            lineHeight: '23px',
-                                            letterSpacing: '-0.1px',
-                                            color: 'hsla(0, 0%, 20%, 1)',
-                                            marginTop: 0,
-                                            marginRight: 0,
-                                            marginBottom: 0,
-                                            marginLeft: 0,
-                                            whiteSpace: 'nowrap'
-                                        }}
-                                    >
-                                        Total Amount Paid
-                                    </p>
-                                    <p
-                                        style={{
-                                            width: '147px',
-                                            height: '16px',
-                                            fontFamily: 'Mona Sans, sans-serif',
-                                            fontWeight: '500',
-                                            fontSize: '10px',
-                                            lineHeight: '16px',
-                                            letterSpacing: '-0.2px',
-                                            color: 'hsla(0, 0%, 33%, 1)',
-                                            marginTop: 0,
-                                            marginRight: 0,
-                                            marginBottom: 0,
-                                            marginLeft: 0,
-                                            whiteSpace: 'nowrap'
-                                        }}
-                                    >
-                                        Partial Monthly Rental Fees
-                                    </p>
+                            <div className="flex items-center gap-3">
+                                <SealCheck size={20} weight="fill" color="hsla(161, 94%, 30%, 1)" className="shrink-0" />
+                                <div className="flex flex-col">
+                                    <p className="font-bold text-[16px] leading-[23px] text-[#333] tracking-[-0.4px] whitespace-nowrap">Total Amount Paid</p>
+                                    <p className="font-medium text-[12px] leading-[16px] text-[#545454] tracking-[-0.4px] whitespace-nowrap">Partial Monthly Rental Fees</p>
                                 </div>
                             </div>
-                            <p style={{ fontFamily: 'Mona Sans, sans-serif', fontWeight: '700', fontSize: '20px', color: 'hsla(122, 100%, 35%, 1)', margin: 0 }}>
-                                ₹{payToday}
-                            </p>
+                            <span className="font-semibold text-[21px] text-[#00b505] tracking-[-0.8px] whitespace-nowrap">₹{payToday}</span>
                         </div>
-
-                        {/* Info Box */}
-                        <div
-                            style={{
-                                width: '374px',
-                                height: '130px',
-                                backgroundColor: 'hsla(60, 100%, 95%, 1)',
-                                padding: '16px 18px 8px 18px',
-                                borderBottomRightRadius: '8px',
-                                borderBottomLeftRadius: '8px',
-                                borderLeft: '1px dashed hsla(45, 100%, 41%, 1)',
-                                borderRight: '1px dashed hsla(45, 100%, 41%, 1)',
-                                borderBottom: '1px dashed hsla(45, 100%, 41%, 1)',
-                                borderTop: '0px',
-                                display: 'flex',
-                                gap: '8px',
-                                boxSizing: 'border-box'
-                            }}
-                        >
-                            <div style={{ flexShrink: 0, marginTop: '2px' }}>
-                                <BsCreditCard size={18} style={{ color: 'hsla(45, 70%, 40%, 1)' }} />
-                            </div>
-                            <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                                <p
-                                    style={{
-                                        width: '307px',
-                                        height: '48px',
-                                        fontFamily: 'Mona Sans, sans-serif',
-                                        fontWeight: 700,
-                                        fontSize: '10px',
-                                        lineHeight: '14px',
-                                        letterSpacing: '-0.2px',
-                                        color: 'hsla(0, 0%, 33%, 1)',
-                                        margin: 0,
-                                        overflow: 'hidden'
-                                    }}
-                                >
+                        <div className="bg-[#ffffe7] border-l border-r border-b border-dashed border-[#d19d00] rounded-b-[8px] flex gap-[8px] pt-[16px] pb-[8px] px-[18px] w-full">
+                            <BsCreditCard size={15} className="shrink-0 mt-0.5 text-[#9A7F40]" />
+                            <div className="flex flex-col gap-1 flex-1">
+                                <p className="font-bold text-[12px] leading-[16px] text-[#545454] tracking-[-0.4px]">
                                     You&apos;re all set! We&apos;ve received your payment, and your product is securely reserved. The last step before we can get your rental to you is a quick identity verification.
                                 </p>
-                                <p
-                                    style={{
-                                        width: '307px',
-                                        height: '50px',
-                                        fontFamily: 'Mona Sans, sans-serif',
-                                        fontWeight: 700,
-                                        fontSize: '10px',
-                                        lineHeight: '14px',
-                                        letterSpacing: '-0.2px',
-                                        color: 'hsla(0, 0%, 33%, 1)',
-                                        margin: 0,
-                                        overflow: 'hidden'
-                                    }}
-                                >
+                                <p className="font-bold text-[12px] leading-[16px] text-[#545454] tracking-[-0.4px]">
                                     Please fill out the KYC form to get started. Don&apos;t worry, your rental billing only kicks off once everything is approved. We&apos;ll be in touch soon to schedule your delivery!
                                 </p>
                             </div>
@@ -241,126 +145,20 @@ const OrderSummary = ({
                     </div>
 
                     {/* Confirmed Banner */}
-                    <div
-                        style={{
-                            width: '366px',
-                            height: '32px',
-                            borderRadius: '8px',
-                            border: '1px solid hsla(161, 94%, 30%, 1)',
-                            gap: '12px',
-                            padding: '8px 16px',
-                            background: 'hsla(149, 80%, 90%, 1)',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            marginTop: '8px',
-                            boxSizing: 'border-box'
-                        }}
-                    >
-                        <span
-                            style={{
-                                fontFamily: 'Mona Sans, sans-serif',
-                                fontWeight: 600,
-                                fontSize: '12px',
-                                color: 'hsla(161, 94%, 30%, 1)',
-                                whiteSpace: 'nowrap'
-                            }}
-                        >
+                    <div className="bg-[#cbffc5] border border-[#00b505] rounded-[8px] px-[16px] py-[8px] flex items-center justify-center w-full">
+                        <span className="font-semibold text-[12px] leading-[16px] tracking-[-0.4px] text-[#028907] whitespace-nowrap">
                             🎉 Woohoo! Your Payment is Confirmed.
                         </span>
                     </div>
                 </>
-
             ) : (
                 <>
-                    {/* Total Amount & Info Container */}
-                    <div className="mt-5 w-full">
-                        {/* Header Box (White) */}
-                        <div
-                            className="bg-white border border-[#E3E3E3] flex justify-between items-center w-full"
-                            style={{
-                                height: '81px',
-                                padding: '20px 18px',
-                                borderRadius: '8px 8px 0 0', // Top rounded-8px, bottom 0 for stacking
-                                border: '1px solid hsla(0, 0%, 89%, 1)',
-                                gap: '12px'
-                            }}
-                        >
-                            <div className="flex gap-3">
-                                <div className="mt-[-4px]">
-                                    <SealCheck
-                                        size={32}
-                                        weight="fill"
-                                        color="hsla(122, 100%, 35%, 1)"
-                                    />
-                                </div>
-                                <div className="flex flex-col">
-                                    <span className="text-[14px] font-bold text-[#1D1D1F] leading-tight">Total Amount To Pay Today</span>
-                                    <span className="text-[12px] text-[#6E6E73] mt-1">Partial Monthly Rental Fees</span>
-                                </div>
-                            </div>
-                            <span className="text-[20px] font-bold text-[#17B31B]">₹{netPayToday}</span>
-                        </div>
-
-                        {/* Info Box (Yellow) */}
-                        <div
-                            className="p-4 flex gap-2 w-full"
-                            style={{
-                                height: '88px',
-                                backgroundColor: 'hsla(60, 100%, 95%, 1)',
-                                padding: '16px 18px 8px 18px',
-                                borderBottomRightRadius: '8px',
-                                borderBottomLeftRadius: '8px',
-                                borderLeft: '1px dashed hsla(45, 100%, 41%, 1)',
-                                borderRight: '1px dashed hsla(45, 100%, 41%, 1)',
-                                borderBottom: '1px dashed hsla(45, 100%, 41%, 1)',
-                                borderTop: '0px',
-                                gap: '8px'
-                            }}
-                        >
-                            <div className="shrink-0 mt-0.5">
-                                <BsCreditCard size={18} className="text-[#9A7F40]" />
-                            </div>
-                            <p
-                                className="tracking-tight"
-                                style={{
-                                    fontFamily: "'Mona Sans', sans-serif",
-                                    fontWeight: 700,
-                                    fontSize: '12px',
-                                    lineHeight: '16px',
-                                    color: 'hsla(0, 0%, 33%, 1)',
-                                    flex: 1
-                                }}
-                            >
-                                By paying this amount, you are securing your order and proceeding to KYC verification.
-                                The remaining balance of your monthly rental will be charged only after your KYC is approved.
-                            </p>
-                        </div>
-                    </div>
-
                     {/* Savings */}
                     {savedAmount > 0 && (
-                        <div
-                            className="mt-4 flex items-center justify-center w-full"
-                            style={{
-                                height: '32px',
-                                backgroundColor: 'hsla(114, 100%, 89%, 1)',
-                                border: '1px solid hsla(122, 100%, 35%, 1)',
-                                borderRadius: '8px',
-                                padding: '8px 16px',
-                                gap: '12px'
-                            }}
-                        >
-                            <span
-                                className="font-medium text-center"
-                                style={{
-                                    fontFamily: "'Mona Sans', sans-serif",
-                                    fontSize: '14px',
-                                    lineHeight: '1',
-                                    color: 'hsla(122, 100%, 35%, 1)'
-                                }}
-                            >
-                                🎉 You saved ₹{savedAmount.toFixed(2)} on this order
+                        <div className="bg-[#cbffc5] border border-[#00b505] rounded-[8px] px-[16px] py-[8px] flex items-center justify-center w-full">
+                            <span className="flex items-center gap-[5px] font-semibold text-[12px] leading-[16px] tracking-[-0.4px]">
+                                <span className="text-black">🎉</span>
+                                <span className="text-[#028907]">You saved ₹{savedAmount.toFixed(2)} on this order</span>
                             </span>
                         </div>
                     )}
@@ -369,22 +167,9 @@ const OrderSummary = ({
                     {showButton && (
                         <button
                             onClick={onCheckout}
-                            className="mt-5 w-full rounded-full flex items-center justify-center transition-all shadow-sm"
-                            style={{
-                                height: '40px',
-                                backgroundColor: 'hsla(44, 100%, 64%, 1)',
-                                padding: '6px 20px',
-                                gap: '2px',
-                                opacity: 1,
-                                border: 'none',
-                                fontFamily: "'Mona Sans', sans-serif",
-                                fontWeight: 500,
-                                fontSize: '16px',
-                                lineHeight: '23px',
-                                color: 'hsla(0, 0%, 12%, 1)'
-                            }}
+                            className="w-full h-[40px] rounded-full flex items-center justify-center bg-[#ffcf46] px-[20px] py-[6px] transition-all"
                         >
-                            {btnText}
+                            <span className="font-medium text-[16px] leading-[23px] text-[#1f1f1f] tracking-[-0.4px]">{btnText}</span>
                         </button>
                     )}
                 </>

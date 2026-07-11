@@ -29,11 +29,14 @@ export default function UserPayments() {
                 const data = await res.json();
                 setPayments(data.map(r => ({
                     _id: r._id,
-                    txnId: `TXN-${r._id.toString().slice(-8).toUpperCase()}`,
+                    // Real Cashfree transaction id when settled; synthetic ref otherwise.
+                    txnId: r.paymentResult?.id
+                        ? String(r.paymentResult.id)
+                        : `TXN-${r._id.toString().slice(-8).toUpperCase()}`,
                     user: r.user?.name || "Unknown",
                     email: r.user?.email || "",
                     amount: r.totalPrice || 0,
-                    method: r.paymentMethod || "Razorpay",
+                    method: r.paymentMethod || "Cashfree",
                     status: r.isPaid ? "Success" : "Pending",
                     date: new Date(r.createdAt).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" }),
                     _raw: r,

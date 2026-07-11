@@ -19,8 +19,7 @@ The backend is built using Node.js and uses the following packages to ensure per
 | **cloudinary** | ^2.8.0 | SDK to integrate with Cloudinary for image management and storage. |
 | **streamifier** | ^0.1.1 | Helper to convert buffers (like uploaded files) into readable streams. |
 | **nodemailer** | ^7.0.11 | Module to send emails (used for notifications, verification, etc). |
-| **razorpay** | ^2.9.6 | SDK for integrating Razorpay payment gateway. |
-| **axios** | ^1.13.2 | Promise-based HTTP client for making external API requests. |
+| **axios** | ^1.13.2 | Promise-based HTTP client for external API requests (also used for the Cashfree PG REST integration). |
 | **winston** | ^3.19.0 | A versatile logging library for Node.js. |
 | **morgan** | ^1.10.1 | HTTP request logger middleware for node.js. |
 
@@ -30,7 +29,7 @@ The backend is built using Node.js and uses the following packages to ensure per
 - **Authentication**: `bcrypt`, `jsonwebtoken`
 - **File Handling**: `multer`, `cloudinary`, `streamifier`
 - **Utilities**: `nodemailer`, `axios`, `express-async-handler`
-- **Payments**: `razorpay`
+- **Payments**: Cashfree PG (integrated via `axios` REST calls)
 - **Logging**: `winston`, `morgan`
 
 ## Frontend Dependencies

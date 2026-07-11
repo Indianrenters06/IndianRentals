@@ -27,11 +27,16 @@ export default function AllTransactions() {
                 const data = await res.json();
                 setTransactions(data.map(r => ({
                     _id: r._id,
-                    txnId: `TXN-${r._id.toString().slice(-8).toUpperCase()}`,
+                    // Prefer the real Cashfree transaction id (stored in paymentResult.id
+                    // when the payment settles); fall back to a synthetic ref for
+                    // unpaid/pending rentals that have no gateway id yet.
+                    txnId: r.paymentResult?.id
+                        ? String(r.paymentResult.id)
+                        : `TXN-${r._id.toString().slice(-8).toUpperCase()}`,
                     user: r.user?.name || "Unknown",
                     email: r.user?.email || "",
                     amount: r.totalPrice || 0,
-                    method: r.paymentMethod || "Razorpay",
+                    method: r.paymentMethod || "Cashfree",
                     status: r.isPaid ? "Success" : "Pending",
                     date: new Date(r.createdAt).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" }),
                     createdAt: new Date(r.createdAt).getTime(),

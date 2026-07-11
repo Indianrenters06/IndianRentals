@@ -9,6 +9,7 @@ import { BsTruck, BsBoxSeam, BsCreditCard } from 'react-icons/bs';
 import { useDispatch } from 'react-redux';
 import { addToCart } from '../../../redux/features/cartSlice';
 import { getProductById } from '../../../services/productService';
+import { checkServiceability } from '../../../services/serviceabilityService';
 import BestRentedProducts from '../../../components/BestRentedProducts';
 import RentVsBuy from '../../../components/RentVsBuy';
 import FaqSection from '../../../components/FaqSection';
@@ -49,7 +50,12 @@ export default function ProductDetailPage() {
     const [reviewRating, setReviewRating] = useState(0);
     const [reviewText, setReviewText] = useState('');
     const [reviewSubmitted, setReviewSubmitted] = useState(false);
-    
+
+    // Delivery pincode serviceability
+    const [pincode, setPincode] = useState('');
+    const [pinChecking, setPinChecking] = useState(false);
+    const [pinResult, setPinResult] = useState(null); // { serviceable, message }
+
     // CMS Layout State
     const [pageLayout, setPageLayout] = useState(null);
 
@@ -64,7 +70,7 @@ export default function ProductDetailPage() {
                 // Since our backend uses MongoDB IDs, we hope the link passed the ID.
                 const data = await getProductById(params.id);
                 setProduct(data);
-                
+
                 try {
                     const API = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
                     const cmsRes = await window.fetch(`${API}/api/cms/product-page`);
@@ -131,6 +137,24 @@ export default function ProductDetailPage() {
         router.push('/cart');
     };
 
+    const handleCheckPincode = async () => {
+        const pin = pincode.trim();
+        if (!/^[1-9][0-9]{5}$/.test(pin)) {
+            setPinResult({ serviceable: false, message: 'Please enter a valid 6-digit pincode.' });
+            return;
+        }
+        try {
+            setPinChecking(true);
+            setPinResult(null);
+            const data = await checkServiceability(pin);
+            setPinResult(data);
+        } catch (e) {
+            setPinResult({ serviceable: false, message: 'Could not check right now. Please try again.' });
+        } finally {
+            setPinChecking(false);
+        }
+    };
+
     if (loading) return <div className="min-h-screen flex justify-center items-center">Loading...</div>;
     if (error || !product) return <div className="min-h-screen flex justify-center items-center">Product not found</div>;
 
@@ -179,7 +203,7 @@ export default function ProductDetailPage() {
 
                 <main className="w-full max-w-[1200px] mx-auto px-4 md:px-8">
                     <div
-                        className="grid grid-cols-1 lg:grid-cols-2 items-start"
+                        className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_536px] items-start"
                         style={{
                             width: '100%',
                             minHeight: '809.73px',
@@ -193,7 +217,6 @@ export default function ProductDetailPage() {
                             className="flex flex-col"
                             style={{
                                 width: '100%',
-                                maxWidth: '611px',
                                 gap: '10px',
                                 opacity: 1
                             }}
@@ -201,16 +224,15 @@ export default function ProductDetailPage() {
 
                             {/* Main Image Slider */}
                             <div
-                                className="relative w-full bg-white rounded-xl flex items-center justify-center p-4 lg:p-6 group overflow-hidden shrink-0"
+                                className="relative w-full bg-white flex items-center justify-center p-4 lg:p-6 group overflow-hidden shrink-0"
                                 style={{
                                     width: '100%',
-                                    height: 'clamp(300px, 90vw, 611px)',
+                                    height: 'clamp(300px, 90vw, 643.64px)',
+                                    borderRadius: '16px',
                                     border: '1px solid hsla(0, 0%, 93%, 1)',
                                     opacity: 1
                                 }}
                             >
-                                <span className="absolute top-6 left-6 z-10 bg-[#FF3B30] text-white text-[12px] font-bold px-3 py-1 rounded-[6px] tracking-wide">20% off</span>
-
                                 <div
                                     className="absolute z-10 flex flex-col"
                                     style={{
@@ -272,28 +294,15 @@ export default function ProductDetailPage() {
 
                                 </Swiper>
 
-                                {/* Custom Heroicon Caret Navigation */}
-                                <div
-                                    className="swiper-button-prev-custom absolute z-10 cursor-pointer hidden md:flex items-center justify-center hover:opacity-80 transition-opacity"
-                                    style={{
-                                        width: '34px',
-                                        height: '34px',
-                                        borderRadius: '69px',
-                                        top: '305px',
-                                        left: '12px',
-                                        background: 'hsla(0, 0%, 93%, 1)',
-                                        boxShadow: '0px 0px 1px 0px hsla(0, 0%, 52%, 0.1), 0px 1px 1px 0px hsla(0, 0%, 52%, 0.09), 0px 3px 2px 0px hsla(0, 0%, 52%, 0.05), 0px 5px 2px 0px hsla(0, 0%, 52%, 0.01), 0px 8px 2px 0px hsla(0, 0%, 52%, 0)'
-                                    }}
-                                >
-                                    <ChevronLeftIcon className="w-[18px] h-[18px] text-gray-800" strokeWidth={2.5} />
-                                </div>
+                                {/* Custom Heroicon Caret Navigation — design shows a single right caret, vertically centered */}
                                 <div
                                     className="swiper-button-next-custom absolute z-10 cursor-pointer flex items-center justify-center hover:opacity-80 transition-opacity"
                                     style={{
                                         width: '34px',
                                         height: '34px',
                                         borderRadius: '69px',
-                                        top: '305px',
+                                        top: '50%',
+                                        transform: 'translateY(-50%)',
                                         right: '12px',
                                         background: 'hsla(0, 0%, 93%, 1)',
                                         boxShadow: '0px 0px 1px 0px hsla(0, 0%, 52%, 0.1), 0px 1px 1px 0px hsla(0, 0%, 52%, 0.09), 0px 3px 2px 0px hsla(0, 0%, 52%, 0.05), 0px 5px 2px 0px hsla(0, 0%, 52%, 0.01), 0px 8px 2px 0px hsla(0, 0%, 52%, 0)'
@@ -301,6 +310,8 @@ export default function ProductDetailPage() {
                                 >
                                     <ChevronRightIcon className="w-[18px] h-[18px] text-gray-800" strokeWidth={2.5} />
                                 </div>
+                                {/* Hidden prev control kept for swiper loop navigation via swipe */}
+                                <div className="swiper-button-prev-custom hidden" />
                             </div>
 
                             {/* Thumbnails Slider */}
@@ -332,7 +343,7 @@ export default function ProductDetailPage() {
 
                         {/* Right Column - Product Purchase Details */}
                         <div
-                            className="flex flex-col w-full lg:justify-self-end gap-[12px] lg:gap-[32px]"
+                            className="flex flex-col w-full lg:justify-self-end gap-[12px] lg:gap-[8px]"
                             style={{
                                 maxWidth: '536.36px',
                                 opacity: 1,
@@ -343,7 +354,7 @@ export default function ProductDetailPage() {
 
                             {/* Main White Card (Title, Rating, Slider, Price) */}
                             <div
-                                className="bg-white rounded-xl flex flex-col overflow-hidden w-full lg:min-h-[334px]"
+                                className="bg-white rounded-[16px] flex flex-col overflow-hidden w-full lg:min-h-[334px]"
                                 style={{
                                     height: 'auto',
                                     border: '1px solid var(--color-grey-grey-100, hsla(0, 0%, 93%, 1))',
@@ -367,7 +378,7 @@ export default function ProductDetailPage() {
                                     }}
                                 >
                                     {/* Title */}
-                                    <h1 className="text-[22px] font-bold text-[#1D1D1F] leading-[1.3] tracking-tight pr-4">
+                                    <h1 className="text-[21px] font-semibold text-[#292929] leading-[28px] tracking-[-0.8px] pr-4">
                                         {product.name}
                                     </h1>
 
@@ -407,9 +418,9 @@ export default function ProductDetailPage() {
                                                     />
                                                 ))}
                                             </div>
-                                            <span className="text-[11px] font-medium text-[#1D1D1F]">{product.rating || "4.5"} ({product.numReviews || 12})</span>
+                                            <span className="text-[12px] font-medium text-[#333333]">{product.rating || "4.5"} ({product.numReviews || 12})</span>
                                         </div>
-                                        <div className="bg-[#00B200] text-white text-[11px] font-medium px-2 py-0.5 rounded-[6px] flex items-center justify-center gap-1.5 h-full whitespace-nowrap">
+                                        <div className="bg-[#00b505] text-white text-[12px] font-medium px-2 py-0.5 rounded-[8px] flex items-center justify-center gap-1.5 h-full whitespace-nowrap">
                                             <BsTruck size={13} className="stroke-[0.5]" />
                                             <span className="mt-[1px]">{product.deliveryTime || pageLayout?.productPageDeliveryText || "2-4 days"}</span>
                                         </div>
@@ -465,7 +476,7 @@ export default function ProductDetailPage() {
                                                 minimum rental period
                                             </span>
                                         </h3>
-                                        <span className="text-[14px] font-bold text-[#1D1D1F]">{duration === 1 ? '1 Month' : `${duration} Months`}</span>
+                                        <span className="text-[16px] font-semibold text-[#1f1f1f] tracking-[-0.4px]">{duration === 1 ? '1 Month' : `${duration} Months`}</span>
                                     </div>
 
                                     {/* Tenure Slider */}
@@ -482,7 +493,7 @@ export default function ProductDetailPage() {
                                             const currentStep = duration <= 1 ? 1 : duration <= 3 ? 2 : duration <= 6 ? 3 : duration <= 9 ? 4 : 5;
                                             const activePct = ((currentStep - 1) / 4) * 100;
                                             const labels = ["1+", "3+", "6+", "9+", "12+"];
-                                            
+
                                             return (
                                                 <>
                                                     {/* Track */}
@@ -494,7 +505,7 @@ export default function ProductDetailPage() {
                                                                 background: `linear-gradient(to right, hsla(24, 91%, 48%, 1) ${activePct}%, hsla(0, 0%, 93%, 1) ${activePct}%)`
                                                             }}
                                                         />
-                                                        
+
                                                         {/* Single Active Thumb */}
                                                         <div
                                                             className="absolute rounded-full bg-white transition-all duration-300 z-10"
@@ -505,7 +516,7 @@ export default function ProductDetailPage() {
                                                                 left: `calc(${activePct}% - 9px)`
                                                             }}
                                                         />
-                                                        
+
                                                         <input
                                                             type="range"
                                                             min="1"
@@ -652,22 +663,22 @@ export default function ProductDetailPage() {
                                                 </span>
                                             </div>
 
-                                            {/* Desktop: price + MRP + discount */}
-                                            <div className="hidden lg:flex flex-col gap-[6px]">
+                                            {/* Desktop: price + MRP + discount — single inline row (matches Figma) */}
+                                            <div className="hidden lg:flex items-center gap-[20px]">
                                                 <div className="flex items-center gap-1">
-                                                    <span style={{ fontFamily: '"Mona Sans", sans-serif', fontWeight: 600, fontSize: '24px', lineHeight: 1, letterSpacing: '-0.8px', color: 'hsla(3, 86%, 51%, 1)' }}>
+                                                    <span style={{ fontFamily: '"Mona Sans", sans-serif', fontWeight: 600, fontSize: '27px', lineHeight: 1, letterSpacing: '-0.8px', color: '#ed2115' }}>
                                                         ₹{currentPlan.price * quantity}
                                                     </span>
-                                                    <span style={{ fontFamily: 'Manrope, sans-serif', fontWeight: 400, fontSize: '16px', lineHeight: 1, letterSpacing: '-0.04em', color: 'hsla(0, 0%, 46%, 1)' }}>
+                                                    <span style={{ fontFamily: 'Manrope, sans-serif', fontWeight: 400, fontSize: '16px', lineHeight: 1, letterSpacing: '-0.04em', color: '#757575' }}>
                                                         /month
                                                     </span>
                                                 </div>
-                                                <div className="flex items-center gap-1">
-                                                    <span className="text-[13px] font-medium text-gray-400 line-through shrink-0">
+                                                <div className="flex items-center gap-[4px]">
+                                                    <span className="text-[16px] font-medium line-through shrink-0" style={{ color: '#757575' }}>
                                                         ₹{product.mrp ? product.mrp * quantity : Math.round(currentPlan.price * 1.5) * quantity}
                                                     </span>
-                                                    <span className="text-white text-[10px] font-bold flex items-center justify-center whitespace-nowrap shrink-0"
-                                                        style={{ width: '59px', height: '22px', borderRadius: '27px', padding: '4px 10px', background: 'hsla(3, 86%, 51%, 1)' }}>
+                                                    <span className="text-[12px] font-normal flex items-center justify-center whitespace-nowrap shrink-0"
+                                                        style={{ height: '22px', borderRadius: '27px', padding: '4px 10px', background: '#ed2115', color: '#fff2f1' }}>
                                                         {product.mrp
                                                             ? `${Math.round(((product.mrp - currentPlan.price) / product.mrp) * 100)}% off`
                                                             : (pageLayout?.productPageDiscountText || "20% off")
@@ -688,13 +699,13 @@ export default function ProductDetailPage() {
                                                 opacity: 1
                                             }}
                                         >
-                                            <span className="hidden lg:inline text-[13.5px] text-[#1D1D1F] font-medium">Quantity</span>
+                                            <span className="hidden lg:inline text-[14px] text-[#333333] font-medium">Quantity</span>
                                             <div className="flex items-center gap-4">
                                                 <button onClick={() => setQuantity(Math.max(1, quantity - 1))} className="text-gray-400 hover:text-black transition-colors">
-                                                    <FaMinus size={10} />
+                                                    <FaMinus size={11} />
                                                 </button>
                                                 <div className="w-[38px] h-[34px] bg-white border border-gray-100 rounded-[8px] flex items-center justify-center shadow-[0_1px_2px_rgba(0,0,0,0.05)]">
-                                                    <span className="text-[14px] font-bold text-[#1D1D1F]">{quantity}</span>
+                                                    <span className="text-[14px] font-semibold text-[#333333]">{quantity}</span>
                                                 </div>
                                                 <button onClick={() => setQuantity(quantity + 1)} className="text-gray-400 hover:text-black transition-colors">
                                                     <FaPlus size={10} />
@@ -733,10 +744,10 @@ export default function ProductDetailPage() {
 
                             {/* What's included in your plan Section */}
                             <div
-                                className="flex flex-col lg:mt-[-18px]"
+                                className="flex flex-col"
                                 style={{
                                     width: '100%',
-                                    gap: '8px'
+                                    gap: '4px'
                                 }}
                             >
                                 <div style={{ height: '16px', display: 'flex', alignItems: 'center' }}>
@@ -745,10 +756,10 @@ export default function ProductDetailPage() {
                                         style={{
                                             fontFamily: '"Mona Sans", sans-serif',
                                             fontWeight: 600,
-                                            fontSize: '13px',
+                                            fontSize: '12px',
                                             lineHeight: '16px',
-                                            letterSpacing: '-0.02em',
-                                            color: 'hsla(0, 0%, 12%, 1)',
+                                            letterSpacing: '-0.4px',
+                                            color: '#1f1f1f',
                                             opacity: 1
                                         }}
                                     >
@@ -803,7 +814,7 @@ export default function ProductDetailPage() {
                                                     border: '1px solid hsla(198, 100%, 85%, 1)'
                                                 }}
                                             >
-                                                <div className="shrink-0 text-white flex items-center justify-center"><Icon size={18} weight="bold" /></div>
+                                                <div className="shrink-0 text-white flex items-center justify-center"><Icon size={20} weight="bold" /></div>
                                                 <span style={{ fontFamily: '"Mona Sans", sans-serif', fontWeight: 600, fontSize: '12px', lineHeight: '16px', color: 'white', whiteSpace: 'normal', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden', wordBreak: 'break-word', width: '87px' }}>
                                                     {benefitText}
                                                 </span>
@@ -815,7 +826,7 @@ export default function ProductDetailPage() {
 
                             {/* Deposit & KYC Information Row */}
                             <div
-                                className="flex flex-col lg:flex-row gap-[6px] lg:items-center lg:mt-[-24px]"
+                                className="flex flex-col lg:flex-row gap-[6px] lg:items-center"
                                 style={{ width: '100%' }}
                             >
                                 {/* Refundable Deposit Card */}
@@ -828,10 +839,10 @@ export default function ProductDetailPage() {
                                         border: '1px solid hsla(198, 100%, 85%, 1)'
                                     }}
                                 >
-                                    <span style={{ fontFamily: '"Mona Sans", sans-serif', fontWeight: 600, fontSize: '13px', lineHeight: '20px', letterSpacing: '-0.02em', color: 'hsla(214, 92%, 40%, 1)' }}>
+                                    <span style={{ fontFamily: '"Mona Sans", sans-serif', fontWeight: 600, fontSize: '12px', lineHeight: '16px', letterSpacing: '-0.4px', color: '#0859c5' }}>
                                         100% Refundable Deposit
                                     </span>
-                                    <span style={{ fontFamily: '"Mona Sans", sans-serif', fontWeight: 700, fontSize: '16px', lineHeight: '23px', letterSpacing: '-0.015em', color: 'hsla(214, 92%, 40%, 1)', whiteSpace: 'nowrap' }}>
+                                    <span style={{ fontFamily: '"Mona Sans", sans-serif', fontWeight: 600, fontSize: '16px', lineHeight: '23px', letterSpacing: '-0.4px', color: '#0859c5', whiteSpace: 'nowrap' }}>
                                         ₹{product.securityDeposit ? `${product.securityDeposit.toLocaleString('en-IN')}/-` : '20,000/-'}
                                     </span>
                                 </div>
@@ -851,10 +862,10 @@ export default function ProductDetailPage() {
                                     }}
                                 >
                                     <div className="flex flex-col justify-center" style={{ flex: 1, minWidth: 0 }}>
-                                        <span style={{ fontFamily: '"Mona Sans", sans-serif', fontWeight: 700, fontSize: '13px', lineHeight: '18px', letterSpacing: '-0.02em', color: 'hsla(272, 72%, 47%, 1)' }}>
+                                        <span style={{ fontFamily: '"Mona Sans", sans-serif', fontWeight: 600, fontSize: '12px', lineHeight: '16px', letterSpacing: '-0.4px', color: '#7e22ce' }}>
                                             Place Order &amp; complete KYC anytime
                                         </span>
-                                        <span style={{ fontFamily: '"Mona Sans", sans-serif', fontWeight: 500, fontSize: '13px', lineHeight: '18px', letterSpacing: '-0.02em', color: 'hsla(272, 72%, 47%, 1)' }}>
+                                        <span style={{ fontFamily: '"Mona Sans", sans-serif', fontWeight: 500, fontSize: '12px', lineHeight: '16px', letterSpacing: '-0.4px', color: '#7e22ce' }}>
                                             to get your items the next day
                                         </span>
                                     </div>
@@ -869,10 +880,10 @@ export default function ProductDetailPage() {
                                 onClick={handleAddToCart}
                                 onMouseEnter={() => setIsRentHovered(true)}
                                 onMouseLeave={() => setIsRentHovered(false)}
-                                className="lg:mt-[-24px]"
+                                className="active:scale-[0.98]"
                                 style={{
                                     width: '100%',
-                                    height: '50px',
+                                    height: '45px',
                                     paddingLeft: '20px',
                                     paddingRight: '20px',
                                     paddingTop: '6px',
@@ -890,13 +901,13 @@ export default function ProductDetailPage() {
                                     transform: isRentHovered ? 'translateY(1px)' : 'none',
                                     transition: 'all 0.1s ease-out'
                                 }}
-                                className="active:scale-[0.98]"
                             >
                                 <span style={{
                                     fontFamily: '"Mona Sans", sans-serif',
-                                    fontWeight: 700,
-                                    fontSize: '15px',
-                                    color: '#1D1D1F'
+                                    fontWeight: 600,
+                                    fontSize: '16px',
+                                    letterSpacing: '-0.4px',
+                                    color: '#333333'
                                 }}>
                                     <span className="lg:hidden">Book Your Plan</span>
                                     <span className="hidden lg:inline">Rent Now</span>
@@ -904,14 +915,14 @@ export default function ProductDetailPage() {
                             </button>
 
                             {/* High-Fidelity Info Row */}
-                            <div className="flex flex-col lg:flex-row gap-[10px] lg:items-center lg:mt-[-24px] w-full">
+                            <div className="flex flex-col lg:flex-row gap-[10px] lg:items-center w-full">
                                 {/* Cancel/Return Card */}
                                 <div
                                     className="w-full flex items-center"
                                     style={{
                                         flex: 1,
                                         minWidth: 0,
-                                        padding: '14px 12px',
+                                        padding: '12px 8px',
                                         borderRadius: '16px',
                                         background: 'hsla(44, 100%, 96%, 1)',
                                         border: '1px solid hsla(47, 100%, 76%, 1)',
@@ -919,10 +930,10 @@ export default function ProductDetailPage() {
                                 >
                                     <div className="flex items-center w-full gap-[10px]">
                                         <div className="rounded-full flex items-center justify-center shrink-0"
-                                            style={{ width: '36px', height: '36px', background: 'hsla(44, 100%, 91%, 1)' }}>
+                                            style={{ width: '28px', height: '28px', background: 'hsla(44, 100%, 91%, 1)' }}>
                                             <Truck size={20} color="hsla(29, 100%, 44%, 1)" />
                                         </div>
-                                        <span style={{ flex: 1, fontFamily: '"Mona Sans", sans-serif', fontWeight: 600, fontSize: '13px', lineHeight: '18px', color: 'hsla(29, 100%, 44%, 1)' }}>
+                                        <span style={{ flex: 1, fontFamily: '"Mona Sans", sans-serif', fontWeight: 600, fontSize: '12px', lineHeight: '16px', color: '#e26e00' }}>
                                             What if I cancel or return before 6 months?
                                         </span>
                                         <button onClick={() => setIsCancellationOpen(true)}
@@ -938,7 +949,7 @@ export default function ProductDetailPage() {
                                     style={{
                                         flex: 1,
                                         minWidth: 0,
-                                        padding: '14px 12px',
+                                        padding: '12px 8px',
                                         borderRadius: '16px',
                                         background: 'hsla(44, 100%, 96%, 1)',
                                         border: '1px solid hsla(47, 100%, 76%, 1)',
@@ -946,10 +957,10 @@ export default function ProductDetailPage() {
                                 >
                                     <div className="flex items-center w-full gap-[10px]">
                                         <div className="rounded-full flex items-center justify-center shrink-0"
-                                            style={{ width: '36px', height: '36px', background: 'hsla(44, 100%, 91%, 1)' }}>
+                                            style={{ width: '28px', height: '28px', background: 'hsla(44, 100%, 91%, 1)' }}>
                                             <CalendarDots size={20} color="hsla(29, 100%, 44%, 1)" />
                                         </div>
-                                        <span style={{ flex: 1, fontFamily: '"Mona Sans", sans-serif', fontWeight: 600, fontSize: '13px', lineHeight: '18px', color: 'hsla(29, 100%, 44%, 1)' }}>
+                                        <span style={{ flex: 1, fontFamily: '"Mona Sans", sans-serif', fontWeight: 600, fontSize: '12px', lineHeight: '16px', color: '#e26e00' }}>
                                             How do I extend tenure after 6 months?
                                         </span>
                                         <Link href="#"
@@ -961,38 +972,80 @@ export default function ProductDetailPage() {
                             </div>
 
                             {/* Delivery Details */}
-                            <div
-                                className="lg:mt-[-24px]"
-                                style={{
-                                    width: '100%',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    padding: '10px',
-                                    borderRadius: '12px',
-                                    background: 'hsla(0, 0%, 100%, 1)',
-                                    border: '1px solid hsla(0, 0%, 89%, 1)',
-                                    gap: '8px'
-                                }}
-                            >
-                                <div className="rounded-full flex items-center justify-center shrink-0"
-                                    style={{ width: '36px', height: '36px', background: 'hsla(120, 100%, 95%, 1)' }}>
-                                    <MapPin weight="fill" size={18} color="hsla(120, 100%, 35%, 1)" />
+                            <div className="w-full flex flex-col gap-[6px]">
+                                <div
+                                    style={{
+                                        width: '100%',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        padding: '10px',
+                                        borderRadius: '16px',
+                                        background: 'hsla(0, 0%, 100%, 1)',
+                                        border: '1px solid hsla(0, 0%, 89%, 1)',
+                                        gap: '8px'
+                                    }}
+                                >
+                                    <div className="rounded-full flex items-center justify-center shrink-0"
+                                        style={{ width: '28px', height: '28px', background: 'hsla(120, 100%, 95%, 1)' }}>
+                                        <MapPin weight="fill" size={18} color="hsla(120, 100%, 35%, 1)" />
+                                    </div>
+                                    <span style={{ fontFamily: '"Mona Sans", sans-serif', fontWeight: 600, fontSize: '12px', color: '#545454', whiteSpace: 'nowrap' }}>
+                                        Delivery
+                                    </span>
+                                    <div className="flex items-center px-3" style={{ border: '1px solid #cbcbcb', borderRadius: '8px', flex: 1, height: '39px' }}>
+                                        <input
+                                            type="text"
+                                            inputMode="numeric"
+                                            maxLength={6}
+                                            value={pincode}
+                                            onChange={(e) => {
+                                                setPincode(e.target.value.replace(/\D/g, '').slice(0, 6));
+                                                setPinResult(null);
+                                            }}
+                                            onKeyDown={(e) => { if (e.key === 'Enter') handleCheckPincode(); }}
+                                            placeholder="Enter your pincode"
+                                            style={{ border: 'none', outline: 'none', fontSize: '12px', letterSpacing: '-0.4px', fontFamily: '"Mona Sans", sans-serif', fontWeight: 500, width: '100%', background: 'transparent', color: '#1D1D1F' }}
+                                        />
+                                    </div>
+                                    <button
+                                        onClick={handleCheckPincode}
+                                        disabled={pinChecking}
+                                        className="hidden lg:flex flex-col items-start justify-center"
+                                        style={{ width: '125px', fontFamily: '"Mona Sans", sans-serif', fontWeight: 700, fontSize: '12px', lineHeight: '16px', letterSpacing: '-0.4px', color: '#757575', background: 'none', border: 'none', cursor: pinChecking ? 'wait' : 'pointer', padding: 0, flexShrink: 0 }}>
+                                        {pinChecking ? (
+                                            <span>Checking…</span>
+                                        ) : (
+                                            <>
+                                                <span>Check availability</span>
+                                                <span>in your state</span>
+                                            </>
+                                        )}
+                                    </button>
+                                    {/* Mobile check button */}
+                                    <button
+                                        onClick={handleCheckPincode}
+                                        disabled={pinChecking}
+                                        className="lg:hidden shrink-0"
+                                        style={{ height: '38px', padding: '0 14px', borderRadius: '10px', fontFamily: '"Mona Sans", sans-serif', fontWeight: 700, fontSize: '12px', color: '#1D1D1F', background: 'hsla(44, 100%, 64%, 1)', border: 'none', cursor: pinChecking ? 'wait' : 'pointer', whiteSpace: 'nowrap' }}>
+                                        {pinChecking ? '…' : 'Check'}
+                                    </button>
                                 </div>
-                                <span style={{ fontFamily: '"Mona Sans", sans-serif', fontWeight: 600, fontSize: '14px', color: '#1D1D1F', whiteSpace: 'nowrap' }}>
-                                    Delivery
-                                </span>
-                                <div className="flex items-center px-3" style={{ border: '1.5px solid hsla(0, 0%, 85%, 1)', borderRadius: '10px', flex: 1, height: '38px' }}>
-                                    <input
-                                        type="text"
-                                        placeholder="Check availability in your state"
-                                        style={{ border: 'none', outline: 'none', fontSize: '13px', fontFamily: '"Mona Sans", sans-serif', width: '100%', background: 'transparent', color: '#1D1D1F' }}
-                                    />
-                                </div>
-                                <button className="hidden lg:flex flex-col items-start justify-center"
-                                    style={{ width: '125px', height: '32px', fontFamily: '"Mona Sans", sans-serif', fontWeight: 700, fontSize: '11px', letterSpacing: '0.08em', color: 'hsla(0, 0%, 46%, 1)', background: 'none', border: 'none', cursor: 'pointer', padding: 0, flexShrink: 0 }}>
-                                    <span>Check availability</span>
-                                    <span>in your state</span>
-                                </button>
+
+                                {pinResult && (
+                                    <div
+                                        className="flex items-center gap-[6px] px-[8px]"
+                                        style={{
+                                            fontFamily: '"Mona Sans", sans-serif',
+                                            fontWeight: 600,
+                                            fontSize: '12.5px',
+                                            lineHeight: '16px',
+                                            color: pinResult.serviceable ? 'hsla(122, 100%, 30%, 1)' : 'hsla(3, 86%, 51%, 1)'
+                                        }}
+                                    >
+                                        <span>{pinResult.serviceable ? '✓' : '✕'}</span>
+                                        <span>{pinResult.message}</span>
+                                    </div>
+                                )}
                             </div>
                         </div>
                     </div>

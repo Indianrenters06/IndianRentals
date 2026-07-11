@@ -3,6 +3,7 @@ import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { ChevronRightIcon } from '@heroicons/react/24/outline';
+import { Info } from '@phosphor-icons/react';
 
 const Sidebar = ({ selectedDuration, setSelectedDuration, selectedSort, setSelectedSort }) => {
     const pathname = usePathname() || "";
@@ -24,13 +25,14 @@ const Sidebar = ({ selectedDuration, setSelectedDuration, selectedSort, setSelec
 
     return (
         <aside
-            className="shrink-0 hidden lg:flex flex-col bg-white"
+            className="shrink-0 hidden lg:flex flex-col"
             style={{
                 fontFamily: "'Mona Sans', sans-serif",
                 width: '250px',
                 minHeight: '754.02px',
                 borderRadius: '20px',
-                border: '1px solid hsla(0, 0%, 89%, 1)',
+                background: '#f6f6f6',
+                border: '1px solid #e2e2e2',
                 gap: '10px',
                 opacity: 1,
                 padding: '21px 21px 41.01px 21px'
@@ -58,10 +60,11 @@ const Sidebar = ({ selectedDuration, setSelectedDuration, selectedSort, setSelec
                         margin: 0,
                         opacity: 1
                     }}
-                    className="uppercase text-[#F08C00]"
+                    className="uppercase text-[#757575]"
                 >
                     Browse Categories
                 </h3>
+                <div className="flex flex-col" style={{ gap: '8px' }}>
                 {categories.map((cat) => {
                     const href = categoryLinks[cat] || "#";
                     const isActive = pathname.startsWith(href) && href !== "/products" && href !== "/categories"
@@ -113,10 +116,11 @@ const Sidebar = ({ selectedDuration, setSelectedDuration, selectedSort, setSelec
                         </Link>
                     )
                 })}
+                </div>
             </div>
 
             {/* Separator */}
-            <div className="border-t border-gray-100 my-2"></div>
+            <div style={{ width: '208px', borderTop: '1px solid #e2e2e2' }} />
 
             <div
                 className="flex flex-col"
@@ -128,13 +132,13 @@ const Sidebar = ({ selectedDuration, setSelectedDuration, selectedSort, setSelec
                 }}
             >
                 <div className="flex items-center gap-2">
-                    <h3 className="text-[12px] font-bold text-[#F08C00] uppercase tracking-[-0.4px] m-0">Rent For</h3>
+                    <h3 className="text-[12px] font-bold text-[#757575] uppercase tracking-[-0.4px] m-0">Rent For</h3>
+                    <Info size={16} weight="bold" color="#757575" />
                 </div>
                 <div
-                    className="grid grid-cols-2 m-0"
+                    className="flex flex-wrap m-0"
                     style={{
                         width: '208px',
-                        height: '120px',
                         gap: '12px',
                         opacity: 1
                     }}
@@ -145,12 +149,12 @@ const Sidebar = ({ selectedDuration, setSelectedDuration, selectedSort, setSelec
                             <button
                                 key={duration}
                                 onClick={() => setSelectedDuration(duration)}
-                                className={`transition-all duration-200 flex items-center justify-center font-sans ${duration === '9 months' ? 'justify-self-end' : 'justify-self-start'}`}
+                                className="transition-all duration-200 flex items-center justify-center font-sans shrink-0"
                                 style={{
                                     height: '32px',
                                     width: 'fit-content',
                                     borderRadius: '8px',
-                                    border: isSelected ? '1px solid #000' : '1px solid hsla(0, 0%, 69%, 1)',
+                                    border: isSelected ? '1px solid #000' : '1px solid #afafaf',
                                     backgroundColor: 'hsla(0, 0%, 100%, 1)',
                                     padding: '8px 16px',
                                     gap: '10px',
@@ -179,7 +183,7 @@ const Sidebar = ({ selectedDuration, setSelectedDuration, selectedSort, setSelec
             </div>
 
             {/* Separator */}
-            <div className="border-t border-gray-100 my-2"></div>
+            <div style={{ width: '208px', borderTop: '1px solid #e2e2e2' }} />
 
             <div
                 className="flex flex-col"
@@ -198,7 +202,7 @@ const Sidebar = ({ selectedDuration, setSelectedDuration, selectedSort, setSelec
                         lineHeight: '16px',
                         letterSpacing: '-0.4px',
                         verticalAlign: 'middle',
-                        color: 'hsla(35, 100%, 47%, 1)',
+                        color: '#757575',
                         textTransform: 'uppercase',
                         width: '208px',
                         height: '16px',
@@ -231,7 +235,7 @@ const Sidebar = ({ selectedDuration, setSelectedDuration, selectedSort, setSelec
                                 opacity: 1
                             }}
                         >
-                            <div className={`w-5 h-5 rounded-full border transition-all duration-200 flex items-center justify-center shrink-0 ${selectedSort === option ? "border-black" : "border-gray-300 group-hover:border-gray-400"}`}>
+                            <div className={`w-5 h-5 rounded-full border transition-all duration-200 flex items-center justify-center shrink-0 ${selectedSort === option ? "border-black" : "border-[#afafaf] group-hover:border-[#8a8a8a]"}`}>
                                 {selectedSort === option && <div className="w-2.5 h-2.5 rounded-full bg-black" />}
                             </div>
                             <span style={{
@@ -253,7 +257,7 @@ const Sidebar = ({ selectedDuration, setSelectedDuration, selectedSort, setSelec
             </div>
 
             {/* Separator */}
-            <div className="border-t border-gray-100 my-2"></div>
+            <div style={{ width: '208px', borderTop: '1px solid #e2e2e2' }} />
 
             <div
                 className="flex flex-col"
@@ -264,9 +268,9 @@ const Sidebar = ({ selectedDuration, setSelectedDuration, selectedSort, setSelec
                     opacity: 1
                 }}
             >
-                <h3 className="text-[12px] font-bold text-[#F08C00] uppercase tracking-[-0.4px] m-0">Deals</h3>
-                <label className="flex items-center gap-2 cursor-pointer group">
-                    <div className="w-3.5 h-3.5 rounded border transition-all duration-200 flex items-center justify-center border-[#AFAFAF] group-hover:border-gray-500">
+                <h3 className="text-[12px] font-bold text-[#757575] uppercase tracking-[-0.4px] m-0">Deals</h3>
+                <label className="flex items-center gap-2 cursor-pointer group rounded-[6px]" style={{ padding: '4px' }}>
+                    <div className="w-3.5 h-3.5 rounded-[4px] border transition-all duration-200 flex items-center justify-center border-[#AFAFAF] group-hover:border-gray-500">
                     </div>
                     <span className="text-[12px] font-semibold text-[#333] tracking-[-0.4px] group-hover:text-black transition-colors duration-200">Deals</span>
                 </label>

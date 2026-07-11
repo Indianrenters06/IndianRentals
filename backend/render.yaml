@@ -31,7 +31,9 @@ services:
         sync: false
       - key: FAST2SMS_API_KEY
         sync: false
-      - key: RAZORPAY_KEY_ID
+      - key: CASHFREE_APP_ID
         sync: false
-      - key: RAZORPAY_KEY_SECRET
+      - key: CASHFREE_SECRET_KEY
+        sync: false
+      - key: CASHFREE_ENV
         sync: false

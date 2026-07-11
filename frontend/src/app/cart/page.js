@@ -9,7 +9,7 @@ import { BsCheckCircleFill, BsCreditCard } from 'react-icons/bs';
 import { FaArrowRight, FaSpinner } from 'react-icons/fa';
 import { IoIosArrowDown } from "react-icons/io";
 import { AiOutlineClose } from "react-icons/ai";
-import { ShoppingCartSimple } from '@phosphor-icons/react';
+import { ShoppingCartSimple, TrashSimple } from '@phosphor-icons/react';
 
 import { useRouter } from 'next/navigation';
 import { useSelector, useDispatch } from 'react-redux';
@@ -112,63 +112,56 @@ const CartItem = ({ item, onUpdate, onRemove }) => {
             </div>
         </div>
 
-        {/* ─────────────── DESKTOP CARD ─────────────── */}
-        <div className="hidden md:block bg-white p-5 rounded-[12px] border border-[#E3E3E3] shadow-[0px_2px_4px_rgba(0,0,0,0.02)] relative transition-all hover:shadow-md">
-            {/* Top Section: Image and Details */}
-            <div className="flex items-start gap-4 mb-4">
-                {/* Image */}
-                <div className="w-16 h-16 relative shrink-0 rounded-lg overflow-hidden bg-white border border-gray-100">
-                    {item.image ? (
-                        <Image src={item.image} alt={item.name} fill className="object-contain p-1" />
-                    ) : (
-                        <div className="w-full h-full flex items-center justify-center text-gray-300 bg-gray-50 text-[10px]">No Img</div>
-                    )}
-                </div>
-
-                {/* Title & Desc */}
-                <div className="flex-1">
-                    <div className="flex justify-between items-start">
-                        <h3 className="text-base font-bold text-gray-900 leading-tight mt-2">{item.name}</h3>
-                        <button
-                            onClick={() => onRemove(item.id)}
-                            className="text-gray-400 hover:text-red-500 transition-colors ml-2"
-                        >
-                            <RiDeleteBin6Line size={18} />
-                        </button>
+        {/* ─────────────── DESKTOP CARD (Figma 23212:7794) ─────────────── */}
+        <div className="hidden md:flex flex-col gap-[20px] bg-white border-2 border-[#eee] rounded-[16px] px-[18px] py-[20px] w-full overflow-hidden">
+            {/* Top row: image + title/desc + trash */}
+            <div className="flex items-center justify-between w-full gap-2">
+                <div className="flex items-center gap-[8px] min-w-0 flex-1">
+                    {/* Image 48×48, rounded-5, no border */}
+                    <div className="size-[48px] relative shrink-0 rounded-[5px] overflow-hidden bg-white">
+                        {item.image ? (
+                            <Image src={item.image} alt={item.name} fill className="object-contain" />
+                        ) : (
+                            <div className="w-full h-full flex items-center justify-center text-gray-300 bg-gray-50 text-[10px]">No Img</div>
+                        )}
                     </div>
-                    <p className="text-gray-800 font-medium text-sm mt-1 leading-relaxed">{item.description}</p>
+                    {/* Title & Desc */}
+                    <div className="flex flex-col min-w-0 text-[#333] tracking-[-0.4px]">
+                        <p className="font-bold text-[16px] leading-[23px]">{item.name}</p>
+                        <p className="font-semibold text-[14px] leading-[20px]">{item.description}</p>
+                    </div>
                 </div>
+                <button
+                    onClick={() => onRemove(item.id)}
+                    className="shrink-0 text-[#333] hover:text-red-500 transition-colors"
+                    aria-label="Remove item"
+                >
+                    <TrashSimple size={20} />
+                </button>
             </div>
 
             {/* Divider */}
-            <div className="h-px bg-gray-200 w-full mb-4"></div>
+            <div className="h-px w-full bg-[#e2e2e2]" />
 
-            {/* Bottom Section: Controls & Pricing */}
-            <div className="flex flex-wrap items-center justify-between gap-4">
-
-                {/* Left Controls: Duration & Quantity */}
-                <div className="flex items-center gap-4">
-                    {/* Duration Dropdown Look-alike */}
+            {/* Controls + pricing row */}
+            <div className="flex items-center justify-between w-full">
+                {/* Left: Duration + Quantity */}
+                <div className="flex items-center gap-[13px]">
+                    {/* Duration */}
                     <div className="relative">
                         <button
                             onClick={() => setIsDurationOpen(!isDurationOpen)}
-                            className="flex items-center justify-between gap-3 px-4 py-2 bg-white border border-gray-300 rounded-lg text-sm text-gray-700 font-medium min-w-[110px]"
+                            className="flex items-center gap-[5px] bg-white border border-[#cbcbcb] rounded-[8px] px-[12px] py-[6px]"
                         >
-                            <span>{item.duration} months</span>
-                            <IoIosArrowDown className={`text-gray-400 transition-transform ${isDurationOpen ? 'rotate-180' : ''}`} />
+                            <span className="text-[14px] text-[#333] tracking-[-0.4px]">{item.duration} months</span>
+                            <IoIosArrowDown className={`text-[#333] text-[15px] transition-transform ${isDurationOpen ? 'rotate-180' : ''}`} />
                         </button>
-
-                        {/* Dropdown Menu */}
                         {isDurationOpen && (
-                            <div className="absolute top-full left-0 mt-1 w-full bg-white border border-gray-200 rounded-lg shadow-lg z-10 overflow-hidden">
+                            <div className="absolute top-full left-0 mt-1 w-full min-w-[110px] bg-white border border-gray-200 rounded-lg shadow-lg z-10 overflow-hidden">
                                 {tenureOptions.map((months) => (
                                     <button
                                         key={months}
-                                        onClick={() => {
-                                            // We just update the duration here. In a real app, price should update too.
-                                            onUpdate(item.id, { duration: months });
-                                            setIsDurationOpen(false);
-                                        }}
+                                        onClick={() => { onUpdate(item.id, { duration: months }); setIsDurationOpen(false); }}
                                         className="w-full text-left px-4 py-2 text-sm hover:bg-gray-50 flex items-center justify-between"
                                     >
                                         <span>{months} Months</span>
@@ -179,43 +172,41 @@ const CartItem = ({ item, onUpdate, onRemove }) => {
                         )}
                     </div>
 
-                    {/* Vertical Divider */}
-                    <div className="h-8 w-px bg-gray-300"></div>
+                    {/* Vertical divider */}
+                    <div className="h-[36px] w-px bg-[#e2e2e2]" />
 
                     {/* Quantity Stepper */}
-                    <div className="flex items-center border border-gray-300 rounded-lg h-[38px] px-3 bg-white">
+                    <div className="flex items-center gap-[8px] bg-white border border-[#cbcbcb] rounded-[8px] px-[12px] py-[6px]">
                         <button
                             onClick={() => onUpdate(item.id, { quantity: Math.max(1, item.quantity - 1) })}
-                            className="text-gray-500 hover:text-black px-2 disabled:opacity-30"
                             disabled={item.quantity <= 1}
+                            className="text-[#333] hover:text-black disabled:opacity-30 leading-none text-[15px]"
                         >
-                            <span className="text-lg leading-none mb-0.5 block">–</span>
+                            –
                         </button>
-                        <span className="w-8 text-center text-sm font-semibold text-gray-900">{item.quantity}</span>
+                        <span className="text-[14px] font-semibold text-[#333] tracking-[-0.4px] text-center min-w-[10px]">{item.quantity}</span>
                         <button
                             onClick={() => onUpdate(item.id, { quantity: item.quantity + 1 })}
-                            className="text-gray-500 hover:text-black px-2"
+                            className="text-[#333] hover:text-black leading-none text-[15px]"
                         >
-                            <span className="text-lg leading-none mb-0.5 block">+</span>
+                            +
                         </button>
                     </div>
                 </div>
 
-                {/* Vertical Divider (Hidden on mobile) */}
-                <div className="hidden md:block h-8 w-px bg-gray-300 mx-2"></div>
+                {/* Middle vertical divider */}
+                <div className="h-[36px] w-px bg-[#e2e2e2]" />
 
-                {/* Right Pricing */}
-                <div className="flex items-center gap-6 md:gap-8 ml-auto md:ml-0">
-                    <div className="flex flex-col items-center">
-                        <span className="text-sm text-gray-500 font-medium">Monthly Rent</span>
-                        <span className="font-bold text-gray-900 text-lg">₹{(item.monthlyRent || item.price) * item.quantity}</span>
+                {/* Right: Pricing */}
+                <div className="flex items-center gap-[13px]">
+                    <div className="flex flex-col gap-[2px] items-center justify-center whitespace-nowrap">
+                        <p className="text-[14px] font-medium text-[#545454] tracking-[-0.4px] leading-[20px]">Monthly Rent</p>
+                        <p className="text-[18px] font-bold text-[#333] tracking-[-0.8px] leading-[25px]">₹{(item.monthlyRent || item.price) * item.quantity}</p>
                     </div>
-
-                    <div className="h-8 w-px bg-gray-300"></div>
-
-                    <div className="flex flex-col items-center">
-                        <span className="text-sm text-gray-500 font-medium">Refundable Amount</span>
-                        <span className="font-bold text-gray-900 text-lg">₹{item.refundableAmount * item.quantity}</span>
+                    <div className="h-[36px] w-px bg-[#e2e2e2]" />
+                    <div className="flex flex-col gap-[2px] items-center justify-center whitespace-nowrap">
+                        <p className="text-[14px] font-medium text-[#545454] tracking-[-0.4px] leading-[20px]">Refundable Amount</p>
+                        <p className="text-[18px] font-bold text-[#333] tracking-[-0.8px] leading-[25px]">₹{item.refundableAmount * item.quantity}</p>
                     </div>
                 </div>
             </div>
@@ -356,12 +347,12 @@ export default function CartPage() {
                         <div
                             className="flex-1 flex flex-col w-full"
                         >
-                            {/* Desktop title (above the box) */}
-                            <h1 className="hidden md:flex text-[32px] font-bold text-gray-900 items-center gap-3 mb-4">
+                            {/* Desktop title (above the cards) — Figma: 27px semibold */}
+                            <h1 className="hidden md:flex text-[27px] font-semibold text-[#1f1f1f] tracking-[-0.8px] leading-[35px] items-center gap-[8px] mb-4">
                                 Your Cart <ShoppingCartSimple className="text-[#333C4E]" size={32} weight="fill" />
                             </h1>
-                            {/* Wrapper: dashed border on mobile, white box on desktop */}
-                            <div className="flex flex-col gap-3 border border-dashed border-[#CBCBCB] rounded-[8px] pt-5 pb-[30px] px-3 bg-transparent md:border-solid md:border-[#F0F0F0] md:rounded-[12px] md:p-[20px] md:bg-white md:shadow-sm">
+                            {/* Wrapper: dashed border on mobile; on desktop the cards float on the grey bg (Figma) */}
+                            <div className="flex flex-col gap-3 border border-dashed border-[#CBCBCB] rounded-[8px] pt-5 pb-[30px] px-3 bg-transparent md:border-0 md:rounded-none md:p-0 md:bg-transparent md:shadow-none md:gap-[10px]">
                                 {/* Mobile title (inside dashed box) */}
                                 <div className="flex md:hidden items-center gap-2">
                                     <p className="text-[20px] font-semibold text-[#545454] tracking-[-0.8px]">Your Cart</p>

@@ -339,6 +339,62 @@ const Hero = () => {
 const SlideItem = ({ slide, isActive, width, viewType, slideHeight }) => {
     const isTablet = viewType === 'tablet';
 
+    const heroImg = slide.image || "https://res.cloudinary.com/dgkckcdk8/image/upload/v1769946716/indian-rentals/fj8ptqbhppbstdd0hs4i.png";
+
+    /* ── Desktop: absolute layout matching Figma (slide 1200×500) ──────────
+       Text  : x=81  y=115 w=599        → left 6.75%  top 23%   w 49.9%
+       Glow  : x=942 y=294 343×343      → left 78.5%  top 58.8% w 28.58%
+       Image : x=628 y=-13 542×542      → left 52.33% top -2.6% w 45.17% h 108.4%
+    ─────────────────────────────────────────────────────────────────────── */
+    const desktopContent = (
+        <div className="w-full h-full relative overflow-hidden">
+            {/* Left: Text */}
+            <div
+                className={`absolute transition-all duration-700 ${isActive ? 'opacity-100 translate-y-0 blur-0' : 'opacity-30 -translate-y-4 blur-[1px]'}`}
+                style={{ left: '6.75%', top: '23%', width: '49.9%', color: slide.textColor || '#fff', display: 'flex', flexDirection: 'column', gap: '16px' }}
+            >
+                <h1 style={{ fontFamily: "'Mona Sans', sans-serif", fontSize: '47px', fontWeight: 600, lineHeight: '58px', letterSpacing: '-1.5px', maxWidth: '594px' }}>
+                    {slide.title}
+                </h1>
+                <p style={{ fontFamily: "'Mona Sans', sans-serif", fontSize: '18px', fontWeight: 600, lineHeight: '25px', letterSpacing: '-0.8px', maxWidth: '599px' }}>
+                    {slide.subtitle}
+                </p>
+                <div>
+                    <div
+                        className="inline-flex items-center justify-center shadow-lg active:scale-95 transition-transform"
+                        style={{ background: '#FFCF46', borderRadius: '9999px', padding: '6px 20px', fontFamily: "'Mona Sans', sans-serif", fontWeight: 500, color: '#333333', fontSize: '16px', lineHeight: '23px' }}
+                    >
+                        {(slide.ctaText || "Rent Now").replace(/ [^\w\s]+.*$| [→➔➜]|^.*[→➔➜]$| \->/g, "").trim()}
+                    </div>
+                </div>
+            </div>
+
+            {/* Glow ellipse behind the laptop */}
+            <div
+                className="absolute rounded-full pointer-events-none"
+                style={{ left: '78.5%', top: '58.8%', width: '28.58%', aspectRatio: '1 / 1', background: '#BAE6FD', filter: 'blur(97px)', opacity: 0.75, zIndex: 0 }}
+            />
+
+            {/* Right: Laptop image (542×542 box) + reflection */}
+            <div
+                className={`absolute flex flex-col items-center justify-start transition-all duration-700 ${isActive ? 'opacity-100 scale-100 blur-0' : 'opacity-30 scale-90 blur-[1px]'}`}
+                style={{ left: '52.33%', top: '-2.6%', width: '45.17%', height: '108.4%', zIndex: 1 }}
+            >
+                {/* Main laptop */}
+                <div className="relative w-full" style={{ height: '80%' }}>
+                    <Image src={heroImg} alt={slide.title} fill unoptimized className="object-contain object-bottom drop-shadow-[0_25px_25px_rgba(0,0,0,0.25)]" />
+                </div>
+                {/* Reflection: flipped, faded, blurred copy hugging the base */}
+                <div
+                    className="relative w-full pointer-events-none"
+                    style={{ height: '20%', transform: 'scaleY(-1)', opacity: 0.5, filter: 'blur(3px)', WebkitMaskImage: 'linear-gradient(to bottom, rgba(0,0,0,0.5), rgba(0,0,0,0) 70%)', maskImage: 'linear-gradient(to bottom, rgba(0,0,0,0.5), rgba(0,0,0,0) 70%)' }}
+                >
+                    <Image src={heroImg} alt="" fill unoptimized aria-hidden="true" className="object-contain object-bottom" />
+                </div>
+            </div>
+        </div>
+    );
+
     const content = (
         <div className="w-full h-full px-16 grid grid-cols-[1.2fr_0.8fr] gap-4 items-center">
             {/* Left: Text */}
@@ -463,7 +519,7 @@ const SlideItem = ({ slide, isActive, width, viewType, slideHeight }) => {
             className="shrink-0 relative rounded-[24px] overflow-hidden transition-all duration-700 ease-[cubic-bezier(0.25,1,0.5,1)] cursor-pointer block"
             style={containerStyle}
         >
-            {content}
+            {viewType === 'desktop' ? desktopContent : content}
         </Link>
     );
 };

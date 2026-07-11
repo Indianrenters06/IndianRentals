@@ -236,38 +236,38 @@ const ProductCard = ({ product, mobile }) => {
 
                 {/* Text area */}
                 <div className="flex flex-col font-sans bg-white" style={{ padding: '8px 12px 12px', gap: '8px' }}>
-                    <h3 className="line-clamp-1" style={{ fontSize: '18px', fontWeight: 600, lineHeight: '25px', letterSpacing: '-0.4px', color: 'hsla(0,0%,16%,1)' }}>
+                    <h3 className="line-clamp-1" style={{ fontSize: '18px', fontWeight: 600, lineHeight: '25px', letterSpacing: '-0.8px', color: '#292929' }}>
                         {product.name}
                     </h3>
 
                     <div className="flex items-center justify-between" style={{ height: '16px' }}>
-                        <div className="flex items-center gap-1">
-                            <div className="flex text-[#FF9500]">
+                        <div className="flex items-center justify-between" style={{ width: '128px' }}>
+                            <div className="flex items-center gap-[2px] text-[#FF9500]">
                                 {[1, 2, 3, 4, 5].map(s => (
-                                    <Star key={s} size={14} weight="fill" className={s <= Math.round(product.rating || 4) ? '' : 'opacity-20'} />
+                                    <Star key={s} size={16} weight="fill" className={s <= Math.round(product.rating || 4) ? '' : 'opacity-20'} />
                                 ))}
                             </div>
-                            <span style={{ fontFamily: "'Mona Sans', sans-serif", fontSize: '11px', fontWeight: 500, color: 'hsla(0,0%,33%,1)', letterSpacing: '-0.01em', marginLeft: '4px' }}>
+                            <span style={{ fontFamily: "'Mona Sans', sans-serif", fontSize: '12px', fontWeight: 500, color: '#545454', letterSpacing: '-0.4px' }}>
                                 {product.rating || '4.5'} ({product.reviewCount || 12})
                             </span>
                         </div>
-                        <div className="flex items-center gap-1.5" style={{ color: 'hsla(0,0%,65%,1)' }}>
+                        <div className="flex items-center gap-[4px]" style={{ color: '#afafaf' }}>
                             <Truck size={16} weight="regular" />
-                            <span style={{ fontSize: '12px', fontWeight: 400, letterSpacing: '-0.04em' }}>2-4 days</span>
+                            <span style={{ fontFamily: 'Manrope, sans-serif', fontSize: '12px', fontWeight: 500, letterSpacing: '-0.48px' }}>2-4 days</span>
                         </div>
                     </div>
 
-                    <div className="flex items-center" style={{ gap: '3px', marginTop: '-4px' }}>
-                        <span style={{ fontFamily: "'Mona Sans', sans-serif", fontSize: '11px', fontWeight: 500, color: 'hsla(0,0%,0%,1)', letterSpacing: '-0.01em' }}>from</span>
+                    <div className="flex items-center" style={{ gap: '3px' }}>
+                        <span style={{ fontFamily: "'Mona Sans', sans-serif", fontSize: '12px', fontWeight: 500, color: '#000000', letterSpacing: '-0.4px' }}>from</span>
                         {product.originalPrice && (
-                            <span className="line-through decoration-[1.5px]" style={{ fontFamily: "'Mona Sans', sans-serif", fontSize: '16px', fontWeight: 600, color: 'hsla(0,0%,46%,1)', letterSpacing: '-0.04em' }}>
+                            <span className="line-through decoration-[1.5px]" style={{ fontFamily: "'Mona Sans', sans-serif", fontSize: '16px', fontWeight: 600, color: '#757575', letterSpacing: '-0.4px' }}>
                                 ₹{product.originalPrice}
                             </span>
                         )}
-                        <span style={{ fontFamily: "'Mona Sans', sans-serif", fontSize: '26px', fontWeight: 600, color: 'hsla(3,100%,56%,1)', letterSpacing: '-0.04em', marginLeft: '4px' }}>
+                        <span style={{ fontFamily: "'Mona Sans', sans-serif", fontSize: '21px', fontWeight: 600, lineHeight: '28px', color: '#ff2c20', letterSpacing: '-0.8px' }}>
                             ₹{product.rentPrice}
                         </span>
-                        <span style={{ fontFamily: "'Mona Sans', sans-serif", fontSize: '11px', fontWeight: 500, color: 'hsla(0,0%,24%,1)', marginLeft: '2px' }}>/month</span>
+                        <span style={{ fontFamily: "'Mona Sans', sans-serif", fontSize: '12px', fontWeight: 500, color: '#757575', letterSpacing: '-0.4px' }}>/month</span>
                     </div>
 
                     {/* Rent Now — slides in on hover */}

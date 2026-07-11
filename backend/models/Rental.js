@@ -38,7 +38,7 @@ const rentalSchema = new mongoose.Schema({
     paymentMethod: {
         type: String,
         required: true,
-        default: 'Razorpay'
+        default: 'Cashfree'
     },
     paymentResult: {
         id: { type: String },

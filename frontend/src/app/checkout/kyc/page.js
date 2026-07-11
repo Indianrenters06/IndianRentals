@@ -342,8 +342,10 @@ export default function KYCPage() {
                                             height: '35px',
                                             fontFamily: 'Mona Sans, sans-serif',
                                             fontWeight: '600',
-                                            fontSize: '24px', // mapping font/size/6
-                                            color: 'hsla(0, 0%, 20%, 1)',
+                                            fontSize: '27px', // font/size/6
+                                            letterSpacing: '-0.8px',
+                                            lineHeight: '35px',
+                                            color: '#333333',
                                             display: 'flex',
                                             alignItems: 'center'
                                         }}
@@ -380,8 +382,9 @@ export default function KYCPage() {
                                                     height: '25px',
                                                     fontFamily: 'Mona Sans, sans-serif',
                                                     fontWeight: '400',
-                                                    fontSize: '16px',
-                                                    color: customerType === 'Customer' ? 'hsla(0, 0%, 93%, 1)' : 'hsla(0, 0%, 20%, 1)',
+                                                    fontSize: '18px',
+                                                    letterSpacing: '-0.8px',
+                                                    color: customerType === 'Customer' ? '#eeeeee' : '#333333',
                                                     display: 'flex',
                                                     alignItems: 'center',
                                                     justifyContent: 'center'
@@ -411,8 +414,9 @@ export default function KYCPage() {
                                                     height: '25px',
                                                     fontFamily: 'Mona Sans, sans-serif',
                                                     fontWeight: '400',
-                                                    fontSize: '16px',
-                                                    color: customerType === 'Company' ? 'hsla(0, 0%, 93%, 1)' : 'hsla(0, 0%, 20%, 1)',
+                                                    fontSize: '18px',
+                                                    letterSpacing: '-0.8px',
+                                                    color: customerType === 'Company' ? '#eeeeee' : '#333333',
                                                     display: 'flex',
                                                     alignItems: 'center',
                                                     justifyContent: 'center'
@@ -425,9 +429,9 @@ export default function KYCPage() {
                                 </div>
                             </div>
 
-                            <div className="bg-[#E8F5E9] border border-[#4CAF50] rounded-md p-3 flex items-center gap-3">
-                                <div className="w-5 h-5 rounded-full bg-[#C8E6C9] flex items-center justify-center text-[#2E7D32]"><FaFingerprint size={14} /></div>
-                                <span className="text-[#1B5E20] font-medium text-sm">Complete KYC to complete your order</span>
+                            <div className="bg-[#e8ffe4] border border-[#5bff53] rounded-[8px] flex items-start gap-[10px] px-[18px] py-[12px]">
+                                <FaFingerprint size={16.67} className="text-[#0c5b11] shrink-0" />
+                                <span className="text-[#0c5b11] font-semibold text-[14px] tracking-[-0.4px] leading-[20px]">Complete KYC to complete your order</span>
                             </div>
 
                             <div
@@ -437,8 +441,8 @@ export default function KYCPage() {
                                     height: '112px',
                                     borderRadius: '12px',
                                     padding: '12px 18px',
-                                    background: 'hsla(44, 100%, 96%, 1)',
-                                    border: '1px solid hsla(33, 100%, 52%, 1)',
+                                    background: '#fffaec',
+                                    border: '1px solid #ff920a',
                                     gap: '10px'
                                 }}
                             >
@@ -470,7 +474,7 @@ export default function KYCPage() {
                                     {[
                                         'Aadhar Card / Voter ID / Passport',
                                         'Rental Agreement / House Electricity Bill',
-                                        'Bank Statement - last 3 Months'
+                                        'Bank Statement → 3 Months'
                                     ].map((text, i) => (
                                         <li
                                             key={i}
@@ -504,8 +508,8 @@ export default function KYCPage() {
                                 style={{
                                     width: '726px',
                                     height: '920px',
-                                    borderRadius: '8px',
-                                    border: '2px solid hsla(0, 0%, 93%, 1)',
+                                    borderRadius: '12px',
+                                    border: '2px solid #eeeeee',
                                     padding: '20px',
                                     gap: '21px',
                                     boxShadow: '0px 1px 2px 0px hsla(0, 0%, 0%, 0.05)',
@@ -544,7 +548,7 @@ export default function KYCPage() {
                                                         color: currentStep >= step ? '#FFFFFF' : 'hsla(0, 0%, 46%, 1)'
                                                     }}
                                                 >
-                                                    {currentStep > step ? <PiCheckCircleFill size={20} /> : <span className="font-semibold text-xs">{step}</span>}
+                                                    {currentStep > step ? <PiCheckCircleFill size={20} /> : <span className="font-semibold text-[14px]">{step}</span>}
                                                 </div>
                                                 {step < 4 && <div className={`w-8 md:w-20 h-0.5 transition-all ${currentStep > step ? 'bg-[#1D1D1F]' : 'bg-gray-300'}`} />}
                                             </React.Fragment>
@@ -567,8 +571,9 @@ export default function KYCPage() {
                                                     height: '36px',
                                                     fontFamily: 'Mona Sans, sans-serif',
                                                     fontWeight: '600',
-                                                    fontSize: '20px',
-                                                    color: 'hsla(0, 0%, 20%, 1)',
+                                                    fontSize: '21px',
+                                                    letterSpacing: '-0.8px',
+                                                    color: '#333333',
                                                     display: 'flex',
                                                     alignItems: 'center',
                                                     paddingBottom: '8px',
@@ -579,20 +584,20 @@ export default function KYCPage() {
                                             >
                                                 Personal Details
                                             </h2>
-                                            <div className="flex flex-col gap-[21px]">
+                                            <div className="flex flex-col gap-[12px]">
                                                 <TextInput label="Name" required error={errors.name} placeholder="Enter Your Full Name" value={formData.personal.name} onChange={(e) => handleTextChange('personal', 'name', e.target.value)} />
-                                                <div className="grid grid-cols-1 md:grid-cols-2 gap-[21px]">
+                                                <div className="grid grid-cols-1 md:grid-cols-2 gap-[16px]">
                                                     <TextInput label="Father's / Mother's Name" required placeholder="Placeholder" value={formData.personal.fatherName} onChange={(e) => handleTextChange('personal', 'fatherName', e.target.value)} />
                                                     <TextInput label="Father's / Mother's Number" required isSelect options={['Father', 'Mother']} placeholder="Placeholder" value={formData.personal.fatherPhone} onChange={(e) => handleTextChange('personal', 'fatherPhone', e.target.value)} />
                                                 </div>
                                                 <TextInput label="Personal Email" required placeholder="Placeholder" value={formData.personal.email} onChange={(e) => handleTextChange('personal', 'email', e.target.value)} />
                                                 <TextInput label="Mobile Number" required placeholder="Placeholder" value={formData.personal.phone} onChange={(e) => handleTextChange('personal', 'phone', e.target.value)} />
                                                 <TextInput label="Permanent Address" required placeholder="Placeholder" value={formData.personal.address} onChange={(e) => handleTextChange('personal', 'address', e.target.value)} />
-                                                <div className="grid grid-cols-1 md:grid-cols-2 gap-[21px]">
+                                                <div className="grid grid-cols-1 md:grid-cols-2 gap-[16px]">
                                                     <TextInput label="City" required placeholder="Placeholder" value={formData.personal.city} onChange={(e) => handleCityChange('personal', e.target.value)} />
                                                     <TextInput label="State" required isSelect options={INDIAN_STATES} value={formData.personal.state} onChange={(e) => handleStateChange('personal', e.target.value)} />
                                                 </div>
-                                                <div className="grid grid-cols-1 md:grid-cols-2 gap-[21px]">
+                                                <div className="grid grid-cols-1 md:grid-cols-2 gap-[16px]">
                                                     <TextInput label="Pincode" required placeholder="Placeholder" value={formData.personal.pincode} onChange={(e) => handlePincodeChange('personal', e.target.value)} />
                                                     <TextInput label="Country" required value="India" readOnly />
                                                 </div>
@@ -637,30 +642,30 @@ export default function KYCPage() {
                                                 className="max-lg:!w-full"
                                                 style={{
                                                     width: '686px', height: '36px', fontFamily: 'Mona Sans, sans-serif',
-                                                    fontWeight: '600', fontSize: '20px', color: 'hsla(0, 0%, 20%, 1)',
+                                                    fontWeight: '600', fontSize: '21px', letterSpacing: '-0.8px', color: '#333333',
                                                     display: 'flex', alignItems: 'center', paddingBottom: '8px',
                                                     marginBottom: '12px', borderBottom: '1px solid hsla(0, 0%, 93%, 1)', gap: '8px'
                                                 }}
                                             >
                                                 Company Details
                                             </h2>
-                                            <div className="flex flex-col gap-[21px]">
+                                            <div className="flex flex-col gap-[12px]">
                                                 <TextInput label="Company Name" required error={errors.companyName} placeholder="Placeholder" value={formData.company.companyName} onChange={(e) => handleTextChange('company', 'companyName', e.target.value)} />
-                                                <div className="grid grid-cols-1 md:grid-cols-2 gap-[21px]">
+                                                <div className="grid grid-cols-1 md:grid-cols-2 gap-[16px]">
                                                     <TextInput label="Type of Company" required isSelect options={['Proprietorship', 'Partnership', 'Private Limited', 'Public Limited', 'LLP', 'Other']} error={errors.companyType} placeholder="Placeholder" value={formData.company.companyType} onChange={(e) => handleTextChange('company', 'companyType', e.target.value)} />
                                                     <TextInput label="Approx no. of employee" required error={errors.employees} placeholder="Placeholder" value={formData.company.employees} onChange={(e) => handleTextChange('company', 'employees', e.target.value)} />
                                                 </div>
                                                 <TextInput label="Your Designation" required error={errors.designation} placeholder="Placeholder" value={formData.company.designation} onChange={(e) => handleTextChange('company', 'designation', e.target.value)} />
-                                                <div className="grid grid-cols-1 md:grid-cols-2 gap-[21px]">
+                                                <div className="grid grid-cols-1 md:grid-cols-2 gap-[16px]">
                                                     <TextInput label="Duration of Service in the company" required error={errors.duration} placeholder="Placeholder" value={formData.company.duration} onChange={(e) => handleTextChange('company', 'duration', e.target.value)} />
                                                     <TextInput label="Official Company email" required error={errors.email} placeholder="Placeholder" value={formData.company.email} onChange={(e) => handleTextChange('company', 'email', e.target.value)} />
                                                 </div>
                                                 <TextInput label="Company Address" required error={errors.address} placeholder="Placeholder" value={formData.company.address} onChange={(e) => handleTextChange('company', 'address', e.target.value)} />
-                                                <div className="grid grid-cols-1 md:grid-cols-2 gap-[21px]">
+                                                <div className="grid grid-cols-1 md:grid-cols-2 gap-[16px]">
                                                     <TextInput label="City" required error={errors.city} placeholder="Placeholder" value={formData.company.city} onChange={(e) => handleCityChange('company', e.target.value)} />
                                                     <TextInput label="State" required isSelect options={INDIAN_STATES} error={errors.state} value={formData.company.state} onChange={(e) => handleStateChange('company', e.target.value)} />
                                                 </div>
-                                                <div className="grid grid-cols-1 md:grid-cols-2 gap-[21px]">
+                                                <div className="grid grid-cols-1 md:grid-cols-2 gap-[16px]">
                                                     <TextInput label="Pincode" required error={errors.pincode} placeholder="Placeholder" value={formData.company.pincode} onChange={(e) => handlePincodeChange('company', e.target.value)} />
                                                     <TextInput label="Country" required value="India" readOnly />
                                                 </div>
@@ -700,24 +705,24 @@ export default function KYCPage() {
                                                 className="max-lg:!w-full"
                                                 style={{
                                                     width: '686px', height: '36px', fontFamily: 'Mona Sans, sans-serif',
-                                                    fontWeight: '600', fontSize: '20px', color: 'hsla(0, 0%, 20%, 1)',
+                                                    fontWeight: '600', fontSize: '21px', letterSpacing: '-0.8px', color: '#333333',
                                                     display: 'flex', alignItems: 'center', paddingBottom: '8px',
                                                     marginBottom: '12px', borderBottom: '1px solid hsla(0, 0%, 93%, 1)', gap: '8px'
                                                 }}
                                             >
                                                 Reference Only
                                             </h2>
-                                            <div className="flex flex-col gap-[21px]">
+                                            <div className="flex flex-col gap-[12px]">
                                                 <TextInput label="Reference Name" required error={errors.name} placeholder="Placeholder" value={formData.reference.name} onChange={(e) => handleTextChange('reference', 'name', e.target.value)} />
                                                 <TextInput label="Relation of the person" required isSelect options={['Father', 'Mother', 'Brother', 'Sister', 'Friend', 'Colleague', 'Other']} error={errors.relation} placeholder="Placeholder" value={formData.reference.relation} onChange={(e) => handleTextChange('reference', 'relation', e.target.value)} />
                                                 <TextInput label="Mobile No." required error={errors.phone} placeholder="Placeholder" value={formData.reference.phone} onChange={(e) => handleTextChange('reference', 'phone', e.target.value)} />
                                                 <TextInput label="Reference Address" required error={errors.address} placeholder="Placeholder" value={formData.reference.address} onChange={(e) => handleTextChange('reference', 'address', e.target.value)} />
                                                 
-                                                <div className="grid grid-cols-1 md:grid-cols-2 gap-[21px]">
+                                                <div className="grid grid-cols-1 md:grid-cols-2 gap-[16px]">
                                                     <TextInput label="City" required error={errors.city} placeholder="Placeholder" value={formData.reference.city} onChange={(e) => handleCityChange('reference', e.target.value)} />
                                                     <TextInput label="State" required isSelect options={INDIAN_STATES} error={errors.state} value={formData.reference.state} onChange={(e) => handleStateChange('reference', e.target.value)} />
                                                 </div>
-                                                <div className="grid grid-cols-1 md:grid-cols-2 gap-[21px]">
+                                                <div className="grid grid-cols-1 md:grid-cols-2 gap-[16px]">
                                                     <TextInput label="Pincode" required error={errors.pincode} placeholder="Placeholder" value={formData.reference.pincode} onChange={(e) => handlePincodeChange('reference', e.target.value)} />
                                                     <TextInput label="Country" required value="India" readOnly />
                                                 </div>
@@ -757,14 +762,14 @@ export default function KYCPage() {
                                                 className="max-lg:!w-full"
                                                 style={{
                                                     width: '686px', height: '36px', fontFamily: 'Mona Sans, sans-serif',
-                                                    fontWeight: '600', fontSize: '20px', color: 'hsla(0, 0%, 20%, 1)',
+                                                    fontWeight: '600', fontSize: '21px', letterSpacing: '-0.8px', color: '#333333',
                                                     display: 'flex', alignItems: 'center', paddingBottom: '8px',
                                                     marginBottom: '12px', borderBottom: '1px solid hsla(0, 0%, 93%, 1)', gap: '8px'
                                                 }}
                                             >
                                                 Documents Upload
                                             </h2>
-                                            <div className="flex flex-col gap-[21px]">
+                                            <div className="flex flex-col gap-[12px]">
                                                 {/* Identity Proof */}
                                                 <div className="flex flex-col gap-2">
                                                     <TextInput 
@@ -930,24 +935,25 @@ const TextInput = ({ label, required, placeholder, isSelect, options, value, onC
                 fontFamily: 'Mona Sans, sans-serif',
                 fontWeight: '600',
                 fontSize: '12px',
-                color: 'hsla(0, 0%, 20%, 1)',
+                lineHeight: '16px',
+                letterSpacing: '-0.4px',
+                color: '#545454',
                 display: 'flex',
                 alignItems: 'center',
-                gap: '2px'
+                gap: '1px'
             }}
         >
-            {label} {required && <span style={{ color: 'hsla(0, 72%, 51%, 1)' }}>*</span>}
+            {label} {required && <span style={{ color: '#ed2115' }}>*</span>}
         </label>
         {isSelect ? (
             <select
-                className="w-full border rounded-md px-3 py-2 text-sm bg-white focus:outline-none transition-all"
+                className="w-full border rounded-[8px] px-2 bg-white focus:outline-none transition-all text-[12px] font-medium text-[#333] tracking-[-0.4px]"
                 value={value}
                 onChange={onChange}
                 style={{
                     height: '39px',
-                    borderRadius: '6px',
                     background: 'hsla(0, 0%, 100%, 1)',
-                    borderColor: error ? 'hsla(0, 72%, 51%, 1)' : 'hsla(0, 0%, 89%, 1)'
+                    borderColor: error ? '#ed2115' : '#e2e2e2'
                 }}
             >
                 <option value="">Select</option>
@@ -956,16 +962,15 @@ const TextInput = ({ label, required, placeholder, isSelect, options, value, onC
         ) : (
             <input
                 type="text"
-                className={`w-full border rounded-md px-3 py-2 text-sm transition-all ${readOnly ? 'bg-gray-50' : 'bg-white'} focus:outline-none`}
+                className={`w-full border rounded-[8px] px-2 transition-all text-[12px] font-medium text-[#333] tracking-[-0.4px] placeholder:text-[#afafaf] placeholder:font-medium ${readOnly ? 'bg-gray-50' : 'bg-white'} focus:outline-none`}
                 placeholder={placeholder}
                 value={value}
                 onChange={onChange}
                 readOnly={readOnly}
                 style={{
                     height: '39px',
-                    borderRadius: '6px',
                     background: 'hsla(0, 0%, 100%, 1)',
-                    borderColor: error ? 'hsla(0, 72%, 51%, 1)' : 'hsla(0, 0%, 89%, 1)'
+                    borderColor: error ? '#ed2115' : '#e2e2e2'
                 }}
             />
         )}
@@ -974,13 +979,15 @@ const TextInput = ({ label, required, placeholder, isSelect, options, value, onC
                 fontFamily: 'Mona Sans, sans-serif',
                 fontWeight: '400',
                 fontSize: '10px',
-                color: error ? 'hsla(0, 72%, 51%, 1)' : 'hsla(0, 0%, 46%, 1)',
+                lineHeight: '16px',
+                letterSpacing: '-0.4px',
+                color: error ? '#ed2115' : '#333333',
                 height: '13px',
                 display: 'flex',
                 alignItems: 'center'
             }}
         >
-            {error || 'Message'}
+            {error || ''}
         </p>
     </div>
 );

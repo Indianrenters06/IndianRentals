@@ -228,3 +228,19 @@
 .hide-scrollbar::-webkit-scrollbar {
   display: none;
 }
+
+/* Product gallery: keep each slide full-height and center the image
+   vertically (matches Figma, which centers the image in the frame).
+   Swiper's base `.swiper-slide { display:block }` otherwise wins and
+   top-aligns the image. */
+.main-image-swiper,
+.main-image-swiper .swiper-wrapper {
+  height: 100%;
+}
+
+.main-image-swiper .swiper-slide {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+}

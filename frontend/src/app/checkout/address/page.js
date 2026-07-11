@@ -4,11 +4,8 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useSelector } from 'react-redux';
-import { FaTrashAlt, FaArrowRight, FaCheck } from 'react-icons/fa';
-import { Plus } from '@phosphor-icons/react';
-import { BsCheckCircleFill } from 'react-icons/bs';
-import { FiEdit2 } from 'react-icons/fi';
-import { UserCircleIcon } from '@heroicons/react/24/outline';
+import { FaCheck } from 'react-icons/fa';
+import { Plus, UserCircle, Trash } from '@phosphor-icons/react';
 import { selectCartTotals } from '../../../redux/features/cartSlice';
 import OrderSummary from '../../../components/OrderSummary';
 import AddressModal from '../../../components/AddressModal';
@@ -121,187 +118,94 @@ export default function AddressPage() {
                 </div>
 
                 <div className="flex flex-col lg:flex-row items-start w-full min-h-[535px]" style={{ gap: '20px' }}>
-                    {/* Left Column: Addresses */}
+                    {/* Left Column: Addresses (Figma 23228:13247) */}
                     <div
-                        className="relative bg-gray-50/50 flex flex-col transition-all duration-300 w-full lg:w-[746px]"
-                        style={{
-                            minHeight: addresses.length > 0 ? '487px' : '200px',
-                            borderRadius: '8px', // rounded-md
-                            border: '1px dashed hsla(0, 0%, 80%, 1)',
-                            borderStyle: 'dashed',
-                            padding: '30px 20px',
-                            gap: '12px',
-                            position: 'relative'
-                        }}
+                        className="relative flex flex-col w-full lg:w-[746px] gap-[12px] rounded-[8px] border border-dashed border-[#cbcbcb] px-[20px] py-[30px]"
+                        style={{ minHeight: addresses.length > 0 ? '487px' : '200px' }}
                     >
-                        <h1
-                            className="mb-2"
-                            style={{
-                                fontFamily: "'Mona Sans', sans-serif",
-                                fontWeight: 600,
-                                fontSize: '24px',
-                                lineHeight: '35px',
-                                color: 'hsla(0, 0%, 20%, 1)',
-                                width: '193px',
-                                height: '35px'
-                            }}
-                        >
-                            Your Addresses
-                        </h1>
+                        {/* Header group (title + divider, then Add button — Figma gap-32) */}
+                        <div className="flex flex-col gap-[32px] w-full">
+                            <div className="flex flex-col gap-[12px] w-full">
+                                <h1 className="font-semibold text-[27px] text-[#333] tracking-[-0.8px] leading-[35px]" style={{ fontFamily: "'Mona Sans', sans-serif" }}>
+                                    Your Addresses
+                                </h1>
+                                <div className="w-full h-px bg-[#e2e2e2]" />
+                            </div>
 
-                        {/* Divider */}
-                        <div
-                            className="mb-6 font-sans"
-                            style={{
-                                width: '100%',
-                                height: '0px',
-                                borderTop: '1px solid hsla(0, 0%, 89%, 1)'
-                            }}
-                        ></div>
+                            {/* Add New Address */}
+                            <button
+                                onClick={handleAddClick}
+                                className="self-start flex items-center justify-center gap-[5px] rounded-[28px] px-[20px] py-[6px] bg-[#333] text-white transition-all active:scale-95"
+                                style={{
+                                    fontFamily: "'Mona Sans', sans-serif",
+                                    boxShadow: '0px 1px 2px 0px hsla(0,0%,55%,0.1), 0px 3px 3px 0px hsla(0,0%,55%,0.09), 0px 8px 5px 0px hsla(0,0%,55%,0.05), 0px 14px 5px 0px hsla(0,0%,55%,0.01), 0px 21px 6px 0px hsla(0,0%,55%,0)'
+                                }}
+                            >
+                                <Plus size={20} weight="bold" />
+                                <span className="font-medium text-[16px] tracking-[-0.4px] leading-[23px]">Add New Address</span>
+                            </button>
+                        </div>
 
-                        {/* Add Address Button */}
-                        <button
-                            onClick={handleAddClick}
-                            className="flex items-center justify-center transition-all active:scale-95 mb-4 group"
-                            style={{
-                                width: '194px',
-                                height: '35px',
-                                opacity: 1,
-                                borderRadius: '28px', // rounded-4xl
-                                paddingTop: '6px',
-                                paddingRight: '20px',
-                                paddingBottom: '6px',
-                                paddingLeft: '20px',
-                                gap: '5px',
-                                background: 'var(--color-grey-700, hsla(0, 0%, 20%, 1))',
-                                border: 'none',
-                                borderBottom: '1px solid hsla(0, 0%, 20%, 1)',
-                                boxShadow: `
-                                    0px 1px 2px 0px hsla(0, 0%, 55%, 0.1),
-                                    0px 3px 3px 0px hsla(0, 0%, 55%, 0.09),
-                                    0px 8px 5px 0px hsla(0, 0%, 55%, 0.05),
-                                    0px 14px 5px 0px hsla(0, 0%, 55%, 0.01),
-                                    0px 21px 6px 0px hsla(0, 0%, 55%, 0)
-                                `,
-                                color: '#FFFFFF',
-                                fontSize: '14px',
-                                fontWeight: '500',
-                                fontFamily: "'Mona Sans', sans-serif",
-                                cursor: 'pointer'
-                            }}
-                        >
-                            <Plus size={18} weight="bold" />
-                            <span>Add New Address</span>
-                        </button>
-
-                        {/* Address List Container */}
-                        <div className="flex-1 flex flex-col gap-[12px] overflow-y-auto pr-1">
-                            {addresses.map((addr) => (
+                        {/* Address cards */}
+                        {addresses.map((addr) => {
+                            const isSelected = selectedAddressId === addr.id;
+                            return (
                                 <div
                                     key={addr.id}
                                     onClick={() => setSelectedAddressId(addr.id)}
-                                    className="relative flex items-center justify-between transition-all cursor-pointer hover:shadow-md shrink-0 mb-1 w-full"
-                                    style={{
-                                        minHeight: '121px',
-                                        background: 'hsla(0, 0%, 100%, 1)',
-                                        borderRadius: '12px',
-                                        border: selectedAddressId === addr.id
-                                            ? '1.5px solid hsla(212, 100%, 50%, 1)'
-                                            : '1.5px solid hsla(0, 0%, 89%, 1)',
-                                        padding: '20px 16px',
-                                        opacity: 1
-                                    }}
+                                    className="relative flex items-center justify-between overflow-hidden rounded-[12px] px-[16px] py-[20px] w-full bg-white cursor-pointer transition-all hover:shadow-md shrink-0"
+                                    style={{ border: isSelected ? '1.5px solid #0075ff' : '1.5px solid #e2e2e2' }}
                                 >
-                                    {/* Selection Mark */}
-                                    {selectedAddressId === addr.id && (
-                                        <div
-                                            className="absolute top-0 right-0 flex items-center justify-center"
-                                            style={{
-                                                width: '35px',
-                                                height: '25px',
-                                                background: 'hsla(212, 100%, 50%, 1)',
-                                                borderBottomLeftRadius: '12px',
-                                                zIndex: 10
-                                            }}
-                                        >
-                                            <FaCheck className="text-white text-[10px]" />
+                                    {/* Selected corner tab */}
+                                    {isSelected && (
+                                        <div className="absolute top-[-0.75px] right-[-0.75px] w-[35px] h-[25px] bg-[#0075ff] rounded-bl-[12px] flex items-center justify-center z-10">
+                                            <FaCheck className="text-white text-[11px]" />
                                         </div>
                                     )}
 
-                                    <div className="flex items-start gap-4">
-                                        <div className="flex-shrink-0">
-                                            <UserCircleIcon className="w-8 h-8 text-gray-800" />
-                                        </div>
-                                        <div className="flex flex-col flex-1 min-w-0" style={{ minHeight: '81px', gap: '6px' }}>
-                                            <h3 className="text-[15px] md:text-[17px] font-semibold text-gray-800 leading-tight">{addr.name}</h3>
-                                            <p className="text-[12px] md:text-[14px] text-gray-700 font-medium truncate">{addr.addressLine}</p>
-                                            <div className="flex items-center flex-wrap gap-x-2 text-[12px] md:text-[14px] text-gray-700 font-medium">
+                                    {/* Left: icon + details */}
+                                    <div className="flex gap-[12px] items-start min-w-0">
+                                        <UserCircle size={40} weight="fill" className="text-[#1f1f1f] shrink-0" />
+                                        <div className="flex flex-col gap-[6px] min-w-0">
+                                            <p className="font-medium text-[16px] text-[#333] tracking-[-0.4px] leading-[23px]">{addr.name}</p>
+                                            <div className="flex items-center gap-[8px] text-[16px] font-medium text-[#333] tracking-[-0.4px] leading-[23px] flex-wrap">
+                                                <span>{addr.addressLine}</span>
+                                                <span className="w-px h-[16px] bg-[#cbcbcb]" />
                                                 <span>{addr.city}</span>
-                                                <span className="text-gray-300">|</span>
+                                                <span className="w-px h-[16px] bg-[#cbcbcb]" />
                                                 <span>{addr.pincode}</span>
-                                                <span className="text-gray-300">|</span>
+                                                <span className="w-px h-[16px] bg-[#cbcbcb]" />
                                                 <span>{addr.country || 'India'}</span>
                                             </div>
-                                            <p className="text-gray-500 text-[12px] md:text-[14px] font-medium">{addr.phone}</p>
+                                            <p className="font-medium text-[16px] text-[#757575] tracking-[-0.4px] leading-[23px]">{addr.phone}</p>
                                         </div>
                                     </div>
 
-                                    {/* Actions Container */}
-                                    <div
-                                        className="flex flex-col items-center justify-center shrink-0"
-                                        style={{
-                                            width: '66px',
-                                            height: '56.5px',
-                                            gap: '5px'
-                                        }}
-                                    >
+                                    {/* Right: trash + edit */}
+                                    <div className="flex flex-col items-center justify-center gap-[5px] shrink-0">
                                         <button
                                             onClick={(e) => handleDeleteClick(e, addr.id)}
-                                            className="text-gray-400 hover:text-red-500 transition-colors"
+                                            className="text-[#333] hover:text-red-500 transition-colors"
                                             title="Delete address"
                                         >
-                                            <FaTrashAlt size={18} />
+                                            <Trash size={26} />
                                         </button>
-                                        <button
-                                            onClick={(e) => handleEditClick(e, addr)}
-                                            className="flex flex-col items-center"
-                                        >
-                                            <span
-                                                className="text-gray-800 font-bold text-center leading-tight hover:underline cursor-pointer"
-                                                style={{
-                                                    fontSize: '11px',
-                                                    fontFamily: 'sans-serif'
-                                                }}
-                                            >
-                                                Click to Edit
-                                            </span>
+                                        <button onClick={(e) => handleEditClick(e, addr)}>
+                                            <span className="font-bold text-[12px] text-[#333] underline tracking-[-0.4px] leading-[16px] whitespace-nowrap">Click to Edit</span>
                                         </button>
                                     </div>
                                 </div>
-                            ))}
-                        </div>
+                            );
+                        })}
 
-                        <div className="mt-auto pt-4">
-                            <button
-                                onClick={handleContinue}
-                                className="hover:opacity-90 text-[#1D1D1F] transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
-                                style={{
-                                    width: '227px',
-                                    height: '35px',
-                                    background: 'hsla(44, 100%, 64%, 1)',
-                                    borderRadius: '9999px',
-                                    padding: '6px 20px',
-                                    gap: '2px',
-                                    fontSize: '14px',
-                                    fontWeight: '500',
-                                    fontFamily: 'sans-serif',
-                                    border: 'none'
-                                }}
-                                disabled={!selectedAddressId}
-                            >
-                                Continue for KYC process
-                            </button>
-                        </div>
+                        {/* Continue */}
+                        <button
+                            onClick={handleContinue}
+                            disabled={!selectedAddressId}
+                            className="self-start flex items-center justify-center h-[35px] rounded-full px-[20px] py-[6px] bg-[#ffcf46] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                            <span className="font-medium text-[16px] text-[#1f1f1f] tracking-[-0.4px] leading-[23px]" style={{ fontFamily: "'Mona Sans', sans-serif" }}>Continue for KYC process</span>
+                        </button>
                     </div>
 
                     {/* Right Column: Order Summary (Fixed Width: 402px) */}

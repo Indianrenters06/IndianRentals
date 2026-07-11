@@ -122,7 +122,7 @@ export default function SubcategoryProductsPage({ subcategoryId, subcategoryName
                 baseRentPrice: baseRent,
                 originalPrice: baseOrigin,
                 rentPrice: baseRent,
-                discount: "20% off",
+                discount: "-20% off",
                 image: (p.images && p.images.length > 0) ? p.images[0] : "/images/placeholder.png",
                 isNew: p.condition === 'New',
                 rentalPrice: p.rentalPrice

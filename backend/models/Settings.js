@@ -103,6 +103,10 @@ const settingsSchema = new mongoose.Schema({
     currency: { type: String, default: 'INR' },
     timezone: { type: String, default: 'Asia/Kolkata' },
 
+    // Delivery serviceability — pincodes (or shorter prefixes, e.g. "560")
+    // that we deliver to. Empty list = serve every valid Indian pincode.
+    serviceablePincodes: { type: [String], default: [] },
+
     // Platform behaviour flags
     maintenanceMode: { type: Boolean, default: false },
     allowRegistrations: { type: Boolean, default: true },

@@ -350,7 +350,10 @@ const BestRentedProducts = ({ type = "bestRented", defaultTitle = "Curated Produ
                                 style={{ boxShadow: '0px 8px 2px 0px rgba(133,133,133,0), 0px 5px 2px 0px rgba(133,133,133,0.01), 0px 3px 2px 0px rgba(133,133,133,0.05), 0px 1px 1px 0px rgba(133,133,133,0.09), 0px 0px 1px 0px rgba(133,133,133,0.1)' }}
                                 aria-label="Previous"
                             >
-                                <ChevronLeftIcon className="w-5 h-5 text-gray-800 group-hover:text-gray-900 transition-colors duration-200" />
+                                <ChevronLeftIcon className="w-5 h-5 text-gray-800
+                                
+                                
+                                group-hover:text-gray-900 transition-colors duration-200" />
                             </button>
                             <button
                                 className={`swiper-next-${sectionSuffix} group w-[34px] h-[34px] rounded-[69px] flex items-center justify-center bg-[#eee] hover:bg-[hsla(0,0%,85%,1)] transition-all`}

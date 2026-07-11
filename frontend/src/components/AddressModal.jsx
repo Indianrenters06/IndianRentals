@@ -93,12 +93,16 @@ const AddressModal = ({ isOpen, onClose, onSave, initialData, isSubmitting = fal
     };
 
     // Shared helpers so every field reflects its error state consistently
-    const inputClass = 'w-full px-4 rounded-[6px] border outline-none transition-all placeholder-gray-300 text-[15px]';
+    // (Figma: Input h-39, rounded-md 8px, border grey-200 #e2e2e2, 12px medium
+    //  placeholder in grey-400 #afafaf, ~8px horizontal padding)
+    const inputClass = "w-full px-2 rounded-[8px] border outline-none transition-all text-[12px] font-medium text-[#333] tracking-[-0.4px] placeholder:text-[#afafaf] placeholder:font-medium";
     const inputStyle = (field) => ({
         height: '39px',
-        borderColor: errors[field] ? 'hsla(0, 84%, 60%, 1)' : 'hsla(0, 0%, 89%, 1)',
+        borderColor: errors[field] ? 'hsla(0, 84%, 60%, 1)' : '#e2e2e2',
         background: 'hsla(0, 0%, 100%, 1)'
     });
+    // Label: Figma text-xs Semi Bold — 12px, semibold, grey-600 #545454
+    const labelClass = "flex items-center gap-px text-[12px] font-semibold text-[#545454] tracking-[-0.4px] leading-[16px]";
 
     if (!isOpen) return null;
 
@@ -117,13 +121,13 @@ const AddressModal = ({ isOpen, onClose, onSave, initialData, isSubmitting = fal
                 {/* Close Button */}
                 <button
                     onClick={onClose}
-                    className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center bg-white border border-gray-100 rounded-full text-gray-400 hover:text-gray-600 shadow-sm transition-all z-20"
+                    className="absolute top-4 right-4 w-[30px] h-[30px] flex items-center justify-center bg-white border-[0.5px] border-[#f6f6f6] rounded-full text-gray-400 hover:text-gray-600 shadow-sm transition-all z-20"
                 >
                     <AiOutlineClose size={14} />
                 </button>
 
                 {/* Left Side: Map (desktop only) */}
-                <div className="hidden md:block flex-1 bg-gray-100 rounded-[12px] overflow-hidden relative">
+                <div className="hidden md:block flex-1 bg-gray-100 rounded-[10px] overflow-hidden relative self-stretch">
                     <iframe
                         width="100%"
                         height="100%"
@@ -148,10 +152,10 @@ const AddressModal = ({ isOpen, onClose, onSave, initialData, isSubmitting = fal
                     className="flex flex-col px-2.5 md:pr-2 md:px-0 py-2 overflow-y-auto w-full md:w-[381px] h-auto md:h-[464px]"
                 >
                     <form onSubmit={handleSubmit} noValidate className="flex flex-col" style={{ height: '430px' }}>
-                        {/* Fields Container */}
-                        <div className="flex flex-col w-full" style={{ gap: '28px', marginTop: '35px' }}>
+                        {/* Fields Container (Figma gap-15) */}
+                        <div className="flex flex-col w-full" style={{ gap: '15px', marginTop: '0px' }}>
                             <div className="flex flex-col w-full" style={{ gap: '4px' }}>
-                                <label className="text-sm font-medium text-[#1D1D1F]">Full Name <span className="text-red-500">*</span></label>
+                                <label className={labelClass}>Full Name</label>
                                 <input
                                     type="text"
                                     name="name"
@@ -164,9 +168,9 @@ const AddressModal = ({ isOpen, onClose, onSave, initialData, isSubmitting = fal
                                 {errors.name && <span className="text-red-500 text-xs">{errors.name}</span>}
                             </div>
 
-                            <div className="flex flex-col md:flex-row gap-4">
+                            <div className="flex flex-col md:flex-row gap-[15px]">
                                 <div className="flex-1 flex flex-col" style={{ gap: '4px' }}>
-                                    <label className="text-sm font-medium text-[#1D1D1F]">Street Address <span className="text-red-500">*</span></label>
+                                    <label className={labelClass}>Street Address <span className="text-[#ed2115] font-medium">*</span></label>
                                     <input
                                         type="text"
                                         name="addressLine"
@@ -179,7 +183,7 @@ const AddressModal = ({ isOpen, onClose, onSave, initialData, isSubmitting = fal
                                     {errors.addressLine && <span className="text-red-500 text-xs">{errors.addressLine}</span>}
                                 </div>
                                 <div className="flex-1 flex flex-col" style={{ gap: '4px' }}>
-                                    <label className="text-sm font-medium text-[#1D1D1F]">City / Region <span className="text-red-500">*</span></label>
+                                    <label className={labelClass}>City / Region <span className="text-[#ed2115] font-medium">*</span></label>
                                     <input
                                         type="text"
                                         name="city"
@@ -193,9 +197,9 @@ const AddressModal = ({ isOpen, onClose, onSave, initialData, isSubmitting = fal
                                 </div>
                             </div>
 
-                            <div className="flex flex-col md:flex-row gap-4">
+                            <div className="flex flex-col md:flex-row gap-[15px]">
                                 <div className="flex-1 flex flex-col" style={{ gap: '4px' }}>
-                                    <label className="text-sm font-medium text-[#1D1D1F]">Zip Code <span className="text-red-500">*</span></label>
+                                    <label className={labelClass}>Zip Code <span className="text-[#ed2115] font-medium">*</span></label>
                                     <input
                                         type="text"
                                         name="pincode"
@@ -210,7 +214,7 @@ const AddressModal = ({ isOpen, onClose, onSave, initialData, isSubmitting = fal
                                     {errors.pincode && <span className="text-red-500 text-xs">{errors.pincode}</span>}
                                 </div>
                                 <div className="flex-1 flex flex-col" style={{ gap: '4px' }}>
-                                    <label className="text-sm font-medium text-[#1D1D1F]">Country <span className="text-red-500">*</span></label>
+                                    <label className={labelClass}>Country <span className="text-[#ed2115] font-medium">*</span></label>
                                     <input
                                         type="text"
                                         name="country"
@@ -225,7 +229,7 @@ const AddressModal = ({ isOpen, onClose, onSave, initialData, isSubmitting = fal
                             </div>
 
                             <div className="flex flex-col w-full" style={{ gap: '4px' }}>
-                                <label className="text-sm font-medium text-[#1D1D1F]">Phone No. <span className="text-red-500">*</span></label>
+                                <label className={labelClass}>Phone No. <span className="text-[#ed2115] font-medium">*</span></label>
                                 <input
                                     type="tel"
                                     name="phone"
@@ -241,30 +245,35 @@ const AddressModal = ({ isOpen, onClose, onSave, initialData, isSubmitting = fal
                             </div>
                         </div>
 
-                            <div className="flex items-center mt-6 w-full" style={{ gap: '12px' }}>
+                            <div className="flex items-center mt-[15px] w-full" style={{ gap: '12px' }}>
                                 <input
                                     type="checkbox"
                                     id="billing"
                                     name="isBillingSame"
                                     checked={formData.isBillingSame}
                                     onChange={handleChange}
-                                    className="w-4 h-4 rounded border-gray-300 text-black focus:ring-0 accent-black cursor-pointer"
+                                    className="w-[14px] h-[14px] rounded-[4px] border-[#afafaf] text-black focus:ring-0 accent-black cursor-pointer shrink-0"
                                 />
-                                <label htmlFor="billing" className="text-xs text-[#1D1D1F] font-medium cursor-pointer">Billing Address is the same as the shipping address</label>
+                                <label htmlFor="billing" className="flex items-start gap-px text-[12px] text-black font-medium tracking-[-0.4px] leading-[16px] cursor-pointer">
+                                    Billing Address is the same as the shipping address<span className="text-[#c8170d]">*</span>
+                                </label>
                             </div>
 
-                        <div className="pt-2">
+                        <div className="pt-[10px]">
                             <button
                                 type="submit"
                                 disabled={isSubmitting}
-                                className="flex justify-center items-center transition-all text-black font-medium text-[15px] font-sans w-full disabled:opacity-50 disabled:cursor-not-allowed"
+                                className="flex justify-center items-center transition-all font-medium text-[16px] w-full disabled:opacity-50 disabled:cursor-not-allowed"
                                 style={{
                                     height: '35px',
                                     gap: '2px',
-                                    borderRadius: '28px', // rounded-4xl approx
-                                    border: '1px solid hsla(0, 0%, 8%, 1)',
+                                    borderRadius: '28px', // rounded-4xl
+                                    border: '1px solid #141414',
                                     padding: '6px 20px',
-                                    background: 'transparent'
+                                    background: 'transparent',
+                                    color: '#141414',
+                                    fontFamily: "'Mona Sans', sans-serif",
+                                    letterSpacing: '-0.4px'
                                 }}
                             >
                                 {isSubmitting ? 'Saving…' : 'Continue to payment'}
