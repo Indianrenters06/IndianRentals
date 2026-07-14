@@ -60,7 +60,6 @@ export default function KYCPage() {
     const [errors, setErrors] = useState({});
 
     // Refs for file uploads
-    const aadharCardRef = useRef(null);
     const identityProofRef = useRef(null);
     const addressProofRef = useRef(null);
     const bankStatementRef = useRef(null);
@@ -185,7 +184,6 @@ export default function KYCPage() {
         }
         if (currentStep === 4) {
             const missingDocs = [];
-            if (!aadharCardRef.current?.files?.[0]) missingDocs.push('Aadhar Card');
             if (!identityProofRef.current?.files?.[0]) missingDocs.push('Identity Proof');
             if (!addressProofRef.current?.files?.[0]) missingDocs.push('Address Proof');
             if (!bankStatementRef.current?.files?.[0]) missingDocs.push('Bank Statement');
@@ -206,7 +204,6 @@ export default function KYCPage() {
                 setLoading(true);
                 try {
                     const fileData = new FormData();
-                    if (aadharCardRef.current?.files[0]) fileData.append('aadharCard', aadharCardRef.current.files[0]);
                     if (identityProofRef.current?.files[0]) fileData.append('identityProof', identityProofRef.current.files[0]);
                     if (addressProofRef.current?.files[0]) fileData.append('addressProof', addressProofRef.current.files[0]);
                     if (bankStatementRef.current?.files[0]) fileData.append('bankStatement', bankStatementRef.current.files[0]);
@@ -773,25 +770,6 @@ export default function KYCPage() {
                                                 Documents Upload
                                             </h2>
                                             <div className="flex flex-col gap-[12px]">
-                                                {/* Aadhar Card */}
-                                                <div className="flex flex-col gap-2">
-                                                    <div className="flex flex-col gap-1">
-                                                        <label className="font-semibold text-xs text-gray-800">Aadhar Card <span className="text-red-500">*</span></label>
-                                                        <div className="flex items-center gap-2">
-                                                            <button onClick={() => aadharCardRef.current?.click()} className="flex items-center justify-center gap-2 border border-gray-300 rounded-md px-4 py-2 text-sm text-[#0B5ED7] bg-white hover:bg-gray-50 transition-colors w-fit">
-                                                                <svg width="14" height="14" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                                                    <path d="M8 11.3333V3.33333M8 3.33333L4.66667 6.66667M8 3.33333L11.3333 6.66667M3.33333 14H12.6667" stroke="#0B5ED7" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                                                                </svg>
-                                                                Attach File
-                                                            </button>
-                                                            <span className="text-xs text-green-600 font-medium truncate w-48">{aadharCardRef.current?.files?.[0]?.name || ''}</span>
-                                                            <input type="file" className="hidden" ref={aadharCardRef} onChange={() => setFormData({...formData})} />
-                                                        </div>
-                                                    </div>
-                                                </div>
-
-                                                <hr className="border-t border-gray-100 my-2" />
-
                                                 {/* Identity Proof */}
                                                 <div className="flex flex-col gap-2">
                                                     <TextInput
@@ -821,7 +799,7 @@ export default function KYCPage() {
                                                 <div className="flex flex-col gap-2">
                                                     <TextInput 
                                                         label="Address Proof" required isSelect 
-                                                        options={['House Electricity Bill', 'Rental Agreement']} 
+                                                        options={['House Electricity Bill', 'Rental Agreement', 'Aadhar Card']} 
                                                         value={formData.documents.addressProof} 
                                                         onChange={(e) => handleTextChange('documents', 'addressProof', e.target.value)} 
                                                     />
