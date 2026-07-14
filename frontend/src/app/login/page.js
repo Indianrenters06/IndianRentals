@@ -15,19 +15,35 @@ const LoginPage = () => {
     const [error, setError] = useState(null);
     const [otpType, setOtpType] = useState("email");
 
-    // Use a flag to avoid SSR issues if necessary, though it should be fine.
-    const [isClient, setIsClient] = useState(false);
+    // Where to send the user after a successful login (set when they were
+    // bounced here by an expired session).
+    const [redirectTo, setRedirectTo] = useState("/");
+    const [notice, setNotice] = useState(null);
+
     useEffect(() => {
-        setIsClient(true);
         setStep(1);
         setIdentifier("");
         setOtp("");
         setError(null);
-    }, []);
 
-    if (!isClient && typeof window === 'undefined') {
-        return null; // Return null on server to avoid hydration mismatch and potential hook issues
-    }
+        // Read session-expired / redirect params written by the auth interceptor.
+        const params = new URLSearchParams(window.location.search);
+        if (params.get("session") === "expired") {
+            setNotice("Your session expired. Please sign in again to continue.");
+        }
+        const redirect = params.get("redirect");
+        if (redirect) {
+            try {
+                const decoded = decodeURIComponent(redirect);
+                // Only allow internal, same-origin paths.
+                if (decoded.startsWith("/") && !decoded.startsWith("//")) {
+                    setRedirectTo(decoded);
+                }
+            } catch {
+                // ignore malformed redirect
+            }
+        }
+    }, []);
 
     const handleSendOtp = async (e) => {
         e.preventDefault();
@@ -78,8 +94,8 @@ const LoginPage = () => {
             localStorage.setItem("userInfo", JSON.stringify(data));
             window.dispatchEvent(new Event("userInfoChanged"));
 
-            // Redirect
-            router.push("/");
+            // Redirect back to where the user came from (or home).
+            router.push(redirectTo);
         } catch (err) {
             setError(err.message);
         } finally {
@@ -106,6 +122,12 @@ const LoginPage = () => {
                             {step === 1 ? "Sign in with Email or Phone" : `Enter the OTP sent to your ${otpType}`}
                         </p>
                     </div>
+
+                    {notice && !error && (
+                        <div className="mb-6 bg-amber-50 border-l-4 border-amber-500 p-4 rounded-md">
+                            <p className="text-sm text-amber-700">{notice}</p>
+                        </div>
+                    )}
 
                     {error && (
                         <div className="mb-6 bg-red-50 border-l-4 border-red-500 p-4 rounded-md">

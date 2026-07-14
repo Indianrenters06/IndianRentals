@@ -11,7 +11,7 @@ const cookieParser = require('cookie-parser');
 dotenv.config();
 
 const app = express();
-const PORT = process.env.PORT || 6000;
+const PORT = process.env.PORT || 5000;
 
 // Middleware
 // Capture the raw request body so the Cashfree webhook can verify its HMAC

@@ -81,8 +81,8 @@ const FaqSection = ({ cmsData, limit, pageName }) => {
     const [activeIndices, setActiveIndices] = useState([]);
 
     useEffect(() => {
-        // Update active indices when displayFaqs changes
-        setActiveIndices(displayFaqs.map((_, i) => i));
+        // FAQs start closed; they open only when the user clicks
+        setActiveIndices([]);
     }, [displayFaqs.length]);
 
     const title = isHomepage

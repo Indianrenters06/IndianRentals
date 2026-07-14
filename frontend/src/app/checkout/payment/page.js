@@ -30,6 +30,20 @@ export default function PaymentPage() {
             return;
         }
 
+        // Guard: cart items must carry a valid Mongo ObjectId (24-hex) for `product`.
+        // Stale/mock items (e.g. slug ids like "macbook-pro-14-m4") saved in localStorage
+        // would otherwise blow up server-side with a cryptic BSONError.
+        const isValidObjectId = (id) => typeof id === 'string' && /^[a-f\d]{24}$/i.test(id);
+        const invalidItems = cartItems.filter(item => !isValidObjectId(item.id));
+        if (invalidItems.length > 0) {
+            setError(
+                `Some items in your cart are outdated and can no longer be ordered: ` +
+                `${invalidItems.map(i => i.name).join(', ')}. ` +
+                `Please remove them from the cart (or clear the cart) and add the product again.`
+            );
+            return;
+        }
+
         setLoading(true);
         setError(null);
 
