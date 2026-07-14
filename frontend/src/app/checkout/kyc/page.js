@@ -254,7 +254,6 @@ export default function KYCPage() {
                 width: '100%',
                 paddingTop: '48px',
                 paddingBottom: '48px',
-                minHeight: '1327px',
                 opacity: 1
             }}
         >
@@ -309,7 +308,6 @@ export default function KYCPage() {
                         className="flex flex-row items-start max-lg:!flex-col max-lg:!w-full"
                         style={{
                             width: '1200px',
-                            minHeight: '1205px',
                             gap: '32px',
                             opacity: 1
                         }}
@@ -319,7 +317,6 @@ export default function KYCPage() {
                             className="flex flex-col max-lg:!w-full"
                             style={{
                                 width: '726px',
-                                minHeight: '1165px',
                                 gap: '20px'
                             }}
                         >
@@ -511,7 +508,6 @@ export default function KYCPage() {
                                 className="bg-white flex flex-col max-lg:!w-full max-lg:!h-auto"
                                 style={{
                                     width: '726px',
-                                    height: '920px',
                                     borderRadius: '12px',
                                     border: '2px solid #eeeeee',
                                     padding: '20px',
@@ -952,8 +948,7 @@ const TextInput = ({ label, required, placeholder, isSelect, options, value, onC
         className="flex flex-col"
         style={{
             width: '100%',
-            height: '77px',
-            gap: '4px'
+            gap: '6px'
         }}
     >
         <label
@@ -1000,20 +995,21 @@ const TextInput = ({ label, required, placeholder, isSelect, options, value, onC
                 }}
             />
         )}
-        <p
-            style={{
-                fontFamily: 'Mona Sans, sans-serif',
-                fontWeight: '400',
-                fontSize: '10px',
-                lineHeight: '16px',
-                letterSpacing: '-0.4px',
-                color: error ? '#ed2115' : '#333333',
-                height: '13px',
-                display: 'flex',
-                alignItems: 'center'
-            }}
-        >
-            {error || ''}
-        </p>
+        {error && (
+            <p
+                style={{
+                    fontFamily: 'Mona Sans, sans-serif',
+                    fontWeight: '400',
+                    fontSize: '10px',
+                    lineHeight: '14px',
+                    letterSpacing: '-0.4px',
+                    color: '#ed2115',
+                    display: 'flex',
+                    alignItems: 'center'
+                }}
+            >
+                {error}
+            </p>
+        )}
     </div>
 );
