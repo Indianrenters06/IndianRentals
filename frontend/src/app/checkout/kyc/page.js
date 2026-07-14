@@ -67,7 +67,7 @@ export default function KYCPage() {
 
     // Form data state
     const [formData, setFormData] = useState({
-        personal: { name: '', fatherName: '', fatherPhone: '', email: '', phone: '', address: '', state: '', city: '', pincode: '' },
+        personal: { name: '', fatherName: '', fatherPhone: '', email: '', phone: '', residenceStatus: '', address: '', state: '', city: '', pincode: '' },
         company: { companyName: '', companyType: '', employees: '', designation: '', duration: '', email: '', address: '', state: '', city: '', pincode: '' },
         reference: { name: '', relation: '', phone: '', address: '', state: '', city: '', pincode: '' },
         documents: { identityProof: 'Voter ID', addressProof: 'House Electricity Bill' }
@@ -126,13 +126,14 @@ export default function KYCPage() {
     };
 
     const validateStep1 = () => {
-        const { name, fatherName, fatherPhone, email, phone, address, state, city, pincode } = formData.personal;
+        const { name, fatherName, fatherPhone, email, phone, residenceStatus, address, state, city, pincode } = formData.personal;
         let newErrors = {};
         if (!name) newErrors.name = 'Required';
         if (!fatherName) newErrors.fatherName = 'Required';
         if (!fatherPhone) newErrors.fatherPhone = 'Required';
         if (!email) newErrors.email = 'Required';
         if (!phone) newErrors.phone = 'Required';
+        if (!residenceStatus) newErrors.residenceStatus = 'Required';
         if (!address) newErrors.address = 'Required';
         if (!state) newErrors.state = 'Required';
         if (!city) newErrors.city = 'Required';
@@ -590,18 +591,21 @@ export default function KYCPage() {
                                             <div className="flex flex-col gap-[12px]">
                                                 <TextInput label="Name" required error={errors.name} placeholder="Enter Your Full Name" value={formData.personal.name} onChange={(e) => handleTextChange('personal', 'name', e.target.value)} />
                                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-[16px]">
-                                                    <TextInput label="Father's / Mother's Name" required placeholder="Placeholder" value={formData.personal.fatherName} onChange={(e) => handleTextChange('personal', 'fatherName', e.target.value)} />
-                                                    <TextInput label="Father's / Mother's Number" required isSelect options={['Father', 'Mother']} placeholder="Placeholder" value={formData.personal.fatherPhone} onChange={(e) => handleTextChange('personal', 'fatherPhone', e.target.value)} />
-                                                </div>
-                                                <TextInput label="Personal Email" required placeholder="Placeholder" value={formData.personal.email} onChange={(e) => handleTextChange('personal', 'email', e.target.value)} />
-                                                <TextInput label="Mobile Number" required placeholder="Placeholder" value={formData.personal.phone} onChange={(e) => handleTextChange('personal', 'phone', e.target.value)} />
-                                                <TextInput label="Permanent Address" required placeholder="Placeholder" value={formData.personal.address} onChange={(e) => handleTextChange('personal', 'address', e.target.value)} />
-                                                <div className="grid grid-cols-1 md:grid-cols-2 gap-[16px]">
-                                                    <TextInput label="City" required placeholder="Placeholder" value={formData.personal.city} onChange={(e) => handleCityChange('personal', e.target.value)} />
-                                                    <TextInput label="State" required isSelect options={INDIAN_STATES} value={formData.personal.state} onChange={(e) => handleStateChange('personal', e.target.value)} />
+                                                    <TextInput label="Personal Email" required error={errors.email} placeholder="Placeholder" value={formData.personal.email} onChange={(e) => handleTextChange('personal', 'email', e.target.value)} />
+                                                    <TextInput label="Mobile Number" required error={errors.phone} placeholder="Placeholder" value={formData.personal.phone} onChange={(e) => handleTextChange('personal', 'phone', e.target.value)} />
                                                 </div>
                                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-[16px]">
-                                                    <TextInput label="Pincode" required placeholder="Placeholder" value={formData.personal.pincode} onChange={(e) => handlePincodeChange('personal', e.target.value)} />
+                                                    <TextInput label="Father's Name" required error={errors.fatherName} placeholder="Placeholder" value={formData.personal.fatherName} onChange={(e) => handleTextChange('personal', 'fatherName', e.target.value)} />
+                                                    <TextInput label="Father's Number" required error={errors.fatherPhone} placeholder="Placeholder" value={formData.personal.fatherPhone} onChange={(e) => handleTextChange('personal', 'fatherPhone', e.target.value)} />
+                                                </div>
+                                                <TextInput label="Residence Status" required isSelect options={['Owned', 'Rented', 'Company Provided', 'Family Owned', 'Other']} error={errors.residenceStatus} placeholder="Select" value={formData.personal.residenceStatus} onChange={(e) => handleTextChange('personal', 'residenceStatus', e.target.value)} />
+                                                <TextInput label="Residence Address" required error={errors.address} placeholder="Placeholder" value={formData.personal.address} onChange={(e) => handleTextChange('personal', 'address', e.target.value)} />
+                                                <div className="grid grid-cols-1 md:grid-cols-2 gap-[16px]">
+                                                    <TextInput label="City" required error={errors.city} placeholder="Placeholder" value={formData.personal.city} onChange={(e) => handleCityChange('personal', e.target.value)} />
+                                                    <TextInput label="State" required isSelect options={INDIAN_STATES} error={errors.state} value={formData.personal.state} onChange={(e) => handleStateChange('personal', e.target.value)} />
+                                                </div>
+                                                <div className="grid grid-cols-1 md:grid-cols-2 gap-[16px]">
+                                                    <TextInput label="Pincode" required error={errors.pincode} placeholder="Placeholder" value={formData.personal.pincode} onChange={(e) => handlePincodeChange('personal', e.target.value)} />
                                                     <TextInput label="Country" required value="India" readOnly />
                                                 </div>
                                                 <button
