@@ -1,0 +1,39 @@
+name: Deploy frontend (Hostinger VPS)
+
+# Auto-deploys the Next.js storefront to the Hostinger VPS on every push to main
+# that touches frontend/. Can also be run manually from the Actions tab.
+on:
+  push:
+    branches: [main]
+    paths:
+      - "frontend/**"
+  workflow_dispatch:
+
+# Avoid overlapping deploys — two concurrent `next build`s would OOM the VPS.
+concurrency:
+  group: deploy-frontend
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: SSH into VPS, pull, build & restart
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: 31.97.202.194
+          username: root
+          key: ${{ secrets.VPS_SSH_KEY }}
+          script_stop: true
+          # `next build` on a 4 GB box is slow; give it room over the 10m default.
+          command_timeout: 20m
+          script: |
+            set -e
+            cd /var/www/IndianRentals
+            git pull --ff-only
+            cd frontend
+            npm install
+            npm run build
+            pm2 restart indianrentals-web --update-env
+            pm2 save --force
+            echo "Deployed $(git rev-parse --short HEAD) at $(date -u)"
