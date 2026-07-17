@@ -136,7 +136,7 @@ EMAIL_FROM=shop.indianrenters@gmail.com
 FAST2SMS_API_KEY=...
 
 # CORS — your live Vercel URLs
-FRONTEND_URL=https://indian-rentals.vercel.app
+FRONTEND_URL=https://31-97-202-194.sslip.io
 ADMIN_URL=https://indian-rentals-yy8s.vercel.app
 ```
 

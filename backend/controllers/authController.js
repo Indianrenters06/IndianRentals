@@ -12,6 +12,16 @@ const generateOTP = () => {
     return Math.floor(100000 + Math.random() * 900000).toString();
 };
 
+// An OTP must never travel back in the HTTP response — /send-otp is public and
+// unauthenticated, so returning it there hands out a login for any account.
+// Outside production, log it to the server console instead so local testing
+// still works when email/SMS delivery is down.
+const logOtpForDev = (target, otp) => {
+    if (process.env.NODE_ENV !== 'production') {
+        console.log(`[DEV OTP] ${target} -> ${otp}`);
+    }
+};
+
 // @desc    Register a new user & Send OTPs
 // @route   POST /api/auth/register
 // @access  Public
@@ -315,7 +325,8 @@ const sendLoginOtp = asyncHandler(async (req, res) => {
             console.error('Email send failed (Network Error?):', error);
             // Non-blocking failure: proceed so user can still login using Network Tab OTP
         }
-        res.json({ message: 'OTP sent to your email', type: 'email', debugOtp: otp });
+        logOtpForDev(user.email, otp);
+        res.json({ message: 'OTP sent to your email', type: 'email' });
 
     } else {
         user.phoneOtp = otp;
@@ -334,10 +345,10 @@ const sendLoginOtp = asyncHandler(async (req, res) => {
             // res.status(500);
             // throw new Error('SMS could not be sent');
         }
+        logOtpForDev(user.phone, otp);
         res.json({
             message: 'OTP sent to your phone',
             type: 'phone',
-            debugOtp: otp
         });
     }
 });
@@ -380,9 +391,9 @@ const verifyLoginOtp = asyncHandler(async (req, res) => {
         throw new Error('Invalid OTP');
     }
 
-    // Success
-    user.isEmailVerified = true;
-    if (!isEmail) user.isPhoneVerified = true;
+    // Only mark verified the channel the OTP was actually proven on.
+    if (isEmail) user.isEmailVerified = true;
+    else user.isPhoneVerified = true;
 
     user.emailOtp = undefined;
     user.phoneOtp = undefined;
