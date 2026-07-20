@@ -369,28 +369,31 @@ const SlideItem = ({ slide, isActive, width, viewType, slideHeight }) => {
                 </div>
             </div>
 
-            {/* Glow ellipse behind the laptop */}
+            {/* Glow ellipse behind the laptop — Figma: 343×343 @ left 942, top 294 */}
             <div
                 className="absolute rounded-full pointer-events-none"
                 style={{ left: '78.5%', top: '58.8%', width: '28.58%', aspectRatio: '1 / 1', background: '#BAE6FD', filter: 'blur(97px)', opacity: 0.75, zIndex: 0 }}
             />
 
-            {/* Right: Laptop image (542×542 box) + reflection */}
+            {/* Reflection — Figma: 542×336.04 @ left 630, top 270. Flipped copy of the
+                image, clipped so only the mirrored base shows, faded out downward. */}
             <div
-                className={`absolute flex flex-col items-center justify-start transition-all duration-700 ${isActive ? 'opacity-100 scale-100 blur-0' : 'opacity-30 scale-90 blur-[1px]'}`}
-                style={{ left: '52.33%', top: '-2.6%', width: '45.17%', height: '108.4%', zIndex: 1 }}
+                className={`absolute pointer-events-none overflow-hidden transition-all duration-700 ${isActive ? 'opacity-100 blur-0' : 'opacity-30 blur-[1px]'}`}
+                style={{ left: '52.5%', top: '54%', width: '45.17%', height: '67.2%', zIndex: 1, opacity: 0.59, filter: 'blur(3px)', WebkitMaskImage: 'linear-gradient(to bottom, #000 0%, rgba(0,0,0,0) 100%)', maskImage: 'linear-gradient(to bottom, #000 0%, rgba(0,0,0,0) 100%)' }}
             >
-                {/* Main laptop */}
-                <div className="relative w-full" style={{ height: '80%' }}>
-                    <Image src={heroImg} alt={slide.title} fill unoptimized className="object-contain object-bottom drop-shadow-[0_25px_25px_rgba(0,0,0,0.25)]" />
+                {/* Full-height flipped copy anchored to the top; the parent clips it, so
+                    what stays visible is the bottom of the original image. */}
+                <div className="absolute left-0 top-0 w-full" style={{ height: '161.3%', transform: 'scaleY(-1)' }}>
+                    <Image src={heroImg} alt="" fill unoptimized aria-hidden="true" className="object-contain object-center" />
                 </div>
-                {/* Reflection: flipped, faded, blurred copy hugging the base */}
-                <div
-                    className="relative w-full pointer-events-none"
-                    style={{ height: '20%', transform: 'scaleY(-1)', opacity: 0.5, filter: 'blur(3px)', WebkitMaskImage: 'linear-gradient(to bottom, rgba(0,0,0,0.5), rgba(0,0,0,0) 70%)', maskImage: 'linear-gradient(to bottom, rgba(0,0,0,0.5), rgba(0,0,0,0) 70%)' }}
-                >
-                    <Image src={heroImg} alt="" fill unoptimized aria-hidden="true" className="object-contain object-bottom" />
-                </div>
+            </div>
+
+            {/* Right: laptop — Figma: 542×542 @ left 628, top -13 */}
+            <div
+                className={`absolute transition-all duration-700 ${isActive ? 'opacity-100 scale-100 blur-0' : 'opacity-30 scale-90 blur-[1px]'}`}
+                style={{ left: '52.33%', top: '-2.6%', width: '45.17%', height: '108.4%', zIndex: 2 }}
+            >
+                <Image src={heroImg} alt={slide.title} fill unoptimized className="object-contain object-center drop-shadow-[0_25px_25px_rgba(0,0,0,0.25)]" />
             </div>
         </div>
     );

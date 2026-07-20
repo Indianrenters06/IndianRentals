@@ -215,11 +215,10 @@ const ShowcaseProductCard = ({ product, index, isDesktop, handleAddToCart }) => 
             >
                 {/* Image Section */}
                 <div
-                    className="relative bg-white flex items-center justify-center overflow-hidden shrink-0"
+                    className="relative bg-white w-full flex items-center justify-center overflow-hidden shrink-0"
                     style={{
-                        width: `${CARD_W}px`,
                         height: isDesktop ? 282 : 184,
-                        borderRadius: "20px",
+                        borderRadius: "20px 20px 0 0",
                         borderBottom: "1px solid hsla(0, 0%, 93%, 1)",
                         backgroundColor: isHovered ? "hsla(0,0%,98%,1)" : "hsla(0, 0%, 100%, 1)",
                         transition: "background-color 0.4s",
@@ -249,12 +248,12 @@ const ShowcaseProductCard = ({ product, index, isDesktop, handleAddToCart }) => 
                         <Heart size={21} weight={isWishlisted ? "fill" : "regular"} color={isWishlisted ? "#ED2115" : "#000000"} />
                     </button>
 
-                    <div className="relative w-full h-full p-4 flex items-center justify-center">
+                    <div className="absolute inset-0 overflow-hidden">
                         <motion.img
                             variants={{ initial: { scale: 1 }, hover: { scale: 1.05 } }}
                             src={product.image}
                             alt={product.name}
-                            className="max-w-full max-h-full object-contain mix-blend-multiply transition-transform duration-700 ease-out"
+                            className="absolute inset-0 w-full h-full object-cover object-center transition-transform duration-700 ease-out"
                         />
                     </div>
                 </div>

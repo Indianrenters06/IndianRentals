@@ -1,5 +1,6 @@
 "use client";
 import React, { useState, useEffect } from 'react';
+import { useWholeCardTrack } from '../hooks/useWholeCardTrack';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation, Autoplay, Scrollbar } from 'swiper/modules';
 import Link from 'next/link';
@@ -142,6 +143,13 @@ const RentByCategory = () => {
         fetchCategories();
     }, []);
 
+    // Card + gap are fixed by the design, so the track snaps to a whole number of
+    // them rather than resizing cards. Declared above the early returns below so the
+    // hook order stays stable across renders.
+    const catCardW = viewType === 'tablet' ? 165 : 177;
+    const catGap = viewType === 'tablet' ? 15 : 24;
+    const [catBoundsRef, catTrackWidth, catPerView] = useWholeCardTrack(catCardW, catGap);
+
     const getIconForCategory = (name) => {
         const lowerName = name.toLowerCase();
         if (lowerName.includes('macbook')) return <Laptop size={40} weight="fill" />;
@@ -222,17 +230,24 @@ const RentByCategory = () => {
 
                 {/* Tablet/Desktop Swiper */}
                 <div className={`${viewType === 'mobile' ? 'hidden' : 'block'} relative`}>
-                    <div style={{
+                    <div ref={catBoundsRef} style={{
                         width: viewType === 'tablet' ? '708px' : '100%',
                         height: viewType === 'tablet' ? '208px' : 'auto',
                         margin: viewType === 'tablet' ? '0 auto' : undefined,
                         overflow: 'hidden',
                         position: 'relative'
                     }}>
+                      <div style={{ width: catTrackWidth ? `${catTrackWidth}px` : '100%', margin: '0 auto' }}>
                         <Swiper
                             modules={[Navigation, Autoplay, Scrollbar]}
-                            spaceBetween={viewType === 'tablet' ? 15 : 24}
+                            spaceBetween={catGap}
                             slidesPerView={'auto'}
+                            // Explicit step, not slidesPerGroupAuto — every advance moves a
+                            // whole page of cards, so the transform stays on a card boundary.
+                            slidesPerGroup={catPerView}
+                            // Needs a spare page to clone for a seamless wrap; under that
+                            // Swiper silently falls back to stopping at the ends.
+                            loop={displayCategories.length >= catPerView * 2}
                             navigation={{
                                 nextEl: '.swiper-next-cat',
                                 prevEl: '.swiper-prev-cat',
@@ -249,7 +264,7 @@ const RentByCategory = () => {
                             className="!py-3"
                         >
                             {displayCategories.map((cat, index) => (
-                                <SwiperSlide key={cat._id || index} style={{ width: viewType === 'tablet' ? '165px' : '177px' }}>
+                                <SwiperSlide key={cat._id || index} style={{ width: `${catCardW}px` }}>
                                     <Link href={getCategoryRoute(cat)} className="group flex flex-col items-center cursor-pointer">
                                         <div
                                             className="cat-card flex items-center justify-center mb-2 relative bg-white border-2 border-[#eee] rounded-xl group-hover:border-orange-300/40 overflow-hidden"
@@ -281,22 +296,7 @@ const RentByCategory = () => {
                                 </SwiperSlide>
                             ))}
                         </Swiper>
-
-                        {/* Edge fade — cards being cut at the left/right while sliding melt into the bg */}
-                        <div
-                            className="pointer-events-none absolute inset-y-0 left-0 z-20"
-                            style={{
-                                width: '24px',
-                                background: 'linear-gradient(to right, var(--color-grey-grey-50, hsla(0,0%,96%,1)) 0%, hsla(0,0%,96%,0) 100%)'
-                            }}
-                        />
-                        <div
-                            className="pointer-events-none absolute inset-y-0 right-0 z-20"
-                            style={{
-                                width: '24px',
-                                background: 'linear-gradient(to left, var(--color-grey-grey-50, hsla(0,0%,96%,1)) 0%, hsla(0,0%,96%,0) 100%)'
-                            }}
-                        />
+                      </div>
                     </div>
 
                     {/* Figma: scrollbar row — width 1164, height 34, gap 24px from cards */}

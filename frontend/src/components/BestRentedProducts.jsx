@@ -1,6 +1,7 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
+import { useWholeCardTrack } from "@/hooks/useWholeCardTrack";
 import { Heart, Star, Lightning, Truck, Info } from "@phosphor-icons/react";
 import { motion } from "framer-motion";
 import { ChevronLeftIcon, ChevronRightIcon, HeartIcon } from "@heroicons/react/24/outline";
@@ -20,11 +21,11 @@ const MobileProductCard = ({ product }) => {
             style={{ width: '100%', cursor: 'pointer', borderRadius: '12px', border: '1px solid hsla(0,0%,91%,1)', background: '#fff', overflow: 'hidden', boxShadow: '0px 1px 3px rgba(0,0,0,0.06)' }}
         >
             {/* Image area */}
-            <div style={{ position: 'relative', width: '100%', aspectRatio: '1/1', background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '12px' }}>
+            <div style={{ position: 'relative', width: '100%', aspectRatio: '1/1', background: '#fff', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px 6px 6px' }}>
                 <span style={{ position: 'absolute', top: '8px', left: '8px', background: 'hsla(3,86%,51%,1)', color: '#fff', fontSize: '10px', fontWeight: 700, padding: '3px 8px', borderRadius: '20px', fontFamily: "'Mona Sans',sans-serif", zIndex: 10 }}>
                     20% off
                 </span>
-                <img src={product.image} alt={product.name} style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+                <img src={product.image} alt={product.name} style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain', objectPosition: 'center' }} />
             </div>
             {/* Info area */}
             <div style={{ padding: '8px 10px 12px', display: 'flex', flexDirection: 'column', gap: '5px', borderTop: '1px solid hsla(0,0%,93%,1)' }}>
@@ -96,7 +97,7 @@ const ProductCard = ({ product, index, isDesktop, handleAddToCart }) => {
             >
                 {/* Image Section */}
                 <div className="relative bg-white flex items-center justify-center overflow-hidden shrink-0"
-                    style={{ width: '100%', height: 282, borderRadius: "20px", borderBottom: "1px solid hsla(0, 0%, 93%, 1)", backgroundColor: isHovered ? "hsla(0,0%,98%,1)" : "hsla(0, 0%, 100%, 1)", transition: "background-color 0.4s" }}
+                    style={{ width: '100%', height: 282, borderRadius: "20px 20px 0 0", borderBottom: "1px solid hsla(0, 0%, 93%, 1)", backgroundColor: isHovered ? "hsla(0,0%,98%,1)" : "hsla(0, 0%, 100%, 1)", transition: "background-color 0.4s" }}
                 >
                     <div className="absolute z-20 flex items-center" style={{ top: "14.57px", left: "14.49px", gap: "4px" }}>
                         <span className="rounded-full flex items-center justify-center shrink-0"
@@ -117,8 +118,10 @@ const ProductCard = ({ product, index, isDesktop, handleAddToCart }) => {
                         aria-pressed={isWishlisted}>
                         <Heart size={21} weight={isWishlisted ? "fill" : "regular"} color={isWishlisted ? "#ED2115" : "#000000"} />
                     </button>
-                    <div className="relative w-full h-full flex items-center justify-center">
-                        <motion.img variants={{ initial: { scale: 1 }, hover: { scale: 1.05 } }} src={product.image} alt={product.name} className="w-full h-full object-contain px-3.5 transition-transform duration-700 ease-out" />
+                    {/* Fixed inset frame: every product image gets the same box and the same
+                        breathing room, whatever aspect ratio was uploaded. */}
+                    <div className="absolute inset-0 flex items-center justify-center" style={{ padding: '26px 10px 10px' }}>
+                        <motion.img variants={{ initial: { scale: 1 }, hover: { scale: 1.05 } }} src={product.image} alt={product.name} className="max-w-full max-h-full object-contain object-center transition-transform duration-700 ease-out" />
                     </div>
                 </div>
                 {/* Text Section */}
@@ -158,8 +161,14 @@ import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/scrollbar';
 
-const BestRentedProducts = ({ type = "bestRented", defaultTitle = "Curated Products", customProducts = null }) => {
+// Card + gap are fixed by the design, so the track is snapped to a whole number of
+// them instead of resizing cards.
+const SLIDE_W = 285;
+const SLIDE_GAP = 20;
+
+const BestRentedProducts =({ type = "bestRented", defaultTitle = "Curated Products", customProducts = null }) => {
     const [isDesktop, setIsDesktop] = useState(false);
+    const [trackBoundsRef, trackWidth, perView] = useWholeCardTrack(SLIDE_W, SLIDE_GAP);
     const router = useRouter();
     const dispatch = useDispatch();
 
@@ -306,11 +315,18 @@ const BestRentedProducts = ({ type = "bestRented", defaultTitle = "Curated Produ
                     </div>
                 </div>
 
-                <div className="hidden md:block relative">
+                <div className="hidden md:block relative" ref={trackBoundsRef}>
+                  <div style={{ width: trackWidth ? `${trackWidth}px` : '100%', margin: '0 auto' }}>
                     <Swiper
                         modules={[Navigation, Autoplay, Scrollbar]}
-                        spaceBetween={20}
+                        spaceBetween={SLIDE_GAP}
                         slidesPerView={'auto'}
+                        // Explicit step, not slidesPerGroupAuto — every advance moves a
+                        // whole page of cards, so the transform stays on a card boundary.
+                        slidesPerGroup={perView}
+                        // Needs a spare page to clone for a seamless wrap; under that
+                        // Swiper silently falls back to stopping at the ends.
+                        loop={products.length >= perView * 2}
                         navigation={{
                             nextEl: `.swiper-next-${sectionSuffix}`,
                             prevEl: `.swiper-prev-${sectionSuffix}`,
@@ -327,7 +343,7 @@ const BestRentedProducts = ({ type = "bestRented", defaultTitle = "Curated Produ
                         className="!pt-6 !pb-[65px] -mt-6 -mb-[65px] !overflow-x-clip !overflow-y-visible"
                     >
                         {products.map((product, index) => (
-                            <SwiperSlide key={product.id || index} style={{ width: '285px' }}>
+                            <SwiperSlide key={product.id || index} style={{ width: `${SLIDE_W}px` }}>
                                 <ProductCard
                                     product={product}
                                     index={index}
@@ -337,6 +353,7 @@ const BestRentedProducts = ({ type = "bestRented", defaultTitle = "Curated Produ
                             </SwiperSlide>
                         ))}
                     </Swiper>
+                  </div>
 
                     {/* Progress Bar & Navigation Arrows */}
                     <div className="flex items-center gap-6 mt-10">
