@@ -297,6 +297,22 @@ const RentByCategory = () => {
                             ))}
                         </Swiper>
                       </div>
+
+                        {/* Edge fade — cards being cut at the left/right while sliding melt into the bg */}
+                        <div
+                            className="pointer-events-none absolute inset-y-0 left-0 z-20"
+                            style={{
+                                width: '24px',
+                                background: 'linear-gradient(to right, var(--color-grey-grey-50, hsla(0,0%,96%,1)) 0%, hsla(0,0%,96%,0) 100%)'
+                            }}
+                        />
+                        <div
+                            className="pointer-events-none absolute inset-y-0 right-0 z-20"
+                            style={{
+                                width: '24px',
+                                background: 'linear-gradient(to left, var(--color-grey-grey-50, hsla(0,0%,96%,1)) 0%, hsla(0,0%,96%,0) 100%)'
+                            }}
+                        />
                     </div>
 
                     {/* Figma: scrollbar row — width 1164, height 34, gap 24px from cards */}
