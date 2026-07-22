@@ -157,20 +157,25 @@ const RentByCategory = () => {
 
     // Desktop only — tablet's track is a fixed 708px with no room either side.
     const catGutter = viewType === 'desktop' ? 64 : 0;
-    // Eased rather than linear: a straight ramp still reads as a visible band with a
-    // definite start, while the weighted stops let the card thin out to nothing.
+    // The feather has to finish inside the gap between cards, not span the whole
+    // gutter: the next card starts only `catGap` past the track edge, so a fade
+    // still half-opaque out there leaves a ghost card parked beside the row. Short
+    // feather, then dead transparent for the rest of the card's travel.
+    const catFeather = 20;
     const catEdgeMask = catGutter
-        ? `linear-gradient(to right,
-            transparent 0px,
-            rgba(0,0,0,0.15) ${catGutter * 0.35}px,
-            rgba(0,0,0,0.55) ${catGutter * 0.65}px,
-            rgba(0,0,0,0.88) ${catGutter * 0.85}px,
-            #000 ${catGutter}px,
-            #000 calc(100% - ${catGutter}px),
-            rgba(0,0,0,0.88) calc(100% - ${catGutter * 0.85}px),
-            rgba(0,0,0,0.55) calc(100% - ${catGutter * 0.65}px),
-            rgba(0,0,0,0.15) calc(100% - ${catGutter * 0.35}px),
-            transparent 100%)`
+        ? (() => {
+            const stops = [
+                [catGutter - catFeather, 0],
+                [catGutter - catFeather * 0.55, 0.12],
+                [catGutter - catFeather * 0.3, 0.45],
+                [catGutter - catFeather * 0.12, 0.8],
+                [catGutter, 1],
+            ];
+            const left = stops.map(([px, a]) => `rgba(0,0,0,${a}) ${px}px`).join(', ');
+            const right = [...stops].reverse()
+                .map(([px, a]) => `rgba(0,0,0,${a}) calc(100% - ${px}px)`).join(', ');
+            return `linear-gradient(to right, transparent 0px, ${left}, #000 calc(100% - ${catGutter}px), ${right}, transparent 100%)`;
+        })()
         : undefined;
 
     const getIconForCategory = (name) => {
