@@ -155,6 +155,24 @@ const RentByCategory = () => {
         { flexGap: true }
     );
 
+    // Desktop only — tablet's track is a fixed 708px with no room either side.
+    const catGutter = viewType === 'desktop' ? 64 : 0;
+    // Eased rather than linear: a straight ramp still reads as a visible band with a
+    // definite start, while the weighted stops let the card thin out to nothing.
+    const catEdgeMask = catGutter
+        ? `linear-gradient(to right,
+            transparent 0px,
+            rgba(0,0,0,0.15) ${catGutter * 0.35}px,
+            rgba(0,0,0,0.55) ${catGutter * 0.65}px,
+            rgba(0,0,0,0.88) ${catGutter * 0.85}px,
+            #000 ${catGutter}px,
+            #000 calc(100% - ${catGutter}px),
+            rgba(0,0,0,0.88) calc(100% - ${catGutter * 0.85}px),
+            rgba(0,0,0,0.55) calc(100% - ${catGutter * 0.65}px),
+            rgba(0,0,0,0.15) calc(100% - ${catGutter * 0.35}px),
+            transparent 100%)`
+        : undefined;
+
     const getIconForCategory = (name) => {
         const lowerName = name.toLowerCase();
         if (lowerName.includes('macbook')) return <Laptop size={40} weight="fill" />;
@@ -235,11 +253,27 @@ const RentByCategory = () => {
 
                 {/* Tablet/Desktop Swiper */}
                 <div className={`${viewType === 'mobile' ? 'hidden' : 'block'} relative`}>
+                  {/* Gutters hang outside the container so a card leaving the row has
+                      somewhere to dissolve — the track itself fills the container edge
+                      to edge, leaving no slack inside it. The mask fades the card's own
+                      pixels to transparent rather than covering them with a coloured
+                      overlay, so it melts into whatever is behind it. */}
+                  <div style={{
+                      marginLeft: catGutter ? `-${catGutter}px` : undefined,
+                      marginRight: catGutter ? `-${catGutter}px` : undefined,
+                      paddingLeft: catGutter ? `${catGutter}px` : undefined,
+                      paddingRight: catGutter ? `${catGutter}px` : undefined,
+                      overflow: 'hidden',
+                      WebkitMaskImage: catEdgeMask,
+                      maskImage: catEdgeMask
+                  }}>
                     <div ref={catBoundsRef} style={{
                         width: viewType === 'tablet' ? '708px' : '100%',
                         height: viewType === 'tablet' ? '208px' : 'auto',
                         margin: viewType === 'tablet' ? '0 auto' : undefined,
-                        overflow: 'hidden',
+                        // Desktop clips at the gutter edge instead, so slides can travel
+                        // into the fade; tablet has no gutter and still clips here.
+                        overflow: viewType === 'tablet' ? 'hidden' : 'visible',
                         position: 'relative'
                     }}>
                       <div style={{ width: catTrackWidth ? `${catTrackWidth}px` : '100%', margin: '0 auto' }}>
@@ -266,7 +300,9 @@ const RentByCategory = () => {
                                 delay: 3000,
                                 disableOnInteraction: false,
                             }}
-                            className="!py-3"
+                            // Swiper clips its own overflow, which would cut a slide dead
+                            // at the track edge before it ever reaches the fade.
+                            className={`!py-3 ${viewType === 'tablet' ? '' : '!overflow-visible'}`}
                         >
                             {displayCategories.map((cat, index) => (
                                 <SwiperSlide key={cat._id || index} style={{ width: `${catCardW}px` }}>
@@ -302,23 +338,8 @@ const RentByCategory = () => {
                             ))}
                         </Swiper>
                       </div>
-
-                        {/* Edge fade — cards being cut at the left/right while sliding melt into the bg */}
-                        <div
-                            className="pointer-events-none absolute inset-y-0 left-0 z-20"
-                            style={{
-                                width: '24px',
-                                background: 'linear-gradient(to right, var(--color-grey-grey-50, hsla(0,0%,96%,1)) 0%, hsla(0,0%,96%,0) 100%)'
-                            }}
-                        />
-                        <div
-                            className="pointer-events-none absolute inset-y-0 right-0 z-20"
-                            style={{
-                                width: '24px',
-                                background: 'linear-gradient(to left, var(--color-grey-grey-50, hsla(0,0%,96%,1)) 0%, hsla(0,0%,96%,0) 100%)'
-                            }}
-                        />
                     </div>
+                  </div>
 
                     {/* Figma: scrollbar row — width 1164, height 34, gap 24px from cards */}
                     <div className="hidden md:flex items-center gap-6 mt-6">
