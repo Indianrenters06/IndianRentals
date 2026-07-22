@@ -15,7 +15,6 @@ router.post('/upload', protect, upload.fields([
     { name: 'aadharFront', maxCount: 1 },     // profile form
     { name: 'aadharBack', maxCount: 1 },      // profile form
     { name: 'panCard', maxCount: 1 },         // profile form
-    { name: 'gstCertificate', maxCount: 1 },  // company KYC
     { name: 'photo', maxCount: 1 },           // selfie / photo
 ]), uploadKYCDocuments);
 

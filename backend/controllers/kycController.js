@@ -64,12 +64,12 @@ exports.updateKYCStatus = async (req, res) => {
     }
 };
 
-// @desc    Create or Update KYC (personal/company/reference details)
+// @desc    Create or Update KYC (personal/reference details)
 // @route   POST /api/kyc
 // @access  Private
 exports.createOrUpdateKYC = async (req, res) => {
     try {
-        const { personalDetails, companyDetails, referenceDetails, documents } = req.body;
+        const { personalDetails, referenceDetails, documents } = req.body;
 
         const kycFields = {
             user: req.user._id,
@@ -77,7 +77,6 @@ exports.createOrUpdateKYC = async (req, res) => {
         };
 
         if (personalDetails) kycFields.personalDetails = personalDetails;
-        if (companyDetails && Object.keys(companyDetails).length > 0) kycFields.companyDetails = companyDetails;
         if (referenceDetails && Object.keys(referenceDetails).length > 0) kycFields.referenceDetails = referenceDetails;
         if (documents && Object.keys(documents).length > 0) kycFields.documents = documents;
 

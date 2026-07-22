@@ -54,7 +54,6 @@ export default function KYCPage() {
     const totals = useSelector(selectCartTotals);
     const { securityAmount, deliveryCharges, monthlyRentTotal, totalGST, totalOneTime, payToday, savedAmount, couponDiscount, couponCode } = totals;
 
-    const [customerType, setCustomerType] = useState('Customer');
     const [currentStep, setCurrentStep] = useState(1);
     const [loading, setLoading] = useState(false);
     const [errors, setErrors] = useState({});
@@ -67,7 +66,6 @@ export default function KYCPage() {
     // Form data state
     const [formData, setFormData] = useState({
         personal: { name: '', fatherName: '', fatherPhone: '', email: '', phone: '', residenceStatus: '', address: '', state: '', city: '', pincode: '' },
-        company: { companyName: '', companyType: '', employees: '', designation: '', duration: '', email: '', address: '', state: '', city: '', pincode: '' },
         reference: { name: '', relation: '', phone: '', address: '', state: '', city: '', pincode: '' },
         documents: { identityProof: 'Voter ID', addressProof: 'House Electricity Bill' }
     });
@@ -142,23 +140,6 @@ export default function KYCPage() {
     };
 
     const validateStep2 = () => {
-        const { companyName, companyType, employees, designation, duration, email, address, state, city, pincode } = formData.company;
-        let newErrors = {};
-        if (!companyName) newErrors.companyName = 'Required';
-        if (!companyType) newErrors.companyType = 'Required';
-        if (!employees) newErrors.employees = 'Required';
-        if (!designation) newErrors.designation = 'Required';
-        if (!duration) newErrors.duration = 'Required';
-        if (!email) newErrors.email = 'Required';
-        if (!address) newErrors.address = 'Required';
-        if (!state) newErrors.state = 'Required';
-        if (!city) newErrors.city = 'Required';
-        if (!pincode) newErrors.pincode = 'Required';
-        setErrors(newErrors);
-        return Object.keys(newErrors).length === 0;
-    };
-
-    const validateStep3 = () => {
         const { name, relation, phone, address, state, city, pincode } = formData.reference;
         let newErrors = {};
         if (!name) newErrors.name = 'Required';
@@ -176,13 +157,10 @@ export default function KYCPage() {
         if (currentStep === 1) {
             if (!validateStep1()) return;
         }
-        if (currentStep === 2 && customerType === 'Company') {
+        if (currentStep === 2) {
             if (!validateStep2()) return;
         }
         if (currentStep === 3) {
-            if (!validateStep3()) return;
-        }
-        if (currentStep === 4) {
             const missingDocs = [];
             if (!identityProofRef.current?.files?.[0]) missingDocs.push('Identity Proof');
             if (!addressProofRef.current?.files?.[0]) missingDocs.push('Address Proof');
@@ -195,51 +173,41 @@ export default function KYCPage() {
                 Swal.fire({ icon: 'warning', title: 'Action Required', text: 'Please check the confirmation box.' });
                 return;
             }
-        }
 
-        if (currentStep === 1 && customerType === 'Customer') {
-            setCurrentStep(3);
-        } else if (currentStep < 5) {
-            if (currentStep === 4) {
-                setLoading(true);
-                try {
-                    const fileData = new FormData();
-                    if (identityProofRef.current?.files[0]) fileData.append('identityProof', identityProofRef.current.files[0]);
-                    if (addressProofRef.current?.files[0]) fileData.append('addressProof', addressProofRef.current.files[0]);
-                    if (bankStatementRef.current?.files[0]) fileData.append('bankStatement', bankStatementRef.current.files[0]);
+            setLoading(true);
+            try {
+                const fileData = new FormData();
+                if (identityProofRef.current?.files[0]) fileData.append('identityProof', identityProofRef.current.files[0]);
+                if (addressProofRef.current?.files[0]) fileData.append('addressProof', addressProofRef.current.files[0]);
+                if (bankStatementRef.current?.files[0]) fileData.append('bankStatement', bankStatementRef.current.files[0]);
 
-                    let uploadedDocs = {};
-                    if ([...fileData.entries()].length > 0) {
-                        uploadedDocs = await uploadKYCFiles(fileData);
-                    }
-
-                    await saveKYCData({
-                        personalDetails: { ...formData.personal, idType: formData.documents.identityProof },
-                        companyDetails: customerType === 'Company' ? formData.company : {},
-                        referenceDetails: formData.reference,
-                        documents: { ...uploadedDocs, identityProofType: formData.documents.identityProof, addressProofType: formData.documents.addressProof }
-                    });
-
-                    router.push('/checkout/payment');
-                } catch (error) {
-                    console.error(error);
-                    Swal.fire({ icon: 'error', title: 'Error', text: 'Failed to submit KYC.' });
-                } finally {
-                    setLoading(false);
+                let uploadedDocs = {};
+                if ([...fileData.entries()].length > 0) {
+                    uploadedDocs = await uploadKYCFiles(fileData);
                 }
-            } else {
-                setCurrentStep(prev => prev + 1);
+
+                await saveKYCData({
+                    personalDetails: { ...formData.personal, idType: formData.documents.identityProof },
+                    referenceDetails: formData.reference,
+                    documents: { ...uploadedDocs, identityProofType: formData.documents.identityProof, addressProofType: formData.documents.addressProof }
+                });
+
+                router.push('/checkout/payment');
+            } catch (error) {
+                console.error(error);
+                Swal.fire({ icon: 'error', title: 'Error', text: 'Failed to submit KYC.' });
+            } finally {
+                setLoading(false);
             }
+            return;
         }
+
+        setCurrentStep(prev => prev + 1);
         window.scrollTo(0, 0);
     };
 
     const handleBack = () => {
-        if (currentStep === 3 && customerType === 'Customer') {
-            setCurrentStep(1);
-        } else if (currentStep > 1) {
-            setCurrentStep(prev => prev - 1);
-        }
+        if (currentStep > 1) setCurrentStep(prev => prev - 1);
         window.scrollTo(0, 0);
     };
 
@@ -256,7 +224,7 @@ export default function KYCPage() {
         >
             <div className="max-w-[1200px] mx-auto px-5 md:px-8">
                 {/* Breadcrumb */}
-                {currentStep !== 5 && (
+                {currentStep !== 4 && (
                     <div className="text-xs text-gray-500 mb-6 flex items-center gap-2">
                         <Link href="/" className="hover:text-black font-medium">Product-Page</Link>
                         <span>›</span>
@@ -268,7 +236,7 @@ export default function KYCPage() {
                     </div>
                 )}
 
-                {currentStep === 5 ? (
+                {currentStep === 4 ? (
                     <div className="flex justify-center items-start min-h-[60vh] py-4">
                         <div className="relative w-full max-w-lg bg-white rounded-2xl shadow-lg p-6 md:px-10 md:py-12">
                             {/* Back */}
@@ -321,7 +289,7 @@ export default function KYCPage() {
                                 className="flex flex-col max-lg:!w-full max-lg:!h-auto"
                                 style={{
                                     width: '726px',
-                                    height: '86px',
+                                    height: '35px',
                                     gap: '12px'
                                 }}
                             >
@@ -329,7 +297,7 @@ export default function KYCPage() {
                                     className="flex flex-col max-lg:!w-full"
                                     style={{
                                         width: '372px',
-                                        height: '86px',
+                                        height: '35px',
                                         gap: '12px'
                                     }}
                                 >
@@ -350,80 +318,6 @@ export default function KYCPage() {
                                     >
                                         KYC & Documentation
                                     </h1>
-
-                                    <div
-                                        className="flex max-lg:!w-full"
-                                        style={{
-                                            width: '372px',
-                                            height: '39px',
-                                            gap: '12px'
-                                        }}
-                                    >
-                                        <button
-                                            onClick={() => setCustomerType('Customer')}
-                                            className="transition-all max-lg:!flex-1"
-                                            style={{
-                                                width: '180px',
-                                                height: '39px',
-                                                borderRadius: '59px',
-                                                padding: '7px 40px',
-                                                background: customerType === 'Customer' ? 'hsla(0, 0%, 20%, 1)' : 'hsla(0, 0%, 93%, 1)',
-                                                display: 'flex',
-                                                alignItems: 'center',
-                                                justifyContent: 'center',
-                                                gap: '10px'
-                                            }}
-                                        >
-                                            <span
-                                                style={{
-                                                    width: '79px',
-                                                    height: '25px',
-                                                    fontFamily: 'Mona Sans, sans-serif',
-                                                    fontWeight: '400',
-                                                    fontSize: '18px',
-                                                    letterSpacing: '-0.8px',
-                                                    color: customerType === 'Customer' ? '#eeeeee' : '#333333',
-                                                    display: 'flex',
-                                                    alignItems: 'center',
-                                                    justifyContent: 'center'
-                                                }}
-                                            >
-                                                Customer
-                                            </span>
-                                        </button>
-                                        <button
-                                            onClick={() => setCustomerType('Company')}
-                                            className="transition-all max-lg:!flex-1"
-                                            style={{
-                                                width: '180px',
-                                                height: '39px',
-                                                borderRadius: '59px',
-                                                padding: '7px 40px',
-                                                background: customerType === 'Company' ? 'hsla(0, 0%, 20%, 1)' : 'hsla(0, 0%, 93%, 1)',
-                                                display: 'flex',
-                                                alignItems: 'center',
-                                                justifyContent: 'center',
-                                                gap: '10px'
-                                            }}
-                                        >
-                                            <span
-                                                style={{
-                                                    width: '79px',
-                                                    height: '25px',
-                                                    fontFamily: 'Mona Sans, sans-serif',
-                                                    fontWeight: '400',
-                                                    fontSize: '18px',
-                                                    letterSpacing: '-0.8px',
-                                                    color: customerType === 'Company' ? '#eeeeee' : '#333333',
-                                                    display: 'flex',
-                                                    alignItems: 'center',
-                                                    justifyContent: 'center'
-                                                }}
-                                            >
-                                                Company
-                                            </span>
-                                        </button>
-                                    </div>
                                 </div>
                             </div>
 
@@ -532,7 +426,7 @@ export default function KYCPage() {
                                             justifyContent: 'center'
                                         }}
                                     >
-                                        {[1, 2, 3, 4].map((step) => (
+                                        {[1, 2, 3].map((step) => (
                                             <React.Fragment key={step}>
                                                 <div
                                                     className={`rounded-full flex items-center justify-center border transition-all`}
@@ -547,7 +441,7 @@ export default function KYCPage() {
                                                 >
                                                     {currentStep > step ? <PiCheckCircleFill size={20} /> : <span className="font-semibold text-[14px]">{step}</span>}
                                                 </div>
-                                                {step < 4 && <div className={`w-8 md:w-20 h-0.5 transition-all ${currentStep > step ? 'bg-[#1D1D1F]' : 'bg-gray-300'}`} />}
+                                                {step < 3 && <div className={`w-8 md:w-20 h-0.5 transition-all ${currentStep > step ? 'bg-[#1D1D1F]' : 'bg-gray-300'}`} />}
                                             </React.Fragment>
                                         ))}
                                     </div>
@@ -635,71 +529,8 @@ export default function KYCPage() {
                                         </div>
                                     )}
 
-                                    {/* Step 2: Company Details */}
+                                    {/* Step 2: Reference Only */}
                                     {currentStep === 2 && (
-                                        <div className="flex flex-col pr-2" style={{ width: '100%' }}>
-                                            <h2
-                                                className="max-lg:!w-full"
-                                                style={{
-                                                    width: '686px', height: '36px', fontFamily: 'Mona Sans, sans-serif',
-                                                    fontWeight: '600', fontSize: '21px', letterSpacing: '-0.8px', color: '#333333',
-                                                    display: 'flex', alignItems: 'center', paddingBottom: '8px',
-                                                    marginBottom: '12px', borderBottom: '1px solid hsla(0, 0%, 93%, 1)', gap: '8px'
-                                                }}
-                                            >
-                                                Company Details
-                                            </h2>
-                                            <div className="flex flex-col gap-[12px]">
-                                                <TextInput label="Company Name" required error={errors.companyName} placeholder="Placeholder" value={formData.company.companyName} onChange={(e) => handleTextChange('company', 'companyName', e.target.value)} />
-                                                <div className="grid grid-cols-1 md:grid-cols-2 gap-[16px]">
-                                                    <TextInput label="Type of Company" required isSelect options={['Proprietorship', 'Partnership', 'Private Limited', 'Public Limited', 'LLP', 'Other']} error={errors.companyType} placeholder="Placeholder" value={formData.company.companyType} onChange={(e) => handleTextChange('company', 'companyType', e.target.value)} />
-                                                    <TextInput label="Approx no. of employee" required error={errors.employees} placeholder="Placeholder" value={formData.company.employees} onChange={(e) => handleTextChange('company', 'employees', e.target.value)} />
-                                                </div>
-                                                <TextInput label="Your Designation" required error={errors.designation} placeholder="Placeholder" value={formData.company.designation} onChange={(e) => handleTextChange('company', 'designation', e.target.value)} />
-                                                <div className="grid grid-cols-1 md:grid-cols-2 gap-[16px]">
-                                                    <TextInput label="Duration of Service in the company" required error={errors.duration} placeholder="Placeholder" value={formData.company.duration} onChange={(e) => handleTextChange('company', 'duration', e.target.value)} />
-                                                    <TextInput label="Official Company email" required error={errors.email} placeholder="Placeholder" value={formData.company.email} onChange={(e) => handleTextChange('company', 'email', e.target.value)} />
-                                                </div>
-                                                <TextInput label="Company Address" required error={errors.address} placeholder="Placeholder" value={formData.company.address} onChange={(e) => handleTextChange('company', 'address', e.target.value)} />
-                                                <div className="grid grid-cols-1 md:grid-cols-2 gap-[16px]">
-                                                    <TextInput label="City" required error={errors.city} placeholder="Placeholder" value={formData.company.city} onChange={(e) => handleCityChange('company', e.target.value)} />
-                                                    <TextInput label="State" required isSelect options={INDIAN_STATES} error={errors.state} value={formData.company.state} onChange={(e) => handleStateChange('company', e.target.value)} />
-                                                </div>
-                                                <div className="grid grid-cols-1 md:grid-cols-2 gap-[16px]">
-                                                    <TextInput label="Pincode" required error={errors.pincode} placeholder="Placeholder" value={formData.company.pincode} onChange={(e) => handlePincodeChange('company', e.target.value)} />
-                                                    <TextInput label="Country" required value="India" readOnly />
-                                                </div>
-                                                
-                                                <div className="grid grid-cols-2 gap-[21px] mt-4 mb-6">
-                                                    <button
-                                                        onClick={handleBack}
-                                                        className="transition-colors flex items-center justify-center"
-                                                        style={{
-                                                            width: '100%', height: '35px', borderRadius: '9999px',
-                                                            background: '#FFFFFF', border: '1px solid #1D1D1F',
-                                                            color: '#1D1D1F', fontWeight: '500', fontSize: '16px'
-                                                        }}
-                                                    >
-                                                        Back
-                                                    </button>
-                                                    <button
-                                                        onClick={handleNext}
-                                                        className="transition-colors flex items-center justify-center"
-                                                        style={{
-                                                            width: '100%', height: '35px', borderRadius: '9999px',
-                                                            background: 'hsla(44, 100%, 64%, 1)', border: 'none',
-                                                            color: 'hsla(0, 0%, 12%, 1)', fontWeight: '500', fontSize: '16px'
-                                                        }}
-                                                    >
-                                                        Next
-                                                    </button>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    )}
-
-                                    {/* Step 3: Reference Only */}
-                                    {currentStep === 3 && (
                                         <div className="flex flex-col pr-2" style={{ width: '100%' }}>
                                             <h2
                                                 className="max-lg:!w-full"
@@ -755,8 +586,8 @@ export default function KYCPage() {
                                         </div>
                                     )}
 
-                                    {/* Step 4: Documents Upload */}
-                                    {currentStep === 4 && (
+                                    {/* Step 3: Documents Upload */}
+                                    {currentStep === 3 && (
                                         <div className="flex flex-col pr-2" style={{ width: '100%' }}>
                                             <h2
                                                 className="max-lg:!w-full"

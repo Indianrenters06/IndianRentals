@@ -38,26 +38,6 @@ const KYCSchema = new mongoose.Schema({
         idNumber: String,
     },
 
-    // ── Company Details ─────────────────────────────────────────────────────────
-    companyDetails: {
-        companyName: String,
-        companyType: String,
-        employeeCount: String,
-        employees: String,          // alias used in checkout form
-        designation: String,
-        serviceDuration: String,
-        duration: String,           // alias used in checkout form
-        companyEmail: String,
-        email: String,              // alias used in checkout form
-        companyAddress: String,
-        address: String,            // alias used in checkout form
-        city: String,
-        state: String,
-        pincode: String,
-        country: { type: String, default: 'India' },
-        gstNumber: String,
-    },
-
     // ── Reference Details ───────────────────────────────────────────────────────
     referenceDetails: {
         name: String,
@@ -79,7 +59,6 @@ const KYCSchema = new mongoose.Schema({
         aadharFront: String,
         aadharBack: String,
         panCard: String,
-        gstCertificate: String,
         photo: String,
         // Type labels chosen by user
         identityProofType: String,

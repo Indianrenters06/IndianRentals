@@ -39,7 +39,6 @@ A complete **KYC (Know Your Customer) approval system** for the admin panel, all
 Shows complete KYC information:
 - ✅ **User Information**: Name, email, phone, status
 - ✅ **Personal Details**: PAN, Aadhar, DOB, Gender, Addresses
-- ✅ **Company Details**: Company name, GST, address, email
 - ✅ **Reference Details**: Reference name, relation, phone
 - ✅ **Documents**: Links to all uploaded documents
 - ✅ **Remarks**: Admin remarks (if any)
@@ -79,7 +78,6 @@ Authorization: Bearer <admin_token>
       "phone": "+91 98765 43210"
     },
     "personalDetails": { ... },
-    "companyDetails": { ... },
     "referenceDetails": { ... },
     "documents": { ... },
     "status": "pending",

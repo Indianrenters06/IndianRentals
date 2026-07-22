@@ -8,7 +8,6 @@ import { useRouter } from 'next/navigation';
 
 export default function KYCPage() {
     const router = useRouter();
-    const [customerType, setCustomerType] = useState('Customer');
     const [currentStep, setCurrentStep] = useState(1);
     const [loading, setLoading] = useState(false);
     const [errors, setErrors] = useState({});
@@ -33,12 +32,8 @@ export default function KYCPage() {
                     setFormData(prev => ({
                         ...prev,
                         personalDetails: data.personalDetails || prev.personalDetails,
-                        companyDetails: data.companyDetails || prev.companyDetails,
                         documents: { ...prev.documents, ...data.documents } // Keep existing uploads if valid, or just simple
                     }));
-                    if (data.companyDetails && data.companyDetails.companyName) {
-                        setCustomerType('Company');
-                    }
                 }
             } else {
                 setKycStatus('not_submitted');
@@ -52,7 +47,6 @@ export default function KYCPage() {
     // Form State
     const [formData, setFormData] = useState({
         personalDetails: { name: '', fatherName: '', fatherPhone: '', email: '', phone: '', permanentAddress: '', currentAddress: '', city: '', state: '', pincode: '', country: 'India' },
-        companyDetails: { companyName: '', companyType: '', employeeCount: '', designation: '', serviceDuration: '', companyEmail: '', referenceAddress: '', city: '', state: '', pincode: '', country: 'India' },
         documents: { aadharFront: null, aadharBack: null, panCard: null, other: null }
     });
 
@@ -83,19 +77,6 @@ export default function KYCPage() {
     };
 
     const validateStep2 = () => {
-        const { companyName, companyType, employeeCount, companyEmail, designation, serviceDuration } = formData.companyDetails;
-        let newErrors = {};
-        if (!companyName) newErrors.companyName = 'Company Name is required';
-        if (!companyType) newErrors.companyType = 'Company Type is required';
-        if (!employeeCount) newErrors.employeeCount = 'Employee Count is required';
-        if (!companyEmail) newErrors.companyEmail = 'Company Email is required';
-        if (!designation) newErrors.designation = 'Designation is required';
-        if (!serviceDuration) newErrors.serviceDuration = 'Service Duration is required';
-        setErrors(newErrors);
-        return Object.keys(newErrors).length === 0;
-    };
-
-    const validateStep3 = () => {
         const { aadharFront, aadharBack, panCard } = formData.documents;
         // Only validate if we are NOT in rejected state (where they might just want to update one file)
         // actually for simplicity, require re-upload if empty, or assume pre-filled if string (URL)
@@ -112,27 +93,18 @@ export default function KYCPage() {
         if (currentStep === 1) {
             if (!validateStep1()) { return; }
         }
-        if (currentStep === 2 && customerType === 'Company') {
+        if (currentStep === 2) {
             if (!validateStep2()) { return; }
         }
-        if (currentStep === 3) {
-            if (!validateStep3()) { return; }
-        }
 
-        if (currentStep === 1 && customerType === 'Customer') {
-            setCurrentStep(3);
-        } else if (currentStep < 4) {
+        if (currentStep < 3) {
             setCurrentStep(prev => prev + 1);
         }
         window.scrollTo(0, 0);
     };
 
     const handleBack = () => {
-        if (currentStep === 3 && customerType === 'Customer') {
-            setCurrentStep(1);
-        } else if (currentStep > 1) {
-            setCurrentStep(prev => prev - 1);
-        }
+        if (currentStep > 1) setCurrentStep(prev => prev - 1);
         window.scrollTo(0, 0);
     };
 
@@ -158,7 +130,6 @@ export default function KYCPage() {
 
             const kycPayload = {
                 personalDetails: { ...formData.personalDetails, idType: 'Aadhar Card' },
-                companyDetails: customerType === 'Company' ? formData.companyDetails : {},
                 referenceDetails: {},
                 documents: uploadedDocs // Send only new uploads or merged?
             };
@@ -237,17 +208,12 @@ export default function KYCPage() {
                 <h1 className="text-3xl font-medium text-gray-700">KYC & Documentation</h1>
             </div>
 
-            <div className="flex bg-gray-100 p-1 rounded-full w-fit mb-8">
-                <button onClick={() => { setCustomerType('Customer'); setCurrentStep(1); setErrors({}); }} className={`px-8 py-2 rounded-full text-sm font-medium transition-all ${customerType === 'Customer' ? 'bg-[#333] text-white' : 'text-gray-600'}`}>Customer</button>
-                <button onClick={() => { setCustomerType('Company'); setCurrentStep(1); setErrors({}); }} className={`px-8 py-2 rounded-full text-sm font-medium transition-all ${customerType === 'Company' ? 'bg-[#333] text-white' : 'text-gray-600'}`}>Company</button>
-            </div>
-
             {/* Steps & Content */}
             <div className="flex justify-center mb-10 mt-4">
                 <div className="flex items-center w-full max-w-xl relative">
                     <div className="absolute left-0 top-1/2 w-full h-px bg-gray-200 -z-10"></div>
-                    <div className="absolute left-0 top-1/2 h-px bg-[#00c853] -z-10 transition-all duration-300" style={{ width: `${((currentStep - 1) / 3) * 100}%` }}></div>
-                    {[1, 2, 3, 4].map((step) => {
+                    <div className="absolute left-0 top-1/2 h-px bg-[#00c853] -z-10 transition-all duration-300" style={{ width: `${((currentStep - 1) / 2) * 100}%` }}></div>
+                    {[1, 2, 3].map((step) => {
                         const isCompleted = step < currentStep;
                         const isActive = step === currentStep;
                         return (
@@ -277,26 +243,11 @@ export default function KYCPage() {
                             <TextInput label="Pincode" required error={errors.pincode} value={formData.personalDetails.pincode} onChange={(e) => handleChange('personalDetails', 'pincode', e.target.value)} />
                             <TextInput label="Country" required value={formData.personalDetails.country} onChange={(e) => handleChange('personalDetails', 'country', e.target.value)} />
                         </div>
-                        <div className="flex justify-end"><button onClick={handleNext} className="bg-[#333] hover:bg-black text-white font-medium py-3 px-8 rounded-xl transition-all text-lg shadow-lg flex items-center">{customerType === 'Customer' ? 'Proceed to Documents' : 'Proceed to Company Details'}</button></div>
+                        <div className="flex justify-end"><button onClick={handleNext} className="bg-[#333] hover:bg-black text-white font-medium py-3 px-8 rounded-xl transition-all text-lg shadow-lg flex items-center">Proceed to Documents</button></div>
                     </>
                 )}
 
                 {currentStep === 2 && (
-                    <>
-                        <div className="mb-8"><h2 className="text-2xl font-medium text-gray-700 mb-2">Company Details</h2><div className="h-px bg-gray-200 w-full"></div></div>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-6 mb-8">
-                            <div className="md:col-span-2"><TextInput label="Company Name" required error={errors.companyName} value={formData.companyDetails.companyName} onChange={(e) => handleChange('companyDetails', 'companyName', e.target.value)} /></div>
-                            <TextInput label="Type of Company" required error={errors.companyType} value={formData.companyDetails.companyType} onChange={(e) => handleChange('companyDetails', 'companyType', e.target.value)} />
-                            <TextInput label="No. of Employees" required error={errors.employeeCount} value={formData.companyDetails.employeeCount} onChange={(e) => handleChange('companyDetails', 'employeeCount', e.target.value)} />
-                            <div className="md:col-span-2"><TextInput label="Designation" required error={errors.designation} value={formData.companyDetails.designation} onChange={(e) => handleChange('companyDetails', 'designation', e.target.value)} /></div>
-                            <TextInput label="Service Duration" required error={errors.serviceDuration} value={formData.companyDetails.serviceDuration} onChange={(e) => handleChange('companyDetails', 'serviceDuration', e.target.value)} />
-                            <TextInput label="Official Email" required error={errors.companyEmail} value={formData.companyDetails.companyEmail} onChange={(e) => handleChange('companyDetails', 'companyEmail', e.target.value)} />
-                        </div>
-                        <div className="flex gap-4 justify-end mt-6"><button onClick={handleBack} className="px-6 py-3 bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium rounded-xl">Back</button><button onClick={handleNext} className="px-6 py-3 bg-[#333] hover:bg-black text-white font-medium rounded-xl shadow-lg">Proceed to Documents</button></div>
-                    </>
-                )}
-
-                {currentStep === 3 && (
                     <>
                         <div className="mb-8"><h2 className="text-2xl font-medium text-gray-700 mb-2">Upload Documents</h2><p className="text-sm text-gray-500 mb-4">Please upload clear images (JPG/PNG/PDF).</p><div className="h-px bg-gray-200 w-full"></div></div>
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
@@ -308,7 +259,7 @@ export default function KYCPage() {
                     </>
                 )}
 
-                {currentStep === 4 && (
+                {currentStep === 3 && (
                     <>
                         <div className="mb-8"><h2 className="text-2xl font-medium text-gray-700 mb-2">Review & Submit</h2><div className="h-px bg-gray-200 w-full"></div></div>
                         <div className="bg-gray-50 p-6 rounded-xl mb-6">
