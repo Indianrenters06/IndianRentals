@@ -9,9 +9,15 @@ import { useState, useRef, useCallback } from "react";
  * multiple that fits. The leftover becomes equal margins at both ends, which is
  * what stops a sliced card ever showing at an edge.
  *
- * Returns [ref, trackWidth, perView] — put the ref on the element whose width is
- * the available space, and apply trackWidth to the swiper wrapper inside it.
+ * Returns [ref, trackWidth, perView, gap] — put the ref on the element whose width
+ * is the available space, and apply trackWidth to the swiper wrapper inside it.
  * trackWidth is null until the first measurement, so fall back to '100%'.
+ *
+ * With `flexGap`, one more card is squeezed in and the gaps tighten to absorb the
+ * leftover, as long as they stay at or above `minGap`. Narrowing the track leaves
+ * dead space at both ends, which reads as the section being inset from its own
+ * heading; tightening the gap instead keeps the cards at their Figma size and the
+ * track flush with the container. Feed the returned gap back as `spaceBetween`.
  *
  * perView must be fed to the swiper as an explicit `slidesPerGroup`. Swiper's
  * `slidesPerGroupAuto` derives the step from its own dynamic visible-slide count,
@@ -24,8 +30,8 @@ import { useState, useRef, useCallback } from "react";
  * again, silently leaving the track unsnapped. A callback ref fires whenever the
  * node actually attaches, including after loading finishes.
  */
-export const useWholeCardTrack = (cardW, gap) => {
-    const [track, setTrack] = useState({ width: null, perView: 1 });
+export const useWholeCardTrack = (cardW, gap, { flexGap = false, minGap = 12 } = {}) => {
+    const [track, setTrack] = useState({ width: null, perView: 1, gap });
     const observerRef = useRef(null);
 
     const measure = useCallback((el) => {
@@ -33,13 +39,26 @@ export const useWholeCardTrack = (cardW, gap) => {
         const available = el.clientWidth;
         // Zero while an ancestor is display:none — the observer re-fires on reveal.
         if (!available) return;
-        const perView = Math.max(1, Math.floor((available + gap) / (cardW + gap)));
+        let perView = Math.max(1, Math.floor((available + gap) / (cardW + gap)));
+        let usedGap = gap;
+
+        if (flexGap) {
+            const more = perView + 1;
+            // Only worth it while the extra card still leaves breathing room.
+            const tightened = (available - more * cardW) / (more - 1);
+            if (tightened >= minGap) {
+                perView = more;
+                usedGap = Math.floor(tightened * 100) / 100;
+            }
+        }
+
+        const width = perView * (cardW + usedGap) - usedGap;
         setTrack((prev) =>
-            prev.perView === perView && prev.width !== null
+            prev.perView === perView && prev.width === width
                 ? prev
-                : { width: perView * (cardW + gap) - gap, perView }
+                : { width, perView, gap: usedGap }
         );
-    }, [cardW, gap]);
+    }, [cardW, gap, flexGap, minGap]);
 
     const boundsRef = useCallback((node) => {
         if (observerRef.current) {
@@ -53,5 +72,5 @@ export const useWholeCardTrack = (cardW, gap) => {
         observerRef.current = ro;
     }, [measure]);
 
-    return [boundsRef, track.width, track.perView];
+    return [boundsRef, track.width, track.perView, track.gap];
 };

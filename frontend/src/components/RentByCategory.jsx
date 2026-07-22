@@ -143,12 +143,17 @@ const RentByCategory = () => {
         fetchCategories();
     }, []);
 
-    // Card + gap are fixed by the design, so the track snaps to a whole number of
-    // them rather than resizing cards. Declared above the early returns below so the
+    // Card width is fixed by the design; the gap absorbs the remainder so a whole
+    // number of cards fills the container edge to edge instead of sitting centred
+    // with dead space at both ends. Declared above the early returns below so the
     // hook order stays stable across renders.
     const catCardW = viewType === 'tablet' ? 165 : 177;
-    const catGap = viewType === 'tablet' ? 15 : 24;
-    const [catBoundsRef, catTrackWidth, catPerView] = useWholeCardTrack(catCardW, catGap);
+    const catBaseGap = viewType === 'tablet' ? 15 : 24;
+    const [catBoundsRef, catTrackWidth, catPerView, catGap] = useWholeCardTrack(
+        catCardW,
+        catBaseGap,
+        { flexGap: true }
+    );
 
     const getIconForCategory = (name) => {
         const lowerName = name.toLowerCase();
