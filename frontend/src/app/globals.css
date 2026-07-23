@@ -36,16 +36,16 @@
   --color-grey-900: #141414;
   --color-white: #ffffff;
 
-  /* Colors - Blue (Secondary) */
-  --color-blue-50: #e9f4ff;
+  /* Colors - Blue (Secondary) — values aligned to the Figma design tokens */
+  --color-blue-50: #edfaff;
   --color-blue-100: #d6ecff;
   --color-blue-200: #b5d9ff;
   --color-blue-400: #5b96ff;
   --color-blue-500: #356cff;
   --color-blue-600: #133fff;
-  --color-blue-700: #0933f9;
-  --color-blue-800: #0b2fc8;
-  --color-blue-900: #13309c;
+  --color-blue-700: #0075ff;
+  --color-blue-800: #0859c5;
+  --color-blue-900: #0d4e9b;
   --color-blue-950: #0e206e;
 
   /* Semantic Colors */

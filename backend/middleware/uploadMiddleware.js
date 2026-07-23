@@ -36,12 +36,13 @@ const upload = multer({
 /**
  * Upload a single file buffer to Cloudinary.
  * Returns the secure_url string.
+ * `folder` defaults to the KYC folder so existing callers are unaffected.
  */
-const uploadToCloudinary = (fileBuffer, fieldName) => {
+const uploadToCloudinary = (fileBuffer, fieldName, folder = 'indian-rentals/kyc') => {
     return new Promise((resolve, reject) => {
         const stream = cloudinary.uploader.upload_stream(
             {
-                folder: 'indian-rentals/kyc',
+                folder,
                 resource_type: 'auto',
                 public_id: `${fieldName}-${Date.now()}`,
             },

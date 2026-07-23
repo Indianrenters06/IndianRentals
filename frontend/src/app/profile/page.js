@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { User } from '@phosphor-icons/react';
+import { logout } from '../../services/authService';
 
 const sections = [
     {
@@ -47,8 +48,13 @@ export default function ProfileHome() {
         <div className="lg:hidden flex flex-col">
             {/* Header */}
             <div className="flex items-center gap-4 mb-6">
-                <div className="w-[60px] h-[60px] rounded-full bg-[#4B4B4B] flex items-center justify-center text-white shrink-0">
-                    <User size={36} weight="fill" />
+                <div className="w-[60px] h-[60px] rounded-full bg-[#4B4B4B] flex items-center justify-center text-white shrink-0 overflow-hidden">
+                    {userInfo?.avatar ? (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img src={userInfo.avatar} alt="" className="w-full h-full object-cover" />
+                    ) : (
+                        <User size={36} weight="fill" />
+                    )}
                 </div>
                 <div>
                     <p className="text-[13px] text-gray-400 font-medium">Your Account,</p>
@@ -81,7 +87,10 @@ export default function ProfileHome() {
                 ))}
             </nav>
 
-            <button className="text-[16px] font-medium text-red-500 mt-8 mb-4 text-left">
+            <button
+                onClick={() => logout()}
+                className="text-[16px] font-medium text-red-500 mt-8 mb-4 text-left"
+            >
                 Logout
             </button>
         </div>

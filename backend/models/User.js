@@ -48,6 +48,11 @@ const userSchema = new mongoose.Schema({
         type: String,
         required: [true, 'Please provide your phone number']
     },
+    // Cloudinary URL of the profile picture. Empty means "use the default icon".
+    avatar: {
+        type: String,
+        default: ''
+    },
     role: {
         type: String,
         enum: ['customer', 'admin', 'staff', 'super_admin', 'operations_manager', 'sales_executive', 'finance_executive'],

@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { clearSession } from './authService';
 
 // Registers a single global axios response interceptor that reacts to 401
 // (Unauthorized) responses anywhere in the app. A 401 means the stored session
@@ -17,9 +18,8 @@ const forceLogout = () => {
     const hadSession = !!localStorage.getItem('userInfo');
     loggingOut = true;
 
-    localStorage.removeItem('userInfo');
     // Let the Navbar and other listeners update their logged-in state.
-    window.dispatchEvent(new Event('userInfoChanged'));
+    clearSession();
 
     // Only bounce to login if the user actually had a session that just went
     // stale — avoids redirecting anonymous visitors hitting protected endpoints.

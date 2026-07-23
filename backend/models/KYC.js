@@ -24,6 +24,10 @@ const KYCSchema = new mongoose.Schema({
         fatherName: String,
         fatherPhone: String,
 
+        // Residence
+        // Collected and required by the checkout KYC form ("Owned", "Rented", …).
+        residenceStatus: String,
+
         // Address
         address: String,
         permanentAddress: String,

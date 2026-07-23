@@ -12,6 +12,7 @@ import { useSelector } from "react-redux";
 import { selectCartTotalQuantity } from "../redux/features/cartSlice";
 import { useSettings } from "../context/SettingsContext";
 import { getCategories } from "../services/categoryService";
+import { logout } from "../services/authService";
 
 const Navbar = () => {
     const router = useRouter();
@@ -159,11 +160,11 @@ const Navbar = () => {
     };
 
     const handleLogout = () => {
-        localStorage.removeItem("userInfo");
         setUserInfo(null);
         setIsProfileDropdownOpen(false);
-        router.push("/login"); // or router.push('/')
-        // Optionally dispatch a custom event if other components need to know
+        setIsMobileMenuOpen(false);
+        setIsHamburgerDropdownOpen(false);
+        logout();
     };
 
     let navLinks = [];
@@ -551,7 +552,9 @@ const Navbar = () => {
                                                 className="absolute top-full right-0 mt-2 bg-white z-50 overflow-hidden"
                                                 style={{
                                                     width: "173px",
-                                                    height: "202px",
+                                                    // Figma height is 202px, but that was sized for 4 menu rows.
+                                                    // Keep it as a floor so the Logout row isn't clipped.
+                                                    minHeight: "202px",
                                                     padding: "16px",
                                                     borderRadius: "12px",
                                                     boxShadow: "0px 0px 6px 0px hsla(0, 0%, 60%, 0.25)",
@@ -616,7 +619,7 @@ const Navbar = () => {
                                                     {[
                                                         { label: "Profile Settings", href: "/profile" },
                                                         { label: "My Orders", href: "/profile/orders" },
-                                                        { label: "KYC Documentation", href: "/kyc" },
+                                                        { label: "KYC Documentation", href: "/profile/kyc" },
                                                         { label: "My Invoices", href: "/profile/invoices" }
                                                     ].map((item) => (
                                                         <Link
@@ -640,6 +643,25 @@ const Navbar = () => {
                                                             {item.label}
                                                         </Link>
                                                     ))}
+
+                                                    <button
+                                                        onClick={handleLogout}
+                                                        style={{
+                                                            width: "141px",
+                                                            height: "20px",
+                                                            fontFamily: "'Mona Sans', sans-serif",
+                                                            fontWeight: 600,
+                                                            fontSize: "13px",
+                                                            color: "hsla(3, 84%, 51%, 1)",
+                                                            lineHeight: "20px",
+                                                            letterSpacing: "0.15px",
+                                                            display: "flex",
+                                                            alignItems: "center"
+                                                        }}
+                                                        className="hover:opacity-80 transition-opacity whitespace-nowrap text-left"
+                                                    >
+                                                        Logout
+                                                    </button>
                                                 </div>
                                             </motion.div>
                                         </>

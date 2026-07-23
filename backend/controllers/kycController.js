@@ -73,7 +73,6 @@ exports.createOrUpdateKYC = async (req, res) => {
 
         const kycFields = {
             user: req.user._id,
-            status: 'pending',
         };
 
         if (personalDetails) kycFields.personalDetails = personalDetails;
@@ -83,6 +82,14 @@ exports.createOrUpdateKYC = async (req, res) => {
         let kyc = await KYC.findOne({ user: req.user._id });
         const isNew = !kyc;
         const wasRejected = kyc?.status === 'rejected';
+        const wasApproved = kyc?.status === 'approved';
+
+        // Approved customers still submit documents on every order (a fresh bank
+        // statement each time), so a re-submission must not push them back into
+        // the review queue — that would show "Verification In Progress" to a
+        // customer who is already verified. Everything else (first submission,
+        // or a re-submit after rejection) does go back to pending.
+        kycFields.status = wasApproved ? 'approved' : 'pending';
 
         if (kyc) {
             // Merge new document URLs on top of existing ones
@@ -100,27 +107,34 @@ exports.createOrUpdateKYC = async (req, res) => {
             await kyc.save();
         }
 
-        // Fire admin notification on first submission OR after a rejection re-submit
-        if (isNew || wasRejected) {
-            await createNotification({
-                title: isNew ? 'New KYC Submission' : 'KYC Re-submitted',
-                message: isNew
-                    ? `User ${req.user.name} submitted their KYC for review.`
-                    : `User ${req.user.name} has re-submitted their KYC after rejection.`,
-                type: 'kyc',
-                relatedId: kyc._id
-            });
+        // Tell the admin about a first submission, a re-submit after rejection,
+        // or fresh paperwork from an already-verified customer.
+        if (isNew || wasRejected || wasApproved) {
+            let title = 'New KYC Submission';
+            let message = `User ${req.user.name} submitted their KYC for review.`;
+            if (wasRejected) {
+                title = 'KYC Re-submitted';
+                message = `User ${req.user.name} has re-submitted their KYC after rejection.`;
+            } else if (wasApproved) {
+                title = 'New KYC Documents';
+                message = `Verified user ${req.user.name} uploaded new documents for a new order.`;
+            }
 
-            // Confirm receipt to the customer (non-blocking).
-            const docKeys = Object.keys(kyc.documents?.toObject?.() ?? kyc.documents ?? {})
-                .filter(k => (kyc.documents?.[k]));
-            const docList = docKeys.length
-                ? `Other documents received: ${docKeys.map(k => DOC_LABELS[k] || k).join(', ')}.`
-                : '';
-            sendTemplatedEmail('KYC Submitted — Under Review', req.user.email, {
-                CUSTOMER_NAME: req.user.name || 'Customer',
-                SUBMITTED_DOCS: docList,
-            });
+            await createNotification({ title, message, type: 'kyc', relatedId: kyc._id });
+
+            // Confirm receipt to the customer (non-blocking). Skipped for approved
+            // customers — they are not "under review", so that email would be wrong.
+            if (!wasApproved) {
+                const docKeys = Object.keys(kyc.documents?.toObject?.() ?? kyc.documents ?? {})
+                    .filter(k => (kyc.documents?.[k]));
+                const docList = docKeys.length
+                    ? `Other documents received: ${docKeys.map(k => DOC_LABELS[k] || k).join(', ')}.`
+                    : '';
+                sendTemplatedEmail('KYC Submitted — Under Review', req.user.email, {
+                    CUSTOMER_NAME: req.user.name || 'Customer',
+                    SUBMITTED_DOCS: docList,
+                });
+            }
         }
 
         res.status(isNew ? 201 : 200).json(kyc);

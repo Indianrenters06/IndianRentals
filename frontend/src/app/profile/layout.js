@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
+import { logout } from '../../services/authService';
 
 // Exact avatar vector from the Figma "side-bar-settings" component (node 23050:11078).
 const AvatarIcon = () => (
@@ -17,10 +18,20 @@ export default function ProfileLayout({ children }) {
     const [userInfo, setUserInfo] = useState(null);
 
     useEffect(() => {
-        const storedUserInfo = localStorage.getItem('userInfo');
-        if (storedUserInfo) {
-            setUserInfo(JSON.parse(storedUserInfo));
-        }
+        // Re-read on `userInfoChanged` so edits made in Profile Settings
+        // (name, picture) show up here without a page reload.
+        const readUserInfo = () => {
+            const storedUserInfo = localStorage.getItem('userInfo');
+            setUserInfo(storedUserInfo ? JSON.parse(storedUserInfo) : null);
+        };
+
+        readUserInfo();
+        window.addEventListener('userInfoChanged', readUserInfo);
+        window.addEventListener('storage', readUserInfo);
+        return () => {
+            window.removeEventListener('userInfoChanged', readUserInfo);
+            window.removeEventListener('storage', readUserInfo);
+        };
     }, []);
 
     const sidebarSections = [
@@ -73,9 +84,14 @@ export default function ProfileLayout({ children }) {
                                 {/* Profile header */}
                                 <div className="flex items-center gap-[10px]">
                                     <div className="size-[55px] rounded-full bg-white border border-[#eeeeee] overflow-hidden relative shrink-0">
-                                        <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 size-[65px]">
-                                            <AvatarIcon />
-                                        </div>
+                                        {userInfo?.avatar ? (
+                                            // eslint-disable-next-line @next/next/no-img-element
+                                            <img src={userInfo.avatar} alt="" className="absolute inset-0 w-full h-full object-cover" />
+                                        ) : (
+                                            <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 size-[65px]">
+                                                <AvatarIcon />
+                                            </div>
+                                        )}
                                     </div>
                                     <div className="flex flex-col w-[87px]">
                                         <p className="text-[14px] font-medium leading-5 tracking-[-0.4px] text-[#757575]">Your Account,</p>
@@ -90,7 +106,7 @@ export default function ProfileLayout({ children }) {
                                         {/* Overview — standalone link, blue when active */}
                                         <Link
                                             href="/profile/overview"
-                                            className={`text-[16px] font-semibold leading-[23px] tracking-[-0.4px] ${pathname.includes('/profile/overview') ? 'text-[#0d4e9b]' : 'text-[#333333] hover:text-[#0d4e9b]'}`}
+                                            className={`text-[16px] font-semibold leading-[23px] tracking-[-0.4px] ${pathname.includes('/profile/overview') ? 'text-blue-900' : 'text-grey-700 hover:text-blue-900'}`}
                                         >
                                             Overview
                                         </Link>
@@ -107,7 +123,7 @@ export default function ProfileLayout({ children }) {
                                                         <Link
                                                             key={item.name}
                                                             href={item.href}
-                                                            className={`text-[14px] font-semibold leading-5 tracking-[-0.4px] ${isActive(item.href) ? 'text-[#0d4e9b]' : 'text-[#333333] hover:text-[#0d4e9b]'}`}
+                                                            className={`text-[14px] font-semibold leading-5 tracking-[-0.4px] ${isActive(item.href) ? 'text-blue-900' : 'text-grey-700 hover:text-blue-900'}`}
                                                         >
                                                             {item.name}
                                                         </Link>
@@ -117,7 +133,10 @@ export default function ProfileLayout({ children }) {
                                         ))}
                                     </nav>
 
-                                    <button className="text-left text-[14px] font-medium leading-5 tracking-[-0.4px] text-[#ed2115] hover:opacity-80 transition-opacity w-[184px]">
+                                    <button
+                                        onClick={() => logout()}
+                                        className="text-left text-[14px] font-medium leading-5 tracking-[-0.4px] text-[#ed2115] hover:opacity-80 transition-opacity w-[184px]"
+                                    >
                                         Logout
                                     </button>
                                 </div>

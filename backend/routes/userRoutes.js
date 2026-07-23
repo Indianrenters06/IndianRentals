@@ -1,8 +1,10 @@
 const express = require('express');
 const router = express.Router();
+const upload = require('../middleware/uploadMiddleware');
 const {
     getUserProfile,
     updateUserProfile,
+    uploadAvatar,
     submitKYC,
     getAllUsers,
     updateKYCStatus,
@@ -22,6 +24,7 @@ router.route('/')
 router.post('/kyc', protect, submitKYC);
 router.get('/profile', protect, getUserProfile);
 router.put('/profile', protect, updateUserProfile);
+router.post('/profile/avatar', protect, upload.single('avatar'), uploadAvatar);
 
 // Saved addresses for the logged-in user.
 // NOTE: must be declared before the '/:id' routes below, otherwise

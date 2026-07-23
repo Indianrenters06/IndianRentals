@@ -1,5 +1,6 @@
 const asyncHandler = require('express-async-handler');
 const User = require('../models/User');
+const { uploadToCloudinary } = require('../middleware/uploadMiddleware');
 
 // @desc    Get user profile
 // @route   GET /api/users/profile
@@ -14,7 +15,9 @@ const getUserProfile = asyncHandler(async (req, res) => {
             email: user.email,
             role: user.role,
             phone: user.phone,
+            avatar: user.avatar,
             kyc: user.kyc,
+            isEmailVerified: user.isEmailVerified,
         });
     } else {
         res.status(404);
@@ -28,22 +31,82 @@ const getUserProfile = asyncHandler(async (req, res) => {
 const updateUserProfile = asyncHandler(async (req, res) => {
     const user = await User.findById(req.user._id);
 
-    if (user) {
-        user.name = req.body.name || user.name;
-        user.email = req.body.email || user.email;
-
-        const updated = await user.save();
-        res.json({
-            _id: updated._id,
-            name: updated.name,
-            email: updated.email,
-            phone: updated.phone,
-            role: updated.role,
-        });
-    } else {
+    if (!user) {
         res.status(404);
         throw new Error('User not found');
     }
+
+    const { name, email, avatar } = req.body;
+
+    if (typeof name === 'string' && name.trim()) {
+        user.name = name.trim();
+    }
+
+    if (typeof email === 'string' && email.trim()) {
+        const nextEmail = email.trim().toLowerCase();
+
+        if (nextEmail !== user.email) {
+            // `email` is a unique index — check first so the client gets a clear
+            // 400 instead of a raw duplicate-key error from Mongo.
+            const taken = await User.findOne({ email: nextEmail, _id: { $ne: user._id } });
+            if (taken) {
+                res.status(400);
+                throw new Error('That email is already registered to another account.');
+            }
+
+            user.email = nextEmail;
+            // The new address hasn't been confirmed yet.
+            user.isEmailVerified = false;
+        }
+    }
+
+    if (typeof avatar === 'string') {
+        user.avatar = avatar;
+    }
+
+    const updated = await user.save();
+    res.json({
+        _id: updated._id,
+        name: updated.name,
+        email: updated.email,
+        phone: updated.phone,
+        role: updated.role,
+        avatar: updated.avatar,
+        isEmailVerified: updated.isEmailVerified,
+    });
+});
+
+// @desc    Upload/replace own profile picture
+// @route   POST /api/users/profile/avatar
+// @access  Private
+const uploadAvatar = asyncHandler(async (req, res) => {
+    if (!req.file) {
+        res.status(400);
+        throw new Error('No image uploaded');
+    }
+
+    // The shared upload middleware also accepts PDFs (for KYC); an avatar must be an image.
+    if (!/^image\//.test(req.file.mimetype)) {
+        res.status(400);
+        throw new Error('Profile picture must be a JPG or PNG image');
+    }
+
+    const user = await User.findById(req.user._id);
+    if (!user) {
+        res.status(404);
+        throw new Error('User not found');
+    }
+
+    const url = await uploadToCloudinary(
+        req.file.buffer,
+        `avatar-${user._id}`,
+        'indian-rentals/avatars'
+    );
+
+    user.avatar = url;
+    await user.save();
+
+    res.json({ avatar: url });
 });
 
 // @desc    Submit KYC documents
@@ -263,6 +326,7 @@ const deleteAddress = asyncHandler(async (req, res) => {
 module.exports = {
     getUserProfile,
     updateUserProfile,
+    uploadAvatar,
     submitKYC,
     getAllUsers,
     updateKYCStatus,

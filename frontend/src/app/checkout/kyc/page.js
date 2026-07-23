@@ -1,13 +1,13 @@
 'use client';
 
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useSelector } from 'react-redux';
 import { FaFingerprint } from 'react-icons/fa';
 import { PiCheckCircleFill, PiCheckCircle, PiCaretLeftBold } from 'react-icons/pi';
-import { saveKYCData, uploadKYCFiles } from '../../../services/kycService';
+import { saveKYCData, uploadKYCFiles, getKYCStatus } from '../../../services/kycService';
 import { selectCartTotals } from '../../../redux/features/cartSlice';
 import OrderSummary from '../../../components/OrderSummary';
 import Swal from 'sweetalert2';
@@ -71,6 +71,70 @@ export default function KYCPage() {
     });
 
     const [isDocumentsChecked, setIsDocumentsChecked] = useState(false);
+
+    // Documents already uploaded in a previous KYC submission, keyed by field
+    // name -> Cloudinary URL. Identity/address proof on file can be reused; a
+    // bank statement is always re-collected (see validation in handleNext).
+    const [existingDocs, setExistingDocs] = useState({});
+    const [kycStatus, setKycStatus] = useState(null);
+
+    // Pull any existing KYC record so returning customers don't retype
+    // everything. Approved customers still pass through this step because a
+    // fresh bank statement is required for each order.
+    useEffect(() => {
+        let cancelled = false;
+
+        const prefill = async () => {
+            try {
+                const data = await getKYCStatus();
+                if (cancelled || !data) return;
+
+                setKycStatus((data.status || '').toLowerCase());
+                setExistingDocs(data.documents || {});
+
+                if (!data.personalDetails && !data.referenceDetails) return;
+
+                // Copy only the keys this form owns, and only when the stored
+                // value is a non-empty string, so inputs stay controlled.
+                const carryOver = (source, keys) => {
+                    const out = {};
+                    keys.forEach((key) => {
+                        const value = source?.[key];
+                        if (typeof value === 'string' && value) out[key] = value;
+                    });
+                    return out;
+                };
+
+                const personal = carryOver(data.personalDetails, [
+                    'name', 'fatherName', 'fatherPhone', 'email', 'phone',
+                    'residenceStatus', 'address', 'state', 'city', 'pincode'
+                ]);
+                // The profile KYC form stores the address as `permanentAddress`.
+                if (!personal.address && data.personalDetails?.permanentAddress) {
+                    personal.address = data.personalDetails.permanentAddress;
+                }
+
+                const reference = carryOver(data.referenceDetails, [
+                    'name', 'relation', 'phone', 'address', 'state', 'city', 'pincode'
+                ]);
+
+                setFormData((prev) => ({
+                    personal: { ...prev.personal, ...personal },
+                    reference: { ...prev.reference, ...reference },
+                    documents: {
+                        identityProof: data.documents?.identityProofType || prev.documents.identityProof,
+                        addressProof: data.documents?.addressProofType || prev.documents.addressProof,
+                    }
+                }));
+            } catch (err) {
+                // No existing KYC (or it couldn't be read) — fall back to a blank form.
+                console.error('Could not prefill KYC:', err);
+            }
+        };
+
+        prefill();
+        return () => { cancelled = true; };
+    }, []);
 
     const handleTextChange = (section, field, value) => {
         setFormData(prev => ({
@@ -162,8 +226,12 @@ export default function KYCPage() {
         }
         if (currentStep === 3) {
             const missingDocs = [];
-            if (!identityProofRef.current?.files?.[0]) missingDocs.push('Identity Proof');
-            if (!addressProofRef.current?.files?.[0]) missingDocs.push('Address Proof');
+            // Identity and address proof already on file from an earlier
+            // submission can be reused — no need to re-upload them each order.
+            if (!identityProofRef.current?.files?.[0] && !existingDocs.identityProof) missingDocs.push('Identity Proof');
+            if (!addressProofRef.current?.files?.[0] && !existingDocs.addressProof) missingDocs.push('Address Proof');
+            // A bank statement covers the last 3 months, so a fresh one is
+            // always required — including for already-approved customers.
             if (!bankStatementRef.current?.files?.[0]) missingDocs.push('Bank Statement');
             if (missingDocs.length > 0) {
                 Swal.fire({ icon: 'warning', title: 'Documents Required', text: `Please attach: ${missingDocs.join(', ')}.` });
@@ -323,7 +391,11 @@ export default function KYCPage() {
 
                             <div className="bg-[#e8ffe4] border border-[#5bff53] rounded-[8px] flex items-start gap-[10px] px-[18px] py-[12px]">
                                 <FaFingerprint size={16.67} className="text-[#0c5b11] shrink-0" />
-                                <span className="text-[#0c5b11] font-semibold text-[14px] tracking-[-0.4px] leading-[20px]">Complete KYC to complete your order</span>
+                                <span className="text-[#0c5b11] font-semibold text-[14px] tracking-[-0.4px] leading-[20px]">
+                                    {kycStatus === 'approved'
+                                        ? 'Your KYC is verified. Please upload a current bank statement for this order.'
+                                        : 'Complete KYC to complete your order'}
+                                </span>
                             </div>
 
                             <div
@@ -610,7 +682,7 @@ export default function KYCPage() {
                                                         onChange={(e) => handleTextChange('documents', 'identityProof', e.target.value)} 
                                                     />
                                                     <div className="flex flex-col gap-1 mt-1">
-                                                        <label className="font-semibold text-xs text-gray-800">{formData.documents.identityProof || 'Identity Proof'} Card <span className="text-red-500">*</span></label>
+                                                        <label className="font-semibold text-xs text-gray-800">{formData.documents.identityProof || 'Identity Proof'} Card {!existingDocs.identityProof && <span className="text-red-500">*</span>}</label>
                                                         <div className="flex items-center gap-2">
                                                             <button onClick={() => identityProofRef.current?.click()} className="flex items-center justify-center gap-2 border border-gray-300 rounded-md px-4 py-2 text-sm text-[#0B5ED7] bg-white hover:bg-gray-50 transition-colors w-fit">
                                                                 <svg width="14" height="14" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -618,7 +690,10 @@ export default function KYCPage() {
                                                                 </svg>
                                                                 Attach File
                                                             </button>
-                                                            <span className="text-xs text-green-600 font-medium truncate w-48">{identityProofRef.current?.files?.[0]?.name || ''}</span>
+                                                            <span className="text-xs text-green-600 font-medium truncate w-48">
+                                                                {identityProofRef.current?.files?.[0]?.name
+                                                                    || (existingDocs.identityProof ? 'Already on file — re-upload only to replace' : '')}
+                                                            </span>
                                                             <input type="file" className="hidden" ref={identityProofRef} onChange={() => setFormData({...formData})} />
                                                         </div>
                                                     </div>
@@ -635,7 +710,7 @@ export default function KYCPage() {
                                                         onChange={(e) => handleTextChange('documents', 'addressProof', e.target.value)} 
                                                     />
                                                     <div className="flex flex-col gap-1 mt-1">
-                                                        <label className="font-semibold text-xs text-gray-800">{formData.documents.addressProof || 'Address Proof'} <span className="text-red-500">*</span></label>
+                                                        <label className="font-semibold text-xs text-gray-800">{formData.documents.addressProof || 'Address Proof'} {!existingDocs.addressProof && <span className="text-red-500">*</span>}</label>
                                                         <div className="flex items-center gap-2">
                                                             <button onClick={() => addressProofRef.current?.click()} className="flex items-center justify-center gap-2 border border-gray-300 rounded-md px-4 py-2 text-sm text-[#0B5ED7] bg-white hover:bg-gray-50 transition-colors w-fit">
                                                                 <svg width="14" height="14" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -643,7 +718,10 @@ export default function KYCPage() {
                                                                 </svg>
                                                                 Attach File
                                                             </button>
-                                                            <span className="text-xs text-green-600 font-medium truncate w-48">{addressProofRef.current?.files?.[0]?.name || ''}</span>
+                                                            <span className="text-xs text-green-600 font-medium truncate w-48">
+                                                                {addressProofRef.current?.files?.[0]?.name
+                                                                    || (existingDocs.addressProof ? 'Already on file — re-upload only to replace' : '')}
+                                                            </span>
                                                             <input type="file" className="hidden" ref={addressProofRef} onChange={() => setFormData({...formData})} />
                                                         </div>
                                                     </div>
