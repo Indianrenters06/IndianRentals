@@ -142,14 +142,14 @@ const FeatureSection = () => {
                         >
                             <Link
                                 href={cms.featureSectionCtaLink || "/store"}
-                                className="inline-flex items-center justify-center transition-all hover:bg-[#ffb50f] hover:translate-x-1 whitespace-nowrap"
+                                className="btn-primary"
                                 style={{
                                     fontFamily: "'Mona Sans', sans-serif",
                                     width: isDesktop ? '130px' : '90px',
                                     height: isDesktop ? '35px' : '28px',
                                     padding: isDesktop ? '6px 20px' : '0 12px',
-                                    background: 'hsla(44, 100%, 64%, 1)',
-                                    color: '#1a2b4c',
+                                    // Background/colour intentionally left to .btn-primary — an
+                                    // inline background would outrank its :hover rule.
                                     borderRadius: isDesktop ? '32px' : '9999px',
                                     fontSize: isDesktop ? '14px' : '11px',
                                     fontWeight: isDesktop ? '500' : 'bold',

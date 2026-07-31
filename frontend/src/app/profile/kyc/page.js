@@ -243,7 +243,7 @@ export default function KYCPage() {
                             <TextInput label="Pincode" required error={errors.pincode} value={formData.personalDetails.pincode} onChange={(e) => handleChange('personalDetails', 'pincode', e.target.value)} />
                             <TextInput label="Country" required value={formData.personalDetails.country} onChange={(e) => handleChange('personalDetails', 'country', e.target.value)} />
                         </div>
-                        <div className="flex justify-end"><button onClick={handleNext} className="bg-[#333] hover:bg-black text-white font-medium py-3 px-8 rounded-xl transition-all text-lg shadow-lg flex items-center">Proceed to Documents</button></div>
+                        <div className="flex justify-end"><button onClick={handleNext} className="btn-secondary py-3 px-8 rounded-xl text-lg">Proceed to Documents</button></div>
                     </>
                 )}
 

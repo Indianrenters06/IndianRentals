@@ -2,8 +2,10 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
-import { PiInfo, PiUserCircleFill, PiCaretRightBold, PiSpinnerGap, PiArrowLeft } from 'react-icons/pi';
+import { PiUserCircleFill, PiSpinnerGap, PiArrowLeft } from 'react-icons/pi';
 import axios from 'axios';
+
+import InfoIcon from '../../../components/common/InfoIcon';
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
 
@@ -28,6 +30,24 @@ const syncStoredUser = (patch) => {
         console.error('Could not update stored user info:', err);
     }
 };
+
+// Figma "Input Fields" (node 23060:15019): 347 wide, 12px semibold label, 39px box.
+const Field = ({ label, required, children, message }) => (
+    <div className="flex w-full max-w-[347px] flex-col gap-1">
+        <div className="flex w-full items-start gap-px">
+            <p className="text-[12px] font-semibold leading-4 tracking-[-0.4px] text-[#545454]">{label}</p>
+            {required && <p className="text-[12px] font-medium leading-4 tracking-[-0.4px] text-[#ed2115]">*</p>}
+        </div>
+        <div className="flex w-full flex-col gap-[2px]">
+            {children}
+            {message !== undefined && (
+                <p className="text-[10px] font-normal leading-4 tracking-[-0.4px] text-[#333333]">{message}</p>
+            )}
+        </div>
+    </div>
+);
+
+const inputBox = 'h-[39px] w-full rounded-[8px] border border-[#e2e2e2] pl-[7px] pr-[8px] text-[12px] font-medium leading-4 tracking-[-0.4px] placeholder:text-[#afafaf] focus:outline-none';
 
 export default function ProfileSettingsPage() {
     const [form, setForm] = useState({ name: '', email: '', phone: '' });
@@ -123,37 +143,38 @@ export default function ProfileSettingsPage() {
     };
 
     return (
-        <div className="bg-white min-h-screen rounded-2xl p-5 lg:p-8 border border-grey-100">
-            <div className="flex items-center gap-3 mb-6">
-                <Link href="/profile" aria-label="Back to menu" className="lg:hidden text-grey-700 shrink-0">
+        <div className="flex flex-col items-start gap-3">
+            <div className="flex items-center gap-3">
+                <Link href="/profile" aria-label="Back to menu" className="shrink-0 text-[#333333] lg:hidden">
                     <PiArrowLeft size={24} />
                 </Link>
-                <h1 className="text-3xl font-medium text-grey-700">Profile Settings</h1>
+                <h1 className="text-[27px] font-semibold leading-[35px] tracking-[-0.8px] text-[#333333]">Profile Settings</h1>
             </div>
 
-            <div className="h-px bg-grey-200 w-full mb-6"></div>
+            {/* Divider — Figma "Line 13" */}
+            <div className="h-px w-full bg-[#afafaf]" />
 
-            {/* Privacy Notice */}
-            <div className="bg-grey-50 rounded-lg p-3 mb-8 flex items-center gap-2 text-xs text-grey-600">
-                <PiInfo size={16} className="shrink-0" />
-                <p>
-                    In accordance with our privacy policy, your information is safe with us and will never be sold to third parties{' '}
-                    <span className="font-semibold underline cursor-pointer">Learn More</span>
+            {/* Privacy note — Figma "Frame 253" */}
+            <div className="flex items-center gap-[5px] rounded-[6px] border border-[#e2e2e2] bg-[#f6f6f6] px-[10px] py-[5px]">
+                <InfoIcon />
+                <p className="text-[12px] font-semibold leading-4 tracking-[-0.4px] text-[#757575]">
+                    In accordance with our privacy policy, your information is safe with us and will never be sold to third parties
                 </p>
+                <button className="text-[12px] font-bold leading-4 tracking-[-0.4px] text-[#757575] underline">Learn More</button>
             </div>
 
-            {/* Profile Picture Section */}
-            <div className="flex items-center gap-4 mb-10">
-                <div className="w-16 h-16 lg:w-20 lg:h-20 text-grey-600 rounded-full overflow-hidden shrink-0 bg-grey-100">
+            {/* Avatar — Figma "Frame 255" */}
+            <div className="flex items-center gap-4 px-3 py-[14px]">
+                <div className="size-[70px] shrink-0 overflow-hidden rounded-full border-[0.986px] border-[#e2e2e2] text-[#545454]">
                     {avatar ? (
                         // eslint-disable-next-line @next/next/no-img-element
-                        <img src={avatar} alt="Your profile" className="w-full h-full object-cover" />
+                        <img src={avatar} alt="Your profile" className="size-full object-cover" />
                     ) : (
-                        <PiUserCircleFill className="w-full h-full" />
+                        <PiUserCircleFill className="size-full" />
                     )}
                 </div>
-                <div className="flex items-center gap-3">
-                    <span className="text-grey-600 font-medium text-sm lg:text-base">Change Profile Pic</span>
+                <div className="flex items-center gap-5">
+                    <span className="text-[16px] font-semibold leading-[23px] tracking-[-0.4px] text-[#757575]">Change Profile Pic</span>
                     <input
                         type="file"
                         ref={fileInputRef}
@@ -164,7 +185,7 @@ export default function ProfileSettingsPage() {
                     <button
                         onClick={() => fileInputRef.current?.click()}
                         disabled={uploading}
-                        className="bg-grey-800 hover:bg-black text-white px-5 py-2 rounded-full text-sm font-medium transition-colors shrink-0 disabled:opacity-60"
+                        className="flex items-center justify-center rounded-[28px] bg-[#333333] py-1 pl-3 pr-2 text-[14px] font-medium leading-5 tracking-[-0.4px] text-white disabled:opacity-60"
                     >
                         {uploading ? 'Uploading…' : 'Update'}
                     </button>
@@ -172,73 +193,51 @@ export default function ProfileSettingsPage() {
             </div>
 
             {loading ? (
-                <div className="flex items-center gap-3 text-grey-400">
+                <div className="flex items-center gap-3 py-6 text-[#757575]">
                     <PiSpinnerGap className="animate-spin" size={22} />
-                    <span className="text-sm">Loading your profile…</span>
+                    <span className="text-[14px] font-medium leading-5 tracking-[-0.4px]">Loading your profile…</span>
                 </div>
             ) : (
                 <>
-                    {/* Form */}
-                    <div className="max-w-xl space-y-6">
-                        <div>
-                            <label className="block text-xs font-medium text-grey-600 mb-1.5">
-                                Full Name <span className="text-red-600">*</span>
-                            </label>
-                            <input
-                                type="text"
-                                value={form.name}
-                                onChange={e => setForm(p => ({ ...p, name: e.target.value }))}
-                                placeholder="Your full name"
-                                className="w-full border border-grey-200 rounded-lg px-4 py-3 text-sm text-grey-700 focus:outline-none focus:border-grey-700 transition-colors"
-                            />
-                        </div>
+                    <Field label="Full Name" required>
+                        <input
+                            type="text"
+                            value={form.name}
+                            onChange={e => setForm(p => ({ ...p, name: e.target.value }))}
+                            placeholder="Your full name"
+                            className={`${inputBox} bg-white text-[#333333]`}
+                        />
+                    </Field>
 
-                        <div>
-                            <label className="block text-xs font-medium text-grey-600 mb-1.5">
-                                Contact Number
-                            </label>
-                            <input
-                                type="text"
-                                value={form.phone}
-                                disabled
-                                placeholder="+91-99XXXXXX9"
-                                className="w-full border border-grey-200 bg-grey-50 rounded-lg px-4 py-3 text-sm text-grey-500 cursor-not-allowed"
-                            />
-                            <p className="text-[10px] text-grey-400 mt-1">Contact number cannot be changed for security reasons.</p>
-                        </div>
+                    <Field label="Contact Number">
+                        <input
+                            type="text"
+                            value={form.phone}
+                            disabled
+                            placeholder="+91-99XXXXXX9"
+                            className={`${inputBox} cursor-not-allowed bg-[#eeeeee] text-[#afafaf]`}
+                        />
+                    </Field>
 
-                        <div>
-                            <label className="block text-xs font-medium text-grey-600 mb-1.5">
-                                Email <span className="text-red-600">*</span>
-                            </label>
-                            <div className="relative">
-                                <input
-                                    type="email"
-                                    value={form.email}
-                                    onChange={e => setForm(p => ({ ...p, email: e.target.value }))}
-                                    placeholder="Enter your email"
-                                    className="w-full border border-grey-200 rounded-lg px-4 py-3 text-sm text-grey-700 focus:outline-none focus:border-grey-700 transition-colors"
-                                />
-                            </div>
-                        </div>
+                    {/* Figma puts the helper/error line ("Message") under this field only. */}
+                    <Field label="Email" required message={msg}>
+                        <input
+                            type="email"
+                            value={form.email}
+                            onChange={e => setForm(p => ({ ...p, email: e.target.value }))}
+                            placeholder="Enter your email"
+                            className={`${inputBox} bg-white text-[#333333]`}
+                        />
+                    </Field>
 
-                        {msg && (
-                            <p className={`text-sm font-medium ${msg.includes('success') ? 'text-green-700' : 'text-red-600'}`}>
-                                {msg}
-                            </p>
-                        )}
-
-                        <div className="pt-4">
-                            <button
-                                onClick={handleSave}
-                                disabled={saving}
-                                className="bg-orange-300 hover:bg-orange-400 text-grey-800 font-bold py-3 px-8 rounded-full transition-colors flex items-center gap-2 shadow-sm disabled:opacity-60"
-                            >
-                                {saving ? 'Saving…' : 'Save Changes'}
-                                {!saving && <PiCaretRightBold />}
-                            </button>
-                        </div>
-                    </div>
+                    {/* Figma "Yellow-primary-btn" */}
+                    <button
+                        onClick={handleSave}
+                        disabled={saving}
+                        className="btn-primary h-[35px] px-5 text-[16px] leading-[23px] tracking-[-0.4px] text-[#1f1f1f] disabled:opacity-60"
+                    >
+                        {saving ? 'Saving…' : 'Save Changes'}
+                    </button>
                 </>
             )}
         </div>

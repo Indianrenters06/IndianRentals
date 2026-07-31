@@ -241,9 +241,8 @@ export default function DashboardLayout({ children }) {
         { name: 'Homepage', path: '/dashboard/cms/homepage' },
         { name: 'Global Layout', path: '/dashboard/cms/layout' },
         { name: 'Blog', path: '/dashboard/cms/blog' },
-        { name: 'Categories Page', path: '/dashboard/cms/categories-page' },
-        { name: 'Single Product Page', path: '/dashboard/cms/single-product' },
-        { name: 'Category Images', path: '/dashboard/cms/category-images' },
+        { name: 'Main Category', path: '/dashboard/cms/categories-page' },
+        { name: 'Single Product Page', path: '/dashboard/cms/product-page' },
         { name: 'Static Pages', path: '/dashboard/cms/pages' },
         { name: 'FAQ Page', path: '/dashboard/cms/faq' },
       ]

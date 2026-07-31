@@ -797,23 +797,23 @@ export default function CMSHomepage() {
                         </div>
                     </div>
 
-                    {/* Client Logos */}
+                    {/* Offers */}
                     <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 shadow-sm space-y-6">
                         <SectionRow
                             icon={<Layout weight="fill" className="text-pink-500" />}
-                            title="Client Logos (Trusted By)"
-                            desc="Upload client/partner logos. The section is hidden on the website until at least one logo is added."
+                            title="Offers"
+                            desc="Upload offer banners. The section is hidden on the website until at least one offer is added."
                             toggle={data.clientSectionEnabled}
                             onToggle={v => set("clientSectionEnabled", v)}
                         />
 
-                        <Field label="Section Title" value={data.clientSectionTitle} onChange={v => set("clientSectionTitle", v)} placeholder="e.g. Trusted By" />
+                        <Field label="Section Title" value={data.clientSectionTitle} onChange={v => set("clientSectionTitle", v)} placeholder="e.g. Offers" />
 
-                        {/* Uploaded logos grid */}
+                        {/* Uploaded offers grid */}
                         {(data.clientLogos || []).length > 0 ? (
                             <div className="space-y-3">
                                 <label className="text-xs font-bold text-slate-500 dark:text-slate-200 uppercase tracking-wider block">
-                                    Uploaded Logos ({data.clientLogos.length})
+                                    Uploaded Offers ({data.clientLogos.length})
                                 </label>
                                 <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-3">
                                     {data.clientLogos.map((logo, idx) => (
@@ -821,7 +821,7 @@ export default function CMSHomepage() {
                                             <img
                                                 src={logo}
                                                 className="max-w-full max-h-full object-contain"
-                                                alt={`Client logo ${idx + 1}`}
+                                                alt={`Offer ${idx + 1}`}
                                             />
                                             <button
                                                 onClick={() => {
@@ -830,7 +830,7 @@ export default function CMSHomepage() {
                                                     set("clientLogos", n);
                                                 }}
                                                 className="absolute -top-2 -right-2 bg-red-500 hover:bg-red-600 text-white w-6 h-6 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity text-xs font-bold shadow-md"
-                                                title="Remove logo"
+                                                title="Remove offer"
                                             >
                                                 ×
                                             </button>
@@ -841,16 +841,16 @@ export default function CMSHomepage() {
                         ) : (
                             <div className="flex items-center gap-3 p-4 rounded-xl bg-amber-50 dark:bg-amber-500/10 border border-amber-200 dark:border-amber-500/20 text-amber-700 dark:text-amber-400 text-sm">
                                 <Layout size={18} weight="bold" className="shrink-0" />
-                                <p>No logos uploaded yet. The section will be hidden on the website until you add at least one logo below.</p>
+                                <p>No offers uploaded yet. The section will be hidden on the website until you add at least one offer below.</p>
                             </div>
                         )}
 
-                        {/* Upload new logo */}
+                        {/* Upload new offer */}
                         <div className="space-y-2">
                             <label className="text-xs font-bold text-slate-500 dark:text-slate-200 uppercase tracking-wider block">
-                                Add Logo
+                                Add Offer
                             </label>
-                            <p className="text-xs text-slate-400 -mt-1">Upload PNG with transparent background for best results. You can add multiple logos one by one.</p>
+                            <p className="text-xs text-slate-400 -mt-1">Offers display in a wide carousel, so use landscape banner images. You can add multiple offers one by one.</p>
                             <div className="max-w-xs">
                                 <ImageUploader
                                     label=""

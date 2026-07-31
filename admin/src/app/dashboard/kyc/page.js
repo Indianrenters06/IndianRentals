@@ -9,12 +9,21 @@ import {
 import { Eye, CheckCircle, WarningCircle, User, IdentificationCard, FileText, Info } from "@phosphor-icons/react";
 import toast from 'react-hot-toast';
 import { DownloadSimple, MagnifyingGlassPlus, X } from "@phosphor-icons/react";
-import jsPDF from "jspdf";
 import SortSelect from "@/components/SortSelect";
+
+const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+
+// Pull the server-supplied filename out of Content-Disposition when present.
+const filenameFromResponse = (res, fallback) => {
+    const disposition = res.headers.get('content-disposition') || '';
+    const match = /filename="?([^"\n;]+)"?/i.exec(disposition);
+    return match ? match[1] : fallback;
+};
 
 export default function KYCManagement({ initialFilter = "all" }) {
     const [statusFilter, setStatusFilter] = useState(initialFilter);
     const [zoomedDoc, setZoomedDoc] = useState(null);
+    const [busyDoc, setBusyDoc] = useState(null);
     const [kycRequests, setKycRequests] = useState([]);
     const [loading, setLoading] = useState(true);
     const [selectedKyc, setSelectedKyc] = useState(null);
@@ -45,6 +54,61 @@ export default function KYCManagement({ initialFilter = "all" }) {
         setIsMounted(true);
         fetchKYC();
     }, []);
+
+    /* Documents are fetched through the authenticated admin route rather than
+       straight from Cloudinary: the raw URLs are public, and Cloudinary refuses
+       to deliver PDFs at all (401 "deny or ACL failure") unless the account has
+       PDF delivery switched on. The server re-signs and streams the file. */
+    const fetchDocument = async (kycId, field) => {
+        const token = localStorage.getItem("adminToken");
+        const res = await fetch(`${API}/api/kyc/admin/${kycId}/document/${field}`, {
+            headers: { "Authorization": `Bearer ${token}` }
+        });
+        if (!res.ok) {
+            const body = await res.json().catch(() => ({}));
+            throw new Error(body.message || `Could not fetch the document (${res.status})`);
+        }
+        return res;
+    };
+
+    const handleDownloadDocument = async (kycId, field) => {
+        const key = `${kycId}:${field}`;
+        try {
+            setBusyDoc(key);
+            const res = await fetchDocument(kycId, field);
+            const blob = await res.blob();
+            const objectUrl = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = objectUrl;
+            link.download = filenameFromResponse(res, `${field}`);
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
+            URL.revokeObjectURL(objectUrl);
+        } catch (err) {
+            toast.error(err.message || 'Could not download the document.');
+        } finally {
+            setBusyDoc(null);
+        }
+    };
+
+    const handleOpenDocument = async (kycId, field) => {
+        const key = `${kycId}:${field}:open`;
+        try {
+            setBusyDoc(key);
+            const res = await fetchDocument(kycId, field);
+            const blob = await res.blob();
+            const objectUrl = URL.createObjectURL(blob);
+            const opened = window.open(objectUrl, '_blank', 'noopener');
+            if (!opened) toast.error('Your browser blocked the popup. Use Download instead.');
+            // Revoked late so the new tab has time to load the blob.
+            setTimeout(() => URL.revokeObjectURL(objectUrl), 60000);
+        } catch (err) {
+            toast.error(err.message || 'Could not open the document.');
+        } finally {
+            setBusyDoc(null);
+        }
+    };
 
     const filteredRequests = statusFilter === "all"
         ? kycRequests
@@ -357,10 +421,27 @@ export default function KYCManagement({ initialFilter = "all" }) {
                                                                         <p className="text-[10px] text-slate-400">PDF Document</p>
                                                                     </div>
                                                                 </div>
-                                                                <a href={url} target="_blank" rel="noopener noreferrer"
-                                                                    className="flex items-center gap-1.5 text-xs font-bold text-indigo-600 dark:text-indigo-400 hover:underline px-3 py-1.5 bg-indigo-50 dark:bg-indigo-500/10 rounded-lg">
-                                                                    Open PDF
-                                                                </a>
+                                                                <div className="flex items-center gap-2">
+                                                                    <Button
+                                                                        size="sm"
+                                                                        variant="flat"
+                                                                        className="font-bold text-xs text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-500/10"
+                                                                        isLoading={busyDoc === `${selectedKyc._id}:${key}:open`}
+                                                                        onPress={() => handleOpenDocument(selectedKyc._id, key)}
+                                                                    >
+                                                                        Open
+                                                                    </Button>
+                                                                    <Button
+                                                                        size="sm"
+                                                                        variant="flat"
+                                                                        className="font-bold text-xs"
+                                                                        startContent={busyDoc === `${selectedKyc._id}:${key}` ? null : <DownloadSimple size={14} weight="bold" />}
+                                                                        isLoading={busyDoc === `${selectedKyc._id}:${key}`}
+                                                                        onPress={() => handleDownloadDocument(selectedKyc._id, key)}
+                                                                    >
+                                                                        Download
+                                                                    </Button>
+                                                                </div>
                                                             </div>
                                                         ) : (
                                                             // Image: show thumbnail with zoom
@@ -368,7 +449,7 @@ export default function KYCManagement({ initialFilter = "all" }) {
                                                                 <img src={url} alt={label} className="w-full h-full object-cover" />
                                                                 <div className="absolute inset-0 bg-black/40 group-hover:bg-black/60 transition-colors flex flex-col items-center justify-center gap-2">
                                                                     <p className="text-white text-xs font-bold uppercase tracking-widest drop-shadow-md">{label}</p>
-                                                                    <Button size="sm" color="primary" variant="solid" className="shadow-lg" startContent={<MagnifyingGlassPlus weight="bold" />} onPress={() => setZoomedDoc(url)}>Zoom & View</Button>
+                                                                    <Button size="sm" color="primary" variant="solid" className="shadow-lg" startContent={<MagnifyingGlassPlus weight="bold" />} onPress={() => setZoomedDoc({ url, field: key })}>Zoom & View</Button>
                                                                 </div>
                                                                 <div className="absolute top-2 left-2 px-2 py-1 bg-black/40 backdrop-blur-md rounded-lg text-[10px] text-white font-bold uppercase tracking-tighter">
                                                                     {label}
@@ -447,39 +528,26 @@ export default function KYCManagement({ initialFilter = "all" }) {
                             </button>
                             <ModalBody className="p-0 flex flex-col items-center justify-center">
                                 <img
-                                    src={zoomedDoc}
+                                    src={zoomedDoc?.url}
                                     alt="KYC Document"
                                     className="max-w-full max-h-[75vh] w-auto object-contain rounded-2xl shadow-2xl border border-white/10"
                                 />
 
+                                {/* Downloads the original file through the admin route. The
+                                    previous version re-wrapped the image into a PDF inside a
+                                    FileReader callback that ran after its own try/catch had
+                                    already exited, so any jsPDF failure was swallowed and the
+                                    button silently did nothing. */}
                                 <div className="mt-4 pb-4">
-                                    <button
-                                        className="flex items-center gap-2 h-11 px-8 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-sm shadow-lg shadow-indigo-500/30 transition-all"
-                                        onClick={async () => {
-                                            try {
-                                                const response = await fetch(zoomedDoc);
-                                                const blob = await response.blob();
-                                                const reader = new FileReader();
-                                                reader.readAsDataURL(blob);
-                                                reader.onloadend = function() {
-                                                    const base64data = reader.result;
-                                                    const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
-                                                    const imgProps = doc.getImageProperties(base64data);
-                                                    const pdfWidth = doc.internal.pageSize.getWidth();
-                                                    const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
-                                                    
-                                                    doc.setFontSize(16);
-                                                    doc.text("KYC Document", 10, 10);
-                                                    doc.addImage(base64data, 'JPEG', 0, 20, pdfWidth, pdfHeight);
-                                                    doc.save('KYC_Document.pdf');
-                                                };
-                                            } catch (e) {
-                                                window.open(zoomedDoc, '_blank');
-                                            }
-                                        }}
+                                    <Button
+                                        className="h-11 px-8 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-sm"
+                                        startContent={busyDoc === `${selectedKyc?._id}:${zoomedDoc?.field}` ? null : <DownloadSimple size={18} weight="bold" />}
+                                        isLoading={busyDoc === `${selectedKyc?._id}:${zoomedDoc?.field}`}
+                                        isDisabled={!selectedKyc?._id || !zoomedDoc?.field}
+                                        onPress={() => handleDownloadDocument(selectedKyc._id, zoomedDoc.field)}
                                     >
-                                        <DownloadSimple size={18} weight="bold" /> Download Document
-                                    </button>
+                                        Download Document
+                                    </Button>
                                 </div>
                             </ModalBody>
                         </>

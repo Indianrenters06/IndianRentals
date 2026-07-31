@@ -174,7 +174,10 @@ const RentalProcess = ({ cmsData = null }) => {
                                         background: isActive
                                             ? 'linear-gradient(125.34deg, rgba(255,207,70,0.5) 1.25%, rgba(255,185,27,0.9) 98.94%)'
                                             : '#FFFFFF',
-                                        border: isActive ? 'none' : '1px solid hsla(0,0%,89%,1)',
+                                        // Constant width, colour-only change: toggling the border off
+                                        // let transition-all animate it back from currentColor (black)
+                                        // at medium width, which flashed a dark edge on deselect.
+                                        border: isActive ? '1px solid transparent' : '1px solid hsla(0,0%,89%,1)',
                                         boxShadow: isActive
                                             ? '-3px -3px 15px -2px hsla(29,100%,44%,0.26) inset'
                                             : '0px 1px 3px 0px rgba(0,0,0,0.04)',
@@ -251,12 +254,13 @@ const RentalProcess = ({ cmsData = null }) => {
                                 <div
                                     key={`mobile-step-${index}`}
                                     onClick={() => setActiveStep(index)}
-                                    className={`relative cursor-pointer transition-all duration-300 rounded-[1.2rem] overflow-hidden flex-1 flex flex-col justify-center ${isActive ? "" : "bg-white border border-[#E5E5E7]"}`}
+                                    className="relative cursor-pointer transition-all duration-300 rounded-[1.2rem] overflow-hidden flex-1 flex flex-col justify-center bg-white"
                                     style={{
                                         height: isActive ? '118px' : 'auto',
                                         padding: '20px 16px',
                                         background: isActive ? 'linear-gradient(125.34deg, rgba(255,207,70,0.5) 1.25%, rgba(255,185,27,0.9) 98.94%)' : undefined,
                                         boxShadow: isActive ? '-3px -3px 15px -2px hsla(29, 100%, 44%, 0.26) inset' : undefined,
+                                        border: isActive ? '1px solid transparent' : '1px solid #E5E5E7',
                                     }}
                                 >
                                     <div className="flex flex-col">
@@ -314,13 +318,13 @@ const RentalProcess = ({ cmsData = null }) => {
                                 <div
                                     key={`desktop-step-${index}`}
                                     onClick={() => setActiveStep(index)}
-                                    className={`relative cursor-pointer transition-all duration-300 rounded-2xl overflow-hidden ${isActive ? "" : "bg-white border-[1.2px] border-[hsla(0,0%,93%,1)]"}`}
+                                    className="relative cursor-pointer transition-all duration-300 rounded-2xl overflow-hidden"
                                     style={{
                                         width: '590px',
                                         height: isActive ? 'auto' : '92px',
                                         background: isActive ? 'linear-gradient(125.34deg, rgba(255, 207, 70, 0.5) 1.25%, rgba(255, 185, 27, 0.9) 98.94%)' : 'hsla(0,0%,100%,1)',
                                         boxShadow: isActive ? '-3px -3px 15px -2px hsla(29, 100%, 44%, 0.26) inset' : undefined,
-                                        border: isActive ? 'none' : undefined,
+                                        border: isActive ? '1.2px solid transparent' : '1.2px solid hsla(0,0%,93%,1)',
                                     }}
                                 >
                                     <div className={`flex flex-col h-full ${isActive ? 'justify-between' : 'justify-center'}`}>

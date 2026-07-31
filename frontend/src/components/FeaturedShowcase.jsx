@@ -118,7 +118,7 @@ const BannerCarousel = ({ banners, current, setCurrent, height = "387px", produc
                                 className="group flex items-center justify-center rounded-full bg-[hsla(0,0%,96%,1)] hover:bg-[hsla(0,0%,85%,1)] hover:scale-110 transition-all duration-200 shrink-0"
                                 style={{ width: "24px", height: "24px", padding: "2.25px" }}
                             >
-                                <ChevronLeftIcon className="w-[19.5px] h-[19.5px] text-[#1D1D1F] group-hover:text-[#1D1D1F] transition-colors duration-200" />
+                                <ChevronLeftIcon strokeWidth={2.5} className="w-[19.5px] h-[19.5px] text-[#1D1D1F] group-hover:text-[#1D1D1F] transition-colors duration-200" />
                             </button>
                             <h3 className="text-white text-[24px] font-bold tracking-tight text-center" style={{ fontFamily: "'Mona Sans', sans-serif" }}>
                                 {slide.title}
@@ -128,7 +128,7 @@ const BannerCarousel = ({ banners, current, setCurrent, height = "387px", produc
                                 className="group flex items-center justify-center rounded-full bg-[hsla(0,0%,96%,1)] hover:bg-[hsla(0,0%,85%,1)] hover:scale-110 transition-all duration-200 shrink-0"
                                 style={{ width: "24px", height: "24px", padding: "2.25px" }}
                             >
-                                <ChevronRightIcon className="w-[19.5px] h-[19.5px] text-[#1D1D1F] group-hover:text-[#1D1D1F] transition-colors duration-200" />
+                                <ChevronRightIcon strokeWidth={2.5} className="w-[19.5px] h-[19.5px] text-[#1D1D1F] group-hover:text-[#1D1D1F] transition-colors duration-200" />
                             </button>
                         </div>
                         <p className="text-white/80 text-[14px] font-medium leading-tight text-center">
@@ -218,7 +218,7 @@ const ShowcaseProductCard = ({ product, index, isDesktop, handleAddToCart }) => 
                     className="relative bg-white w-full flex items-center justify-center overflow-hidden shrink-0"
                     style={{
                         height: isDesktop ? 282 : 184,
-                        borderRadius: "20px 20px 0 0",
+                        borderRadius: "20px",
                         borderBottom: "1px solid hsla(0, 0%, 93%, 1)",
                         backgroundColor: isHovered ? "hsla(0,0%,98%,1)" : "hsla(0, 0%, 100%, 1)",
                         transition: "background-color 0.4s",

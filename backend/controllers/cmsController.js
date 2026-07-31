@@ -115,9 +115,17 @@ const updatePage = asyncHandler(async (req, res) => {
         // Categories Page
         'categoriesPageTitle', 'categoriesPageSubtitle', 'categoriesGrid',
 
-        // Product Page
-        'productPageBenefits', 'productPageDeliveryText', 'productPageDiscountText', 
+        // Product Page — every field the editor sends must be listed here, or the
+        // save silently drops it while still reporting success.
+        'productPageBenefits', 'productPageDeliveryText', 'productPageDiscountText',
+        'productPageCtaText', 'productPageCompareLinkText', 'productPagePriceBreakdownText',
+        'productPageTenureSliderLabel', 'productPageDepositLabel', 'productPageKycNote',
+        'productPageBenefitsHeading', 'productPageTestimonialsHeading',
+        'productPageFaqHeading', 'productPageFaqSubheading',
+        'productPageRelatedHeading', 'productPageGlobalRelatedIds',
         'productPageEnableCompare', 'productPageEnableRelated', 'productPageEnableFaq', 'productPageEnableTestimonials',
+        'productPageEnableRating', 'productPageEnablePriceBreakdown',
+        'productPageEnableTenureSlider', 'productPageEnableQuantity',
 
         // SEO
         'metaTitle', 'metaDescription', 'publishStatus', 'scheduledPublishTime',

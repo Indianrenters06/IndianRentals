@@ -44,7 +44,6 @@ export default function ProductDetailPage() {
     const [activeTab, setActiveTab] = useState('Product Details');
     const [openFaq, setOpenFaq] = useState(0);
     const [thumbsSwiper, setThumbsSwiper] = useState(null);
-    const [isRentHovered, setIsRentHovered] = useState(false);
     const [isCompareOpen, setIsCompareOpen] = useState(false);
     const [isCancellationOpen, setIsCancellationOpen] = useState(false);
     const [reviewRating, setReviewRating] = useState(0);
@@ -464,7 +463,7 @@ export default function ProductDetailPage() {
                                                 whiteSpace: 'nowrap'
                                             }}
                                         >
-                                            Select your <span
+                                            <span
                                                 style={{
                                                     textDecoration: 'underline',
                                                     textDecorationStyle: 'solid',
@@ -473,7 +472,7 @@ export default function ProductDetailPage() {
                                                     textDecorationSkipInk: 'auto'
                                                 }}
                                             >
-                                                minimum rental period
+                                                {pageLayout?.productPageTenureSliderLabel || 'Select your minimum rental period'}
                                             </span>
                                         </h3>
                                         <span className="text-[16px] font-semibold text-[#1f1f1f] tracking-[-0.4px]">{duration === 1 ? '1 Month' : `${duration} Months`}</span>
@@ -496,24 +495,32 @@ export default function ProductDetailPage() {
 
                                             return (
                                                 <>
-                                                    {/* Track */}
-                                                    <div className="relative w-full flex items-center" style={{ height: '4px' }}>
+                                                    {/* Track — Figma node I23805:12116;23337:14508;23337:14400.
+                                                        Solid orange bar with a 1.2px border; the radii far exceed
+                                                        the 3.726px height, so both ends render as full pill caps. */}
+                                                    <div className="relative w-full flex items-center" style={{ height: '6.126px' }}>
                                                         <div
-                                                            className="absolute w-full rounded-none"
+                                                            className="absolute w-full"
                                                             style={{
-                                                                height: '3.73px',
-                                                                background: `linear-gradient(to right, hsla(24, 91%, 48%, 1) ${activePct}%, hsla(0, 0%, 93%, 1) ${activePct}%)`
+                                                                // Figma gives the bar a 3.726px box plus a 1.2px stroke.
+                                                                // Read as an outside stroke that totals 6.126px; as a CSS
+                                                                // border it sat inside the box under border-box and added
+                                                                // nothing, so the height carries the full value instead.
+                                                                height: '6.126px',
+                                                                boxSizing: 'border-box',
+                                                                background: 'var(--color-orange-600, #e26e00)',
+                                                                borderRadius: '31.846px 38.85px 31.846px 31.846px'
                                                             }}
                                                         />
 
-                                                        {/* Single Active Thumb */}
+                                                        {/* Thumb — Figma 16px ring over a 10px white centre (3px ring). */}
                                                         <div
                                                             className="absolute rounded-full bg-white transition-all duration-300 z-10"
                                                             style={{
-                                                                width: '18px',
-                                                                height: '18px',
-                                                                border: '4px solid hsla(24, 91%, 48%, 1)',
-                                                                left: `calc(${activePct}% - 9px)`
+                                                                width: '16px',
+                                                                height: '16px',
+                                                                border: '3px solid var(--color-orange-600, #e26e00)',
+                                                                left: `calc(${activePct}% - 8px)`
                                                             }}
                                                         />
 
@@ -547,14 +554,18 @@ export default function ProductDetailPage() {
                                                                         top: '0px'
                                                                     }}
                                                                 >
-                                                                    <div style={{ width: '1px', height: '6px', background: 'hsla(0, 0%, 75%, 1)', marginBottom: '5px' }} />
+                                                                    {/* Tick + label per Figma: 8.424px rule, 12px/1.2
+                                                                        Regular at -0.48px tracking in grey-700, and no
+                                                                        gap between the rule and its label. */}
+                                                                    <div style={{ width: '1px', height: '8.424px', background: 'hsla(0, 0%, 75%, 1)' }} />
                                                                     <span
                                                                         style={{
                                                                             fontFamily: '"Mona Sans", sans-serif',
-                                                                            fontSize: '13px',
+                                                                            fontSize: '12px',
                                                                             fontWeight: 400,
-                                                                            color: 'hsla(0, 0%, 12%, 1)',
-                                                                            lineHeight: '1'
+                                                                            color: '#333333',
+                                                                            lineHeight: 1.2,
+                                                                            letterSpacing: '-0.48px'
                                                                         }}
                                                                     >
                                                                         {labels[step - 1]}
@@ -589,7 +600,7 @@ export default function ProductDetailPage() {
                                                 whiteSpace: 'nowrap'
                                             }}
                                         >
-                                            price breakdown
+                                            {pageLayout?.productPagePriceBreakdownText || 'price breakdown'}
                                         </Link>
                                         {(pageLayout?.productPageEnableCompare !== false) && (
                                             <button
@@ -611,7 +622,7 @@ export default function ProductDetailPage() {
                                                     padding: 0
                                                 }}
                                             >
-                                                compare all tenures
+                                                {pageLayout?.productPageCompareLinkText || 'compare all tenures'}
                                             </button>
                                         )}
                                     </div>
@@ -763,7 +774,7 @@ export default function ProductDetailPage() {
                                             opacity: 1
                                         }}
                                     >
-                                        What’s included in your plan
+                                        {pageLayout?.productPageBenefitsHeading || 'What’s included in your plan'}
                                     </h4>
                                 </div>
 
@@ -840,7 +851,7 @@ export default function ProductDetailPage() {
                                     }}
                                 >
                                     <span style={{ fontFamily: '"Mona Sans", sans-serif', fontWeight: 600, fontSize: '12px', lineHeight: '16px', letterSpacing: '-0.4px', color: '#0859c5' }}>
-                                        100% Refundable Deposit
+                                        {pageLayout?.productPageDepositLabel || '100% Refundable Deposit'}
                                     </span>
                                     <span style={{ fontFamily: '"Mona Sans", sans-serif', fontWeight: 600, fontSize: '16px', lineHeight: '23px', letterSpacing: '-0.4px', color: '#0859c5', whiteSpace: 'nowrap' }}>
                                         ₹{product.securityDeposit ? `${product.securityDeposit.toLocaleString('en-IN')}/-` : '20,000/-'}
@@ -878,29 +889,8 @@ export default function ProductDetailPage() {
                             {/* Primary CTA */}
                             <button
                                 onClick={handleAddToCart}
-                                onMouseEnter={() => setIsRentHovered(true)}
-                                onMouseLeave={() => setIsRentHovered(false)}
-                                className="active:scale-[0.98]"
-                                style={{
-                                    width: '100%',
-                                    height: '45px',
-                                    paddingLeft: '20px',
-                                    paddingRight: '20px',
-                                    paddingTop: '6px',
-                                    paddingBottom: '6px',
-                                    background: isRentHovered ? 'hsla(44, 100%, 60%, 1)' : 'hsla(44, 100%, 64%, 1)',
-                                    borderRadius: '9999px',
-                                    boxShadow: isRentHovered ? 'none' : '0px 3px 7px 0px hsla(0, 0%, 55%, 0.05), 0px 13px 13px 0px hsla(0, 0%, 55%, 0.04), 0px 28px 17px 0px hsla(0, 0%, 55%, 0.02), 0px 50px 20px 0px hsla(0, 0%, 55%, 0.01), 0px 78px 22px 0px hsla(0, 0%, 55%, 0)',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                    gap: '2px',
-                                    border: 'none',
-                                    borderBottom: isRentHovered ? 'none' : '1px solid hsla(44, 100%, 54%, 1)',
-                                    cursor: 'pointer',
-                                    transform: isRentHovered ? 'translateY(1px)' : 'none',
-                                    transition: 'all 0.1s ease-out'
-                                }}
+                                className="btn-primary w-full gap-[2px]"
+                                style={{ height: '45px' }}
                             >
                                 <span style={{
                                     fontFamily: '"Mona Sans", sans-serif',
@@ -910,7 +900,7 @@ export default function ProductDetailPage() {
                                     color: '#333333'
                                 }}>
                                     <span className="lg:hidden">Book Your Plan</span>
-                                    <span className="hidden lg:inline">Rent Now</span>
+                                    <span className="hidden lg:inline">{pageLayout?.productPageCtaText || 'Rent Now'}</span>
                                 </span>
                             </button>
 
@@ -1251,6 +1241,8 @@ export default function ProductDetailPage() {
             {pageLayout?.productPageEnableRelated !== false && (
                 <BestRentedProducts
                     customProducts={product.pageLayout?.relatedProducts?.length > 0 ? product.pageLayout.relatedProducts : null}
+                    titleOverride={pageLayout?.productPageRelatedHeading || null}
+                    productIdsOverride={pageLayout?.productPageGlobalRelatedIds || null}
                 />
             )}
 
@@ -1258,7 +1250,11 @@ export default function ProductDetailPage() {
 
             {pageLayout?.productPageEnableFaq !== false && (
                 product.faqs && product.faqs.length > 0 ? (
-                    <FaqSection cmsData={{ faqItems: product.faqs, faqTitle: "Product FAQs", faqSubtitle: "Specific questions about this product." }} />
+                    <FaqSection cmsData={{
+                        faqItems: product.faqs,
+                        faqTitle: pageLayout?.productPageFaqHeading || "Product FAQs",
+                        faqSubtitle: pageLayout?.productPageFaqSubheading || "Specific questions about this product.",
+                    }} />
                 ) : (
                     <FaqSection limit={5} />
                 )

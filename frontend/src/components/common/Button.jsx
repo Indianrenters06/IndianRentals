@@ -31,13 +31,17 @@ const Button = ({
   ...props
 }) => {
 
-  const baseClasses = 'inline-flex items-center justify-center font-semibold text-sm transition-all duration-200 cursor-pointer text-center rounded-md border h-10 w-full px-6 py-2 tablet:h-9 tablet:w-auto tablet:min-w-[110px] tablet:px-5.5 tablet:py-2.5 desktop:h-[35px] desktop:min-w-[120px] desktop:px-5 desktop:py-2';
+  // Shared hover/press motion, kept identical to .btn-primary in globals.css so every
+  // button in the app reacts the same way: lift + shadow on hover, press down on active.
+  const motionClasses = 'hover:shadow-md hover:-translate-y-[1px] active:shadow-none active:translate-y-0 active:scale-95 disabled:shadow-none disabled:transform-none';
+
+  const baseClasses = `inline-flex items-center justify-center font-semibold text-sm transition-all duration-300 cursor-pointer text-center rounded-md border h-10 w-full px-6 py-2 tablet:h-9 tablet:w-auto tablet:min-w-[110px] tablet:px-5.5 tablet:py-2.5 desktop:h-[35px] desktop:min-w-[120px] desktop:px-5 desktop:py-2 ${motionClasses}`;
 
   const variants = {
     yellow: `${baseClasses} bg-orange-300 text-black border-orange-300 hover:bg-orange-400 hover:border-orange-400 active:bg-orange-500 active:border-orange-500 focus:outline-none focus:ring-2 focus:ring-blue-info focus:ring-offset-2 focus:border-blue-info disabled:bg-orange-100 disabled:text-grey-400 disabled:border-orange-100 disabled:opacity-50 disabled:cursor-not-allowed`,
     black: `${baseClasses} bg-white text-black border-black hover:bg-black hover:text-white active:bg-grey-700 active:border-grey-700 active:text-white focus:outline-none focus:ring-2 focus:ring-blue-info focus:ring-offset-2 disabled:bg-white disabled:text-grey-300 disabled:border-grey-300 disabled:opacity-50 disabled:cursor-not-allowed`,
     blue: `${baseClasses} bg-blue-secondary text-white border-blue-secondary hover:bg-[#0689ff] hover:border-[#0689ff] active:bg-[#0859c5] active:border-[#0859c5] focus:outline-none focus:ring-2 focus:ring-orange-300 focus:ring-offset-2 disabled:bg-blue-50 disabled:text-grey-400 disabled:border-blue-50 disabled:opacity-50 disabled:cursor-not-allowed`,
-    pill: 'inline-flex items-center justify-center font-semibold text-sm transition-all duration-200 cursor-pointer text-center rounded-full border border-grey-700 bg-white text-grey-700 px-5 py-2 hover:bg-grey-100 [&.selected]:bg-grey-700 [&.selected]:text-white [&.selected]:border-grey-700 focus:outline-none focus:ring-2 focus:ring-blue-info focus:ring-offset-2 disabled:bg-grey-50 disabled:text-grey-300 disabled:border-grey-200 disabled:opacity-50 disabled:cursor-not-allowed',
+    pill: `inline-flex items-center justify-center font-semibold text-sm transition-all duration-300 cursor-pointer text-center rounded-full border border-grey-700 bg-white text-grey-700 px-5 py-2 hover:bg-grey-100 ${motionClasses} [&.selected]:bg-grey-700 [&.selected]:text-white [&.selected]:border-grey-700 focus:outline-none focus:ring-2 focus:ring-blue-info focus:ring-offset-2 disabled:bg-grey-50 disabled:text-grey-300 disabled:border-grey-200 disabled:opacity-50 disabled:cursor-not-allowed`,
     outline: `${baseClasses} bg-transparent text-grey-800 border-grey-200 hover:border-grey-800`,
     ghost: `${baseClasses} bg-transparent text-grey-600 border-transparent hover:bg-grey-50 border-0`,
   };

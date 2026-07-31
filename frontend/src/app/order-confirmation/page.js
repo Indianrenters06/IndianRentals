@@ -81,7 +81,7 @@ function OrderConfirmationContent() {
                 <div className="flex gap-4 flex-col sm:flex-row">
                     <Link
                         href="/"
-                        className="flex-1 flex items-center justify-center gap-2 bg-[#FFD740] hover:bg-[#FFC400] text-[#1D1D1F] px-6 py-3.5 rounded-full font-medium transition-colors"
+                        className="btn-primary flex-1 gap-2 px-6 py-3.5"
                     >
                         <FaHome /> Back to Home
                     </Link>

@@ -304,14 +304,14 @@ const Hero = () => {
                             style={{ boxShadow: '0px 8px 2px 0px rgba(133,133,133,0), 0px 5px 2px 0px rgba(133,133,133,0.01), 0px 3px 2px 0px rgba(133,133,133,0.05), 0px 1px 1px 0px rgba(133,133,133,0.09), 0px 0px 1px 0px rgba(133,133,133,0.1)' }}
                             className="pointer-events-auto w-[26px] h-[40px] rounded-[9px] flex items-center justify-center bg-[hsla(0,0%,93%,1)] hover:bg-[hsla(0,0%,85%,1)] active:scale-95 transition-all opacity-100 group/btn"
                         >
-                            <ChevronLeftIcon className="w-5 h-5 text-gray-800 group-hover/btn:text-gray-900 transition-colors" />
+                            <ChevronLeftIcon strokeWidth={2.5} className="w-5 h-5 text-gray-800 group-hover/btn:text-gray-900 transition-colors" />
                         </button>
                         <button
                             onClick={next}
                             style={{ boxShadow: '0px 8px 2px 0px rgba(133,133,133,0), 0px 5px 2px 0px rgba(133,133,133,0.01), 0px 3px 2px 0px rgba(133,133,133,0.05), 0px 1px 1px 0px rgba(133,133,133,0.09), 0px 0px 1px 0px rgba(133,133,133,0.1)' }}
                             className="pointer-events-auto w-[26px] h-[40px] rounded-[9px] flex items-center justify-center bg-[hsla(0,0%,93%,1)] hover:bg-[hsla(0,0%,85%,1)] active:scale-95 transition-all opacity-100 group/btn"
                         >
-                            <ChevronRightIcon className="w-5 h-5 text-gray-800 group-hover/btn:text-gray-900 transition-colors" />
+                            <ChevronRightIcon strokeWidth={2.5} className="w-5 h-5 text-gray-800 group-hover/btn:text-gray-900 transition-colors" />
                         </button>
                     </div>
 
@@ -361,8 +361,8 @@ const SlideItem = ({ slide, isActive, width, viewType, slideHeight }) => {
                 </p>
                 <div>
                     <div
-                        className="inline-flex items-center justify-center shadow-lg active:scale-95 transition-transform"
-                        style={{ background: '#FFCF46', borderRadius: '9999px', padding: '6px 20px', fontFamily: "'Mona Sans', sans-serif", fontWeight: 500, color: '#333333', fontSize: '16px', lineHeight: '23px' }}
+                        className="btn-primary inline-flex shadow-lg"
+                        style={{ fontFamily: "'Mona Sans', sans-serif", fontWeight: 500, color: '#333333', fontSize: '16px', lineHeight: '23px' }}
                     >
                         {(slide.ctaText || "Rent Now").replace(/ [^\w\s]+.*$| [→➔➜]|^.*[→➔➜]$| \->/g, "").trim()}
                     </div>
@@ -434,10 +434,8 @@ const SlideItem = ({ slide, isActive, width, viewType, slideHeight }) => {
                 </p>
                 <div>
                     <div
-                        className={`inline-flex items-center justify-center shadow-lg active:scale-95 transition-transform ${isTablet ? 'px-8 py-2' : 'px-10 py-3'}`}
+                        className={`btn-primary inline-flex shadow-lg ${isTablet ? 'px-8 py-2' : 'px-10 py-3'}`}
                         style={{
-                            background: "#FFCF46",
-                            borderRadius: "9999px",
                             fontFamily: "'Mona Sans', sans-serif",
                             fontWeight: 500,
                             color: "#333333",

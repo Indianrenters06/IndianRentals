@@ -2,31 +2,66 @@
 
 import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
+import Link from 'next/link';
 import { PiSmileySad } from 'react-icons/pi';
 
-import { getMyOrders } from '../../../services/orderService';
-
-// Exact info icon from Figma "My order" (node 23253:9392), 13.33px.
-const InfoIcon = () => (
-    <svg width="13.333" height="13.333" viewBox="0 0 13.3333 13.3333" fill="none" xmlns="http://www.w3.org/2000/svg" className="shrink-0">
-        <path d="M6.66667 1.25C5.59535 1.25 4.54809 1.56768 3.65733 2.16287C2.76656 2.75806 2.07229 3.60403 1.66232 4.5938C1.25234 5.58356 1.14508 6.67268 1.35408 7.72341C1.56308 8.77414 2.07897 9.73929 2.83651 10.4968C3.59404 11.2544 4.5592 11.7703 5.60993 11.9793C6.66066 12.1883 7.74977 12.081 8.73954 11.671C9.7293 11.261 10.5753 10.5668 11.1705 9.67601C11.7657 8.78524 12.0833 7.73798 12.0833 6.66667C12.0818 5.23054 11.5106 3.85367 10.4952 2.83818C9.47966 1.82269 8.10279 1.25152 6.66667 1.25ZM6.66667 11.25C5.76017 11.25 4.87403 10.9812 4.1203 10.4776C3.36658 9.97395 2.77912 9.25813 2.43222 8.42063C2.08532 7.58314 1.99455 6.66158 2.1714 5.7725C2.34825 4.88342 2.78477 4.06675 3.42576 3.42576C4.06675 2.78477 4.88342 2.34825 5.7725 2.1714C6.66158 1.99455 7.58314 2.08532 8.42063 2.43222C9.25813 2.77912 9.97395 3.36658 10.4776 4.1203C10.9812 4.87403 11.25 5.76017 11.25 6.66667C11.2486 7.88182 10.7653 9.04681 9.90605 9.90605C9.04681 10.7653 7.88182 11.2486 6.66667 11.25ZM7.5 9.16667C7.5 9.27717 7.4561 9.38316 7.37796 9.4613C7.29982 9.53944 7.19384 9.58333 7.08333 9.58333C6.86232 9.58333 6.65036 9.49554 6.49408 9.33926C6.3378 9.18298 6.25 8.97101 6.25 8.75V6.66667C6.13949 6.66667 6.03351 6.62277 5.95537 6.54463C5.87723 6.46649 5.83333 6.36051 5.83333 6.25C5.83333 6.13949 5.87723 6.03351 5.95537 5.95537C6.03351 5.87723 6.13949 5.83333 6.25 5.83333C6.47101 5.83333 6.68298 5.92113 6.83926 6.07741C6.99554 6.23369 7.08333 6.44565 7.08333 6.66667V8.75C7.19384 8.75 7.29982 8.7939 7.37796 8.87204C7.4561 8.95018 7.5 9.05616 7.5 9.16667ZM5.83333 4.375C5.83333 4.25139 5.86999 4.13055 5.93866 4.02777C6.00734 3.92499 6.10495 3.84488 6.21916 3.79758C6.33336 3.75027 6.45903 3.73789 6.58027 3.76201C6.7015 3.78613 6.81287 3.84565 6.90028 3.93306C6.98768 4.02047 7.04721 4.13183 7.07132 4.25307C7.09544 4.37431 7.08306 4.49997 7.03576 4.61418C6.98845 4.72838 6.90835 4.82599 6.80556 4.89467C6.70278 4.96334 6.58195 5 6.45833 5C6.29257 5 6.1336 4.93415 6.01639 4.81694C5.89918 4.69973 5.83333 4.54076 5.83333 4.375Z" fill="#757575" />
-    </svg>
-);
+import { getMyOrders, cancelOrder } from '../../../services/orderService';
+import { getKYCStatus } from '../../../services/kycService';
+import InfoIcon from '../../../components/common/InfoIcon';
 
 // Status pill — Figma "Process-tags" shape (rounded-16, px-8 py-4, 12px semibold), colour per status.
 const StatusTag = ({ status }) => {
     const map = {
-        'Active': { label: 'Active Order', cls: 'bg-[#edfaff] border-[#0075ff] text-[#0075ff]' },
-        'Pending': { label: 'Under Review', cls: 'bg-[#fff3d3] border-[#ff7a00] text-[#ff7a00]' },
+        'Active': { label: 'Active Order', cls: 'bg-[#edfaff] border-[#0689ff] text-[#0689ff]' },
+        'KYC Pending': { label: 'In Process', cls: 'bg-[#fff3d3] border-[#ff7a00] text-[#ff7a00]' },
         'Under Review': { label: 'Under Review', cls: 'bg-[#fff3d3] border-[#ff7a00] text-[#ff7a00]' },
-        'Inactive': { label: 'Inactive Order', cls: 'bg-[#f6f6f6] border-[#afafaf] text-[#757575]' },
+        'Inactive': { label: 'Inactive Order', cls: 'bg-[#f6f6f6] border-[#545454] text-[#545454]' },
         'Failed': { label: 'Order Failed', cls: 'bg-[#fdecec] border-[#ed2115] text-[#ed2115]' },
     };
-    const { label, cls } = map[status] || map['Pending'];
+    const { label, cls } = map[status] || map['Under Review'];
     return (
         <span className={`shrink-0 whitespace-nowrap rounded-[16px] border px-2 py-1 text-[12px] font-semibold leading-4 tracking-[-0.4px] ${cls}`}>
             {label}
         </span>
+    );
+};
+
+// Rental.status (backend enum) → the status vocabulary the Figma card is drawn for.
+const STATUS_MAP = {
+    Pending: 'Under Review',
+    Approved: 'Under Review',
+    Shipped: 'Under Review',
+    Delivered: 'Active',
+    Active: 'Active',
+    Returned: 'Inactive',
+    // Figma reserves "Order Failed" for KYC rejection ("Re-submit KYC Form"),
+    // so a customer cancellation belongs under Inactive Orders.
+    Cancelled: 'Inactive',
+};
+
+// Figma splits every not-yet-delivered order by the customer's KYC state rather than the
+// rental's: no documents yet -> "In Process", submitted -> "Under Review", rejected -> "Order Failed".
+const deriveStatus = (rental, kycStatus) => {
+    const fromRental = STATUS_MAP[rental.status] || 'Under Review';
+    if (fromRental !== 'Under Review') return fromRental; // already Active / Inactive
+    if (kycStatus === 'rejected') return 'Failed';
+    if (kycStatus === 'approved' || kycStatus === 'pending' || kycStatus === 'review') return 'Under Review';
+    return 'KYC Pending'; // no record, not submitted, or incomplete
+};
+
+const ordinalSuffix = (day) => (day > 3 && day < 21 ? 'th' : ['th', 'st', 'nd', 'rd'][day % 10] || 'th');
+
+// "25th Aug 2025" — Figma baselines the ordinal at 7.74px against the 12px date, it is not raised.
+const OrdinalDate = ({ value }) => {
+    const d = new Date(value);
+    if (Number.isNaN(d.getTime())) return null;
+    const day = d.getDate();
+    return (
+        <>
+            {day}
+            <span className="text-[7.74px] font-semibold">{ordinalSuffix(day)}</span>
+            {` ${d.toLocaleDateString('en-GB', { month: 'short' })} ${d.getFullYear()}`}
+        </>
     );
 };
 
@@ -37,6 +72,19 @@ const Chip = ({ label, value, valueColor = 'text-[#333333]' }) => (
         <span className={`text-[12px] font-semibold leading-4 tracking-[-0.4px] ${valueColor}`}>{value}</span>
     </div>
 );
+
+// Card actions — Figma "Blue-Secondary-btn", the black pill, and "Secondary-Black-Btn".
+const invoicesBtn = 'flex h-[24px] w-full items-center justify-center rounded-[28px] bg-[#0075ff] px-3 py-1 text-[12px] font-semibold leading-4 tracking-[-0.4px] text-[#edfaff]';
+// The Active Orders screen (node 23280:9781) sizes the same button 127x32 rather than full-width x 24.
+const invoicesBtnActive = 'flex h-[32px] w-[127px] items-center justify-center rounded-[28px] bg-[#0075ff] px-3 py-1 text-[12px] font-semibold leading-4 tracking-[-0.4px] text-[#edfaff]';
+// Filled "Secondary-Black-Btn" (node 23280:9849) — hugs its label, 14px medium, so 28px tall.
+const rentAgainBtn = 'flex items-center justify-center rounded-[28px] bg-[#333333] py-1 pl-3 pr-2 text-[14px] font-medium leading-5 tracking-[-0.4px] text-white';
+// Figma style "Typography/text-sm/Link" is weight 700.
+const cancelLink = 'py-1 pl-3 pr-2 text-[14px] font-bold leading-5 tracking-[-0.4px] text-[#333333] underline';
+
+// The design has no per-order invoice document, only the My Invoices list — so open it scoped to this order.
+const invoiceHref = (order) => `/profile/invoices?order=${encodeURIComponent(order.id)}`;
+const rentAgainHref = (order) => (order.productId ? `/products/${order.productId}` : '/products');
 
 // One label/value column in the card header — Figma "Frame 422..427".
 const HeaderCell = ({ label, value }) => (
@@ -51,23 +99,32 @@ export default function MyOrdersPage() {
     const [viewType, setViewType] = useState('orders'); // 'orders' | 'subscriptions'
     const [orders, setOrders] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [cancelTarget, setCancelTarget] = useState(null);
+    const [cancelling, setCancelling] = useState(false);
+    const [cancelError, setCancelError] = useState('');
 
     useEffect(() => {
         const fetchOrders = async () => {
             try {
-                const data = await getMyOrders();
+                const [data, kyc] = await Promise.all([getMyOrders(), getKYCStatus()]);
+                const kycStatus = String(kyc?.status || '').toLowerCase();
+                // shippingAddress carries no name, so "Delivery to" comes from the signed-in user.
+                const stored = typeof window !== 'undefined' ? localStorage.getItem('userInfo') : null;
+                const userName = stored ? JSON.parse(stored).name : null;
                 const mappedOrders = data.map(order => ({
                     id: order._id.substring(order._id.length - 6).toUpperCase(),
                     fullId: order._id,
                     date: new Date(order.createdAt).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: '2-digit' }).replace(/ /g, '-'),
-                    deliveryTo: (order.shippingAddress && order.shippingAddress.name) ? order.shippingAddress.name : 'Customer',
+                    deliveryTo: userName || 'Customer',
                     monthlyRent: order.orderItems && order.orderItems[0] ? order.orderItems[0].price : 0,
                     securityAmount: order.orderItems && order.orderItems[0] ? order.orderItems[0].securityDeposit : 0,
                     partialAmount: order.totalPrice,
-                    status: order.isPaid ? (order.isDelivered ? 'Active' : 'Pending') : 'Inactive',
+                    status: deriveStatus(order, kycStatus),
                     productName: order.orderItems && order.orderItems[0] ? order.orderItems[0].name : 'Rental Product',
-                    planDuration: '3 months',
-                    rentalPeriod: `${new Date(order.createdAt).toLocaleDateString('en-GB')} to ...`,
+                    productId: order.orderItems && order.orderItems[0] ? order.orderItems[0].product : null,
+                    planDuration: order.rentalPeriod?.durationMonths ? `${order.rentalPeriod.durationMonths} months` : '3 months',
+                    rentalStart: order.rentalPeriod?.startDate,
+                    rentalEnd: order.rentalPeriod?.endDate,
                     image: order.orderItems && order.orderItems[0] ? order.orderItems[0].image : '/macbook-placeholder.jpg',
                 }));
                 setOrders(mappedOrders);
@@ -88,7 +145,7 @@ export default function MyOrdersPage() {
         if (viewType === 'orders') {
             if (activeTab === 'All Orders') return true;
             if (activeTab === 'KYC Under Review' && order.status === 'Under Review') return true;
-            if (activeTab === 'KYC Pending' && order.status === 'Pending') return true;
+            if (activeTab === 'KYC Pending' && order.status === 'KYC Pending') return true;
             if (activeTab === 'Active Orders' && order.status === 'Active') return true;
             if (activeTab === 'Inactive Orders' && order.status === 'Inactive') return true;
             if (activeTab === 'Order Failed' && order.status === 'Failed') return true;
@@ -100,16 +157,36 @@ export default function MyOrdersPage() {
         return false;
     });
 
+    const handleCancelConfirm = async () => {
+        if (!cancelTarget) return;
+        setCancelling(true);
+        setCancelError('');
+        try {
+            await cancelOrder(cancelTarget.fullId);
+            setOrders(prev => prev.map(o => (
+                o.fullId === cancelTarget.fullId ? { ...o, status: 'Inactive' } : o
+            )));
+            setCancelTarget(null);
+        } catch (err) {
+            setCancelError(err?.response?.data?.message || 'Could not cancel this order. Please try again.');
+        } finally {
+            setCancelling(false);
+        }
+    };
+
     const handleViewChange = (type) => {
         setViewType(type);
         setActiveTab(type === 'orders' ? 'All Orders' : 'All Subscriptions');
     };
 
+    // Figma varies one word per tab: "…has been failed…" (Order Failed), "…has been cancelled…" (Active Orders).
     const infoText = viewType === 'subscriptions'
         ? 'Once you order, Your order is automatically made into a subscription. You can extend your current subscription, cancel or renew your old subscription.'
         : activeTab === 'Order Failed'
             ? 'Please note, once the order has been failed your amount will be returned within 24-48 hours of cancellation'
-            : 'Please note, once the order has been your amount will be returned within 24-48 hours of cancellation';
+            : (activeTab === 'Active Orders' || activeTab === 'Inactive Orders')
+                ? 'Please note, once the order has been cancelled your amount will be returned within 24-48 hours of cancellation'
+                : 'Please note, once the order has been your amount will be returned within 24-48 hours of cancellation';
 
     return (
         <div className="flex flex-col gap-3">
@@ -170,12 +247,15 @@ export default function MyOrdersPage() {
                         >
                             {/* Header row */}
                             <div className="flex w-full items-center justify-between gap-4 overflow-x-auto border-b-[1.5px] border-[#e2e2e2] px-4 py-2 scrollbar-hide">
-                                <HeaderCell label="Order Date" value={order.date} />
-                                <HeaderCell label="Order No." value={order.id} />
-                                <HeaderCell label="Delivery to" value={order.deliveryTo} />
-                                <HeaderCell label="Monthly Rent" value={`₹${order.monthlyRent}/mo`} />
-                                <HeaderCell label="Security Amount" value={`₹${parseFloat(order.securityAmount || 0).toFixed(2)}`} />
-                                <HeaderCell label="Partial Amount" value={`₹${order.partialAmount}`} />
+                                {/* Figma "Frame 421": the six cells sit in one group on a fixed 53px gap, pill pushed right. */}
+                                <div className="flex shrink-0 items-center gap-[53px]">
+                                    <HeaderCell label="Order Date" value={order.date} />
+                                    <HeaderCell label="Order No." value={order.id} />
+                                    <HeaderCell label="Delivery to" value={order.deliveryTo} />
+                                    <HeaderCell label="Monthly Rent" value={`₹${order.monthlyRent}/mo`} />
+                                    <HeaderCell label="Security Amount" value={`₹${parseFloat(order.securityAmount || 0).toFixed(2)}`} />
+                                    <HeaderCell label="Partial Amount" value={`₹${order.partialAmount}`} />
+                                </div>
                                 <StatusTag status={order.status} />
                             </div>
 
@@ -192,7 +272,11 @@ export default function MyOrdersPage() {
                                         <div className="mt-1 flex items-center gap-[20px]">
                                             <Chip label="Plan Duration" value={order.planDuration} />
                                             <div className="h-5 w-px bg-[#cbcbcb]" />
-                                            <Chip label="Rental Period" value={order.rentalPeriod} valueColor="text-[#545454]" />
+                                            <Chip
+                                                label="Rental Period"
+                                                value={<><OrdinalDate value={order.rentalStart} /> to <OrdinalDate value={order.rentalEnd} /></>}
+                                                valueColor="text-[#545454]"
+                                            />
                                         </div>
                                     </div>
                                 </div>
@@ -202,29 +286,63 @@ export default function MyOrdersPage() {
                                     {viewType === 'subscriptions' ? (
                                         order.status === 'Inactive' ? (
                                             <>
-                                                <button className="flex h-[24px] w-full items-center justify-center rounded-[28px] bg-[#333333] px-3 py-1 text-[12px] font-semibold leading-4 tracking-[-0.4px] text-white">Rent Again</button>
-                                                <button className="flex h-[24px] w-full items-center justify-center rounded-[28px] bg-[#0075ff] px-3 py-1 text-[12px] font-semibold leading-4 tracking-[-0.4px] text-[#edfaff]">Invoices</button>
+                                                <Link href={rentAgainHref(order)} className={rentAgainBtn}>Rent Again</Link>
+                                                <Link href={invoiceHref(order)} className={invoicesBtn}>Invoices</Link>
                                             </>
                                         ) : (
                                             <>
-                                                <button className="flex h-[24px] w-full items-center justify-center rounded-[28px] bg-[#0075ff] px-3 py-1 text-[12px] font-semibold leading-4 tracking-[-0.4px] text-[#edfaff]">Extend Tenure</button>
-                                                <button className="py-1 pl-3 pr-2 text-[14px] font-medium leading-5 tracking-[-0.4px] text-[#333333] underline">Cancel My Order</button>
+                                                <button className={invoicesBtn}>Extend Tenure</button>
+                                                <button onClick={() => { setCancelError(''); setCancelTarget(order); }} className={cancelLink}>Cancel My Order</button>
                                             </>
                                         )
                                     ) : order.status === 'Inactive' ? (
-                                        <button className="flex h-[24px] w-full items-center justify-center rounded-[28px] bg-[#333333] px-3 py-1 text-[12px] font-semibold leading-4 tracking-[-0.4px] text-white">Rent Again</button>
+                                        <Link href={rentAgainHref(order)} className={rentAgainBtn}>Rent Again</Link>
                                     ) : order.status === 'Failed' ? (
-                                        <button className="flex h-[24px] w-full items-center justify-center rounded-[28px] bg-[#333333] px-3 py-1 text-[12px] font-semibold leading-4 tracking-[-0.4px] text-white">Re-submit KYC</button>
+                                        <Link href="/profile/kyc" className={rentAgainBtn}>Re-submit KYC Form</Link>
+                                    ) : order.status === 'KYC Pending' ? (
+                                        /* Nothing has been processed yet, so Figma shows no Invoices button here. */
+                                        <button onClick={() => { setCancelError(''); setCancelTarget(order); }} className={cancelLink}>Cancel My Order</button>
                                     ) : (
                                         <>
-                                            <button className="flex h-[24px] w-full items-center justify-center rounded-[28px] bg-[#0075ff] px-3 py-1 text-[12px] font-semibold leading-4 tracking-[-0.4px] text-[#edfaff]">Invoices</button>
-                                            <button className="py-1 pl-3 pr-2 text-[14px] font-medium leading-5 tracking-[-0.4px] text-[#333333] underline">Cancel My Order</button>
+                                            <Link href={invoiceHref(order)} className={order.status === 'Active' ? invoicesBtnActive : invoicesBtn}>Invoices</Link>
+                                            <button onClick={() => { setCancelError(''); setCancelTarget(order); }} className={cancelLink}>Cancel My Order</button>
                                         </>
                                     )}
                                 </div>
                             </div>
                         </div>
                     ))}
+                </div>
+            )}
+
+            {/* Cancel confirmation — cancelling is irreversible, so never fire it straight off the link. */}
+            {cancelTarget && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
+                    <div role="dialog" aria-modal="true" className="w-full max-w-[400px] rounded-[16px] border-[1.5px] border-[#e2e2e2] bg-white p-5">
+                        <p className="text-[16px] font-semibold leading-[23px] tracking-[-0.4px] text-[#333333]">Cancel this order?</p>
+                        <p className="mt-2 text-[12px] font-semibold leading-4 tracking-[-0.4px] text-[#757575]">
+                            Order #{cancelTarget.id} — {cancelTarget.productName}. Any amount paid is returned within 24-48 hours of cancellation. This cannot be undone.
+                        </p>
+                        {cancelError && (
+                            <p className="mt-3 text-[12px] font-semibold leading-4 tracking-[-0.4px] text-[#ed2115]">{cancelError}</p>
+                        )}
+                        <div className="mt-5 flex items-center justify-end gap-2">
+                            <button
+                                onClick={() => setCancelTarget(null)}
+                                disabled={cancelling}
+                                className="rounded-[28px] bg-[#eeeeee] px-4 py-[6px] text-[12px] font-semibold leading-4 tracking-[-0.4px] text-[#333333] disabled:opacity-50"
+                            >
+                                Keep Order
+                            </button>
+                            <button
+                                onClick={handleCancelConfirm}
+                                disabled={cancelling}
+                                className="rounded-[28px] bg-[#ed2115] px-4 py-[6px] text-[12px] font-semibold leading-4 tracking-[-0.4px] text-white disabled:opacity-50"
+                            >
+                                {cancelling ? 'Cancelling…' : 'Yes, Cancel Order'}
+                            </button>
+                        </div>
+                    </div>
                 </div>
             )}
         </div>

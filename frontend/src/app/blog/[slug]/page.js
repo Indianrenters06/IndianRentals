@@ -228,7 +228,7 @@ export default function BlogPostPage() {
                                 By subscribing you agree to with our{' '}
                                 <Link href="/privacy" className="font-bold underline">Privacy Policy</Link>.
                             </p>
-                            <button type="submit" className="mt-1 bg-[#ffcf46] text-[#1f1f1f] text-[12px] md:text-[14px] font-medium px-4 py-2 rounded-full w-full hover:brightness-95 transition">
+                            <button type="submit" className="btn-primary mt-1 text-[12px] md:text-[14px] px-4 py-2 w-full">
                                 Subscribe
                             </button>
                         </form>

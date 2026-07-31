@@ -6,7 +6,8 @@ const {
     updateRentalToPaid,
     getMyRentals,
     getRentals,
-    updateRentalStatus
+    updateRentalStatus,
+    cancelMyRental
 } = require('../controllers/rentalController');
 const { protect, admin } = require('../middleware/authMiddleware');
 
@@ -21,5 +22,7 @@ router.route('/:id').get(protect, getRentalById);
 router.route('/:id/pay').put(protect, updateRentalToPaid);
 
 router.route('/:id/status').put(protect, admin, updateRentalStatus);
+
+router.route('/:id/cancel').put(protect, cancelMyRental);
 
 module.exports = router;

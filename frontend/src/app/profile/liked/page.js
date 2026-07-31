@@ -42,7 +42,7 @@ export default function WishlistPage() {
 
                 <Link
                     href="/"
-                    className="bg-[#FFCF46] hover:brightness-105 text-[#1f1f1f] font-medium text-[12px] md:text-[16px] py-1.5 md:py-2 px-5 rounded-full transition-all"
+                    className="btn-primary text-[12px] md:text-[16px] py-1.5 md:py-2 px-5"
                 >
                     Explore Products
                 </Link>

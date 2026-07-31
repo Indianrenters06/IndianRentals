@@ -25,3 +25,14 @@ export const getMyOrders = async () => {
     const response = await axios.get(`${API_URL}/myrentals`, config);
     return response.data;
 };
+
+export const cancelOrder = async (id, reason) => {
+    const token = getToken();
+    const config = {
+        headers: {
+            Authorization: `Bearer ${token}`
+        }
+    };
+    const response = await axios.put(`${API_URL}/${id}/cancel`, { reason }, config);
+    return response.data;
+};

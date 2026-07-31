@@ -270,7 +270,7 @@ export default function PaymentPage() {
                             <button
                                 onClick={handlePay}
                                 disabled={loading}
-                                className="bg-[#FFD740] hover:bg-[#FFC400] disabled:opacity-70 disabled:hover:scale-100 text-[#1D1D1F] px-10 py-3.5 rounded-full text-lg font-medium shadow-md transition-all hover:scale-105 flex items-center gap-2"
+                                className="btn-primary px-10 py-3.5 text-lg gap-2 disabled:opacity-70"
                             >
                                 {loading ? <FaSpinner className="animate-spin" /> : null}
                                 {loading ? 'Processing...' : `Pay ₹${netPayToday}`}

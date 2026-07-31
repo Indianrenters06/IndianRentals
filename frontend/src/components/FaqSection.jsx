@@ -107,7 +107,6 @@ const FaqSection = ({ cmsData, limit, pageName }) => {
         <section 
             className="w-full border-t border-gray-100 bg-white"
             style={{
-                minHeight: '568px',
                 paddingTop: '48px',
                 paddingBottom: '48px',
                 display: 'flex',
@@ -140,7 +139,7 @@ const FaqSection = ({ cmsData, limit, pageName }) => {
 
                 {/* Right Column - Accordion */}
                 <div
-                    className="w-full lg:flex-1 lg:max-w-[758px] lg:min-h-[568px] border-b border-[hsla(0,0%,69%,1)]"
+                    className="w-full lg:flex-1 lg:max-w-[758px] border-b border-[hsla(0,0%,69%,1)]"
                 >
                     <div className="space-y-0">
                         {displayFaqs.map((faq, index) => (

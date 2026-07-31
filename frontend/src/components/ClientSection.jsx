@@ -95,7 +95,9 @@ const ClientSection = () => {
                                         padding: "32px"
                                     }}
                                 >
-                                    <img src={client.image} alt="Client Logo" className="w-full h-full object-contain grayscale hover:grayscale-0 transition-all duration-300" />
+                                    {/* Offer banners show in full colour — the greyscale-until-hover
+                                        treatment here was a logo-wall convention. */}
+                                    <img src={client.image} alt="Offer" className="w-full h-full object-contain transition-transform duration-300 hover:scale-[1.02]" />
                                 </div>
                             </SwiperSlide>
                         ))}
@@ -109,14 +111,14 @@ const ClientSection = () => {
                         style={{ opacity: 1 }}
                         ref={prevRef}
                     >
-                        <ChevronLeftIcon className="w-5 h-5 text-gray-800 group-hover:text-gray-900 transition-colors duration-200" />
+                        <ChevronLeftIcon strokeWidth={2.5} className="w-5 h-5 text-gray-800 group-hover:text-gray-900 transition-colors duration-200" />
                     </button>
                     <button
                         className="client-next group absolute right-0 top-[140px] -translate-y-1/2 translate-x-[calc(100%+12px)] z-10 w-[26px] h-[40px] rounded-[9px] flex items-center justify-center bg-[hsla(0,0%,93%,1)] hover:bg-[hsla(0,0%,85%,1)] hover:scale-110 active:scale-95 shadow-sm hover:shadow-md transition-all"
                         style={{ opacity: 1 }}
                         ref={nextRef}
                     >
-                        <ChevronRightIcon className="w-5 h-5 text-gray-800 group-hover:text-gray-900 transition-colors duration-200" />
+                        <ChevronRightIcon strokeWidth={2.5} className="w-5 h-5 text-gray-800 group-hover:text-gray-900 transition-colors duration-200" />
                     </button>
                 </div>
             </div>

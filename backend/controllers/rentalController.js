@@ -18,6 +18,18 @@ const productLabel = (items = []) => {
     return items.length > 1 ? `${first} & ${items.length - 1} more` : first;
 };
 const inr = (n) => Number(n || 0).toLocaleString('en-IN');
+const fmtDate = (d) => d ? new Date(d).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : '—';
+
+// Email merge fields shared by every rental status email.
+const rentalEmailBase = (rental) => ({
+    CUSTOMER_NAME: rental.user?.name || 'Customer',
+    ORDER_ID: rental._id.toString().slice(-6).toUpperCase(),
+    PRODUCT_NAME: productLabel(rental.orderItems),
+    DELIVERY_DATE: fmtDate(rental.rentalPeriod?.startDate),
+    RENTAL_DURATION: rental.rentalPeriod?.durationMonths ? `${rental.rentalPeriod.durationMonths} month(s)` : '1 month',
+    MONTHLY_RENT: inr(rental.itemsPrice),
+    DELIVERY_ADDRESS: formatAddress(rental.shippingAddress),
+});
 
 // @desc    Create new rental order
 // @route   POST /api/rentals
@@ -231,17 +243,8 @@ const updateRentalStatus = asyncHandler(async (req, res) => {
         const updatedRental = await rental.save();
 
         // Send the email matching the new status (non-blocking).
-        const fmtDate = (d) => d ? new Date(d).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : '—';
         const depositTotal = (rental.orderItems || []).reduce((s, i) => s + (i.securityDeposit || 0) * (i.qty || 1), 0);
-        const base = {
-            CUSTOMER_NAME: rental.user?.name || 'Customer',
-            ORDER_ID: rental._id.toString().slice(-6).toUpperCase(),
-            PRODUCT_NAME: productLabel(rental.orderItems),
-            DELIVERY_DATE: fmtDate(rental.rentalPeriod?.startDate),
-            RENTAL_DURATION: rental.rentalPeriod?.durationMonths ? `${rental.rentalPeriod.durationMonths} month(s)` : '1 month',
-            MONTHLY_RENT: inr(rental.itemsPrice),
-            DELIVERY_ADDRESS: formatAddress(rental.shippingAddress),
-        };
+        const base = rentalEmailBase(rental);
         const email = rental.user?.email;
         if (status === RENTAL_STATUS.APPROVED) {
             sendTemplatedEmail('Order Approved', email, base);
@@ -283,6 +286,55 @@ const updateRentalStatus = asyncHandler(async (req, res) => {
     }
 });
 
+// @desc    Cancel your own rental order
+// @route   PUT /api/rentals/:id/cancel
+// @access  Private
+const cancelMyRental = asyncHandler(async (req, res) => {
+    const rental = await Rental.findById(req.params.id).populate('user', 'name email');
+
+    if (!rental) {
+        res.status(404);
+        throw new Error('Rental not found');
+    }
+
+    // Owner only — the id comes from the client, so never cancel someone else's order.
+    const ownerId = rental.user?._id || rental.user;
+    if (ownerId.toString() !== req.user._id.toString()) {
+        res.status(403);
+        throw new Error('Not authorised to cancel this order');
+    }
+
+    if (rental.status === RENTAL_STATUS.CANCELLED) {
+        res.status(400);
+        throw new Error('This order is already cancelled');
+    }
+
+    // Once the item is out with the customer, cancellation becomes a return, not a cancel.
+    if ([RENTAL_STATUS.DELIVERED, RENTAL_STATUS.ACTIVE, RENTAL_STATUS.RETURNED].includes(rental.status)) {
+        res.status(400);
+        throw new Error('This order can no longer be cancelled. Please contact support.');
+    }
+
+    rental.status = RENTAL_STATUS.CANCELLED;
+    const updatedRental = await rental.save();
+
+    sendTemplatedEmail('Order Cancelled', rental.user?.email, {
+        ...rentalEmailBase(rental),
+        CANCELLATION_REASON: req.body.reason || 'Cancelled by the customer.',
+        REFUND_AMOUNT: rental.isPaid ? inr(rental.totalPrice) : '0',
+        PAYMENT_METHOD: rental.paymentMethod || 'original payment method',
+    });
+
+    createNotification({
+        title: 'Order cancelled by customer',
+        message: `${rental.user?.name || 'A customer'} cancelled order #${rental._id.toString().slice(-6).toUpperCase()}.`,
+        type: 'order',
+        relatedId: rental._id,
+    });
+
+    res.json(updatedRental);
+});
+
 module.exports = {
     addRentalItems,
     getRentalById,
@@ -290,5 +342,6 @@ module.exports = {
     getMyRentals,
     getRentals,
     updateRentalStatus,
+    cancelMyRental,
     markRentalPaid,
 };

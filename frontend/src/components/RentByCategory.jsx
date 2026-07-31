@@ -202,7 +202,9 @@ const RentByCategory = () => {
             }}
         >
             <div className="max-w-[1200px] mx-auto px-4 sm:px-6">
-                <div className="flex items-center justify-between mb-4 md:mb-12">
+                {/* Figma gap is 32px header→cards; the Swiper below adds 12px of its own
+                    top padding (!py-3), so the margin carries only the remaining 20px. */}
+                <div className="flex items-center justify-between mb-4 md:mb-5">
                     <h2
                         className="text-[24px] md:text-[36px] leading-[32px] md:leading-[45px]"
                         style={{
@@ -313,28 +315,45 @@ const RentByCategory = () => {
                                 <SwiperSlide key={cat._id || index} style={{ width: `${catCardW}px` }}>
                                     <Link href={getCategoryRoute(cat)} className="group flex flex-col items-center cursor-pointer">
                                         <div
-                                            className="cat-card flex items-center justify-center mb-2 relative bg-white border-2 border-[#eee] rounded-xl group-hover:border-orange-300/40 overflow-hidden"
+                                            className="cat-card flex items-center justify-center mb-[7px] relative bg-white border-2 border-[#eee] rounded-xl overflow-hidden"
                                             style={{
                                                 width: viewType === 'tablet' ? '165px' : '177px',
-                                                height: viewType === 'tablet' ? '158px' : '173px'
+                                                height: viewType === 'tablet' ? '158px' : '173px',
+                                                // Figma insets the product inside the card rather than
+                                                // bleeding it: 167x128 art in a 183x173 frame, with the
+                                                // top inset a shade deeper than the bottom.
+                                                padding: viewType === 'tablet' ? '20px 7px' : '22px 8px 21px'
                                             }}
                                         >
                                             {cat.image ? (
-                                                <Image
-                                                    src={cat.image}
-                                                    alt={cat.name}
-                                                    fill
-                                                    className="object-cover"
-                                                />
+                                                // fill resolves against the padding box, so the inset
+                                                // needs its own wrapper to bite.
+                                                <div className="relative w-full h-full">
+                                                    <Image
+                                                        src={cat.image}
+                                                        alt={cat.name}
+                                                        fill
+                                                        className="object-contain"
+                                                    />
+                                                </div>
                                             ) : (
                                                 <div className="text-gray-400 group-hover:text-orange-300 transition-colors">
                                                     {getIconForCategory(cat.name)}
                                                 </div>
                                             )}
                                         </div>
+                                        {/* Figma Typography/text-xl/Semi Bold: Mona Sans 600,
+                                            21/28, -0.8px tracking, grey-600. */}
                                         <h3
-                                            className="font-semibold font-sans text-gray-600 text-center group-hover:text-gray-700 transition-colors"
-                                            style={{ fontSize: viewType === 'tablet' ? '12px' : '15px' }}
+                                            className="text-center transition-colors"
+                                            style={{
+                                                fontFamily: '"Mona Sans", sans-serif',
+                                                fontWeight: 600,
+                                                fontSize: viewType === 'tablet' ? '18px' : '21px',
+                                                lineHeight: viewType === 'tablet' ? '24px' : '28px',
+                                                letterSpacing: '-0.8px',
+                                                color: '#545454'
+                                            }}
                                         >
                                             {cat.name}
                                         </h3>
@@ -354,20 +373,20 @@ const RentByCategory = () => {
                             style={{ height: '3.5px', position: 'relative' }}
                         />
                         {/* Nav arrows */}
-                        <div className="flex items-center gap-3 shrink-0">
+                        <div className="flex items-center gap-2 shrink-0">
                             <button
                                 className="swiper-prev-cat group w-[34px] h-[34px] rounded-[69px] flex items-center justify-center bg-[#eee] hover:bg-[hsla(0,0%,85%,1)] transition-all"
                                 style={{ opacity: 1, boxShadow: '0px 8px 2px 0px rgba(133,133,133,0), 0px 5px 2px 0px rgba(133,133,133,0.01), 0px 3px 2px 0px rgba(133,133,133,0.05), 0px 1px 1px 0px rgba(133,133,133,0.09), 0px 0px 1px 0px rgba(133,133,133,0.1)' }}
                                 aria-label="Previous"
                             >
-                                <ChevronLeftIcon className="w-5 h-5 text-gray-800 group-hover:text-gray-900 transition-colors duration-200" />
+                                <ChevronLeftIcon strokeWidth={2} className="w-6 h-6 text-[#1F1F1F] transition-colors duration-200" />
                             </button>
                             <button
                                 className="swiper-next-cat group w-[34px] h-[34px] rounded-[69px] flex items-center justify-center bg-[#eee] hover:bg-[hsla(0,0%,85%,1)] transition-all"
                                 style={{ opacity: 1, boxShadow: '0px 8px 2px 0px rgba(133,133,133,0), 0px 5px 2px 0px rgba(133,133,133,0.01), 0px 3px 2px 0px rgba(133,133,133,0.05), 0px 1px 1px 0px rgba(133,133,133,0.09), 0px 0px 1px 0px rgba(133,133,133,0.1)' }}
                                 aria-label="Next"
                             >
-                                <ChevronRightIcon className="w-5 h-5 text-gray-800 group-hover:text-gray-900 transition-colors duration-200" />
+                                <ChevronRightIcon strokeWidth={2} className="w-6 h-6 text-[#1F1F1F] transition-colors duration-200" />
                             </button>
                         </div>
                     </div>
@@ -387,9 +406,6 @@ const RentByCategory = () => {
                     will-change: transform;
                 }
                 .group:hover .cat-card {
-                    box-shadow:
-                        0px 18px 32px -10px rgba(0,0,0,0.14),
-                        0px 8px 14px -6px rgba(0,0,0,0.08);
                     transform: scale(1.02);
                 }
                 /* Kill Swiper's default ::after arrow injection on all nav buttons */

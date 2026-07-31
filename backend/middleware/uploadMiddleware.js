@@ -60,3 +60,5 @@ const uploadToCloudinary = (fileBuffer, fieldName, folder = 'indian-rentals/kyc'
 
 module.exports = upload;
 module.exports.uploadToCloudinary = uploadToCloudinary;
+// Share the already-configured client so callers don't re-declare credentials.
+module.exports.cloudinary = cloudinary;

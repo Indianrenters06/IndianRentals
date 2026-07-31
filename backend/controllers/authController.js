@@ -38,6 +38,9 @@ const adminLogin = asyncHandler(async (req, res) => {
 
         const token = generateToken(res, user._id);
 
+        // Admin sign-in has no OTP step, so the session starts here.
+        await User.updateOne({ _id: user._id }, { $set: { lastLogin: new Date() } });
+
         res.json({
             _id: user._id,
             name: user.name,
@@ -178,6 +181,8 @@ const verifyOtp = asyncHandler(async (req, res) => {
     user.emailOtp = undefined;
     user.phoneOtp = undefined;
     user.otpExpires = undefined;
+    // Verification completes signup and issues a session, so it counts as a login.
+    user.lastLogin = new Date();
     await user.save();
 
     // Send the Welcome email now that the account is fully verified.
@@ -399,6 +404,8 @@ const verifyLoginOtp = asyncHandler(async (req, res) => {
     user.emailOtp = undefined;
     user.phoneOtp = undefined;
     user.otpExpires = undefined;
+    // This is the customer login path — the password step above only sends an OTP.
+    user.lastLogin = new Date();
     await user.save();
 
     const token = generateToken(res, user._id);

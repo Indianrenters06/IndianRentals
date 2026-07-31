@@ -202,7 +202,7 @@ export default function AddressPage() {
                         <button
                             onClick={handleContinue}
                             disabled={!selectedAddressId}
-                            className="self-start flex items-center justify-center h-[35px] rounded-full px-[20px] py-[6px] bg-[#ffcf46] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                            className="btn-primary self-start h-[35px] disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                             <span className="font-medium text-[16px] text-[#1f1f1f] tracking-[-0.4px] leading-[23px]" style={{ fontFamily: "'Mona Sans', sans-serif" }}>Continue for KYC process</span>
                         </button>

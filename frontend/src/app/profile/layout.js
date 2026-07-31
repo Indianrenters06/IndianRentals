@@ -147,7 +147,10 @@ export default function ProfileLayout({ children }) {
                     {/* Main Content — single dashed panel, exact match of Figma "Frame 237" (node 23050:11079):
                         1px #cbcbcb stroke, 10px dash / 10px gap, 20px radius, 20px horizontal / 40px vertical padding.
                         Drawn as an SVG stroke so the dash length matches Figma exactly (CSS border-dashed can't). */}
-                    <div className="flex-1 bg-white rounded-none lg:rounded-[20px] py-5 lg:px-5 lg:py-10 h-auto lg:self-start relative overflow-visible">
+                    {/* min-w-0: without it this flex item won't shrink below its content's min-content
+                        width, so a wide child (e.g. the invoices table) pushes the panel — and its right
+                        padding and dashed border — off screen instead of scrolling inside it. */}
+                    <div className="flex-1 min-w-0 bg-white rounded-none lg:rounded-[20px] py-5 lg:px-5 lg:py-10 h-auto lg:self-start relative overflow-visible">
                         <div className="hidden lg:block absolute inset-0 pointer-events-none">
                             <svg className="w-full h-full overflow-visible">
                                 <rect

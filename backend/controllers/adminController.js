@@ -47,7 +47,61 @@ const getDashboardStats = asyncHandler(async (req, res) => {
     // 9. Recent Notifications
     const recentNotifications = await Notification.find({}).sort({ createdAt: -1 }).limit(5);
 
+    // 10. Revenue per day for the last 12 months (paid rentals only), so the
+    //     dashboard can chart any range without inventing a shape for the data.
+    const oneYearAgo = new Date();
+    oneYearAgo.setHours(0, 0, 0, 0);
+    oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
+
+    const revenueByDayAgg = await Rental.aggregate([
+        {
+            $match: {
+                isPaid: true,
+                $expr: { $gte: [{ $ifNull: ['$paidAt', '$createdAt'] }, oneYearAgo] }
+            }
+        },
+        {
+            $group: {
+                _id: {
+                    $dateToString: {
+                        format: '%Y-%m-%d',
+                        date: { $ifNull: ['$paidAt', '$createdAt'] },
+                        timezone: 'Asia/Kolkata'
+                    }
+                },
+                total: { $sum: '$totalPrice' }
+            }
+        },
+        { $sort: { _id: 1 } }
+    ]);
+    const revenueByDay = revenueByDayAgg.map(d => ({ date: d._id, total: d.total }));
+
+    // 11. Order count per status across ALL orders, so the dashboard shows the
+    //     real pipeline rather than the status mix of the latest five.
+    const statusAgg = await Rental.aggregate([
+        { $group: { _id: '$status', count: { $sum: 1 } } }
+    ]);
+    const rentalsByStatus = statusAgg.reduce((acc, s) => {
+        if (s._id) acc[s._id] = s.count;
+        return acc;
+    }, {});
+
+    // 12. Order volume for the last 30 days vs the 30 before it, so the dashboard
+    //     can show a real trend instead of a decorative percentage. Revenue trend
+    //     is derived client-side from revenueByDay above.
+    const now = new Date();
+    const last30Start = new Date(now); last30Start.setDate(now.getDate() - 30);
+    const prev30Start = new Date(now); prev30Start.setDate(now.getDate() - 60);
+
+    const ordersLast30 = await Rental.countDocuments({ createdAt: { $gte: last30Start } });
+    const ordersPrev30 = await Rental.countDocuments({
+        createdAt: { $gte: prev30Start, $lt: last30Start }
+    });
+
     res.json({
+        rentalsByStatus,
+        ordersLast30,
+        ordersPrev30,
         totalUsers,
         totalProducts,
         totalRentals,
@@ -56,7 +110,8 @@ const getDashboardStats = asyncHandler(async (req, res) => {
         lowStockProducts,
         activeNow,
         pendingKYC,
-        recentNotifications
+        recentNotifications,
+        revenueByDay
     });
 });
 

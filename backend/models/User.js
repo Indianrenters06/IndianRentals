@@ -118,6 +118,13 @@ const userSchema = new mongoose.Schema({
     addresses: {
         type: [addressSchema],
         default: []
+    },
+    // Stamped every time a session is actually issued (after OTP, not at the
+    // password step). Drives "Active Users" on the dashboard and the Active
+    // Members list. Undefined for accounts that have not logged in since this
+    // field was introduced.
+    lastLogin: {
+        type: Date
     }
 }, {
     timestamps: true

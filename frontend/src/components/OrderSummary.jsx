@@ -167,7 +167,7 @@ const OrderSummary = ({
                     {showButton && (
                         <button
                             onClick={onCheckout}
-                            className="w-full h-[40px] rounded-full flex items-center justify-center bg-[#ffcf46] px-[20px] py-[6px] transition-all"
+                            className="btn-primary w-full h-[40px]"
                         >
                             <span className="font-medium text-[16px] leading-[23px] text-[#1f1f1f] tracking-[-0.4px]">{btnText}</span>
                         </button>

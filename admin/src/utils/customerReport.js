@@ -1,10 +1,15 @@
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
+import { resolveUserLocation } from "./userLocation";
 
 const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
 
 export async function downloadCustomerReport(user) {
-    const hasPersonalDetails = !!(user.phone && user.city);
+    const location = resolveUserLocation(user);
+    // This gate previously read user.city, which is never set on the user
+    // document — so it was always false and every customer without KYC was
+    // refused a report.
+    const hasPersonalDetails = !!(user.phone || location);
     const hasKYC = !!(user.kyc?.status && user.kyc.status !== "not_submitted");
 
     if (!hasPersonalDetails && !hasKYC) {
@@ -47,7 +52,7 @@ export async function downloadCustomerReport(user) {
             ["Full Name", user.name || "N/A"],
             ["Email Address", user.email || "N/A"],
             ["Phone Number", user.phone || "N/A"],
-            ["Location", user.city ? `${user.city}${user.state ? ", " + user.state : ""}` : "N/A"],
+            ["Location", location || "N/A"],
             ["Account Status", user.isBlocked ? "Blocked" : user.isActive ? "Active" : "Inactive"],
             ["Member Since", user.createdAt ? new Date(user.createdAt).toLocaleDateString("en-IN") : "N/A"],
             ["Last Updated", user.updatedAt ? new Date(user.updatedAt).toLocaleDateString("en-IN") : "N/A"],

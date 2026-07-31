@@ -73,7 +73,9 @@ const ProductCard = ({ product, index, isDesktop, handleAddToCart }) => {
         dispatch(toggleWishlist(product));
     };
 
-    const CARD_W = 285;
+    // Figma lays out 4 cards of 285 + 3 gaps of 20 across a flush 1200 frame. The
+    // container here is 1200 *minus* px-6, so the cards shrink to keep 4 per view.
+    const CARD_W = 273;
     const CARD_H = 387;
     const HOVER_H = 446;
     const LIFT = 12;
@@ -97,7 +99,7 @@ const ProductCard = ({ product, index, isDesktop, handleAddToCart }) => {
             >
                 {/* Image Section */}
                 <div className="relative bg-white flex items-center justify-center overflow-hidden shrink-0"
-                    style={{ width: '100%', height: 282, borderRadius: "20px 20px 0 0", borderBottom: "1px solid hsla(0, 0%, 93%, 1)", backgroundColor: isHovered ? "hsla(0,0%,98%,1)" : "hsla(0, 0%, 100%, 1)", transition: "background-color 0.4s" }}
+                    style={{ width: '100%', height: 282, borderRadius: "20px", borderBottom: "1px solid hsla(0, 0%, 93%, 1)", backgroundColor: isHovered ? "hsla(0,0%,98%,1)" : "hsla(0, 0%, 100%, 1)", transition: "background-color 0.4s" }}
                 >
                     <div className="absolute z-20 flex items-center" style={{ top: "14.57px", left: "14.49px", gap: "4px" }}>
                         <span className="rounded-full flex items-center justify-center shrink-0"
@@ -163,10 +165,12 @@ import 'swiper/css/scrollbar';
 
 // Card + gap are fixed by the design, so the track is snapped to a whole number of
 // them instead of resizing cards.
-const SLIDE_W = 285;
+const SLIDE_W = 273;
 const SLIDE_GAP = 20;
 
-const BestRentedProducts =({ type = "bestRented", defaultTitle = "Curated Products", customProducts = null }) => {
+// titleOverride / productIdsOverride let a host page (e.g. the product page) drive
+// this section from its own CMS document instead of the homepage's.
+const BestRentedProducts =({ type = "bestRented", defaultTitle = "Curated Products", customProducts = null, titleOverride = null, productIdsOverride = null }) => {
     const [isDesktop, setIsDesktop] = useState(false);
     const [trackBoundsRef, trackWidth, perView] = useWholeCardTrack(SLIDE_W, SLIDE_GAP);
     const router = useRouter();
@@ -225,6 +229,9 @@ const BestRentedProducts =({ type = "bestRented", defaultTitle = "Curated Produc
                         targetIds = cmsData.newLaunchProductIds || [];
                     }
                 }
+
+                if (titleOverride) finalTitle = titleOverride;
+                if (productIdsOverride && productIdsOverride.length > 0) targetIds = productIdsOverride;
 
                 setCmsConfig({ enabled: isEnabled, title: finalTitle, productIds: targetIds });
 
@@ -288,7 +295,7 @@ const BestRentedProducts =({ type = "bestRented", defaultTitle = "Curated Produc
             }
         };
         fetchCMSAndProducts();
-    }, [type, defaultTitle]);
+    }, [type, defaultTitle, titleOverride, productIdsOverride]);
 
     if (loading) return <div className="h-48 w-full bg-slate-50 animate-pulse my-4" />;
     if (!cmsConfig.enabled) return null;
@@ -361,23 +368,20 @@ const BestRentedProducts =({ type = "bestRented", defaultTitle = "Curated Produc
                             className={`swiper-scrollbar-${sectionSuffix} flex-1`}
                             style={{ height: '3.5px', position: 'relative' }}
                         />
-                        <div className="flex items-center gap-4 shrink-0">
+                        <div className="flex items-center gap-2 shrink-0">
                             <button
                                 className={`swiper-prev-${sectionSuffix} group w-[34px] h-[34px] rounded-[69px] flex items-center justify-center bg-[#eee] hover:bg-[hsla(0,0%,85%,1)] transition-all`}
                                 style={{ boxShadow: '0px 8px 2px 0px rgba(133,133,133,0), 0px 5px 2px 0px rgba(133,133,133,0.01), 0px 3px 2px 0px rgba(133,133,133,0.05), 0px 1px 1px 0px rgba(133,133,133,0.09), 0px 0px 1px 0px rgba(133,133,133,0.1)' }}
                                 aria-label="Previous"
                             >
-                                <ChevronLeftIcon className="w-5 h-5 text-gray-800
-                                
-                                
-                                group-hover:text-gray-900 transition-colors duration-200" />
+                                <ChevronLeftIcon strokeWidth={2} className="w-6 h-6 text-[#1F1F1F] transition-colors duration-200" />
                             </button>
                             <button
                                 className={`swiper-next-${sectionSuffix} group w-[34px] h-[34px] rounded-[69px] flex items-center justify-center bg-[#eee] hover:bg-[hsla(0,0%,85%,1)] transition-all`}
                                 style={{ boxShadow: '0px 8px 2px 0px rgba(133,133,133,0), 0px 5px 2px 0px rgba(133,133,133,0.01), 0px 3px 2px 0px rgba(133,133,133,0.05), 0px 1px 1px 0px rgba(133,133,133,0.09), 0px 0px 1px 0px rgba(133,133,133,0.1)' }}
                                 aria-label="Next"
                             >
-                                <ChevronRightIcon className="w-5 h-5 text-gray-800 group-hover:text-gray-900 transition-colors duration-200" />
+                                <ChevronRightIcon strokeWidth={2} className="w-6 h-6 text-[#1F1F1F] transition-colors duration-200" />
                             </button>
                         </div>
                     </div>

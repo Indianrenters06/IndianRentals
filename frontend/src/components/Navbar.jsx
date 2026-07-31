@@ -1007,7 +1007,7 @@ const Navbar = () => {
                                             setIsMobileMenuOpen(false);
                                             setIsAuthModalOpen(true);
                                         }}
-                                        className="block w-full text-center py-2.5 bg-amber-300 text-gray-900 rounded-lg font-bold mb-3 shadow-sm"
+                                        className="btn-primary w-full py-2.5 rounded-lg font-bold mb-3"
                                     >
                                         Login / Register
                                     </button>

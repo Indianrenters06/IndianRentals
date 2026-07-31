@@ -231,10 +231,32 @@ const cmsSchema = new mongoose.Schema({
     },
     productPageDeliveryText: { type: String, default: "2-4 days" },
     productPageDiscountText: { type: String, default: "20% off" },
+
+    // Copy around the pricing / tenure block.
+    productPageCtaText: { type: String, default: "Rent Now" },
+    productPageCompareLinkText: { type: String, default: "compare all tenures" },
+    productPagePriceBreakdownText: { type: String, default: "price breakdown" },
+    productPageTenureSliderLabel: { type: String, default: "Select your minimum rental period" },
+    productPageDepositLabel: { type: String, default: "100% Refundable Deposit" },
+    productPageKycNote: { type: String, default: "Place Order & complete KYC anytime to get your items the next day" },
+
+    // Section headings.
+    productPageBenefitsHeading: { type: String, default: "What's included in your plan:" },
+    productPageTestimonialsHeading: { type: String, default: "Don't just take our word for it" },
+    productPageFaqHeading: { type: String, default: "Product FAQs" },
+    productPageFaqSubheading: { type: String, default: "Specific questions about this product." },
+    productPageRelatedHeading: { type: String, default: "Best Rented Products" },
+    productPageGlobalRelatedIds: { type: [String], default: [] },
+
+    // Section visibility toggles.
     productPageEnableCompare: { type: Boolean, default: true },
     productPageEnableRelated: { type: Boolean, default: true },
     productPageEnableFaq: { type: Boolean, default: true },
     productPageEnableTestimonials: { type: Boolean, default: true },
+    productPageEnableRating: { type: Boolean, default: true },
+    productPageEnablePriceBreakdown: { type: Boolean, default: true },
+    productPageEnableTenureSlider: { type: Boolean, default: true },
+    productPageEnableQuantity: { type: Boolean, default: true },
 
     // ── SEO ──────────────────────────────────────────────────────────────────
     metaTitle: { type: String, default: '' },

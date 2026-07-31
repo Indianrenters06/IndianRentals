@@ -118,7 +118,7 @@ export default function CategoriesPageCMS() {
 
     if (!mounted || loading) return (
         <div className="flex items-center justify-center gap-3 py-24 text-slate-400">
-            <Spinner size="sm" color="secondary" /> Loading Categories Page CMS…
+            <Spinner size="sm" color="secondary" /> Loading Main Category CMS…
         </div>
     );
 
@@ -128,7 +128,7 @@ export default function CategoriesPageCMS() {
             <div className="flex items-center justify-between flex-wrap gap-3">
                 <div>
                     <h1 className="text-3xl font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2">
-                        Categories Page <span className="text-indigo-600 dark:text-indigo-400 font-extrabold">CMS</span>
+                        Main Category <span className="text-indigo-600 dark:text-indigo-400 font-extrabold">CMS</span>
                     </h1>
                     <p className="text-sm text-slate-500 mt-1">Manage the &quot;All Categories&quot; frontend page layout and cards.</p>
                 </div>

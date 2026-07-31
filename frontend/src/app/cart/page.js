@@ -113,7 +113,9 @@ const CartItem = ({ item, onUpdate, onRemove }) => {
         </div>
 
         {/* ─────────────── DESKTOP CARD (Figma 23212:7794) ─────────────── */}
-        <div className="hidden md:flex flex-col gap-[20px] bg-white border-2 border-[#eee] rounded-[16px] px-[18px] py-[20px] w-full overflow-hidden">
+        {/* No overflow-hidden here: the duration dropdown is absolutely positioned and would be
+            clipped at the card's bottom edge (z-index can't escape an ancestor's clip). */}
+        <div className="hidden md:flex flex-col gap-[20px] bg-white border-2 border-[#eee] rounded-[16px] px-[18px] py-[20px] w-full">
             {/* Top row: image + title/desc + trash */}
             <div className="flex items-center justify-between w-full gap-2">
                 <div className="flex items-center gap-[8px] min-w-0 flex-1">

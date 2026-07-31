@@ -9,6 +9,7 @@ import {
 } from "@heroui/react";
 import { Users, ArrowRight, WarningCircle, CheckCircle, XCircle, MagnifyingGlass, DownloadSimple, Eye, Phone, MapPin } from "@phosphor-icons/react";
 import { downloadCustomerReport } from "@/utils/customerReport";
+import { resolveUserLocation } from "@/utils/userLocation";
 import SortSelect from "@/components/SortSelect";
 
 const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
@@ -55,8 +56,10 @@ export default function ActiveUsers() {
                 if (!res.ok) throw new Error("Failed to fetch users");
                 const data = await res.json();
                 const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
-                const active = data.filter(u => u.lastLogin && new Date(u.lastLogin) >= oneDayAgo);
-                setUsers(active.length > 0 ? active : data.slice(0, 20));
+                // Strictly users with a real login inside the window. This used to
+                // fall back to data.slice(0, 20) when nothing matched, which listed
+                // arbitrary customers under an "Active" heading with "Never" logins.
+                setUsers(data.filter(u => u.lastLogin && new Date(u.lastLogin) >= oneDayAgo));
             } catch (err) {
                 setError(err.message);
             } finally {
@@ -77,6 +80,17 @@ export default function ActiveUsers() {
         return `${Math.floor(hrs / 24)}d ago`;
     };
 
+    // The exact stamp, for the tooltip and the profile modal.
+    const formatExact = (dateStr) => {
+        if (!dateStr) return "Never";
+        return new Date(dateStr).toLocaleString("en-IN", {
+            day: "numeric", month: "short", year: "numeric",
+            hour: "numeric", minute: "2-digit",
+        });
+    };
+
+    const getLocation = resolveUserLocation;
+
     const downloadUser = async (user) => {
         try {
             await downloadCustomerReport(user);
@@ -91,12 +105,17 @@ export default function ActiveUsers() {
         let list = [...users];
         if (search.trim()) {
             const q = search.toLowerCase();
-            list = list.filter(u => u.name?.toLowerCase().includes(q) || u.email?.toLowerCase().includes(q) || u.city?.toLowerCase().includes(q));
+            list = list.filter(u =>
+                u.name?.toLowerCase().includes(q) ||
+                u.email?.toLowerCase().includes(q) ||
+                (getLocation(u) || "").toLowerCase().includes(q)
+            );
         }
         return list.sort((a, b) => {
             const col = sortDescriptor.column;
             let first, second;
             if (col === "lastLogin") { first = new Date(a.lastLogin).getTime() || 0; second = new Date(b.lastLogin).getTime() || 0; }
+            else if (col === "city") { first = (getLocation(a) || "").toLowerCase(); second = (getLocation(b) || "").toLowerCase(); }
             else { first = (a[col] || "").toString().toLowerCase(); second = (b[col] || "").toString().toLowerCase(); }
             const cmp = first < second ? -1 : first > second ? 1 : 0;
             return sortDescriptor.direction === "descending" ? -cmp : cmp;
@@ -181,8 +200,15 @@ export default function ActiveUsers() {
                                             </div>
                                         </TableCell>
                                         <TableCell className="text-xs text-slate-500">{user.email}</TableCell>
-                                        <TableCell className="text-xs text-slate-500">{user.city ? `${user.city}, ${user.state}` : "—"}</TableCell>
-                                        <TableCell><span className="text-xs font-bold text-slate-500 uppercase tracking-wider">{getTimeSince(user.lastLogin)}</span></TableCell>
+                                        <TableCell className="text-xs text-slate-500">{getLocation(user) || "—"}</TableCell>
+                                        <TableCell>
+                                            <span
+                                                className="text-xs font-bold text-slate-500 uppercase tracking-wider"
+                                                title={formatExact(user.lastLogin)}
+                                            >
+                                                {getTimeSince(user.lastLogin)}
+                                            </span>
+                                        </TableCell>
                                         <TableCell>
                                             <div className="flex justify-center">
                                                 <Chip size="sm" color="success" variant="flat" className="font-bold">Active</Chip>
@@ -228,8 +254,8 @@ export default function ActiveUsers() {
                                 <div className="grid grid-cols-2 gap-4">
                                     {[
                                         { label: "Phone", value: selectedUser.phone || "N/A", icon: <Phone size={14} /> },
-                                        { label: "Location", value: selectedUser.city ? `${selectedUser.city}, ${selectedUser.state}` : "N/A", icon: <MapPin size={14} /> },
-                                        { label: "Last Login", value: getTimeSince(selectedUser.lastLogin), icon: null },
+                                        { label: "Location", value: getLocation(selectedUser) || "Not provided", icon: <MapPin size={14} /> },
+                                        { label: "Last Login", value: formatExact(selectedUser.lastLogin), icon: null },
                                         { label: "Member Since", value: selectedUser.createdAt ? new Date(selectedUser.createdAt).toLocaleDateString("en-IN") : "N/A", icon: null },
                                     ].map((field, i) => (
                                         <div key={i} className="p-3 bg-slate-50 dark:bg-slate-800/50 rounded-xl">
