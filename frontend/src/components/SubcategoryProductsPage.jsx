@@ -9,8 +9,11 @@ import { ChevronRightIcon, ArrowsUpDownIcon, FunnelIcon, XMarkIcon } from '@hero
 import { getProductsBySubcategory, getProducts } from '../services/productService';
 import ProductCard from './ProductCard';
 import Sidebar from './Sidebar';
+import CategoryNavBar from './CategoryNavBar';
 
 export default function SubcategoryProductsPage({ subcategoryId, subcategoryName, parentName, parentHref }) {
+    // "/category/it-products" → "it-products"
+    const parentSlug = (parentHref || '').split('/').filter(Boolean).pop() || '';
     const router = useRouter();
     const [products, setProducts] = useState([]);
     const [subcategories, setSubcategories] = useState([]);
@@ -150,6 +153,13 @@ export default function SubcategoryProductsPage({ subcategoryId, subcategoryName
     return (
         <div className="min-h-screen bg-white">
 
+            {/* ── Breadcrumb + category pills ── */}
+            <CategoryNavBar
+                parentSlug={parentSlug}
+                parentLabel={parentName}
+                currentLabel={subcategoryName}
+            />
+
             {/* ── Mobile Header ── */}
             {isMobile && (
                 <div style={{ padding: '24px 16px 16px' }}>
@@ -163,24 +173,6 @@ export default function SubcategoryProductsPage({ subcategoryId, subcategoryName
                         <h1 style={{ fontFamily: "'Mona Sans', sans-serif", fontSize: '26px', fontWeight: 600, letterSpacing: '-0.01em', color: 'hsla(0, 0%, 12%, 1)', lineHeight: '1.2', margin: 0 }}>
                             {subcategoryName}
                         </h1>
-                    </div>
-                </div>
-            )}
-
-            {/* ── Desktop Breadcrumbs ── */}
-            {!isMobile && (
-                <div style={{ padding: '16px 32px', maxWidth: '1200px', margin: '0 auto' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                        <button onClick={() => router.back()} style={{ padding: '4px', background: 'none', border: 'none', cursor: 'pointer', borderRadius: '50%' }}>
-                            <FaArrowLeft size={18} style={{ color: '#1f2937' }} />
-                        </button>
-                        <p style={{ fontSize: '12px', color: '#6b7280', margin: 0 }}>
-                            <Link href="/" style={{ textDecoration: 'none', color: 'inherit' }}>Home</Link>
-                            {' › '}
-                            <Link href={parentHref || '#'} style={{ textDecoration: 'none', color: 'inherit' }}>{parentName}</Link>
-                            {' › '}
-                            <span style={{ color: '#1f2937' }}>{subcategoryName}</span>
-                        </p>
                     </div>
                 </div>
             )}

@@ -7,6 +7,7 @@ import { FaArrowLeft } from 'react-icons/fa';
 import { FiPackage } from 'react-icons/fi';
 import { ArrowRight, ArrowLeft } from '@phosphor-icons/react';
 import { getSubcategoriesByParentName } from '../services/categoryService';
+import CategoryNavBar from './CategoryNavBar';
 
 /**
  * DynamicCategoryPage
@@ -91,82 +92,8 @@ export default function DynamicCategoryPage({
     return (
         <div className="bg-white font-sans">
 
-            {/* ── Mobile: pills-only in 3+2 grid (hidden on lg+) ── */}
-            <div className="block lg:hidden" style={{ width: '100%', background: 'hsla(0, 0%, 96%, 1)', padding: '10px 14px', borderBottom: '1px solid hsla(0, 0%, 93%, 1)', boxSizing: 'border-box' }}>
-                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', justifyContent: 'center' }}>
-                    {[
-                        { label: 'Apple Products', slug: 'apple' },
-                        { label: 'IT Products', slug: 'it-products' },
-                        { label: 'AV Products', slug: 'av-products' },
-                        { label: 'Office Equipment', slug: 'office-equipment' },
-                        { label: 'DSLR Cameras', slug: 'dslr' },
-                    ].map((cat) => {
-                        const isActive = categorySlug === cat.slug;
-                        return (
-                            <Link
-                                key={cat.slug}
-                                href={`/category/${cat.slug}`}
-                                style={{
-                                    flex: '0 0 calc((100% - 16px) / 3)',
-                                    height: '34px',
-                                    borderRadius: '68px',
-                                    border: isActive ? '1px solid hsla(44, 100%, 64%, 1)' : '1px solid hsla(0, 0%, 89%, 1)',
-                                    background: isActive ? 'hsla(43, 100%, 95%, 1)' : 'hsla(0, 0%, 100%, 1)',
-                                    textDecoration: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                    transition: 'all 0.15s', boxSizing: 'border-box', overflow: 'hidden',
-                                }}
-                            >
-                                <span style={{ fontFamily: "'Mona Sans', sans-serif", fontWeight: 600, fontSize: '11px', lineHeight: '16px', letterSpacing: '-0.01em', color: 'hsla(0, 0%, 0%, 1)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', padding: '0 6px' }}>
-                                    {cat.label}
-                                </span>
-                            </Link>
-                        );
-                    })}
-                </div>
-            </div>
-
-            {/* ── Desktop: breadcrumb + pills in one row (hidden below lg) ── */}
-            <div className="hidden lg:block">
-                <div style={{ width: '100%', background: 'hsla(0, 0%, 96%, 1)', height: '62px' }}>
-                    <div style={{ maxWidth: '1200px', width: '100%', height: '62px', margin: '0 auto', padding: '0 32px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '10px', boxSizing: 'border-box' }}>
-                        <div className="flex items-center gap-2 text-[12px] font-medium text-[#64748B] whitespace-nowrap">
-                            <Link href="/" className="hover:text-black transition-colors">Homepage</Link>
-                            <span className="text-gray-400">›</span>
-                            <Link href="/categories" className="hover:text-black transition-colors">All Categories</Link>
-                            <span className="text-gray-400">›</span>
-                            <span className="text-[#1D1D1F] font-semibold">{displayTitle}</span>
-                        </div>
-                        <div style={{ height: '62px', display: 'flex', alignItems: 'center', gap: '8px', paddingTop: '12px', paddingBottom: '12px', flexShrink: 0, boxSizing: 'border-box' }}>
-                            {[
-                                { label: 'Apple Products', slug: 'apple' },
-                                { label: 'IT Products', slug: 'it-products' },
-                                { label: 'AV Products', slug: 'av-products' },
-                                { label: 'Office Equipment', slug: 'office-equipment' },
-                                { label: 'DSLR Cameras', slug: 'dslr' },
-                            ].map((cat) => {
-                                const isActive = categorySlug === cat.slug;
-                                return (
-                                    <Link
-                                        key={cat.slug}
-                                        href={`/category/${cat.slug}`}
-                                        style={{
-                                            height: '38px', padding: '8px 16px', borderRadius: isActive ? '68px' : '38px',
-                                            border: isActive ? '1px solid hsla(44, 100%, 64%, 1)' : '1px solid hsla(0, 0%, 89%, 1)',
-                                            background: isActive ? 'hsla(43, 100%, 95%, 1)' : 'hsla(0, 0%, 100%, 1)',
-                                            textDecoration: 'none', whiteSpace: 'nowrap', display: 'flex', alignItems: 'center',
-                                            justifyContent: 'center', opacity: 1, transition: 'all 0.15s', boxSizing: 'border-box',
-                                        }}
-                                    >
-                                        <span style={{ fontFamily: "'Mona Sans', sans-serif", fontWeight: 600, fontSize: '14px', lineHeight: '20px', letterSpacing: '-0.01em', textAlign: 'center', color: 'hsla(0, 0%, 0%, 1)' }}>
-                                            {cat.label}
-                                        </span>
-                                    </Link>
-                                );
-                            })}
-                        </div>
-                    </div>
-                </div>
-            </div>
+            {/* ── Breadcrumb + category pills ── */}
+            <CategoryNavBar parentSlug={categorySlug} parentLabel={displayTitle} />
 
             <main
                 style={{
