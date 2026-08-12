@@ -5,7 +5,6 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Spinner, Button } from '@heroui/react';
 import { FloppyDisk, CheckCircle, Plus, Trash, ArrowRight, Image as PhosphorImage, Link as LinkIcon, TextT } from '@phosphor-icons/react';
-import ImageUploader from '@/components/ImageUploader';
 import Image from 'next/image';
 
 const API = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
@@ -205,30 +204,22 @@ export default function CategoriesPageCMS() {
                                             className="absolute top-4 right-4 p-1.5 text-slate-400 hover:text-red-500 bg-white dark:bg-slate-800 rounded-lg shadow-sm border border-slate-200 dark:border-slate-700 transition-all z-10">
                                             <Trash size={16} />
                                         </button>
-                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                            <div className="space-y-4">
-                                                <TextInput 
-                                                    label={`Card ${i + 1} Title`}
-                                                    value={card.title} 
-                                                    onChange={v => updateCard(i, 'title', v)} 
-                                                    icon={TextT}
-                                                />
-                                                <TextInput 
-                                                    label="Target Link" 
-                                                    value={card.href} 
-                                                    onChange={v => updateCard(i, 'href', v)} 
-                                                    placeholder="/category/example"
-                                                    icon={LinkIcon}
-                                                />
-                                            </div>
-                                            <div>
-                                                <Label>Card Image</Label>
-                                                <ImageUploader 
-                                                    existingUrl={card.image} 
-                                                    onUpload={url => updateCard(i, 'image', url)} 
-                                                    label="Upload Category Image"
-                                                />
-                                            </div>
+                                        {/* Card images are no longer editable here — the stored
+                                            image is left untouched and still rendered on the site. */}
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pr-10">
+                                            <TextInput
+                                                label={`Card ${i + 1} Title`}
+                                                value={card.title}
+                                                onChange={v => updateCard(i, 'title', v)}
+                                                icon={TextT}
+                                            />
+                                            <TextInput
+                                                label="Target Link"
+                                                value={card.href}
+                                                onChange={v => updateCard(i, 'href', v)}
+                                                placeholder="/category/example"
+                                                icon={LinkIcon}
+                                            />
                                         </div>
                                     </motion.div>
                                 ))}

@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter, useParams } from 'next/navigation';
@@ -41,7 +41,7 @@ export default function ProductDetailPage() {
     // UI States
     const [duration, setDuration] = useState(1);
     const [quantity, setQuantity] = useState(1);
-    const [activeTab, setActiveTab] = useState('Product Details');
+    const [activeTab, setActiveTab] = useState('details');
     const [openFaq, setOpenFaq] = useState(0);
     const [thumbsSwiper, setThumbsSwiper] = useState(null);
     const [isCompareOpen, setIsCompareOpen] = useState(false);
@@ -55,8 +55,8 @@ export default function ProductDetailPage() {
     const [pinChecking, setPinChecking] = useState(false);
     const [pinResult, setPinResult] = useState(null); // { serviceable, message }
 
-    // CMS Layout State
-    const [pageLayout, setPageLayout] = useState(null);
+    // CMS Layout State — the global product-page template.
+    const [globalLayout, setGlobalLayout] = useState(null);
 
     // Fetch Product Data
     useEffect(() => {
@@ -65,32 +65,10 @@ export default function ProductDetailPage() {
         const fetchProduct = async () => {
             try {
                 setLoading(true);
-                // The ID from URL might be a slug or actual ID. 
+                // The ID from URL might be a slug or actual ID.
                 // Since our backend uses MongoDB IDs, we hope the link passed the ID.
                 const data = await getProductById(params.id);
                 setProduct(data);
-
-                try {
-                    const API = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
-                    const cmsRes = await window.fetch(`${API}/api/cms/product-page`);
-                    if (cmsRes.ok) {
-                        const globalLayout = await cmsRes.json();
-                        // Merge product-specific layout overrides
-                        const prodLayout = data.pageLayout || {};
-                        setPageLayout({
-                            ...globalLayout,
-                            ...(prodLayout.enableCompare != null ? { productPageEnableCompare: prodLayout.enableCompare } : {}),
-                            ...(prodLayout.enableRelated != null ? { productPageEnableRelated: prodLayout.enableRelated } : {}),
-                            ...(prodLayout.enableFaq != null ? { productPageEnableFaq: prodLayout.enableFaq } : {}),
-                            ...(prodLayout.enableTestimonials != null ? { productPageEnableTestimonials: prodLayout.enableTestimonials } : {}),
-                            ...(prodLayout.discountText ? { productPageDiscountText: prodLayout.discountText } : {}),
-                            ...(prodLayout.deliveryText ? { productPageDeliveryText: prodLayout.deliveryText } : {}),
-                            ...(prodLayout.benefits?.length > 0 ? { productPageBenefits: prodLayout.benefits } : {}),
-                        });
-                    }
-                } catch (e) {
-                    console.error("Failed to load product page layout", e);
-                }
             } catch (err) {
                 console.error("Failed to load product", err);
                 setError("Product not found");
@@ -102,20 +80,82 @@ export default function ProductDetailPage() {
         fetchProduct();
     }, [params.id]);
 
+    // The CMS template is independent of the product, so it loads in parallel —
+    // that way even the loading/not-found copy comes from the CMS.
+    useEffect(() => {
+        const fetchLayout = async () => {
+            try {
+                const API = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+                const cmsRes = await window.fetch(`${API}/api/cms/product-page`);
+                if (cmsRes.ok) setGlobalLayout(await cmsRes.json());
+            } catch (e) {
+                console.error("Failed to load product page layout", e);
+            }
+        };
+        fetchLayout();
+    }, []);
+
+    // Per-product overrides win over the global template; blanks fall through.
+    const pageLayout = useMemo(() => {
+        const g = globalLayout || {};
+        const o = product?.pageLayout || {};
+        const text = (value, key) => (value ? { [key]: value } : {});
+        const flag = (value, key) => (value != null ? { [key]: value } : {});
+        return {
+            ...g,
+            ...flag(o.enableCompare, 'productPageEnableCompare'),
+            ...flag(o.enableRelated, 'productPageEnableRelated'),
+            ...flag(o.enableFaq, 'productPageEnableFaq'),
+            ...flag(o.enableTestimonials, 'productPageEnableTestimonials'),
+            ...flag(o.enableRating, 'productPageEnableRating'),
+            ...flag(o.enablePriceBreakdown, 'productPageEnablePriceBreakdown'),
+            ...flag(o.enableTenureSlider, 'productPageEnableTenureSlider'),
+            ...flag(o.enableQuantity, 'productPageEnableQuantity'),
+            ...text(o.discountText, 'productPageDiscountText'),
+            ...text(o.deliveryText, 'productPageDeliveryText'),
+            ...text(o.ctaText, 'productPageCtaText'),
+            ...text(o.compareLinkText, 'productPageCompareLinkText'),
+            ...text(o.priceBreakdownText, 'productPagePriceBreakdownText'),
+            ...text(o.tenureSliderLabel, 'productPageTenureSliderLabel'),
+            ...text(o.benefitsHeading, 'productPageBenefitsHeading'),
+            ...text(o.testimonialsHeading, 'productPageTestimonialsHeading'),
+            ...text(o.faqHeading, 'productPageFaqHeading'),
+            ...text(o.relatedHeading, 'productPageRelatedHeading'),
+            ...(o.benefits?.length > 0 ? { productPageBenefits: o.benefits } : {}),
+        };
+    }, [globalLayout, product]);
+
+    // Every label on this page reads through here, so the CMS value always wins
+    // and the literal is only the last-resort fallback.
+    const cms = (key, fallback) => {
+        const value = pageLayout?.[`productPage${key}`];
+        return value === undefined || value === null || value === '' ? fallback : value;
+    };
+    const on = (key) => pageLayout?.[`productPageEnable${key}`] !== false;
 
     const toggleFaq = (index) => {
         setOpenFaq(openFaq === index ? -1 : index);
     };
 
-    const tenures = [
-        { label: '1+', months: 1, price: product?.rentalPrice || 2560 }, // Use product price as base
-        { label: '3+', months: 3, price: Math.round((product?.rentalPrice || 2560) * 0.9) },
-        { label: '6+', months: 6, price: Math.round((product?.rentalPrice || 2560) * 0.8) },
-        { label: '9+', months: 9, price: Math.round((product?.rentalPrice || 2560) * 0.75) },
-        { label: '12+', months: 12, price: Math.round((product?.rentalPrice || 2560) * 0.7) },
-    ];
+    // Tenure plans come from the CMS; discountPercent is applied to base rent.
+    const basePrice = product?.rentalPrice || 2560;
+    const cmsTenures = pageLayout?.productPageTenures?.length > 0
+        ? pageLayout.productPageTenures
+        : [
+            { label: '1+', months: 1, discountPercent: 0 },
+            { label: '3+', months: 3, discountPercent: 10 },
+            { label: '6+', months: 6, discountPercent: 20 },
+            { label: '9+', months: 9, discountPercent: 25 },
+            { label: '12+', months: 12, discountPercent: 30 },
+        ];
+    const tenures = cmsTenures.map(t => ({
+        label: t.label,
+        months: Number(t.months) || 1,
+        price: Math.round(basePrice * (1 - (Number(t.discountPercent) || 0) / 100)),
+    }));
 
     const currentPlan = tenures.find(t => duration <= t.months) || tenures[tenures.length - 1];
+    const monthWord = (n) => (n === 1 ? cms('MonthLabel', 'Month') : cms('MonthsLabel', 'Months'));
 
     const handleAddToCart = () => {
         if (!product) return;
@@ -139,7 +179,7 @@ export default function ProductDetailPage() {
     const handleCheckPincode = async () => {
         const pin = pincode.trim();
         if (!/^[1-9][0-9]{5}$/.test(pin)) {
-            setPinResult({ serviceable: false, message: 'Please enter a valid 6-digit pincode.' });
+            setPinResult({ serviceable: false, message: cms('PincodeInvalidText', 'Please enter a valid 6-digit pincode.') });
             return;
         }
         try {
@@ -148,25 +188,43 @@ export default function ProductDetailPage() {
             const data = await checkServiceability(pin);
             setPinResult(data);
         } catch (e) {
-            setPinResult({ serviceable: false, message: 'Could not check right now. Please try again.' });
+            setPinResult({ serviceable: false, message: cms('PincodeErrorText', 'Could not check right now. Please try again.') });
         } finally {
             setPinChecking(false);
         }
     };
 
-    if (loading) return <div className="min-h-screen flex justify-center items-center">Loading...</div>;
-    if (error || !product) return <div className="min-h-screen flex justify-center items-center">Product not found</div>;
+    if (loading) return <div className="min-h-screen flex justify-center items-center">{cms('LoadingText', 'Loading...')}</div>;
+    if (error || !product) return <div className="min-h-screen flex justify-center items-center">{cms('NotFoundText', 'Product not found')}</div>;
 
     // Derived Data
     const mainImage = product.images && product.images.length > 0 ? product.images[0] : "/images/placeholder.png";
-    const specs = [
-        { label: "BRAND", value: product.brand || "N/A" },
-        { label: "CATEGORY", value: product.category || "N/A" },
-        { label: "CONDITION", value: product.condition || "New" },
-        { label: "STOCK", value: product.stock > 0 ? "In Stock" : "Out of Stock" },
-        { label: "LOCATION", value: product.city || "All India" },
-        { label: "DETAILS", value: product.description || "N/A" }
-    ];
+
+    // Specs fall back to the CMS default list when the product has none.
+    const cmsDefaultSpecs = pageLayout?.productPageDefaultSpecs?.length > 0
+        ? pageLayout.productPageDefaultSpecs
+        : [
+            { label: 'DISPLAY', value: '16.2 inches (3024 x 1964)' },
+            { label: 'GRAPHICS', value: 'Apple Integrated 16-core GPU' },
+            { label: 'DIMENSIONS', value: '35.57 x 35.57 x 1.68 cm * 2.14 kg' },
+            { label: 'OPERATING SYSTEM', value: 'Mac OS' },
+            { label: 'MEMORY', value: '24GB' },
+            { label: 'PROCESSOR', value: 'Apple M4 Pro' },
+            { label: 'STORAGE', value: '512GB SSD' },
+            { label: 'KEYBOARD LANGUAGE', value: 'English (Qwerty)' }
+        ];
+    const specRows = product.specifications && product.specifications.length > 0
+        ? product.specifications
+        : [{ label: 'MODEL', value: product.name }, ...cmsDefaultSpecs];
+
+    // Details tabs — labels and per-tab visibility are CMS-driven.
+    const tabs = [
+        { key: 'details', label: cms('TabDetailsLabel', 'Product Details'), enabled: true },
+        { key: 'return', label: cms('TabReturnLabel', 'Return Policy'), enabled: on('TabReturn') },
+        { key: 'shipping', label: cms('TabShippingLabel', 'Shipping Policy'), enabled: on('TabShipping') },
+        { key: 'review', label: cms('TabReviewLabel', 'Give us a Review'), enabled: on('TabReview') },
+    ].filter(t => t.enabled);
+    const currentTab = tabs.some(t => t.key === activeTab) ? activeTab : 'details';
 
     return (
         <div className="w-full flex flex-col items-center bg-white font-sans text-[#1D1D1F] tracking-tight antialiased">
@@ -186,9 +244,10 @@ export default function ProductDetailPage() {
                 }}
             >
                 {/* Breadcrumb */}
+                {on('Breadcrumb') && (
                 <div className="w-full max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8 text-[14px] font-medium text-[#586A84]">
                     <div className="flex items-center gap-2">
-                        <Link href="/" className="hover:text-black transition-colors">Shop all</Link>
+                        <Link href={cms('BreadcrumbHomeLink', '/')} className="hover:text-black transition-colors">{cms('BreadcrumbHomeLabel', 'Shop all')}</Link>
                         <span className="text-gray-300 text-[16px] leading-none mb-0.5">›</span>
                         <Link href={`/category/${product.category?.toLowerCase() || 'all'}`} className="hover:text-black transition-colors">{product.category || 'Category'}</Link>
                         {product.subcategory?.name && (
@@ -199,6 +258,7 @@ export default function ProductDetailPage() {
                         )}
                     </div>
                 </div>
+                )}
 
                 <main className="w-full max-w-[1200px] mx-auto px-4 md:px-8">
                     <div
@@ -243,14 +303,18 @@ export default function ProductDetailPage() {
                                         opacity: 1
                                     }}
                                 >
-                                    <button className="flex items-center justify-center rounded-full transition-colors border border-transparent hover:border-gray-200"
-                                        style={{ width: '34px', height: '34px', background: 'hsla(0, 0%, 93%, 1)', color: 'hsla(0, 0%, 16%, 1)' }}>
-                                        <Heart size={20} weight="regular" />
-                                    </button>
-                                    <button className="flex items-center justify-center rounded-full transition-colors border border-transparent hover:border-gray-200"
-                                        style={{ width: '34px', height: '34px', background: 'hsla(0, 0%, 93%, 1)', color: 'hsla(0, 0%, 16%, 1)' }}>
-                                        <ExportIcon size={20} />
-                                    </button>
+                                    {on('Wishlist') && (
+                                        <button className="flex items-center justify-center rounded-full transition-colors border border-transparent hover:border-gray-200"
+                                            style={{ width: '34px', height: '34px', background: 'hsla(0, 0%, 93%, 1)', color: 'hsla(0, 0%, 16%, 1)' }}>
+                                            <Heart size={20} weight="regular" />
+                                        </button>
+                                    )}
+                                    {on('Share') && (
+                                        <button className="flex items-center justify-center rounded-full transition-colors border border-transparent hover:border-gray-200"
+                                            style={{ width: '34px', height: '34px', background: 'hsla(0, 0%, 93%, 1)', color: 'hsla(0, 0%, 16%, 1)' }}>
+                                            <ExportIcon size={20} />
+                                        </button>
+                                    )}
                                 </div>
 
                                 <Swiper
@@ -314,6 +378,7 @@ export default function ProductDetailPage() {
                             </div>
 
                             {/* Thumbnails Slider */}
+                            {on('Thumbnails') && (
                             <div className="w-full h-[80px] md:h-[110px]">
                                 <Swiper
                                     onSwiper={setThumbsSwiper}
@@ -338,6 +403,7 @@ export default function ProductDetailPage() {
                                     ))}
                                 </Swiper>
                             </div>
+                            )}
                         </div>
 
                         {/* Right Column - Product Purchase Details */}
@@ -391,6 +457,7 @@ export default function ProductDetailPage() {
                                             opacity: 1
                                         }}
                                     >
+                                        {on('Rating') && (
                                         <div
                                             className="flex items-center"
                                             style={{
@@ -419,14 +486,18 @@ export default function ProductDetailPage() {
                                             </div>
                                             <span className="text-[12px] font-medium text-[#333333]">{product.rating || "4.5"} ({product.numReviews || 12})</span>
                                         </div>
+                                        )}
+                                        {on('DeliveryBadge') && (
                                         <div className="bg-[#00b505] text-white text-[12px] font-medium px-2 py-0.5 rounded-[8px] flex items-center justify-center gap-1.5 h-full whitespace-nowrap">
                                             <BsTruck size={13} className="stroke-[0.5]" />
-                                            <span className="mt-[1px]">{product.deliveryTime || pageLayout?.productPageDeliveryText || "2-4 days"}</span>
+                                            <span className="mt-[1px]">{product.deliveryTime || cms('DeliveryText', '2-4 days')}</span>
                                         </div>
+                                        )}
                                     </div>
                                 </div>
 
                                 {/* Interactive Slider Section — desktop only */}
+                                {on('TenureSlider') && (
                                 <div
                                     className="hidden lg:flex flex-col"
                                     style={{
@@ -472,10 +543,10 @@ export default function ProductDetailPage() {
                                                     textDecorationSkipInk: 'auto'
                                                 }}
                                             >
-                                                {pageLayout?.productPageTenureSliderLabel || 'Select your minimum rental period'}
+                                                {cms('TenureSliderLabel', 'Select your minimum rental period')}
                                             </span>
                                         </h3>
-                                        <span className="text-[16px] font-semibold text-[#1f1f1f] tracking-[-0.4px]">{duration === 1 ? '1 Month' : `${duration} Months`}</span>
+                                        <span className="text-[16px] font-semibold text-[#1f1f1f] tracking-[-0.4px]">{`${duration} ${monthWord(duration)}`}</span>
                                     </div>
 
                                     {/* Tenure Slider */}
@@ -489,9 +560,13 @@ export default function ProductDetailPage() {
                                         }}
                                     >
                                         {(() => {
-                                            const currentStep = duration <= 1 ? 1 : duration <= 3 ? 2 : duration <= 6 ? 3 : duration <= 9 ? 4 : 5;
-                                            const activePct = ((currentStep - 1) / 4) * 100;
-                                            const labels = ["1+", "3+", "6+", "9+", "12+"];
+                                            // Steps come straight from the CMS tenure list.
+                                            const stepCount = tenures.length;
+                                            const lastIdx = Math.max(stepCount - 1, 1);
+                                            const matchIdx = tenures.findIndex(t => duration <= t.months);
+                                            const currentStep = (matchIdx === -1 ? stepCount - 1 : matchIdx) + 1;
+                                            const activePct = ((currentStep - 1) / lastIdx) * 100;
+                                            const labels = tenures.map(t => t.label);
 
                                             return (
                                                 <>
@@ -527,13 +602,12 @@ export default function ProductDetailPage() {
                                                         <input
                                                             type="range"
                                                             min="1"
-                                                            max="5"
+                                                            max={stepCount}
                                                             step="1"
                                                             value={currentStep}
                                                             onChange={(e) => {
                                                                 const step = parseInt(e.target.value);
-                                                                const months = [1, 3, 6, 9, 12];
-                                                                setDuration(months[step - 1]);
+                                                                setDuration(tenures[step - 1]?.months || 1);
                                                             }}
                                                             className="absolute w-full opacity-0 cursor-pointer z-20"
                                                             style={{ height: '24px', top: '-9px' }}
@@ -542,11 +616,11 @@ export default function ProductDetailPage() {
 
                                                     {/* Labels and Ticks */}
                                                     <div className="relative w-full" style={{ height: '20px' }}>
-                                                        {[1, 2, 3, 4, 5].map(step => {
-                                                            const pct = ((step - 1) / 4) * 100;
+                                                        {labels.map((label, i) => {
+                                                            const pct = (i / lastIdx) * 100;
                                                             return (
                                                                 <div
-                                                                    key={step}
+                                                                    key={i}
                                                                     className="absolute flex flex-col items-center pointer-events-none"
                                                                     style={{
                                                                         left: `calc(${pct}%)`,
@@ -568,7 +642,7 @@ export default function ProductDetailPage() {
                                                                             letterSpacing: '-0.48px'
                                                                         }}
                                                                     >
-                                                                        {labels[step - 1]}
+                                                                        {label}
                                                                     </span>
                                                                 </div>
                                                             );
@@ -581,8 +655,9 @@ export default function ProductDetailPage() {
 
                                     {/* Links */}
                                     <div className="flex justify-between items-center">
+                                        {on('PriceBreakdown') ? (
                                         <Link
-                                            href="#"
+                                            href={cms('PriceBreakdownLink', '#')}
                                             style={{
                                                 width: '89px',
                                                 height: '16px',
@@ -600,9 +675,10 @@ export default function ProductDetailPage() {
                                                 whiteSpace: 'nowrap'
                                             }}
                                         >
-                                            {pageLayout?.productPagePriceBreakdownText || 'price breakdown'}
+                                            {cms('PriceBreakdownText', 'price breakdown')}
                                         </Link>
-                                        {(pageLayout?.productPageEnableCompare !== false) && (
+                                        ) : <span />}
+                                        {on('Compare') && (
                                             <button
                                                 onClick={() => setIsCompareOpen(true)}
                                                 style={{
@@ -622,11 +698,12 @@ export default function ProductDetailPage() {
                                                     padding: 0
                                                 }}
                                             >
-                                                {pageLayout?.productPageCompareLinkText || 'compare all tenures'}
+                                                {cms('CompareLinkText', 'compare all tenures')}
                                             </button>
                                         )}
                                     </div>
                                 </div>
+                                )}
 
                                 {/* Price & Quantity Footer Card */}
                                 <div
@@ -670,7 +747,7 @@ export default function ProductDetailPage() {
                                                     ₹{currentPlan.price * quantity}
                                                 </span>
                                                 <span style={{ fontFamily: 'Manrope, sans-serif', fontWeight: 400, fontSize: '13px', color: 'hsla(0, 0%, 46%, 1)', whiteSpace: 'nowrap' }}>
-                                                    /mo for {duration} month{duration > 1 ? 's' : ''}
+                                                    {cms('MobilePriceSuffix', '/mo for')} {duration} {monthWord(duration).toLowerCase()}
                                                 </span>
                                             </div>
 
@@ -681,7 +758,7 @@ export default function ProductDetailPage() {
                                                         ₹{currentPlan.price * quantity}
                                                     </span>
                                                     <span style={{ fontFamily: 'Manrope, sans-serif', fontWeight: 400, fontSize: '16px', lineHeight: 1, letterSpacing: '-0.04em', color: '#757575' }}>
-                                                        /month
+                                                        {cms('PerMonthLabel', '/month')}
                                                     </span>
                                                 </div>
                                                 <div className="flex items-center gap-[4px]">
@@ -692,13 +769,14 @@ export default function ProductDetailPage() {
                                                         style={{ height: '22px', borderRadius: '27px', padding: '4px 10px', background: '#ed2115', color: '#fff2f1' }}>
                                                         {product.mrp
                                                             ? `${Math.round(((product.mrp - currentPlan.price) / product.mrp) * 100)}% off`
-                                                            : (pageLayout?.productPageDiscountText || "20% off")
+                                                            : cms('DiscountText', '20% off')
                                                         }
                                                     </span>
                                                 </div>
                                             </div>
                                         </div>
 
+                                        {on('Quantity') && (
                                         <div
                                             className="flex items-center justify-end"
                                             style={{
@@ -710,7 +788,7 @@ export default function ProductDetailPage() {
                                                 opacity: 1
                                             }}
                                         >
-                                            <span className="hidden lg:inline text-[14px] text-[#333333] font-medium">Quantity</span>
+                                            <span className="hidden lg:inline text-[14px] text-[#333333] font-medium">{cms('QuantityLabel', 'Quantity')}</span>
                                             <div className="flex items-center gap-4">
                                                 <button onClick={() => setQuantity(Math.max(1, quantity - 1))} className="text-gray-400 hover:text-black transition-colors">
                                                     <FaMinus size={11} />
@@ -723,9 +801,11 @@ export default function ProductDetailPage() {
                                                 </button>
                                             </div>
                                         </div>
+                                        )}
                                     </div>
 
                                     {/* View All Benefits Row */}
+                                    {on('ViewAllBenefits') && (
                                     <div
                                         className="flex items-center justify-center w-full grow"
                                         style={{ borderTop: '1px solid hsla(0, 0%, 93%, 1)' }}
@@ -747,13 +827,15 @@ export default function ProductDetailPage() {
                                                 cursor: 'pointer'
                                             }}
                                         >
-                                            View All Benefits
+                                            {cms('ViewAllBenefitsText', 'View All Benefits')}
                                         </button>
                                     </div>
+                                    )}
                                 </div>
                             </div>
 
                             {/* What's included in your plan Section */}
+                            {on('Benefits') && (
                             <div
                                 className="flex flex-col"
                                 style={{
@@ -774,7 +856,7 @@ export default function ProductDetailPage() {
                                             opacity: 1
                                         }}
                                     >
-                                        {pageLayout?.productPageBenefitsHeading || 'What’s included in your plan'}
+                                        {cms('BenefitsHeading', 'What’s included in your plan')}
                                     </h4>
                                 </div>
 
@@ -834,13 +916,16 @@ export default function ProductDetailPage() {
                                     })}
                                 </div>
                             </div>
+                            )}
 
                             {/* Deposit & KYC Information Row */}
+                            {(on('DepositCard') || on('KycCard')) && (
                             <div
                                 className="flex flex-col lg:flex-row gap-[6px] lg:items-center"
                                 style={{ width: '100%' }}
                             >
                                 {/* Refundable Deposit Card */}
+                                {on('DepositCard') && (
                                 <div
                                     className="w-full rounded-[12px] flex items-center justify-between px-[12px] py-[14px] lg:py-[2px] lg:px-[8px] lg:h-[56px]"
                                     style={{
@@ -851,14 +936,16 @@ export default function ProductDetailPage() {
                                     }}
                                 >
                                     <span style={{ fontFamily: '"Mona Sans", sans-serif', fontWeight: 600, fontSize: '12px', lineHeight: '16px', letterSpacing: '-0.4px', color: '#0859c5' }}>
-                                        {pageLayout?.productPageDepositLabel || '100% Refundable Deposit'}
+                                        {cms('DepositLabel', '100% Refundable Deposit')}
                                     </span>
                                     <span style={{ fontFamily: '"Mona Sans", sans-serif', fontWeight: 600, fontSize: '16px', lineHeight: '23px', letterSpacing: '-0.4px', color: '#0859c5', whiteSpace: 'nowrap' }}>
                                         ₹{product.securityDeposit ? `${product.securityDeposit.toLocaleString('en-IN')}/-` : '20,000/-'}
                                     </span>
                                 </div>
+                                )}
 
                                 {/* KYC & Delivery Card */}
+                                {on('KycCard') && (
                                 <div
                                     className="w-full flex items-center justify-between overflow-hidden rounded-[12px] lg:h-[56px]"
                                     style={{
@@ -874,17 +961,21 @@ export default function ProductDetailPage() {
                                 >
                                     <div className="flex flex-col justify-center" style={{ flex: 1, minWidth: 0 }}>
                                         <span style={{ fontFamily: '"Mona Sans", sans-serif', fontWeight: 600, fontSize: '12px', lineHeight: '16px', letterSpacing: '-0.4px', color: '#7e22ce' }}>
-                                            Place Order &amp; complete KYC anytime
+                                            {cms('KycLine1', 'Place Order & complete KYC anytime')}
                                         </span>
                                         <span style={{ fontFamily: '"Mona Sans", sans-serif', fontWeight: 500, fontSize: '12px', lineHeight: '16px', letterSpacing: '-0.4px', color: '#7e22ce' }}>
-                                            to get your items the next day
+                                            {cms('KycLine2', 'to get your items the next day')}
                                         </span>
                                     </div>
-                                    <div style={{ width: '64px', alignSelf: 'stretch', background: 'hsla(0, 0%, 89%, 1)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                                        <span style={{ fontFamily: '"Mona Sans", sans-serif', fontWeight: 600, fontSize: '11px', color: '#000' }}>gif</span>
-                                    </div>
+                                    {cms('KycImage', '') && (
+                                        <div style={{ width: '64px', alignSelf: 'stretch', background: 'hsla(0, 0%, 89%, 1)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, overflow: 'hidden' }}>
+                                            <img src={cms('KycImage', '')} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                        </div>
+                                    )}
                                 </div>
+                                )}
                             </div>
+                            )}
 
                             {/* Primary CTA */}
                             <button
@@ -899,12 +990,13 @@ export default function ProductDetailPage() {
                                     letterSpacing: '-0.4px',
                                     color: '#333333'
                                 }}>
-                                    <span className="lg:hidden">Book Your Plan</span>
-                                    <span className="hidden lg:inline">{pageLayout?.productPageCtaText || 'Rent Now'}</span>
+                                    <span className="lg:hidden">{cms('CtaTextMobile', 'Book Your Plan')}</span>
+                                    <span className="hidden lg:inline">{cms('CtaText', 'Rent Now')}</span>
                                 </span>
                             </button>
 
                             {/* High-Fidelity Info Row */}
+                            {on('InfoCards') && (
                             <div className="flex flex-col lg:flex-row gap-[10px] lg:items-center w-full">
                                 {/* Cancel/Return Card */}
                                 <div
@@ -924,11 +1016,11 @@ export default function ProductDetailPage() {
                                             <Truck size={20} color="hsla(29, 100%, 44%, 1)" />
                                         </div>
                                         <span style={{ flex: 1, fontFamily: '"Mona Sans", sans-serif', fontWeight: 600, fontSize: '12px', lineHeight: '16px', color: '#e26e00' }}>
-                                            What if I cancel or return before 6 months?
+                                            {cms('CancelCardText', 'What if I cancel or return before 6 months?')}
                                         </span>
                                         <button onClick={() => setIsCancellationOpen(true)}
                                             style={{ fontFamily: '"Mona Sans", sans-serif', fontSize: '12px', fontWeight: 600, color: 'hsla(3, 86%, 51%, 1)', textDecoration: 'underline', background: 'none', border: 'none', cursor: 'pointer', padding: 0, whiteSpace: 'nowrap', flexShrink: 0 }}>
-                                            View Details
+                                            {cms('CancelCardLinkText', 'View Details')}
                                         </button>
                                     </div>
                                 </div>
@@ -951,17 +1043,19 @@ export default function ProductDetailPage() {
                                             <CalendarDots size={20} color="hsla(29, 100%, 44%, 1)" />
                                         </div>
                                         <span style={{ flex: 1, fontFamily: '"Mona Sans", sans-serif', fontWeight: 600, fontSize: '12px', lineHeight: '16px', color: '#e26e00' }}>
-                                            How do I extend tenure after 6 months?
+                                            {cms('ExtendCardText', 'How do I extend tenure after 6 months?')}
                                         </span>
-                                        <Link href="#"
+                                        <Link href={cms('ExtendCardLink', '#')}
                                             style={{ fontFamily: '"Mona Sans", sans-serif', fontSize: '12px', fontWeight: 600, color: 'hsla(3, 86%, 51%, 1)', textDecoration: 'underline', whiteSpace: 'nowrap', flexShrink: 0 }}>
-                                            View Details
+                                            {cms('ExtendCardLinkText', 'View Details')}
                                         </Link>
                                     </div>
                                 </div>
                             </div>
+                            )}
 
                             {/* Delivery Details */}
+                            {on('PincodeCheck') && (
                             <div className="w-full flex flex-col gap-[6px]">
                                 <div
                                     style={{
@@ -980,7 +1074,7 @@ export default function ProductDetailPage() {
                                         <MapPin weight="fill" size={18} color="hsla(120, 100%, 35%, 1)" />
                                     </div>
                                     <span style={{ fontFamily: '"Mona Sans", sans-serif', fontWeight: 600, fontSize: '12px', color: '#545454', whiteSpace: 'nowrap' }}>
-                                        Delivery
+                                        {cms('DeliveryLabel', 'Delivery')}
                                     </span>
                                     <div className="flex items-center px-3" style={{ border: '1px solid #cbcbcb', borderRadius: '8px', flex: 1, height: '39px' }}>
                                         <input
@@ -993,7 +1087,7 @@ export default function ProductDetailPage() {
                                                 setPinResult(null);
                                             }}
                                             onKeyDown={(e) => { if (e.key === 'Enter') handleCheckPincode(); }}
-                                            placeholder="Enter your pincode"
+                                            placeholder={cms('PincodePlaceholder', 'Enter your pincode')}
                                             style={{ border: 'none', outline: 'none', fontSize: '12px', letterSpacing: '-0.4px', fontFamily: '"Mona Sans", sans-serif', fontWeight: 500, width: '100%', background: 'transparent', color: '#1D1D1F' }}
                                         />
                                     </div>
@@ -1003,11 +1097,11 @@ export default function ProductDetailPage() {
                                         className="hidden lg:flex flex-col items-start justify-center"
                                         style={{ width: '125px', fontFamily: '"Mona Sans", sans-serif', fontWeight: 700, fontSize: '12px', lineHeight: '16px', letterSpacing: '-0.4px', color: '#757575', background: 'none', border: 'none', cursor: pinChecking ? 'wait' : 'pointer', padding: 0, flexShrink: 0 }}>
                                         {pinChecking ? (
-                                            <span>Checking…</span>
+                                            <span>{cms('PincodeCheckingText', 'Checking…')}</span>
                                         ) : (
                                             <>
-                                                <span>Check availability</span>
-                                                <span>in your state</span>
+                                                <span>{cms('PincodeCtaLine1', 'Check availability')}</span>
+                                                <span>{cms('PincodeCtaLine2', 'in your state')}</span>
                                             </>
                                         )}
                                     </button>
@@ -1017,7 +1111,7 @@ export default function ProductDetailPage() {
                                         disabled={pinChecking}
                                         className="lg:hidden shrink-0"
                                         style={{ height: '38px', padding: '0 14px', borderRadius: '10px', fontFamily: '"Mona Sans", sans-serif', fontWeight: 700, fontSize: '12px', color: '#1D1D1F', background: 'hsla(44, 100%, 64%, 1)', border: 'none', cursor: pinChecking ? 'wait' : 'pointer', whiteSpace: 'nowrap' }}>
-                                        {pinChecking ? '…' : 'Check'}
+                                        {pinChecking ? '…' : cms('PincodeMobileCtaText', 'Check')}
                                     </button>
                                 </div>
 
@@ -1037,10 +1131,12 @@ export default function ProductDetailPage() {
                                     </div>
                                 )}
                             </div>
+                            )}
                         </div>
                     </div>
 
                     {/* High-Fidelity Details Tabs Section */}
+                    {on('Tabs') && (
                     <div
                         className="px-[10px] lg:px-[20px]"
                         style={{
@@ -1062,13 +1158,13 @@ export default function ProductDetailPage() {
                     >
                         {/* Tabs Header */}
                         <div className="flex items-center gap-[8px] w-full overflow-x-auto no-scrollbar">
-                            {['Product Details', 'Return Policy', 'Shipping Policy', 'Give us a Review'].map((tab) => {
-                                const isActive = activeTab === tab;
-                                const isReview = tab === 'Give us a Review';
+                            {tabs.map(({ key, label }) => {
+                                const isActive = currentTab === key;
+                                const isReview = key === 'review';
                                 return (
                                     <button
-                                        key={tab}
-                                        onClick={() => setActiveTab(tab)}
+                                        key={key}
+                                        onClick={() => setActiveTab(key)}
                                         style={{
                                             flex: '0 0 auto',
                                             height: '44px',
@@ -1090,7 +1186,7 @@ export default function ProductDetailPage() {
                                             justifyContent: 'center'
                                         }}
                                     >
-                                        {tab}
+                                        {label}
                                     </button>
                                 );
                             })}
@@ -1101,21 +1197,11 @@ export default function ProductDetailPage() {
 
                         {/* Content Area */}
                         <div className="flex-1 overflow-hidden" style={{ width: '100%' }}>
-                            {activeTab === 'Product Details' && (
+                            {currentTab === 'details' && (
                                 <>
                                     {/* Mobile: single column list */}
                                     <div className="flex flex-col gap-[20px] pt-4 lg:hidden">
-                                        {(product.specifications && product.specifications.length > 0 ? product.specifications : [
-                                            { label: 'MODEL', value: product.name },
-                                            { label: 'DISPLAY', value: '16.2 inches (3024 x 1964)' },
-                                            { label: 'GRAPHICS', value: 'Apple Integrated 16-core GPU' },
-                                            { label: 'DIMENSIONS', value: '35.57 x 35.57 x 1.68 cm * 2.14 kg' },
-                                            { label: 'OPERATING SYSTEM', value: 'Mac OS' },
-                                            { label: 'MEMORY', value: '24GB' },
-                                            { label: 'PROCESSOR', value: 'Apple M4 Pro' },
-                                            { label: 'STORAGE', value: '512GB SSD' },
-                                            { label: 'KEYBOARD LANGUAGE', value: 'English (Qwerty)' }
-                                        ]).map((item, idx) => (
+                                        {specRows.map((item, idx) => (
                                             <div key={idx} style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
                                                 <h4 style={{ fontFamily: '"Mona Sans", sans-serif', fontWeight: 700, fontSize: '12px', lineHeight: '16px', letterSpacing: '0.05em', color: '#000', textTransform: 'uppercase' }}>
                                                     {item.label}
@@ -1136,17 +1222,7 @@ export default function ProductDetailPage() {
                                             gridAutoColumns: 'minmax(250px, 1fr)'
                                         }}
                                     >
-                                        {(product.specifications && product.specifications.length > 0 ? product.specifications : [
-                                            { label: 'MODEL', value: product.name },
-                                            { label: 'DISPLAY', value: '16.2 inches (3024 x 1964)' },
-                                            { label: 'GRAPHICS', value: 'Apple Integrated 16-core GPU' },
-                                            { label: 'DIMENSIONS', value: '35.57 x 35.57 x 1.68 cm * 2.14 kg' },
-                                            { label: 'OPERATING SYSTEM', value: 'Mac OS' },
-                                            { label: 'MEMORY', value: '24GB' },
-                                            { label: 'PROCESSOR', value: 'Apple M4 Pro' },
-                                            { label: 'STORAGE', value: '512GB SSD' },
-                                            { label: 'KEYBOARD LANGUAGE', value: 'English (Qwerty)' }
-                                        ]).map((item, idx) => (
+                                        {specRows.map((item, idx) => (
                                             <div key={idx} style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
                                                 <h4 style={{ fontFamily: '"Mona Sans", sans-serif', fontWeight: 600, fontSize: '13px', lineHeight: '18px', letterSpacing: '0.02em', color: '#000', textTransform: 'uppercase' }}>
                                                     {item.label}
@@ -1160,29 +1236,29 @@ export default function ProductDetailPage() {
                                 </>
                             )}
 
-                            {activeTab === 'Return Policy' && (
+                            {currentTab === 'return' && (
                                 <div className="pt-4" style={{ fontFamily: '"Mona Sans", sans-serif', fontSize: '15px', color: '#4B4B4B', lineHeight: '1.6' }}>
-                                    {product.returnPolicy || "Standard return policy applies. Please contact support for details."}
+                                    {product.returnPolicy || cms('DefaultReturnPolicy', 'Standard return policy applies. Please contact support for details.')}
                                 </div>
                             )}
 
-                            {activeTab === 'Shipping Policy' && (
+                            {currentTab === 'shipping' && (
                                 <div className="pt-4" style={{ fontFamily: '"Mona Sans", sans-serif', fontSize: '15px', color: '#4B4B4B', lineHeight: '1.6' }}>
-                                    {product.shippingPolicy || "Standard shipping policy applies. Delivery usually takes 2-5 business days."}
+                                    {product.shippingPolicy || cms('DefaultShippingPolicy', 'Standard shipping policy applies. Delivery usually takes 2-5 business days.')}
                                 </div>
                             )}
 
-                            {activeTab === 'Give us a Review' && (
+                            {currentTab === 'review' && (
                                 <div className="pt-4 flex flex-col gap-4 max-w-[560px]">
                                     {reviewSubmitted ? (
                                         <div style={{ fontFamily: '"Mona Sans", sans-serif', fontSize: '15px', color: 'hsla(122, 100%, 30%, 1)', fontWeight: 600 }}>
-                                            Thanks for your review! 🎉
+                                            {cms('ReviewThanksText', 'Thanks for your review!')} 🎉
                                         </div>
                                     ) : (
                                         <>
                                             <div className="flex flex-col gap-1">
                                                 <span style={{ fontFamily: '"Mona Sans", sans-serif', fontWeight: 600, fontSize: '15px', color: '#1D1D1F' }}>
-                                                    How was your experience?
+                                                    {cms('ReviewPrompt', 'How was your experience?')}
                                                 </span>
                                                 <div className="flex items-center gap-1">
                                                     {[1, 2, 3, 4, 5].map((s) => (
@@ -1202,7 +1278,7 @@ export default function ProductDetailPage() {
                                             <textarea
                                                 value={reviewText}
                                                 onChange={(e) => setReviewText(e.target.value)}
-                                                placeholder="Tell others what you liked (or didn't)…"
+                                                placeholder={cms('ReviewPlaceholder', "Tell others what you liked (or didn't)…")}
                                                 rows={4}
                                                 style={{ width: '100%', border: '1px solid hsla(0, 0%, 89%, 1)', borderRadius: '12px', padding: '12px', fontFamily: '"Mona Sans", sans-serif', fontSize: '14px', color: '#1D1D1F', outline: 'none', resize: 'vertical' }}
                                             />
@@ -1223,7 +1299,7 @@ export default function ProductDetailPage() {
                                                     cursor: reviewRating === 0 ? 'not-allowed' : 'pointer'
                                                 }}
                                             >
-                                                Submit Review
+                                                {cms('ReviewSubmitText', 'Submit Review')}
                                             </button>
                                         </>
                                     )}
@@ -1231,29 +1307,35 @@ export default function ProductDetailPage() {
                             )}
                         </div>
                     </div>
+                    )}
                 </main>
             </div>
 
-            {pageLayout?.productPageEnableTestimonials !== false && (
-                <div className="hidden lg:block"><Testimonials /></div>
+            {on('Testimonials') && (
+                <div className="hidden lg:block">
+                    <Testimonials
+                        titleOverride={cms('TestimonialsHeading', null)}
+                        subtitleOverride={cms('TestimonialsSubheading', null)}
+                    />
+                </div>
             )}
 
-            {pageLayout?.productPageEnableRelated !== false && (
+            {on('Related') && (
                 <BestRentedProducts
                     customProducts={product.pageLayout?.relatedProducts?.length > 0 ? product.pageLayout.relatedProducts : null}
-                    titleOverride={pageLayout?.productPageRelatedHeading || null}
+                    titleOverride={cms('RelatedHeading', null)}
                     productIdsOverride={pageLayout?.productPageGlobalRelatedIds || null}
                 />
             )}
 
-            <RentVsBuy />
+            {on('RentVsBuy') && <RentVsBuy />}
 
-            {pageLayout?.productPageEnableFaq !== false && (
+            {on('Faq') && (
                 product.faqs && product.faqs.length > 0 ? (
                     <FaqSection cmsData={{
                         faqItems: product.faqs,
-                        faqTitle: pageLayout?.productPageFaqHeading || "Product FAQs",
-                        faqSubtitle: pageLayout?.productPageFaqSubheading || "Specific questions about this product.",
+                        faqTitle: cms('FaqHeading', 'Product FAQs'),
+                        faqSubtitle: cms('FaqSubheading', 'Specific questions about this product.'),
                     }} />
                 ) : (
                     <FaqSection limit={5} />

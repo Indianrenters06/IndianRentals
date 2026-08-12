@@ -139,14 +139,27 @@ productSchema.add({
         required: true,
         default: 0,
     },
-    // Layout Overrides
+    // Layout Overrides — anything left null/blank falls back to the global
+    // product-page CMS template.
     pageLayout: {
         enableCompare: { type: Boolean, default: null },
         enableRelated: { type: Boolean, default: null },
         enableFaq: { type: Boolean, default: null },
         enableTestimonials: { type: Boolean, default: null },
+        enableRating: { type: Boolean, default: null },
+        enablePriceBreakdown: { type: Boolean, default: null },
+        enableTenureSlider: { type: Boolean, default: null },
+        enableQuantity: { type: Boolean, default: null },
         discountText: { type: String, default: "" },
         deliveryText: { type: String, default: "" },
+        ctaText: { type: String, default: "" },
+        compareLinkText: { type: String, default: "" },
+        priceBreakdownText: { type: String, default: "" },
+        tenureSliderLabel: { type: String, default: "" },
+        benefitsHeading: { type: String, default: "" },
+        testimonialsHeading: { type: String, default: "" },
+        faqHeading: { type: String, default: "" },
+        relatedHeading: { type: String, default: "" },
         benefits: { type: [String], default: [] },
         relatedProducts: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Product' }]
     }

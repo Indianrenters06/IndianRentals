@@ -15,14 +15,63 @@ const DEFAULTS = {
     productPageDeliveryText: "2-4 days",
     productPageDiscountText: "33% off",
     productPageCtaText: "Rent Now",
+    productPageCtaTextMobile: "Book Your Plan",
     productPageCompareLinkText: "compare all tenures",
     productPagePriceBreakdownText: "price breakdown",
+    productPagePriceBreakdownLink: "#",
     productPageTenureSliderLabel: "Select your minimum rental period",
     productPageBenefitsHeading: "What's included in your plan:",
     productPageTestimonialsHeading: "Don't just take our word for it",
+    productPageTestimonialsSubheading: "",
     productPageFaqHeading: "Product FAQs",
+    productPageFaqSubheading: "Specific questions about this product.",
     productPageRelatedHeading: "Best Rented Products",
     productPageGlobalRelatedIds: [],
+    productPageLoadingText: "Loading...",
+    productPageNotFoundText: "Product not found",
+    productPageBreadcrumbHomeLabel: "Shop all",
+    productPageBreadcrumbHomeLink: "/",
+    productPagePerMonthLabel: "/month",
+    productPageMobilePriceSuffix: "/mo for",
+    productPageMonthLabel: "Month",
+    productPageMonthsLabel: "Months",
+    productPageQuantityLabel: "Quantity",
+    productPageViewAllBenefitsText: "View All Benefits",
+    productPageDepositLabel: "100% Refundable Deposit",
+    productPageKycLine1: "Place Order & complete KYC anytime",
+    productPageKycLine2: "to get your items the next day",
+    productPageKycImage: "",
+    productPageTenures: [
+        { label: "1+", months: 1, discountPercent: 0 },
+        { label: "3+", months: 3, discountPercent: 10 },
+        { label: "6+", months: 6, discountPercent: 20 },
+        { label: "9+", months: 9, discountPercent: 25 },
+        { label: "12+", months: 12, discountPercent: 30 },
+    ],
+    productPageCancelCardText: "What if I cancel or return before 6 months?",
+    productPageCancelCardLinkText: "View Details",
+    productPageExtendCardText: "How do I extend tenure after 6 months?",
+    productPageExtendCardLinkText: "View Details",
+    productPageExtendCardLink: "#",
+    productPageDeliveryLabel: "Delivery",
+    productPagePincodePlaceholder: "Enter your pincode",
+    productPagePincodeCtaLine1: "Check availability",
+    productPagePincodeCtaLine2: "in your state",
+    productPagePincodeCheckingText: "Checking...",
+    productPagePincodeMobileCtaText: "Check",
+    productPagePincodeInvalidText: "Please enter a valid 6-digit pincode.",
+    productPagePincodeErrorText: "Could not check right now. Please try again.",
+    productPageTabDetailsLabel: "Product Details",
+    productPageTabReturnLabel: "Return Policy",
+    productPageTabShippingLabel: "Shipping Policy",
+    productPageTabReviewLabel: "Give us a Review",
+    productPageDefaultReturnPolicy: "Standard return policy applies. Please contact support for details.",
+    productPageDefaultShippingPolicy: "Standard shipping policy applies. Delivery usually takes 2-5 business days.",
+    productPageDefaultSpecs: [],
+    productPageReviewPrompt: "How was your experience?",
+    productPageReviewPlaceholder: "Tell others what you liked (or didn't)...",
+    productPageReviewSubmitText: "Submit Review",
+    productPageReviewThanksText: "Thanks for your review!",
     productPageEnableCompare: true,
     productPageEnableRelated: true,
     productPageEnableFaq: true,
@@ -31,7 +80,146 @@ const DEFAULTS = {
     productPageEnablePriceBreakdown: true,
     productPageEnableTenureSlider: true,
     productPageEnableQuantity: true,
+    productPageEnableBreadcrumb: true,
+    productPageEnableWishlist: true,
+    productPageEnableShare: true,
+    productPageEnableThumbnails: true,
+    productPageEnableDeliveryBadge: true,
+    productPageEnableBenefits: true,
+    productPageEnableViewAllBenefits: true,
+    productPageEnableDepositCard: true,
+    productPageEnableKycCard: true,
+    productPageEnableInfoCards: true,
+    productPageEnablePincodeCheck: true,
+    productPageEnableTabs: true,
+    productPageEnableTabReturn: true,
+    productPageEnableTabShipping: true,
+    productPageEnableTabReview: true,
+    productPageEnableRentVsBuy: true,
 };
+
+// Everything on the storefront product page, grouped for the content editor.
+// [field key, label, textarea?]
+const CONTENT_GROUPS = [
+    {
+        title: 'Page states & breadcrumb',
+        fields: [
+            ['productPageLoadingText', 'Loading text'],
+            ['productPageNotFoundText', 'Product-not-found text'],
+            ['productPageBreadcrumbHomeLabel', 'Breadcrumb home label'],
+            ['productPageBreadcrumbHomeLink', 'Breadcrumb home link'],
+        ],
+    },
+    {
+        title: 'Pricing & tenure copy',
+        fields: [
+            ['productPageTenureSliderLabel', 'Tenure slider label'],
+            ['productPagePriceBreakdownText', 'Price breakdown link text'],
+            ['productPagePriceBreakdownLink', 'Price breakdown link URL'],
+            ['productPageCompareLinkText', 'Compare tenures link text'],
+            ['productPagePerMonthLabel', 'Per-month suffix (desktop)'],
+            ['productPageMobilePriceSuffix', 'Price suffix (mobile)'],
+            ['productPageMonthLabel', 'Word for one month'],
+            ['productPageMonthsLabel', 'Word for many months'],
+            ['productPageQuantityLabel', 'Quantity label'],
+            ['productPageDiscountText', 'Fallback discount badge'],
+            ['productPageDeliveryText', 'Fallback delivery time'],
+            ['productPageViewAllBenefitsText', 'View-all-benefits link'],
+        ],
+    },
+    {
+        title: 'CTA, deposit & KYC',
+        fields: [
+            ['productPageCtaText', 'CTA button (desktop)'],
+            ['productPageCtaTextMobile', 'CTA button (mobile)'],
+            ['productPageBenefitsHeading', 'Benefits heading'],
+            ['productPageDepositLabel', 'Deposit card label'],
+            ['productPageKycLine1', 'KYC card line 1'],
+            ['productPageKycLine2', 'KYC card line 2'],
+            ['productPageKycImage', 'KYC card image URL'],
+        ],
+    },
+    {
+        title: 'Cancellation & tenure cards',
+        fields: [
+            ['productPageCancelCardText', 'Cancellation card text'],
+            ['productPageCancelCardLinkText', 'Cancellation card link text'],
+            ['productPageExtendCardText', 'Extend-tenure card text'],
+            ['productPageExtendCardLinkText', 'Extend-tenure link text'],
+            ['productPageExtendCardLink', 'Extend-tenure link URL'],
+        ],
+    },
+    {
+        title: 'Delivery / pincode check',
+        fields: [
+            ['productPageDeliveryLabel', 'Delivery label'],
+            ['productPagePincodePlaceholder', 'Pincode input placeholder'],
+            ['productPagePincodeCtaLine1', 'Check button line 1'],
+            ['productPagePincodeCtaLine2', 'Check button line 2'],
+            ['productPagePincodeCheckingText', 'Checking… text'],
+            ['productPagePincodeMobileCtaText', 'Mobile check button'],
+            ['productPagePincodeInvalidText', 'Invalid pincode message'],
+            ['productPagePincodeErrorText', 'Lookup failed message'],
+        ],
+    },
+    {
+        title: 'Details tabs',
+        fields: [
+            ['productPageTabDetailsLabel', 'Tab 1 label'],
+            ['productPageTabReturnLabel', 'Tab 2 label'],
+            ['productPageTabShippingLabel', 'Tab 3 label'],
+            ['productPageTabReviewLabel', 'Tab 4 label'],
+            ['productPageDefaultReturnPolicy', 'Fallback return policy', true],
+            ['productPageDefaultShippingPolicy', 'Fallback shipping policy', true],
+        ],
+    },
+    {
+        title: 'Review form',
+        fields: [
+            ['productPageReviewPrompt', 'Rating prompt'],
+            ['productPageReviewPlaceholder', 'Comment placeholder'],
+            ['productPageReviewSubmitText', 'Submit button'],
+            ['productPageReviewThanksText', 'Thank-you message'],
+        ],
+    },
+    {
+        title: 'Bottom sections',
+        fields: [
+            ['productPageTestimonialsHeading', 'Testimonials heading'],
+            ['productPageTestimonialsSubheading', 'Testimonials subheading'],
+            ['productPageRelatedHeading', 'Related products heading'],
+            ['productPageFaqHeading', 'FAQ heading'],
+            ['productPageFaqSubheading', 'FAQ subheading'],
+        ],
+    },
+];
+
+const SECTION_TOGGLES = [
+    ['productPageEnableBreadcrumb', 'Breadcrumb'],
+    ['productPageEnableThumbnails', 'Image thumbnails'],
+    ['productPageEnableWishlist', 'Wishlist button'],
+    ['productPageEnableShare', 'Share button'],
+    ['productPageEnableRating', 'Rating badge'],
+    ['productPageEnableDeliveryBadge', 'Delivery badge'],
+    ['productPageEnableTenureSlider', 'Tenure slider'],
+    ['productPageEnablePriceBreakdown', 'Price breakdown link'],
+    ['productPageEnableCompare', 'Compare tenures link'],
+    ['productPageEnableQuantity', 'Quantity selector'],
+    ['productPageEnableViewAllBenefits', 'View all benefits link'],
+    ['productPageEnableBenefits', 'Benefits strip'],
+    ['productPageEnableDepositCard', 'Deposit card'],
+    ['productPageEnableKycCard', 'KYC card'],
+    ['productPageEnableInfoCards', 'Cancellation / tenure cards'],
+    ['productPageEnablePincodeCheck', 'Pincode check'],
+    ['productPageEnableTabs', 'Details tabs'],
+    ['productPageEnableTabReturn', 'Return policy tab'],
+    ['productPageEnableTabShipping', 'Shipping policy tab'],
+    ['productPageEnableTabReview', 'Review tab'],
+    ['productPageEnableTestimonials', 'Testimonials section'],
+    ['productPageEnableRelated', 'Related products section'],
+    ['productPageEnableRentVsBuy', 'Rent vs Buy section'],
+    ['productPageEnableFaq', 'FAQ section'],
+];
 
 export default function ProductPageCMS() {
     const [globalData, setGlobalData] = useState(DEFAULTS);
@@ -659,6 +847,140 @@ export default function ProductPageCMS() {
                     </div>
                 </div>
             </div>
+
+            {/* ── Full content editor (global template only) ─────────────────── */}
+            {!isProduct && (
+                <div className="space-y-6">
+                    <div className="flex items-center gap-3">
+                        <h2 className="text-lg font-bold text-slate-900 dark:text-slate-100">Every other label on the page</h2>
+                        <span className="text-xs text-slate-500">Edits here apply to every product unless that product overrides them above.</span>
+                    </div>
+
+                    {CONTENT_GROUPS.map(group => (
+                        <div key={group.title} className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 shadow-sm">
+                            <h3 className="text-sm font-bold text-slate-800 dark:text-slate-100 uppercase tracking-wider mb-4">{group.title}</h3>
+                            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+                                {group.fields.map(([key, label, isArea]) => (
+                                    <div key={key} className={`flex flex-col gap-1 ${isArea ? 'md:col-span-2 xl:col-span-3' : ''}`}>
+                                        <label className="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">{label}</label>
+                                        {isArea ? (
+                                            <textarea
+                                                value={data[key] ?? ''}
+                                                onChange={e => set(key, e.target.value)}
+                                                rows={3}
+                                                className="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/30 resize-none"
+                                            />
+                                        ) : (
+                                            <input
+                                                value={data[key] ?? ''}
+                                                onChange={e => set(key, e.target.value)}
+                                                className="w-full h-10 px-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/30"
+                                            />
+                                        )}
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    ))}
+
+                    {/* Rental tenures */}
+                    <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 shadow-sm">
+                        <div className="flex items-center justify-between mb-4">
+                            <div>
+                                <h3 className="text-sm font-bold text-slate-800 dark:text-slate-100 uppercase tracking-wider">Rental tenures</h3>
+                                <p className="text-xs text-slate-500 mt-1">Drives the slider steps and the compare drawer. Discount % comes off the product&apos;s monthly rent.</p>
+                            </div>
+                            <button
+                                onClick={() => set('productPageTenures', [...(data.productPageTenures || []), { label: '', months: 1, discountPercent: 0 }])}
+                                className="flex items-center gap-1 text-xs font-semibold text-indigo-600 hover:text-indigo-700"
+                            >+ Add tenure</button>
+                        </div>
+                        <div className="space-y-2">
+                            {(data.productPageTenures || []).map((t, i) => {
+                                const patch = (k, v) => {
+                                    const next = [...data.productPageTenures];
+                                    next[i] = { ...next[i], [k]: k === 'label' ? v : Number(v) };
+                                    set('productPageTenures', next);
+                                };
+                                return (
+                                    <div key={i} className="flex items-end gap-3">
+                                        <div className="flex flex-col gap-1 w-24">
+                                            <label className="text-[11px] font-bold text-slate-500 uppercase">Label</label>
+                                            <input value={t.label ?? ''} onChange={e => patch('label', e.target.value)}
+                                                className="h-9 px-2 rounded-lg bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm dark:text-white" />
+                                        </div>
+                                        <div className="flex flex-col gap-1 w-24">
+                                            <label className="text-[11px] font-bold text-slate-500 uppercase">Months</label>
+                                            <input type="number" min="1" value={t.months ?? 1} onChange={e => patch('months', e.target.value)}
+                                                className="h-9 px-2 rounded-lg bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm dark:text-white" />
+                                        </div>
+                                        <div className="flex flex-col gap-1 w-28">
+                                            <label className="text-[11px] font-bold text-slate-500 uppercase">Discount %</label>
+                                            <input type="number" min="0" max="100" value={t.discountPercent ?? 0} onChange={e => patch('discountPercent', e.target.value)}
+                                                className="h-9 px-2 rounded-lg bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm dark:text-white" />
+                                        </div>
+                                        <button
+                                            onClick={() => set('productPageTenures', data.productPageTenures.filter((_, idx) => idx !== i))}
+                                            className="h-9 px-3 text-xs font-semibold text-red-500 hover:text-red-700"
+                                        >Remove</button>
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    </div>
+
+                    {/* Fallback specifications */}
+                    <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 shadow-sm">
+                        <div className="flex items-center justify-between mb-4">
+                            <div>
+                                <h3 className="text-sm font-bold text-slate-800 dark:text-slate-100 uppercase tracking-wider">Fallback specifications</h3>
+                                <p className="text-xs text-slate-500 mt-1">Shown under Product Details only when a product has no specifications of its own.</p>
+                            </div>
+                            <button
+                                onClick={() => set('productPageDefaultSpecs', [...(data.productPageDefaultSpecs || []), { label: '', value: '' }])}
+                                className="flex items-center gap-1 text-xs font-semibold text-indigo-600 hover:text-indigo-700"
+                            >+ Add spec</button>
+                        </div>
+                        <div className="space-y-2">
+                            {(data.productPageDefaultSpecs || []).map((s, i) => {
+                                const patch = (k, v) => {
+                                    const next = [...data.productPageDefaultSpecs];
+                                    next[i] = { ...next[i], [k]: v };
+                                    set('productPageDefaultSpecs', next);
+                                };
+                                return (
+                                    <div key={i} className="flex items-center gap-3">
+                                        <input value={s.label ?? ''} onChange={e => patch('label', e.target.value)} placeholder="LABEL"
+                                            className="h-9 px-2 w-52 rounded-lg bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm dark:text-white" />
+                                        <input value={s.value ?? ''} onChange={e => patch('value', e.target.value)} placeholder="Value"
+                                            className="h-9 px-2 flex-1 rounded-lg bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm dark:text-white" />
+                                        <button
+                                            onClick={() => set('productPageDefaultSpecs', data.productPageDefaultSpecs.filter((_, idx) => idx !== i))}
+                                            className="text-xs font-semibold text-red-500 hover:text-red-700"
+                                        >Remove</button>
+                                    </div>
+                                );
+                            })}
+                            {(data.productPageDefaultSpecs || []).length === 0 && (
+                                <p className="text-xs text-slate-400 italic">Using the built-in fallback list. Add rows to replace it.</p>
+                            )}
+                        </div>
+                    </div>
+
+                    {/* Section visibility */}
+                    <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 shadow-sm">
+                        <h3 className="text-sm font-bold text-slate-800 dark:text-slate-100 uppercase tracking-wider mb-4">Show / hide on the page</h3>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3">
+                            {SECTION_TOGGLES.map(([key, label]) => (
+                                <div key={key} className="flex items-center justify-between gap-3 px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700">
+                                    <span className="text-sm font-medium text-slate-700 dark:text-slate-200">{label}</span>
+                                    <Switch isSelected={data[key] !== false} onValueChange={v => set(key, v)} size="sm" color="success" />
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }

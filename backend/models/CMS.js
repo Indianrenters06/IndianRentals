@@ -96,10 +96,14 @@ const cmsSchema = new mongoose.Schema({
     homepageFaqSubtitle: { type: String, default: 'Everything you need to know about renting with us.' },
     homepageFaqItems: { type: [faqItemSchema], default: [] },
 
-    // ── Client Section (homepage) ─────────────────────────────────────────────
+    // ── Offer Section (homepage) ──────────────────────────────────────────────
+    // Legacy field names (`client*`) are kept so existing documents keep working;
+    // the section is called "Offers" everywhere in the UI.
     clientSectionEnabled: { type: Boolean, default: true },
-    clientSectionTitle: { type: String, default: 'Trusted By' },
-    clientLogos: { type: [String], default: [] },
+    clientSectionTitle: { type: String, default: 'Offers' },
+    // Each entry is { image, link }. Mixed so older documents that stored a plain
+    // image URL string still hydrate — updatePage normalises them on save.
+    clientLogos: { type: [mongoose.Schema.Types.Mixed], default: [] },
 
     // ── Metrics/Stats (homepage) ─────────────────────────────────────────────
     statsDevices: { type: String, default: '90k+' },
@@ -225,6 +229,9 @@ const cmsSchema = new mongoose.Schema({
     contactWhatsApp: { type: String, default: '' },
 
     // ── Product Page ──────────────────────────────────────────────────────────
+    // Every piece of copy, every list and every section toggle on the single
+    // product page lives here. A product may override a subset via its own
+    // `pageLayout` (see models/Product.js).
     productPageBenefits: {
         type: [String],
         default: ["Fully Functional", "Accessories Included", "Free Repairs & Maintenance", "Professionally sanitized"]
@@ -232,17 +239,95 @@ const cmsSchema = new mongoose.Schema({
     productPageDeliveryText: { type: String, default: "2-4 days" },
     productPageDiscountText: { type: String, default: "20% off" },
 
+    // Page states.
+    productPageLoadingText: { type: String, default: "Loading..." },
+    productPageNotFoundText: { type: String, default: "Product not found" },
+
+    // Breadcrumb.
+    productPageBreadcrumbHomeLabel: { type: String, default: "Shop all" },
+    productPageBreadcrumbHomeLink: { type: String, default: "/" },
+
     // Copy around the pricing / tenure block.
     productPageCtaText: { type: String, default: "Rent Now" },
+    productPageCtaTextMobile: { type: String, default: "Book Your Plan" },
     productPageCompareLinkText: { type: String, default: "compare all tenures" },
     productPagePriceBreakdownText: { type: String, default: "price breakdown" },
+    productPagePriceBreakdownLink: { type: String, default: "#" },
     productPageTenureSliderLabel: { type: String, default: "Select your minimum rental period" },
+    productPagePerMonthLabel: { type: String, default: "/month" },
+    productPageMobilePriceSuffix: { type: String, default: "/mo for" },
+    productPageMonthLabel: { type: String, default: "Month" },
+    productPageMonthsLabel: { type: String, default: "Months" },
+    productPageQuantityLabel: { type: String, default: "Quantity" },
+    productPageViewAllBenefitsText: { type: String, default: "View All Benefits" },
     productPageDepositLabel: { type: String, default: "100% Refundable Deposit" },
     productPageKycNote: { type: String, default: "Place Order & complete KYC anytime to get your items the next day" },
+    productPageKycLine1: { type: String, default: "Place Order & complete KYC anytime" },
+    productPageKycLine2: { type: String, default: "to get your items the next day" },
+    productPageKycImage: { type: String, default: "" },
+
+    // Rental tenures offered by the slider / compare drawer. `discountPercent`
+    // is applied to the product's base monthly rent.
+    productPageTenures: {
+        type: [{ label: String, months: Number, discountPercent: Number }],
+        default: [
+            { label: "1+", months: 1, discountPercent: 0 },
+            { label: "3+", months: 3, discountPercent: 10 },
+            { label: "6+", months: 6, discountPercent: 20 },
+            { label: "9+", months: 9, discountPercent: 25 },
+            { label: "12+", months: 12, discountPercent: 30 },
+        ]
+    },
+
+    // Cancellation / tenure-extension info cards.
+    productPageCancelCardText: { type: String, default: "What if I cancel or return before 6 months?" },
+    productPageCancelCardLinkText: { type: String, default: "View Details" },
+    productPageExtendCardText: { type: String, default: "How do I extend tenure after 6 months?" },
+    productPageExtendCardLinkText: { type: String, default: "View Details" },
+    productPageExtendCardLink: { type: String, default: "#" },
+
+    // Pincode / serviceability row.
+    productPageDeliveryLabel: { type: String, default: "Delivery" },
+    productPagePincodePlaceholder: { type: String, default: "Enter your pincode" },
+    productPagePincodeCtaLine1: { type: String, default: "Check availability" },
+    productPagePincodeCtaLine2: { type: String, default: "in your state" },
+    productPagePincodeCheckingText: { type: String, default: "Checking..." },
+    productPagePincodeMobileCtaText: { type: String, default: "Check" },
+    productPagePincodeInvalidText: { type: String, default: "Please enter a valid 6-digit pincode." },
+    productPagePincodeErrorText: { type: String, default: "Could not check right now. Please try again." },
+
+    // Details tabs.
+    productPageTabDetailsLabel: { type: String, default: "Product Details" },
+    productPageTabReturnLabel: { type: String, default: "Return Policy" },
+    productPageTabShippingLabel: { type: String, default: "Shipping Policy" },
+    productPageTabReviewLabel: { type: String, default: "Give us a Review" },
+    productPageDefaultReturnPolicy: { type: String, default: "Standard return policy applies. Please contact support for details." },
+    productPageDefaultShippingPolicy: { type: String, default: "Standard shipping policy applies. Delivery usually takes 2-5 business days." },
+    // Shown when a product has no specifications of its own.
+    productPageDefaultSpecs: {
+        type: [{ label: String, value: String }],
+        default: [
+            { label: "DISPLAY", value: "16.2 inches (3024 x 1964)" },
+            { label: "GRAPHICS", value: "Apple Integrated 16-core GPU" },
+            { label: "DIMENSIONS", value: "35.57 x 35.57 x 1.68 cm * 2.14 kg" },
+            { label: "OPERATING SYSTEM", value: "Mac OS" },
+            { label: "MEMORY", value: "24GB" },
+            { label: "PROCESSOR", value: "Apple M4 Pro" },
+            { label: "STORAGE", value: "512GB SSD" },
+            { label: "KEYBOARD LANGUAGE", value: "English (Qwerty)" },
+        ]
+    },
+
+    // Review tab.
+    productPageReviewPrompt: { type: String, default: "How was your experience?" },
+    productPageReviewPlaceholder: { type: String, default: "Tell others what you liked (or didn't)..." },
+    productPageReviewSubmitText: { type: String, default: "Submit Review" },
+    productPageReviewThanksText: { type: String, default: "Thanks for your review!" },
 
     // Section headings.
     productPageBenefitsHeading: { type: String, default: "What's included in your plan:" },
     productPageTestimonialsHeading: { type: String, default: "Don't just take our word for it" },
+    productPageTestimonialsSubheading: { type: String, default: "" },
     productPageFaqHeading: { type: String, default: "Product FAQs" },
     productPageFaqSubheading: { type: String, default: "Specific questions about this product." },
     productPageRelatedHeading: { type: String, default: "Best Rented Products" },
@@ -257,6 +342,22 @@ const cmsSchema = new mongoose.Schema({
     productPageEnablePriceBreakdown: { type: Boolean, default: true },
     productPageEnableTenureSlider: { type: Boolean, default: true },
     productPageEnableQuantity: { type: Boolean, default: true },
+    productPageEnableBreadcrumb: { type: Boolean, default: true },
+    productPageEnableWishlist: { type: Boolean, default: true },
+    productPageEnableShare: { type: Boolean, default: true },
+    productPageEnableThumbnails: { type: Boolean, default: true },
+    productPageEnableDeliveryBadge: { type: Boolean, default: true },
+    productPageEnableBenefits: { type: Boolean, default: true },
+    productPageEnableViewAllBenefits: { type: Boolean, default: true },
+    productPageEnableDepositCard: { type: Boolean, default: true },
+    productPageEnableKycCard: { type: Boolean, default: true },
+    productPageEnableInfoCards: { type: Boolean, default: true },
+    productPageEnablePincodeCheck: { type: Boolean, default: true },
+    productPageEnableTabs: { type: Boolean, default: true },
+    productPageEnableTabReturn: { type: Boolean, default: true },
+    productPageEnableTabShipping: { type: Boolean, default: true },
+    productPageEnableTabReview: { type: Boolean, default: true },
+    productPageEnableRentVsBuy: { type: Boolean, default: true },
 
     // ── SEO ──────────────────────────────────────────────────────────────────
     metaTitle: { type: String, default: '' },

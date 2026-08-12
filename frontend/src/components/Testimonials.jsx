@@ -39,7 +39,7 @@ const staticReviews = [
     { id: 9, name: "John Doe", role: "AI Engineer", text: "Lorem ipsum nunc tortor viverra condimentum faucibus pharetra nunc turpis consequat gravida suspendisse ullamcorper elit ut dignissim mattis egestas odio facilisi sagittis integer morbi dignissim quam risus tellus cras ut ac ornare felis duis et donec et sed tincidunt.", bgColor: "hsla(46, 100%, 89%, 1)", textColor: "text-[#BB4A02]", stars: 5 },
 ];
 
-const Testimonials = ({ overrideBg, overridePadding, overrideHeight }) => {
+const Testimonials = ({ overrideBg, overridePadding, overrideHeight, titleOverride, subtitleOverride }) => {
     const [viewType, setViewType] = useState('mobile');
     const [reviewsData, setReviewsData] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -203,7 +203,7 @@ const Testimonials = ({ overrideBg, overridePadding, overrideHeight }) => {
                                 margin: 0
                             }}
                         >
-                            What Our Customers Say
+                            {titleOverride || 'What Our Customers Say'}
                         </h2>
                         <p
                             style={{
@@ -218,7 +218,7 @@ const Testimonials = ({ overrideBg, overridePadding, overrideHeight }) => {
                                 margin: 0
                             }}
                         >
-                            Real experiences from innovators, businesses, and creators powering their ambitions with IndianRenters.
+                            {subtitleOverride || 'Real experiences from innovators, businesses, and creators powering their ambitions with IndianRenters.'}
                         </p>
                     </div>
 

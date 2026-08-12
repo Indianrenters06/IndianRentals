@@ -4,6 +4,18 @@ const CMS = require('../models/CMS');
 const ALLOWED_PAGES = ['homepage', 'about', 'terms', 'privacy', 'contact', 'shipping', 'refund', 'faq', 'rental-process', 'kyc-policy', 'categories-page', 'delivery-charges', 'late-fee-rules', 'cancellation-rules', 'subscription-rules', 'product-page'];
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
+// Offers live under the legacy `clientLogos` key. Older documents stored a plain
+// image URL string per offer; the editor now sends { image, link }. Accept both
+// and always persist the object form.
+const normaliseOffers = (items) =>
+    (Array.isArray(items) ? items : [])
+        .map((item) =>
+            typeof item === 'string'
+                ? { image: item, link: '' }
+                : { image: String(item?.image || ''), link: String(item?.link || '') }
+        )
+        .filter((offer) => offer.image);
+
 const getOrCreatePage = async (pageName) => {
     let page = await CMS.findOne({ pageName });
     if (!page) {
@@ -79,8 +91,8 @@ const updatePage = asyncHandler(async (req, res) => {
         // Category section
         'categorySectionEnabled', 'categorySectionTitle',
 
-        // Client section
-        'clientSectionEnabled', 'clientSectionTitle', 'clientLogos',
+        // Offer section (legacy `client*` field names)
+        'clientSectionEnabled', 'clientSectionTitle',
 
         // Featured Showcase section
         'featuredShowcaseEnabled', 'featuredShowcaseProductIds', 'featuredShowcaseBanners',
@@ -118,14 +130,36 @@ const updatePage = asyncHandler(async (req, res) => {
         // Product Page — every field the editor sends must be listed here, or the
         // save silently drops it while still reporting success.
         'productPageBenefits', 'productPageDeliveryText', 'productPageDiscountText',
-        'productPageCtaText', 'productPageCompareLinkText', 'productPagePriceBreakdownText',
-        'productPageTenureSliderLabel', 'productPageDepositLabel', 'productPageKycNote',
-        'productPageBenefitsHeading', 'productPageTestimonialsHeading',
+        'productPageLoadingText', 'productPageNotFoundText',
+        'productPageBreadcrumbHomeLabel', 'productPageBreadcrumbHomeLink',
+        'productPageCtaText', 'productPageCtaTextMobile', 'productPageCompareLinkText',
+        'productPagePriceBreakdownText', 'productPagePriceBreakdownLink',
+        'productPageTenureSliderLabel', 'productPageTenures',
+        'productPagePerMonthLabel', 'productPageMobilePriceSuffix', 'productPageQuantityLabel',
+        'productPageMonthLabel', 'productPageMonthsLabel',
+        'productPageViewAllBenefitsText',
+        'productPageDepositLabel', 'productPageKycNote', 'productPageKycLine1', 'productPageKycLine2', 'productPageKycImage',
+        'productPageCancelCardText', 'productPageCancelCardLinkText',
+        'productPageExtendCardText', 'productPageExtendCardLinkText', 'productPageExtendCardLink',
+        'productPageDeliveryLabel', 'productPagePincodePlaceholder',
+        'productPagePincodeCtaLine1', 'productPagePincodeCtaLine2', 'productPagePincodeCheckingText',
+        'productPagePincodeMobileCtaText', 'productPagePincodeInvalidText', 'productPagePincodeErrorText',
+        'productPageTabDetailsLabel', 'productPageTabReturnLabel', 'productPageTabShippingLabel', 'productPageTabReviewLabel',
+        'productPageDefaultReturnPolicy', 'productPageDefaultShippingPolicy', 'productPageDefaultSpecs',
+        'productPageReviewPrompt', 'productPageReviewPlaceholder', 'productPageReviewSubmitText', 'productPageReviewThanksText',
+        'productPageBenefitsHeading', 'productPageTestimonialsHeading', 'productPageTestimonialsSubheading',
         'productPageFaqHeading', 'productPageFaqSubheading',
         'productPageRelatedHeading', 'productPageGlobalRelatedIds',
         'productPageEnableCompare', 'productPageEnableRelated', 'productPageEnableFaq', 'productPageEnableTestimonials',
         'productPageEnableRating', 'productPageEnablePriceBreakdown',
         'productPageEnableTenureSlider', 'productPageEnableQuantity',
+        'productPageEnableBreadcrumb', 'productPageEnableWishlist', 'productPageEnableShare',
+        'productPageEnableThumbnails', 'productPageEnableDeliveryBadge',
+        'productPageEnableBenefits', 'productPageEnableViewAllBenefits',
+        'productPageEnableDepositCard', 'productPageEnableKycCard', 'productPageEnableInfoCards',
+        'productPageEnablePincodeCheck', 'productPageEnableTabs',
+        'productPageEnableTabReturn', 'productPageEnableTabShipping', 'productPageEnableTabReview',
+        'productPageEnableRentVsBuy',
 
         // SEO
         'metaTitle', 'metaDescription', 'publishStatus', 'scheduledPublishTime',
@@ -136,6 +170,12 @@ const updatePage = asyncHandler(async (req, res) => {
             cms[field] = req.body[field];
         }
     });
+
+    if (req.body.clientLogos !== undefined) {
+        cms.clientLogos = normaliseOffers(req.body.clientLogos);
+        // Mixed paths need an explicit dirty flag or mongoose skips the write.
+        cms.markModified('clientLogos');
+    }
 
     const updated = await cms.save();
     res.json(updated);

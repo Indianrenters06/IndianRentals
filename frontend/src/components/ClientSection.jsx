@@ -8,6 +8,8 @@ import "swiper/css";
 import "swiper/css/pagination";
 import { API } from '@/services/apiConfig';
 
+const isExternal = (href) => /^(https?:)?\/\//i.test(href) || href.startsWith("mailto:") || href.startsWith("tel:");
+
 const ClientSection = () => {
     const prevRef = useRef(null);
     const nextRef = useRef(null);
@@ -26,16 +28,21 @@ const ClientSection = () => {
     // Hidden by admin toggle
     if (cms?.clientSectionEnabled === false) return null;
 
-    // No logos uploaded yet — hide the section
-    const rawLogos = cms?.clientLogos || [];
-    if (rawLogos.length === 0) return null;
+    // Offers are stored under the legacy `clientLogos` key. Older entries are a
+    // plain image URL string; newer ones are { image, link }.
+    const rawOffers = (cms?.clientLogos || [])
+        .map(o => (typeof o === "string" ? { image: o, link: "" } : { image: o?.image || "", link: o?.link || "" }))
+        .filter(o => o.image);
+
+    // No offers added yet — hide the section
+    if (rawOffers.length === 0) return null;
 
     // Swiper loop needs enough slides to fill the viewport.
-    // Duplicate logos until we have at least 6 so loop always works.
+    // Duplicate offers until we have at least 6 so loop always works.
     const MIN_SLIDES = 6;
-    const clients = rawLogos.length < MIN_SLIDES
-        ? Array.from({ length: MIN_SLIDES }, (_, i) => ({ id: i, image: rawLogos[i % rawLogos.length] }))
-        : rawLogos.map((url, i) => ({ id: i, image: url }));
+    const clients = rawOffers.length < MIN_SLIDES
+        ? Array.from({ length: MIN_SLIDES }, (_, i) => ({ ...rawOffers[i % rawOffers.length], id: i }))
+        : rawOffers.map((o, i) => ({ ...o, id: i }));
 
     return (
         <section className="py-12 bg-white">
@@ -84,8 +91,8 @@ const ClientSection = () => {
                             768: { slidesPerView: 2, spaceBetween: 32 },
                         }}
                     >
-                        {clients.map((client) => (
-                            <SwiperSlide key={client.id}>
+                        {clients.map((client) => {
+                            const card = (
                                 <div
                                     className="flex items-center justify-center select-none shadow-sm bg-white"
                                     style={{
@@ -99,8 +106,19 @@ const ClientSection = () => {
                                         treatment here was a logo-wall convention. */}
                                     <img src={client.image} alt="Offer" className="w-full h-full object-contain transition-transform duration-300 hover:scale-[1.02]" />
                                 </div>
-                            </SwiperSlide>
-                        ))}
+                            );
+
+                            return (
+                                <SwiperSlide key={client.id}>
+                                    {!client.link ? card
+                                        : isExternal(client.link) ? (
+                                            <a href={client.link} target="_blank" rel="noopener noreferrer" className="block">{card}</a>
+                                        ) : (
+                                            <Link href={client.link} className="block">{card}</Link>
+                                        )}
+                                </SwiperSlide>
+                            );
+                        })}
                     </Swiper>
 
                     {/* Custom Pagination Container */}

@@ -39,6 +39,13 @@ const Field = ({ label, value, onChange, placeholder, type = "text", rows, class
     </div>
 );
 
+// ── Offers ───────────────────────────────────────────────────────────────────
+// Offers are stored under the legacy `clientLogos` key. Older entries are plain
+// image URL strings; new ones are { image, link }.
+const toOffer = (o) => (typeof o === "string"
+    ? { image: o, link: "" }
+    : { image: o?.image || "", link: o?.link || "" });
+
 // ── Section Header ───────────────────────────────────────────────────────────
 const SectionRow = ({ icon, title, desc, toggle, onToggle }) => (
     <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-4">
@@ -253,7 +260,7 @@ const DEFAULTS = {
     whyChooseUsSubtitle: "",
     whyChooseUsImage: "",
     statsDevices: "90k+", statsCustomers: "30k+", statsCities: "401+",
-    clientSectionEnabled: true, clientSectionTitle: "Trusted By", clientLogos: [],
+    clientSectionEnabled: true, clientSectionTitle: "Offers", clientLogos: [],
     faqSectionEnabled: true,
     homepageFaqEnabled: true,
     homepageFaqTitle: "Frequently Asked Questions",
@@ -287,7 +294,22 @@ export default function CMSHomepage() {
     const [saved, setSaved] = useState(false);
     const [data, setData] = useState(DEFAULTS);
 
+    const [offerImageUrl, setOfferImageUrl] = useState("");
+
     const set = (key, val) => setData(prev => ({ ...prev, [key]: val }));
+
+    // ── Offers (stored under the legacy `clientLogos` key) ────────────────────
+    const offers = (data.clientLogos || []).map(toOffer);
+    const addOffer = (image, link = "") => set("clientLogos", [...offers, { image, link }]);
+    const updateOffer = (idx, patch) =>
+        set("clientLogos", offers.map((o, i) => (i === idx ? { ...o, ...patch } : o)));
+    const addOfferFromUrl = () => {
+        const url = offerImageUrl.trim();
+        if (!url) return;
+        if (!/^https?:\/\//i.test(url)) { toast.error("Image link must start with http:// or https://"); return; }
+        addOffer(url);
+        setOfferImageUrl("");
+    };
 
     const fetchCMS = useCallback(async () => {
         try {
@@ -313,6 +335,7 @@ export default function CMSHomepage() {
                 }
                 if (d.whyChooseUsEnabled === undefined) d.whyChooseUsEnabled = true;
                 if (d.clientSectionEnabled === undefined) d.clientSectionEnabled = true;
+                d.clientLogos = (d.clientLogos || []).map(toOffer);
                 if (d.faqSectionEnabled === undefined) d.faqSectionEnabled = true;
                 if (d.homepageFaqEnabled === undefined) d.homepageFaqEnabled = true;
                 if (!d.homepageFaqItems) d.homepageFaqItems = [];
@@ -802,37 +825,49 @@ export default function CMSHomepage() {
                         <SectionRow
                             icon={<Layout weight="fill" className="text-pink-500" />}
                             title="Offers"
-                            desc="Upload offer banners. The section is hidden on the website until at least one offer is added."
+                            desc="Upload an offer banner or paste an image link, and optionally point each offer at a page. The section is hidden on the website until at least one offer is added."
                             toggle={data.clientSectionEnabled}
                             onToggle={v => set("clientSectionEnabled", v)}
                         />
 
                         <Field label="Section Title" value={data.clientSectionTitle} onChange={v => set("clientSectionTitle", v)} placeholder="e.g. Offers" />
 
-                        {/* Uploaded offers grid */}
-                        {(data.clientLogos || []).length > 0 ? (
+                        {/* Existing offers */}
+                        {offers.length > 0 ? (
                             <div className="space-y-3">
                                 <label className="text-xs font-bold text-slate-500 dark:text-slate-200 uppercase tracking-wider block">
-                                    Uploaded Offers ({data.clientLogos.length})
+                                    Offers ({offers.length})
                                 </label>
-                                <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-3">
-                                    {data.clientLogos.map((logo, idx) => (
-                                        <div key={idx} className="relative group rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 p-3 flex items-center justify-center aspect-square">
-                                            <img
-                                                src={logo}
-                                                className="max-w-full max-h-full object-contain"
-                                                alt={`Offer ${idx + 1}`}
-                                            />
+                                <div className="space-y-3">
+                                    {offers.map((offer, idx) => (
+                                        <div key={idx} className="flex flex-col sm:flex-row sm:items-center gap-4 p-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-950">
+                                            <div className="w-full sm:w-40 h-24 shrink-0 rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 flex items-center justify-center overflow-hidden">
+                                                {offer.image ? (
+                                                    <img src={offer.image} className="max-w-full max-h-full object-contain" alt={`Offer ${idx + 1}`} />
+                                                ) : (
+                                                    <PhosphorImage size={22} className="text-slate-300" />
+                                                )}
+                                            </div>
+                                            <div className="flex-1 space-y-2 min-w-0">
+                                                <Field
+                                                    label="Image URL"
+                                                    value={offer.image}
+                                                    onChange={v => updateOffer(idx, { image: v })}
+                                                    placeholder="https://res.cloudinary.com/..."
+                                                />
+                                                <Field
+                                                    label="Click-through Link (Optional)"
+                                                    value={offer.link}
+                                                    onChange={v => updateOffer(idx, { link: v })}
+                                                    placeholder="/products or https://..."
+                                                />
+                                            </div>
                                             <button
-                                                onClick={() => {
-                                                    const n = [...data.clientLogos];
-                                                    n.splice(idx, 1);
-                                                    set("clientLogos", n);
-                                                }}
-                                                className="absolute -top-2 -right-2 bg-red-500 hover:bg-red-600 text-white w-6 h-6 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity text-xs font-bold shadow-md"
+                                                onClick={() => set("clientLogos", offers.filter((_, i) => i !== idx))}
+                                                className="self-start sm:self-center text-red-500 hover:text-red-700 p-2 shrink-0"
                                                 title="Remove offer"
                                             >
-                                                ×
+                                                <Trash size={16} />
                                             </button>
                                         </div>
                                     ))}
@@ -841,24 +876,46 @@ export default function CMSHomepage() {
                         ) : (
                             <div className="flex items-center gap-3 p-4 rounded-xl bg-amber-50 dark:bg-amber-500/10 border border-amber-200 dark:border-amber-500/20 text-amber-700 dark:text-amber-400 text-sm">
                                 <Layout size={18} weight="bold" className="shrink-0" />
-                                <p>No offers uploaded yet. The section will be hidden on the website until you add at least one offer below.</p>
+                                <p>No offers added yet. The section will be hidden on the website until you add at least one offer below.</p>
                             </div>
                         )}
 
-                        {/* Upload new offer */}
-                        <div className="space-y-2">
+                        {/* Add a new offer */}
+                        <div className="space-y-3">
                             <label className="text-xs font-bold text-slate-500 dark:text-slate-200 uppercase tracking-wider block">
                                 Add Offer
                             </label>
-                            <p className="text-xs text-slate-400 -mt-1">Offers display in a wide carousel, so use landscape banner images. You can add multiple offers one by one.</p>
+                            <p className="text-xs text-slate-400 -mt-1">Offers display in a wide carousel, so use landscape banner images. You can add multiple offers one by one, then set a click-through link on each.</p>
+
                             <div className="max-w-xs">
                                 <ImageUploader
                                     label=""
                                     existingUrl=""
-                                    onUpload={url => {
-                                        if (url) set("clientLogos", [...(data.clientLogos || []), url]);
-                                    }}
+                                    onUpload={url => { if (url) addOffer(url); }}
                                 />
+                            </div>
+
+                            <div className="flex items-center gap-2 max-w-xl">
+                                <div className="flex-1 h-[1px] bg-slate-200 dark:bg-slate-700" />
+                                <span className="text-xs text-slate-400 font-semibold uppercase tracking-wider">Or paste an image link</span>
+                                <div className="flex-1 h-[1px] bg-slate-200 dark:bg-slate-700" />
+                            </div>
+
+                            <div className="flex flex-col sm:flex-row gap-2 max-w-xl">
+                                <input
+                                    type="url"
+                                    value={offerImageUrl}
+                                    onChange={e => setOfferImageUrl(e.target.value)}
+                                    onKeyDown={e => { if (e.key === "Enter") { e.preventDefault(); addOfferFromUrl(); } }}
+                                    placeholder="https://example.com/offer-banner.jpg"
+                                    className="flex-1 h-10 px-3 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-base text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/40 focus:border-indigo-400 transition-all"
+                                />
+                                <button
+                                    onClick={addOfferFromUrl}
+                                    className="h-10 px-4 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold flex items-center justify-center gap-1.5 transition-colors shrink-0"
+                                >
+                                    <Plus size={14} /> Add Offer
+                                </button>
                             </div>
                         </div>
                     </div>
