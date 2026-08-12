@@ -13,6 +13,7 @@ import { selectCartTotalQuantity } from "../redux/features/cartSlice";
 import { useSettings } from "../context/SettingsContext";
 import { getCategories } from "../services/categoryService";
 import { logout } from "../services/authService";
+import { categoryHref } from "../lib/categoryRoutes";
 
 const Navbar = () => {
     const router = useRouter();
@@ -171,19 +172,9 @@ const Navbar = () => {
     if (settings?.navbarLinks?.length > 0) {
         navLinks = settings.navbarLinks;
     } else {
-        const getCategoryRoute = (cat) => {
-            const lowerName = cat.name.toLowerCase();
-            if (lowerName.includes('apple')) return '/category/apple';
-            if (lowerName.includes('dslr')) return '/category/dslr';
-            if (lowerName.includes('it')) return '/category/it-products';
-            if (lowerName.includes('av')) return '/category/av-products';
-            if (lowerName.includes('office')) return '/category/office-equipment';
-            return `/category/${cat.slug || cat.name.toLowerCase().replace(/\s+/g, '-')}`;
-        };
-
         const dynamicLinks = fetchedCategories.slice(0, 5).map(cat => ({
             name: cat.name,
-            href: getCategoryRoute(cat)
+            href: categoryHref(cat)
         }));
 
         if (dynamicLinks.length > 0) {
