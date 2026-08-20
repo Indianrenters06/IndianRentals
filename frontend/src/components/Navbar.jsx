@@ -31,6 +31,7 @@ const Navbar = () => {
     const [pincodeArea, setPincodeArea] = useState("");
     const [pincodeError, setPincodeError] = useState("");
     const [fetchedCategories, setFetchedCategories] = useState([]);
+    const [isMobileScreen, setIsMobileScreen] = useState(typeof window !== 'undefined' ? window.innerWidth < 1024 : false);
 
     // Redux Cart Selector
     const totalQuantity = useSelector(selectCartTotalQuantity);
@@ -81,16 +82,34 @@ const Navbar = () => {
         loadLocation();
         fetchNavCategories();
 
+        const handleResize = () => {
+            setIsMobileScreen(window.innerWidth < 1024);
+        };
+        handleResize();
+        window.addEventListener("resize", handleResize);
+
         window.addEventListener("userInfoChanged", checkUserInfo);
         // Listen for storage events (in case login happens in another tab/window)
         window.addEventListener("storage", checkUserInfo);
 
         return () => {
             window.removeEventListener("scroll", handleScroll);
+            window.removeEventListener("resize", handleResize);
             window.removeEventListener("userInfoChanged", checkUserInfo);
             window.removeEventListener("storage", checkUserInfo);
         };
     }, []);
+
+    useEffect(() => {
+        if (isMobileMenuOpen) {
+            document.body.style.overflow = "hidden";
+        } else {
+            document.body.style.overflow = "";
+        }
+        return () => {
+            document.body.style.overflow = "";
+        };
+    }, [isMobileMenuOpen]);
 
     const fetchLocation = () => {
         if (!navigator.geolocation) {
@@ -130,6 +149,22 @@ const Navbar = () => {
             }
         );
     };
+
+    useEffect(() => {
+        const checkAutoLocation = async () => {
+            if (!localStorage.getItem("userLocation") && navigator.geolocation) {
+                try {
+                    const result = await navigator.permissions.query({ name: 'geolocation' });
+                    if (result.state === 'granted') {
+                        fetchLocation();
+                    }
+                } catch (e) {
+                    console.error("Permission check failed", e);
+                }
+            }
+        };
+        checkAutoLocation();
+    }, []);
 
     const fetchPincodeArea = async (pincode) => {
         if (!/^\d{6}$/.test(pincode)) {
@@ -333,7 +368,10 @@ const Navbar = () => {
                         <div className="relative flex items-center shrink-0">
                             <button
                                 className="flex items-center outline-none h-[33px] group"
-                                onClick={() => setIsCityDropdownOpen(!isCityDropdownOpen)}
+                                onClick={() => {
+                                    if (typeof window !== 'undefined') setIsMobileScreen(window.innerWidth < 1024);
+                                    setIsCityDropdownOpen(!isCityDropdownOpen);
+                                }}
                                 style={{
                                     border: "1.5px solid #d1d1d1",
                                     borderRadius: "9999px",
@@ -350,166 +388,7 @@ const Navbar = () => {
                                 </span>
                             </button>
 
-                            {/* City Drawer -> Location Sidebar */}
-                            <AnimatePresence>
-                                {isCityDropdownOpen && (
-                                    <>
-                                        {/* Backdrop */}
-                                        <motion.div
-                                            initial={{ opacity: 0 }}
-                                            animate={{ opacity: 1 }}
-                                            exit={{ opacity: 0 }}
-                                            className="fixed inset-0 bg-black/20 backdrop-blur-sm z-[998]"
-                                            onClick={() => setIsCityDropdownOpen(false)}
-                                        />
-
-                                        {/* Sidebar itself */}
-                                        <motion.div
-                                            initial={{ x: "-100%" }}
-                                            animate={{ x: 0 }}
-                                            exit={{ x: "-100%" }}
-                                            transition={{ type: "spring", damping: 25, stiffness: 200 }}
-                                            className="fixed left-0 top-0 h-screen z-[999] overflow-y-auto scrollbar-hide flex flex-col rounded-r-3xl shadow-[10px_0_30px_rgba(0,0,0,0.08)]"
-                                            style={{ width: '360px', background: '#F2F2F7', padding: '12px' }}
-                                        >
-                                            {/* Card 1 — Pincode */}
-                                            <div className="bg-white rounded-2xl p-3 mb-2">
-                                                {/* Back pill — sits in its own row, never touches text */}
-                                                <div className="flex justify-end mb-3">
-                                                    <button
-                                                        onClick={() => setIsCityDropdownOpen(false)}
-                                                        className="flex items-center"
-                                                        style={{
-                                                            height: '24px',
-                                                            minWidth: '66px',
-                                                            borderRadius: '18px',
-                                                            border: '1px solid hsla(3, 88%, 42%, 1)',
-                                                            background: 'hsla(4, 100%, 97%, 1)',
-                                                            paddingTop: '2px',
-                                                            paddingBottom: '2px',
-                                                            paddingLeft: '6px',
-                                                            paddingRight: '10px',
-                                                            gap: '2px',
-                                                            color: 'hsla(3, 88%, 42%, 1)',
-                                                            fontSize: '11px',
-                                                            fontWeight: 600,
-                                                        }}
-                                                    >
-                                                        <ChevronLeftIcon className="w-[10px] h-[10px]" strokeWidth={3} />
-                                                        Back
-                                                    </button>
-                                                </div>
-
-                                                <div className="flex items-center gap-2 mb-4">
-                                                    <MapPin size={22} color="#0066FF" weight="regular" />
-                                                    <h2 className="text-[16px] font-bold text-gray-900 font-sans tracking-tight">
-                                                        Enter Your Delivery Location
-                                                    </h2>
-                                                </div>
-
-                                                <div className="relative mb-3">
-                                                    <input
-                                                        type="text"
-                                                        value={locationInput}
-                                                        onChange={(e) => {
-                                                            setLocationInput(e.target.value);
-                                                            setPincodeArea("");
-                                                            setPincodeError("");
-                                                        }}
-                                                        placeholder="Enter Your Delivery Pincode"
-                                                        maxLength={6}
-                                                        className="w-full pl-4 pr-10 border border-[#3B82F6] rounded-xl focus:outline-none focus:ring-1 focus:ring-blue-500 text-[13px] font-medium text-gray-800 placeholder-gray-400"
-                                                        style={{ height: '42px' }}
-                                                        onKeyDown={(e) => {
-                                                            if (e.key === 'Enter') fetchPincodeArea(locationInput.trim());
-                                                        }}
-                                                    />
-                                                    <button
-                                                        className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-blue-500 focus:outline-none disabled:opacity-40"
-                                                        onClick={() => fetchPincodeArea(locationInput.trim())}
-                                                        disabled={pincodeLoading}
-                                                    >
-                                                        {pincodeLoading
-                                                            ? <span className="block w-3.5 h-3.5 border-2 border-blue-400 border-t-transparent rounded-full animate-spin" />
-                                                            : <ArrowRight size={18} weight="regular" />}
-                                                    </button>
-                                                </div>
-
-                                                {pincodeArea && (
-                                                    <p className="text-[11px] text-center text-green-600 font-semibold mb-1">📍 {pincodeArea}</p>
-                                                )}
-                                                {pincodeError && (
-                                                    <p className="text-[11px] text-center text-red-500 font-medium mb-1">{pincodeError}</p>
-                                                )}
-                                                {!pincodeArea && !pincodeError && (
-                                                    <p className="text-[12px] text-center text-gray-400 font-medium">
-                                                        Your currently selected pincode : <span className="text-[#646464] font-bold">{selectedCity || "110034"}</span>
-                                                    </p>
-                                                )}
-                                            </div>
-
-                                            {/* Card 2 — City Grid */}
-                                            <div className="bg-white rounded-2xl p-5">
-                                                <h3 className="text-[13px] font-bold text-gray-400 uppercase tracking-wider mb-4">or Select your Delivery City</h3>
-
-                                                <div className="grid grid-cols-4 gap-x-2 gap-y-4">
-                                                    {[
-                                                        { name: "Delhi", img: "https://images.unsplash.com/photo-1587474260584-136574528ed5?w=200&q=80" },
-                                                        { name: "Noida", img: "https://images.unsplash.com/photo-1680374657222-df1b21f26a6e?w=200&q=80" },
-                                                        { name: "Mumbai", img: "https://images.unsplash.com/photo-1529253355930-ddbe423a2ac7?w=200&q=80" },
-                                                        { name: "Pune", img: "https://images.unsplash.com/photo-1570168007204-dfb528c6958f?w=200&q=80" },
-                                                        { name: "Bangalore", img: "https://images.unsplash.com/photo-1596176530529-78163a4f7af2?w=200&q=80" },
-                                                        { name: "Hyderabad", img: "https://images.unsplash.com/photo-1558431382-27e303142255?w=200&q=80" },
-                                                        { name: "Kolkata", img: "https://images.unsplash.com/photo-1558431382-27e303142255?w=200&q=80" },
-                                                        { name: "Chennai", img: "https://images.unsplash.com/photo-1582510003544-4d00b7f74220?w=200&q=80" },
-                                                    ].map((city) => (
-                                                        <div
-                                                            key={city.name}
-                                                            className="flex flex-col items-center gap-1.5 cursor-pointer group"
-                                                            onClick={() => {
-                                                                setSelectedCity(city.name);
-                                                                setLocationInput(city.name);
-                                                                localStorage.setItem('userLocation', city.name);
-                                                                setIsCityDropdownOpen(false);
-                                                            }}
-                                                        >
-                                                            <div className={`w-[68px] h-[68px] rounded-xl overflow-hidden border-2 transition-all duration-300 shadow-sm ${selectedCity === city.name ? 'border-[#FFCF46] scale-105' : 'border-transparent group-hover:border-gray-200 group-hover:scale-105'}`}>
-                                                                <img
-                                                                    src={city.img}
-                                                                    alt={city.name}
-                                                                    className="w-full h-full object-cover"
-                                                                    onError={(e) => { e.target.onError = null; e.target.src = `https://placehold.co/150x150/E5E7EB/6B7280?font=montserrat&text=${city.name[0]}` }}
-                                                                />
-                                                            </div>
-                                                            <span className={`text-[10px] transition-colors text-center leading-tight ${selectedCity === city.name ? 'text-[#1D1D1F] font-bold' : 'text-gray-500 font-medium group-hover:text-black'}`}>{city.name}</span>
-                                                        </div>
-                                                    ))}
-                                                </div>
-
-                                                <div className="mt-5 flex justify-center">
-                                                    <button
-                                                        onClick={() => setIsCityDropdownOpen(false)}
-                                                        className="font-medium text-black transition-all duration-200 active:scale-95 hover:brightness-105 flex items-center justify-center whitespace-nowrap"
-                                                        style={{
-                                                            width: '68px',
-                                                            height: '23px',
-                                                            borderRadius: '9999px',
-                                                            background: 'hsla(44, 100%, 64%, 1)',
-                                                            fontFamily: '"Mona Sans", sans-serif',
-                                                            fontWeight: 500,
-                                                            fontSize: '11px',
-                                                            letterSpacing: '-0.2px',
-                                                            padding: '0'
-                                                        }}
-                                                    >
-                                                        Continue
-                                                    </button>
-                                                </div>
-                                            </div>
-                                        </motion.div>
-                                    </>
-                                )}
-                            </AnimatePresence>
+                            
                         </div>
 
                         {/* Login/Register or Profile (Desktop) */}
@@ -608,7 +487,7 @@ const Navbar = () => {
                                                 {/* Menu Items */}
                                                 <div className="flex flex-col gap-[10px]">
                                                     {[
-                                                        { label: "Profile Settings", href: "/profile" },
+                                                        { label: "Profile Settings", href: "/profile/settings" },
                                                         { label: "My Orders", href: "/profile/orders" },
                                                         { label: "KYC Documentation", href: "/profile/kyc" },
                                                         { label: "My Invoices", href: "/profile/invoices" }
@@ -727,7 +606,7 @@ const Navbar = () => {
                                             }}
                                         >
                                             <Link
-                                                href="/how-it-works"
+                                                href="/rental-process"
                                                 style={{
                                                     width: "141px",
                                                     height: "20px",
@@ -752,7 +631,7 @@ const Navbar = () => {
 
                                             <div style={{ width: "141px", height: "48px", display: "flex", flexDirection: "column", gap: "8px", opacity: 1 }}>
                                                 <Link
-                                                    href="/rental-policy"
+                                                    href="/rules"
                                                     style={{
                                                         width: "141px",
                                                         height: "20px",
@@ -772,7 +651,7 @@ const Navbar = () => {
                                                 </Link>
 
                                                 <Link
-                                                    href="/delivery-policy"
+                                                    href="/delivery-charges"
                                                     style={{
                                                         width: "141px",
                                                         height: "20px",
@@ -798,7 +677,7 @@ const Navbar = () => {
 
                                             <div style={{ width: "141px", height: "48px", display: "flex", flexDirection: "column", gap: "8px", opacity: 1 }}>
                                                 <Link
-                                                    href="/faqs"
+                                                    href="/faq"
                                                     style={{
                                                         width: "141px",
                                                         height: "20px",
@@ -849,7 +728,10 @@ const Navbar = () => {
                     <div className="lg:hidden flex items-center gap-2">
                         {/* Mobile Location Pill */}
                         <button
-                            onClick={() => setIsCityDropdownOpen(!isCityDropdownOpen)}
+                            onClick={() => {
+                                if (typeof window !== 'undefined') setIsMobileScreen(window.innerWidth < 1024);
+                                setIsCityDropdownOpen(!isCityDropdownOpen);
+                            }}
                             className="flex items-center gap-1.5 focus:outline-none"
                             style={{
                                 height: "35px",
@@ -923,135 +805,332 @@ const Navbar = () => {
             </div>
 
 
-            {/* Mobile Menu */}
+            {/* Mobile Menu Side Drawer */}
             <AnimatePresence>
                 {isMobileMenuOpen && (
-                    <motion.div
-                        initial={{ opacity: 0, height: 0 }}
-                        animate={{ opacity: 1, height: "auto" }}
-                        exit={{ opacity: 0, height: 0 }}
-                        className="lg:hidden bg-white border-t border-gray-100 overflow-hidden shadow-lg"
-                    >
-                        <div className="px-4 py-4 space-y-4">
-                            {/* Mobile Search */}
-                            <div className="relative">
-                                <input
-                                    type="text"
-                                    placeholder="Search..."
-                                    className="w-full px-4 py-2 rounded-lg bg-gray-50 border border-gray-200 focus:ring-2 focus:ring-indigo-500 outline-none"
-                                    value={searchQuery}
-                                    onChange={(e) => setSearchQuery(e.target.value)}
-                                    onKeyDown={handleSearch}
-                                />
-                                <div
-                                    className="absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer"
-                                    onClick={handleSearchClick}
+                    <>
+                        {/* Backdrop overlay */}
+                        <motion.div
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            transition={{ duration: 0.2 }}
+                            className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[998] lg:hidden"
+                            onClick={() => setIsMobileMenuOpen(false)}
+                        />
+
+                        {/* Side Drawer */}
+                        <motion.div
+                            initial={{ x: "-100%" }}
+                            animate={{ x: 0 }}
+                            exit={{ x: "-100%" }}
+                            transition={{ type: "spring", damping: 25, stiffness: 220 }}
+                            className="fixed top-0 left-0 bottom-0 w-[85%] max-w-[320px] bg-white z-[999] lg:hidden shadow-2xl flex flex-col h-full overflow-y-auto"
+                        >
+                            {/* Drawer Header */}
+                            <div className="flex items-center justify-between px-4 py-3.5 border-b border-gray-100 sticky top-0 bg-white z-10">
+                                <Link href="/" onClick={() => setIsMobileMenuOpen(false)}>
+                                    <Image
+                                        src={siteLogo}
+                                        alt={siteName}
+                                        width={125}
+                                        height={34}
+                                        className="h-8 w-auto object-contain"
+                                    />
+                                </Link>
+                                <button
+                                    onClick={() => setIsMobileMenuOpen(false)}
+                                    className="p-1.5 rounded-full hover:bg-gray-100 text-gray-700 transition"
                                 >
-                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-[18px] h-[18px] text-gray-400">
-                                        <path strokeLinecap="round" strokeLinejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
-                                    </svg>
-                                </div>
+                                    <X size={22} color="hsla(0, 0%, 16%, 1)" />
+                                </button>
                             </div>
 
-                            {/* Mobile Links */}
-                            <div className="flex flex-col space-y-3">
-                                {navLinks.map((link) => (
-                                    <Link
-                                        key={link.name}
-                                        href={link.href}
-                                        className="text-gray-600 font-medium hover:text-indigo-600 border-b border-gray-50 pb-2 last:border-0"
-                                        onClick={() => setIsMobileMenuOpen(false)}
+                            <div className="px-4 py-4 space-y-4 flex-1">
+                                {/* Mobile Search */}
+                                <div className="relative">
+                                    <input
+                                        type="text"
+                                        placeholder="Search products..."
+                                        className="w-full px-4 py-2 rounded-xl bg-gray-50 border border-gray-200 focus:ring-2 focus:ring-amber-500 outline-none text-sm text-gray-800"
+                                        value={searchQuery}
+                                        onChange={(e) => setSearchQuery(e.target.value)}
+                                        onKeyDown={(e) => {
+                                            if (e.key === 'Enter') {
+                                                handleSearch(e);
+                                                setIsMobileMenuOpen(false);
+                                            }
+                                        }}
+                                    />
+                                    <div
+                                        className="absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer"
+                                        onClick={() => {
+                                            handleSearchClick();
+                                            setIsMobileMenuOpen(false);
+                                        }}
                                     >
-                                        {link.name}
-                                    </Link>
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-[18px] h-[18px] text-gray-400">
+                                            <path strokeLinecap="round" strokeLinejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
+                                        </svg>
+                                    </div>
+                                </div>
+
+                                {/* Navigation Links */}
+                                <div className="flex flex-col space-y-1 pt-1">
+                                    <span className="text-[11px] font-bold text-gray-400 uppercase tracking-wider px-1 mb-1">Categories & Pages</span>
+                                    {navLinks.map((link) => (
+                                        <Link
+                                            key={link.name}
+                                            href={link.href}
+                                            className="text-gray-700 font-medium hover:text-amber-600 px-2 py-2.5 rounded-lg hover:bg-amber-50/50 transition text-sm flex items-center justify-between"
+                                            onClick={() => setIsMobileMenuOpen(false)}
+                                        >
+                                            <span>{link.name}</span>
+                                            <ArrowRight size={14} className="text-gray-400" />
+                                        </Link>
+                                    ))}
+                                </div>
+
+                                {/* Mobile Auth */}
+                                <div className="pt-3 border-t border-gray-100">
+                                    {userInfo ? (
+                                        <div className="space-y-3">
+                                            <div className="flex items-center gap-3 p-3 bg-amber-50/60 rounded-xl border border-amber-100">
+                                                <div className="w-9 h-9 rounded-full bg-amber-100 flex items-center justify-center text-amber-700 font-bold text-sm border border-amber-200">
+                                                    {userInfo.name?.charAt(0).toUpperCase() || "U"}
+                                                </div>
+                                                <div className="flex-1 min-w-0">
+                                                    <p className="text-sm font-bold text-gray-900 truncate">{userInfo.name || "User"}</p>
+                                                    <p className="text-xs text-gray-500 truncate">{userInfo.email}</p>
+                                                </div>
+                                            </div>
+                                            <Link href="/profile/overview" className="block w-full py-2 px-4 text-sm font-medium text-gray-700 bg-gray-50 rounded-lg text-center hover:bg-gray-100" onClick={() => setIsMobileMenuOpen(false)}>
+                                                My Profile
+                                            </Link>
+                                            <button
+                                                onClick={handleLogout}
+                                                className="block w-full py-2 px-4 text-sm font-medium text-red-600 bg-red-50 rounded-lg text-center hover:bg-red-100"
+                                            >
+                                                Logout
+                                            </button>
+                                        </div>
+                                    ) : (
+                                        <button
+                                            onClick={() => {
+                                                setIsMobileMenuOpen(false);
+                                                setIsAuthModalOpen(true);
+                                            }}
+                                            className="w-full py-2.5 rounded-full font-bold text-sm bg-orange-300 text-black hover:bg-orange-400 active:bg-orange-500 transition mb-2"
+                                        >
+                                            Login / Register
+                                        </button>
+                                    )}
+
+                                    {/* Location selection */}
+                                    <div className="p-3.5 bg-gray-50 rounded-xl mt-3 border border-gray-100">
+                                        <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-2">
+                                            Delivery Location
+                                        </label>
+                                        <div className="flex flex-col gap-2.5 relative w-full">
+                                            <div className="flex gap-2 w-full">
+                                                <div className="relative flex-1">
+                                                    <MapPin size={16} weight="fill" className="absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-400" />
+                                                    <input
+                                                        type="text"
+                                                        value={locationInput}
+                                                        onChange={(e) => setLocationInput(e.target.value)}
+                                                        placeholder="Pincode or city"
+                                                        className="w-full pl-8 pr-2 py-1.5 border border-gray-200 rounded-lg bg-white focus:outline-none focus:ring-1 focus:ring-amber-500 text-xs text-gray-800"
+                                                    />
+                                                </div>
+                                                <button
+                                                    className="bg-black text-white px-3 py-1.5 rounded-lg text-xs font-semibold hover:bg-gray-800 transition disabled:opacity-50"
+                                                    disabled={pincodeLoading}
+                                                    onClick={async () => {
+                                                        const val = locationInput.trim();
+                                                        if (/^\d{6}$/.test(val)) {
+                                                            await fetchPincodeArea(val);
+                                                            // Close mobile menu as well
+                                                            setTimeout(() => setIsMobileMenuOpen(false), 900);
+                                                        } else if (val && val !== "Fetching...") {
+                                                            setSelectedCity(val);
+                                                            localStorage.setItem('userLocation', val);
+                                                            setIsMobileMenuOpen(false);
+                                                        }
+                                                    }}
+                                                >
+                                                    {pincodeLoading ? 'Saving...' : 'Save'}
+                                                </button>
+                                            </div>
+                                            {pincodeError && <p className="text-red-500 text-[10px] mt-1 font-medium">{pincodeError}</p>}
+                                            {pincodeArea && <p className="text-green-600 text-[10px] mt-1 font-medium">📍 {pincodeArea}</p>}
+
+                                            <button
+                                                className="w-full flex items-center justify-center gap-1.5 bg-white text-gray-700 border border-gray-200 font-medium text-xs py-1.5 rounded-lg hover:bg-gray-100 transition"
+                                                onClick={() => {
+                                                    fetchLocation();
+                                                    setIsMobileMenuOpen(false);
+                                                }}
+                                            >
+                                                <NavigationArrow size={12} weight="fill" className="text-amber-500" />
+                                                Use current location
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </motion.div>
+                    </>
+                )}
+            </AnimatePresence>
+
+            {/* City Drawer -> Location Bottom Sheet (Mobile) / Sidebar (Desktop) */}
+            <AnimatePresence>
+                {isCityDropdownOpen && (
+                    <>
+                        {/* Backdrop */}
+                        <motion.div
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            className="fixed inset-0 bg-black/40 backdrop-blur-sm z-[998]"
+                            onClick={() => setIsCityDropdownOpen(false)}
+                        />
+
+                        {/* Location Drawer/Sheet */}
+                        <motion.div
+                            initial={isMobileScreen ? { y: "100%", x: 0 } : { x: "-100%", y: 0 }}
+                            animate={isMobileScreen ? { y: 0, x: 0 } : { x: 0, y: 0 }}
+                            exit={isMobileScreen ? { y: "100%", x: 0 } : { x: "-100%", y: 0 }}
+                            transition={{ type: "spring", damping: 25, stiffness: 220 }}
+                            className={`fixed z-[999] overflow-y-auto scrollbar-hide flex flex-col bg-white shadow-2xl ${
+                                isMobileScreen
+                                    ? "bottom-0 left-0 right-0 w-full max-h-[90vh] rounded-t-[32px] p-5 pb-6"
+                                    : "left-0 top-0 h-screen w-[380px] rounded-r-3xl p-5"
+                            }`}
+                        >
+                            {/* Mobile Drag handle */}
+                            {isMobileScreen && (
+                                <div className="w-12 h-1.5 bg-gray-300 rounded-full mx-auto mb-3 shrink-0" />
+                            )}
+
+                            {/* Back button for Desktop */}
+                            {!isMobileScreen && (
+                                <div className="flex justify-end mb-2">
+                                    <button
+                                        onClick={() => setIsCityDropdownOpen(false)}
+                                        className="flex items-center gap-1 text-xs font-semibold text-[#D32F2F] bg-red-50 hover:bg-red-100 border border-[#D32F2F] px-3 py-1 rounded-full transition-colors"
+                                    >
+                                        <ChevronLeftIcon className="w-3 h-3" strokeWidth={3} />
+                                        Back
+                                    </button>
+                                </div>
+                            )}
+
+                            {/* Header Section */}
+                            <div className="flex flex-col items-center justify-center pt-1 pb-3 gap-2">
+                                <MapPin size={34} color="#0066FF" weight="regular" />
+                                <h2 className="text-[20px] font-bold text-gray-900 font-sans tracking-tight text-center">
+                                    Enter Your Delivery Location
+                                </h2>
+                            </div>
+
+                            {/* Pincode Input Box */}
+                            <div className="relative mb-2">
+                                <input
+                                    type="text"
+                                    value={locationInput}
+                                    onChange={(e) => {
+                                        setLocationInput(e.target.value);
+                                        setPincodeArea("");
+                                        setPincodeError("");
+                                    }}
+                                    placeholder="Enter Your Delivery Pincode"
+                                    maxLength={6}
+                                    className="w-full pl-4 pr-10 border-2 border-[#3B82F6] rounded-2xl text-[14px] font-medium text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500/30 transition-all"
+                                    style={{ height: '48px' }}
+                                    onKeyDown={(e) => {
+                                        if (e.key === 'Enter') fetchPincodeArea(locationInput.trim());
+                                    }}
+                                />
+                                <button
+                                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-700 hover:text-blue-600 focus:outline-none disabled:opacity-40 p-1"
+                                    onClick={() => fetchPincodeArea(locationInput.trim())}
+                                    disabled={pincodeLoading}
+                                >
+                                    {pincodeLoading
+                                        ? <span className="block w-4 h-4 border-2 border-blue-500 border-t-transparent rounded-full animate-spin" />
+                                        : <ArrowRight size={20} weight="bold" />}
+                                </button>
+                            </div>
+
+                            {/* Pincode Feedback */}
+                            {pincodeArea && (
+                                <p className="text-[12px] text-center text-green-600 font-semibold mb-2">📍 {pincodeArea}</p>
+                            )}
+                            {pincodeError && (
+                                <p className="text-[12px] text-center text-red-500 font-medium mb-2">{pincodeError}</p>
+                            )}
+                            {!pincodeArea && !pincodeError && (
+                                <p className="text-[12px] text-center text-gray-500 font-medium mb-3">
+                                    Your currently selected pincode : <span className="text-gray-900 font-bold">{selectedCity || "110034"}</span>
+                                </p>
+                            )}
+
+                            {/* Divider */}
+                            <div className="relative my-4 flex items-center justify-center">
+                                <div className="border-t border-gray-200 w-full" />
+                                <span className="bg-white px-3 text-[12px] font-semibold text-gray-400 uppercase tracking-wider whitespace-nowrap absolute">
+                                    or Select your Delivery City
+                                </span>
+                            </div>
+
+                            {/* City Grid */}
+                            <div className="grid grid-cols-4 gap-x-2 gap-y-4 my-2">
+                                {[
+                                    { name: "Delhi", img: "https://images.unsplash.com/photo-1587474260584-136574528ed5?w=200&q=80" },
+                                    { name: "Noida", img: "https://images.unsplash.com/photo-1680374657222-df1b21f26a6e?w=200&q=80" },
+                                    { name: "Mumbai", img: "https://images.unsplash.com/photo-1529253355930-ddbe423a2ac7?w=200&q=80" },
+                                    { name: "Pune", img: "https://images.unsplash.com/photo-1570168007204-dfb528c6958f?w=200&q=80" },
+                                    { name: "Bangalore", img: "https://images.unsplash.com/photo-1596176530529-78163a4f7af2?w=200&q=80" },
+                                    { name: "Hyderabad", img: "https://images.unsplash.com/photo-1558431382-27e303142255?w=200&q=80" },
+                                    { name: "Kolkata", img: "https://images.unsplash.com/photo-1558431382-27e303142255?w=200&q=80" },
+                                    { name: "Chennai", img: "https://images.unsplash.com/photo-1582510003544-4d00b7f74220?w=200&q=80" },
+                                ].map((city) => (
+                                    <div
+                                        key={city.name}
+                                        className="flex flex-col items-center gap-1.5 cursor-pointer group"
+                                        onClick={() => {
+                                            setSelectedCity(city.name);
+                                            setLocationInput(city.name);
+                                            localStorage.setItem('userLocation', city.name);
+                                            setIsCityDropdownOpen(false);
+                                        }}
+                                    >
+                                        <div className={`w-[66px] h-[66px] sm:w-[72px] sm:h-[72px] rounded-2xl overflow-hidden border-2 transition-all duration-300 shadow-sm ${selectedCity === city.name ? 'border-[#FFCF46] scale-105 shadow-md' : 'border-transparent group-hover:border-gray-200 group-hover:scale-105'}`}>
+                                            <img
+                                                src={city.img}
+                                                alt={city.name}
+                                                className="w-full h-full object-cover"
+                                                onError={(e) => { e.target.onError = null; e.target.src = `https://placehold.co/150x150/E5E7EB/6B7280?font=montserrat&text=${city.name[0]}` }}
+                                            />
+                                        </div>
+                                        <span className={`text-[11px] transition-colors text-center font-medium leading-tight ${selectedCity === city.name ? 'text-gray-900 font-bold' : 'text-gray-600 group-hover:text-black'}`}>{city.name}</span>
+                                    </div>
                                 ))}
                             </div>
 
-                            {/* Mobile Auth */}
-                            <div className="pt-4 mt-2">
-                                {userInfo ? (
-                                    <div className="space-y-3">
-                                        <div className="flex items-center gap-3 p-3 bg-indigo-50 rounded-xl">
-                                            <div className="w-10 h-10 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 border border-indigo-200">
-                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-[18px] h-[18px]">
-                                                    <path strokeLinecap="round" strokeLinejoin="round" d="M17.982 18.725A7.488 7.488 0 0 0 12 15.75a7.488 7.488 0 0 0-5.982 2.975m11.963 0a9 9 0 1 0-11.963 0m11.963 0A8.966 8.966 0 0 1 12 21a8.966 8.966 0 0 1-5.982-2.275M15 9.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
-                                                </svg>
-                                            </div>
-                                            <div className="flex-1 min-w-0">
-                                                <p className="text-sm font-bold text-gray-900 truncate">{userInfo.name || "User"}</p>
-                                                <p className="text-xs text-gray-500 truncate">{userInfo.email}</p>
-                                            </div>
-                                        </div>
-                                        <Link href="/profile" className="block w-full py-2 px-4 text-sm font-medium text-gray-700 bg-gray-50 rounded-lg text-center" onClick={() => setIsMobileMenuOpen(false)}>
-                                            My Profile
-                                        </Link>
-                                        <button
-                                            onClick={handleLogout}
-                                            className="block w-full py-2 px-4 text-sm font-medium text-red-600 bg-red-50 rounded-lg text-center"
-                                        >
-                                            Logout
-                                        </button>
-                                    </div>
-                                ) : (
-                                    <button
-                                        onClick={() => {
-                                            setIsMobileMenuOpen(false);
-                                            setIsAuthModalOpen(true);
-                                        }}
-                                        className="btn-primary w-full py-2.5 rounded-lg font-bold mb-3"
-                                    >
-                                        Login / Register
-                                    </button>
-                                )}
-
-                                <div className="p-4 bg-gray-50 rounded-lg mt-3">
-                                    <label className="block text-sm font-bold text-gray-800 mb-2">
-                                        Enter your location
-                                    </label>
-                                    <div className="flex flex-col gap-3 relative w-full">
-                                        <div className="flex gap-2 w-full">
-                                            <div className="relative flex-1">
-                                                <MapPin size={18} weight="fill" className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-                                                <input
-                                                    type="text"
-                                                    value={locationInput}
-                                                    onChange={(e) => setLocationInput(e.target.value)}
-                                                    placeholder="Your location"
-                                                    className="w-full pl-9 pr-3 py-2 border border-gray-200 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm"
-                                                />
-                                            </div>
-                                            <button
-                                                className="bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-indigo-700 transition"
-                                                onClick={() => {
-                                                    const val = locationInput.trim();
-                                                    if (val && val !== "Fetching...") {
-                                                        setSelectedCity(val);
-                                                        localStorage.setItem('userLocation', val);
-                                                    }
-                                                }}
-                                            >
-                                                Save
-                                            </button>
-                                        </div>
-
-                                        <div className="relative flex items-center py-1">
-                                            <div className="grow border-t border-gray-200"></div>
-                                            <span className="shrink-0 mx-2 text-gray-400 text-xs">OR</span>
-                                            <div className="grow border-t border-gray-200"></div>
-                                        </div>
-
-                                        <button
-                                            className="w-full flex items-center justify-center gap-2 bg-white text-indigo-600 border border-indigo-200 font-bold text-sm py-2 rounded-lg hover:bg-indigo-50 transition"
-                                            onClick={fetchLocation}
-                                        >
-                                            <NavigationArrow size={12} weight="fill" />
-                                            Use my current location
-                                        </button>
-                                    </div>
-                                </div>
+                            {/* Continue Button */}
+                            <div className="mt-3">
+                                <button
+                                    onClick={() => setIsCityDropdownOpen(false)}
+                                    className="w-full h-[48px] bg-[#FFCF46] hover:bg-[#ffc72e] active:scale-[0.99] text-black font-bold text-[15px] rounded-full transition-all shadow-sm flex items-center justify-center cursor-pointer"
+                                >
+                                    Continue
+                                </button>
                             </div>
-                        </div>
-                    </motion.div>
+                        </motion.div>
+                    </>
                 )}
             </AnimatePresence>
 
@@ -1060,7 +1139,7 @@ const Navbar = () => {
                 onClose={() => setIsAuthModalOpen(false)}
                 initialView="login"
             />
-        </header >
+        </header>
     );
 };
 

@@ -88,41 +88,70 @@ const Testimonials = ({ overrideBg, overridePadding, overrideHeight, titleOverri
         fetchAll();
     }, []);
 
-    const TestimonialCard = ({ review }) => (
+    const TestimonialCard = ({ review, isMobile }) => (
         <div
-            className="rounded-2xl p-[20px] flex flex-col transition-all hover:scale-[1.01] duration-300 shadow-sm font-sans"
             style={{
+                boxSizing: 'border-box',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'flex-start',
+                padding: '18px',
+                gap: '10px',
+                width: isMobile ? '100%' : '100%',
+                borderRadius: '20px',
                 backgroundColor: review.bgColor || '#FFFFFF',
-                width: '100%',
                 willChange: 'transform',
                 backfaceVisibility: 'hidden',
                 WebkitFontSmoothing: 'antialiased',
                 transform: 'translateZ(0)'
             }}
         >
-            <div className="flex flex-col mb-4">
-                <span className={`text-[18px] font-medium ${review.textColor || "text-[#1D1D1F]"} leading-[25px]`}>{review.name}</span>
-                <span className={`text-[12px] ${review.textColor || "text-[#86868B]"} opacity-80`}>{review.role || "Verified User"}</span>
+            {/* Name & Role */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '1px', width: '100%' }}>
+                <span
+                    style={{
+                        fontFamily: "'Mona Sans', sans-serif",
+                        fontWeight: 500,
+                        fontSize: '18px',
+                        lineHeight: '25px',
+                        letterSpacing: '-0.8px',
+                        color: review.nameColor || (review.textColor?.includes('orange') ? '#7C2F0B' : (review.textColor?.includes('violet') || review.textColor?.includes('5718') ? '#000000' : (review.textColor?.includes('309C') ? '#0E206E' : '#333333')))
+                    }}
+                >{review.name}</span>
+                <span
+                    style={{
+                        fontFamily: "'Mona Sans', sans-serif",
+                        fontWeight: 400,
+                        fontSize: '12px',
+                        lineHeight: '16px',
+                        letterSpacing: '-0.4px',
+                        color: review.roleColor || (review.textColor?.includes('orange') ? '#7C2F0B' : (review.textColor?.includes('violet') || review.textColor?.includes('5718') ? '#000000' : (review.textColor?.includes('309C') ? '#0E206E' : '#545454')))
+                    }}
+                >{review.role || 'Verified User'}</span>
             </div>
 
+            {/* Review Text */}
             <p
-                className={`grow mb-auto ${review.textColor || "text-[#1D1D1F]"}`}
+                className={review.textColor}
                 style={{
                     fontFamily: "'Mona Sans', sans-serif",
-                    fontSize: "14px",
+                    fontSize: '14px',
                     fontWeight: 500,
-                    lineHeight: "20px",
-                    letterSpacing: "-0.4px"
+                    lineHeight: '20px',
+                    letterSpacing: '-0.4px',
+                    width: '100%',
+                    margin: 0
                 }}
             >
                 {review.message || review.text}
             </p>
 
-            <div className="flex items-center justify-between mt-6">
+            {/* Footer: Google logo + Stars */}
+            <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', width: '100%', marginTop: '4px' }}>
                 <GoogleGLogo />
-                <div className="flex items-center gap-0.5 text-[#FFB323]">
+                <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', gap: '3px' }}>
                     {[...Array(5)].map((_, i) => (
-                        <PiStarFill key={i} size={18} />
+                        <PiStarFill key={i} size={18} style={{ color: '#FFAD32' }} />
                     ))}
                 </div>
             </div>
@@ -151,11 +180,130 @@ const Testimonials = ({ overrideBg, overridePadding, overrideHeight, titleOverri
         { ...staticReviews[5] }
     ];
 
+    // ─── Mobile Layout ────────────────────────────────────────────────────────
+    if (viewType === 'mobile') {
+        const mobileCards = (reviewsData.length > 0 ? reviewsData : staticReviews).slice(0, 3);
+        return (
+            <section
+                style={{
+                    boxSizing: 'border-box',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    padding: '40px 20px',
+                    gap: '10px',
+                    width: '100%',
+                    background: overrideBg || '#FFFFFF',
+                    position: 'relative',
+                    isolation: 'isolate'
+                }}
+            >
+                {/* Frame 158 — Inner container */}
+                <div
+                    style={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        padding: '0px',
+                        gap: '24px',
+                        width: '100%',
+                        maxWidth: '350px'
+                    }}
+                >
+                    {/* Header Row */}
+                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: '14px', width: '100%' }}>
+                        <h2
+                            style={{
+                                fontFamily: "'Mona Sans', sans-serif",
+                                fontWeight: 600,
+                                fontSize: '25px',
+                                lineHeight: '31px',
+                                letterSpacing: '-0.8px',
+                                color: '#333333',
+                                margin: 0
+                            }}
+                        >
+                            {titleOverride || 'What Our Customers Say'}
+                        </h2>
+                        <p
+                            style={{
+                                fontFamily: "'Mona Sans', sans-serif",
+                                fontWeight: 500,
+                                fontSize: '12px',
+                                lineHeight: '18px',
+                                letterSpacing: '-0.4px',
+                                color: '#545454',
+                                margin: 0,
+                                width: '100%'
+                            }}
+                        >
+                            {subtitleOverride || 'Real experiences from innovators, businesses, and creators powering their ambitions with IndianRenters.'}
+                        </p>
+                    </div>
+
+                    {/* Cards — with bottom fade overlay */}
+                    <div style={{ position: 'relative', width: '100%', height: '590px', overflow: 'hidden' }}>
+                        {/* Scrollable cards column */}
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', width: '100%' }}>
+                            {mobileCards.map((review, i) => (
+                                <TestimonialCard key={review.id || i} review={review} isMobile />
+                            ))}
+                        </div>
+
+                        {/* Bottom gradient fade overlay */}
+                        <div
+                            style={{
+                                position: 'absolute',
+                                width: '100%',
+                                height: '349px',
+                                left: 0,
+                                bottom: 0,
+                                background: 'linear-gradient(0deg, #FFFFFF 25.84%, rgba(255, 255, 255, 0) 89.91%)',
+                                pointerEvents: 'none',
+                                zIndex: 1
+                            }}
+                        />
+                    </div>
+
+                    {/* Blue CTA Button */}
+                    <Link
+                        href="/reviews"
+                        style={{
+                            display: 'flex',
+                            flexDirection: 'row',
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                            padding: '6px 20px',
+                            gap: '2px',
+                            width: '131px',
+                            height: '30px',
+                            background: '#0075FF',
+                            borderRadius: '28px',
+                            fontFamily: "'Mona Sans', sans-serif",
+                            fontWeight: 500,
+                            fontSize: '12px',
+                            lineHeight: '18px',
+                            letterSpacing: '-0.4px',
+                            color: '#EDFAFF',
+                            textDecoration: 'none',
+                            flexShrink: 0
+                        }}
+                    >
+                        Read All Reviews
+                    </Link>
+                </div>
+            </section>
+        );
+    }
+
+    // ─── Desktop / Tablet Layout ──────────────────────────────────────────────
     return (
         <section
             className="w-full flex flex-col items-center mx-auto"
             style={{
-                background: overrideBg || (viewType === 'desktop' ? '#FFFFFF' : (viewType === 'tablet' ? '#FFFFFF' : 'hsla(0, 0%, 96%, 1)')),
+                background: overrideBg || '#FFFFFF',
                 width: '100%',
                 maxWidth: '1440px',
                 minHeight: overrideHeight || 'auto',
@@ -169,12 +317,11 @@ const Testimonials = ({ overrideBg, overridePadding, overrideHeight, titleOverri
                     maxWidth: '1200px',
                     paddingTop: overridePadding || '40px',
                     paddingBottom: overridePadding || '40px',
-                    gap: viewType === 'desktop' ? '24px' : (viewType === 'tablet' ? '16px' : '10px'),
+                    gap: viewType === 'desktop' ? '24px' : '16px',
                     position: 'relative',
                     zIndex: 1
                 }}
             >
-
                 <div
                     className="w-full flex font-sans mb-2 gap-6"
                     style={{
@@ -183,21 +330,13 @@ const Testimonials = ({ overrideBg, overridePadding, overrideHeight, titleOverri
                         justifyContent: viewType === 'desktop' ? 'space-between' : 'flex-start'
                     }}
                 >
-                    <div
-                        className="flex flex-col"
-                        style={{
-                            width: viewType === 'mobile' ? '100%' : (viewType === 'desktop' ? '600px' : '100%'),
-                            maxWidth: viewType === 'mobile' ? '350px' : undefined,
-                            height: viewType === 'mobile' ? '81px' : 'auto',
-                            justifyContent: 'flex-start',
-                            gap: viewType === 'mobile' ? '5px' : '8px'
-                        }}
-                    >
+                    <div className="flex flex-col" style={{ width: viewType === 'desktop' ? '600px' : '100%', gap: '8px' }}>
                         <h2
-                            className="text-[24px] md:text-[36px] leading-[32px] md:leading-[45px]"
                             style={{
-                                fontFamily: '"Mona Sans", sans-serif',
+                                fontFamily: "'Mona Sans', sans-serif",
                                 fontWeight: 600,
+                                fontSize: viewType === 'desktop' ? '36px' : '28px',
+                                lineHeight: viewType === 'desktop' ? '45px' : '36px',
                                 letterSpacing: '-0.02em',
                                 color: 'hsla(0, 0%, 20%, 1)',
                                 margin: 0
@@ -207,14 +346,12 @@ const Testimonials = ({ overrideBg, overridePadding, overrideHeight, titleOverri
                         </h2>
                         <p
                             style={{
-                                width: '100%',
-                                height: viewType === 'mobile' ? '36px' : 'auto',
-                                fontFamily: '"Mona Sans", sans-serif',
-                                fontSize: viewType === 'mobile' ? '14px' : '16px',
+                                fontFamily: "'Mona Sans', sans-serif",
+                                fontSize: '16px',
                                 fontWeight: 500,
-                                lineHeight: viewType === 'mobile' ? '18px' : '1.4',
-                                letterSpacing: viewType === 'mobile' ? '0.01em' : '-0.02em',
-                                color: viewType === 'mobile' ? 'hsla(0, 0%, 33%, 1)' : '#545454',
+                                lineHeight: '1.4',
+                                letterSpacing: '-0.02em',
+                                color: '#545454',
                                 margin: 0
                             }}
                         >
@@ -222,49 +359,41 @@ const Testimonials = ({ overrideBg, overridePadding, overrideHeight, titleOverri
                         </p>
                     </div>
 
-                    {/* Google Badge */}
-                    <div className={`${viewType === 'desktop' ? 'flex' : 'hidden'} items-center gap-2 self-end mb-2`}>
-                        <GoogleGLogo />
-                        <span className="text-[13px] font-semibold text-[#1D1D1F]">5000+ reviews</span>
-                        <div className="h-4 w-[1px] bg-[#D2D2D7] mx-1" />
-                        <div className="flex items-center gap-1.5">
-                            <div className="flex text-[#1D1D1F]">
-                                <PiStarFill size={14} /><PiStarFill size={14} /><PiStarFill size={14} /><PiStarFill size={14} /><PiStarHalfFill size={14} />
+                    {/* Google Badge — desktop only */}
+                    {viewType === 'desktop' && (
+                        <div className="flex items-center gap-2 self-end mb-2">
+                            <GoogleGLogo />
+                            <span className="text-[13px] font-semibold text-[#1D1D1F]">5000+ reviews</span>
+                            <div className="h-4 w-[1px] bg-[#D2D2D7] mx-1" />
+                            <div className="flex items-center gap-1.5">
+                                <div className="flex text-[#1D1D1F]">
+                                    <PiStarFill size={14} /><PiStarFill size={14} /><PiStarFill size={14} /><PiStarFill size={14} /><PiStarHalfFill size={14} />
+                                </div>
+                                <span className="text-[13px] font-bold text-[#1D1D1F]">4.9</span>
                             </div>
-                            <span className="text-[13px] font-bold text-[#1D1D1F]">4.9</span>
                         </div>
-                    </div>
+                    )}
                 </div>
 
-                {/* Grid Container */}
+                {/* Grid */}
                 <div
-                    className={`${viewType === 'desktop' ? 'grid-cols-3' : (viewType === 'tablet' ? 'grid-cols-2' : 'grid-cols-1')} grid w-full`}
+                    className={`${viewType === 'desktop' ? 'grid-cols-3' : 'grid-cols-2'} grid w-full`}
                     style={{
-                        minHeight: viewType === 'desktop' ? '869.95px' : 'auto',
-                        width: viewType === 'mobile' ? '100%' : '100%',
-                        maxWidth: viewType === 'mobile' ? '350px' : undefined,
-                        margin: viewType === 'mobile' ? '0 auto' : undefined,
                         gap: viewType === 'desktop' ? '24px' : '20px',
-                        opacity: 1,
                         maskImage: viewType === 'desktop' ? 'linear-gradient(to bottom, #000 60%, transparent 100%)' : undefined,
                         WebkitMaskImage: viewType === 'desktop' ? 'linear-gradient(to bottom, #000 60%, transparent 100%)' : undefined
                     }}
                 >
-                    {/* Column 1 */}
-                    <div className="flex flex-col" style={{ gap: viewType === 'desktop' ? '24px' : (viewType === 'mobile' ? '10px' : '24px') }}>
+                    <div className="flex flex-col" style={{ gap: viewType === 'desktop' ? '24px' : '20px' }}>
                         <TestimonialCard review={reviewsData[0] || staticReviews[0]} />
                         <TestimonialCard review={reviewsData[1] || staticReviews[1]} />
                         <TestimonialCard review={reviewsData[2] || staticReviews[2]} />
                     </div>
-
-                    {/* Column 2 */}
-                    <div className={`${viewType === 'mobile' ? 'hidden' : 'flex'} flex-col`} style={{ gap: viewType === 'desktop' ? '24px' : '20px' }}>
+                    <div className="flex flex-col" style={{ gap: viewType === 'desktop' ? '24px' : '20px' }}>
                         <TestimonialCard review={reviewsData[3] || staticReviews[3]} />
                         <TestimonialCard review={reviewsData[4] || staticReviews[4]} />
                         <TestimonialCard review={reviewsData[5] || staticReviews[5]} />
                     </div>
-
-                    {/* Column 3 - Desktop Only */}
                     {viewType === 'desktop' && (
                         <div className="flex flex-col" style={{ gap: '24px' }}>
                             <TestimonialCard review={reviewsData[6] || staticReviews[6]} />
@@ -273,8 +402,6 @@ const Testimonials = ({ overrideBg, overridePadding, overrideHeight, titleOverri
                         </div>
                     )}
                 </div>
-
-
 
                 <div className="flex mt-8 md:mt-12 w-full justify-center z-10">
                     <Link
@@ -287,20 +414,16 @@ const Testimonials = ({ overrideBg, overridePadding, overrideHeight, titleOverri
                             backgroundColor: '#0075FF',
                             color: '#EDFAFF',
                             fontFamily: "'Mona Sans', sans-serif",
-                            fontSize: "16px",
+                            fontSize: '16px',
                             fontWeight: 500,
-                            letterSpacing: "-0.4px",
-                            lineHeight: "23px"
+                            letterSpacing: '-0.4px',
+                            lineHeight: '23px'
                         }}
                     >
                         Read All Reviews
                     </Link>
                 </div>
             </div>
-            <style jsx>{`
-                .scrollbar-hide::-webkit-scrollbar { display: none; }
-                .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
-            `}</style>
         </section>
     );
 };

@@ -29,7 +29,9 @@ export default function Home() {
       </div>
       <RentalProcess />
       <WhyChooseUs />
-      <FaqSection pageName="homepage" />
+      <div className="hidden md:block">
+        <FaqSection pageName="homepage" />
+      </div>
       <Testimonials />
     </main>
   );

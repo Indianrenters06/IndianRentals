@@ -69,20 +69,30 @@ const FaqSection = ({ cmsData, limit, pageName }) => {
     }, [cmsData, pageName]);
 
     const isHomepage = pageName === 'homepage';
+    const isFaqPage = pageName === 'faq';
+
     let displayFaqs;
     if (isHomepage) {
         displayFaqs = cms?.homepageFaqItems && cms.homepageFaqItems.length > 0 ? cms.homepageFaqItems : faqs;
     } else {
         displayFaqs = cms?.faqItems && cms.faqItems.length > 0 ? cms.faqItems : faqs;
     }
-    if (limit) {
+
+    if (!isFaqPage) {
+        displayFaqs = displayFaqs.slice(0, limit || 5);
+    } else if (limit) {
         displayFaqs = displayFaqs.slice(0, limit);
     }
-    const [activeIndices, setActiveIndices] = useState([]);
+
+    const [activeIndices, setActiveIndices] = useState([0]);
 
     useEffect(() => {
-        // FAQs start closed; they open only when the user clicks
-        setActiveIndices([]);
+        // 1st FAQ is mandatorily open by default
+        if (displayFaqs && displayFaqs.length > 0) {
+            setActiveIndices([0]);
+        } else {
+            setActiveIndices([]);
+        }
     }, [displayFaqs.length]);
 
     const title = isHomepage

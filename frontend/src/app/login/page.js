@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { FaEnvelope, FaLock, FaGoogle, FaApple, FaArrowRight, FaPhone, FaArrowLeft } from "react-icons/fa";
 import { useRouter } from "next/navigation";
 import { API_BASE_URL } from "../../services/apiConfig";
+import { useGoogleLogin } from "@react-oauth/google";
 
 const LoginPage = () => {
     const router = useRouter();
@@ -102,6 +103,39 @@ const LoginPage = () => {
             setLoading(false);
         }
     };
+
+    const handleGoogleLogin = useGoogleLogin({
+        onSuccess: async (tokenResponse) => {
+            setLoading(true);
+            setError(null);
+            try {
+                const res = await fetch(`${API_BASE_URL}/api/auth/google-login`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ access_token: tokenResponse.access_token }),
+                });
+
+                const data = await res.json();
+
+                if (!res.ok) {
+                    throw new Error(data.message || "Google Login failed");
+                }
+
+                // Store token
+                localStorage.setItem("userInfo", JSON.stringify(data));
+                window.dispatchEvent(new Event("userInfoChanged"));
+
+                // Redirect back to where the user came from (or home).
+                router.push(redirectTo);
+            } catch (err) {
+                setError(err.message);
+                setLoading(false);
+            }
+        },
+        onError: () => {
+            setError("Google login failed or was cancelled");
+        }
+    });
 
     return (
         <div className="min-h-[calc(100vh-80px)] flex items-center justify-center bg-gray-50 px-4 py-12 sm:px-6 lg:px-8 relative overflow-hidden font-sans">
@@ -262,10 +296,10 @@ const LoginPage = () => {
                         </div>
 
                         <div className="mt-6 grid grid-cols-2 gap-3">
-                            <button type="button" className="w-full inline-flex justify-center items-center py-2.5 px-4 border border-gray-200 rounded-xl shadow-sm bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 transition-colors">
+                            <button onClick={() => handleGoogleLogin()} disabled={loading} type="button" className="w-full inline-flex justify-center items-center py-2.5 px-4 border border-gray-200 rounded-xl shadow-sm bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 transition-colors disabled:opacity-50">
                                 <FaGoogle className="text-red-500 mr-2" /> Google
                             </button>
-                            <button type="button" className="w-full inline-flex justify-center items-center py-2.5 px-4 border border-gray-200 rounded-xl shadow-sm bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 transition-colors">
+                            <button disabled={true} type="button" className="w-full inline-flex justify-center items-center py-2.5 px-4 border border-gray-200 rounded-xl shadow-sm bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 transition-colors disabled:opacity-50">
                                 <FaApple className="text-black mr-2" /> Apple
                             </button>
                         </div>

@@ -482,6 +482,91 @@ const adminResetPassword = asyncHandler(async (req, res) => {
     res.json({ message: 'Password reset successfully. You can now log in.' });
 });
 
+const { OAuth2Client } = require('google-auth-library');
+const googleClient = new OAuth2Client(process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || 'dummy-client-id');
+
+// @desc    Google Sign In / Register
+// @route   POST /api/auth/google-login
+// @access  Public
+const googleLogin = asyncHandler(async (req, res) => {
+    const { access_token } = req.body;
+
+    if (!access_token) {
+        res.status(400);
+        throw new Error('No Google access_token provided');
+    }
+
+    try {
+        const userInfoRes = await fetch("https://www.googleapis.com/oauth2/v3/userinfo", {
+            headers: { Authorization: `Bearer ${access_token}` },
+        });
+
+        if (!userInfoRes.ok) {
+            throw new Error('Failed to fetch user info from Google');
+        }
+
+        const payload = await userInfoRes.json();
+        const { email, name, picture } = payload;
+        
+        let user = await User.findOne({ email });
+
+        if (!user) {
+            // Register new user via Google
+            const Settings = require('../models/Settings');
+            const settings = await Settings.findOne();
+            if (settings && settings.allowRegistrations === false) {
+                res.status(403);
+                throw new Error('New registrations are currently disabled by the administrator.');
+            }
+            
+            user = await User.create({
+                name,
+                email,
+                password: Date.now().toString() + Math.random().toString(), // Dummy password since Google handles auth
+                role: 'customer',
+                isEmailVerified: true,
+                avatar: picture,
+            });
+            
+            await createNotification({
+                title: 'New User Registered (Google)',
+                message: `User ${name} (${email}) just joined IndianRentals via Google.`,
+                type: 'user',
+                relatedId: user._id
+            });
+        } else {
+            // Update avatar if missing
+            if (!user.avatar && picture) {
+                user.avatar = picture;
+                await user.save();
+            }
+        }
+        
+        user.lastLogin = new Date();
+        await user.save();
+
+        const token = generateToken(res, user._id);
+
+        res.json({
+            _id: user._id,
+            name: user.name,
+            email: user.email,
+            role: user.role,
+            phone: user.phone || '',
+            avatar: user.avatar,
+            kyc: user.kyc,
+            isEmailVerified: user.isEmailVerified,
+            isPhoneVerified: user.isPhoneVerified || false,
+            token: token,
+        });
+        
+    } catch (error) {
+        console.error('Google verification failed:', error);
+        res.status(401);
+        throw new Error('Invalid Google access_token');
+    }
+});
+
 module.exports = {
     registerUser,
     loginUser,
@@ -492,4 +577,5 @@ module.exports = {
     adminLogin,
     adminForgotPassword,
     adminResetPassword,
+    googleLogin,
 };

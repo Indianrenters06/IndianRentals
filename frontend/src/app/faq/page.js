@@ -31,7 +31,7 @@ export default function FaqPage() {
                     </div>
                 </div>
             </section>
-            <FaqSection cmsData={cms} limit={17} />
+            <FaqSection cmsData={cms} pageName="faq" />
         </div>
     );
 }

@@ -10,6 +10,7 @@ const {
     verifyLoginOtp,
     adminForgotPassword,
     adminResetPassword,
+    googleLogin,
 } = require('../controllers/authController');
 
 router.post('/register', registerUser);
@@ -21,5 +22,6 @@ router.post('/send-otp', sendLoginOtp);
 router.post('/verify-login', verifyLoginOtp);
 router.post('/admin-forgot-password', adminForgotPassword);
 router.post('/admin-reset-password', adminResetPassword);
+router.post('/google-login', googleLogin);
 
 module.exports = router;

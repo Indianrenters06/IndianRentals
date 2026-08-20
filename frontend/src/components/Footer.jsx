@@ -12,26 +12,32 @@ const DEFAULT_PAYMENT_LOGOS = [
 ];
 
 const DEFAULT_FOOTER_COLUMNS = [
-    { title: "Company", links: [
-        { name: "About Us", href: "/about" },
-        { name: "How It Works", href: "/rental-process" },
-        { name: "Jobs & Careers", href: "/careers" },
-        { name: "Contact", href: "/contact" },
-        { name: "IndianRenters (B2B Link)", href: "/b2b" },
-    ] },
-    { title: "Policies", links: [
-        { name: "KYC Policy", href: "/kyc-policy" },
-        { name: "Shipping Policy", href: "/shipping-policy" },
-        { name: "Return Policy", href: "/return-policy" },
-        { name: "Privacy Policy", href: "/privacy" },
-        { name: "Rental Terms & Conditions", href: "/terms" },
-    ] },
-    { title: "Support", links: [
-        { name: "FAQs", href: "/faq" },
-        { name: "Raise a Ticket", href: "/ticket" },
-        { name: "Customer Reviews", href: "/reviews" },
-        { name: "Blog", href: "/blog" },
-    ] },
+    {
+        title: "Company", links: [
+            { name: "About Us", href: "/about" },
+            { name: "How It Works", href: "/rental-process" },
+            { name: "Jobs & Careers", href: "/careers" },
+            { name: "Contact", href: "/contact" },
+            { name: "IndianRenters (B2B Link)", href: "/b2b" },
+        ]
+    },
+    {
+        title: "Policies", links: [
+            { name: "KYC Policy", href: "/kyc-policy" },
+            { name: "Shipping Policy", href: "/shipping-policy" },
+            { name: "Return Policy", href: "/return-policy" },
+            { name: "Privacy Policy", href: "/privacy" },
+            { name: "Rental Terms & Conditions", href: "/terms" },
+        ]
+    },
+    {
+        title: "Support", links: [
+            { name: "FAQs", href: "/faq" },
+            { name: "Raise a Ticket", href: "/ticket" },
+            { name: "Customer Reviews", href: "/reviews" },
+            { name: "Blog", href: "/blog" },
+        ]
+    },
 ];
 
 const Footer = () => {
@@ -129,11 +135,11 @@ const Footer = () => {
                 </div>
 
                 {/* Copyright bar */}
-                <div 
+                <div
                     className="w-full max-w-[1200px] mx-auto px-6 md:px-8 flex flex-col md:flex-row items-center justify-between"
-                    style={{ 
-                        height: viewType === 'desktop' ? '77px' : 'auto', 
-                        paddingTop: '24px', 
+                    style={{
+                        height: viewType === 'desktop' ? '77px' : 'auto',
+                        paddingTop: '24px',
                         paddingBottom: '24px',
                         borderTop: '1px solid hsla(0, 0%, 89%, 1)',
                         gap: '16px'
@@ -152,81 +158,168 @@ const Footer = () => {
 
             {/* ── Mobile Footer ── */}
             <footer
-                className={`${viewType === 'mobile' ? 'block' : 'hidden'} w-full font-sans`}
+                className={`${viewType === 'mobile' ? 'flex' : 'hidden'} flex-col items-start w-full font-sans`}
                 style={{
-                    background: 'hsla(0, 0%, 96%, 1)',
-                    borderTop: '1px solid hsla(0, 0%, 89%, 1)',
-                    paddingTop: '36px',
-                    paddingBottom: '32px',
+                    padding: '32px 20px 0px',
+                    gap: '20px',
+                    background: '#F6F6F6',
+                    borderTop: '1px solid #E2E2E2',
+                    boxSizing: 'border-box'
                 }}
             >
-                <div className="mx-auto w-full max-w-[390px] px-5">
-                    {/* Logo Area */}
-                    <div className="flex flex-col mb-8" style={{ gap: '10px' }}>
+                <div className="flex flex-col items-start w-full max-w-[350px] gap-[20px] mx-auto">
+                    {/* Logo + tagline */}
+                    <div className="flex flex-col items-start gap-[10px] w-[137px]">
                         <Link href="/" className="inline-block">
-                            <Image src={siteLogo} alt={siteName} width={160} height={44} className="h-[44px] w-auto object-contain" />
+                            <Image
+                                src={siteLogo}
+                                alt={siteName}
+                                width={137}
+                                height={37}
+                                className="object-contain"
+                                style={{ width: '137px', height: '37px' }}
+                            />
                         </Link>
-                        <p className="text-[#1D1D1F] text-[12px] font-medium leading-snug tracking-tight">
-                            {settings?.footerDescription || "Rent Anything, Anytime, Anywhere"}
+                        <p style={{
+                            fontFamily: "'Mona Sans', sans-serif",
+                            fontWeight: 500,
+                            fontSize: '8px',
+                            lineHeight: '14px',
+                            letterSpacing: '-0.4px',
+                            textAlign: 'center',
+                            color: '#000000',
+                            width: '119px',
+                            margin: 0
+                        }}>
+                            {settings?.footerDescription || 'Rent Anything, Anytime, Anywhere'}
                         </p>
                     </div>
 
-                    {/* Primary Links (first column) */}
+                    {/* Company links */}
                     {primaryColumn && (
-                        <div className="flex flex-col mb-8" style={{ gap: '12px' }}>
+                        <div className="flex flex-col items-start gap-[8px] w-full">
                             {(primaryColumn.links || []).map((link, li) => (
-                                <Link key={li} href={link.href || "#"} className="text-black font-bold text-[15px] leading-tight transition-opacity hover:opacity-70">{link.name}</Link>
+                                <Link
+                                    key={li}
+                                    href={link.href || '#'}
+                                    style={{
+                                        fontFamily: "'Mona Sans', sans-serif",
+                                        fontWeight: 500,
+                                        fontSize: '12px',
+                                        lineHeight: '16px',
+                                        letterSpacing: '-0.4px',
+                                        color: '#000000',
+                                        textDecoration: 'none'
+                                    }}
+                                >
+                                    {link.name}
+                                </Link>
                             ))}
                         </div>
                     )}
 
-                    {secondaryColumns.length > 0 && <div className="h-[1px] w-full bg-[#E5E5EA] mb-8"></div>}
+                    {/* Divider */}
+                    <div className="w-full h-[1px] bg-[#EEEEEE] shrink-0" />
 
-                    {/* Secondary Links (remaining columns) */}
+                    {/* Policies + Support */}
                     {secondaryColumns.length > 0 && (
-                        <div className="grid grid-cols-2 mb-8" style={{ gap: '20px' }}>
+                        <div className="flex flex-row items-start w-full gap-[24px]">
                             {secondaryColumns.map((col, ci) => (
-                                <div key={ci} className="flex flex-col gap-3 text-black text-[13px] font-medium tracking-tight">
+                                <div key={ci} className="flex flex-col items-start gap-[8px]">
                                     {(col.links || []).map((link, li) => (
-                                        <Link key={li} href={link.href || "#"} className="hover:opacity-70">{link.name}</Link>
+                                        <Link
+                                            key={li}
+                                            href={link.href || '#'}
+                                            style={{
+                                                fontFamily: "'Mona Sans', sans-serif",
+                                                fontWeight: 500,
+                                                fontSize: '10px',
+                                                lineHeight: '16px',
+                                                letterSpacing: '-0.4px',
+                                                color: '#000000',
+                                                textDecoration: 'none'
+                                            }}
+                                        >
+                                            {link.name}
+                                        </Link>
                                     ))}
                                 </div>
                             ))}
                         </div>
                     )}
 
-                    <div className="h-[1px] w-full bg-[#E5E5EA] mb-8"></div>
+                    {/* Divider */}
+                    <div className="w-full h-[1px] bg-[#EEEEEE] shrink-0" />
 
-                    {/* Socials */}
-                    <div className="flex items-center gap-[6px] mb-8">
-                        <a href={`https://wa.me/${sitePhone.replace(/[^\d]/g, '')}`} className="w-[40px] h-[40px] rounded-full bg-white flex items-center justify-center shrink-0 transition-opacity hover:opacity-70" target="_blank" rel="noopener noreferrer" aria-label="WhatsApp">
-                            <img src="/social/whatsapp.svg" alt="WhatsApp" className="w-[22px] h-[22px]" />
+                    {/* Social icons */}
+                    <div className="flex flex-row items-center gap-[5px]">
+                        <a
+                            href={`https://wa.me/${sitePhone.replace(/[^\d]/g, '')}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            aria-label="WhatsApp"
+                            className="flex items-center justify-center bg-white rounded-full shrink-0"
+                            style={{ width: '34.9px', height: '34.9px' }}
+                        >
+                            <img src="/social/whatsapp.svg" alt="WhatsApp" style={{ width: '20px', height: '20px' }} />
                         </a>
-                        <a href={settings?.socialLinks?.facebook || "#"} className="w-[40px] h-[40px] rounded-full bg-white flex items-center justify-center shrink-0 transition-opacity hover:opacity-70" aria-label="Facebook">
-                            <img src="/social/facebook.svg" alt="Facebook" className="w-[22px] h-[22px]" />
+                        <a
+                            href={settings?.socialLinks?.facebook || '#'}
+                            aria-label="Facebook"
+                            className="flex items-center justify-center bg-white rounded-full shrink-0"
+                            style={{ width: '34.9px', height: '34.9px' }}
+                        >
+                            <img src="/social/facebook.svg" alt="Facebook" style={{ width: '20px', height: '20px' }} />
                         </a>
-                        <a href={settings?.socialLinks?.instagram || "#"} className="w-[40px] h-[40px] rounded-full bg-white flex items-center justify-center shrink-0 transition-opacity hover:opacity-70" aria-label="Instagram">
-                            <img src="/social/instagram.svg" alt="Instagram" className="w-[22px] h-[22px]" />
+                        <a
+                            href={settings?.socialLinks?.instagram || '#'}
+                            aria-label="Instagram"
+                            className="flex items-center justify-center bg-white rounded-full shrink-0"
+                            style={{ width: '34.9px', height: '34.9px' }}
+                        >
+                            <img src="/social/instagram.svg" alt="Instagram" style={{ width: '20px', height: '20px' }} />
                         </a>
-                        <a href={settings?.socialLinks?.linkedin || "#"} className="w-[40px] h-[40px] rounded-full bg-white flex items-center justify-center shrink-0 transition-opacity hover:opacity-70" aria-label="LinkedIn">
-                            <img src="/social/linkedin.svg" alt="LinkedIn" className="w-[22px] h-[22px]" />
+                        <a
+                            href={settings?.socialLinks?.linkedin || '#'}
+                            aria-label="LinkedIn"
+                            className="flex items-center justify-center bg-white rounded-full shrink-0"
+                            style={{ width: '34.9px', height: '34.9px' }}
+                        >
+                            <img src="/social/linkedin.svg" alt="LinkedIn" style={{ width: '20px', height: '20px' }} />
                         </a>
                     </div>
+                </div>
 
-                    <div className="h-[1px] w-full bg-[#E5E5EA] mb-6"></div>
+                {/* Copyright bar */}
+                <div className="flex flex-col justify-center items-start w-full max-w-[350px] mx-auto border-t border-[#EEEEEE]" style={{ padding: '16px 0px', gap: '10px' }}>
+                    <p style={{
+                        fontFamily: "'Mona Sans', sans-serif",
+                        fontWeight: 300,
+                        fontSize: '10px',
+                        lineHeight: '16px',
+                        letterSpacing: '-0.4px',
+                        color: '#000000',
+                        margin: 0
+                    }}>
+                        © {currentYear} {copyrightName}. All Rights Reserved
+                    </p>
 
-                    {/* Copyright + Payment */}
-                    <div className="flex flex-col gap-4">
-                        <p className="text-[#86868B] text-[12px] font-medium">
-                            © {currentYear} {copyrightName}. All Rights Reserved
-                        </p>
-                        <div className="flex items-center gap-2">
-                            {paymentLogos.map((url, i) => (
-                                <div key={i} className="bg-white rounded-xl flex items-center justify-center" style={{ width: '54px', height: '36px', boxShadow: '0 1px 3px rgba(0,0,0,0.08)' }}>
-                                    <img src={url} alt={`payment-${i}`} className="h-5 w-auto object-contain" />
-                                </div>
-                            ))}
-                        </div>
+                    {/* Payment logos */}
+                    <div className="flex flex-row items-center isolate">
+                        {paymentLogos.map((url, i) => (
+                            <div
+                                key={i}
+                                className="flex items-center justify-center bg-white border-2 border-[#F6F6F6] rounded-full shrink-0 relative"
+                                style={{
+                                    width: '45px',
+                                    height: '45px',
+                                    marginLeft: i === 0 ? '0' : '-10px',
+                                    zIndex: paymentLogos.length - i
+                                }}
+                            >
+                                <img src={url} alt={`payment-${i}`} style={{ maxWidth: '35px', maxHeight: '27px', objectFit: 'contain' }} />
+                            </div>
+                        ))}
                     </div>
                 </div>
             </footer>

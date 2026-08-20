@@ -2,7 +2,6 @@
 
 import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
-import Link from 'next/link';
 import Testimonials from '@/components/Testimonials';
 import WhyChooseUs from '@/components/WhyChooseUs';
 import RentalProcess from '@/components/RentalProcess';
@@ -31,119 +30,81 @@ export default function RentalProcessPage() {
     ];
 
     return (
-        <div className="font-sans text-gray-800">
-            {/* 1. Header Hero Banner */}
-            <div className="max-w-[1200px] mx-auto px-4 mt-8 mb-16">
-                <div className="w-full h-[300px] md:h-[400px] relative bg-gray-900 overflow-hidden rounded-3xl">
+        <div className="font-sans text-gray-800 bg-white">
+            {/* 1. Hero Header Banner */}
+            <div className="w-full max-w-[1200px] mx-auto px-5 md:px-8 pt-5 md:pt-7">
+                <div className="relative overflow-hidden flex items-center justify-center w-full mx-auto rounded-2xl md:rounded-[32px] h-[197px] md:h-[400px]">
                     <Image
                         src={bannerImage}
                         alt={bannerTitle}
                         fill
-                        className="object-cover object-center opacity-60"
+                        className="object-cover object-center opacity-80"
                     />
-                    <div className="absolute inset-0 flex items-center justify-center">
-                        <h1 className="text-white text-5xl md:text-7xl font-semibold drop-shadow-lg font-sans">{bannerTitle}</h1>
-                    </div>
+                    <div className="absolute inset-0 bg-black/20" />
+                    <h1 className="relative z-10 text-white drop-shadow-md font-semibold text-[16px] md:text-5xl text-center tracking-[-0.8px]">
+                        {bannerTitle}
+                    </h1>
                 </div>
             </div>
 
-            {/* 2. Rental Process Steps Section */}
+            {/* 2. How It Works Section */}
             <RentalProcess cmsData={cms} />
 
-            {/* 3. Features Section (1440px Outer Wrapper) */}
-            <section
-                className="w-full relative mx-auto"
-                style={{
-                    maxWidth: '1440px',
-                    minHeight: '568px',
-                    paddingTop: '98px',
-                    paddingBottom: '98px',
-                    background: 'hsla(0, 0%, 100%, 1)',
-                    opacity: 1
-                }}
-            >
-                <div
-                    className="mx-auto flex flex-col justify-center"
-                    style={{
-                        maxWidth: '1200px',
-                        width: '100%',
-                        height: 'auto',
-                        gap: '32px',
-                        paddingLeft: '16px',
-                        paddingRight: '16px',
-                        opacity: 1
-                    }}
-                >
-                    <div className="text-center max-w-2xl mx-auto mb-16">
-                        <h2
-                            className="font-sans font-semibold tracking-tight"
-                            style={{
-                                fontSize: '36px',
-                                lineHeight: '48px',
-                                color: 'hsla(0, 0%, 20%, 1)',
-                                marginBottom: '16px'
-                            }}
-                        >
+            {/* 3. Why Choose Us Section */}
+            <WhyChooseUs />
+
+            {/* 4. Features Section */}
+            <section className="w-full bg-white py-12">
+                <div className="max-w-[1200px] mx-auto px-5 md:px-8 flex flex-col items-center gap-8">
+                    {/* Header */}
+                    <div className="text-center max-w-2xl mx-auto flex flex-col gap-1 md:gap-3">
+                        <h2 className="font-semibold text-[#333333] tracking-[-0.8px] text-[25px] md:text-[36px] leading-[31px] md:leading-[48px]">
                             {featuresTitle}
                         </h2>
-                        <p className="text-gray-600 font-sans text-[16px] leading-[1.5]">
+                        <p className="text-[#545454] font-medium text-[12px] md:text-[16px] leading-[18px] md:leading-6 tracking-[-0.4px]">
                             {featuresSubtitle}
                         </p>
                     </div>
 
-                    <div 
-                        className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-0"
-                        style={{
-                            width: '100%',
-                            maxWidth: '1200px',
-                            opacity: 1,
-                            margin: '0 auto'
-                        }}
-                    >
-                        {displayFeatures.map((f, i) => (
-                            <div 
-                                key={i}
-                                className="flex flex-col items-center justify-center text-center p-[10px_45px] border-slate-200"
-                                style={{
-                                    height: '236px',
-                                    borderStyle: 'solid',
-                                    borderWidth: i === displayFeatures.length - 1 ? '1px' : '1px 0px 1px 1px',
-                                    borderTopLeftRadius: i === 0 ? '8px' : '0px',
-                                    borderBottomLeftRadius: i === 0 ? '8px' : '0px',
-                                    borderTopRightRadius: i === displayFeatures.length - 1 ? '8px' : '0px',
-                                    borderBottomRightRadius: i === displayFeatures.length - 1 ? '8px' : '0px',
-                                }}
-                            >
-                                <div className="flex flex-col items-center justify-center gap-[9px]">
-                                    <div className="w-[120px] h-[120px] relative">
-                                        <img 
-                                            src={f.image || "https://res.cloudinary.com/dgkckcdk8/image/upload/v1776714078/64e2ed1925a146151a5bfc674829bb2b3e685b49_4_zpulqn.png"} 
-                                            alt={f.title}
-                                            className="w-full h-full object-contain"
-                                        />
+                    {/* Features Grid: 2x2 on Mobile, 4x1 on Desktop */}
+                    <div className="grid grid-cols-2 lg:grid-cols-4 w-full">
+                        {displayFeatures.map((f, i) => {
+                            const isTop = i < 2;
+                            const isLeft = i % 2 === 0;
+                            return (
+                                <div
+                                    key={i}
+                                    className={`border-[#e2e2e2] border-solid flex flex-col items-center justify-center p-3 md:p-6 h-[180px] md:h-[236px] text-center
+                                        ${isTop ? 'border-t' : ''} ${isLeft ? 'border-l' : 'border-r'}
+                                        ${isTop && isLeft ? 'rounded-tl-xl border-r border-b lg:rounded-r-none' : ''}
+                                        ${isTop && !isLeft ? 'rounded-tr-xl border-b lg:rounded-l-none' : ''}
+                                        ${!isTop && isLeft ? 'rounded-bl-xl border-r border-b lg:rounded-r-none' : ''}
+                                        ${!isTop && !isLeft ? 'rounded-br-xl border-b lg:rounded-l-none' : ''}
+                                    `}
+                                >
+                                    <div className="flex flex-col items-center justify-center gap-2 md:gap-3">
+                                        <div className="w-[80px] h-[80px] md:w-[110px] md:h-[110px] relative">
+                                            <img
+                                                src={f.image || "https://res.cloudinary.com/dgkckcdk8/image/upload/v1776714078/64e2ed1925a146151a5bfc674829bb2b3e685b49_4_zpulqn.png"}
+                                                alt={f.title}
+                                                className="w-full h-full object-contain pointer-events-none"
+                                            />
+                                        </div>
+                                        <div className="flex flex-col gap-1">
+                                            <h3 className="font-semibold text-[#333333] text-[14px] md:text-xl tracking-[-0.8px]">{f.title}</h3>
+                                            <p className="text-[#757575] text-[10px] md:text-sm font-normal tracking-[-0.4px]">{f.description}</p>
+                                        </div>
                                     </div>
-                                    <h3 className="text-xl font-bold text-gray-900 font-sans">{f.title}</h3>
-                                    <p className="text-gray-500 text-sm font-sans">{f.description}</p>
                                 </div>
-                            </div>
-                        ))}
+                            );
+                        })}
                     </div>
                 </div>
             </section>
 
-            {/* 4. Why Choose Us Section */}
-            <WhyChooseUs 
-                overrideBg="hsla(0, 0%, 100%, 1)"
-                overridePaddingTop="0px"
-                hideBorder={true}
-            />
-
             {/* 5. Testimonials Section */}
-            <Testimonials 
-                overrideBg="hsla(0, 0%, 100%, 1)"
-                overridePadding="20px 0px"
-                overrideHeight="888px"
-            />
+            <Testimonials />
         </div>
     );
 }
+

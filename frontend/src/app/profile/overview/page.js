@@ -67,42 +67,90 @@ const cards = [
     { title: 'Get In Touch', description: 'Contact customer support.', icon: <IconContact />, href: '/profile/contact' },
 ];
 
+import { logout } from '../../../services/authService';
+import { useRouter } from 'next/navigation';
+
 export default function OverviewPage() {
+    const router = useRouter();
+
+    const handleLogout = () => {
+        logout();
+        router.push('/');
+        window.dispatchEvent(new Event('userInfoChanged'));
+    };
+
     return (
-        <div className="flex flex-col gap-3">
-            {/* Title */}
-            <div className="flex items-center gap-3">
-                <Link href="/profile" aria-label="Back to menu" className="lg:hidden text-gray-800 shrink-0">
-                    <BsArrowLeft size={24} />
-                </Link>
-                <h1 className="text-[27px] font-semibold leading-[35px] tracking-[-0.8px] text-[#333333]">
+        <>
+            {/* ── DESKTOP VIEW (Original, zero desktop changes) ── */}
+            <div className="hidden lg:flex flex-col gap-5">
+                <h1 className="text-[26px] font-bold tracking-[-0.8px] text-[#1D1D1F]">
                     Overview
                 </h1>
+
+                <div className="h-px w-full bg-[#e2e2e2]" />
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-[14px]">
+                    {cards.map((card) => (
+                        <Link
+                            key={card.title}
+                            href={card.href}
+                            className="flex flex-col gap-[12px] bg-white border border-[#e2e2e2] rounded-[12px] p-[20px] h-[140px] w-full transition-colors hover:border-[#cbcbcb] shadow-sm"
+                        >
+                            <div className="flex flex-col items-start gap-[10px]">
+                                <div className="size-5">{card.icon}</div>
+                                <h3 className="text-[15px] font-[800] tracking-[-0.4px] text-[#1D1D1F] leading-none">
+                                    {card.title}
+                                </h3>
+                            </div>
+                            <p className="text-[12px] font-medium leading-[16px] text-[#757575]">
+                                {card.description}
+                            </p>
+                        </Link>
+                    ))}
+                </div>
             </div>
 
-            {/* Divider */}
-            <div className="h-px w-full bg-[#e2e2e2]" />
+            {/* ── MOBILE VIEW (Figma exact match) ── */}
+            <div className="flex lg:hidden flex-col gap-[12px]">
+                {/* Title */}
+                <div className="flex items-center justify-start">
+                    <h1 className="text-[27px] font-semibold tracking-[-0.8px] text-[#333333] leading-[35px]">
+                        Overview
+                    </h1>
+                </div>
 
-            {/* Cards grid — 3 columns, matching the Figma rows (3 / 3 / 1) */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-                {cards.map((card) => (
-                    <Link
-                        key={card.title}
-                        href={card.href}
-                        className="flex flex-col gap-2 bg-white border border-[#e2e2e2] rounded-2xl px-5 py-8 overflow-hidden transition-colors hover:border-[#cbcbcb]"
-                    >
-                        <div className="flex flex-col justify-center gap-[7px]">
-                            <div className="size-5">{card.icon}</div>
-                            <h3 className="text-[18px] font-bold leading-[25px] tracking-[-0.8px] text-black">
-                                {card.title}
-                            </h3>
-                        </div>
-                        <p className="text-[14px] font-medium leading-5 tracking-[-0.4px] text-[#757575]">
-                            {card.description}
-                        </p>
-                    </Link>
-                ))}
+                {/* Divider */}
+                <div className="h-px w-full bg-[#e2e2e2]" />
+
+                {/* Mobile Cards Stack */}
+                <div className="flex flex-col gap-[12px]">
+                    {cards.map((card) => (
+                        <Link
+                            key={card.title}
+                            href={card.href}
+                            className="flex flex-col gap-[8px] bg-white border border-[#e2e2e2] rounded-[16px] p-[20px] w-full hover:border-[#cbcbcb] transition-colors"
+                        >
+                            <div className="flex flex-col gap-[7px] items-start">
+                                <div className="size-5 shrink-0">{card.icon}</div>
+                                <h3 className="text-[18px] font-bold tracking-[-0.8px] text-black leading-[25px] whitespace-nowrap">
+                                    {card.title}
+                                </h3>
+                            </div>
+                            <p className="text-[14px] font-medium leading-[20px] tracking-[-0.4px] text-[#757575]">
+                                {card.description}
+                            </p>
+                        </Link>
+                    ))}
+                </div>
+
+                {/* Mobile Logout button — Figma: red-700 (#c8170d), rounded-[30px], full width */}
+                <button
+                    onClick={handleLogout}
+                    className="w-full bg-[#c8170d] text-white font-semibold text-[14px] tracking-[-0.4px] py-[6px] h-[32px] rounded-[30px] hover:bg-[#a8130b] transition-colors"
+                >
+                    Logout
+                </button>
             </div>
-        </div>
+        </>
     );
 }

@@ -139,120 +139,187 @@ const Hero = () => {
     const trackHeight = viewType === 'tablet' ? 332 : 510;
 
     return (
-        <section className="w-full pt-8 pb-8 px-4 mx-auto gap-[10px] overflow-x-clip" style={{ background: 'var(--color-grey-grey-50, hsla(0, 0%, 96%, 1))' }}>
-            {/* ── Mobile (Restored from March 28) ────────────────────── */}
-            <div
-                className="block md:hidden flex overflow-x-auto snap-x snap-mandatory"
-                style={{
-                    width: "390px",
-                    maxWidth: "100%",
-                    height: "369px",
-                    paddingTop: "12px",
-                    paddingBottom: "12px",
-                    paddingLeft: "16px",
-                    paddingRight: "16px",
-                    gap: "10px",
-                    opacity: 1,
-                    backgroundColor: "transparent",
-                    scrollbarWidth: "none",
-                    msOverflowStyle: "none"
-                }}
-
-            >
-                <div className="hide-scrollbar overflow-auto"></div>
-                {slides.map((s, i) => (
-                    <Link
-                        href={s.slideLink || s.ctaLink || "/store"}
-                        key={i}
-                        className="snap-center shrink-0 rounded-lg relative h-full flex flex-col p-[14px] overflow-hidden z-0"
-                        style={{
-                            width: "216px",
-                            background: s.bgGradient || s.bgColor,
-                            display: "block"
-                        }}
-                    >
-                        {/* Image at TOP */}
-                        <div
-                            className="absolute z-0 pointer-events-none"
+        <section className="w-full mx-auto gap-[10px] overflow-x-clip md:pt-8 md:pb-8 md:px-4" style={{ background: 'var(--color-grey-grey-50, hsla(0, 0%, 96%, 1))' }}>
+            {/* ── Mobile Hero ────────────────────────────────────────── */}
+            <div className="block md:hidden w-full" style={{ background: '#FFFFFF' }}>
+                {/* Frame 562 — scroll container */}
+                <div
+                    className="flex overflow-x-auto snap-x snap-mandatory"
+                    style={{
+                        padding: '12px 20px',
+                        gap: '10px',
+                        height: '369px',
+                        width: '100%',
+                        boxSizing: 'border-box',
+                        scrollbarWidth: 'none',
+                        msOverflowStyle: 'none',
+                        WebkitOverflowScrolling: 'touch'
+                    }}
+                    onScroll={(e) => {
+                        const el = e.currentTarget;
+                        const cardW = 216 + 10;
+                        const idx = Math.round(el.scrollLeft / cardW);
+                        setCurrentIndex(idx);
+                    }}
+                >
+                    {slides.map((s, i) => (
+                        <Link
+                            href={s.slideLink || s.ctaLink || '/products'}
+                            key={i}
+                            className="snap-center shrink-0 relative overflow-hidden"
                             style={{
-                                width: "221px",
-                                height: "221px",
-                                left: "-6px",
-                                top: "0px"
+                                boxSizing: 'border-box',
+                                width: '216px',
+                                minWidth: '216px',
+                                height: '345px',
+                                background: s.bgGradient || s.bgColor || 'linear-gradient(100.45deg, #01A6EE 10.43%, #38BDF8 92.63%)',
+                                borderRadius: '12px',
+                                display: 'block',
+                                flexShrink: 0
                             }}
                         >
-                            <Image
-                                src={s.image || FALLBACK_SLIDES[0].image}
-                                alt={s.title}
-                                fill
-                                unoptimized
-                                className="object-contain object-center drop-shadow-[0_25px_25px_rgba(0,0,0,0.25)]"
-                            />
-                        </div>
+                            {/* Glow ellipse */}
+                            <div style={{
+                                position: 'absolute',
+                                width: '164px',
+                                height: '164px',
+                                right: '-40px',
+                                top: '40px',
+                                background: '#BAE6FD',
+                                filter: 'blur(97px)',
+                                pointerEvents: 'none',
+                                zIndex: 0
+                            }} />
 
-                        {/* Text at BOTTOM */}
-                        <div
-                            className="absolute flex flex-col z-10"
-                            style={{
-                                width: "200px",
-                                height: "auto",
-                                top: "215px",
-                                left: "14px",
-                                gap: "2px",
-                                color: s.textColor || "#fff"
-                            }}
-                        >
-                            <h1
-                                className="font-manrope font-bold"
-                                style={{
-                                    width: "200px",
-                                    fontSize: "14px",
-                                    lineHeight: "16px",
-                                    letterSpacing: "-0.01em",
-                                    color: "hsla(0, 0%, 100%, 1)"
-                                }}
-                            >
-                                {s.title}
-                            </h1>
-                            <p
-                                className="font-manrope font-normal"
-                                style={{
-                                    width: "193px",
-                                    height: "42px",
-                                    fontSize: "10px",
-                                    lineHeight: "14px",
-                                    letterSpacing: "-0.01em",
-                                    color: "hsla(0, 0%, 100%, 1)"
-                                }}
-                            >
-                                {s.subtitle}
-                            </p>
+                            {/* Product image — top, 221×221, left:-6px top:0 */}
+                            <div style={{
+                                position: 'absolute',
+                                width: '221px',
+                                height: '221px',
+                                left: '-6px',
+                                top: '0px',
+                                zIndex: 1,
+                                pointerEvents: 'none'
+                            }}>
+                                <Image
+                                    src={s.image || FALLBACK_SLIDES[0].image}
+                                    alt={s.title}
+                                    fill
+                                    unoptimized
+                                    className="object-contain object-center"
+                                />
+                            </div>
 
-                            <div className="pt-2">
-                                <div
-                                    className="flex items-center justify-center active:scale-95 transition-transform shrink-0"
-                                    style={{
-                                        padding: "4px 10px",
-                                        borderRadius: "100px",
-                                        borderBottom: "0.61px solid rgba(0,0,0,0.1)",
-                                        background: "hsla(44, 100%, 64%, 1)",
-                                        minWidth: "0",
-                                        minHeight: "0"
-                                    }}
-                                >
-                                    <span className="whitespace-nowrap flex items-center gap-1" style={{ fontFamily: "'Mona Sans', sans-serif", fontWeight: 500, color: "hsla(0, 0%, 20%, 1)", fontSize: "10px", lineHeight: "1" }}>
-                                        {s.ctaText || "Rent Now"}
-                                        <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
-                                            <line x1="5" y1="12" x2="19" y2="12"></line>
-                                            <polyline points="12 5 19 12 12 19"></polyline>
-                                        </svg>
+                            {/* Reflection fade */}
+                            <div style={{
+                                position: 'absolute',
+                                width: '221px',
+                                height: '137px',
+                                left: '-1px',
+                                top: '115px',
+                                background: 'linear-gradient(180deg, rgba(255,255,255,0.18) 0%, rgba(0,0,0,0) 100%)',
+                                filter: 'blur(3.7px)',
+                                zIndex: 2,
+                                pointerEvents: 'none'
+                            }} />
+
+                            {/* Text block — bottom */}
+                            <div style={{
+                                position: 'absolute',
+                                left: '13px',
+                                bottom: '16px',
+                                width: '193px',
+                                display: 'flex',
+                                flexDirection: 'column',
+                                alignItems: 'flex-start',
+                                gap: '4px',
+                                zIndex: 3
+                            }}>
+                                <p style={{
+                                    fontFamily: "'Mona Sans', sans-serif",
+                                    fontWeight: 600,
+                                    fontSize: '12px',
+                                    lineHeight: '18px',
+                                    letterSpacing: '-0.4px',
+                                    color: '#FFFFFF',
+                                    margin: 0,
+                                    width: '152px'
+                                }}>
+                                    {s.title}
+                                </p>
+                                <p style={{
+                                    fontFamily: "'Mona Sans', sans-serif",
+                                    fontWeight: 400,
+                                    fontSize: '8px',
+                                    lineHeight: '14px',
+                                    letterSpacing: '-0.4px',
+                                    color: '#FFFFFF',
+                                    margin: 0,
+                                    width: '193px'
+                                }}>
+                                    {s.subtitle}
+                                </p>
+
+                                {/* Yellow CTA button */}
+                                <div style={{
+                                    display: 'inline-flex',
+                                    flexDirection: 'row',
+                                    justifyContent: 'center',
+                                    alignItems: 'center',
+                                    padding: '2.42px 4.84px 2.42px 7.26px',
+                                    gap: '1.21px',
+                                    width: '58px',
+                                    height: '14.53px',
+                                    background: '#FFCF46',
+                                    borderRadius: '17.41px',
+                                    marginTop: '2px'
+                                }}>
+                                    <span style={{
+                                        fontFamily: "'Mona Sans', sans-serif",
+                                        fontWeight: 800,
+                                        fontSize: '7.46px',
+                                        lineHeight: '8px',
+                                        letterSpacing: '-0.24px',
+                                        color: '#1F1F1F',
+                                        whiteSpace: 'nowrap'
+                                    }}>
+                                        {s.ctaText || 'Rent Now'}
                                     </span>
+                                    <svg width="9.68" height="9.68" viewBox="0 0 24 24" fill="none" stroke="#1F1F1F" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
+                                        <line x1="5" y1="12" x2="19" y2="12" />
+                                        <polyline points="12 5 19 12 12 19" />
+                                    </svg>
                                 </div>
                             </div>
-                        </div>
-                    </Link>
-                ))}
+                        </Link>
+                    ))}
+                </div>
+
+                {/* Dot indicators */}
+                <div style={{
+                    display: 'flex',
+                    flexDirection: 'row',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    padding: '16px',
+                    gap: '8px',
+                    width: '100%'
+                }}>
+                    {slides.map((_, i) => (
+                        <div
+                            key={i}
+                            style={{
+                                width: '8px',
+                                height: '8px',
+                                borderRadius: '50%',
+                                background: i === (currentIndex % slides.length) ? '#545454' : '#CBCBCB',
+                                transition: 'background 0.3s'
+                            }}
+                        />
+                    ))}
+                </div>
             </div>
+
 
             {/* Tablet / Desktop View — identical layout, just scaled on tablet */}
             <div

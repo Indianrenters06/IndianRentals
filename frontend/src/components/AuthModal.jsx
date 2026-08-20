@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { EnvelopeSimple, Lock, GoogleLogo, AppleLogo, ArrowRight, Phone, ArrowLeft, X, User } from "@phosphor-icons/react";
 import { useRouter } from "next/navigation";
 import { API_BASE_URL } from "../services/apiConfig";
-
+import { useGoogleLogin } from "@react-oauth/google";
 
 const AuthModal = ({ isOpen, onClose, initialView = "login" }) => {
     const router = useRouter();
@@ -152,6 +152,39 @@ const AuthModal = ({ isOpen, onClose, initialView = "login" }) => {
             setLoading(false);
         }
     };
+
+    const handleGoogleLogin = useGoogleLogin({
+        onSuccess: async (tokenResponse) => {
+            setLoading(true);
+            setError(null);
+            try {
+                const res = await fetch(`${API_BASE_URL}/api/auth/google-login`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ access_token: tokenResponse.access_token }),
+                });
+
+                const data = await res.json();
+
+                if (!res.ok) {
+                    throw new Error(data.message || "Google Login failed");
+                }
+
+                // Store token
+                localStorage.setItem("userInfo", JSON.stringify(data));
+                window.dispatchEvent(new Event("userInfoChanged"));
+
+                // Close modal
+                onClose();
+            } catch (err) {
+                setError(err.message);
+                setLoading(false);
+            }
+        },
+        onError: () => {
+            setError("Google login failed or was cancelled");
+        }
+    });
 
     if (!isOpen) return null;
 
@@ -413,6 +446,26 @@ const AuthModal = ({ isOpen, onClose, initialView = "login" }) => {
                                         </button>
                                     </motion.form>
                                 )}
+
+                                <div className="mt-8">
+                                    <div className="relative">
+                                        <div className="absolute inset-0 flex items-center">
+                                            <div className="w-full border-t border-gray-100"></div>
+                                        </div>
+                                        <div className="relative flex justify-center text-sm">
+                                            <span className="px-2 bg-white text-gray-400 text-xs uppercase tracking-wider">Or continue with</span>
+                                        </div>
+                                    </div>
+
+                                    <div className="mt-6 grid grid-cols-2 gap-3">
+                                        <button onClick={() => handleGoogleLogin()} disabled={loading} type="button" className="w-full inline-flex justify-center items-center py-2.5 px-4 border border-gray-200 rounded-xl shadow-sm bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 transition-colors disabled:opacity-50">
+                                            <GoogleLogo className="text-red-500 mr-2" size={16} weight="bold" /> Google
+                                        </button>
+                                        <button disabled={true} type="button" className="w-full inline-flex justify-center items-center py-2.5 px-4 border border-gray-200 rounded-xl shadow-sm bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 transition-colors disabled:opacity-50">
+                                            <AppleLogo className="text-black mr-2" size={16} weight="fill" /> Apple
+                                        </button>
+                                    </div>
+                                </div>
 
                                 {/* Switcher */}
                                 <div className="mt-8 text-center text-sm text-gray-600">

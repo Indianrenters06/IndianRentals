@@ -43,7 +43,7 @@ const FeatureSection = () => {
 
     return (
         <section className="w-full bg-white overflow-hidden text-black py-0">
-            <div className="w-full max-w-[1200px] mx-auto px-4 sm:px-6">
+            <div className={`w-full max-w-[1200px] mx-auto ${isDesktop ? 'px-4 sm:px-6' : 'px-0'}`}>
                 {/* Inner radial gradient container */}
                 <div
                     className="w-full relative flex flex-col lg:flex-row items-center justify-between overflow-hidden"
@@ -91,20 +91,18 @@ const FeatureSection = () => {
                                 initial={{ opacity: 0, y: 20 }}
                                 whileInView={{ opacity: 1, y: 0 }}
                                 viewport={{ once: true }}
-                                className="text-[36px] md:text-5xl lg:text-[42px]"
                                 style={{
                                     fontFamily: "'Mona Sans', sans-serif",
-                                    width: 'auto',
-                                    height: 'auto',
-                                    fontWeight: isDesktop ? '500' : 'bold',
-                                    background: isDesktop ? 'linear-gradient(90deg, #0F2239 0%, #517396 87.77%)' : 'none',
-                                    WebkitBackgroundClip: isDesktop ? 'text' : 'none',
-                                    WebkitTextFillColor: isDesktop ? 'transparent' : 'inherit',
-                                    color: isDesktop ? 'transparent' : '#0F2239',
-                                    letterSpacing: isDesktop ? '-0.02em' : '-0.01em',
-                                    lineHeight: '1.1',
+                                    fontWeight: isDesktop ? 500 : 600,
+                                    fontSize: isDesktop ? '42px' : '25px',
+                                    lineHeight: isDesktop ? '1.1' : '31px',
+                                    letterSpacing: isDesktop ? '-0.02em' : '-0.8px',
+                                    background: 'linear-gradient(90deg, #0F2239 0%, #517396 87.77%)',
+                                    WebkitBackgroundClip: 'text',
+                                    WebkitTextFillColor: 'transparent',
                                     whiteSpace: isDesktop ? 'nowrap' : 'normal',
-                                    marginBottom: '16px'
+                                    marginBottom: isDesktop ? '16px' : '8px',
+                                    margin: 0
                                 }}
                             >
                                 {cms.featureSectionTitle || "MacBook Air"}
@@ -115,21 +113,19 @@ const FeatureSection = () => {
                                 whileInView={{ opacity: 1, y: 0 }}
                                 viewport={{ once: true }}
                                 transition={{ delay: 0.1 }}
-                                className=""
                                 style={{
                                     fontFamily: "'Mona Sans', sans-serif",
-                                    width: isDesktop ? '235px' : '342px',
-                                    height: isDesktop ? '115px' : 'auto',
-                                    fontSize: isDesktop ? '14px' : '13px',
-                                    fontWeight: isDesktop ? '400' : '500',
-                                    color: isDesktop ? 'hsla(214, 74%, 21%, 1)' : '#64748b',
+                                    fontWeight: isDesktop ? 400 : 500,
+                                    fontSize: isDesktop ? '14px' : '12px',
                                     lineHeight: isDesktop ? '1.5' : '18px',
-                                    maxWidth: isDesktop ? '235px' : 'none',
-                                    overflow: 'hidden',
-                                    marginBottom: isDesktop ? '0' : '4px'
+                                    letterSpacing: '-0.4px',
+                                    color: '#757575',
+                                    maxWidth: isDesktop ? '235px' : '100%',
+                                    margin: 0,
+                                    marginBottom: isDesktop ? '0' : '8px'
                                 }}
                             >
-                                {cms.featureSectionSubtitle || "Skip the setup hassle. Get high-performance workstations pre-configured with Ollama for instant AI development. Run large language models locally,"}
+                                {cms.featureSectionSubtitle || "Skip the setup hassle. Get high-performance workstations pre-configured with Ollama for instant AI development. Run large language models locally."}
                             </motion.p>
                         </div>
 
@@ -141,20 +137,25 @@ const FeatureSection = () => {
                             className="flex"
                         >
                             <Link
-                                href={cms.featureSectionCtaLink || "/store"}
-                                className="btn-primary"
+                                href={cms.featureSectionCtaLink || "/products"}
                                 style={{
+                                    display: 'inline-flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
                                     fontFamily: "'Mona Sans', sans-serif",
-                                    width: isDesktop ? '130px' : '90px',
-                                    height: isDesktop ? '35px' : '28px',
-                                    padding: isDesktop ? '6px 20px' : '0 12px',
-                                    // Background/colour intentionally left to .btn-primary — an
-                                    // inline background would outrank its :hover rule.
-                                    borderRadius: isDesktop ? '32px' : '9999px',
-                                    fontSize: isDesktop ? '14px' : '11px',
-                                    fontWeight: isDesktop ? '500' : 'bold',
-                                    gap: isDesktop ? '2px' : '4px'
+                                    fontWeight: 500,
+                                    fontSize: isDesktop ? '14px' : '8.68px',
+                                    lineHeight: isDesktop ? 'normal' : '13px',
+                                    letterSpacing: isDesktop ? 'normal' : '-0.289px',
+                                    color: '#1F1F1F',
+                                    background: isDesktop ? undefined : '#FFCF46',
+                                    borderRadius: isDesktop ? '32px' : '20.47px',
+                                    padding: isDesktop ? '6px 20px' : '4.34px 14.47px',
+                                    height: isDesktop ? '35px' : '22.68px',
+                                    textDecoration: 'none',
+                                    ...(isDesktop ? { } : { })
                                 }}
+                                className={isDesktop ? 'btn-primary' : ''}
                             >
                                 {cms.featureSectionCtaText || "Rent Now"}
                             </Link>
@@ -260,15 +261,15 @@ const FeatureSection = () => {
                                         <p
                                             style={{
                                                 fontFamily: "'Mona Sans', sans-serif",
-                                                fontSize: isDesktop ? '13px' : '9px',
-                                                fontWeight: isDesktop ? '600' : '500',
-                                                width: isDesktop ? '51px' : 'auto',
-                                                height: 'auto',
-                                                color: isDesktop ? (isThird ? '#2d5d36' : 'hsla(0, 0%, 46%, 1)') : '#64748b',
-                                                lineHeight: isDesktop ? '1.2' : 'normal',
+                                                fontSize: isDesktop ? '13px' : '10px',
+                                                fontWeight: 600,
+                                                lineHeight: '16px',
+                                                letterSpacing: '-0.4px',
+                                                color: isDesktop ? (isThird ? '#2d5d36' : 'hsla(0, 0%, 46%, 1)') : (isThird ? 'transparent' : '#757575'),
+                                                background: (!isDesktop && isThird) ? 'linear-gradient(90deg, #0F3914 0%, #51966A 87.77%)' : 'none',
+                                                WebkitBackgroundClip: (!isDesktop && isThird) ? 'text' : 'none',
+                                                WebkitTextFillColor: (!isDesktop && isThird) ? 'transparent' : 'inherit',
                                                 marginBottom: 0,
-                                                display: 'flex',
-                                                alignItems: 'center'
                                             }}
                                         >
                                             {stat.label}
@@ -276,19 +277,16 @@ const FeatureSection = () => {
                                         <h4
                                             style={{
                                                 fontFamily: "'Mona Sans', sans-serif",
-                                                fontSize: isDesktop ? '32px' : '24px',
-                                                fontWeight: isDesktop ? '500' : 'bold',
-                                                width: isDesktop ? '76px' : 'auto',
-                                                height: 'auto',
-                                                display: 'flex',
-                                                alignItems: 'center',
+                                                fontSize: isDesktop ? '32px' : '20px',
+                                                fontWeight: 600,
+                                                lineHeight: isDesktop ? '1.1' : '26px',
+                                                letterSpacing: isDesktop ? '-0.02em' : '-0.8px',
                                                 margin: 0,
-                                                background: isDesktop ? (isThird ? 'none' : 'linear-gradient(90deg, #0F2239 0%, #517396 87.77%)') : 'none',
-                                                WebkitBackgroundClip: isDesktop ? (isThird ? 'none' : 'text') : 'none',
-                                                WebkitTextFillColor: isDesktop ? (isThird ? 'inherit' : 'transparent') : 'inherit',
-                                                color: isThird ? '#2d5d36' : (isDesktop ? 'transparent' : '#1a2b4c'),
-                                                lineHeight: isDesktop ? '1.1' : 'normal',
-                                                letterSpacing: isDesktop ? '-0.02em' : 'tight'
+                                                background: isThird
+                                                    ? 'linear-gradient(90deg, #0F3914 0%, #51966A 87.77%)'
+                                                    : 'linear-gradient(90deg, #0F2239 0%, #517396 87.77%)',
+                                                WebkitBackgroundClip: 'text',
+                                                WebkitTextFillColor: 'transparent',
                                             }}
                                         >
                                             {stat.value}
@@ -297,14 +295,16 @@ const FeatureSection = () => {
                                     <p
                                         style={{
                                             fontFamily: "'Mona Sans', sans-serif",
-                                            fontSize: isDesktop ? '12px' : '9px',
-                                            fontWeight: isDesktop ? '600' : '500',
-                                            width: isDesktop ? (idx === 0 ? '142px' : '107px') : '90px',
-                                            height: 'auto',
-                                            color: isDesktop ? (isThird ? '#2d5d36' : 'hsla(0, 0%, 46%, 1)') : (isThird ? '#2d5d36' : '#64748b'),
-                                            lineHeight: isDesktop ? '1.2' : '1.2',
-                                            overflow: 'hidden',
-                                            marginTop: 0
+                                            fontSize: isDesktop ? '12px' : '10px',
+                                            fontWeight: 600,
+                                            lineHeight: '16px',
+                                            letterSpacing: '-0.4px',
+                                            color: isDesktop ? (isThird ? '#2d5d36' : 'hsla(0, 0%, 46%, 1)') : (isThird ? 'transparent' : '#757575'),
+                                            background: (!isDesktop && isThird) ? 'linear-gradient(90deg, #0F3914 0%, #51966A 87.77%)' : 'none',
+                                            WebkitBackgroundClip: (!isDesktop && isThird) ? 'text' : 'none',
+                                            WebkitTextFillColor: (!isDesktop && isThird) ? 'transparent' : 'inherit',
+                                            marginTop: 0,
+                                            overflow: 'hidden'
                                         }}
                                     >
                                         {stat.sublabel}
@@ -322,11 +322,21 @@ const FeatureSection = () => {
                         transition={{ delay: 0.5 }}
                         className={isDesktop ? "w-full text-center relative z-10 order-4 pt-4 lg:absolute lg:bottom-[2px] lg:left-1/2 lg:-translate-x-1/2 pointer-events-none" : "w-full text-center relative z-20 order-4 mt-auto"}
                     >
-                        <h3 className="text-[14px] md:text-xl font-bold tracking-tight pb-2" style={{ fontFamily: "'Mona Sans', sans-serif" }}>
-                            <span className="text-[#3b82f6]">Built for </span>
-                            <span className="bg-clip-text text-transparent bg-gradient-to-r from-purple-500 via-pink-500 to-orange-500">
-                                Apple Intelligence.
-                            </span>
+                        <h3
+                            style={{
+                                fontFamily: "'Mona Sans', sans-serif",
+                                fontWeight: 800,
+                                fontSize: isDesktop ? '14px' : '12px',
+                                lineHeight: '18px',
+                                letterSpacing: '-0.4px',
+                                background: 'linear-gradient(90deg, #3583F0 0%, #BC58E3 47.12%, #E05821 100%)',
+                                WebkitBackgroundClip: 'text',
+                                WebkitTextFillColor: 'transparent',
+                                paddingBottom: '8px',
+                                margin: 0
+                            }}
+                        >
+                            Built for Apple Intelligence.
                         </h3>
                     </motion.div>
                 </div>

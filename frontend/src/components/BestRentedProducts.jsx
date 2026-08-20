@@ -13,48 +13,323 @@ import { useDispatch, useSelector } from "react-redux";
 import { addToCart } from "@/redux/features/cartSlice";
 import { toggleWishlist, selectIsWishlisted } from "@/redux/features/wishlistSlice";
 
-const MobileProductCard = ({ product }) => {
+const MobileProductCard = ({ product, handleAddToCart }) => {
     const router = useRouter();
+    const dispatch = useDispatch();
+    const [isHovered, setIsHovered] = useState(false);
+    const isWishlisted = useSelector(selectIsWishlisted(product?.id));
+
+    const handleToggleWishlist = (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        dispatch(toggleWishlist(product));
+    };
+
     return (
         <div
             onClick={() => router.push(`/products/${product.id}`)}
-            style={{ width: '100%', cursor: 'pointer', borderRadius: '12px', border: '1px solid hsla(0,0%,91%,1)', background: '#fff', overflow: 'hidden', boxShadow: '0px 1px 3px rgba(0,0,0,0.06)' }}
+            onMouseEnter={() => setIsHovered(true)}
+            onMouseLeave={() => setIsHovered(false)}
+            onTouchStart={() => setIsHovered(prev => !prev)}
+            style={{
+                width: '100%',
+                maxWidth: '170px',
+                height: '256px',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'flex-start',
+                padding: '0px',
+                background: '#FFFFFF',
+                border: '1px solid #E2E2E2',
+                boxShadow: isHovered ? '0px 8px 16px rgba(0, 0, 0, 0.1)' : '0px 1px 2px rgba(0, 0, 0, 0.05)',
+                borderRadius: '12px',
+                overflow: 'hidden',
+                cursor: 'pointer',
+                boxSizing: 'border-box',
+                margin: '0 auto',
+                position: 'relative',
+                transition: 'box-shadow 0.3s ease'
+            }}
         >
-            {/* Image area */}
-            <div style={{ position: 'relative', width: '100%', aspectRatio: '1/1', background: '#fff', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px 6px 6px' }}>
-                <span style={{ position: 'absolute', top: '8px', left: '8px', background: 'hsla(3,86%,51%,1)', color: '#fff', fontSize: '10px', fontWeight: 700, padding: '3px 8px', borderRadius: '20px', fontFamily: "'Mona Sans',sans-serif", zIndex: 10 }}>
-                    20% off
-                </span>
-                <img src={product.image} alt={product.name} style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain', objectPosition: 'center' }} />
+            {/* Frame 5 — Image Container */}
+            <div
+                style={{
+                    position: 'relative',
+                    width: '100%',
+                    height: '184px',
+                    background: '#FFFFFF',
+                    borderWidth: '0px 1px 1px 1px',
+                    borderStyle: 'solid',
+                    borderColor: '#EEEEEE',
+                    boxShadow: '0px 59px 23px rgba(222, 222, 222, 0.01), 0px 33px 20px rgba(222, 222, 222, 0.05), 0px 15px 15px rgba(222, 222, 222, 0.09), 0px 4px 8px rgba(222, 222, 222, 0.1)',
+                    borderRadius: '12px',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    boxSizing: 'border-box',
+                    flexShrink: 0,
+                    overflow: 'hidden',
+                    zIndex: 2
+                }}
+            >
+                {/* Badges - 20% off */}
+                <div
+                    style={{
+                        position: 'absolute',
+                        width: '39px',
+                        height: '18px',
+                        left: '10px',
+                        top: '10px',
+                        display: 'flex',
+                        flexDirection: 'row',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        padding: '2px 6px',
+                        gap: '10px',
+                        background: '#ED2115',
+                        boxShadow: '0px 5px 2px rgba(120, 120, 120, 0.01), 0px 3px 2px rgba(120, 120, 120, 0.05), 0px 1px 1px rgba(120, 120, 120, 0.09), 0px 0px 1px rgba(120, 120, 120, 0.1)',
+                        borderRadius: '27px',
+                        zIndex: 10
+                    }}
+                >
+                    <span
+                        style={{
+                            width: '27px',
+                            height: '14px',
+                            fontFamily: "'Mona Sans', sans-serif",
+                            fontWeight: 600,
+                            fontSize: '8px',
+                            lineHeight: '14px',
+                            letterSpacing: '-0.4px',
+                            color: '#FFF2F1',
+                            whiteSpace: 'nowrap',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center'
+                        }}
+                    >
+                        {product.discount || '20% off'}
+                    </span>
+                </div>
+
+                {/* Product Image */}
+                <div
+                    style={{
+                        position: 'absolute',
+                        top: '24px',
+                        bottom: '36px',
+                        left: '8px',
+                        right: '8px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center'
+                    }}
+                >
+                    <img
+                        src={product.image}
+                        alt={product.name}
+                        style={{
+                            maxWidth: '100%',
+                            maxHeight: '100%',
+                            objectFit: 'contain',
+                            transform: isHovered ? 'scale(1.05)' : 'scale(1)',
+                            transition: 'transform 0.4s ease'
+                        }}
+                    />
+                </div>
+
+                {/* Rent Now Golden Yellow Pill Button — Slides up into view inside image box on hover/tap */}
+                <button
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        if (handleAddToCart) {
+                            handleAddToCart(e, product);
+                        } else {
+                            router.push(`/products/${product.id}`);
+                        }
+                    }}
+                    style={{
+                        position: 'absolute',
+                        bottom: '8px',
+                        left: '50%',
+                        transform: isHovered ? 'translate(-50%, 0)' : 'translate(-50%, 45px)',
+                        opacity: isHovered ? 1 : 0,
+                        pointerEvents: isHovered ? 'auto' : 'none',
+                        transition: 'transform 0.3s cubic-bezier(0.33, 1, 0.68, 1), opacity 0.25s ease',
+                        width: '155px',
+                        maxWidth: 'calc(100% - 14px)',
+                        height: '30px',
+                        display: 'flex',
+                        flexDirection: 'row',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        padding: '4px 20px',
+                        gap: '2px',
+                        background: '#FFCF46',
+                        border: 'none',
+                        borderRadius: '28px',
+                        fontFamily: "'Mona Sans', sans-serif",
+                        fontWeight: 600,
+                        fontSize: '12px',
+                        lineHeight: '18px',
+                        letterSpacing: '-0.4px',
+                        color: '#141414',
+                        cursor: 'pointer',
+                        boxShadow: '0px 2px 6px rgba(0, 0, 0, 0.12)',
+                        zIndex: 10
+                    }}
+                    className="active:scale-95 hover:bg-[#ffc72e]"
+                >
+                    Rent Now
+                </button>
             </div>
-            {/* Info area */}
-            <div style={{ padding: '8px 10px 12px', display: 'flex', flexDirection: 'column', gap: '5px', borderTop: '1px solid hsla(0,0%,93%,1)' }}>
-                {/* Name — 1 line truncated */}
-                <h3 style={{ fontFamily: "'Mona Sans',sans-serif", fontSize: '13px', fontWeight: 600, color: '#1D1D1F', lineHeight: '18px', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+
+            {/* Frame 86 — Text Details Container */}
+            <div
+                style={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'flex-start',
+                    padding: '4px 8px 8px',
+                    gap: '4px',
+                    width: '100%',
+                    height: '72px',
+                    boxSizing: 'border-box'
+                }}
+            >
+                {/* Product Name */}
+                <h3
+                    style={{
+                        width: '100%',
+                        height: '16px',
+                        fontFamily: "'Mona Sans', sans-serif",
+                        fontWeight: 600,
+                        fontSize: '10px',
+                        lineHeight: '16px',
+                        letterSpacing: '-0.4px',
+                        color: '#333333',
+                        margin: 0,
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                        whiteSpace: 'nowrap'
+                    }}
+                >
                     {product.name}
                 </h3>
-                {/* Rating + Delivery */}
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '3px' }}>
-                        <Star size={13} weight="fill" color="#FF9500" />
-                        <span style={{ fontFamily: "'Mona Sans',sans-serif", fontSize: '11px', fontWeight: 500, color: 'hsla(0,0%,33%,1)' }}>{product.rating || '4.5'} ({product.reviews || 12})</span>
+
+                {/* Frame 678 — Reviews & Delivery */}
+                <div
+                    style={{
+                        display: 'flex',
+                        flexDirection: 'row',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                        padding: '0px',
+                        gap: '4px',
+                        width: '100%',
+                        height: '16px'
+                    }}
+                >
+                    {/* Reviews */}
+                    <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', padding: 0, gap: '4px' }}>
+                        <Star size={12} weight="fill" color="#FF920A" />
+                        <span
+                            style={{
+                                fontFamily: "'Mona Sans', sans-serif",
+                                fontWeight: 500,
+                                fontSize: '8px',
+                                lineHeight: '14px',
+                                letterSpacing: '-0.4px',
+                                color: '#545454'
+                            }}
+                        >
+                            {product.rating || '4.5'} ({product.reviews || product.reviewCount || 12})
+                        </span>
                     </div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '3px', color: 'hsla(0,0%,60%,1)' }}>
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" style={{ width: '13px', height: '13px' }}>
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 18.75a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 0 1-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m3 0h1.125c.621 0 1.129-.504 1.09-1.124a17.902 17.902 0 0 0-3.213-9.193 2.056 2.056 0 0 0-1.58-.86H14.25M16.5 18.75h-2.25m0-11.177v-.958c0-.568-.422-1.048-.987-1.106a48.554 48.554 0 0 0-10.026 0 1.106 1.106 0 0 0-.987 1.106v7.635m12-6.677v6.677m0 4.5v-4.5m0 0h-12" />
-                        </svg>
-                        <span style={{ fontSize: '11px', fontWeight: 400 }}>2-4 days</span>
-                        <Info size={11} color="hsla(0,0%,65%,1)" />
+
+                    {/* Delivery */}
+                    <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', padding: 0, gap: '2px' }}>
+                        <Truck size={10} weight="regular" color="#AFAFAF" />
+                        <span
+                            style={{
+                                fontFamily: "'Mona Sans', sans-serif",
+                                fontWeight: 500,
+                                fontSize: '8px',
+                                lineHeight: '14px',
+                                letterSpacing: '-0.4px',
+                                color: '#AFAFAF'
+                            }}
+                        >
+                            2-4 days
+                        </span>
+                        <Info size={10} color="#10B981" style={{ opacity: 0.7 }} />
                     </div>
                 </div>
-                {/* Price — all on one line */}
-                <div style={{ display: 'flex', alignItems: 'baseline', gap: '3px', flexWrap: 'wrap' }}>
-                    <span style={{ fontFamily: "'Mona Sans',sans-serif", fontSize: '11px', fontWeight: 400, color: 'hsla(0,0%,40%,1)' }}>from</span>
+
+                {/* Frame 85 — Price Row */}
+                <div
+                    style={{
+                        display: 'flex',
+                        flexDirection: 'row',
+                        alignItems: 'center',
+                        padding: '0px',
+                        gap: '3px',
+                        width: '100%',
+                        height: '20px'
+                    }}
+                >
+                    <span
+                        style={{
+                            fontFamily: "'Mona Sans', sans-serif",
+                            fontWeight: 500,
+                            fontSize: '8px',
+                            lineHeight: '14px',
+                            letterSpacing: '-0.4px',
+                            color: '#545454'
+                        }}
+                    >
+                        from
+                    </span>
                     {product.originalPrice && (
-                        <span style={{ fontFamily: "'Mona Sans',sans-serif", fontSize: '12px', fontWeight: 500, color: 'hsla(0,0%,50%,1)', textDecoration: 'line-through' }}>₹{product.originalPrice}</span>
+                        <span
+                            style={{
+                                fontFamily: "'Mona Sans', sans-serif",
+                                fontWeight: 600,
+                                fontSize: '10px',
+                                lineHeight: '16px',
+                                letterSpacing: '-0.4px',
+                                textDecorationLine: 'line-through',
+                                color: '#757575'
+                            }}
+                        >
+                            ₹{product.originalPrice}
+                        </span>
                     )}
-                    <span style={{ fontFamily: "'Mona Sans',sans-serif", fontSize: '15px', fontWeight: 700, color: 'hsla(3,86%,45%,1)', letterSpacing: '-0.03em' }}>₹{product.rentPrice}</span>
-                    <span style={{ fontFamily: "'Mona Sans',sans-serif", fontSize: '11px', fontWeight: 400, color: 'hsla(0,0%,40%,1)' }}>/month</span>
+                    <span
+                        style={{
+                            fontFamily: "'Mona Sans', sans-serif",
+                            fontWeight: 600,
+                            fontSize: '14px',
+                            lineHeight: '20px',
+                            letterSpacing: '-0.8px',
+                            color: '#FF2C20'
+                        }}
+                    >
+                        ₹{product.rentPrice}
+                    </span>
+                    <span
+                        style={{
+                            fontFamily: "'Mona Sans', sans-serif",
+                            fontWeight: 500,
+                            fontSize: '8px',
+                            lineHeight: '14px',
+                            letterSpacing: '-0.4px',
+                            color: '#757575'
+                        }}
+                    >
+                        /month
+                    </span>
                 </div>
             </div>
         </div>
@@ -250,7 +525,7 @@ const BestRentedProducts =({ type = "bestRented", defaultTitle = "Curated Produc
                         reviews: p.numReviews || 12,
                         originalPrice: Math.round((p.rentalPrice || 0) * 1.5),
                         rentPrice: p.rentalPrice,
-                        discount: p.condition === 'New' ? "NEW" : "HOT",
+                        discount: p.discount || "20% off",
                         isNew: p.condition === 'New',
                         tags: ["Quality tested", "Deep Cleaned"],
                         statusTags: ["Like New", "In Stock"],
@@ -282,7 +557,7 @@ const BestRentedProducts =({ type = "bestRented", defaultTitle = "Curated Produc
                     reviews: p.numReviews || 12,
                     originalPrice: Math.round((p.rentalPrice || 0) * 1.5),
                     rentPrice: p.rentalPrice,
-                    discount: p.condition === 'New' ? "NEW" : "HOT",
+                    discount: p.discount || "20% off",
                     isNew: p.condition === 'New',
                     tags: ["Quality tested", "Deep Cleaned"],
                     statusTags: ["Like New", "In Stock"],
