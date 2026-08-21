@@ -92,9 +92,15 @@ export default function AboutPage() {
                 {/* ── 2. Our Story ──────────────────────────────────────────────── */}
                 <section className="w-full max-w-[1440px] mx-auto mb-6 md:mb-24">
                     <div className="max-w-[1200px] mx-auto px-5 md:px-8 grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-[57px] items-center">
-                        {/* Left */}
                         <div className="flex flex-col gap-3 md:gap-[27px]">
-                            <h2 className="text-[25px] md:text-5xl font-semibold leading-tight font-sans text-gray-900">
+                            <h2
+                                className="text-[25px] md:text-[36px] font-semibold leading-[31px] md:leading-[45px] font-sans tracking-[-0.8px] w-full md:w-[492px] max-w-full"
+                                style={{
+                                    color: 'var(--color-grey-grey-700, #333)',
+                                    fontFamily: 'var(--font-family-Mona-Sans, "Mona Sans")',
+                                    letterSpacing: 'var(--font-letter-spacing-3, -0.8px)',
+                                }}
+                            >
                                 {c.aboutStoryTitle}
                             </h2>
                             <div className="text-gray-600 md:text-gray-900 font-sans font-normal flex flex-col gap-4 md:gap-6">

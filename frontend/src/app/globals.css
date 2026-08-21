@@ -122,6 +122,12 @@
     --theme-accent-hover: #5b96ff;
     --theme-accent-active: #133fff;
     --theme-accent-disabled: #d6ecff;
+
+    --color-grey-grey-700: #333333;
+    --font-family-Mona-Sans: "Mona Sans", ui-sans-serif, system-ui, sans-serif;
+    --font-size-7: 36px;
+    --font-line-height-7: 45px;
+    --font-letter-spacing-3: -0.8px;
   }
 
   body {

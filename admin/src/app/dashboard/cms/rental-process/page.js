@@ -62,7 +62,7 @@ const Card = ({ icon, title, children, accent = 'indigo' }) => {
 
 // ── DEFAULTS ─────────────────────────────────────────────────────────────────
 const DEFAULTS = {
-    bannerImage: '', bannerTitle: 'Rental Process',
+    bannerImage: 'https://res.cloudinary.com/dpu9ikeqe/image/upload/v1787305860/9f8d4d5a95b5ff564196928771ca74a7229121d9_jmb6yw.png', bannerTitle: 'Rental Process',
     rentalFeaturesTitle: 'Features',
     rentalFeaturesSubtitle: 'Rent with confidence. Every product comes with transparent pricing, flexible terms, and reliable support—so you focus on your work, not equipment hassles.',
     rentalFeatures: [

@@ -408,26 +408,27 @@ const Hero = () => {
 
 const SlideItem = ({ slide, isActive, width, viewType, slideHeight }) => {
     const isTablet = viewType === 'tablet';
-    const hasForegroundImage = Boolean(slide.image);
-    const heroImg = slide.image || "https://res.cloudinary.com/dgkckcdk8/image/upload/v1769946716/indian-rentals/fj8ptqbhppbstdd0hs4i.png";
+    const bgPicture = slide.bgImage || slide.image;
+    const isCustomCover = Boolean(bgPicture);
+    const heroImg = slide.image || slide.bgImage || "https://res.cloudinary.com/dgkckcdk8/image/upload/v1769946716/indian-rentals/fj8ptqbhppbstdd0hs4i.png";
     const targetHref = slide.ctaLink || slide.slideLink || "/products";
 
     const desktopContent = (
         <div className="w-full h-full relative overflow-hidden">
             {/* Cover Background Image (Cover-to-Cover) */}
-            {slide.bgImage && (
-                <div className="absolute inset-0 w-full h-full z-0 pointer-events-none overflow-hidden">
+            {isCustomCover && (
+                <div className="absolute inset-0 w-full h-full z-0 pointer-events-none overflow-hidden rounded-[24px]">
                     <Image
-                        src={slide.bgImage}
+                        src={bgPicture}
                         alt={slide.title || "Hero Banner Background"}
                         fill
                         unoptimized
                         className="object-cover object-center w-full h-full"
                     />
                     <div
-                        className="absolute inset-0 w-full h-full"
+                        className="absolute inset-0 w-full h-full rounded-[24px]"
                         style={{
-                            background: 'linear-gradient(to right, rgba(0,0,0,0.65) 0%, rgba(0,0,0,0.3) 55%, transparent 100%)'
+                            background: 'linear-gradient(to right, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.2) 60%, transparent 100%)'
                         }}
                     />
                 </div>
@@ -455,15 +456,36 @@ const SlideItem = ({ slide, isActive, width, viewType, slideHeight }) => {
             </div>
 
             {/* Glow ellipse behind foreground image */}
-            {!slide.bgImage && (
+            {!isCustomCover && (
                 <div
                     className="absolute rounded-full pointer-events-none"
                     style={{ left: '78.5%', top: '58.8%', width: '28.58%', aspectRatio: '1 / 1', background: '#BAE6FD', filter: 'blur(97px)', opacity: 0.75, zIndex: 0 }}
                 />
             )}
 
-            {/* Foreground image reflection & image */}
-            {(hasForegroundImage || !slide.bgImage) && (
+            {/* Foreground image reflection & image (if both bg & fg images exist) */}
+            {slide.bgImage && slide.image && (
+                <>
+                    <div
+                        className={`absolute pointer-events-none overflow-hidden transition-all duration-700 ${isActive ? 'opacity-100 blur-0' : 'opacity-30 blur-[1px]'}`}
+                        style={{ left: '52.5%', top: '54%', width: '45.17%', height: '67.2%', zIndex: 1, opacity: 0.59, filter: 'blur(3px)', WebkitMaskImage: 'linear-gradient(to bottom, #000 0%, rgba(0,0,0,0) 100%)', maskImage: 'linear-gradient(to bottom, #000 0%, rgba(0,0,0,0) 100%)' }}
+                    >
+                        <div className="absolute left-0 top-0 w-full" style={{ height: '161.3%', transform: 'scaleY(-1)' }}>
+                            <Image src={heroImg} alt="" fill unoptimized aria-hidden="true" className="object-contain object-center" />
+                        </div>
+                    </div>
+
+                    <div
+                        className={`absolute transition-all duration-700 ${isActive ? 'opacity-100 scale-100 blur-0' : 'opacity-30 scale-90 blur-[1px]'}`}
+                        style={{ left: '52.33%', top: '-2.6%', width: '45.17%', height: '108.4%', zIndex: 2 }}
+                    >
+                        <Image src={heroImg} alt={slide.title || ""} fill unoptimized className="object-contain object-center drop-shadow-[0_25px_25px_rgba(0,0,0,0.25)]" />
+                    </div>
+                </>
+            )}
+
+            {/* Standard fallback single image positioning */}
+            {!isCustomCover && (
                 <>
                     <div
                         className={`absolute pointer-events-none overflow-hidden transition-all duration-700 ${isActive ? 'opacity-100 blur-0' : 'opacity-30 blur-[1px]'}`}
@@ -488,16 +510,16 @@ const SlideItem = ({ slide, isActive, width, viewType, slideHeight }) => {
     const content = (
         <div className="w-full h-full px-16 grid grid-cols-[1.2fr_0.8fr] gap-4 items-center relative overflow-hidden">
             {/* Cover Background Image (Cover-to-Cover) */}
-            {slide.bgImage && (
+            {isCustomCover && (
                 <div className="absolute inset-0 w-full h-full z-0 pointer-events-none overflow-hidden">
                     <Image
-                        src={slide.bgImage}
+                        src={bgPicture}
                         alt={slide.title || ""}
                         fill
                         unoptimized
                         className="object-cover object-center w-full h-full"
                     />
-                    <div className="absolute inset-0 bg-black/50" />
+                    <div className="absolute inset-0 bg-black/40" />
                 </div>
             )}
 
@@ -550,12 +572,12 @@ const SlideItem = ({ slide, isActive, width, viewType, slideHeight }) => {
             </div>
 
             {/* Right: Image */}
-            {(hasForegroundImage || !slide.bgImage) && (
+            {(!isCustomCover || (slide.bgImage && slide.image)) && (
                 <div
                     className={`relative z-10 w-full flex flex-col items-center justify-end transition-all duration-700 ${isActive ? 'opacity-100 scale-105 blur-0' : 'opacity-30 scale-90 blur-[1px]'}`}
                     style={{ height: isTablet ? '280px' : '440px' }}
                 >
-                    {!slide.bgImage && (
+                    {!isCustomCover && (
                         <div
                             className="absolute rounded-full pointer-events-none"
                             style={{
@@ -588,7 +610,7 @@ const SlideItem = ({ slide, isActive, width, viewType, slideHeight }) => {
         width: width,
         minWidth: width,
         height: `${slideHeight}px`,
-        background: slide.bgImage ? 'none' : (slide.bgGradient || slide.bgColor),
+        background: slide.bgGradient || slide.bgColor || '#00A8FF',
         opacity: isActive ? 1 : 0.85,
         boxShadow: isActive ? '0 12px 24px -6px rgba(0,0,0,0.12)' : '0 4px 8px -2px rgba(0,0,0,0.06)',
         zIndex: isActive ? 20 : 10
