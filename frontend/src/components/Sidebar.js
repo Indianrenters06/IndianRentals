@@ -1,12 +1,30 @@
 "use client";
-import React from 'react';
+import React, { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { ChevronRightIcon } from '@heroicons/react/24/outline';
-import { Info } from '@phosphor-icons/react';
+import { ChevronRightIcon, CheckIcon } from '@heroicons/react/24/outline';
 
-const Sidebar = ({ selectedDuration, setSelectedDuration, selectedSort, setSelectedSort }) => {
+const imgVector2 = "https://www.figma.com/api/mcp/asset/31a2c546-e600-4cc0-a4dd-670ec2ed76e8.svg";
+
+const Sidebar = ({
+    selectedDuration,
+    setSelectedDuration,
+    selectedSort,
+    setSelectedSort,
+    dealsOnly,
+    setDealsOnly
+}) => {
     const pathname = usePathname() || "";
+    const [localDeals, setLocalDeals] = useState(false);
+
+    const isDealsActive = dealsOnly !== undefined ? dealsOnly : localDeals;
+    const handleDealsToggle = () => {
+        if (setDealsOnly) {
+            setDealsOnly(!dealsOnly);
+        } else {
+            setLocalDeals(!localDeals);
+        }
+    };
 
     const categoryLinks = {
         "Most Rented": "/products",
@@ -20,160 +38,99 @@ const Sidebar = ({ selectedDuration, setSelectedDuration, selectedSort, setSelec
     };
 
     const categories = Object.keys(categoryLinks);
-
     const durations = ["1 month", "3 months", "6 months", "9 months", "18 months", "24 months"];
+    const sortOptions = ["Most Popular", "Price (high to low)", "Price (low to high)", "New Arrivals"];
 
     return (
         <aside
-            className="shrink-0 hidden lg:flex flex-col"
+            className="shrink-0 hidden lg:flex flex-col bg-[#f6f6f6] border border-[#e2e2e2] gap-[10px] items-start pb-[41.01px] pt-[21px] px-[21px] rounded-[20px] w-[250px]"
             style={{
                 fontFamily: "'Mona Sans', sans-serif",
-                width: '250px',
-                minHeight: '754.02px',
-                borderRadius: '20px',
-                background: '#f6f6f6',
-                border: '1px solid #e2e2e2',
-                gap: '10px',
-                opacity: 1,
-                padding: '21px 21px 41.01px 21px'
+                opacity: 1
             }}
+            data-name="filter-Aside"
         >
-            <div
-                className="flex flex-col"
-                style={{
-                    width: '208px',
-                    minHeight: '268px',
-                    gap: '12px',
-                    opacity: 1
-                }}
-            >
-                <h3
-                    style={{
-                        fontFamily: "'Mona Sans', sans-serif",
-                        fontWeight: 700,
-                        width: '208px',
-                        height: '16px',
-                        display: 'flex',
-                        alignItems: 'center',
-                        fontSize: '12px',
-                        letterSpacing: '-0.4px',
-                        margin: 0,
-                        opacity: 1
-                    }}
-                    className="uppercase text-[#757575]"
-                >
-                    Browse Categories
-                </h3>
-                <div className="flex flex-col" style={{ gap: '8px' }}>
-                {categories.map((cat) => {
-                    const href = categoryLinks[cat] || "#";
-                    const isActive = pathname.startsWith(href) && href !== "/products" && href !== "/categories"
-                        ? true
-                        : pathname === href && (cat === "Most Rented" || cat === "Latest Launch" || cat === "More");
+            {/* 1. BROWSE CATEGORIES */}
+            <div className="flex flex-col gap-[12px] items-start w-full">
+                <div className="w-full">
+                    <p className="font-bold text-[12px] leading-[16px] text-[#757575] tracking-[-0.4px] uppercase m-0">
+                        BROWSE CATEGORIES
+                    </p>
+                </div>
 
-                    const isMore = cat === "More";
+                <div className="flex flex-col gap-[8px] items-start w-full">
+                    {categories.map((cat) => {
+                        const href = categoryLinks[cat] || "#";
+                        const isActive = pathname.startsWith(href) && href !== "/products" && href !== "/categories"
+                            ? true
+                            : pathname === href && (cat === "Most Rented" || cat === "Latest Launch" || cat === "More");
 
-                    return (
-                        <Link
-                            key={cat}
-                            href={href}
-                            className="group flex items-center justify-between transition-all duration-200"
-                            style={{
-                                width: '208px',
-                                height: '24px',
-                                borderRadius: '6px',
-                                padding: '4px',
-                                opacity: 1
-                            }}
-                        >
-                            <span
-                                style={{
-                                    fontFamily: "'Mona Sans', sans-serif",
-                                    fontWeight: isActive || isMore ? 700 : 600,
-                                    color: isActive ? 'hsla(0, 0%, 0%, 1)' : isMore ? 'hsla(3, 86%, 51%, 1)' : 'hsla(0, 0%, 20%, 1)',
-                                    fontSize: '12px',
-                                    lineHeight: '16px',
-                                    height: '16px',
-                                    letterSpacing: '-0.4px',
-                                    verticalAlign: 'middle',
-                                    display: 'inline-block',
-                                    textDecoration: isMore ? 'underline' : 'none',
-                                    textDecorationStyle: 'solid',
-                                    textUnderlineOffset: isMore ? '2px' : 'auto',
-                                    textDecorationThickness: isMore ? '1px' : 'auto',
-                                    opacity: 1
-                                }}
-                                className="transition-colors duration-200 hover:text-black"
+                        const isMore = cat === "More";
+
+                        return (
+                            <Link
+                                key={cat}
+                                href={href}
+                                className="group flex items-center justify-between p-[4px] rounded-[6px] w-full transition-colors hover:bg-black/5"
                             >
-                                {cat}
-                            </span>
-                            {!isMore && (
-                                <ChevronRightIcon
-                                    className={`w-3 h-3 transition-transform duration-200 ${isActive ? "text-black translate-x-1" : "text-[hsla(0,0%,20%,1)] group-hover:text-black group-hover:translate-x-1"}`}
-                                    strokeWidth={2}
-                                />
-                            )}
-                        </Link>
-                    )
-                })}
+                                <span
+                                    className={`font-['Mona_Sans'] text-[12px] leading-[16px] tracking-[-0.4px] transition-colors ${
+                                        isMore
+                                            ? 'font-bold text-[#ed2115] underline decoration-solid decoration-[1.5%] text-left'
+                                            : isActive
+                                            ? 'font-bold text-[#333] text-left'
+                                            : 'font-semibold text-[#333] text-left group-hover:text-black'
+                                    }`}
+                                >
+                                    {cat === "DSLR Camera & Lenses" ? "DSLR Camera & Lenses" : cat}
+                                </span>
+                                {!isMore && (
+                                    <ChevronRightIcon
+                                        className={`w-[12px] h-[12px] shrink-0 transition-transform duration-200 ${
+                                            isActive
+                                                ? "text-[#333] translate-x-0.5 font-bold"
+                                                : "text-[#333] group-hover:text-black group-hover:translate-x-0.5"
+                                        }`}
+                                        strokeWidth={2.5}
+                                    />
+                                )}
+                            </Link>
+                        );
+                    })}
                 </div>
             </div>
 
             {/* Separator */}
-            <div style={{ width: '208px', borderTop: '1px solid #e2e2e2' }} />
+            <div className="w-[208px] h-0 border-t border-[#e2e2e2] shrink-0 my-1" />
 
-            <div
-                className="flex flex-col"
-                style={{
-                    width: '208px',
-                    minHeight: '148.01px',
-                    gap: '12px',
-                    opacity: 1
-                }}
-            >
-                <div className="flex items-center gap-2">
-                    <h3 className="text-[12px] font-bold text-[#757575] uppercase tracking-[-0.4px] m-0">Rent For</h3>
-                    <Info size={16} weight="bold" color="#757575" />
+            {/* 2. RENT FOR */}
+            <div className="flex flex-col gap-[12.01px] items-start w-full">
+                <div className="flex gap-[8px] items-center w-full">
+                    <p className="font-bold text-[12px] leading-[16px] text-[#757575] tracking-[-0.4px] uppercase m-0">
+                        RENT FOR
+                    </p>
+                    <div className="w-[16px] h-[16px] shrink-0 relative overflow-hidden">
+                        <img alt="info" className="absolute inset-0 size-full block" src={imgVector2} />
+                    </div>
                 </div>
-                <div
-                    className="flex flex-wrap m-0"
-                    style={{
-                        width: '208px',
-                        gap: '12px',
-                        opacity: 1
-                    }}
-                >
+
+                <div className="flex flex-wrap gap-[12px] items-start w-full cursor-pointer">
                     {durations.map((duration) => {
                         const isSelected = selectedDuration === duration;
                         return (
                             <button
                                 key={duration}
-                                onClick={() => setSelectedDuration(duration)}
-                                className="transition-all duration-200 flex items-center justify-center font-sans shrink-0"
-                                style={{
-                                    height: '32px',
-                                    width: 'fit-content',
-                                    borderRadius: '8px',
-                                    border: isSelected ? '1px solid #000' : '1px solid #afafaf',
-                                    backgroundColor: 'hsla(0, 0%, 100%, 1)',
-                                    padding: '8px 16px',
-                                    gap: '10px',
-                                    outline: 'none',
-                                    boxShadow: isSelected ? '0 1px 2px rgba(0,0,0,0.05)' : 'none'
-                                }}
+                                type="button"
+                                onClick={() => setSelectedDuration && setSelectedDuration(duration)}
+                                className={`bg-white border border-solid px-[16px] py-[8px] rounded-[8px] flex items-center justify-center shrink-0 transition-all cursor-pointer ${
+                                    isSelected
+                                        ? 'border-[#1f1f1f] shadow-sm'
+                                        : 'border-[#afafaf] hover:border-[#757575]'
+                                }`}
                             >
-                                <span style={{
-                                    fontFamily: "'Mona Sans', sans-serif",
-                                    fontWeight: 700,
-                                    fontSize: '12px',
-                                    lineHeight: '16px',
-                                    letterSpacing: '-0.4px',
-                                    verticalAlign: 'middle',
-                                    color: isSelected ? 'hsla(0, 0%, 0%, 1)' : 'hsla(0, 0%, 20%, 1)',
-                                    display: 'inline-block',
-                                    whiteSpace: 'nowrap',
-                                    opacity: 1
-                                }}>
+                                <span className={`font-['Mona_Sans'] text-[12px] leading-[16px] tracking-[-0.4px] whitespace-nowrap ${
+                                    isSelected ? 'font-bold text-[#1f1f1f]' : 'font-bold text-[#333]'
+                                }`}>
                                     {duration}
                                 </span>
                             </button>
@@ -183,100 +140,79 @@ const Sidebar = ({ selectedDuration, setSelectedDuration, selectedSort, setSelec
             </div>
 
             {/* Separator */}
-            <div style={{ width: '208px', borderTop: '1px solid #e2e2e2' }} />
+            <div className="w-[208px] h-0 border-t border-[#e2e2e2] shrink-0 my-1" />
 
-            <div
-                className="flex flex-col"
-                style={{
-                    width: '208px',
-                    height: '164px',
-                    gap: '12px',
-                    opacity: 1
-                }}
-            >
-                <h3
-                    style={{
-                        fontFamily: "'Mona Sans', sans-serif",
-                        fontWeight: 700,
-                        fontSize: '12px',
-                        lineHeight: '16px',
-                        letterSpacing: '-0.4px',
-                        verticalAlign: 'middle',
-                        color: '#757575',
-                        textTransform: 'uppercase',
-                        width: '208px',
-                        height: '16px',
-                        display: 'flex',
-                        alignItems: 'center',
-                        margin: 0,
-                        opacity: 1
-                    }}
-                >Sort By</h3>
-                <div
-                    className="flex flex-col"
-                    style={{
-                        width: '208px',
-                        height: '136px',
-                        gap: '8px',
-                        opacity: 1
-                    }}
-                >
-                    {["Most Popular", "Price (high to low)", "Price (low to high)", "New Arrivals"].map((option) => (
-                        <label
-                            key={option}
-                            className="flex items-center cursor-pointer group transition-all duration-200"
-                            onClick={() => setSelectedSort(option)}
-                            style={{
-                                width: '208px',
-                                height: '28px',
-                                borderRadius: '6px',
-                                gap: '8px',
-                                padding: '4px',
-                                opacity: 1
-                            }}
-                        >
-                            <div className={`w-5 h-5 rounded-full border transition-all duration-200 flex items-center justify-center shrink-0 ${selectedSort === option ? "border-black" : "border-[#afafaf] group-hover:border-[#8a8a8a]"}`}>
-                                {selectedSort === option && <div className="w-2.5 h-2.5 rounded-full bg-black" />}
+            {/* 3. SORT BY */}
+            <div className="flex flex-col gap-[12px] items-start w-full">
+                <p className="font-bold text-[12px] leading-[16px] text-[#757575] tracking-[-0.4px] uppercase m-0">
+                    SORT BY
+                </p>
+
+                <div className="flex flex-col gap-[8px] items-start w-full">
+                    {sortOptions.map((option) => {
+                        const isSelected = selectedSort === option;
+                        return (
+                            <div
+                                key={option}
+                                onClick={() => setSelectedSort && setSelectedSort(option)}
+                                className="flex gap-[8px] items-center p-[4px] rounded-[6px] w-full cursor-pointer group transition-colors hover:bg-black/5"
+                            >
+                                <button
+                                    type="button"
+                                    className={`size-[20px] rounded-full border shrink-0 relative flex items-center justify-center transition-all ${
+                                        isSelected ? 'border-[#1f1f1f]' : 'border-[#afafaf] group-hover:border-[#757575]'
+                                    }`}
+                                >
+                                    {isSelected && (
+                                        <div className="size-[8px] rounded-full bg-[#1f1f1f]" />
+                                    )}
+                                </button>
+                                <span className={`font-['Mona_Sans'] text-[12px] leading-[16px] tracking-[-0.4px] whitespace-nowrap transition-colors ${
+                                    isSelected ? 'font-bold text-[#1f1f1f]' : 'font-semibold text-[#333] group-hover:text-black'
+                                }`}>
+                                    {option}
+                                </span>
                             </div>
-                            <span style={{
-                                fontFamily: "'Mona Sans', sans-serif",
-                                fontWeight: selectedSort === option ? 700 : 600,
-                                fontSize: '12px',
-                                lineHeight: '16px',
-                                letterSpacing: '-0.4px',
-                                verticalAlign: 'middle',
-                                color: selectedSort === option ? 'hsla(0, 0%, 0%, 1)' : 'hsla(0, 0%, 20%, 1)',
-                                display: 'inline-block',
-                                height: '16px',
-                                opacity: 1,
-                                transition: 'color 0.2s'
-                            }}>{option}</span>
-                        </label>
-                    ))}
+                        );
+                    })}
                 </div>
             </div>
 
             {/* Separator */}
-            <div style={{ width: '208px', borderTop: '1px solid #e2e2e2' }} />
+            <div className="w-[208px] h-0 border-t border-[#e2e2e2] shrink-0 my-1" />
 
-            <div
-                className="flex flex-col"
-                style={{
-                    width: '208px',
-                    height: '52px',
-                    gap: '12px',
-                    opacity: 1
-                }}
-            >
-                <h3 className="text-[12px] font-bold text-[#757575] uppercase tracking-[-0.4px] m-0">Deals</h3>
-                <label className="flex items-center gap-2 cursor-pointer group rounded-[6px]" style={{ padding: '4px' }}>
-                    <div className="w-3.5 h-3.5 rounded-[4px] border transition-all duration-200 flex items-center justify-center border-[#AFAFAF] group-hover:border-gray-500">
+            {/* 4. DEALS */}
+            <div className="flex flex-col gap-[12px] items-start w-full">
+                <p className="font-bold text-[12px] leading-[16px] text-[#757575] tracking-[-0.4px] uppercase m-0">
+                    DEALS
+                </p>
+
+                <div className="flex flex-col items-start w-full">
+                    <div
+                        onClick={handleDealsToggle}
+                        className="flex gap-[8px] items-center p-[4px] rounded-[6px] w-full cursor-pointer group transition-colors hover:bg-black/5"
+                    >
+                        <button
+                            type="button"
+                            className={`size-[14px] bg-white border border-solid rounded-[4px] shrink-0 flex items-center justify-center transition-all ${
+                                isDealsActive ? 'bg-[#1f1f1f] border-[#1f1f1f]' : 'border-[#afafaf] group-hover:border-[#757575]'
+                            }`}
+                        >
+                            {isDealsActive && (
+                                <CheckIcon className="w-[10px] h-[10px] text-white stroke-[3]" />
+                            )}
+                        </button>
+                        <span className={`font-['Mona_Sans'] text-[12px] leading-[16px] tracking-[-0.4px] whitespace-nowrap transition-colors ${
+                            isDealsActive ? 'font-bold text-[#1f1f1f]' : 'font-semibold text-[#333] group-hover:text-black'
+                        }`}>
+                            Deals
+                        </span>
                     </div>
-                    <span className="text-[12px] font-semibold text-[#333] tracking-[-0.4px] group-hover:text-black transition-colors duration-200">Deals</span>
-                </label>
+                </div>
             </div>
         </aside>
     );
 };
 
 export default Sidebar;
+
