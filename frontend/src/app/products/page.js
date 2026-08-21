@@ -1,6 +1,8 @@
 "use client";
 import React, { useState, useEffect, Suspense } from "react";
+import Link from "next/link";
 import { useSearchParams } from "next/navigation";
+import { ChevronRightIcon } from '@heroicons/react/24/outline';
 import Sidebar from "@/components/Sidebar";
 import ProductCard from "@/components/ProductCard";
 import { API } from "@/services/apiConfig";
@@ -146,13 +148,19 @@ function ProductsPageContent() {
                     className="mx-auto w-full flex flex-col px-4 md:px-8"
                     style={{
                         maxWidth: '1200px',
-                        paddingTop: '40px',
+                        paddingTop: '24px',
                         paddingBottom: '40px',
                         gap: '30px',
                         opacity: 1,
                         background: 'hsla(0, 0%, 100%, 1)',
                     }}
                 >
+                    {/* Breadcrumb */}
+                    <nav className="flex items-center gap-1 flex-wrap">
+                        <Link href="/" className="text-[14px] font-medium text-[#586A84] hover:text-black transition-colors whitespace-nowrap" style={{ fontFamily: "'Mona Sans', sans-serif" }}>Shop all</Link>
+                        <ChevronRightIcon className="w-[12px] h-[12px] text-[#586A84] shrink-0" strokeWidth={2.5} />
+                        <span className="text-[14px] font-semibold text-[#1D1D1F] line-clamp-1" style={{ fontFamily: "'Mona Sans', sans-serif" }}>{cmsConfig.title}</span>
+                    </nav>
                     <div className="flex flex-col max-w-[900px]">
                         <h1
                             style={{
