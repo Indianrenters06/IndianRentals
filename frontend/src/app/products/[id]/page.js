@@ -800,7 +800,7 @@ export default function ProductDetailPage() {
                                     {/* Interactive Slider Section — desktop only */}
                                     {on('TenureSlider') && (
                                         <div
-                                            className="hidden lg:flex flex-col"
+                                            className="flex flex-col"
                                             style={{
                                                 width: '100%',
                                                 height: 'auto',
@@ -1108,7 +1108,7 @@ export default function ProductDetailPage() {
                                         {/* View All Benefits Row */}
                                         {on('ViewAllBenefits') && (
                                             <div
-                                                className="flex items-center justify-center w-full grow"
+                                                className="flex items-center justify-center w-full py-[4px]"
                                                 style={{ borderTop: '1px solid hsla(0, 0%, 93%, 1)' }}
                                             >
                                                 <button
@@ -1116,15 +1116,16 @@ export default function ProductDetailPage() {
                                                     style={{
                                                         fontFamily: '"Mona Sans", sans-serif',
                                                         fontWeight: 700,
-                                                        fontSize: '11px',
+                                                        fontSize: '12px',
                                                         lineHeight: '16px',
-                                                        color: 'hsla(29, 100%, 44%, 1)',
+                                                        color: '#333',
                                                         textDecoration: 'underline',
                                                         textDecorationStyle: 'solid',
                                                         textUnderlineOffset: '6%',
+                                                        textDecorationThickness: '1.5%',
                                                         background: 'none',
                                                         border: 'none',
-                                                        padding: 0,
+                                                        padding: '0 4px',
                                                         cursor: 'pointer'
                                                     }}
                                                 >
@@ -1188,8 +1189,8 @@ export default function ProductDetailPage() {
                                             })}
                                         </div>
 
-                                        {/* Desktop: horizontal scroll */}
-                                        <div className="hidden lg:flex gap-[4px] w-full overflow-x-auto hide-scrollbar items-center" style={{ height: '48px' }}>
+                                        {/* Desktop: 2×2 grid matching Figma layout */}
+                                        <div className="hidden lg:grid grid-cols-2 gap-[4px] w-full">
                                             {(product.benefits && product.benefits.length > 0 ? product.benefits : (pageLayout?.productPageBenefits || [
                                                 "Fully Functional", "Accessories Included", "Free Repairs & Maintenance", "Professionally sanitized"
                                             ])).map((benefit, idx) => {
@@ -1198,18 +1199,16 @@ export default function ProductDetailPage() {
                                                 return (
                                                     <div
                                                         key={idx}
-                                                        className="rounded-lg flex items-center shrink-0"
+                                                        className="rounded-xl flex items-center gap-[8px]"
                                                         style={{
-                                                            width: '131.09px',
-                                                            height: '48px',
                                                             padding: '8px',
-                                                            gap: '10px',
-                                                            background: 'linear-gradient(89.92deg, #0689FF -1.19%, #0075FF 100.13%)',
-                                                            border: '1px solid hsla(198, 100%, 85%, 1)'
+                                                            background: 'linear-gradient(89.78deg, #0689FF 1.186%, #0075FF 100.13%)',
+                                                            border: '1px solid hsla(198, 100%, 85%, 1)',
+                                                            minHeight: '48px'
                                                         }}
                                                     >
                                                         <div className="shrink-0 text-white flex items-center justify-center"><Icon size={20} weight="bold" /></div>
-                                                        <span style={{ fontFamily: '"Mona Sans", sans-serif', fontWeight: 600, fontSize: '12px', lineHeight: '16px', color: 'white', whiteSpace: 'normal', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden', wordBreak: 'break-word', width: '87px' }}>
+                                                        <span style={{ fontFamily: '"Mona Sans", sans-serif', fontWeight: 600, fontSize: '12px', lineHeight: '16px', color: 'white', wordBreak: 'break-word' }}>
                                                             {benefitText}
                                                         </span>
                                                     </div>
