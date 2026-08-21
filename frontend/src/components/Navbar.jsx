@@ -541,8 +541,22 @@ const Navbar = () => {
                         ) : (
                             <button
                                 onClick={() => setIsAuthModalOpen(true)}
-                                className="inline-flex items-center justify-center font-bold text-sm bg-orange-300 text-black rounded-full hover:bg-orange-400 active:bg-orange-500 transition-all duration-200 cursor-pointer text-center"
-                                style={{ height: "35px", paddingLeft: "20px", paddingRight: "20px" }}
+                                className="inline-flex items-center justify-center cursor-pointer transition-all duration-200 hover:opacity-90 hover:shadow-md active:scale-95 shrink-0"
+                                style={{
+                                    background: '#ffcf46',
+                                    borderRadius: '9999px',
+                                    height: '35px',
+                                    paddingLeft: '20px',
+                                    paddingRight: '20px',
+                                    fontFamily: "'Mona Sans', sans-serif",
+                                    fontWeight: 500,
+                                    fontSize: '16px',
+                                    lineHeight: '23px',
+                                    letterSpacing: '-0.4px',
+                                    color: '#1f1f1f',
+                                    whiteSpace: 'nowrap',
+                                    border: 'none',
+                                }}
                             >
                                 Login/Register
                             </button>

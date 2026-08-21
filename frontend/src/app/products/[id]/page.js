@@ -330,7 +330,65 @@ export default function ProductDetailPage() {
                             </div>
                         </div>
 
-                        {/* Price + Month selector */}
+                        {/* Tenure Slider — Mobile */}
+                        <div style={{ padding: '10px 12px', borderBottom: '1px solid #E2E2E2', display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                            {/* Label row */}
+                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                                <span style={{ fontFamily: "'Mona Sans', sans-serif", fontWeight: 500, fontSize: '12px', lineHeight: '20px', letterSpacing: '-0.4px', color: '#1f1f1f', textDecoration: 'underline', textDecorationStyle: 'solid', textUnderlineOffset: '10%', textDecorationThickness: '8%' }}>
+                                    {cms('TenureSliderLabel', 'Select your minimum rental period')}
+                                </span>
+                                <span style={{ fontFamily: "'Mona Sans', sans-serif", fontWeight: 600, fontSize: '13px', color: '#1f1f1f', letterSpacing: '-0.4px' }}>
+                                    {`${duration} ${duration === 1 ? 'Month' : 'Months'}`}
+                                </span>
+                            </div>
+
+                            {/* Slider track + thumb + labels */}
+                            {(() => {
+                                const stepCount = tenures.length;
+                                const lastIdx = Math.max(stepCount - 1, 1);
+                                const matchIdx = tenures.findIndex(t => duration <= t.months);
+                                const currentStep = (matchIdx === -1 ? stepCount - 1 : matchIdx) + 1;
+                                const activePct = ((currentStep - 1) / lastIdx) * 100;
+                                const labels = tenures.map(t => t.label);
+                                return (
+                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                                        {/* Track */}
+                                        <div style={{ position: 'relative', width: '100%', height: '6px', display: 'flex', alignItems: 'center' }}>
+                                            <div style={{ position: 'absolute', width: '100%', height: '6px', background: '#e26e00', borderRadius: '31px', boxSizing: 'border-box' }} />
+                                            {/* Thumb */}
+                                            <div style={{ position: 'absolute', width: '16px', height: '16px', borderRadius: '50%', background: '#fff', border: '3px solid #e26e00', left: `calc(${activePct}% - 8px)`, transition: 'left 0.2s', zIndex: 10 }} />
+                                            {/* Hidden range input for touch/drag */}
+                                            <input
+                                                type="range"
+                                                min="1"
+                                                max={stepCount}
+                                                step="1"
+                                                value={currentStep}
+                                                onChange={(e) => {
+                                                    const step = parseInt(e.target.value);
+                                                    setDuration(tenures[step - 1]?.months || 1);
+                                                }}
+                                                style={{ position: 'absolute', width: '100%', opacity: 0, cursor: 'pointer', zIndex: 20, height: '24px', top: '-9px' }}
+                                            />
+                                        </div>
+                                        {/* Tick labels */}
+                                        <div style={{ position: 'relative', width: '100%', height: '20px' }}>
+                                            {labels.map((label, i) => {
+                                                const pct = (i / lastIdx) * 100;
+                                                return (
+                                                    <div key={i} style={{ position: 'absolute', left: `${pct}%`, transform: 'translateX(-50%)', display: 'flex', flexDirection: 'column', alignItems: 'center', pointerEvents: 'none' }}>
+                                                        <div style={{ width: '1px', height: '6px', background: '#bfbfbf' }} />
+                                                        <span style={{ fontFamily: "'Mona Sans', sans-serif", fontSize: '10px', fontWeight: 400, color: '#333', lineHeight: 1.2, letterSpacing: '-0.4px' }}>{label}</span>
+                                                    </div>
+                                                );
+                                            })}
+                                        </div>
+                                    </div>
+                                );
+                            })()}
+                        </div>
+
+                        {/* Price row */}
                         <div style={{ display: 'flex', height: '45px', borderBottom: '1px solid #E2E2E2' }}>
                             <div style={{ flex: 1, display: 'flex', alignItems: 'center', gap: '4px', padding: '0 10px' }}>
                                 <span style={{ fontFamily: "'Mona Sans', sans-serif", fontWeight: 600, fontSize: '20px', lineHeight: '26px', letterSpacing: '-0.8px', color: '#E11D48' }}>
@@ -340,17 +398,6 @@ export default function ProductDetailPage() {
                                 <span style={{ fontFamily: "'Mona Sans', sans-serif", fontWeight: 500, fontSize: '10px', color: '#757575', letterSpacing: '-0.4px', marginLeft: '2px' }}>
                                     for {duration} {duration === 1 ? 'month' : 'months'}
                                 </span>
-                            </div>
-                            <div style={{ borderLeft: '1px solid #E2E2E2', display: 'flex', alignItems: 'center', justifyContent: 'flex-end', padding: '0 10px', gap: '8px' }}>
-                                <button onClick={() => setDuration(Math.max(1, duration - 1))} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#888', display: 'flex', alignItems: 'center', justifyContent: 'center', width: '15px', height: '15px' }}>
-                                    <FaMinus size={9} />
-                                </button>
-                                <div style={{ border: '1px solid #AFAFAF', borderRadius: '8px', padding: '6px 12px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                    <span style={{ fontFamily: "'Mona Sans', sans-serif", fontWeight: 600, fontSize: '10px', color: '#333', letterSpacing: '-0.4px' }}>{duration}</span>
-                                </div>
-                                <button onClick={() => setDuration(duration + 1)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#888', display: 'flex', alignItems: 'center', justifyContent: 'center', width: '15px', height: '15px' }}>
-                                    <FaPlus size={9} />
-                                </button>
                             </div>
                         </div>
 
@@ -758,49 +805,46 @@ export default function ProductDetailPage() {
                                                 opacity: 1
                                             }}
                                         >
-                                            {on('Rating') && (
-                                                <div
-                                                    className="flex items-center"
-                                                    style={{
-                                                        width: '140px',
-                                                        height: '24px',
-                                                        borderRadius: '8px',
-                                                        padding: '4px 6px 4px 6px',
-                                                        gap: '4px',
-                                                        opacity: 1,
-                                                        background: 'hsla(44, 100%, 91%, 1)',
-                                                        border: '1px solid hsla(47, 100%, 76%, 1)'
-                                                    }}
-                                                >
-                                                    <div className="flex gap-[2px]">
-                                                        {[1, 2, 3, 4, 5].map(s => (
-                                                            <StarIcon
-                                                                key={s}
-                                                                style={{
-                                                                    width: '13.21px',
-                                                                    height: '12.65px',
-                                                                    color: 'var(--color-orange-orange-500, hsla(33, 100%, 52%, 1))',
-                                                                    opacity: s <= Math.round(product.rating || 4.5) ? 1 : 0.3
-                                                                }}
-                                                            />
-                                                        ))}
-                                                    </div>
-                                                    <span className="text-[12px] font-medium text-[#333333]">{product.rating || "4.5"} ({product.numReviews || 12})</span>
+                                            {/* Star Rating — always visible */}
+                                            <div
+                                                className="flex items-center"
+                                                style={{
+                                                    width: '140px',
+                                                    height: '24px',
+                                                    borderRadius: '8px',
+                                                    padding: '4px 6px 4px 6px',
+                                                    gap: '4px',
+                                                    opacity: 1,
+                                                    background: 'hsla(44, 100%, 91%, 1)',
+                                                    border: '1px solid hsla(47, 100%, 76%, 1)'
+                                                }}
+                                            >
+                                                <div className="flex gap-[2px]">
+                                                    {[1, 2, 3, 4, 5].map(s => (
+                                                        <StarIcon
+                                                            key={s}
+                                                            style={{
+                                                                width: '13.21px',
+                                                                height: '12.65px',
+                                                                color: 'var(--color-orange-orange-500, hsla(33, 100%, 52%, 1))',
+                                                                opacity: s <= Math.round(product.rating || 4.5) ? 1 : 0.3
+                                                            }}
+                                                        />
+                                                    ))}
                                                 </div>
-                                            )}
-                                            {on('DeliveryBadge') && (
-                                                <div className="bg-[#00b505] text-white text-[12px] font-medium px-2 py-0.5 rounded-[8px] flex items-center justify-center gap-1.5 h-full whitespace-nowrap">
-                                                    <BsTruck size={13} className="stroke-[0.5]" />
-                                                    <span className="mt-[1px]">{product.deliveryTime || cms('DeliveryText', '2-4 days')}</span>
-                                                </div>
-                                            )}
+                                                <span className="text-[12px] font-medium text-[#333333]">{product.rating || "4.5"} ({product.numReviews || 12})</span>
+                                            </div>
+                                            {/* Delivery Badge — always visible */}
+                                            <div className="bg-[#00b505] text-white text-[12px] font-medium px-2 py-0.5 rounded-[8px] flex items-center justify-center gap-1.5 h-full whitespace-nowrap">
+                                                <BsTruck size={13} className="stroke-[0.5]" />
+                                                <span className="mt-[1px]">{product.deliveryTime || cms('DeliveryText', '2-4 days')}</span>
+                                            </div>
                                         </div>
                                     </div>
 
-                                    {/* Interactive Slider Section — desktop only */}
-                                    {on('TenureSlider') && (
-                                        <div
-                                            className="flex flex-col"
+                                    {/* Interactive Slider Section — always visible */}
+                                    <div
+                                        className="flex flex-col"
                                             style={{
                                                 width: '100%',
                                                 height: 'auto',
@@ -1004,7 +1048,6 @@ export default function ProductDetailPage() {
                                                 )}
                                             </div>
                                         </div>
-                                    )}
 
                                     {/* Price & Quantity Footer Card */}
                                     <div
