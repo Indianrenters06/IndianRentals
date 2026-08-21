@@ -103,7 +103,7 @@ const Hero = () => {
                 if (!r.ok) return;
                 const cms = await r.json();
                 if (cms.heroEnabled === false) { setHeroVisible(false); return; }
-                if (cms.heroSlides?.length >= 2) setSlides(cms.heroSlides);
+                if (cms.heroSlides && cms.heroSlides.length > 0) setSlides(cms.heroSlides);
             } catch (e) { }
         })();
     }, []);
@@ -134,7 +134,6 @@ const Hero = () => {
 
     const translateX = -(currentIndex * (SIDE_WIDTH + GAP) + mainWidth / 2);
 
-    // Tablet slide height: 380 - 24 (pt) - 24 (pb) = 332px
     const slideHeight = viewType === 'tablet' ? 332 : 500;
     const trackHeight = viewType === 'tablet' ? 332 : 510;
 
@@ -142,7 +141,6 @@ const Hero = () => {
         <section className="w-full mx-auto gap-[10px] overflow-x-clip md:pt-8 md:pb-8 md:px-4" style={{ background: 'var(--color-grey-grey-50, hsla(0, 0%, 96%, 1))' }}>
             {/* ── Mobile Hero ────────────────────────────────────────── */}
             <div className="block md:hidden w-full" style={{ background: '#FFFFFF' }}>
-                {/* Frame 562 — scroll container */}
                 <div
                     className="flex overflow-x-auto snap-x snap-mandatory"
                     style={{
@@ -164,7 +162,7 @@ const Hero = () => {
                 >
                     {slides.map((s, i) => (
                         <Link
-                            href={s.slideLink || s.ctaLink || '/products'}
+                            href={s.ctaLink || s.slideLink || '/products'}
                             key={i}
                             className="snap-center shrink-0 relative overflow-hidden"
                             style={{
@@ -178,50 +176,55 @@ const Hero = () => {
                                 flexShrink: 0
                             }}
                         >
+                            {/* Cover Background Image if provided */}
+                            {s.bgImage && (
+                                <div className="absolute inset-0 w-full h-full z-0 pointer-events-none">
+                                    <Image
+                                        src={s.bgImage}
+                                        alt={s.title || ""}
+                                        fill
+                                        unoptimized
+                                        className="object-cover object-center w-full h-full rounded-[12px]"
+                                    />
+                                    <div className="absolute inset-0 bg-black/40 rounded-[12px]" />
+                                </div>
+                            )}
+
                             {/* Glow ellipse */}
-                            <div style={{
-                                position: 'absolute',
-                                width: '164px',
-                                height: '164px',
-                                right: '-40px',
-                                top: '40px',
-                                background: '#BAE6FD',
-                                filter: 'blur(97px)',
-                                pointerEvents: 'none',
-                                zIndex: 0
-                            }} />
+                            {!s.bgImage && (
+                                <div style={{
+                                    position: 'absolute',
+                                    width: '164px',
+                                    height: '164px',
+                                    right: '-40px',
+                                    top: '40px',
+                                    background: '#BAE6FD',
+                                    filter: 'blur(97px)',
+                                    pointerEvents: 'none',
+                                    zIndex: 0
+                                }} />
+                            )}
 
-                            {/* Product image — top, 221×221, left:-6px top:0 */}
-                            <div style={{
-                                position: 'absolute',
-                                width: '221px',
-                                height: '221px',
-                                left: '-6px',
-                                top: '0px',
-                                zIndex: 1,
-                                pointerEvents: 'none'
-                            }}>
-                                <Image
-                                    src={s.image || FALLBACK_SLIDES[0].image}
-                                    alt={s.title}
-                                    fill
-                                    unoptimized
-                                    className="object-contain object-center"
-                                />
-                            </div>
-
-                            {/* Reflection fade */}
-                            <div style={{
-                                position: 'absolute',
-                                width: '221px',
-                                height: '137px',
-                                left: '-1px',
-                                top: '115px',
-                                background: 'linear-gradient(180deg, rgba(255,255,255,0.18) 0%, rgba(0,0,0,0) 100%)',
-                                filter: 'blur(3.7px)',
-                                zIndex: 2,
-                                pointerEvents: 'none'
-                            }} />
+                            {/* Product image (foreground) */}
+                            {(s.image || !s.bgImage) && (
+                                <div style={{
+                                    position: 'absolute',
+                                    width: '221px',
+                                    height: '221px',
+                                    left: '-6px',
+                                    top: '0px',
+                                    zIndex: 1,
+                                    pointerEvents: 'none'
+                                }}>
+                                    <Image
+                                        src={s.image || FALLBACK_SLIDES[0].image}
+                                        alt={s.title}
+                                        fill
+                                        unoptimized
+                                        className="object-contain object-center"
+                                    />
+                                </div>
+                            )}
 
                             {/* Text block — bottom */}
                             <div style={{
@@ -241,7 +244,7 @@ const Hero = () => {
                                     fontSize: '12px',
                                     lineHeight: '18px',
                                     letterSpacing: '-0.4px',
-                                    color: '#FFFFFF',
+                                    color: s.textColor || '#FFFFFF',
                                     margin: 0,
                                     width: '152px'
                                 }}>
@@ -253,7 +256,7 @@ const Hero = () => {
                                     fontSize: '8px',
                                     lineHeight: '14px',
                                     letterSpacing: '-0.4px',
-                                    color: '#FFFFFF',
+                                    color: s.textColor || '#FFFFFF',
                                     margin: 0,
                                     width: '193px'
                                 }}>
@@ -268,11 +271,12 @@ const Hero = () => {
                                     alignItems: 'center',
                                     padding: '2.42px 4.84px 2.42px 7.26px',
                                     gap: '1.21px',
-                                    width: '58px',
-                                    height: '14.53px',
+                                    width: 'auto',
+                                    minWidth: '58px',
+                                    height: '18px',
                                     background: '#FFCF46',
                                     borderRadius: '17.41px',
-                                    marginTop: '2px'
+                                    marginTop: '4px'
                                 }}>
                                     <span style={{
                                         fontFamily: "'Mona Sans', sans-serif",
@@ -320,8 +324,7 @@ const Hero = () => {
                 </div>
             </div>
 
-
-            {/* Tablet / Desktop View — identical layout, just scaled on tablet */}
+            {/* Tablet / Desktop View */}
             <div
                 className={`${viewType === 'mobile' ? 'hidden' : 'flex'} flex-col items-center w-full relative group`}
                 style={{
@@ -405,19 +408,34 @@ const Hero = () => {
 
 const SlideItem = ({ slide, isActive, width, viewType, slideHeight }) => {
     const isTablet = viewType === 'tablet';
-
+    const hasForegroundImage = Boolean(slide.image);
     const heroImg = slide.image || "https://res.cloudinary.com/dgkckcdk8/image/upload/v1769946716/indian-rentals/fj8ptqbhppbstdd0hs4i.png";
+    const targetHref = slide.ctaLink || slide.slideLink || "/products";
 
-    /* ── Desktop: absolute layout matching Figma (slide 1200×500) ──────────
-       Text  : x=81  y=115 w=599        → left 6.75%  top 23%   w 49.9%
-       Glow  : x=942 y=294 343×343      → left 78.5%  top 58.8% w 28.58%
-       Image : x=628 y=-13 542×542      → left 52.33% top -2.6% w 45.17% h 108.4%
-    ─────────────────────────────────────────────────────────────────────── */
     const desktopContent = (
         <div className="w-full h-full relative overflow-hidden">
+            {/* Cover Background Image (Cover-to-Cover) */}
+            {slide.bgImage && (
+                <div className="absolute inset-0 w-full h-full z-0 pointer-events-none overflow-hidden">
+                    <Image
+                        src={slide.bgImage}
+                        alt={slide.title || "Hero Banner Background"}
+                        fill
+                        unoptimized
+                        className="object-cover object-center w-full h-full"
+                    />
+                    <div
+                        className="absolute inset-0 w-full h-full"
+                        style={{
+                            background: 'linear-gradient(to right, rgba(0,0,0,0.65) 0%, rgba(0,0,0,0.3) 55%, transparent 100%)'
+                        }}
+                    />
+                </div>
+            )}
+
             {/* Left: Text */}
             <div
-                className={`absolute transition-all duration-700 ${isActive ? 'opacity-100 translate-y-0 blur-0' : 'opacity-30 -translate-y-4 blur-[1px]'}`}
+                className={`absolute z-10 transition-all duration-700 ${isActive ? 'opacity-100 translate-y-0 blur-0' : 'opacity-30 -translate-y-4 blur-[1px]'}`}
                 style={{ left: '6.75%', top: '23%', width: '49.9%', color: slide.textColor || '#fff', display: 'flex', flexDirection: 'column', gap: '16px' }}
             >
                 <h1 style={{ fontFamily: "'Mona Sans', sans-serif", fontSize: '47px', fontWeight: 600, lineHeight: '58px', letterSpacing: '-1.5px', maxWidth: '594px' }}>
@@ -436,40 +454,56 @@ const SlideItem = ({ slide, isActive, width, viewType, slideHeight }) => {
                 </div>
             </div>
 
-            {/* Glow ellipse behind the laptop — Figma: 343×343 @ left 942, top 294 */}
-            <div
-                className="absolute rounded-full pointer-events-none"
-                style={{ left: '78.5%', top: '58.8%', width: '28.58%', aspectRatio: '1 / 1', background: '#BAE6FD', filter: 'blur(97px)', opacity: 0.75, zIndex: 0 }}
-            />
+            {/* Glow ellipse behind foreground image */}
+            {!slide.bgImage && (
+                <div
+                    className="absolute rounded-full pointer-events-none"
+                    style={{ left: '78.5%', top: '58.8%', width: '28.58%', aspectRatio: '1 / 1', background: '#BAE6FD', filter: 'blur(97px)', opacity: 0.75, zIndex: 0 }}
+                />
+            )}
 
-            {/* Reflection — Figma: 542×336.04 @ left 630, top 270. Flipped copy of the
-                image, clipped so only the mirrored base shows, faded out downward. */}
-            <div
-                className={`absolute pointer-events-none overflow-hidden transition-all duration-700 ${isActive ? 'opacity-100 blur-0' : 'opacity-30 blur-[1px]'}`}
-                style={{ left: '52.5%', top: '54%', width: '45.17%', height: '67.2%', zIndex: 1, opacity: 0.59, filter: 'blur(3px)', WebkitMaskImage: 'linear-gradient(to bottom, #000 0%, rgba(0,0,0,0) 100%)', maskImage: 'linear-gradient(to bottom, #000 0%, rgba(0,0,0,0) 100%)' }}
-            >
-                {/* Full-height flipped copy anchored to the top; the parent clips it, so
-                    what stays visible is the bottom of the original image. */}
-                <div className="absolute left-0 top-0 w-full" style={{ height: '161.3%', transform: 'scaleY(-1)' }}>
-                    <Image src={heroImg} alt="" fill unoptimized aria-hidden="true" className="object-contain object-center" />
-                </div>
-            </div>
+            {/* Foreground image reflection & image */}
+            {(hasForegroundImage || !slide.bgImage) && (
+                <>
+                    <div
+                        className={`absolute pointer-events-none overflow-hidden transition-all duration-700 ${isActive ? 'opacity-100 blur-0' : 'opacity-30 blur-[1px]'}`}
+                        style={{ left: '52.5%', top: '54%', width: '45.17%', height: '67.2%', zIndex: 1, opacity: 0.59, filter: 'blur(3px)', WebkitMaskImage: 'linear-gradient(to bottom, #000 0%, rgba(0,0,0,0) 100%)', maskImage: 'linear-gradient(to bottom, #000 0%, rgba(0,0,0,0) 100%)' }}
+                    >
+                        <div className="absolute left-0 top-0 w-full" style={{ height: '161.3%', transform: 'scaleY(-1)' }}>
+                            <Image src={heroImg} alt="" fill unoptimized aria-hidden="true" className="object-contain object-center" />
+                        </div>
+                    </div>
 
-            {/* Right: laptop — Figma: 542×542 @ left 628, top -13 */}
-            <div
-                className={`absolute transition-all duration-700 ${isActive ? 'opacity-100 scale-100 blur-0' : 'opacity-30 scale-90 blur-[1px]'}`}
-                style={{ left: '52.33%', top: '-2.6%', width: '45.17%', height: '108.4%', zIndex: 2 }}
-            >
-                <Image src={heroImg} alt={slide.title} fill unoptimized className="object-contain object-center drop-shadow-[0_25px_25px_rgba(0,0,0,0.25)]" />
-            </div>
+                    <div
+                        className={`absolute transition-all duration-700 ${isActive ? 'opacity-100 scale-100 blur-0' : 'opacity-30 scale-90 blur-[1px]'}`}
+                        style={{ left: '52.33%', top: '-2.6%', width: '45.17%', height: '108.4%', zIndex: 2 }}
+                    >
+                        <Image src={heroImg} alt={slide.title || ""} fill unoptimized className="object-contain object-center drop-shadow-[0_25px_25px_rgba(0,0,0,0.25)]" />
+                    </div>
+                </>
+            )}
         </div>
     );
 
     const content = (
-        <div className="w-full h-full px-16 grid grid-cols-[1.2fr_0.8fr] gap-4 items-center">
+        <div className="w-full h-full px-16 grid grid-cols-[1.2fr_0.8fr] gap-4 items-center relative overflow-hidden">
+            {/* Cover Background Image (Cover-to-Cover) */}
+            {slide.bgImage && (
+                <div className="absolute inset-0 w-full h-full z-0 pointer-events-none overflow-hidden">
+                    <Image
+                        src={slide.bgImage}
+                        alt={slide.title || ""}
+                        fill
+                        unoptimized
+                        className="object-cover object-center w-full h-full"
+                    />
+                    <div className="absolute inset-0 bg-black/50" />
+                </div>
+            )}
+
             {/* Left: Text */}
             <div
-                className={`transition-all duration-700 ${isActive ? 'opacity-100 translate-y-0 scale-100 blur-0' : 'opacity-30 -translate-y-4 scale-95 origin-left blur-[1px]'}`}
+                className={`z-10 transition-all duration-700 ${isActive ? 'opacity-100 translate-y-0 scale-100 blur-0' : 'opacity-30 -translate-y-4 scale-95 origin-left blur-[1px]'}`}
                 style={{ color: slide.textColor || "#fff", display: 'flex', flexDirection: 'column', gap: isTablet ? '8px' : '16px' }}
             >
                 <h1
@@ -515,59 +549,38 @@ const SlideItem = ({ slide, isActive, width, viewType, slideHeight }) => {
                 </div>
             </div>
 
-            {/* Right: Image with mirrored reflection (Figma) */}
-            <div
-                className={`relative w-full flex flex-col items-center justify-end transition-all duration-700 ${isActive ? 'opacity-100 scale-105 blur-0' : 'opacity-30 scale-90 blur-[1px]'}`}
-                style={{ height: isTablet ? '280px' : '440px' }}
-            >
-                {/* Glow ellipse behind the image */}
+            {/* Right: Image */}
+            {(hasForegroundImage || !slide.bgImage) && (
                 <div
-                    className="absolute rounded-full pointer-events-none"
-                    style={{
-                        width: isTablet ? '230px' : '343px',
-                        height: isTablet ? '230px' : '343px',
-                        background: '#BAE6FD',
-                        filter: 'blur(97px)',
-                        opacity: 0.75,
-                        bottom: isTablet ? '10px' : '40px',
-                        zIndex: 0,
-                    }}
-                />
-
-                {/* Main image */}
-                <div className="relative w-full" style={{ height: isTablet ? '74%' : '76%', zIndex: 1 }}>
-                    <Image
-                        src={slide.image || "https://res.cloudinary.com/dgkckcdk8/image/upload/v1769946716/indian-rentals/fj8ptqbhppbstdd0hs4i.png"}
-                        alt={slide.title}
-                        fill
-                        unoptimized
-                        className="object-contain object-bottom drop-shadow-[0_25px_25px_rgba(0,0,0,0.25)]"
-                    />
-                </div>
-
-                {/* Reflection: flipped, faded, blurred copy */}
-                <div
-                    className="relative w-full pointer-events-none"
-                    style={{
-                        height: isTablet ? '26%' : '24%',
-                        transform: 'scaleY(-1)',
-                        opacity: 0.59,
-                        filter: 'blur(3px)',
-                        WebkitMaskImage: 'linear-gradient(to bottom, rgba(0,0,0,0.55), rgba(0,0,0,0) 75%)',
-                        maskImage: 'linear-gradient(to bottom, rgba(0,0,0,0.55), rgba(0,0,0,0) 75%)',
-                        zIndex: 1,
-                    }}
+                    className={`relative z-10 w-full flex flex-col items-center justify-end transition-all duration-700 ${isActive ? 'opacity-100 scale-105 blur-0' : 'opacity-30 scale-90 blur-[1px]'}`}
+                    style={{ height: isTablet ? '280px' : '440px' }}
                 >
-                    <Image
-                        src={slide.image || "https://res.cloudinary.com/dgkckcdk8/image/upload/v1769946716/indian-rentals/fj8ptqbhppbstdd0hs4i.png"}
-                        alt=""
-                        fill
-                        unoptimized
-                        aria-hidden="true"
-                        className="object-contain object-bottom"
-                    />
+                    {!slide.bgImage && (
+                        <div
+                            className="absolute rounded-full pointer-events-none"
+                            style={{
+                                width: isTablet ? '230px' : '343px',
+                                height: isTablet ? '230px' : '343px',
+                                background: '#BAE6FD',
+                                filter: 'blur(97px)',
+                                opacity: 0.75,
+                                bottom: isTablet ? '10px' : '40px',
+                                zIndex: 0,
+                            }}
+                        />
+                    )}
+
+                    <div className="relative w-full" style={{ height: isTablet ? '74%' : '76%', zIndex: 1 }}>
+                        <Image
+                            src={heroImg}
+                            alt={slide.title || ""}
+                            fill
+                            unoptimized
+                            className="object-contain object-bottom drop-shadow-[0_25px_25px_rgba(0,0,0,0.25)]"
+                        />
+                    </div>
                 </div>
-            </div>
+            )}
         </div>
     );
 
@@ -575,7 +588,7 @@ const SlideItem = ({ slide, isActive, width, viewType, slideHeight }) => {
         width: width,
         minWidth: width,
         height: `${slideHeight}px`,
-        background: slide.bgGradient || slide.bgColor,
+        background: slide.bgImage ? 'none' : (slide.bgGradient || slide.bgColor),
         opacity: isActive ? 1 : 0.85,
         boxShadow: isActive ? '0 12px 24px -6px rgba(0,0,0,0.12)' : '0 4px 8px -2px rgba(0,0,0,0.06)',
         zIndex: isActive ? 20 : 10
@@ -583,7 +596,7 @@ const SlideItem = ({ slide, isActive, width, viewType, slideHeight }) => {
 
     return (
         <Link
-            href={slide.slideLink || slide.ctaLink || "/store"}
+            href={targetHref}
             className="shrink-0 relative rounded-[24px] overflow-hidden transition-all duration-700 ease-[cubic-bezier(0.25,1,0.5,1)] cursor-pointer block"
             style={containerStyle}
         >

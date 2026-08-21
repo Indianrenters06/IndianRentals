@@ -443,9 +443,9 @@ export default function CMSHomepage() {
                                             <Field label="Sub-headline" value={slide.subtitle} onChange={v => { const n = [...data.heroSlides]; n[index].subtitle = v; set("heroSlides", n); }} placeholder="Get the latest MacBooks right now..." rows={2} />
                                             <div className="grid grid-cols-2 gap-4">
                                                 <Field label="CTA Button Text" value={slide.ctaText} onChange={v => { const n = [...data.heroSlides]; n[index].ctaText = v; set("heroSlides", n); }} placeholder="Rent Now" />
-                                                <Field label="CTA Button Link" value={slide.ctaLink} onChange={v => { const n = [...data.heroSlides]; n[index].ctaLink = v; set("heroSlides", n); }} placeholder="/products" />
+                                                <Field label="Target Product Page Link" value={slide.ctaLink} onChange={v => { const n = [...data.heroSlides]; n[index].ctaLink = v; set("heroSlides", n); }} placeholder="/products/product-slug-or-id" />
                                             </div>
-                                            <Field label="Entire Slide Link (Optional)" value={slide.slideLink || ""} onChange={v => { const n = [...data.heroSlides]; n[index].slideLink = v; set("heroSlides", n); }} placeholder="https://..." />
+                                            <Field label="Entire Slide Link (Optional Fallback)" value={slide.slideLink || ""} onChange={v => { const n = [...data.heroSlides]; n[index].slideLink = v; set("heroSlides", n); }} placeholder="/products" />
                                             <div className="grid grid-cols-2 gap-4">
                                                 <div>
                                                     <label className="text-xs font-bold text-slate-500 dark:text-slate-200 uppercase tracking-wider block mb-2">Background Color</label>
@@ -464,18 +464,19 @@ export default function CMSHomepage() {
                                                     </div>
                                                 </div>
                                             </div>
-                                            <ImageUploader label="Background Image (Replaces solid color)" existingUrl={slide.bgImage}
+                                            <ImageUploader label="Full Cover-to-Cover Background Picture (Fills entire hero slide)" existingUrl={slide.bgImage}
                                                 onUpload={url => { const n = [...data.heroSlides]; n[index].bgImage = url; set("heroSlides", n); }} />
                                         </div>
                                         <div className="space-y-4">
-                                            <ImageUploader label="Foreground Image (Transparent PNG Recommended)" existingUrl={slide.image}
+                                            <ImageUploader label="Foreground Product Image (Optional - Transparent PNG)" existingUrl={slide.image}
                                                 onUpload={url => { const n = [...data.heroSlides]; n[index].image = url; set("heroSlides", n); }} />
                                             {(slide.image || slide.bgImage) && (
                                                 <div className="h-32 rounded-xl flex items-center justify-center p-2 border border-slate-200 dark:border-slate-700 relative overflow-hidden"
                                                     style={{ backgroundColor: slide.bgColor }}>
-                                                    {slide.bgImage && <img src={slide.bgImage} className="absolute inset-0 w-full h-full object-cover opacity-50" alt="BG Preview" />}
-                                                    <img src={slide.image || "https://res.cloudinary.com/dgkckcdk8/image/upload/v1769946716/indian-rentals/fj8ptqbhppbstdd0hs4i.png"}
-                                                        className="relative z-10 max-h-full max-w-full object-contain drop-shadow-xl" alt="Preview" />
+                                                    {slide.bgImage && <img src={slide.bgImage} className="absolute inset-0 w-full h-full object-cover opacity-80" alt="BG Preview" />}
+                                                    {slide.image && (
+                                                        <img src={slide.image} className="relative z-10 max-h-full max-w-full object-contain drop-shadow-xl" alt="Preview" />
+                                                    )}
                                                 </div>
                                             )}
                                         </div>
