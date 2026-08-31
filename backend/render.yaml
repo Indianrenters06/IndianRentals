@@ -2,6 +2,7 @@ services:
   - type: web
     name: indian-rentals-backend
     env: node
+    rootDir: backend
     buildCommand: npm install
     startCommand: node index.js
     envVars:
@@ -36,4 +37,14 @@ services:
       - key: CASHFREE_SECRET_KEY
         sync: false
       - key: CASHFREE_ENV
+        sync: false
+      - key: CASHFREE_API_VERSION
+        value: "2023-08-01"
+      # Deployed frontend URLs for CORS — update after Netlify deploy
+      - key: FRONTEND_URL
+        sync: false
+      - key: ADMIN_URL
+        sync: false
+      # Google OAuth client ID
+      - key: GOOGLE_CLIENT_ID
         sync: false

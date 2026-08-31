@@ -29,19 +29,23 @@ const allowedOrigins = [
   'http://127.0.0.1:3001',
   process.env.LOCAL_FRONTEND_URL,   // http://localhost:3000
   process.env.LOCAL_ADMIN_URL,      // http://localhost:3001
-  // Live deployed
-  process.env.FRONTEND_URL,         // https://indian-rentals.vercel.app
+  // Live deployed (Netlify frontend + Vercel admin)
+  process.env.FRONTEND_URL,         // https://<your-site>.netlify.app
   process.env.ADMIN_URL,            // https://indian-rentals-yy8s.vercel.app
 ].filter(Boolean);
 
 // Regex for Vercel preview deployments
 const VERCEL_PATTERN = /^https:\/\/indian-rent(als|ers)(-[a-z0-9]+)?\.vercel\.app$/;
 
+// Regex for Netlify deployments (main + preview branches)
+const NETLIFY_PATTERN = /^https:\/\/[a-z0-9-]+\.netlify\.app$/;
+
 const corsOptions = {
   origin: (origin, callback) => {
     if (!origin) return callback(null, true); // curl, Postman, mobile
     if (allowedOrigins.includes(origin)) return callback(null, true);
     if (VERCEL_PATTERN.test(origin)) return callback(null, true);
+    if (NETLIFY_PATTERN.test(origin)) return callback(null, true);
     console.warn(`[CORS] Blocked: ${origin}`);
     callback(new Error(`CORS: Origin ${origin} not allowed`));
   },

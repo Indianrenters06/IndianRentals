@@ -36,6 +36,7 @@
     "zustand": "^5.0.9"
   },
   "devDependencies": {
+    "@netlify/plugin-nextjs": "^5.11.0",
     "@types/node": "25.5.0",
     "@types/react": "19.2.14",
     "autoprefixer": "^10.4.23",
