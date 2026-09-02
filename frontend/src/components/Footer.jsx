@@ -22,20 +22,30 @@ const DEFAULT_FOOTER_COLUMNS = [
         ]
     },
     {
-        title: "Policies", links: [
-            { name: "KYC Policy", href: "/kyc-policy" },
-            { name: "Shipping Policy", href: "/shipping-policy" },
-            { name: "Return Policy", href: "/return-policy" },
-            { name: "Privacy Policy", href: "/privacy" },
-            { name: "Rental Terms & Conditions", href: "/terms" },
+        title: "Services", links: [
+            { name: "Laptop Rental", href: "/services/laptop-rental" },
+            { name: "MacBook Rental", href: "/services/macbook-rental" },
+            { name: "Camera Rental", href: "/services/camera-rental" },
+            { name: "AV Equipment", href: "/services/av-equipment-rental" },
+            { name: "Server Rental", href: "/services/server-rental" },
         ]
     },
     {
-        title: "Support", links: [
+        title: "Locations", links: [
+            { name: "Rentals in Delhi", href: "/locations/delhi" },
+            { name: "Rentals in Mumbai", href: "/locations/mumbai" },
+            { name: "Rentals in Bangalore", href: "/locations/bangalore" },
+            { name: "Rentals in Hyderabad", href: "/locations/hyderabad" },
+            { name: "Rentals in Pune", href: "/locations/pune" },
+        ]
+    },
+    {
+        title: "Policies", links: [
+            { name: "KYC Policy", href: "/kyc-policy" },
+            { name: "Privacy Policy", href: "/privacy" },
+            { name: "Terms & Conditions", href: "/terms" },
             { name: "FAQs", href: "/faq" },
-            { name: "Raise a Ticket", href: "/ticket" },
             { name: "Customer Reviews", href: "/reviews" },
-            { name: "Blog", href: "/blog" },
         ]
     },
 ];

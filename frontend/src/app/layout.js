@@ -4,7 +4,11 @@ import "@fontsource/mona-sans/600.css";
 import "@fontsource/mona-sans/700.css";
 import "@fontsource/mona-sans/800.css";
 import "./globals.css";
+import Script from "next/script";
 import { SITE_URL, SITE_NAME, SITE_TAGLINE, SITE_DESCRIPTION, DEFAULT_OG_IMAGE } from "@/config/site";
+
+const GA_ID = process.env.NEXT_PUBLIC_GA_ID || ""; // e.g. G-XXXXXXXXXX
+const GSC_TOKEN = process.env.NEXT_PUBLIC_GSC_TOKEN || ""; // Google Search Console HTML-tag token
 
 export const metadata = {
   metadataBase: new URL(SITE_URL),
@@ -40,10 +44,13 @@ export const metadata = {
     follow: true,
     googleBot: { index: true, follow: true, "max-image-preview": "large", "max-snippet": -1 },
   },
+  // Google Search Console domain verification (add token via NEXT_PUBLIC_GSC_TOKEN env var)
+  ...(GSC_TOKEN ? { verification: { google: GSC_TOKEN } } : {}),
 };
 
 import ClientLayout from "@/components/ClientLayout";
 import Providers from "@/components/Providers";
+import StickyMobileCTA from "@/components/StickyMobileCTA";
 
 // Organization + WebSite structured data — helps Google and AI assistants
 // understand and cite the brand.
@@ -77,6 +84,27 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <body className={`font-sans bg-gray-50 flex flex-col min-h-screen antialiased overflow-x-hidden max-w-full`}>
+        {/* Google Analytics 4 — only loads when GA_ID env var is set */}
+        {GA_ID && (
+          <>
+            <Script
+              strategy="afterInteractive"
+              src={`https://www.googletagmanager.com/gtag/js?id=${GA_ID}`}
+            />
+            <Script
+              id="gtag-init"
+              strategy="afterInteractive"
+              dangerouslySetInnerHTML={{
+                __html: `
+                  window.dataLayer = window.dataLayer || [];
+                  function gtag(){dataLayer.push(arguments);}
+                  gtag('js', new Date());
+                  gtag('config', '${GA_ID}', { page_path: window.location.pathname });
+                `,
+              }}
+            />
+          </>
+        )}
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(orgJsonLd) }}
@@ -85,6 +113,7 @@ export default function RootLayout({ children }) {
           <ClientLayout>
             {children}
           </ClientLayout>
+          <StickyMobileCTA />
         </Providers>
       </body>
     </html>

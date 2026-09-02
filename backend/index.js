@@ -31,22 +31,32 @@ const allowedOrigins = [
   process.env.LOCAL_ADMIN_URL,      // http://localhost:3001
   // Live deployed (Netlify frontend + Vercel admin)
   process.env.FRONTEND_URL,         // https://<your-site>.netlify.app
-  process.env.ADMIN_URL,            // https://indian-rentals-yy8s.vercel.app
+  process.env.ADMIN_URL,            // https://indian-rentals-vert.vercel.app
+  process.env.FRONTEND_URL_2,       // optional second frontend URL
 ].filter(Boolean);
 
-// Regex for Vercel preview deployments
-const VERCEL_PATTERN = /^https:\/\/indian-rent(als|ers)(-[a-z0-9]+)?\.vercel\.app$/;
+// Regex for ANY Vercel deployment (main + preview branches)
+// Matches: https://<anything>.vercel.app
+const VERCEL_PATTERN = /^https:\/\/[a-zA-Z0-9-]+\.vercel\.app$/;
 
 // Regex for Netlify deployments (main + preview branches)
 const NETLIFY_PATTERN = /^https:\/\/[a-z0-9-]+\.netlify\.app$/;
 
+// Regex for sslip.io / nip.io IP-based domains (e.g. https://31-97-202-194.sslip.io)
+const SSLIP_PATTERN = /^https?:\/\/[\d-]+\.sslip\.io$/;
+
+// Regex for custom domains passed via EXTRA_ORIGINS env (comma-separated)
+const extraOrigins = (process.env.EXTRA_ORIGINS || '').split(',').map(o => o.trim()).filter(Boolean);
+
 const corsOptions = {
   origin: (origin, callback) => {
-    if (!origin) return callback(null, true); // curl, Postman, mobile
+    if (!origin) return callback(null, true); // curl, Postman, mobile apps
     if (allowedOrigins.includes(origin)) return callback(null, true);
+    if (extraOrigins.includes(origin)) return callback(null, true);
     if (VERCEL_PATTERN.test(origin)) return callback(null, true);
     if (NETLIFY_PATTERN.test(origin)) return callback(null, true);
-    console.warn(`[CORS] Blocked: ${origin}`);
+    if (SSLIP_PATTERN.test(origin)) return callback(null, true);
+    console.warn(`[CORS] Blocked origin: ${origin}`);
     callback(new Error(`CORS: Origin ${origin} not allowed`));
   },
   credentials: true,
