@@ -114,7 +114,7 @@ const FaqSection = ({ cmsData, limit, pageName }) => {
     if (!enabled) return null;
 
     return (
-        <section 
+        <section
             className="w-full border-t border-gray-100 bg-white"
             style={{
                 paddingTop: '48px',

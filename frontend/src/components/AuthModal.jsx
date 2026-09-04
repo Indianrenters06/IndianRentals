@@ -1,7 +1,8 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { EnvelopeSimple, Lock, GoogleLogo, AppleLogo, ArrowRight, Phone, ArrowLeft, X, User } from "@phosphor-icons/react";
+import { EnvelopeSimple, Lock, ArrowRight, Phone, ArrowLeft, X, User, Eye, EyeSlash } from "@phosphor-icons/react";
+import { FaGoogle, FaApple } from "react-icons/fa";
 import { useRouter } from "next/navigation";
 import { API_BASE_URL } from "../services/apiConfig";
 import { useGoogleLogin } from "@react-oauth/google";
@@ -24,6 +25,8 @@ const AuthModal = ({ isOpen, onClose, initialView = "login" }) => {
         password: "",
         confirmPassword: "",
     });
+    const [showPassword, setShowPassword] = useState(false);
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
     // Shared States
     const [loading, setLoading] = useState(false);
@@ -407,13 +410,20 @@ const AuthModal = ({ isOpen, onClose, initialView = "login" }) => {
                                                     </div>
                                                     <input
                                                         name="password"
-                                                        type="password"
+                                                        type={showPassword ? "text" : "password"}
                                                         required
                                                         value={registerData.password}
                                                         onChange={handleRegisterChange}
-                                                        className="w-full border border-grey-300 rounded-md px-3 transition-all duration-200 text-base font-normal h-10 tablet:h-9 desktop:h-[35px] pl-10 bg-gray-50 focus:bg-white"
+                                                        className="w-full border border-grey-300 rounded-md px-3 transition-all duration-200 text-base font-normal h-10 tablet:h-9 desktop:h-[35px] pl-10 pr-10 bg-gray-50 focus:bg-white"
                                                         placeholder="••••••••"
                                                     />
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => setShowPassword(!showPassword)}
+                                                        className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600 transition-colors"
+                                                    >
+                                                        {showPassword ? <EyeSlash size={16} weight="fill" /> : <Eye size={16} weight="fill" />}
+                                                    </button>
                                                 </div>
                                             </div>
                                             <div>
@@ -424,13 +434,20 @@ const AuthModal = ({ isOpen, onClose, initialView = "login" }) => {
                                                     </div>
                                                     <input
                                                         name="confirmPassword"
-                                                        type="password"
+                                                        type={showConfirmPassword ? "text" : "password"}
                                                         required
                                                         value={registerData.confirmPassword}
                                                         onChange={handleRegisterChange}
-                                                        className="w-full border border-grey-300 rounded-md px-3 transition-all duration-200 text-base font-normal h-10 tablet:h-9 desktop:h-[35px] pl-10 bg-gray-50 focus:bg-white"
+                                                        className="w-full border border-grey-300 rounded-md px-3 transition-all duration-200 text-base font-normal h-10 tablet:h-9 desktop:h-[35px] pl-10 pr-10 bg-gray-50 focus:bg-white"
                                                         placeholder="••••••••"
                                                     />
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                                                        className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600 transition-colors"
+                                                    >
+                                                        {showConfirmPassword ? <EyeSlash size={16} weight="fill" /> : <Eye size={16} weight="fill" />}
+                                                    </button>
                                                 </div>
                                             </div>
                                         </div>
@@ -458,11 +475,18 @@ const AuthModal = ({ isOpen, onClose, initialView = "login" }) => {
                                     </div>
 
                                     <div className="mt-6 grid grid-cols-2 gap-3">
-                                        <button onClick={() => handleGoogleLogin()} disabled={loading} type="button" className="w-full inline-flex justify-center items-center py-2.5 px-4 border border-gray-200 rounded-xl shadow-sm bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 transition-colors disabled:opacity-50">
-                                            <GoogleLogo className="text-red-500 mr-2" size={16} weight="bold" /> Google
+                                        <button onClick={() => handleGoogleLogin()} disabled={loading} type="button" className="w-full inline-flex justify-center items-center py-2.5 px-4 border border-gray-200 rounded-xl shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors disabled:opacity-50 gap-2">
+                                            <svg width="18" height="18" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+                                                <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
+                                                <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
+                                                <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
+                                                <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
+                                                <path fill="none" d="M0 0h48v48H0z"/>
+                                            </svg>
+                                            Google
                                         </button>
-                                        <button disabled={true} type="button" className="w-full inline-flex justify-center items-center py-2.5 px-4 border border-gray-200 rounded-xl shadow-sm bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 transition-colors disabled:opacity-50">
-                                            <AppleLogo className="text-black mr-2" size={16} weight="fill" /> Apple
+                                        <button disabled={true} type="button" className="w-full inline-flex justify-center items-center py-2.5 px-4 border border-gray-200 rounded-xl shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors disabled:opacity-50 gap-2">
+                                            <FaApple className="text-black" size={18} /> Apple
                                         </button>
                                     </div>
                                 </div>

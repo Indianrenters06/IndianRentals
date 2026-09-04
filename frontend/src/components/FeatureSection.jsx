@@ -153,7 +153,7 @@ const FeatureSection = () => {
                                     padding: isDesktop ? '6px 20px' : '4.34px 14.47px',
                                     height: isDesktop ? '35px' : '22.68px',
                                     textDecoration: 'none',
-                                    ...(isDesktop ? { } : { })
+                                    ...(isDesktop ? {} : {})
                                 }}
                                 className={isDesktop ? 'btn-primary' : ''}
                             >

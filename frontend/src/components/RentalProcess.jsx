@@ -485,11 +485,10 @@ const RentalProcess = ({ cmsData = null }) => {
                                 <div
                                     key={`desktop-step-${index}`}
                                     onClick={() => setActiveStep(index)}
-                                    className={`relative cursor-pointer transition-all duration-300 rounded-[20px] overflow-hidden ${
-                                        isActive
-                                            ? 'bg-gradient-to-br from-[#ffcf46]/50 to-[#ffb91b]/90 shadow-[inset_-3px_-3px_15px_-2px_rgba(226,110,0,0.26)] border-[1.2px] border-[#ffcf46]'
-                                            : 'bg-white border-[1.2px] border-[#eee] hover:border-gray-300'
-                                    }`}
+                                    className={`relative cursor-pointer transition-all duration-300 rounded-[20px] overflow-hidden ${isActive
+                                        ? 'bg-gradient-to-br from-[#ffcf46]/50 to-[#ffb91b]/90 shadow-[inset_-3px_-3px_15px_-2px_rgba(226,110,0,0.26)] border-[1.2px] border-[#ffcf46]'
+                                        : 'bg-white border-[1.2px] border-[#eee] hover:border-gray-300'
+                                        }`}
                                 >
                                     <div className="flex flex-col w-full">
                                         {/* Card Header (Icon, Title, Step Badge) */}
@@ -502,11 +501,10 @@ const RentalProcess = ({ cmsData = null }) => {
                                                     {step.title}
                                                 </h3>
                                             </div>
-                                            <div className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg shrink-0 transition-colors ${
-                                                isActive
-                                                    ? 'bg-[#fff1c5] border border-[#7c2f0b]'
-                                                    : 'border border-[#afafaf]'
-                                            }`}>
+                                            <div className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg shrink-0 transition-colors ${isActive
+                                                ? 'bg-[#fff1c5] border border-[#7c2f0b]'
+                                                : 'border border-[#afafaf]'
+                                                }`}>
                                                 <div className={`size-1.5 rounded-full transition-colors ${isActive ? 'bg-[#7c2f0b]' : 'bg-[#757575]'}`} />
                                                 <span className={`text-[16px] font-medium tracking-[-0.4px] transition-colors ${isActive ? 'text-[#7c2f0b]' : 'text-[#757575]'}`}>
                                                     Step {index + 1}

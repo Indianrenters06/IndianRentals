@@ -154,6 +154,7 @@ const RentByCategory = () => {
         catBaseGap,
         { flexGap: true }
     );
+    const [catSwiper, setCatSwiper] = useState(null);
 
     // Desktop only — tablet's track is a fixed 708px with no room either side.
     const catGutter = viewType === 'desktop' ? 64 : 0;
@@ -260,110 +261,111 @@ const RentByCategory = () => {
 
                 {/* Tablet/Desktop Swiper */}
                 <div className={`${viewType === 'mobile' ? 'hidden' : 'block'} relative`}>
-                  {/* Gutters hang outside the container so a card leaving the row has
+                    {/* Gutters hang outside the container so a card leaving the row has
                       somewhere to dissolve — the track itself fills the container edge
                       to edge, leaving no slack inside it. The mask fades the card's own
                       pixels to transparent rather than covering them with a coloured
                       overlay, so it melts into whatever is behind it. */}
-                  <div style={{
-                      marginLeft: catGutter ? `-${catGutter}px` : undefined,
-                      marginRight: catGutter ? `-${catGutter}px` : undefined,
-                      paddingLeft: catGutter ? `${catGutter}px` : undefined,
-                      paddingRight: catGutter ? `${catGutter}px` : undefined,
-                      overflow: 'hidden',
-                      WebkitMaskImage: catEdgeMask,
-                      maskImage: catEdgeMask
-                  }}>
-                    <div ref={catBoundsRef} style={{
-                        width: viewType === 'tablet' ? '708px' : '100%',
-                        height: viewType === 'tablet' ? '208px' : 'auto',
-                        margin: viewType === 'tablet' ? '0 auto' : undefined,
-                        // Desktop clips at the gutter edge instead, so slides can travel
-                        // into the fade; tablet has no gutter and still clips here.
-                        overflow: viewType === 'tablet' ? 'hidden' : 'visible',
-                        position: 'relative'
+                    <div style={{
+                        marginLeft: catGutter ? `-${catGutter}px` : undefined,
+                        marginRight: catGutter ? `-${catGutter}px` : undefined,
+                        paddingLeft: catGutter ? `${catGutter}px` : undefined,
+                        paddingRight: catGutter ? `${catGutter}px` : undefined,
+                        overflow: 'hidden',
+                        WebkitMaskImage: catEdgeMask,
+                        maskImage: catEdgeMask
                     }}>
-                      <div style={{ width: catTrackWidth ? `${catTrackWidth}px` : '100%', margin: '0 auto' }}>
-                        <Swiper
-                            modules={[Navigation, Autoplay, Scrollbar]}
-                            spaceBetween={catGap}
-                            slidesPerView={'auto'}
-                            // Explicit step, not slidesPerGroupAuto — every advance moves a
-                            // whole page of cards, so the transform stays on a card boundary.
-                            slidesPerGroup={catPerView}
-                            // Needs a spare page to clone for a seamless wrap; under that
-                            // Swiper silently falls back to stopping at the ends.
-                            loop={displayCategories.length >= catPerView * 2}
-                            navigation={{
-                                nextEl: '.swiper-next-cat',
-                                prevEl: '.swiper-prev-cat',
-                            }}
-                            scrollbar={{
-                                el: '.swiper-scrollbar-cat',
-                                draggable: true,
-                                hide: false,
-                            }}
-                            autoplay={{
-                                delay: 3000,
-                                disableOnInteraction: false,
-                            }}
-                            // Swiper clips its own overflow, which would cut a slide dead
-                            // at the track edge before it ever reaches the fade.
-                            className={`!py-3 ${viewType === 'tablet' ? '' : '!overflow-visible'}`}
-                        >
-                            {displayCategories.map((cat, index) => (
-                                <SwiperSlide key={cat._id || index} style={{ width: `${catCardW}px` }}>
-                                    <Link href={getCategoryRoute(cat)} className="group flex flex-col items-center cursor-pointer">
-                                        <div
-                                            className="cat-card flex items-center justify-center mb-[7px] relative bg-white border-2 border-[#eee] rounded-xl overflow-hidden"
-                                            style={{
-                                                width: viewType === 'tablet' ? '165px' : '177px',
-                                                height: viewType === 'tablet' ? '158px' : '173px',
-                                                // Figma insets the product inside the card rather than
-                                                // bleeding it: 167x128 art in a 183x173 frame, with the
-                                                // top inset a shade deeper than the bottom.
-                                                padding: viewType === 'tablet' ? '20px 7px' : '22px 8px 21px'
-                                            }}
-                                        >
-                                            {cat.image ? (
-                                                // fill resolves against the padding box, so the inset
-                                                // needs its own wrapper to bite.
-                                                <div className="relative w-full h-full">
-                                                    <Image
-                                                        src={cat.image}
-                                                        alt={cat.name}
-                                                        fill
-                                                        className="object-contain"
-                                                    />
+                        <div ref={catBoundsRef} style={{
+                            width: viewType === 'tablet' ? '708px' : '100%',
+                            height: viewType === 'tablet' ? '208px' : 'auto',
+                            margin: viewType === 'tablet' ? '0 auto' : undefined,
+                            // Desktop clips at the gutter edge instead, so slides can travel
+                            // into the fade; tablet has no gutter and still clips here.
+                            overflow: viewType === 'tablet' ? 'hidden' : 'visible',
+                            position: 'relative'
+                        }}>
+                            <div style={{ width: catTrackWidth ? `${catTrackWidth}px` : '100%', margin: '0 auto' }}>
+                                <Swiper
+                                    modules={[Navigation, Autoplay, Scrollbar]}
+                                    spaceBetween={catGap}
+                                    slidesPerView={'auto'}
+                                    // Explicit step, not slidesPerGroupAuto — every advance moves a
+                                    // whole page of cards, so the transform stays on a card boundary.
+                                    slidesPerGroup={catPerView}
+                                    // Needs a spare page to clone for a seamless wrap; under that
+                                    // Swiper silently falls back to stopping at the ends.
+                                    loop={displayCategories.length >= catPerView * 2}
+                                    onSwiper={setCatSwiper}
+                                    navigation={{
+                                        nextEl: '.swiper-next-cat',
+                                        prevEl: '.swiper-prev-cat',
+                                    }}
+                                    scrollbar={{
+                                        el: '.swiper-scrollbar-cat',
+                                        draggable: true,
+                                        hide: false,
+                                    }}
+                                    autoplay={{
+                                        delay: 3000,
+                                        disableOnInteraction: false,
+                                    }}
+                                    // Swiper clips its own overflow, which would cut a slide dead
+                                    // at the track edge before it ever reaches the fade.
+                                    className={`!py-3 ${viewType === 'tablet' ? '' : '!overflow-visible'}`}
+                                >
+                                    {displayCategories.map((cat, index) => (
+                                        <SwiperSlide key={cat._id || index} style={{ width: `${catCardW}px` }}>
+                                            <Link href={getCategoryRoute(cat)} className="group flex flex-col items-center cursor-pointer">
+                                                <div
+                                                    className="cat-card flex items-center justify-center mb-[7px] relative bg-white border-2 border-[#eee] rounded-xl overflow-hidden"
+                                                    style={{
+                                                        width: viewType === 'tablet' ? '165px' : '177px',
+                                                        height: viewType === 'tablet' ? '158px' : '173px',
+                                                        // Figma insets the product inside the card rather than
+                                                        // bleeding it: 167x128 art in a 183x173 frame, with the
+                                                        // top inset a shade deeper than the bottom.
+                                                        padding: viewType === 'tablet' ? '20px 7px' : '22px 8px 21px'
+                                                    }}
+                                                >
+                                                    {cat.image ? (
+                                                        // fill resolves against the padding box, so the inset
+                                                        // needs its own wrapper to bite.
+                                                        <div className="relative w-full h-full">
+                                                            <Image
+                                                                src={cat.image}
+                                                                alt={cat.name}
+                                                                fill
+                                                                className="object-contain"
+                                                            />
+                                                        </div>
+                                                    ) : (
+                                                        <div className="text-gray-400 group-hover:text-orange-300 transition-colors">
+                                                            {getIconForCategory(cat.name)}
+                                                        </div>
+                                                    )}
                                                 </div>
-                                            ) : (
-                                                <div className="text-gray-400 group-hover:text-orange-300 transition-colors">
-                                                    {getIconForCategory(cat.name)}
-                                                </div>
-                                            )}
-                                        </div>
-                                        {/* Figma Typography/text-xl/Semi Bold: Mona Sans 600,
+                                                {/* Figma Typography/text-xl/Semi Bold: Mona Sans 600,
                                             21/28, -0.8px tracking, grey-600. */}
-                                        <h3
-                                            className="text-center transition-colors"
-                                            style={{
-                                                fontFamily: '"Mona Sans", sans-serif',
-                                                fontWeight: 600,
-                                                fontSize: viewType === 'tablet' ? '18px' : '21px',
-                                                lineHeight: viewType === 'tablet' ? '24px' : '28px',
-                                                letterSpacing: '-0.8px',
-                                                color: '#545454'
-                                            }}
-                                        >
-                                            {cat.name}
-                                        </h3>
-                                    </Link>
-                                </SwiperSlide>
-                            ))}
-                        </Swiper>
-                      </div>
+                                                <h3
+                                                    className="text-center transition-colors"
+                                                    style={{
+                                                        fontFamily: '"Mona Sans", sans-serif',
+                                                        fontWeight: 600,
+                                                        fontSize: viewType === 'tablet' ? '18px' : '21px',
+                                                        lineHeight: viewType === 'tablet' ? '24px' : '28px',
+                                                        letterSpacing: '-0.8px',
+                                                        color: '#545454'
+                                                    }}
+                                                >
+                                                    {cat.name}
+                                                </h3>
+                                            </Link>
+                                        </SwiperSlide>
+                                    ))}
+                                </Swiper>
+                            </div>
+                        </div>
                     </div>
-                  </div>
 
                     {/* Figma: scrollbar row — width 1164, height 34, gap 24px from cards */}
                     <div className="hidden md:flex items-center gap-6 mt-6">
@@ -375,16 +377,18 @@ const RentByCategory = () => {
                         {/* Nav arrows */}
                         <div className="flex items-center gap-2 shrink-0">
                             <button
-                                className="swiper-prev-cat group w-[34px] h-[34px] rounded-[69px] flex items-center justify-center bg-[#eee] hover:bg-[hsla(0,0%,85%,1)] transition-all"
+                                className="swiper-prev-cat group w-[34px] h-[34px] rounded-[69px] flex items-center justify-center bg-[#eee] hover:bg-[hsla(0,0%,85%,1)] transition-all cursor-pointer"
                                 style={{ opacity: 1, boxShadow: '0px 8px 2px 0px rgba(133,133,133,0), 0px 5px 2px 0px rgba(133,133,133,0.01), 0px 3px 2px 0px rgba(133,133,133,0.05), 0px 1px 1px 0px rgba(133,133,133,0.09), 0px 0px 1px 0px rgba(133,133,133,0.1)' }}
                                 aria-label="Previous"
+                                onClick={() => catSwiper?.slidePrev()}
                             >
                                 <ChevronLeftIcon strokeWidth={2} className="w-6 h-6 text-[#1F1F1F] transition-colors duration-200" />
                             </button>
                             <button
-                                className="swiper-next-cat group w-[34px] h-[34px] rounded-[69px] flex items-center justify-center bg-[#eee] hover:bg-[hsla(0,0%,85%,1)] transition-all"
+                                className="swiper-next-cat group w-[34px] h-[34px] rounded-[69px] flex items-center justify-center bg-[#eee] hover:bg-[hsla(0,0%,85%,1)] transition-all cursor-pointer"
                                 style={{ opacity: 1, boxShadow: '0px 8px 2px 0px rgba(133,133,133,0), 0px 5px 2px 0px rgba(133,133,133,0.01), 0px 3px 2px 0px rgba(133,133,133,0.05), 0px 1px 1px 0px rgba(133,133,133,0.09), 0px 0px 1px 0px rgba(133,133,133,0.1)' }}
                                 aria-label="Next"
+                                onClick={() => catSwiper?.slideNext()}
                             >
                                 <ChevronRightIcon strokeWidth={2} className="w-6 h-6 text-[#1F1F1F] transition-colors duration-200" />
                             </button>

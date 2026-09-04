@@ -76,7 +76,7 @@ export default function BlogPage() {
         category: 'Category',
         author: 'John Doe',
         createdAt: '2022-01-11T00:00:00Z',
-        coverImage: 'https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=1200&auto=format&fit=crop&q=80'
+        coverImage: 'https://res.cloudinary.com/dgkckcdk8/image/upload/v1778574729/indian-rentals/qhhhtoouiwurctnypu6z.png'
     };
     
     // Fill the rest with placeholders if not enough posts to match the design visually

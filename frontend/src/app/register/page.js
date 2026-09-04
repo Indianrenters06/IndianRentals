@@ -2,7 +2,7 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { FaUser, FaEnvelope, FaLock, FaPhone, FaArrowRight } from "react-icons/fa";
+import { FaUser, FaEnvelope, FaLock, FaPhone, FaArrowRight, FaEye, FaEyeSlash } from "react-icons/fa";
 import { useRouter } from "next/navigation";
 import { API_BASE_URL } from "../../services/apiConfig";
 
@@ -17,6 +17,8 @@ const RegisterPage = () => {
     });
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
+    const [showPassword, setShowPassword] = useState(false);
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
     const handleChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -160,13 +162,20 @@ const RegisterPage = () => {
                                     <input
                                         id="password"
                                         name="password"
-                                        type="password"
+                                        type={showPassword ? "text" : "password"}
                                         required
                                         value={formData.password}
                                         onChange={handleChange}
-                                        className="block w-full pl-10 pr-3 py-3 border border-gray-200 rounded-xl text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#00A8FF] focus:border-transparent transition-all text-sm bg-gray-50 focus:bg-white"
+                                        className="block w-full pl-10 pr-10 py-3 border border-gray-200 rounded-xl text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#00A8FF] focus:border-transparent transition-all text-sm bg-gray-50 focus:bg-white"
                                         placeholder="••••••••"
                                     />
+                                    <button
+                                        type="button"
+                                        onClick={() => setShowPassword(!showPassword)}
+                                        className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600 transition-colors"
+                                    >
+                                        {showPassword ? <FaEyeSlash size={16} /> : <FaEye size={16} />}
+                                    </button>
                                 </div>
                             </div>
 
@@ -179,13 +188,20 @@ const RegisterPage = () => {
                                     <input
                                         id="confirmPassword"
                                         name="confirmPassword"
-                                        type="password"
+                                        type={showConfirmPassword ? "text" : "password"}
                                         required
                                         value={formData.confirmPassword}
                                         onChange={handleChange}
-                                        className="block w-full pl-10 pr-3 py-3 border border-gray-200 rounded-xl text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#00A8FF] focus:border-transparent transition-all text-sm bg-gray-50 focus:bg-white"
+                                        className="block w-full pl-10 pr-10 py-3 border border-gray-200 rounded-xl text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#00A8FF] focus:border-transparent transition-all text-sm bg-gray-50 focus:bg-white"
                                         placeholder="••••••••"
                                     />
+                                    <button
+                                        type="button"
+                                        onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                                        className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600 transition-colors"
+                                    >
+                                        {showConfirmPassword ? <FaEyeSlash size={16} /> : <FaEye size={16} />}
+                                    </button>
                                 </div>
                             </div>
                         </div>

@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Lock, EnvelopeSimple, ShieldCheck, ArrowRight, ChartLineUp, Database, HardDrive, Calendar, Package } from "@phosphor-icons/react";
+import { Lock, EnvelopeSimple, ShieldCheck, ArrowRight, ChartLineUp, Database, HardDrive, Calendar, Package, Eye, EyeSlash } from "@phosphor-icons/react";
 import { useRouter } from "next/navigation";
 import { Card, CardBody, Button } from "@heroui/react";
 import { ThemeToggle } from "../components/ThemeToggle";
@@ -19,6 +19,9 @@ export default function AdminLogin() {
   const [forgotOtp, setForgotOtp] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const router = useRouter();
 
   const handleLogin = async (e) => {
@@ -261,15 +264,22 @@ export default function AdminLogin() {
                           weight="bold"
                         />
                         <input
-                          type="password"
+                          type={showPassword ? "text" : "password"}
                           placeholder="••••••••"
                           value={password}
                           onChange={(e) => setPassword(e.target.value)}
                           autoComplete="new-password"
                           name="admin-pass-nofill"
                           required
-                          className="w-full h-14 pl-11 pr-4 rounded-xl bg-slate-50 dark:bg-slate-950/50 border-2 border-slate-200 dark:border-white/5 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-600 font-medium tracking-widest text-sm focus:outline-none focus:bg-white dark:focus:bg-slate-900/50 focus:border-indigo-500 hover:border-slate-300 dark:hover:border-white/10 transition-colors"
+                          className="w-full h-14 pl-11 pr-11 rounded-xl bg-slate-50 dark:bg-slate-950/50 border-2 border-slate-200 dark:border-white/5 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-600 font-medium tracking-widest text-sm focus:outline-none focus:bg-white dark:focus:bg-slate-900/50 focus:border-indigo-500 hover:border-slate-300 dark:hover:border-white/10 transition-colors"
                         />
+                        <button
+                          type="button"
+                          onClick={() => setShowPassword(!showPassword)}
+                          className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-indigo-500 transition-colors"
+                        >
+                          {showPassword ? <EyeSlash size={20} weight="bold" /> : <Eye size={20} weight="bold" />}
+                        </button>
                       </div>
                     </div>
 
@@ -373,13 +383,20 @@ export default function AdminLogin() {
                       <div className="relative">
                         <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 pointer-events-none" weight="bold" />
                         <input
-                          type="password"
+                          type={showNewPassword ? "text" : "password"}
                           placeholder="Min. 8 characters"
                           value={newPassword}
                           onChange={(e) => setNewPassword(e.target.value)}
                           required
-                          className="w-full h-14 pl-11 pr-4 rounded-xl bg-slate-50 dark:bg-slate-950/50 border-2 border-slate-200 dark:border-white/5 text-slate-900 dark:text-white placeholder:text-slate-400 font-medium focus:outline-none focus:border-indigo-500 transition-colors"
+                          className="w-full h-14 pl-11 pr-11 rounded-xl bg-slate-50 dark:bg-slate-950/50 border-2 border-slate-200 dark:border-white/5 text-slate-900 dark:text-white placeholder:text-slate-400 font-medium focus:outline-none focus:border-indigo-500 transition-colors"
                         />
+                        <button
+                          type="button"
+                          onClick={() => setShowNewPassword(!showNewPassword)}
+                          className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-indigo-500 transition-colors"
+                        >
+                          {showNewPassword ? <EyeSlash size={20} weight="bold" /> : <Eye size={20} weight="bold" />}
+                        </button>
                       </div>
                     </div>
                     <div className="space-y-1.5">
@@ -387,13 +404,20 @@ export default function AdminLogin() {
                       <div className="relative">
                         <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 pointer-events-none" weight="bold" />
                         <input
-                          type="password"
+                          type={showConfirmPassword ? "text" : "password"}
                           placeholder="Repeat password"
                           value={confirmPassword}
                           onChange={(e) => setConfirmPassword(e.target.value)}
                           required
-                          className="w-full h-14 pl-11 pr-4 rounded-xl bg-slate-50 dark:bg-slate-950/50 border-2 border-slate-200 dark:border-white/5 text-slate-900 dark:text-white placeholder:text-slate-400 font-medium focus:outline-none focus:border-indigo-500 transition-colors"
+                          className="w-full h-14 pl-11 pr-11 rounded-xl bg-slate-50 dark:bg-slate-950/50 border-2 border-slate-200 dark:border-white/5 text-slate-900 dark:text-white placeholder:text-slate-400 font-medium focus:outline-none focus:border-indigo-500 transition-colors"
                         />
+                        <button
+                          type="button"
+                          onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                          className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-indigo-500 transition-colors"
+                        >
+                          {showConfirmPassword ? <EyeSlash size={20} weight="bold" /> : <Eye size={20} weight="bold" />}
+                        </button>
                       </div>
                     </div>
                     <div className="pt-2 flex flex-col gap-3">

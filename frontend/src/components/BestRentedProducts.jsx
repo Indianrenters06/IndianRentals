@@ -445,9 +445,10 @@ const SLIDE_GAP = 20;
 
 // titleOverride / productIdsOverride let a host page (e.g. the product page) drive
 // this section from its own CMS document instead of the homepage's.
-const BestRentedProducts =({ type = "bestRented", defaultTitle = "Curated Products", customProducts = null, titleOverride = null, productIdsOverride = null }) => {
+const BestRentedProducts = ({ type = "bestRented", defaultTitle = "Curated Products", customProducts = null, titleOverride = null, productIdsOverride = null }) => {
     const [isDesktop, setIsDesktop] = useState(false);
     const [trackBoundsRef, trackWidth, perView] = useWholeCardTrack(SLIDE_W, SLIDE_GAP);
+    const [swiperInstance, setSwiperInstance] = useState(null);
     const router = useRouter();
     const dispatch = useDispatch();
 
@@ -598,44 +599,45 @@ const BestRentedProducts =({ type = "bestRented", defaultTitle = "Curated Produc
                 </div>
 
                 <div className="hidden md:block relative" ref={trackBoundsRef}>
-                  <div style={{ width: trackWidth ? `${trackWidth}px` : '100%', margin: '0 auto' }}>
-                    <Swiper
-                        modules={[Navigation, Autoplay, Scrollbar]}
-                        spaceBetween={SLIDE_GAP}
-                        slidesPerView={'auto'}
-                        // Explicit step, not slidesPerGroupAuto — every advance moves a
-                        // whole page of cards, so the transform stays on a card boundary.
-                        slidesPerGroup={perView}
-                        // Needs a spare page to clone for a seamless wrap; under that
-                        // Swiper silently falls back to stopping at the ends.
-                        loop={products.length >= perView * 2}
-                        navigation={{
-                            nextEl: `.swiper-next-${sectionSuffix}`,
-                            prevEl: `.swiper-prev-${sectionSuffix}`,
-                        }}
-                        scrollbar={{
-                            el: `.swiper-scrollbar-${sectionSuffix}`,
-                            draggable: true,
-                            hide: false,
-                        }}
-                        autoplay={{
-                            delay: 4000,
-                            disableOnInteraction: false,
-                        }}
-                        className="!pt-6 !pb-[65px] -mt-6 -mb-[65px] !overflow-x-clip !overflow-y-visible"
-                    >
-                        {products.map((product, index) => (
-                            <SwiperSlide key={product.id || index} style={{ width: `${SLIDE_W}px` }}>
-                                <ProductCard
-                                    product={product}
-                                    index={index}
-                                    isDesktop={isDesktop}
-                                    handleAddToCart={handleAddToCart}
-                                />
-                            </SwiperSlide>
-                        ))}
-                    </Swiper>
-                  </div>
+                    <div style={{ width: trackWidth ? `${trackWidth}px` : '100%', margin: '0 auto' }}>
+                        <Swiper
+                            modules={[Navigation, Autoplay, Scrollbar]}
+                            spaceBetween={SLIDE_GAP}
+                            slidesPerView={'auto'}
+                            // Explicit step, not slidesPerGroupAuto — every advance moves a
+                            // whole page of cards, so the transform stays on a card boundary.
+                            slidesPerGroup={perView}
+                            // Needs a spare page to clone for a seamless wrap; under that
+                            // Swiper silently falls back to stopping at the ends.
+                            loop={products.length >= perView * 2}
+                            onSwiper={setSwiperInstance}
+                            navigation={{
+                                nextEl: `.swiper-next-${sectionSuffix}`,
+                                prevEl: `.swiper-prev-${sectionSuffix}`,
+                            }}
+                            scrollbar={{
+                                el: `.swiper-scrollbar-${sectionSuffix}`,
+                                draggable: true,
+                                hide: false,
+                            }}
+                            autoplay={{
+                                delay: 4000,
+                                disableOnInteraction: false,
+                            }}
+                            className="!pt-6 !pb-[65px] -mt-6 -mb-[65px] !overflow-x-clip !overflow-y-visible"
+                        >
+                            {products.map((product, index) => (
+                                <SwiperSlide key={product.id || index} style={{ width: `${SLIDE_W}px` }}>
+                                    <ProductCard
+                                        product={product}
+                                        index={index}
+                                        isDesktop={isDesktop}
+                                        handleAddToCart={handleAddToCart}
+                                    />
+                                </SwiperSlide>
+                            ))}
+                        </Swiper>
+                    </div>
 
                     {/* Progress Bar & Navigation Arrows */}
                     <div className="flex items-center gap-6 mt-10">
@@ -645,16 +647,18 @@ const BestRentedProducts =({ type = "bestRented", defaultTitle = "Curated Produc
                         />
                         <div className="flex items-center gap-2 shrink-0">
                             <button
-                                className={`swiper-prev-${sectionSuffix} group w-[34px] h-[34px] rounded-[69px] flex items-center justify-center bg-[#eee] hover:bg-[hsla(0,0%,85%,1)] transition-all`}
+                                className={`swiper-prev-${sectionSuffix} group w-[34px] h-[34px] rounded-[69px] flex items-center justify-center bg-[#eee] hover:bg-[hsla(0,0%,85%,1)] transition-all cursor-pointer`}
                                 style={{ boxShadow: '0px 8px 2px 0px rgba(133,133,133,0), 0px 5px 2px 0px rgba(133,133,133,0.01), 0px 3px 2px 0px rgba(133,133,133,0.05), 0px 1px 1px 0px rgba(133,133,133,0.09), 0px 0px 1px 0px rgba(133,133,133,0.1)' }}
                                 aria-label="Previous"
+                                onClick={() => swiperInstance?.slidePrev()}
                             >
                                 <ChevronLeftIcon strokeWidth={2} className="w-6 h-6 text-[#1F1F1F] transition-colors duration-200" />
                             </button>
                             <button
-                                className={`swiper-next-${sectionSuffix} group w-[34px] h-[34px] rounded-[69px] flex items-center justify-center bg-[#eee] hover:bg-[hsla(0,0%,85%,1)] transition-all`}
+                                className={`swiper-next-${sectionSuffix} group w-[34px] h-[34px] rounded-[69px] flex items-center justify-center bg-[#eee] hover:bg-[hsla(0,0%,85%,1)] transition-all cursor-pointer`}
                                 style={{ boxShadow: '0px 8px 2px 0px rgba(133,133,133,0), 0px 5px 2px 0px rgba(133,133,133,0.01), 0px 3px 2px 0px rgba(133,133,133,0.05), 0px 1px 1px 0px rgba(133,133,133,0.09), 0px 0px 1px 0px rgba(133,133,133,0.1)' }}
                                 aria-label="Next"
+                                onClick={() => swiperInstance?.slideNext()}
                             >
                                 <ChevronRightIcon strokeWidth={2} className="w-6 h-6 text-[#1F1F1F] transition-colors duration-200" />
                             </button>
