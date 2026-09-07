@@ -293,10 +293,18 @@ export default function CMSHomepage() {
     const [saving, setSaving] = useState(false);
     const [saved, setSaved] = useState(false);
     const [data, setData] = useState(DEFAULTS);
+    const [availableProducts, setAvailableProducts] = useState([]);
 
     const [offerImageUrl, setOfferImageUrl] = useState("");
 
     const set = (key, val) => setData(prev => ({ ...prev, [key]: val }));
+
+    useEffect(() => {
+        fetch(`${API}/api/products?limit=500`)
+            .then(r => r.ok ? r.json() : null)
+            .then(d => { if (d?.products) setAvailableProducts(d.products); })
+            .catch(err => console.error("Failed to load products for picker", err));
+    }, []);
 
     // ── Offers (stored under the legacy `clientLogos` key) ────────────────────
     const offers = (data.clientLogos || []).map(toOffer);
@@ -414,75 +422,181 @@ export default function CMSHomepage() {
 
                     <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 shadow-sm space-y-6">
                         <div className="flex justify-between items-center">
-                            <h3 className="text-lg font-bold flex items-center gap-2 text-slate-800 dark:text-slate-100"><PhosphorImage /> Carousel Slides</h3>
-                            <button onClick={() => set("heroSlides", [...data.heroSlides, { title: "New Slide", subtitle: "", image: "", bgColor: "#333333", textColor: "#ffffff", bgImage: "", ctaText: "Rent Now", ctaLink: "/products" }])}
-                                className="flex items-center gap-1.5 h-8 px-4 rounded-lg bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 text-sm font-semibold hover:bg-indigo-100 dark:hover:bg-indigo-500/20 transition-all border border-indigo-200 dark:border-indigo-500/20">
-                                <Plus size={14} /> Add Slide
+                            <div>
+                                <h3 className="text-lg font-bold flex items-center gap-2 text-slate-800 dark:text-slate-100"><PhosphorImage /> Hero Banner Slides</h3>
+                                <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">Upload banner images and set the product link. When clicked on the homepage, each banner directs customers to its product page.</p>
+                            </div>
+                            <button onClick={() => set("heroSlides", [...data.heroSlides, { title: `Banner #${data.heroSlides.length + 1}`, image: "", bgImage: "", ctaLink: "/products", slideLink: "/products", link: "/products" }])}
+                                className="flex items-center gap-1.5 h-9 px-4 rounded-lg bg-indigo-600 text-white text-sm font-semibold hover:bg-indigo-700 transition-all shadow-sm cursor-pointer">
+                                <Plus size={15} weight="bold" /> Add Banner
                             </button>
                         </div>
 
-                        <div className="space-y-5">
-                            {data.heroSlides.map((slide, index) => (
-                                <div key={index} className="p-5 border border-slate-200 dark:border-slate-700 rounded-2xl relative bg-slate-50 dark:bg-slate-950">
-                                    <div className="flex items-center justify-between mb-5">
-                                        <div className="flex items-center gap-2">
-                                            <span className="w-7 h-7 bg-indigo-100 text-indigo-700 rounded-full flex items-center justify-center font-bold text-xs">#{index + 1}</span>
-                                            <h4 className="font-semibold text-slate-800 dark:text-slate-200">Slide Configuration</h4>
-                                        </div>
-                                        {data.heroSlides.length > 1 && (
-                                            <button onClick={() => { const n = [...data.heroSlides]; n.splice(index, 1); set("heroSlides", n); }}
-                                                className="text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 p-2 rounded-lg transition-colors">
-                                                <Trash size={16} />
-                                            </button>
-                                        )}
-                                    </div>
+                        <div className="space-y-6">
+                            {data.heroSlides.map((slide, index) => {
+                                const currentImage = slide.bgImage || slide.image || "";
+                                const currentLink = slide.ctaLink || slide.slideLink || slide.link || "";
 
-                                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                                        <div className="space-y-4">
-                                            <Field label="Headline" value={slide.title} onChange={v => { const n = [...data.heroSlides]; n[index].title = v; set("heroSlides", n); }} placeholder="The Tech That Powers Your Ambition." />
-                                            <Field label="Sub-headline" value={slide.subtitle} onChange={v => { const n = [...data.heroSlides]; n[index].subtitle = v; set("heroSlides", n); }} placeholder="Get the latest MacBooks right now..." rows={2} />
-                                            <div className="grid grid-cols-2 gap-4">
-                                                <Field label="CTA Button Text" value={slide.ctaText} onChange={v => { const n = [...data.heroSlides]; n[index].ctaText = v; set("heroSlides", n); }} placeholder="Rent Now" />
-                                                <Field label="Target Product Page Link" value={slide.ctaLink} onChange={v => { const n = [...data.heroSlides]; n[index].ctaLink = v; set("heroSlides", n); }} placeholder="/products/product-slug-or-id" />
+                                return (
+                                    <div key={index} className="p-6 border border-slate-200 dark:border-slate-800 rounded-2xl relative bg-slate-50/70 dark:bg-slate-950/60 space-y-5">
+                                        <div className="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-3">
+                                            <div className="flex items-center gap-2.5">
+                                                <span className="w-7 h-7 bg-indigo-100 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300 rounded-lg flex items-center justify-center font-bold text-xs">#{index + 1}</span>
+                                                <h4 className="font-semibold text-slate-800 dark:text-slate-200 text-sm">
+                                                    {slide.title || `Hero Banner #${index + 1}`}
+                                                </h4>
                                             </div>
-                                            <Field label="Entire Slide Link (Optional Fallback)" value={slide.slideLink || ""} onChange={v => { const n = [...data.heroSlides]; n[index].slideLink = v; set("heroSlides", n); }} placeholder="/products" />
-                                            <div className="grid grid-cols-2 gap-4">
-                                                <div>
-                                                    <label className="text-xs font-bold text-slate-500 dark:text-slate-200 uppercase tracking-wider block mb-2">Background Color</label>
-                                                    <div className="flex items-center gap-2">
-                                                        <input type="color" value={slide.bgColor} onChange={e => { const n = [...data.heroSlides]; n[index].bgColor = e.target.value; set("heroSlides", n); }} className="w-10 h-10 rounded-lg cursor-pointer border border-slate-200 dark:border-slate-700" />
-                                                        <input type="text" value={slide.bgColor} onChange={e => { const n = [...data.heroSlides]; n[index].bgColor = e.target.value; set("heroSlides", n); }}
-                                                            className="flex-1 h-10 px-3 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs font-mono" />
-                                                    </div>
-                                                </div>
-                                                <div>
-                                                    <label className="text-xs font-bold text-slate-500 dark:text-slate-200 uppercase tracking-wider block mb-2">Text Color</label>
-                                                    <div className="flex items-center gap-2">
-                                                        <input type="color" value={slide.textColor || "#ffffff"} onChange={e => { const n = [...data.heroSlides]; n[index].textColor = e.target.value; set("heroSlides", n); }} className="w-10 h-10 rounded-lg cursor-pointer border border-slate-200 dark:border-slate-700" />
-                                                        <input type="text" value={slide.textColor || "#ffffff"} onChange={e => { const n = [...data.heroSlides]; n[index].textColor = e.target.value; set("heroSlides", n); }}
-                                                            className="flex-1 h-10 px-3 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs font-mono" />
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <ImageUploader label="Full Cover-to-Cover Background Picture (Fills entire hero slide)" existingUrl={slide.bgImage}
-                                                onUpload={url => { const n = [...data.heroSlides]; n[index].bgImage = url; set("heroSlides", n); }} />
-                                        </div>
-                                        <div className="space-y-4">
-                                            <ImageUploader label="Foreground Product Image (Optional - Transparent PNG)" existingUrl={slide.image}
-                                                onUpload={url => { const n = [...data.heroSlides]; n[index].image = url; set("heroSlides", n); }} />
-                                            {(slide.image || slide.bgImage) && (
-                                                <div className="h-32 rounded-xl flex items-center justify-center p-2 border border-slate-200 dark:border-slate-700 relative overflow-hidden"
-                                                    style={{ backgroundColor: slide.bgColor }}>
-                                                    {slide.bgImage && <img src={slide.bgImage} className="absolute inset-0 w-full h-full object-cover opacity-80" alt="BG Preview" />}
-                                                    {slide.image && (
-                                                        <img src={slide.image} className="relative z-10 max-h-full max-w-full object-contain drop-shadow-xl" alt="Preview" />
-                                                    )}
-                                                </div>
+                                            {data.heroSlides.length > 1 && (
+                                                <button
+                                                    onClick={() => { const n = [...data.heroSlides]; n.splice(index, 1); set("heroSlides", n); }}
+                                                    className="text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-500/10 p-2 rounded-lg transition-colors cursor-pointer flex items-center gap-1 text-xs font-medium"
+                                                    title="Delete this banner"
+                                                >
+                                                    <Trash size={15} /> Remove
+                                                </button>
                                             )}
                                         </div>
+
+                                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
+                                            {/* Left Column: Image Upload & URL */}
+                                            <div className="space-y-4">
+                                                <ImageUploader
+                                                    label="Banner Image"
+                                                    existingUrl={currentImage}
+                                                    onUpload={url => {
+                                                        const n = [...data.heroSlides];
+                                                        n[index].bgImage = url;
+                                                        n[index].image = url;
+                                                        set("heroSlides", n);
+                                                    }}
+                                                />
+                                                <div>
+                                                    <label className="text-xs font-bold text-slate-600 dark:text-slate-300 uppercase tracking-wider block mb-1.5">
+                                                        Or Direct Image URL
+                                                    </label>
+                                                    <input
+                                                        type="text"
+                                                        value={currentImage}
+                                                        onChange={e => {
+                                                            const n = [...data.heroSlides];
+                                                            n[index].bgImage = e.target.value;
+                                                            n[index].image = e.target.value;
+                                                            set("heroSlides", n);
+                                                        }}
+                                                        placeholder="https://res.cloudinary.com/... or https://..."
+                                                        className="w-full h-11 px-3.5 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white text-xs font-mono focus:outline-none focus:border-indigo-500 transition-colors"
+                                                    />
+                                                </div>
+                                            </div>
+
+                                            {/* Right Column: Target Product Link & Preview */}
+                                            <div className="space-y-4">
+                                                <div>
+                                                    <div className="flex items-center justify-between mb-1.5">
+                                                        <label className="text-xs font-bold text-slate-600 dark:text-slate-300 uppercase tracking-wider">
+                                                            Product Page Link <span className="text-red-500">*</span>
+                                                        </label>
+                                                        <span className="text-[11px] text-slate-400 font-medium">/products/&lt;id&gt; or /products</span>
+                                                    </div>
+
+                                                    {/* Quick Select Dropdown */}
+                                                    {availableProducts.length > 0 && (
+                                                        <div className="mb-2.5">
+                                                            <select
+                                                                defaultValue=""
+                                                                onChange={e => {
+                                                                    const prodId = e.target.value;
+                                                                    if (!prodId) return;
+                                                                    const prod = availableProducts.find(p => p._id === prodId);
+                                                                    const n = [...data.heroSlides];
+                                                                    const targetLink = `/products/${prodId}`;
+                                                                    n[index].ctaLink = targetLink;
+                                                                    n[index].slideLink = targetLink;
+                                                                    n[index].link = targetLink;
+                                                                    if (!n[index].title && prod?.name) {
+                                                                        n[index].title = prod.name;
+                                                                    }
+                                                                    set("heroSlides", n);
+                                                                    e.target.value = "";
+                                                                }}
+                                                                className="w-full h-10 px-3 appearance-none rounded-xl bg-indigo-50/70 dark:bg-indigo-950/40 border border-indigo-200 dark:border-indigo-800 text-xs font-semibold text-indigo-900 dark:text-indigo-200 focus:outline-none focus:ring-2 focus:ring-indigo-500/40 cursor-pointer"
+                                                            >
+                                                                <option value="">⚡ Select a product to auto-fill link...</option>
+                                                                {availableProducts.map(p => (
+                                                                    <option key={p._id} value={p._id}>
+                                                                        {p.name} {p.rentalPrice ? `(₹${p.rentalPrice}/mo)` : ''}
+                                                                    </option>
+                                                                ))}
+                                                            </select>
+                                                        </div>
+                                                    )}
+
+                                                    <input
+                                                        type="text"
+                                                        value={currentLink}
+                                                        onChange={e => {
+                                                            const n = [...data.heroSlides];
+                                                            const val = e.target.value;
+                                                            n[index].ctaLink = val;
+                                                            n[index].slideLink = val;
+                                                            n[index].link = val;
+                                                            set("heroSlides", n);
+                                                        }}
+                                                        placeholder="/products/65fa... or /products"
+                                                        className="w-full h-11 px-3.5 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white text-xs font-mono focus:outline-none focus:border-indigo-500 transition-colors font-medium"
+                                                    />
+                                                    <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+                                                        Select from the dropdown above or enter any custom URL (e.g., <code className="text-indigo-600 dark:text-indigo-400 font-mono">/products</code> or <code className="text-indigo-600 dark:text-indigo-400 font-mono">/products/&lt;id&gt;</code>).
+                                                    </p>
+                                                </div>
+
+                                                <div>
+                                                    <label className="text-xs font-bold text-slate-600 dark:text-slate-300 uppercase tracking-wider block mb-1.5">
+                                                        Banner Label / Title (Optional)
+                                                    </label>
+                                                    <input
+                                                        type="text"
+                                                        value={slide.title || ""}
+                                                        onChange={e => {
+                                                            const n = [...data.heroSlides];
+                                                            n[index].title = e.target.value;
+                                                            set("heroSlides", n);
+                                                        }}
+                                                        placeholder="e.g. MacBook Pro Offer"
+                                                        className="w-full h-11 px-3.5 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white text-sm focus:outline-none focus:border-indigo-500 transition-colors"
+                                                    />
+                                                </div>
+
+                                                {/* Live Banner Preview */}
+                                                <div>
+                                                    <label className="text-xs font-bold text-slate-600 dark:text-slate-300 uppercase tracking-wider block mb-1.5">
+                                                        Live Banner Preview
+                                                    </label>
+                                                    {currentImage ? (
+                                                        <div className="w-full h-36 rounded-xl border border-slate-200 dark:border-slate-700 overflow-hidden relative bg-slate-900 shadow-inner group">
+                                                            <img
+                                                                src={currentImage}
+                                                                alt={slide.title || "Hero banner preview"}
+                                                                className="w-full h-full object-cover object-center"
+                                                            />
+                                                            <div className="absolute bottom-2 left-2 right-2 bg-black/75 backdrop-blur-md px-3 py-1.5 rounded-lg flex items-center justify-between text-xs text-white">
+                                                                <span className="truncate font-medium flex items-center gap-1.5">
+                                                                    🔗 {currentLink || "/products"}
+                                                                </span>
+                                                                <span className="text-[10px] text-emerald-400 font-bold uppercase tracking-wider shrink-0">Clickable</span>
+                                                            </div>
+                                                        </div>
+                                                    ) : (
+                                                        <div className="w-full h-36 rounded-xl border-2 border-dashed border-slate-300 dark:border-slate-700 flex flex-col items-center justify-center text-slate-400 text-xs gap-1">
+                                                            <span>Upload a banner image to see preview</span>
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
-                                </div>
-                            ))}
+                                );
+                            })}
                         </div>
                     </div>
                 </motion.div>

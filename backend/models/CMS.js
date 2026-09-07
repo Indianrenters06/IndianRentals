@@ -21,13 +21,15 @@ const heroSlideSchema = new mongoose.Schema({
     title: { type: String, default: '' },
     subtitle: { type: String, default: '' },
     image: { type: String, default: '' },
+    bgImage: { type: String, default: '' },
     bgColor: { type: String, default: '#0075ff' },
     bgGradient: { type: String, default: '' },
     textColor: { type: String, default: '#FFFFFF' },
     ctaText: { type: String, default: 'Rent Now' },
     ctaLink: { type: String, default: '/products' },
     slideLink: { type: String, default: '' },
-}, { _id: false });
+    link: { type: String, default: '/products' },
+}, { _id: false, strict: false });
 
 const faqItemSchema = new mongoose.Schema({
     question: { type: String, default: '' },

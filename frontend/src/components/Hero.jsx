@@ -1,10 +1,16 @@
 "use client";
 import Image from "next/image";
 import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/outline";
-import { useState, useEffect, useRef } from "react";
-import Button from "./common/Button";
+import { useState, useEffect, useRef, useCallback } from "react";
 import Link from "next/link";
 import { API } from "@/services/apiConfig";
+
+import { Swiper, SwiperSlide } from 'swiper/react';
+import { Navigation, Autoplay, Pagination } from 'swiper/modules';
+
+import 'swiper/css';
+import 'swiper/css/navigation';
+import 'swiper/css/pagination';
 
 /* ─── Figma Spec ──────────────────────────────────────────────────────────
    outer section : full-width × 564px
@@ -59,16 +65,16 @@ const FALLBACK_SLIDES = [
 
 const Hero = () => {
     const [slides, setSlides] = useState(FALLBACK_SLIDES);
-    const [currentIndex, setCurrentIndex] = useState(2);
-    const [isTransitioning, setIsTransitioning] = useState(true);
     const [heroVisible, setHeroVisible] = useState(true);
+    const [activeSlideIndex, setActiveSlideIndex] = useState(0);
+    const [mobileActiveIndex, setMobileActiveIndex] = useState(0);
+
+    const desktopSwiperRef = useRef(null);
+    const mobileSwiperRef = useRef(null);
 
     const GAP = 20;
-    const SIDE_WIDTH = 931;
-    const CLONES_AT_START = 2;
-
     const [mainWidth, setMainWidth] = useState(1200);
-    const [viewType, setViewType] = useState('mobile');
+    const [viewType, setViewType] = useState('desktop');
 
     useEffect(() => {
         const updateView = () => {
@@ -78,7 +84,7 @@ const Hero = () => {
             else setViewType('mobile');
 
             if (w < 1440) {
-                setMainWidth(Math.min(1200, w * 0.90));
+                setMainWidth(Math.min(1200, Math.round(w * 0.90)));
             } else {
                 setMainWidth(1200);
             }
@@ -87,14 +93,6 @@ const Hero = () => {
         window.addEventListener('resize', updateView);
         return () => window.removeEventListener('resize', updateView);
     }, []);
-
-    const displaySlides = [...slides.slice(-CLONES_AT_START), ...slides, ...slides.slice(0, CLONES_AT_START)];
-
-    useEffect(() => {
-        if (!heroVisible || window.innerWidth < 768) return;
-        const timer = setInterval(() => { next(); }, 5000);
-        return () => clearInterval(timer);
-    }, [heroVisible, slides.length]);
 
     useEffect(() => {
         (async () => {
@@ -108,195 +106,225 @@ const Hero = () => {
         })();
     }, []);
 
-    const handleTransitionEnd = () => {
-        if (currentIndex <= 1) {
-            setIsTransitioning(false);
-            setCurrentIndex(currentIndex + slides.length);
-        } else if (currentIndex >= slides.length + 2) {
-            setIsTransitioning(false);
-            setCurrentIndex(currentIndex - slides.length);
-        }
-    };
-
-    useEffect(() => {
-        if (!isTransitioning) {
-            const timeout = setTimeout(() => setIsTransitioning(true), 20);
-            return () => clearTimeout(timeout);
-        }
-    }, [isTransitioning]);
-
-    const prev = () => { if (!isTransitioning) return; setCurrentIndex(prev => prev - 1); };
-    const next = () => { if (!isTransitioning) return; setCurrentIndex(prev => prev + 1); };
-
-    const activeSlideIndex = (currentIndex - CLONES_AT_START + slides.length) % slides.length;
-
-    if (!heroVisible) return null;
-
-    const translateX = -(currentIndex * (SIDE_WIDTH + GAP) + mainWidth / 2);
-
     const slideHeight = viewType === 'tablet' ? 332 : 500;
     const trackHeight = viewType === 'tablet' ? 332 : 510;
 
+    const handlePrev = useCallback(() => {
+        if (desktopSwiperRef.current) {
+            desktopSwiperRef.current.slidePrev();
+        }
+    }, []);
+
+    const handleNext = useCallback(() => {
+        if (desktopSwiperRef.current) {
+            desktopSwiperRef.current.slideNext();
+        }
+    }, []);
+
+    const handleGoTo = useCallback((index) => {
+        if (desktopSwiperRef.current) {
+            desktopSwiperRef.current.slideToLoop(index);
+        }
+    }, []);
+
+    if (!heroVisible) return null;
+
     return (
         <section className="w-full mx-auto gap-[10px] overflow-x-clip md:pt-8 md:pb-8 md:px-4" style={{ background: 'var(--color-grey-grey-50, hsla(0, 0%, 96%, 1))' }}>
+            <style dangerouslySetInnerHTML={{
+                __html: `
+                .hero-desktop-swiper {
+                    overflow: visible !important;
+                }
+                .hero-desktop-swiper .swiper-wrapper {
+                    align-items: center;
+                }
+                .hero-mobile-swiper {
+                    overflow: visible !important;
+                }
+            `}} />
+
             {/* ── Mobile Hero ────────────────────────────────────────── */}
-            <div className="block md:hidden w-full" style={{ background: '#FFFFFF' }}>
-                <div
-                    className="flex overflow-x-auto snap-x snap-mandatory"
-                    style={{
-                        padding: '12px 20px',
-                        gap: '10px',
-                        height: '369px',
-                        width: '100%',
-                        boxSizing: 'border-box',
-                        scrollbarWidth: 'none',
-                        msOverflowStyle: 'none',
-                        WebkitOverflowScrolling: 'touch'
-                    }}
-                    onScroll={(e) => {
-                        const el = e.currentTarget;
-                        const cardW = 216 + 10;
-                        const idx = Math.round(el.scrollLeft / cardW);
-                        setCurrentIndex(idx);
-                    }}
-                >
-                    {slides.map((s, i) => (
-                        <Link
-                            href={s.ctaLink || s.slideLink || '/products'}
-                            key={i}
-                            className="snap-center shrink-0 relative overflow-hidden"
-                            style={{
-                                boxSizing: 'border-box',
-                                width: '216px',
-                                minWidth: '216px',
-                                height: '345px',
-                                background: s.bgGradient || s.bgColor || 'linear-gradient(100.45deg, #01A6EE 10.43%, #38BDF8 92.63%)',
-                                borderRadius: '12px',
-                                display: 'block',
-                                flexShrink: 0
-                            }}
-                        >
-                            {/* Cover Background Image if provided */}
-                            {s.bgImage && (
-                                <div className="absolute inset-0 w-full h-full z-0 pointer-events-none">
-                                    <Image
-                                        src={s.bgImage}
-                                        alt={s.title || ""}
-                                        fill
-                                        unoptimized
-                                        className="object-cover object-center w-full h-full rounded-[12px]"
-                                    />
-                                    <div className="absolute inset-0 bg-black/40 rounded-[12px]" />
-                                </div>
-                            )}
+            <div className="block md:hidden w-full overflow-hidden" style={{ background: '#FFFFFF' }}>
+                <div className="py-3 px-4">
+                    <Swiper
+                        modules={[Autoplay]}
+                        slidesPerView={'auto'}
+                        spaceBetween={10}
+                        loop={slides.length > 1}
+                        loopAdditionalSlides={2}
+                        grabCursor={true}
+                        speed={500}
+                        autoplay={{
+                            delay: 4500,
+                            disableOnInteraction: false,
+                        }}
+                        onSwiper={(swiper) => {
+                            mobileSwiperRef.current = swiper;
+                            setMobileActiveIndex(swiper.realIndex);
+                        }}
+                        onSlideChange={(swiper) => {
+                            setMobileActiveIndex(swiper.realIndex);
+                        }}
+                        className="w-full hero-mobile-swiper"
+                    >
+                        {slides.map((s, i) => {
+                            const mobileImg = s.bgImage || s.image;
+                            const mobileHref = s.ctaLink || s.slideLink || s.link || '/products';
+                            const hasMobileText = Boolean(s.title && s.subtitle);
 
-                            {/* Glow ellipse */}
-                            {!s.bgImage && (
-                                <div style={{
-                                    position: 'absolute',
-                                    width: '164px',
-                                    height: '164px',
-                                    right: '-40px',
-                                    top: '40px',
-                                    background: '#BAE6FD',
-                                    filter: 'blur(97px)',
-                                    pointerEvents: 'none',
-                                    zIndex: 0
-                                }} />
-                            )}
+                            return (
+                                <SwiperSlide
+                                    key={i}
+                                    style={{
+                                        width: '216px',
+                                        minWidth: '216px',
+                                        height: '345px',
+                                    }}
+                                    className="shrink-0"
+                                >
+                                    <Link
+                                        href={mobileHref}
+                                        className="relative overflow-hidden block w-full h-full select-none"
+                                        style={{
+                                            boxSizing: 'border-box',
+                                            width: '216px',
+                                            minWidth: '216px',
+                                            height: '345px',
+                                            background: s.bgGradient || s.bgColor || 'linear-gradient(100.45deg, #01A6EE 10.43%, #38BDF8 92.63%)',
+                                            borderRadius: '12px',
+                                            display: 'block',
+                                            flexShrink: 0
+                                        }}
+                                    >
+                                        {/* Cover Background Image if provided */}
+                                        {mobileImg && (
+                                            <div className="absolute inset-0 w-full h-full z-0 pointer-events-none">
+                                                <Image
+                                                    src={mobileImg}
+                                                    alt={s.title || "Hero banner"}
+                                                    fill
+                                                    unoptimized
+                                                    className="object-cover object-center w-full h-full rounded-[12px]"
+                                                />
+                                                {hasMobileText && (
+                                                    <div className="absolute inset-0 bg-black/40 rounded-[12px]" />
+                                                )}
+                                            </div>
+                                        )}
 
-                            {/* Product image (foreground) */}
-                            {(s.image || !s.bgImage) && (
-                                <div style={{
-                                    position: 'absolute',
-                                    width: '221px',
-                                    height: '221px',
-                                    left: '-6px',
-                                    top: '0px',
-                                    zIndex: 1,
-                                    pointerEvents: 'none'
-                                }}>
-                                    <Image
-                                        src={s.image || FALLBACK_SLIDES[0].image}
-                                        alt={s.title}
-                                        fill
-                                        unoptimized
-                                        className="object-contain object-center"
-                                    />
-                                </div>
-                            )}
+                                        {/* Glow ellipse for slides without cover image */}
+                                        {!mobileImg && (
+                                            <div style={{
+                                                position: 'absolute',
+                                                width: '164px',
+                                                height: '164px',
+                                                right: '-40px',
+                                                top: '40px',
+                                                background: '#BAE6FD',
+                                                filter: 'blur(97px)',
+                                                pointerEvents: 'none',
+                                                zIndex: 0
+                                            }} />
+                                        )}
 
-                            {/* Text block — bottom */}
-                            <div style={{
-                                position: 'absolute',
-                                left: '13px',
-                                bottom: '16px',
-                                width: '193px',
-                                display: 'flex',
-                                flexDirection: 'column',
-                                alignItems: 'flex-start',
-                                gap: '4px',
-                                zIndex: 3
-                            }}>
-                                <p style={{
-                                    fontFamily: "'Mona Sans', sans-serif",
-                                    fontWeight: 600,
-                                    fontSize: '12px',
-                                    lineHeight: '18px',
-                                    letterSpacing: '-0.4px',
-                                    color: s.textColor || '#FFFFFF',
-                                    margin: 0,
-                                    width: '152px'
-                                }}>
-                                    {s.title}
-                                </p>
-                                <p style={{
-                                    fontFamily: "'Mona Sans', sans-serif",
-                                    fontWeight: 400,
-                                    fontSize: '8px',
-                                    lineHeight: '14px',
-                                    letterSpacing: '-0.4px',
-                                    color: s.textColor || '#FFFFFF',
-                                    margin: 0,
-                                    width: '193px'
-                                }}>
-                                    {s.subtitle}
-                                </p>
+                                        {/* Product image (foreground) if fallback slide */}
+                                        {!mobileImg && s.image && (
+                                            <div style={{
+                                                position: 'absolute',
+                                                width: '221px',
+                                                height: '221px',
+                                                left: '-6px',
+                                                top: '0px',
+                                                zIndex: 1,
+                                                pointerEvents: 'none'
+                                            }}>
+                                                <Image
+                                                    src={s.image || FALLBACK_SLIDES[0].image}
+                                                    alt={s.title || ""}
+                                                    fill
+                                                    unoptimized
+                                                    className="object-contain object-center"
+                                                />
+                                            </div>
+                                        )}
 
-                                {/* Yellow CTA button */}
-                                <div style={{
-                                    display: 'inline-flex',
-                                    flexDirection: 'row',
-                                    justifyContent: 'center',
-                                    alignItems: 'center',
-                                    padding: '2.42px 4.84px 2.42px 7.26px',
-                                    gap: '1.21px',
-                                    width: 'auto',
-                                    minWidth: '58px',
-                                    height: '18px',
-                                    background: '#FFCF46',
-                                    borderRadius: '17.41px',
-                                    marginTop: '4px'
-                                }}>
-                                    <span style={{
-                                        fontFamily: "'Mona Sans', sans-serif",
-                                        fontWeight: 800,
-                                        fontSize: '7.46px',
-                                        lineHeight: '8px',
-                                        letterSpacing: '-0.24px',
-                                        color: '#1F1F1F',
-                                        whiteSpace: 'nowrap'
-                                    }}>
-                                        {s.ctaText || 'Rent Now'}
-                                    </span>
-                                    <svg width="9.68" height="9.68" viewBox="0 0 24 24" fill="none" stroke="#1F1F1F" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
-                                        <line x1="5" y1="12" x2="19" y2="12" />
-                                        <polyline points="12 5 19 12 12 19" />
-                                    </svg>
-                                </div>
-                            </div>
-                        </Link>
-                    ))}
+                                        {/* Text block — bottom (only if title and subtitle are present) */}
+                                        {hasMobileText && (
+                                            <div style={{
+                                                position: 'absolute',
+                                                left: '13px',
+                                                bottom: '16px',
+                                                width: '193px',
+                                                display: 'flex',
+                                                flexDirection: 'column',
+                                                alignItems: 'flex-start',
+                                                gap: '4px',
+                                                zIndex: 3
+                                            }}>
+                                                <p style={{
+                                                    fontFamily: "'Mona Sans', sans-serif",
+                                                    fontWeight: 600,
+                                                    fontSize: '12px',
+                                                    lineHeight: '18px',
+                                                    letterSpacing: '-0.4px',
+                                                    color: s.textColor || '#FFFFFF',
+                                                    margin: 0,
+                                                    width: '152px'
+                                                }}>
+                                                    {s.title}
+                                                </p>
+                                                <p style={{
+                                                    fontFamily: "'Mona Sans', sans-serif",
+                                                    fontWeight: 400,
+                                                    fontSize: '8px',
+                                                    lineHeight: '14px',
+                                                    letterSpacing: '-0.4px',
+                                                    color: s.textColor || '#FFFFFF',
+                                                    margin: 0,
+                                                    width: '193px'
+                                                }}>
+                                                    {s.subtitle}
+                                                </p>
+
+                                                {/* Yellow CTA button */}
+                                                <div style={{
+                                                    display: 'inline-flex',
+                                                    flexDirection: 'row',
+                                                    justifyContent: 'center',
+                                                    alignItems: 'center',
+                                                    padding: '2.42px 4.84px 2.42px 7.26px',
+                                                    gap: '1.21px',
+                                                    width: 'auto',
+                                                    minWidth: '58px',
+                                                    height: '18px',
+                                                    background: '#FFCF46',
+                                                    borderRadius: '17.41px',
+                                                    marginTop: '4px'
+                                                }}>
+                                                    <span style={{
+                                                        fontFamily: "'Mona Sans', sans-serif",
+                                                        fontWeight: 800,
+                                                        fontSize: '7.46px',
+                                                        lineHeight: '8px',
+                                                        letterSpacing: '-0.24px',
+                                                        color: '#1F1F1F',
+                                                        whiteSpace: 'nowrap'
+                                                    }}>
+                                                        {s.ctaText || 'Rent Now'}
+                                                    </span>
+                                                    <svg width="9.68" height="9.68" viewBox="0 0 24 24" fill="none" stroke="#1F1F1F" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
+                                                        <line x1="5" y1="12" x2="19" y2="12" />
+                                                        <polyline points="12 5 19 12 12 19" />
+                                                    </svg>
+                                                </div>
+                                            </div>
+                                        )}
+                                    </Link>
+                                </SwiperSlide>
+                            );
+                        })}
+                    </Swiper>
                 </div>
 
                 {/* Dot indicators */}
@@ -310,14 +338,20 @@ const Hero = () => {
                     width: '100%'
                 }}>
                     {slides.map((_, i) => (
-                        <div
+                        <button
                             key={i}
+                            type="button"
+                            aria-label={`Go to slide ${i + 1}`}
+                            onClick={() => mobileSwiperRef.current?.slideToLoop(i)}
                             style={{
                                 width: '8px',
                                 height: '8px',
                                 borderRadius: '50%',
-                                background: i === (currentIndex % slides.length) ? '#545454' : '#CBCBCB',
-                                transition: 'background 0.3s'
+                                background: i === mobileActiveIndex ? '#545454' : '#CBCBCB',
+                                transition: 'background 0.3s',
+                                border: 'none',
+                                padding: 0,
+                                cursor: 'pointer'
                             }}
                         />
                     ))}
@@ -326,7 +360,7 @@ const Hero = () => {
 
             {/* Tablet / Desktop View */}
             <div
-                className={`${viewType === 'mobile' ? 'hidden' : 'flex'} flex-col items-center w-full relative group`}
+                className="hidden md:flex flex-col items-center w-full relative group"
                 style={{
                     minHeight: viewType === 'tablet' ? '380px' : '530px',
                     paddingTop: viewType === 'tablet' ? '24px' : '0px',
@@ -340,29 +374,53 @@ const Hero = () => {
                     className="relative w-full flex items-center justify-center overflow-visible"
                     style={{ height: `${trackHeight}px` }}
                 >
-                    <div
-                        onTransitionEnd={handleTransitionEnd}
-                        className={`flex absolute left-1/2 items-center ${isTransitioning ? 'transition-all duration-700 ease-[cubic-bezier(0.25,1,0.5,1)]' : 'transition-none'}`}
-                        style={{
-                            height: `${slideHeight}px`,
-                            transform: `translateX(${translateX}px)`,
-                            gap: `${GAP}px`
+                    <Swiper
+                        modules={[Navigation, Autoplay, Pagination]}
+                        centeredSlides={true}
+                        slidesPerView={'auto'}
+                        spaceBetween={GAP}
+                        loop={slides.length > 1}
+                        loopAdditionalSlides={2}
+                        slideToClickedSlide={true}
+                        grabCursor={true}
+                        speed={650}
+                        autoplay={{
+                            delay: 5000,
+                            disableOnInteraction: false,
+                            pauseOnMouseEnter: true,
                         }}
+                        onSwiper={(swiper) => {
+                            desktopSwiperRef.current = swiper;
+                            setActiveSlideIndex(swiper.realIndex);
+                        }}
+                        onSlideChange={(swiper) => {
+                            setActiveSlideIndex(swiper.realIndex);
+                        }}
+                        className="w-full hero-desktop-swiper !overflow-visible"
+                        style={{ height: `${slideHeight}px` }}
                     >
-                        {displaySlides.map((s, idx) => {
-                            const isCurrent = idx === currentIndex;
-                            return (
-                                <SlideItem
-                                    key={idx}
-                                    slide={s}
-                                    width={isCurrent ? `${mainWidth}px` : `${SIDE_WIDTH}px`}
-                                    isActive={isCurrent}
-                                    viewType={viewType}
-                                    slideHeight={slideHeight}
-                                />
-                            );
-                        })}
-                    </div>
+                        {slides.map((s, idx) => (
+                            <SwiperSlide
+                                key={idx}
+                                style={{
+                                    width: `${mainWidth}px`,
+                                    maxWidth: '90vw',
+                                    height: `${slideHeight}px`,
+                                }}
+                                className="shrink-0 flex items-center justify-center select-none"
+                            >
+                                {({ isActive }) => (
+                                    <SlideItem
+                                        slide={s}
+                                        width="100%"
+                                        isActive={isActive}
+                                        viewType={viewType}
+                                        slideHeight={slideHeight}
+                                    />
+                                )}
+                            </SwiperSlide>
+                        ))}
+                    </Swiper>
 
                     {/* Navigation Arrows */}
                     <div
@@ -370,16 +428,20 @@ const Hero = () => {
                         style={{ width: `${mainWidth + GAP + 60}px` }}
                     >
                         <button
-                            onClick={prev}
+                            type="button"
+                            onClick={handlePrev}
+                            aria-label="Previous slide"
                             style={{ boxShadow: '0px 8px 2px 0px rgba(133,133,133,0), 0px 5px 2px 0px rgba(133,133,133,0.01), 0px 3px 2px 0px rgba(133,133,133,0.05), 0px 1px 1px 0px rgba(133,133,133,0.09), 0px 0px 1px 0px rgba(133,133,133,0.1)' }}
-                            className="pointer-events-auto w-[26px] h-[40px] rounded-[9px] flex items-center justify-center bg-[hsla(0,0%,93%,1)] hover:bg-[hsla(0,0%,85%,1)] active:scale-95 transition-all opacity-100 group/btn"
+                            className="pointer-events-auto w-[26px] h-[40px] rounded-[9px] flex items-center justify-center bg-[hsla(0,0%,93%,1)] hover:bg-[hsla(0,0%,85%,1)] active:scale-95 transition-all opacity-100 group/btn cursor-pointer"
                         >
                             <ChevronLeftIcon strokeWidth={2.5} className="w-5 h-5 text-gray-800 group-hover/btn:text-gray-900 transition-colors" />
                         </button>
                         <button
-                            onClick={next}
+                            type="button"
+                            onClick={handleNext}
+                            aria-label="Next slide"
                             style={{ boxShadow: '0px 8px 2px 0px rgba(133,133,133,0), 0px 5px 2px 0px rgba(133,133,133,0.01), 0px 3px 2px 0px rgba(133,133,133,0.05), 0px 1px 1px 0px rgba(133,133,133,0.09), 0px 0px 1px 0px rgba(133,133,133,0.1)' }}
-                            className="pointer-events-auto w-[26px] h-[40px] rounded-[9px] flex items-center justify-center bg-[hsla(0,0%,93%,1)] hover:bg-[hsla(0,0%,85%,1)] active:scale-95 transition-all opacity-100 group/btn"
+                            className="pointer-events-auto w-[26px] h-[40px] rounded-[9px] flex items-center justify-center bg-[hsla(0,0%,93%,1)] hover:bg-[hsla(0,0%,85%,1)] active:scale-95 transition-all opacity-100 group/btn cursor-pointer"
                         >
                             <ChevronRightIcon strokeWidth={2.5} className="w-5 h-5 text-gray-800 group-hover/btn:text-gray-900 transition-colors" />
                         </button>
@@ -391,8 +453,10 @@ const Hero = () => {
                             {slides.map((_, i) => (
                                 <button
                                     key={i}
-                                    onClick={() => isTransitioning && setCurrentIndex(i + CLONES_AT_START)}
-                                    className={`transition-all duration-300 rounded-full ${i === activeSlideIndex
+                                    type="button"
+                                    aria-label={`Go to slide ${i + 1}`}
+                                    onClick={() => handleGoTo(i)}
+                                    className={`transition-all duration-300 rounded-full cursor-pointer ${i === activeSlideIndex
                                         ? "w-[36px] h-[8px] bg-white shadow-md active:scale-95"
                                         : "w-[8px] h-[8px] bg-white/40 hover:bg-white/60 hover:scale-110 active:scale-90"
                                         }`}
@@ -411,91 +475,65 @@ const SlideItem = ({ slide, isActive, width, viewType, slideHeight }) => {
     const bgPicture = slide.bgImage || slide.image;
     const isCustomCover = Boolean(bgPicture);
     const heroImg = slide.image || slide.bgImage || "https://res.cloudinary.com/dgkckcdk8/image/upload/v1769946716/indian-rentals/fj8ptqbhppbstdd0hs4i.png";
-    const targetHref = slide.ctaLink || slide.slideLink || "/products";
+    const targetHref = slide.ctaLink || slide.slideLink || slide.link || "/products";
+    const hasTextOverlay = Boolean(slide.title && slide.subtitle);
 
     const desktopContent = (
-        <div className="w-full h-full relative overflow-hidden">
+        <div className="w-full h-full relative overflow-hidden rounded-[24px]">
             {/* Cover Background Image (Cover-to-Cover) */}
             {isCustomCover && (
                 <div className="absolute inset-0 w-full h-full z-0 pointer-events-none overflow-hidden rounded-[24px]">
                     <Image
                         src={bgPicture}
-                        alt={slide.title || "Hero Banner Background"}
+                        alt={slide.title || "Hero Banner"}
                         fill
                         unoptimized
                         className="object-cover object-center w-full h-full"
+                        priority={isActive}
                     />
-                    <div
-                        className="absolute inset-0 w-full h-full rounded-[24px]"
-                        style={{
-                            background: 'linear-gradient(to right, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.2) 60%, transparent 100%)'
-                        }}
-                    />
+                    {hasTextOverlay && (
+                        <div
+                            className="absolute inset-0 w-full h-full rounded-[24px]"
+                            style={{
+                                background: 'linear-gradient(to right, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.2) 60%, transparent 100%)'
+                            }}
+                        />
+                    )}
                 </div>
             )}
 
-            {/* Left: Text */}
-            <div
-                className={`absolute z-10 transition-all duration-700 ${isActive ? 'opacity-100 translate-y-0 blur-0' : 'opacity-30 -translate-y-4 blur-[1px]'}`}
-                style={{ left: '6.75%', top: '23%', width: '49.9%', color: slide.textColor || '#fff', display: 'flex', flexDirection: 'column', gap: '16px' }}
-            >
-                <h1 style={{ fontFamily: "'Mona Sans', sans-serif", fontSize: '47px', fontWeight: 600, lineHeight: '58px', letterSpacing: '-1.5px', maxWidth: '594px' }}>
-                    {slide.title}
-                </h1>
-                <p style={{ fontFamily: "'Mona Sans', sans-serif", fontSize: '18px', fontWeight: 600, lineHeight: '25px', letterSpacing: '-0.8px', maxWidth: '599px' }}>
-                    {slide.subtitle}
-                </p>
-                <div>
-                    <div
-                        className="btn-primary inline-flex shadow-lg"
-                        style={{ fontFamily: "'Mona Sans', sans-serif", fontWeight: 500, color: '#333333', fontSize: '16px', lineHeight: '23px' }}
-                    >
-                        {(slide.ctaText || "Rent Now").replace(/ [^\w\s]+.*$| [→➔➜]|^.*[→➔➜]$| \->/g, "").trim()}
-                    </div>
-                </div>
-            </div>
-
-            {/* Glow ellipse behind foreground image */}
-            {!isCustomCover && (
+            {/* Left: Text - only displayed if both title & subtitle are configured */}
+            {hasTextOverlay && (
                 <div
-                    className="absolute rounded-full pointer-events-none"
-                    style={{ left: '78.5%', top: '58.8%', width: '28.58%', aspectRatio: '1 / 1', background: '#BAE6FD', filter: 'blur(97px)', opacity: 0.75, zIndex: 0 }}
-                />
-            )}
-
-            {/* Foreground image reflection & image (if both bg & fg images exist) */}
-            {slide.bgImage && slide.image && (
-                <>
-                    <div
-                        className={`absolute pointer-events-none overflow-hidden transition-all duration-700 ${isActive ? 'opacity-100 blur-0' : 'opacity-30 blur-[1px]'}`}
-                        style={{ left: '52.5%', top: '54%', width: '45.17%', height: '67.2%', zIndex: 1, opacity: 0.59, filter: 'blur(3px)', WebkitMaskImage: 'linear-gradient(to bottom, #000 0%, rgba(0,0,0,0) 100%)', maskImage: 'linear-gradient(to bottom, #000 0%, rgba(0,0,0,0) 100%)' }}
-                    >
-                        <div className="absolute left-0 top-0 w-full" style={{ height: '161.3%', transform: 'scaleY(-1)' }}>
-                            <Image src={heroImg} alt="" fill unoptimized aria-hidden="true" className="object-contain object-center" />
+                    className={`absolute z-10 transition-all duration-700 ${isActive ? 'opacity-100 translate-y-0 blur-0' : 'opacity-30 -translate-y-4 blur-[1px]'}`}
+                    style={{ left: '6.75%', top: '23%', width: '49.9%', color: slide.textColor || '#fff', display: 'flex', flexDirection: 'column', gap: '16px' }}
+                >
+                    <h1 style={{ fontFamily: "'Mona Sans', sans-serif", fontSize: '47px', fontWeight: 600, lineHeight: '58px', letterSpacing: '-1.5px', maxWidth: '594px' }}>
+                        {slide.title}
+                    </h1>
+                    <p style={{ fontFamily: "'Mona Sans', sans-serif", fontSize: '18px', fontWeight: 600, lineHeight: '25px', letterSpacing: '-0.8px', maxWidth: '599px' }}>
+                        {slide.subtitle}
+                    </p>
+                    {slide.ctaText && (
+                        <div>
+                            <div
+                                className="btn-primary inline-flex shadow-lg"
+                                style={{ fontFamily: "'Mona Sans', sans-serif", fontWeight: 500, color: '#333333', fontSize: '16px', lineHeight: '23px' }}
+                            >
+                                {slide.ctaText.replace(/ [^\w\s]+.*$| [→➔➜]|^.*[→➔➜]$| \->/g, "").trim()}
+                            </div>
                         </div>
-                    </div>
-
-                    <div
-                        className={`absolute transition-all duration-700 ${isActive ? 'opacity-100 scale-100 blur-0' : 'opacity-30 scale-90 blur-[1px]'}`}
-                        style={{ left: '52.33%', top: '-2.6%', width: '45.17%', height: '108.4%', zIndex: 2 }}
-                    >
-                        <Image src={heroImg} alt={slide.title || ""} fill unoptimized className="object-contain object-center drop-shadow-[0_25px_25px_rgba(0,0,0,0.25)]" />
-                    </div>
-                </>
+                    )}
+                </div>
             )}
 
-            {/* Standard fallback single image positioning */}
+            {/* Fallback styling for slides without custom banner image */}
             {!isCustomCover && (
                 <>
                     <div
-                        className={`absolute pointer-events-none overflow-hidden transition-all duration-700 ${isActive ? 'opacity-100 blur-0' : 'opacity-30 blur-[1px]'}`}
-                        style={{ left: '52.5%', top: '54%', width: '45.17%', height: '67.2%', zIndex: 1, opacity: 0.59, filter: 'blur(3px)', WebkitMaskImage: 'linear-gradient(to bottom, #000 0%, rgba(0,0,0,0) 100%)', maskImage: 'linear-gradient(to bottom, #000 0%, rgba(0,0,0,0) 100%)' }}
-                    >
-                        <div className="absolute left-0 top-0 w-full" style={{ height: '161.3%', transform: 'scaleY(-1)' }}>
-                            <Image src={heroImg} alt="" fill unoptimized aria-hidden="true" className="object-contain object-center" />
-                        </div>
-                    </div>
-
+                        className="absolute rounded-full pointer-events-none"
+                        style={{ left: '78.5%', top: '58.8%', width: '28.58%', aspectRatio: '1 / 1', background: '#BAE6FD', filter: 'blur(97px)', opacity: 0.75, zIndex: 0 }}
+                    />
                     <div
                         className={`absolute transition-all duration-700 ${isActive ? 'opacity-100 scale-100 blur-0' : 'opacity-30 scale-90 blur-[1px]'}`}
                         style={{ left: '52.33%', top: '-2.6%', width: '45.17%', height: '108.4%', zIndex: 2 }}
@@ -508,90 +546,96 @@ const SlideItem = ({ slide, isActive, width, viewType, slideHeight }) => {
     );
 
     const content = (
-        <div className="w-full h-full px-16 grid grid-cols-[1.2fr_0.8fr] gap-4 items-center relative overflow-hidden">
+        <div className="w-full h-full relative overflow-hidden rounded-[24px]">
             {/* Cover Background Image (Cover-to-Cover) */}
             {isCustomCover && (
-                <div className="absolute inset-0 w-full h-full z-0 pointer-events-none overflow-hidden">
+                <div className="absolute inset-0 w-full h-full z-0 pointer-events-none overflow-hidden rounded-[24px]">
                     <Image
                         src={bgPicture}
-                        alt={slide.title || ""}
+                        alt={slide.title || "Hero Banner"}
                         fill
                         unoptimized
                         className="object-cover object-center w-full h-full"
+                        priority={isActive}
                     />
-                    <div className="absolute inset-0 bg-black/40" />
+                    {hasTextOverlay && (
+                        <div className="absolute inset-0 bg-black/40 rounded-[24px]" />
+                    )}
                 </div>
             )}
 
-            {/* Left: Text */}
-            <div
-                className={`z-10 transition-all duration-700 ${isActive ? 'opacity-100 translate-y-0 scale-100 blur-0' : 'opacity-30 -translate-y-4 scale-95 origin-left blur-[1px]'}`}
-                style={{ color: slide.textColor || "#fff", display: 'flex', flexDirection: 'column', gap: isTablet ? '8px' : '16px' }}
-            >
-                <h1
-                    className="tracking-tight"
-                    style={{
-                        width: viewType === 'desktop' ? '594px' : '100%',
-                        maxWidth: viewType === 'desktop' ? '594px' : (isTablet ? '420px' : '480px'),
-                        fontFamily: "'Mona Sans', sans-serif",
-                        fontSize: viewType === 'desktop' ? "47px" : (isTablet ? "32px" : "36px"),
-                        fontWeight: 600,
-                        lineHeight: viewType === 'desktop' ? "58px" : (isTablet ? "38px" : "42px"),
-                        letterSpacing: viewType === 'desktop' ? "-1.5px" : "-0.01em",
-                    }}
-                >
-                    {slide.title}
-                </h1>
-                <p
-                    className="leading-relaxed"
-                    style={{
-                        fontFamily: "'Mona Sans', sans-serif",
-                        fontSize: viewType === 'desktop' ? "18px" : (isTablet ? "12px" : "14px"),
-                        fontWeight: viewType === 'desktop' ? 600 : 400,
-                        maxWidth: viewType === 'desktop' ? "599px" : (isTablet ? "380px" : "520px"),
-                        lineHeight: viewType === 'desktop' ? "25px" : (isTablet ? "18px" : "22px"),
-                        letterSpacing: viewType === 'desktop' ? "-0.8px" : "-0.01em",
-                    }}
-                >
-                    {slide.subtitle}
-                </p>
-                <div>
+            {/* Text only if title and subtitle are present */}
+            {hasTextOverlay && (
+                <div className="w-full h-full px-16 grid grid-cols-[1.2fr_0.8fr] gap-4 items-center relative z-10">
                     <div
-                        className={`btn-primary inline-flex shadow-lg ${isTablet ? 'px-8 py-2' : 'px-10 py-3'}`}
-                        style={{
-                            fontFamily: "'Mona Sans', sans-serif",
-                            fontWeight: 500,
-                            color: "#333333",
-                            fontSize: viewType === 'desktop' ? "16px" : "14px",
-                            lineHeight: "23px"
-                        }}
+                        className={`z-10 transition-all duration-700 ${isActive ? 'opacity-100 translate-y-0 scale-100 blur-0' : 'opacity-30 -translate-y-4 scale-95 origin-left blur-[1px]'}`}
+                        style={{ color: slide.textColor || "#fff", display: 'flex', flexDirection: 'column', gap: isTablet ? '8px' : '16px' }}
                     >
-                        {(slide.ctaText || "Rent Now").replace(/ [^\w\s]+.*$| [→➔➜]|^.*[→➔➜]$| \->/g, "").trim()}
+                        <h1
+                            className="tracking-tight"
+                            style={{
+                                width: '100%',
+                                maxWidth: isTablet ? '420px' : '480px',
+                                fontFamily: "'Mona Sans', sans-serif",
+                                fontSize: isTablet ? "32px" : "36px",
+                                lineHeight: isTablet ? "38px" : "42px",
+                                letterSpacing: "-0.01em",
+                                fontWeight: 600,
+                            }}
+                        >
+                            {slide.title}
+                        </h1>
+                        <p
+                            className="leading-relaxed"
+                            style={{
+                                fontFamily: "'Mona Sans', sans-serif",
+                                fontSize: isTablet ? "12px" : "14px",
+                                fontWeight: 400,
+                                maxWidth: isTablet ? "380px" : "520px",
+                                lineHeight: isTablet ? "18px" : "22px",
+                                letterSpacing: "-0.01em",
+                            }}
+                        >
+                            {slide.subtitle}
+                        </p>
+                        {slide.ctaText && (
+                            <div>
+                                <div
+                                    className={`btn-primary inline-flex shadow-lg ${isTablet ? 'px-8 py-2' : 'px-10 py-3'}`}
+                                    style={{
+                                        fontFamily: "'Mona Sans', sans-serif",
+                                        fontWeight: 500,
+                                        color: "#333333",
+                                        fontSize: "14px",
+                                        lineHeight: "23px"
+                                    }}
+                                >
+                                    {slide.ctaText.replace(/ [^\w\s]+.*$| [→➔➜]|^.*[→➔➜]$| \->/g, "").trim()}
+                                </div>
+                            </div>
+                        )}
                     </div>
                 </div>
-            </div>
+            )}
 
-            {/* Right: Image */}
-            {(!isCustomCover || (slide.bgImage && slide.image)) && (
+            {/* Fallback image if no custom cover */}
+            {!isCustomCover && (
                 <div
                     className={`relative z-10 w-full flex flex-col items-center justify-end transition-all duration-700 ${isActive ? 'opacity-100 scale-105 blur-0' : 'opacity-30 scale-90 blur-[1px]'}`}
                     style={{ height: isTablet ? '280px' : '440px' }}
                 >
-                    {!isCustomCover && (
-                        <div
-                            className="absolute rounded-full pointer-events-none"
-                            style={{
-                                width: isTablet ? '230px' : '343px',
-                                height: isTablet ? '230px' : '343px',
-                                background: '#BAE6FD',
-                                filter: 'blur(97px)',
-                                opacity: 0.75,
-                                bottom: isTablet ? '10px' : '40px',
-                                zIndex: 0,
-                            }}
-                        />
-                    )}
-
+                    <div
+                        className="absolute rounded-full pointer-events-none"
+                        style={{
+                            width: isTablet ? '230px' : '343px',
+                            height: isTablet ? '230px' : '343px',
+                            background: '#BAE6FD',
+                            filter: 'blur(97px)',
+                            opacity: 0.75,
+                            bottom: isTablet ? '10px' : '40px',
+                            zIndex: 0,
+                        }}
+                    />
                     <div className="relative w-full" style={{ height: isTablet ? '74%' : '76%', zIndex: 1 }}>
                         <Image
                             src={heroImg}

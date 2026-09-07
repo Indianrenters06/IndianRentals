@@ -271,12 +271,13 @@ export default function AdminLogin() {
                           autoComplete="new-password"
                           name="admin-pass-nofill"
                           required
-                          className="w-full h-14 pl-11 pr-11 rounded-xl bg-slate-50 dark:bg-slate-950/50 border-2 border-slate-200 dark:border-white/5 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-600 font-medium tracking-widest text-sm focus:outline-none focus:bg-white dark:focus:bg-slate-900/50 focus:border-indigo-500 hover:border-slate-300 dark:hover:border-white/10 transition-colors"
+                          className={`w-full h-14 pl-11 pr-12 rounded-xl bg-slate-50 dark:bg-slate-950/50 border-2 border-slate-200 dark:border-white/5 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-600 font-medium ${showPassword ? 'tracking-normal text-base' : 'tracking-widest text-sm'} focus:outline-none focus:bg-white dark:focus:bg-slate-900/50 focus:border-indigo-500 hover:border-slate-300 dark:hover:border-white/10 transition-colors`}
                         />
                         <button
                           type="button"
                           onClick={() => setShowPassword(!showPassword)}
-                          className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-indigo-500 transition-colors"
+                          aria-label={showPassword ? "Hide password" : "Show password"}
+                          className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-indigo-500 dark:hover:text-indigo-400 transition-colors cursor-pointer z-10 p-1 flex items-center justify-center focus:outline-none"
                         >
                           {showPassword ? <EyeSlash size={20} weight="bold" /> : <Eye size={20} weight="bold" />}
                         </button>
@@ -388,12 +389,13 @@ export default function AdminLogin() {
                           value={newPassword}
                           onChange={(e) => setNewPassword(e.target.value)}
                           required
-                          className="w-full h-14 pl-11 pr-11 rounded-xl bg-slate-50 dark:bg-slate-950/50 border-2 border-slate-200 dark:border-white/5 text-slate-900 dark:text-white placeholder:text-slate-400 font-medium focus:outline-none focus:border-indigo-500 transition-colors"
+                          className={`w-full h-14 pl-11 pr-12 rounded-xl bg-slate-50 dark:bg-slate-950/50 border-2 border-slate-200 dark:border-white/5 text-slate-900 dark:text-white placeholder:text-slate-400 font-medium ${showNewPassword ? 'tracking-normal text-base' : 'tracking-widest text-sm'} focus:outline-none focus:border-indigo-500 transition-colors`}
                         />
                         <button
                           type="button"
                           onClick={() => setShowNewPassword(!showNewPassword)}
-                          className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-indigo-500 transition-colors"
+                          aria-label={showNewPassword ? "Hide password" : "Show password"}
+                          className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-indigo-500 dark:hover:text-indigo-400 transition-colors cursor-pointer z-10 p-1 flex items-center justify-center focus:outline-none"
                         >
                           {showNewPassword ? <EyeSlash size={20} weight="bold" /> : <Eye size={20} weight="bold" />}
                         </button>
@@ -409,12 +411,13 @@ export default function AdminLogin() {
                           value={confirmPassword}
                           onChange={(e) => setConfirmPassword(e.target.value)}
                           required
-                          className="w-full h-14 pl-11 pr-11 rounded-xl bg-slate-50 dark:bg-slate-950/50 border-2 border-slate-200 dark:border-white/5 text-slate-900 dark:text-white placeholder:text-slate-400 font-medium focus:outline-none focus:border-indigo-500 transition-colors"
+                          className={`w-full h-14 pl-11 pr-12 rounded-xl bg-slate-50 dark:bg-slate-950/50 border-2 border-slate-200 dark:border-white/5 text-slate-900 dark:text-white placeholder:text-slate-400 font-medium ${showConfirmPassword ? 'tracking-normal text-base' : 'tracking-widest text-sm'} focus:outline-none focus:border-indigo-500 transition-colors`}
                         />
                         <button
                           type="button"
                           onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                          className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-indigo-500 transition-colors"
+                          aria-label={showConfirmPassword ? "Hide password" : "Show password"}
+                          className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-indigo-500 dark:hover:text-indigo-400 transition-colors cursor-pointer z-10 p-1 flex items-center justify-center focus:outline-none"
                         >
                           {showConfirmPassword ? <EyeSlash size={20} weight="bold" /> : <Eye size={20} weight="bold" />}
                         </button>
