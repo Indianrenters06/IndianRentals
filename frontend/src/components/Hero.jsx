@@ -1,7 +1,7 @@
 "use client";
 import Image from "next/image";
 import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/outline";
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import Link from "next/link";
 import { API } from "@/services/apiConfig";
 
@@ -76,6 +76,17 @@ const Hero = () => {
     const [mainWidth, setMainWidth] = useState(1200);
     const [viewType, setViewType] = useState('desktop');
 
+    // Multiply slides to guarantee Swiper loop clone pool never starves or stops at the end
+    const displaySlides = useMemo(() => {
+        if (!slides || slides.length === 0) return [];
+        if (slides.length === 1) return slides;
+        let list = [...slides];
+        while (list.length < 12) {
+            list = [...list, ...slides];
+        }
+        return list;
+    }, [slides]);
+
     useEffect(() => {
         const updateView = () => {
             const w = window.innerWidth;
@@ -121,11 +132,23 @@ const Hero = () => {
         }
     }, []);
 
-    const handleGoTo = useCallback((index) => {
-        if (desktopSwiperRef.current) {
-            desktopSwiperRef.current.slideToLoop(index);
-        }
-    }, []);
+    const handleGoTo = useCallback((targetIndex) => {
+        if (!desktopSwiperRef.current || slides.length === 0) return;
+        const swiper = desktopSwiperRef.current;
+        const currentReal = swiper.realIndex;
+        const currentMod = currentReal % slides.length;
+        const diff = targetIndex - currentMod;
+        swiper.slideTo(swiper.activeIndex + diff);
+    }, [slides.length]);
+
+    const handleMobileGoTo = useCallback((targetIndex) => {
+        if (!mobileSwiperRef.current || slides.length === 0) return;
+        const swiper = mobileSwiperRef.current;
+        const currentReal = swiper.realIndex;
+        const currentMod = currentReal % slides.length;
+        const diff = targetIndex - currentMod;
+        swiper.slideTo(swiper.activeIndex + diff);
+    }, [slides.length]);
 
     if (!heroVisible) return null;
 
@@ -148,16 +171,19 @@ const Hero = () => {
             <div className="block md:hidden w-full overflow-hidden" style={{ background: '#FFFFFF' }}>
                 <div className="py-3 px-4">
                     <Swiper
+                        key={`hero-mobile-${displaySlides.length}-${slides.length}`}
                         modules={[Autoplay]}
                         slidesPerView={'auto'}
                         spaceBetween={10}
-                        loop={slides.length > 1}
-                        loopAdditionalSlides={2}
+                        loop={displaySlides.length > 1}
+                        loopAdditionalSlides={4}
+                        loopAddBlankSlides={true}
                         grabCursor={true}
                         speed={500}
                         autoplay={{
-                            delay: 4500,
+                            delay: 4000,
                             disableOnInteraction: false,
+                            pauseOnMouseEnter: false,
                         }}
                         onSwiper={(swiper) => {
                             mobileSwiperRef.current = swiper;
@@ -168,14 +194,14 @@ const Hero = () => {
                         }}
                         className="w-full hero-mobile-swiper"
                     >
-                        {slides.map((s, i) => {
+                        {displaySlides.map((s, i) => {
                             const mobileImg = s.bgImage || s.image;
                             const mobileHref = s.ctaLink || s.slideLink || s.link || '/products';
                             const hasMobileText = Boolean(s.title && s.subtitle);
 
                             return (
                                 <SwiperSlide
-                                    key={i}
+                                    key={`mobile-${i}`}
                                     style={{
                                         width: '216px',
                                         minWidth: '216px',
@@ -342,12 +368,12 @@ const Hero = () => {
                             key={i}
                             type="button"
                             aria-label={`Go to slide ${i + 1}`}
-                            onClick={() => mobileSwiperRef.current?.slideToLoop(i)}
+                            onClick={() => handleMobileGoTo(i)}
                             style={{
                                 width: '8px',
                                 height: '8px',
                                 borderRadius: '50%',
-                                background: i === mobileActiveIndex ? '#545454' : '#CBCBCB',
+                                background: i === (mobileActiveIndex % slides.length) ? '#545454' : '#CBCBCB',
                                 transition: 'background 0.3s',
                                 border: 'none',
                                 padding: 0,
@@ -375,19 +401,21 @@ const Hero = () => {
                     style={{ height: `${trackHeight}px` }}
                 >
                     <Swiper
+                        key={`hero-desktop-${displaySlides.length}-${slides.length}`}
                         modules={[Navigation, Autoplay, Pagination]}
                         centeredSlides={true}
                         slidesPerView={'auto'}
                         spaceBetween={GAP}
-                        loop={slides.length > 1}
-                        loopAdditionalSlides={2}
+                        loop={displaySlides.length > 1}
+                        loopAdditionalSlides={4}
+                        loopAddBlankSlides={true}
                         slideToClickedSlide={true}
                         grabCursor={true}
                         speed={650}
                         autoplay={{
-                            delay: 5000,
+                            delay: 4000,
                             disableOnInteraction: false,
-                            pauseOnMouseEnter: true,
+                            pauseOnMouseEnter: false,
                         }}
                         onSwiper={(swiper) => {
                             desktopSwiperRef.current = swiper;
@@ -399,9 +427,9 @@ const Hero = () => {
                         className="w-full hero-desktop-swiper !overflow-visible"
                         style={{ height: `${slideHeight}px` }}
                     >
-                        {slides.map((s, idx) => (
+                        {displaySlides.map((s, idx) => (
                             <SwiperSlide
-                                key={idx}
+                                key={`desktop-${idx}`}
                                 style={{
                                     width: `${mainWidth}px`,
                                     maxWidth: '90vw',
@@ -456,10 +484,11 @@ const Hero = () => {
                                     type="button"
                                     aria-label={`Go to slide ${i + 1}`}
                                     onClick={() => handleGoTo(i)}
-                                    className={`transition-all duration-300 rounded-full cursor-pointer ${i === activeSlideIndex
-                                        ? "w-[36px] h-[8px] bg-white shadow-md active:scale-95"
-                                        : "w-[8px] h-[8px] bg-white/40 hover:bg-white/60 hover:scale-110 active:scale-90"
-                                        }`}
+                                    className={`transition-all duration-300 rounded-full cursor-pointer ${
+                                        i === (activeSlideIndex % slides.length)
+                                            ? "w-[36px] h-[8px] bg-white shadow-md active:scale-95"
+                                            : "w-[8px] h-[8px] bg-white/40 hover:bg-white/60 hover:scale-110 active:scale-90"
+                                    }`}
                                 />
                             ))}
                         </div>
