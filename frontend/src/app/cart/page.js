@@ -78,21 +78,10 @@ const CartItem = ({ item, onUpdate, onRemove }) => {
 
                 <div className="h-9 w-px bg-gray-200" />
 
-                <div className="flex items-center gap-2 border border-[#CBCBCB] rounded-[8px] px-3 py-1.5 bg-white">
-                    <button
-                        onClick={() => onUpdate(item.id, { quantity: Math.max(1, item.quantity - 1) })}
-                        disabled={item.quantity <= 1}
-                        className="text-gray-600 hover:text-black disabled:opacity-30"
-                    >
-                        <span className="text-base leading-none block">–</span>
-                    </button>
-                    <span className="text-[10px] font-semibold text-[#333] min-w-[14px] text-center">{item.quantity}</span>
-                    <button
-                        onClick={() => onUpdate(item.id, { quantity: item.quantity + 1 })}
-                        className="text-gray-600 hover:text-black"
-                    >
-                        <span className="text-base leading-none block">+</span>
-                    </button>
+                {/* Fixed Quantity Badge (Quantity cannot be changed) */}
+                <div className="flex items-center gap-1.5 border border-[#CBCBCB] rounded-[8px] px-3 py-1.5 bg-[#f9f9f9]">
+                    <span className="text-[11px] font-medium text-[#757575]">Qty:</span>
+                    <span className="text-[11px] font-semibold text-[#333] min-w-[14px] text-center">1</span>
                 </div>
             </div>
 
@@ -177,22 +166,10 @@ const CartItem = ({ item, onUpdate, onRemove }) => {
                     {/* Vertical divider */}
                     <div className="h-[36px] w-px bg-[#e2e2e2]" />
 
-                    {/* Quantity Stepper */}
-                    <div className="flex items-center gap-[8px] bg-white border border-[#cbcbcb] rounded-[8px] px-[12px] py-[6px]">
-                        <button
-                            onClick={() => onUpdate(item.id, { quantity: Math.max(1, item.quantity - 1) })}
-                            disabled={item.quantity <= 1}
-                            className="text-[#333] hover:text-black disabled:opacity-30 leading-none text-[15px]"
-                        >
-                            –
-                        </button>
-                        <span className="text-[14px] font-semibold text-[#333] tracking-[-0.4px] text-center min-w-[10px]">{item.quantity}</span>
-                        <button
-                            onClick={() => onUpdate(item.id, { quantity: item.quantity + 1 })}
-                            className="text-[#333] hover:text-black leading-none text-[15px]"
-                        >
-                            +
-                        </button>
+                    {/* Fixed Quantity Badge (Quantity cannot be changed) */}
+                    <div className="flex items-center gap-[6px] bg-[#f9f9f9] border border-[#cbcbcb] rounded-[8px] px-[12px] py-[6px]">
+                        <span className="text-[14px] font-medium text-[#757575] tracking-[-0.4px]">Qty:</span>
+                        <span className="text-[14px] font-semibold text-[#333] tracking-[-0.4px]">1</span>
                     </div>
                 </div>
 
@@ -223,6 +200,10 @@ export default function CartPage() {
     const cartItems = useSelector(selectCartItems);
     const totals = useSelector(selectCartTotals);
     const { securityAmount, deliveryCharges, monthlyRentTotal, totalGST, totalOneTime, payToday, savedAmount, couponDiscount, couponCode: appliedCouponCode } = totals;
+
+    const firstItem = cartItems[0];
+    const productPageUrl = firstItem?.sourceUrl || (firstItem?.id ? `/products/${firstItem.id}` : '/products');
+    const productPageLabel = firstItem?.name || 'Product Page';
 
     const [couponCode, setCouponCodeInput] = useState('');
     const [couponError, setCouponError] = useState('');
@@ -287,6 +268,7 @@ export default function CartPage() {
 
     const updateItem = (id, updates) => {
         let finalUpdates = { ...updates };
+        delete finalUpdates.quantity; // Quantity cannot be changed
         if (updates.duration) {
             const item = cartItems.find(i => i.id === id);
             if (item?.tenures) {
@@ -331,9 +313,16 @@ export default function CartPage() {
                 >
                     {/* Breadcrumb */}
                     <nav
+                        aria-label="Breadcrumb"
                         className="text-[10px] md:text-[12px] text-[#808080] flex items-center gap-[8px] mb-[16px]"
                     >
-                        <span>$[Product-Page]</span>
+                        <Link
+                            href={productPageUrl}
+                            className="text-[#808080] hover:text-black hover:underline transition-colors font-medium max-w-[240px] md:max-w-[420px] truncate"
+                            title={productPageLabel}
+                        >
+                            {productPageLabel}
+                        </Link>
                         <span className="text-[#808080] text-[12px]">›</span>
                         <span style={{
                             fontFamily: "'Mona Sans', sans-serif",

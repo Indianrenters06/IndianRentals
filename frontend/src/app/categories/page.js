@@ -73,18 +73,18 @@ const CategoriesPage = () => {
     });
 
     const gridItems = (() => {
-        if (cmsData.categoriesGrid && cmsData.categoriesGrid.length > 0) {
-            return cmsData.categoriesGrid.map(item => ({
-                ...item,
-                href: nameToRoute[item.title] || item.href,
-            }));
-        }
         if (realCategories.length > 0) {
             return realCategories.map(cat => ({
                 id: cat._id,
                 title: cat.name,
                 image: cat.image,
                 href: getCategoryRoute(cat)
+            }));
+        }
+        if (cmsData.categoriesGrid && cmsData.categoriesGrid.length > 0) {
+            return cmsData.categoriesGrid.map(item => ({
+                ...item,
+                href: nameToRoute[item.title] || item.href,
             }));
         }
         return defaultCMS.categoriesGrid;

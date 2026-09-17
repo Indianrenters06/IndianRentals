@@ -871,6 +871,7 @@ const FeaturedShowcase = () => {
             monthlyRent: product.rentPrice,
             quantity: 1,
             duration: 1,
+            sourceUrl: `/products/${product.id}`
         }));
     };
 

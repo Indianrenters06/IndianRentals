@@ -52,7 +52,8 @@ const ProductCard = ({ product, mobile }) => {
             quantity: 1,
             duration: parseInt(product.selectedDurationStr) || 1,
             refundableAmount: 0,
-            description: product.description
+            description: product.description,
+            sourceUrl: `/products/${product.id}`
         }));
         router.push(`/products/${product.id}`);
     };

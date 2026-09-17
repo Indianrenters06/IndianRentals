@@ -479,7 +479,8 @@ const BestRentedProducts = ({ type = "bestRented", defaultTitle = "Curated Produ
             quantity: 1,
             duration: 1,
             refundableAmount: 0,
-            description: product.name
+            description: product.name,
+            sourceUrl: `/products/${product.id}`
         }));
         setAddedStatus(prev => ({ ...prev, [product.id]: true }));
         setTimeout(() => setAddedStatus(prev => ({ ...prev, [product.id]: false })), 2000);

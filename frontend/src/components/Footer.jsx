@@ -42,6 +42,7 @@ const DEFAULT_FOOTER_COLUMNS = [
     {
         title: "Policies", links: [
             { name: "KYC Policy", href: "/kyc-policy" },
+            { name: "Return & Refund Policy", href: "/return-policy" },
             { name: "Privacy Policy", href: "/privacy" },
             { name: "Terms & Conditions", href: "/terms" },
             { name: "FAQs", href: "/faq" },

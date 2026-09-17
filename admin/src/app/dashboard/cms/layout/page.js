@@ -75,6 +75,7 @@ export default function LayoutCMSPage() {
     const [saving, setSaving]       = useState(false);
     const [saved, setSaved]         = useState(false);
     const [data, setData] = useState({
+        showNavbarCategories: true,
         navbarAnnouncements: [],
         navbarLinks: [],
         footerDescription: "",
@@ -96,6 +97,7 @@ export default function LayoutCMSPage() {
                 if (res.ok) {
                     const d = await res.json();
                     setData({
+                        showNavbarCategories: d.showNavbarCategories !== false,
                         navbarAnnouncements: d.navbarAnnouncements || [],
                         navbarLinks: d.navbarLinks || [],
                         footerDescription: d.footerDescription || "",
@@ -238,9 +240,47 @@ export default function LayoutCMSPage() {
                     <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 shadow-sm space-y-5">
                         <SectionRow
                             icon={<NavigationArrow weight="fill" size={18} className="text-violet-500" />}
-                            title="Navbar Links"
-                            desc="Main navigation links shown in the header. Order here reflects order on site."
+                            title="Category Navigation Bar"
+                            desc="Category links shown below the search bar in the header. Order here reflects order on site."
                         />
+
+                        {/* Master Toggle: Show or Remove the Category Section */}
+                        <div className="flex flex-col sm:flex-row sm:items-center justify-between p-4 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 gap-3">
+                            <div>
+                                <div className="flex items-center gap-2">
+                                    <span className="text-sm font-semibold text-slate-800 dark:text-slate-100">
+                                        Show Category Bar
+                                    </span>
+                                    {data.showNavbarCategories !== false ? (
+                                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-300">
+                                            Visible on Site
+                                        </span>
+                                    ) : (
+                                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-200 text-slate-600 dark:bg-slate-700 dark:text-slate-300">
+                                            Hidden / Removed
+                                        </span>
+                                    )}
+                                </div>
+                                <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                                    Switch on to show, or switch off to completely remove the category section from the website navbar.
+                                </p>
+                            </div>
+                            <label className="relative inline-flex items-center cursor-pointer shrink-0">
+                                <input
+                                    type="checkbox"
+                                    className="sr-only peer"
+                                    checked={data.showNavbarCategories !== false}
+                                    onChange={e => set("showNavbarCategories", e.target.checked)}
+                                />
+                                <div className="w-11 h-6 bg-slate-200 dark:bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-indigo-600" />
+                            </label>
+                        </div>
+
+                        {data.showNavbarCategories === false && (
+                            <div className="p-3.5 rounded-xl bg-amber-50 dark:bg-amber-500/10 border border-amber-200 dark:border-amber-500/20 text-amber-800 dark:text-amber-300 text-xs">
+                                ℹ️ The category bar is currently <strong>hidden</strong> on the website. Toggle it back on and click Save to restore it.
+                            </div>
+                        )}
 
                         {/* Column headers */}
                         <div className="hidden md:grid grid-cols-[1fr_1fr_auto_auto] gap-3 px-1">

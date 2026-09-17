@@ -167,10 +167,11 @@ export default function ProductDetailPage() {
             price: currentPlan.price,
             monthlyRent: currentPlan.price,
             duration: duration,
-            quantity: quantity,
+            quantity: 1, // Quantity fixed to 1
             refundableAmount: product.securityDeposit || 10000,
             description: product.description,
-            tenures: tenures
+            tenures: tenures,
+            sourceUrl: `/products/${product._id}`,
         };
         dispatch(addToCart(item));
         router.push('/cart');
@@ -1133,16 +1134,8 @@ export default function ProductDetailPage() {
                                                     }}
                                                 >
                                                     <span className="hidden lg:inline text-[14px] text-[#333333] font-medium">{cms('QuantityLabel', 'Quantity')}</span>
-                                                    <div className="flex items-center gap-4">
-                                                        <button onClick={() => setQuantity(Math.max(1, quantity - 1))} className="text-gray-400 hover:text-black transition-colors">
-                                                            <FaMinus size={11} />
-                                                        </button>
-                                                        <div className="w-[38px] h-[34px] bg-white border border-gray-100 rounded-[8px] flex items-center justify-center shadow-[0_1px_2px_rgba(0,0,0,0.05)]">
-                                                            <span className="text-[14px] font-semibold text-[#333333]">{quantity}</span>
-                                                        </div>
-                                                        <button onClick={() => setQuantity(quantity + 1)} className="text-gray-400 hover:text-black transition-colors">
-                                                            <FaPlus size={10} />
-                                                        </button>
+                                                    <div className="w-[38px] h-[34px] bg-gray-50 border border-gray-200 rounded-[8px] flex items-center justify-center shadow-xs">
+                                                        <span className="text-[14px] font-semibold text-[#333333]">1</span>
                                                     </div>
                                                 </div>
                                             )}

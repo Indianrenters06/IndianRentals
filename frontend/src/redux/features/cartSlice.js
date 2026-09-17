@@ -13,63 +13,60 @@ const cartSlice = createSlice({
     reducers: {
         addToCart: (state, action) => {
             const newItem = action.payload;
-            const existingItem = state.items.find((item) => item.id === newItem.id);
-
-            if (!existingItem) {
-                state.items.push({
-                    id: newItem.id,
-                    name: newItem.name,
-                    image: newItem.image,
-                    price: newItem.price,
-                    monthlyRent: newItem.monthlyRent || newItem.price,
-                    quantity: newItem.quantity,
-                    duration: newItem.duration, // Rental duration in months
-                    refundableAmount: newItem.refundableAmount || 0,
-                    description: newItem.description,
-                    tenures: newItem.tenures // Pricing logic
-                });
-                state.totalQuantity += newItem.quantity;
-            } else {
-                existingItem.quantity += newItem.quantity;
-                state.totalQuantity += newItem.quantity;
-            }
-
-            // Recalculate totals if needed
+            // Requirement: Only 1 product can only be added in the entire cart, and quantity cannot be changed (always 1)
+            state.items = [{
+                id: newItem.id,
+                name: newItem.name,
+                image: newItem.image,
+                price: newItem.price,
+                monthlyRent: newItem.monthlyRent || newItem.price,
+                quantity: 1, // Quantity strictly 1
+                duration: newItem.duration || 1, // Rental duration in months
+                refundableAmount: newItem.refundableAmount || 0,
+                description: newItem.description,
+                tenures: newItem.tenures,
+                sourceUrl: newItem.sourceUrl || (newItem.id ? `/products/${newItem.id}` : '/products')
+            }];
+            state.totalQuantity = 1;
         },
         removeFromCart: (state, action) => {
-            const id = action.payload;
-            const existingItem = state.items.find((item) => item.id === id);
-
-            if (existingItem) {
-                state.totalQuantity -= existingItem.quantity;
-                state.items = state.items.filter((item) => item.id !== id);
-            }
+            state.items = [];
+            state.totalQuantity = 0;
+            state.coupon = null;
         },
         updateCartItemQuantity: (state, action) => {
-            const { id, quantity } = action.payload;
-            const item = state.items.find(item => item.id === id);
-            if (item) {
-                const diff = quantity - item.quantity;
-                item.quantity = quantity;
-                state.totalQuantity += diff;
+            // Quantity is immutable (strictly 1)
+            if (state.items.length > 0) {
+                state.items[0].quantity = 1;
+                state.totalQuantity = 1;
             }
         },
         updateCartItem: (state, action) => {
             const { id, ...updates } = action.payload;
             const item = state.items.find(item => item.id === id);
             if (item) {
-                // Handle quantity update specifically to adjust totalQuantity
-                if (updates.quantity !== undefined) {
-                    const diff = updates.quantity - item.quantity;
-                    state.totalQuantity += diff;
-                }
-                // Update other fields
+                // Prevent any modification to quantity
+                delete updates.quantity;
                 Object.assign(item, updates);
+                item.quantity = 1;
+                state.totalQuantity = 1;
             }
         },
         restoreCart: (state, action) => {
-            state.items = action.payload.items || [];
-            state.totalQuantity = action.payload.totalQuantity || 0;
+            const rawItems = action.payload.items || [];
+            if (rawItems.length > 0) {
+                // Sanitize restored cart to strictly 1 item of quantity 1
+                const first = {
+                    ...rawItems[0],
+                    quantity: 1,
+                    sourceUrl: rawItems[0].sourceUrl || (rawItems[0].id ? `/products/${rawItems[0].id}` : '/products')
+                };
+                state.items = [first];
+                state.totalQuantity = 1;
+            } else {
+                state.items = [];
+                state.totalQuantity = 0;
+            }
             state.totalAmount = action.payload.totalAmount || 0;
             state.coupon = action.payload.coupon || null;
         },

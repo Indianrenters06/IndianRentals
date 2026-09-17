@@ -1,7 +1,10 @@
 'use client';
+
 import React, { useEffect, useState } from 'react';
 import Image from 'next/image';
+
 const API = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+
 const FALLBACK = `
 <h2>1. Cancellation Prior to Dispatch</h2>
 <p>We understand that project requirements and schedules can change. You may cancel your rental order at any time before dispatch:</p>
@@ -52,7 +55,7 @@ const FALLBACK = `
 </ul>
 `;
 
-export default function RefundPage() {
+export default function ReturnPolicyPage() {
     const [cms, setCms] = useState(null);
     const [loading, setLoading] = useState(true);
 

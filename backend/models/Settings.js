@@ -14,6 +14,7 @@ const settingsSchema = new mongoose.Schema({
     },
 
     // Navbar
+    showNavbarCategories: { type: Boolean, default: true },
     navbarAnnouncements: { type: [String], default: ["♥ SAVE Extra 5% up to ₹100 on UPI Orders ♥", "♥ Free Delivery on orders above ₹500 ♥"] },
     navbarLinks: { 
         type: [{ name: String, href: String, separator: { type: Boolean, default: false } }], 

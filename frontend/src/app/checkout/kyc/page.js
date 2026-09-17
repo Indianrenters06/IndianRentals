@@ -8,7 +8,7 @@ import { useSelector } from 'react-redux';
 import { FaFingerprint } from 'react-icons/fa';
 import { PiCheckCircleFill, PiCheckCircle, PiCaretLeftBold } from 'react-icons/pi';
 import { saveKYCData, uploadKYCFiles, getKYCStatus } from '../../../services/kycService';
-import { selectCartTotals } from '../../../redux/features/cartSlice';
+import { selectCartTotals, selectCartItems } from '../../../redux/features/cartSlice';
 import OrderSummary from '../../../components/OrderSummary';
 import Swal from 'sweetalert2';
 
@@ -52,6 +52,10 @@ const INDIAN_STATES = Object.keys(STATE_CITY_MAP).sort();
 export default function KYCPage() {
     const router = useRouter();
     const totals = useSelector(selectCartTotals);
+    const cartItems = useSelector(selectCartItems);
+    const firstItem = cartItems[0];
+    const productPageUrl = firstItem?.sourceUrl || (firstItem?.id ? `/products/${firstItem.id}` : '/products');
+    const productPageLabel = firstItem?.name || 'Product Page';
     const { securityAmount, deliveryCharges, monthlyRentTotal, totalGST, totalOneTime, payToday, savedAmount, couponDiscount, couponCode } = totals;
 
     const [currentStep, setCurrentStep] = useState(1);
@@ -294,7 +298,9 @@ export default function KYCPage() {
                 {/* Breadcrumb */}
                 {currentStep !== 4 && (
                     <div className="text-xs text-gray-500 mb-6 flex items-center gap-2">
-                        <Link href="/" className="hover:text-black font-medium">Product-Page</Link>
+                        <Link href={productPageUrl} className="hover:text-black font-medium max-w-[200px] truncate" title={productPageLabel}>
+                            {productPageLabel}
+                        </Link>
                         <span>›</span>
                         <Link href="/cart" className="hover:text-black font-medium">Cart</Link>
                         <span>›</span>

@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation';
 import { useSelector } from 'react-redux';
 import { FaCheck } from 'react-icons/fa';
 import { Plus, UserCircle, Trash } from '@phosphor-icons/react';
-import { selectCartTotals } from '../../../redux/features/cartSlice';
+import { selectCartTotals, selectCartItems } from '../../../redux/features/cartSlice';
 import OrderSummary from '../../../components/OrderSummary';
 import AddressModal from '../../../components/AddressModal';
 import { getAddresses, addAddress, updateAddress, deleteAddress } from '../../../services/addressService';
@@ -14,6 +14,10 @@ import { getAddresses, addAddress, updateAddress, deleteAddress } from '../../..
 export default function AddressPage() {
     const router = useRouter();
     const totals = useSelector(selectCartTotals);
+    const cartItems = useSelector(selectCartItems);
+    const firstItem = cartItems[0];
+    const productPageUrl = firstItem?.sourceUrl || (firstItem?.id ? `/products/${firstItem.id}` : '/products');
+    const productPageLabel = firstItem?.name || 'Product Page';
     const { securityAmount, deliveryCharges, monthlyRentTotal, totalGST, totalOneTime, payToday, savedAmount, couponDiscount, couponCode } = totals;
 
     const [addresses, setAddresses] = useState([]);
@@ -108,9 +112,11 @@ export default function AddressPage() {
 
             {/* Main Content */}
             <div className="max-w-[1200px] mx-auto px-5 md:px-8 pt-5 md:pt-[48px] pb-12 md:pb-[48px]">
-                {/* Breadcrumb - Mocked based on image */}
+                {/* Breadcrumb */}
                 <div className="text-xs text-gray-500 mb-6 flex items-center gap-2">
-                    <Link href="/" className="hover:text-black font-medium font-sans">Product-Page</Link>
+                    <Link href={productPageUrl} className="hover:text-black font-medium font-sans max-w-[200px] truncate" title={productPageLabel}>
+                        {productPageLabel}
+                    </Link>
                     <span>›</span>
                     <Link href="/cart" className="hover:text-black font-medium font-sans">Cart</Link>
                     <span>›</span>

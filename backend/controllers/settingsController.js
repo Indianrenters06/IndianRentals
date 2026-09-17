@@ -28,7 +28,7 @@ const updateSettings = asyncHandler(async (req, res) => {
     const {
         siteName, siteLogo, contactEmail, contactPhone, address,
         currency, timezone,
-        navbarAnnouncements, navbarLinks, footerDescription, socialLinks, footerQuickLinks,
+        navbarAnnouncements, navbarLinks, showNavbarCategories, footerDescription, socialLinks, footerQuickLinks,
         footerColumns, footerCopyright, paymentLogos,
         maintenanceMode, allowRegistrations, requireKYC,
         paymentGatewaySecret, theme,
@@ -55,6 +55,7 @@ const updateSettings = asyncHandler(async (req, res) => {
             : [];
     }
 
+    if (showNavbarCategories !== undefined) settings.showNavbarCategories = showNavbarCategories;
     if (navbarAnnouncements !== undefined) settings.navbarAnnouncements = navbarAnnouncements;
     if (navbarLinks !== undefined) settings.navbarLinks = navbarLinks;
     if (footerDescription !== undefined) settings.footerDescription = footerDescription;

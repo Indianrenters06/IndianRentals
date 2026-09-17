@@ -15,7 +15,7 @@ import { getCategories } from "../services/categoryService";
 import { logout } from "../services/authService";
 import { categoryHref } from "../lib/categoryRoutes";
 
-const Navbar = () => {
+const Navbar = ({ showCategories: propShowCategories } = {}) => {
     const router = useRouter();
     const [isScrolled, setIsScrolled] = useState(false);
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -38,6 +38,10 @@ const Navbar = () => {
     const { settings } = useSettings();
     const siteLogo = settings?.siteLogo || "https://res.cloudinary.com/dgkckcdk8/image/upload/v1776892240/1d1f7c4e3c0490bcddb69ceb328c67be2f7cf361_6_kufcee.png";
     const siteName = settings?.siteName || "Indian Renters";
+
+    const showCategories = propShowCategories !== undefined
+        ? propShowCategories
+        : (settings?.showNavbarCategories !== false);
 
     // Removed fixed cities array
     // Handle scroll effect
@@ -204,32 +208,34 @@ const Navbar = () => {
     };
 
     let navLinks = [];
-    if (settings?.navbarLinks?.length > 0) {
-        navLinks = settings.navbarLinks;
-    } else {
-        const dynamicLinks = fetchedCategories.slice(0, 5).map(cat => ({
-            name: cat.name,
-            href: categoryHref(cat)
-        }));
-
-        if (dynamicLinks.length > 0) {
-            navLinks = [
-                ...dynamicLinks,
-                { name: "More", href: "/categories" },
-                { name: "Latest Launch", href: "/products", separator: true },
-                { name: "Deals %", href: "/products" }
-            ];
+    if (showCategories) {
+        if (settings?.navbarLinks && Array.isArray(settings.navbarLinks)) {
+            navLinks = settings.navbarLinks;
         } else {
-            navLinks = [
-                { name: "Apple Products", href: "/category/apple" },
-                { name: "IT Products", href: "/category/it-products" },
-                { name: "AV Products", href: "/category/av-products" },
-                { name: "Office Equipment", href: "/category/office-equipment" },
-                { name: "DSLR Cameras", href: "/category/dslr" },
-                { name: "More", href: "/categories" },
-                { name: "Latest Launch", href: "/products", separator: true },
-                { name: "Deals %", href: "/products" }
-            ];
+            const dynamicLinks = fetchedCategories.slice(0, 5).map(cat => ({
+                name: cat.name,
+                href: categoryHref(cat)
+            }));
+
+            if (dynamicLinks.length > 0) {
+                navLinks = [
+                    ...dynamicLinks,
+                    { name: "More", href: "/categories" },
+                    { name: "Latest Launch", href: "/products", separator: true },
+                    { name: "Deals %", href: "/products" }
+                ];
+            } else {
+                navLinks = [
+                    { name: "Apple Products", href: "/category/apple" },
+                    { name: "IT Products", href: "/category/it-products" },
+                    { name: "AV Products", href: "/category/av-products" },
+                    { name: "Office Equipment", href: "/category/office-equipment" },
+                    { name: "DSLR Cameras", href: "/category/dslr" },
+                    { name: "More", href: "/categories" },
+                    { name: "Latest Launch", href: "/products", separator: true },
+                    { name: "Deals %", href: "/products" }
+                ];
+            }
         }
     }
 
@@ -562,10 +568,12 @@ const Navbar = () => {
                             </button>
                         )}
 
-                        {/* Wishlist */}
-                        <Link href="/profile/liked" className="flex items-center justify-center hover:opacity-80 transition-opacity shrink-0 ml-1" style={{ width: "30px", height: "30px" }}>
-                            <Heart size={26.25} color="#000000" weight="regular" />
-                        </Link>
+                        {/* Wishlist — only visible when signed up / logged in */}
+                        {userInfo && (
+                            <Link href="/profile/liked" className="flex items-center justify-center hover:opacity-80 transition-opacity shrink-0 ml-1" style={{ width: "30px", height: "30px" }} title="Wishlist">
+                                <Heart size={26.25} color="#000000" weight="regular" />
+                            </Link>
+                        )}
 
                         {/* Cart */}
                         <Link href="/cart" className="relative flex items-center justify-center hover:opacity-80 transition-opacity shrink-0" style={{ width: "30px", height: "30px" }}>
@@ -784,39 +792,42 @@ const Navbar = () => {
                 </div>
             </div>
 
-            <div className="hidden lg:block bg-white w-full border-t border-gray-100">
-                <div className="max-w-[1200px] mx-auto px-4 md:px-8 h-[28px] flex items-center">
-                    <div className="flex items-center" style={{ width: "754px", height: "20px", gap: "17px" }}>
-                        {navLinks.map((link, index) => (
-                            <React.Fragment key={link.name}>
-                                {link.separator && (
-                                    <div
+            {/* Category Navigation Bar (show/remove category section) */}
+            {showCategories && navLinks.length > 0 && (
+                <div className="hidden lg:block bg-white w-full border-t border-gray-100">
+                    <div className="max-w-[1200px] mx-auto px-4 md:px-8 h-[28px] flex items-center">
+                        <div className="flex items-center" style={{ width: "754px", height: "20px", gap: "17px" }}>
+                            {navLinks.map((link, index) => (
+                                <React.Fragment key={link.name}>
+                                    {link.separator && (
+                                        <div
+                                            style={{
+                                                width: "1px",
+                                                height: "19px",
+                                                backgroundColor: "hsla(0, 0%, 60%, 1)",
+                                                opacity: 1,
+                                                flexShrink: 0
+                                            }}
+                                        />
+                                    )}
+                                    <Link
+                                        href={link.href}
+                                        className="font-medium text-[#464646] hover:text-black whitespace-nowrap transition-colors"
                                         style={{
-                                            width: "1px",
-                                            height: "19px",
-                                            backgroundColor: "hsla(0, 0%, 60%, 1)",
-                                            opacity: 1,
-                                            flexShrink: 0
+                                            fontFamily: "'Mona Sans', sans-serif",
+                                            fontSize: "14px",
+                                            lineHeight: "20px",
+                                            letterSpacing: "-0.04em",
                                         }}
-                                    />
-                                )}
-                                <Link
-                                    href={link.href}
-                                    className="font-medium text-[#464646] hover:text-black whitespace-nowrap transition-colors"
-                                    style={{
-                                        fontFamily: "'Mona Sans', sans-serif",
-                                        fontSize: "14px",
-                                        lineHeight: "20px",
-                                        letterSpacing: "-0.04em",
-                                    }}
-                                >
-                                    {link.name}
-                                </Link>
-                            </React.Fragment>
-                        ))}
+                                    >
+                                        {link.name}
+                                    </Link>
+                                </React.Fragment>
+                            ))}
+                        </div>
                     </div>
                 </div>
-            </div>
+            )}
 
 
             {/* Mobile Menu Side Drawer */}
@@ -889,21 +900,23 @@ const Navbar = () => {
                                     </div>
                                 </div>
 
-                                {/* Navigation Links */}
-                                <div className="flex flex-col space-y-1 pt-1">
-                                    <span className="text-[11px] font-bold text-gray-400 uppercase tracking-wider px-1 mb-1">Categories & Pages</span>
-                                    {navLinks.map((link) => (
-                                        <Link
-                                            key={link.name}
-                                            href={link.href}
-                                            className="text-gray-700 font-medium hover:text-amber-600 px-2 py-2.5 rounded-lg hover:bg-amber-50/50 transition text-sm flex items-center justify-between"
-                                            onClick={() => setIsMobileMenuOpen(false)}
-                                        >
-                                            <span>{link.name}</span>
-                                            <ArrowRight size={14} className="text-gray-400" />
-                                        </Link>
-                                    ))}
-                                </div>
+                                {/* Navigation Links — only when category section is enabled */}
+                                {showCategories && navLinks.length > 0 && (
+                                    <div className="flex flex-col space-y-1 pt-1">
+                                        <span className="text-[11px] font-bold text-gray-400 uppercase tracking-wider px-1 mb-1">Categories &amp; Pages</span>
+                                        {navLinks.map((link) => (
+                                            <Link
+                                                key={link.name}
+                                                href={link.href}
+                                                className="text-gray-700 font-medium hover:text-amber-600 px-2 py-2.5 rounded-lg hover:bg-amber-50/50 transition text-sm flex items-center justify-between"
+                                                onClick={() => setIsMobileMenuOpen(false)}
+                                            >
+                                                <span>{link.name}</span>
+                                                <ArrowRight size={14} className="text-gray-400" />
+                                            </Link>
+                                        ))}
+                                    </div>
+                                )}
 
                                 {/* Mobile Auth */}
                                 <div className="pt-3 border-t border-gray-100">
