@@ -118,9 +118,9 @@ const cmsSchema = new mongoose.Schema({
     featuredShowcaseBanners: {
         type: [featuredShowcaseBannerSchema],
         default: [
-            { title: 'Apple Products', subtitle: 'MacBooks | iPads | iPhones | Mac Studio | Mac Mini', image: '', bg: 'linear-gradient(135deg, #2a1a5e 0%, #4c3099 40%, #7c5cbf 70%, #b08ad4 100%)', href: '/categories/apple' },
-            { title: 'Gaming Laptops', subtitle: 'ASUS ROG | Lenovo Legion | MSI | HP Omen', image: '', bg: 'linear-gradient(135deg, #0a1628 0%, #1a3a5c 40%, #1e5f8c 70%, #2a9fd6 100%)', href: '/categories/gaming' },
-            { title: 'Smart Devices', subtitle: 'Tablets | Smartwatches | Earbuds | Accessories', image: '', bg: 'linear-gradient(135deg, #1a2e1a 0%, #1e5c3a 40%, #25874f 70%, #3ac47d 100%)', href: '/categories/smart-devices' },
+            { title: 'Apple Products', subtitle: 'MacBooks | iPads | iPhones | Mac Studio | Mac Mini', image: 'https://res.cloudinary.com/dgkckcdk8/image/upload/v1776108199/f6540bc8c3d4a91dfd954f6fe1cf8d3803b81b4a_3_optlwp.png', bg: 'linear-gradient(135deg, #1f1435 0%, #3b2069 45%, #6a3ea1 80%, #9055d4 100%)', href: '/categories/apple' },
+            { title: 'Gaming Laptops', subtitle: 'ASUS ROG | Lenovo Legion | MSI | HP Omen', image: 'https://images.unsplash.com/photo-1603302576837-37561b2e2302?auto=format&fit=crop&w=1200&q=80', bg: 'linear-gradient(135deg, #070d18 0%, #0d2238 45%, #133c5e 80%, #1c5f8a 100%)', href: '/categories/gaming' },
+            { title: 'Smart Devices', subtitle: 'Tablets | Smartwatches | Earbuds | Accessories', image: 'https://images.unsplash.com/photo-1544244015-0df4b3ffc6b0?auto=format&fit=crop&w=1200&q=80', bg: 'linear-gradient(135deg, #0b1a14 0%, #153326 45%, #1f523c 80%, #2b7756 100%)', href: '/categories/smart-devices' },
         ]
     },
 
@@ -202,11 +202,11 @@ const cmsSchema = new mongoose.Schema({
             href: String
         }],
         default: [
-            { title: "Apple Products", image: "/macbook-pro-new.jpg", href: "/category/apple" },
-            { title: "IT Products", image: "/it-products-new.jpg", href: "/category/it-products" },
-            { title: "AV Products", image: "/it-products-new.jpg", href: "/category/av-products" },
-            { title: "Office Equipment", image: "/office-equipment-new.jpg", href: "/category/office-equipment" },
-            { title: "DSLR Cameras", image: "https://res.cloudinary.com/dgkckcdk8/image/upload/v1769967871/indian-rentals/ea5ryxbvie8spmdb9slz.jpg", href: "/category/dslr" }
+            { title: "Apple Products", image: "https://res.cloudinary.com/dgkckcdk8/image/upload/v1769946716/indian-rentals/fj8ptqbhppbstdd0hs4i.png", href: "/category/apple" },
+            { title: "IT Products", image: "https://res.cloudinary.com/dgkckcdk8/image/upload/v1778099153/indian-rentals/tqniq6juxhhf1j3svppm.png", href: "/category/it-products" },
+            { title: "AV Products", image: "https://res.cloudinary.com/dgkckcdk8/image/upload/v1769967671/indian-rentals/ecmi4pwvqgqs0owaw4xi.jpg", href: "/category/av-products" },
+            { title: "Office Equipment", image: "https://res.cloudinary.com/dgkckcdk8/image/upload/v1769967742/indian-rentals/bg4ktprnuvw0jf33m6wv.jpg", href: "/category/office-equipment" },
+            { title: "DSLR Cameras", image: "https://res.cloudinary.com/dgkckcdk8/image/upload/v1789664661/indian-rentals/bwbf0rroyukoaqfcddla.png", href: "/category/dslr" }
         ]
     },
 

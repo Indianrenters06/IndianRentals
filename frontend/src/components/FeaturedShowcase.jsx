@@ -12,21 +12,46 @@ import { useRouter } from 'next/navigation';
 
 const API = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
 
+const DEFAULT_CATEGORY_IMAGES = {
+    apple: "https://res.cloudinary.com/dgkckcdk8/image/upload/v1776108199/f6540bc8c3d4a91dfd954f6fe1cf8d3803b81b4a_3_optlwp.png",
+    gaming: "https://images.unsplash.com/photo-1603302576837-37561b2e2302?auto=format&fit=crop&w=1200&q=80",
+    smart: "https://images.unsplash.com/photo-1544244015-0df4b3ffc6b0?auto=format&fit=crop&w=1200&q=80",
+};
+
+const getSlideImage = (s) => {
+    if (s?.image && typeof s.image === 'string' && s.image.trim() !== '') {
+        return s.image;
+    }
+    const t = `${s?.title || ''} ${s?.subtitle || ''}`.toLowerCase();
+    if (t.includes('apple') || t.includes('mac')) return DEFAULT_CATEGORY_IMAGES.apple;
+    if (t.includes('gaming') || t.includes('rog') || t.includes('legion') || t.includes('alienware') || t.includes('omen')) return DEFAULT_CATEGORY_IMAGES.gaming;
+    if (t.includes('smart') || t.includes('tablet') || t.includes('watch') || t.includes('device') || t.includes('phone')) return DEFAULT_CATEGORY_IMAGES.smart;
+    return '';
+};
+
 const FALLBACK_BANNERS = [
     {
         title: "Apple Products",
         subtitle: "MacBooks | iPads | iPhones | Mac Studio | Mac Mini",
-        image: "https://res.cloudinary.com/dgkckcdk8/image/upload/v1776108199/f6540bc8c3d4a91dfd954f6fe1cf8d3803b81b4a_3_optlwp.png",
-        href: "/products",
-        bg: "linear-gradient(180deg, #4A3B9C 0%, #5B4AB5 100%)",
+        image: DEFAULT_CATEGORY_IMAGES.apple,
+        href: "/categories/apple",
+        bg: "linear-gradient(135deg, #1f1435 0%, #3b2069 45%, #6a3ea1 80%, #9055d4 100%)",
         category: "MacBook"
     },
     {
+        title: "Gaming Laptops",
+        subtitle: "ASUS ROG | Lenovo Legion | MSI | HP Omen",
+        image: DEFAULT_CATEGORY_IMAGES.gaming,
+        href: "/categories/gaming",
+        bg: "linear-gradient(135deg, #070d18 0%, #0d2238 45%, #133c5e 80%, #1c5f8a 100%)",
+        category: "Gaming"
+    },
+    {
         title: "Smart Devices",
-        subtitle: "Everything you need for your smart home.",
-        image: null,
-        href: "/products",
-        bg: "linear-gradient(to bottom, #2D6A4F, #1B4332)",
+        subtitle: "Tablets | Smartwatches | Earbuds | Accessories",
+        image: DEFAULT_CATEGORY_IMAGES.smart,
+        href: "/categories/smart-devices",
+        bg: "linear-gradient(135deg, #0b1a14 0%, #153326 45%, #1f523c 80%, #2b7756 100%)",
         category: "SmartPhone"
     }
 ];
@@ -220,35 +245,34 @@ const MobileFeaturedCard = ({ banner }) => {
 };
 
 // ─── Banner Carousel ──────────────────────────────────────────────────────────
-const BannerCarousel = ({ banners, current, setCurrent, height = "387px", productImage, isDesktop }) => {
+const BannerCarousel = ({ banners = [], current, setCurrent, isDesktop }) => {
     const [direction, setDirection] = useState(1);
-    const [failedImages, setFailedImages] = useState(new Set());
     const router = useRouter();
 
     const go = useCallback((dir, event) => {
         if (event) { event.preventDefault(); event.stopPropagation(); }
+        if (!banners.length) return;
         setDirection(dir);
         setCurrent(prev => (prev + dir + banners.length) % banners.length);
     }, [banners.length, setCurrent]);
 
     useEffect(() => {
+        if (!banners.length) return;
         const t = setInterval(() => go(1), 8000);
         return () => clearInterval(t);
-    }, [go]);
+    }, [go, banners.length]);
 
-    const slide = banners[current];
-    const displayImage = slide.image || productImage;
+    if (!banners.length) return null;
 
-    if (isDesktop === false) {
-        return <MobileFeaturedCard banner={slide} />;
-    }
+    const slide = banners[current] || banners[0];
+    const displayImage = getSlideImage(slide);
 
     return (
         <div
-            className="relative overflow-hidden shadow-xl w-full"
+            className="relative overflow-hidden shadow-xl w-full select-none"
             style={{
                 height: '387px',
-                borderRadius: '16px'
+                borderRadius: '20px'
             }}
         >
             <AnimatePresence initial={false} custom={direction}>
@@ -265,73 +289,100 @@ const BannerCarousel = ({ banners, current, setCurrent, height = "387px", produc
                     exit="exit"
                     transition={{ duration: 0.45, ease: "easeInOut" }}
                     className="absolute inset-0 cursor-pointer"
-                    style={{ background: slide.bg || "#F5F5F7" }}
+                    style={{ background: slide.bg || "linear-gradient(135deg, #111827 0%, #1f2937 100%)" }}
                     onClick={() => router.push(slide.href || "/products")}
                 >
-                    {/* Full-bleed image — covers entire banner, no gaps */}
+                    {/* Full-bleed banner imagery */}
                     {displayImage && (
                         <motion.img
                             key={displayImage}
-                            initial={{ opacity: 0, scale: 1.02 }}
+                            initial={{ opacity: 0, scale: 1.05 }}
                             animate={{ opacity: 1, scale: 1 }}
-                            transition={{ duration: 0.5, ease: "easeOut" }}
+                            transition={{ duration: 0.55, ease: "easeOut" }}
                             src={displayImage}
-                            alt="Featured"
+                            alt={slide.title || "Featured Banner"}
                             className="absolute inset-0 w-full h-full object-cover object-center z-0"
-                            style={{ pointerEvents: 'none', transform: 'scale(0.85)', transformOrigin: 'center center' }}
+                            style={{ pointerEvents: 'none' }}
                         />
                     )}
 
-                    {/* Figma exact gradient overlay */}
+                    {/* Gradient overlay for readability */}
                     <div
-                        className="absolute inset-0 z-10"
+                        className="absolute inset-0 z-10 pointer-events-none"
                         style={{
-                            background: 'linear-gradient(180.66deg, rgba(0, 0, 0, 0) 52.71%, rgba(0, 0, 0, 0.8) 86.37%)'
+                            background: 'linear-gradient(180deg, rgba(0, 0, 0, 0.15) 0%, rgba(0, 0, 0, 0.45) 45%, rgba(0, 0, 0, 0.88) 100%)'
                         }}
                     />
 
-                    {/* Content: pinned to bottom with Figma padding */}
+                    {/* Floating Side Navigation Arrows */}
+                    <div className="absolute inset-y-0 left-0 right-0 z-30 flex items-center justify-between px-3 sm:px-4 pointer-events-none">
+                        <button
+                            type="button"
+                            onClick={(e) => go(-1, e)}
+                            aria-label="Previous slide"
+                            className="pointer-events-auto flex items-center justify-center rounded-full bg-black/35 hover:bg-black/65 backdrop-blur-md border border-white/20 text-white hover:scale-110 active:scale-95 transition-all duration-200 shadow-lg"
+                            style={{ width: "36px", height: "36px" }}
+                        >
+                            <ChevronLeftIcon strokeWidth={2.5} className="w-5 h-5 text-white" />
+                        </button>
+                        <button
+                            type="button"
+                            onClick={(e) => go(1, e)}
+                            aria-label="Next slide"
+                            className="pointer-events-auto flex items-center justify-center rounded-full bg-black/35 hover:bg-black/65 backdrop-blur-md border border-white/20 text-white hover:scale-110 active:scale-95 transition-all duration-200 shadow-lg"
+                            style={{ width: "36px", height: "36px" }}
+                        >
+                            <ChevronRightIcon strokeWidth={2.5} className="w-5 h-5 text-white" />
+                        </button>
+                    </div>
+
+                    {/* Banner Content: positioned cleanly in lower half */}
                     <div
-                        className="absolute inset-0 z-20 flex flex-col justify-end"
-                        style={{
-                            paddingTop: '30px',
-                            paddingRight: '31px',
-                            paddingBottom: '30px',
-                            paddingLeft: '31px',
-                            gap: '10px',
-                            display: 'flex',
-                            flexDirection: 'column',
-                            justifyContent: 'flex-end'
-                        }}
+                        className="absolute inset-x-0 bottom-0 z-20 flex flex-col items-center text-center pb-6 px-6 sm:px-8 pointer-events-none"
+                        style={{ gap: '8px' }}
                     >
-                        <div className="flex items-center justify-center gap-4">
-                            <button
-                                onClick={(e) => go(-1, e)}
-                                className="group flex items-center justify-center rounded-full bg-[hsla(0,0%,96%,1)] hover:bg-[hsla(0,0%,85%,1)] hover:scale-110 transition-all duration-200 shrink-0"
-                                style={{ width: "24px", height: "24px", padding: "2.25px" }}
-                            >
-                                <ChevronLeftIcon strokeWidth={2.5} className="w-[19.5px] h-[19.5px] text-[#1D1D1F] group-hover:text-[#1D1D1F] transition-colors duration-200" />
-                            </button>
-                            <h3 className="text-white text-[24px] font-bold tracking-tight text-center" style={{ fontFamily: "'Mona Sans', sans-serif" }}>
-                                {slide.title}
-                            </h3>
-                            <button
-                                onClick={(e) => go(1, e)}
-                                className="group flex items-center justify-center rounded-full bg-[hsla(0,0%,96%,1)] hover:bg-[hsla(0,0%,85%,1)] hover:scale-110 transition-all duration-200 shrink-0"
-                                style={{ width: "24px", height: "24px", padding: "2.25px" }}
-                            >
-                                <ChevronRightIcon strokeWidth={2.5} className="w-[19.5px] h-[19.5px] text-[#1D1D1F] group-hover:text-[#1D1D1F] transition-colors duration-200" />
-                            </button>
-                        </div>
-                        <p className="text-white/80 text-[14px] font-medium leading-tight text-center">
+                        <span className="inline-flex items-center px-3 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-white/20 text-white backdrop-blur-md border border-white/20 shadow-sm">
+                            Featured Collection
+                        </span>
+
+                        <h3
+                            className="text-white text-[24px] sm:text-[28px] font-bold tracking-tight text-center leading-tight drop-shadow-md"
+                            style={{ fontFamily: "'Mona Sans', sans-serif" }}
+                        >
+                            {slide.title}
+                        </h3>
+
+                        <p className="text-white/90 text-[13px] sm:text-[14px] font-medium leading-normal max-w-[90%] text-center drop-shadow">
                             {slide.subtitle}
                         </p>
-                        <div className="flex justify-center gap-1.5">
+
+                        {/* CTA Explore Button */}
+                        <div className="pt-1 pointer-events-auto">
+                            <button
+                                type="button"
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    router.push(slide.href || "/products");
+                                }}
+                                className="inline-flex items-center gap-1.5 px-5 py-2 rounded-full bg-white text-gray-900 text-xs font-bold shadow-md hover:bg-gray-100 hover:scale-105 active:scale-95 transition-all duration-200"
+                            >
+                                Explore Category &rarr;
+                            </button>
+                        </div>
+
+                        {/* Dots Indicator */}
+                        <div className="flex justify-center items-center gap-1.5 pt-2 pointer-events-auto">
                             {banners.map((_, i) => (
                                 <button
                                     key={i}
-                                    onClick={(e) => { e.preventDefault(); e.stopPropagation(); setDirection(i > current ? 1 : -1); setCurrent(i); }}
-                                    className={`transition-all duration-300 rounded-full h-1.5 ${i === current ? "w-6 bg-white" : "w-1.5 bg-white/40"}`}
+                                    aria-label={`Go to slide ${i + 1}`}
+                                    onClick={(e) => {
+                                        e.preventDefault();
+                                        e.stopPropagation();
+                                        setDirection(i > current ? 1 : -1);
+                                        setCurrent(i);
+                                    }}
+                                    className={`transition-all duration-300 rounded-full h-1.5 ${i === current ? "w-6 bg-white shadow-sm" : "w-1.5 bg-white/40 hover:bg-white/75"}`}
                                 />
                             ))}
                         </div>
@@ -875,9 +926,11 @@ const FeaturedShowcase = () => {
         }));
     };
 
-    // Load products — pinned IDs take priority, then fall back to category/general
+    // Load products — pinned IDs take priority, then fall back to general products
     useEffect(() => {
         if (!cms) return;
+
+        let isCancelled = false;
 
         const loadProducts = async () => {
             try {
@@ -894,40 +947,42 @@ const FeaturedShowcase = () => {
                 }
 
                 if (fetchedProducts.length < 2) {
-                    const activeCategory = cms.banners[currentBanner]?.category;
-                    let url = activeCategory
-                        ? `${API}/api/products?category=${activeCategory}&limit=2`
-                        : `${API}/api/products?limit=2`;
-
-                    let res = await fetch(url).catch(() => ({ ok: false }));
+                    let res = await fetch(`${API}/api/products?limit=6`).catch(() => ({ ok: false }));
                     let data = res.ok ? await res.json() : { products: [] };
-
-                    if (data.products?.length === 0 && activeCategory) {
-                        const fallbackRes = await fetch(`${API}/api/products?limit=2`).catch(() => ({ ok: false }));
-                        if (fallbackRes.ok) data = await fallbackRes.json();
-                    }
-                    fetchedProducts = data.products || [];
+                    const fallbackList = data.products || [];
+                    const needed = 2 - fetchedProducts.length;
+                    const existingIds = new Set(fetchedProducts.map(p => p._id));
+                    const extra = fallbackList.filter(p => !existingIds.has(p._id)).slice(0, needed);
+                    fetchedProducts = [...fetchedProducts, ...extra];
                 }
 
-                setProducts(fetchedProducts.map(p => ({
-                    id: p._id,
-                    name: p.name,
-                    image: p.images?.[0] || "/images/placeholder.png",
-                    rating: p.rating || 4.5,
-                    reviews: p.numReviews || 12,
-                    originalPrice: p.rentalPrice ? Math.round(p.rentalPrice * 1.5) : 8999,
-                    rentPrice: p.rentalPrice || 5000,
-                    isNew: p.isNew || false,
-                })));
+                if (!isCancelled) {
+                    setProducts(fetchedProducts.map(p => ({
+                        id: p._id,
+                        name: p.name,
+                        image: p.images?.[0] || "/images/placeholder.png",
+                        rating: p.rating || 4.5,
+                        reviews: p.numReviews || 12,
+                        originalPrice: p.rentalPrice ? Math.round(p.rentalPrice * 1.5) : 8999,
+                        rentPrice: p.rentalPrice || 5000,
+                        isNew: p.isNew || false,
+                    })));
+                }
             } catch (err) {
                 console.error("Showcase fetch error:", err);
             } finally {
-                setLoading(false);
+                if (!isCancelled) {
+                    setLoading(false);
+                }
             }
         };
 
         loadProducts();
-    }, [currentBanner, cms, pinnedProductIds]);
+
+        return () => {
+            isCancelled = true;
+        };
+    }, [cms?.enabled, JSON.stringify(pinnedProductIds)]);
 
     // Still fetching CMS or products
     if (!cms || loading) return null;
@@ -970,8 +1025,6 @@ const FeaturedShowcase = () => {
                             banners={cms.banners}
                             current={currentBanner}
                             setCurrent={setCurrentBanner}
-                            height="387px"
-                            productImage={products[0]?.image || products[1]?.image}
                             isDesktop={isDesktop}
                         />
                     </div>

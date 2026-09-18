@@ -6,20 +6,21 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Spinner, Button } from '@heroui/react';
 import { FloppyDisk, CheckCircle, Plus, Trash, ArrowRight, Image as PhosphorImage, Link as LinkIcon, TextT } from '@phosphor-icons/react';
 import Image from 'next/image';
+import ImageUploader from '@/components/ImageUploader';
 
 const API = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
 const getToken = () => typeof window !== 'undefined' ? localStorage.getItem('adminToken') : null;
 
-// Default empty state
+// Default empty state with actual uploaded images
 const DEFAULTS = {
     categoriesPageTitle: 'All Categories',
-    categoriesPageSubtitle: 'Lorem ipsum dolor sit amet consectetur. Vel libero cras laoreet ut dignissim eget. Scelerisque mauris pharetra tristique cras sit malesuada. Egestas pulvinar interdum sapien et. Consequat neque at donec turpis leo. Quis at.',
+    categoriesPageSubtitle: 'Explore our wide range of rental categories across Apple, IT, AV, and more.',
     categoriesGrid: [
-        { title: "Apple Products", image: "/macbook-pro-new.jpg", href: "/category/apple" },
-        { title: "IT Products", image: "/it-products-new.jpg", href: "/category/it-products" },
-        { title: "AV Products", image: "/it-products-new.jpg", href: "/category/av-products" },
-        { title: "Office Equipment", image: "/office-equipment-new.jpg", href: "/category/office-equipment" },
-        { title: "DSLR Cameras", image: "https://res.cloudinary.com/dgkckcdk8/image/upload/v1769967871/indian-rentals/ea5ryxbvie8spmdb9slz.jpg", href: "/category/dslr" }
+        { title: "Apple Products", image: "https://res.cloudinary.com/dgkckcdk8/image/upload/v1769946716/indian-rentals/fj8ptqbhppbstdd0hs4i.png", href: "/category/apple" },
+        { title: "IT Products", image: "https://res.cloudinary.com/dgkckcdk8/image/upload/v1778099153/indian-rentals/tqniq6juxhhf1j3svppm.png", href: "/category/it-products" },
+        { title: "AV Products", image: "https://res.cloudinary.com/dgkckcdk8/image/upload/v1769967671/indian-rentals/ecmi4pwvqgqs0owaw4xi.jpg", href: "/category/av-products" },
+        { title: "Office Equipment", image: "https://res.cloudinary.com/dgkckcdk8/image/upload/v1769967742/indian-rentals/bg4ktprnuvw0jf33m6wv.jpg", href: "/category/office-equipment" },
+        { title: "DSLR Cameras", image: "https://res.cloudinary.com/dgkckcdk8/image/upload/v1789664661/indian-rentals/bwbf0rroyukoaqfcddla.png", href: "/category/dslr" }
     ],
     metaTitle: '', metaDescription: '', publishStatus: 'published',
 };
@@ -95,6 +96,7 @@ export default function CategoriesPageCMS() {
             if (!res.ok) throw new Error('Failed to save');
             setSaved(true);
             setTimeout(() => setSaved(false), 3000);
+            toast.success("Main Category CMS saved successfully!");
         } catch (e) { toast.error(e.message); }
         finally { setSaving(false); }
     };
@@ -204,8 +206,7 @@ export default function CategoriesPageCMS() {
                                             className="absolute top-4 right-4 p-1.5 text-slate-400 hover:text-red-500 bg-white dark:bg-slate-800 rounded-lg shadow-sm border border-slate-200 dark:border-slate-700 transition-all z-10">
                                             <Trash size={16} />
                                         </button>
-                                        {/* Card images are no longer editable here — the stored
-                                            image is left untouched and still rendered on the site. */}
+                                        
                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pr-10">
                                             <TextInput
                                                 label={`Card ${i + 1} Title`}
@@ -219,6 +220,16 @@ export default function CategoriesPageCMS() {
                                                 onChange={v => updateCard(i, 'href', v)}
                                                 placeholder="/category/example"
                                                 icon={LinkIcon}
+                                            />
+                                        </div>
+
+                                        <div className="mt-4 pr-10">
+                                            <Label>Card Image</Label>
+                                            <ImageUploader
+                                                key={`card-${i}-${card.image || 'empty'}`}
+                                                label="Upload Category Image"
+                                                existingUrl={card.image}
+                                                onUpload={url => updateCard(i, 'image', url)}
                                             />
                                         </div>
                                     </motion.div>

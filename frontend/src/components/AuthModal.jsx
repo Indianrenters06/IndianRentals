@@ -188,7 +188,11 @@ const AuthModal = ({ isOpen, onClose, initialView = "login" }) => {
                 setLoading(false);
             }
         },
-        onError: () => setError("Google login failed or was cancelled"),
+        onError: (err) => {
+            console.error("Google OAuth error:", err);
+            setError(err?.error_description || "Google login failed or was cancelled");
+            setLoading(false);
+        },
     });
 
     if (!isOpen) return null;

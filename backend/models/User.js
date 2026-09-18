@@ -28,7 +28,9 @@ const userSchema = new mongoose.Schema({
     },
     password: {
         type: String,
-        required: [true, 'Please provide a password'],
+        required: function () {
+            return this.authProvider === 'local';
+        },
         // Complexity is enforced ONLY when the password is actually being set or
         // changed (i.e. it's still plaintext). On every other save() the stored
         // value is a bcrypt hash — which contains '.' and '/' and would always
@@ -38,6 +40,7 @@ const userSchema = new mongoose.Schema({
         validate: {
             validator: function (value) {
                 if (!this.isModified('password')) return true;
+                if (!value && this.authProvider === 'google') return true;
                 return /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/.test(value);
             },
             message: 'Password must be at least 8 characters and contain an uppercase letter, a lowercase letter, a number, and a special character'
@@ -46,7 +49,19 @@ const userSchema = new mongoose.Schema({
     },
     phone: {
         type: String,
-        required: [true, 'Please provide your phone number']
+        default: '',
+        required: function () {
+            return this.authProvider === 'local';
+        }
+    },
+    authProvider: {
+        type: String,
+        enum: ['local', 'google'],
+        default: 'local'
+    },
+    googleId: {
+        type: String,
+        default: ''
     },
     // Cloudinary URL of the profile picture. Empty means "use the default icon".
     avatar: {
@@ -132,7 +147,7 @@ const userSchema = new mongoose.Schema({
 
 // Encrypt password before saving
 userSchema.pre('save', async function () {
-    if (!this.isModified('password')) {
+    if (!this.password || !this.isModified('password')) {
         return;
     }
     const salt = await bcrypt.genSalt(10);
