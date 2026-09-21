@@ -124,71 +124,59 @@ const FaqSection = ({ cmsData, limit, pageName }) => {
             }}
         >
             <div
-                className="max-w-[1200px] mx-auto px-5 sm:px-6 w-full flex flex-col lg:flex-row justify-between items-start gap-6 lg:gap-[100px]"
+                className="max-w-[1200px] mx-auto px-5 sm:px-6 w-full flex flex-col lg:flex-row items-start gap-6 lg:gap-[40px]"
             >
-                {/* Left Column */}
-                <div
-                    className="w-full lg:max-w-[442px] flex flex-col gap-[20px] lg:min-h-[190px]"
-                >
-                    {/* Heading — on mobile the eyebrow (subtitle) sits above the title */}
-                    <h2
-                        className="order-2 md:order-1 m-0 font-semibold text-[#333] tracking-[-0.02em] max-w-[442px] text-[25px] leading-[31px] md:text-[36px] md:leading-[45px]"
-                        style={{ fontFamily: "'Mona Sans', sans-serif" }}
-                    >
-                        {title}
-                    </h2>
+                {/* Left Column — Figma "Section Title" (node under FAQ frame): gap 20px, eyebrow above heading */}
+                <div className="w-full lg:w-[442px] lg:shrink-0 flex flex-col gap-5">
                     {subtitle && (
                         <span
-                            className="order-1 md:order-2 block text-[#333] tracking-[-0.02em] max-w-[442px] font-semibold md:font-medium text-[20px] leading-[26px] md:text-[36px] md:leading-[45px]"
+                            className="block text-[#333333] tracking-[-0.8px] text-[20px] leading-[26px] md:text-[27px] md:leading-[35px] font-medium"
                             style={{ fontFamily: "'Mona Sans', sans-serif" }}
                         >
                             {subtitle}
                         </span>
                     )}
+                    <h2
+                        className="m-0 font-semibold text-[#333333] tracking-[-0.8px] text-[25px] leading-[31px] md:text-[36px] md:leading-[45px]"
+                        style={{ fontFamily: "'Mona Sans', sans-serif" }}
+                    >
+                        {title}
+                    </h2>
                 </div>
 
-                {/* Right Column - Accordion */}
-                <div
-                    className="w-full lg:flex-1 lg:max-w-[758px] border-b border-[hsla(0,0%,69%,1)]"
-                >
-                    <div className="space-y-0">
-                        {displayFaqs.map((faq, index) => (
-                            <div
-                                key={index}
-                                className={`w-full overflow-hidden border-t border-[hsla(0,0%,69%,1)] ${activeIndices.includes(index) ? 'h-auto md:min-h-[142px]' : 'h-auto md:h-[72px]'}`}
-                            >
+                {/* Right Column — Figma "Accordion List" (width 718, border-bottom #EEEEEE) */}
+                <div className="w-full lg:flex-1 border-b border-[#EEEEEE]">
+                    {displayFaqs.map((faq, index) => {
+                        const open = activeIndices.includes(index);
+                        return (
+                            <div key={index} className="w-full flex flex-col items-start border-t border-[#EEEEEE]">
                                 <button
-                                    className="w-full flex items-center justify-between text-left focus:outline-none group gap-[24px] py-2 md:py-5 md:h-[72px]"
+                                    className="w-full flex items-center justify-between text-left focus:outline-none group gap-6 py-4 md:py-5"
                                     onClick={() => toggleFaq(index)}
                                 >
                                     <span
-                                        className="group-hover:text-blue-600 transition-colors font-bold text-[#333] tracking-[0.01em] max-w-[702px] text-sm md:text-[18px] leading-[20px] md:leading-[25px]"
+                                        className="flex-1 group-hover:text-blue-600 transition-colors font-bold text-[#333333] tracking-[-0.8px] text-sm md:text-[18px] leading-[20px] md:leading-[25px]"
                                         style={{ fontFamily: "'Mona Sans', sans-serif" }}
                                     >
                                         {faq.question}
                                     </span>
-                                    <span className="flex-shrink-0 text-gray-400 group-hover:text-blue-600 transition-colors text-[20px] md:text-[24px]">
-                                        {activeIndices.includes(index) ? (
-                                            <PiCaretUp />
-                                        ) : (
-                                            <PiCaretDown />
-                                        )}
+                                    <span className="shrink-0 flex items-center justify-center size-[20px] md:size-[28px] text-[#333333] group-hover:text-blue-600 transition-colors">
+                                        {open ? <PiCaretUp /> : <PiCaretDown />}
                                     </span>
                                 </button>
                                 <div
-                                    className={`overflow-hidden transition-all duration-300 ease-in-out ${activeIndices.includes(index) ? 'max-h-[500px] opacity-100 pb-3 md:pb-6' : 'max-h-0 opacity-0'
-                                        }`}
+                                    className={`w-full overflow-hidden transition-all duration-300 ease-in-out ${open ? 'max-h-[500px] opacity-100' : 'max-h-0 opacity-0'}`}
                                 >
                                     <p
-                                        className="m-0 font-normal text-[hsla(0,0%,33%,1)] tracking-[0.01em] max-w-[758px] text-xs md:text-[14px] leading-[18px] md:leading-[23px]"
+                                        className="flex-1 m-0 pb-6 font-normal text-[#545454] tracking-[-0.4px] text-xs md:text-[16px] leading-[18px] md:leading-[23px]"
                                         style={{ fontFamily: "'Mona Sans', sans-serif" }}
                                     >
                                         {faq.answer}
                                     </p>
                                 </div>
                             </div>
-                        ))}
-                    </div>
+                        );
+                    })}
                 </div>
             </div>
         </section>

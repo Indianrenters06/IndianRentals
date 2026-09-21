@@ -208,7 +208,7 @@ export default function SubcategoryProductsPage({ subcategoryId, subcategoryName
                                         >
                                             <div style={{ width: '100px', height: '100px', position: 'relative' }}>
                                                 {sub.image ? (
-                                                    <Image src={sub.image} alt={sub.name} fill className="object-contain" sizes="100px" />
+                                                    <Image src={sub.image} alt={sub.name} fill className="object-cover" sizes="100px" />
                                                 ) : (
                                                     <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                                                         <FiPackage size={24} style={{ color: '#d1d5db' }} />

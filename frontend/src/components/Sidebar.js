@@ -2,9 +2,7 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { ChevronRightIcon, CheckIcon } from '@heroicons/react/24/outline';
-
-const imgVector2 = "https://www.figma.com/api/mcp/asset/31a2c546-e600-4cc0-a4dd-670ec2ed76e8.svg";
+import { ChevronRightIcon, CheckIcon, InformationCircleIcon } from '@heroicons/react/24/outline';
 
 const Sidebar = ({
     selectedDuration,
@@ -109,9 +107,8 @@ const Sidebar = ({
                     <p className="font-bold text-[12px] leading-[16px] text-[#757575] tracking-[-0.4px] uppercase m-0">
                         RENT FOR
                     </p>
-                    <div className="w-[16px] h-[16px] shrink-0 relative overflow-hidden">
-                        <img alt="info" className="absolute inset-0 size-full block" src={imgVector2} />
-                    </div>
+                    <InformationCircleIcon className="w-[16px] h-[16px] shrink-0 text-[#757575]" />
+
                 </div>
 
                 <div className="flex flex-wrap gap-[12px] items-start w-full cursor-pointer">
@@ -160,15 +157,31 @@ const Sidebar = ({
                                 <button
                                     type="button"
                                     className={`size-[20px] rounded-full border shrink-0 relative flex items-center justify-center transition-all ${
-                                        isSelected ? 'border-[#1f1f1f]' : 'border-[#afafaf] group-hover:border-[#757575]'
+                                        isSelected
+                                            ? 'bg-[#2563eb] border-[#2563eb]'
+                                            : 'bg-white border-[#c4c4c4] group-hover:border-[#757575]'
                                     }`}
                                 >
                                     {isSelected && (
-                                        <div className="size-[8px] rounded-full bg-[#1f1f1f]" />
+                                        <svg
+                                            width="12"
+                                            height="12"
+                                            viewBox="0 0 12 12"
+                                            fill="none"
+                                            xmlns="http://www.w3.org/2000/svg"
+                                        >
+                                            <path
+                                                d="M2.5 6.2L4.7 8.4L9.5 3.6"
+                                                stroke="white"
+                                                strokeWidth="1.6"
+                                                strokeLinecap="round"
+                                                strokeLinejoin="round"
+                                            />
+                                        </svg>
                                     )}
                                 </button>
                                 <span className={`font-['Mona_Sans'] text-[12px] leading-[16px] tracking-[-0.4px] whitespace-nowrap transition-colors ${
-                                    isSelected ? 'font-bold text-[#1f1f1f]' : 'font-semibold text-[#333] group-hover:text-black'
+                                    isSelected ? 'font-semibold text-[#1f1f1f]' : 'font-semibold text-[#333] group-hover:text-black'
                                 }`}>
                                     {option}
                                 </span>

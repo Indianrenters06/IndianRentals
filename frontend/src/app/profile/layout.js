@@ -90,12 +90,12 @@ export default function ProfileLayout({ children }) {
     const showBreadcrumb = pathname !== '/profile/overview' && !!currentPageName;
 
     return (
-        <div className="w-full bg-white lg:bg-[#F5F5F5] min-h-screen" style={{ opacity: 1 }}>
+        <div className="w-full bg-white min-h-screen" style={{ opacity: 1 }}>
             <div className="max-w-[1440px] mx-auto flex items-start justify-center py-0 lg:py-[10px] h-auto">
                 <div className="max-w-[1200px] w-full mx-auto px-5 md:px-8 flex flex-col lg:flex-row gap-[20px] lg:items-start">
                     {/* Sidebar (desktop only) — exact rebuild of Figma "side-bar-settings" (node 23050:11078) */}
                     <div className="hidden lg:block lg:w-[250px] flex-shrink-0 lg:self-start">
-                        <div className="bg-white border border-[#e2e2e2] rounded-2xl px-[22px] py-8 flex items-center">
+                        <div className="bg-[#f6f6f6] border border-[#e2e2e2] rounded-xl px-[22px] py-8 flex items-center overflow-hidden">
                             <div className="flex flex-col gap-[22px] w-[206px]">
                                 {/* Profile header */}
                                 <div className="flex items-center gap-[10px]">
@@ -133,7 +133,7 @@ export default function ProfileLayout({ children }) {
                                                 <p className="text-[12px] font-bold leading-4 tracking-[-0.4px] text-[#757575] uppercase">
                                                     {section.label}
                                                 </p>
-                                                <div className="h-px w-full bg-[#e2e2e2]" />
+                                                <div className="h-px w-full bg-[#afafaf]" />
                                                 <div className="flex flex-col gap-[11px]">
                                                     {section.items.map((item) => (
                                                         <Link
@@ -160,29 +160,12 @@ export default function ProfileLayout({ children }) {
                         </div>
                     </div>
 
-                    {/* Main Content — single dashed panel, exact match of Figma "Frame 237" (node 23050:11079):
-                        1px #cbcbcb stroke, 10px dash / 10px gap, 20px radius, 20px horizontal / 40px vertical padding.
-                        Drawn as an SVG stroke so the dash length matches Figma exactly (CSS border-dashed can't). */}
+                    {/* Main Content — Figma "Frame 237" (node 23059:14187): plain white panel, no border,
+                        20px radius, 20px horizontal / 40px vertical padding. */}
                     {/* min-w-0: without it this flex item won't shrink below its content's min-content
-                        width, so a wide child (e.g. the invoices table) pushes the panel — and its right
-                        padding and dashed border — off screen instead of scrolling inside it. */}
+                        width, so a wide child (e.g. the invoices table) pushes the panel off screen
+                        instead of scrolling inside it. */}
                     <div className="flex-1 min-w-0 w-full bg-white rounded-none lg:rounded-[20px] py-5 lg:px-5 lg:py-10 h-auto lg:self-start relative overflow-visible">
-                        <div className="hidden lg:block absolute inset-0 pointer-events-none">
-                            <svg className="w-full h-full overflow-visible">
-                                <rect
-                                    x="0.5"
-                                    y="0.5"
-                                    width="calc(100% - 1px)"
-                                    height="calc(100% - 1px)"
-                                    rx="20"
-                                    ry="20"
-                                    fill="none"
-                                    stroke="#cbcbcb"
-                                    strokeWidth="1"
-                                    strokeDasharray="10 10"
-                                />
-                            </svg>
-                        </div>
                         {/* Breadcrumb — "Overview › Page Name", shown on all sub-pages */}
                         {showBreadcrumb && (
                             <div className="flex items-center gap-1.5 bg-[#f6f6f6] rounded-[6px] px-3 py-1.5 mb-4 self-start">

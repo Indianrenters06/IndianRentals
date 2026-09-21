@@ -87,10 +87,17 @@ const invoiceHref = (order) => `/profile/invoices?order=${encodeURIComponent(ord
 const rentAgainHref = (order) => (order.productId ? `/products/${order.productId}` : '/products');
 
 // One label/value column in the card header — Figma "Frame 422..427".
-const HeaderCell = ({ label, value }) => (
-    <div className="flex flex-col items-center justify-center gap-1 whitespace-nowrap">
-        <span className="text-[12px] font-semibold leading-4 tracking-[-0.4px] text-[#757575] text-center">{label}</span>
-        <span className="text-[12px] font-bold leading-4 tracking-[-0.4px] text-[#333333] text-center">{value}</span>
+// `truncate`: for free-text values (e.g. a long delivery name) that could otherwise blow out
+// the row width and force the "Under Review" pill onto its own line.
+const HeaderCell = ({ label, value, truncate = false }) => (
+    <div className={`flex flex-col items-center justify-center gap-1 ${truncate ? 'min-w-0 max-w-[130px]' : 'whitespace-nowrap'}`}>
+        <span className="text-[12px] font-semibold leading-4 tracking-[-0.4px] text-[#757575] text-center whitespace-nowrap">{label}</span>
+        <span
+            className={`text-[12px] font-bold leading-4 tracking-[-0.4px] text-[#333333] text-center ${truncate ? 'block w-full truncate' : 'whitespace-nowrap'}`}
+            title={truncate ? value : undefined}
+        >
+            {value}
+        </span>
     </div>
 );
 
@@ -190,15 +197,17 @@ export default function MyOrdersPage() {
 
     return (
         <div className="flex flex-col gap-3">
-            {/* Toggle — My Orders / Subscriptions */}
+            {/* Toggle — My Orders / Subscriptions — Figma "btn-extra" (node 23059:14189/14190): fixed 180x39, px-40 py-7 */}
             <div className="flex items-start gap-[10px]">
                 {[{ key: 'orders', label: 'My Orders' }, { key: 'subscriptions', label: 'Subscriptions' }].map(({ key, label }) => (
                     <button
                         key={key}
                         onClick={() => handleViewChange(key)}
-                        className={`flex flex-1 items-center justify-center rounded-[59px] py-[7px] text-[14px] lg:text-[18px] font-normal leading-[20px] lg:leading-[25px] tracking-[-0.8px] transition-colors ${viewType === key ? 'bg-[#333333] text-[#eeeeee]' : 'bg-[#eeeeee] text-[#333333]'}`}
+                        className={`flex flex-1 lg:flex-none lg:w-[180px] items-center justify-center rounded-[59px] px-5 lg:px-[40px] py-[7px] transition-colors ${viewType === key ? 'bg-[#333333]' : 'bg-[#eeeeee]'}`}
                     >
-                        {label}
+                        <p className={`font-sans font-normal text-[14px] lg:text-[18px] leading-[20px] lg:leading-[25px] tracking-[-0.8px] whitespace-nowrap ${viewType === key ? 'text-[#eeeeee]' : 'text-[#333333]'}`}>
+                            {label}
+                        </p>
                     </button>
                 ))}
             </div>
@@ -240,7 +249,7 @@ export default function MyOrdersPage() {
                     {filteredOrders.map((order) => (
                         <div
                             key={order.id}
-                            className="w-full overflow-hidden rounded-[16px] border-[1.5px] border-[#e2e2e2] bg-white shadow-[0px_6px_13px_0px_rgba(245,245,245,0.5)]"
+                            className="w-full overflow-hidden rounded-[16px] border-[1.5px] border-[#e2e2e2] bg-white shadow-[0px_93px_37px_0px_rgba(245,245,245,0.01),0px_53px_32px_0px_rgba(245,245,245,0.05),0px_23px_23px_0px_rgba(245,245,245,0.09),0px_6px_13px_0px_rgba(245,245,245,0.1)]"
                         >
                             {/* ── MOBILE CARD: Figma exact layout ── */}
                             <div className="lg:hidden">
@@ -323,8 +332,8 @@ export default function MyOrdersPage() {
 
                             {/* ── DESKTOP CARD: original horizontal layout ── */}
                             <div className="hidden lg:block pb-4">
-                                <div className="flex w-full items-center justify-between gap-4 overflow-x-auto border-b-[1.5px] border-[#e2e2e2] px-4 py-2 scrollbar-hide">
-                                    <div className="flex shrink-0 items-center gap-[53px]">
+                                <div className="flex w-full items-center justify-between gap-[10px] border-b-[1.5px] border-[#e2e2e2] px-4 py-2">
+                                    <div className="flex flex-1 items-center justify-between min-w-0">
                                         <HeaderCell label="Order Date" value={order.date} />
                                         <HeaderCell label="Order No." value={order.id} />
                                         <HeaderCell label="Delivery to" value={order.deliveryTo} />
@@ -345,7 +354,7 @@ export default function MyOrdersPage() {
                                             </p>
                                             <div className="mt-1 flex items-center gap-[20px]">
                                                 <Chip label="Plan Duration" value={order.planDuration} />
-                                                <div className="h-5 w-px bg-[#cbcbcb]" />
+                                                <div className="h-5 w-px bg-[#afafaf]" />
                                                 <Chip
                                                     label="Rental Period"
                                                     value={<><OrdinalDate value={order.rentalStart} /> to <OrdinalDate value={order.rentalEnd} /></>}

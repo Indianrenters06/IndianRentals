@@ -9,7 +9,7 @@ import { BsCheckCircleFill, BsCreditCard } from 'react-icons/bs';
 import { FaArrowRight, FaSpinner } from 'react-icons/fa';
 import { IoIosArrowDown } from "react-icons/io";
 import { AiOutlineClose } from "react-icons/ai";
-import { ShoppingCartSimple, TrashSimple } from '@phosphor-icons/react';
+import { ShoppingCartSimple, TrashSimple, Minus, Plus } from '@phosphor-icons/react';
 
 import { useRouter } from 'next/navigation';
 import { useSelector, useDispatch } from 'react-redux';
@@ -32,7 +32,7 @@ const CartItem = ({ item, onUpdate, onRemove }) => {
             <div className="flex items-start justify-between w-full">
                 <div className="w-12 h-12 relative shrink-0 rounded-[5px] overflow-hidden bg-white">
                     {item.image ? (
-                        <Image src={item.image} alt={item.name} fill className="object-contain p-0.5" />
+                        <Image src={item.image} alt={item.name} fill className="object-cover" />
                     ) : (
                         <div className="w-full h-full flex items-center justify-center text-gray-300 bg-gray-50 text-[9px]">No Img</div>
                     )}
@@ -45,7 +45,6 @@ const CartItem = ({ item, onUpdate, onRemove }) => {
             {/* Title + Description */}
             <div className="flex flex-col w-full text-[#333] tracking-[-0.4px]">
                 <p className="font-bold text-[12px] leading-[18px]">{item.name}</p>
-                <p className="font-semibold text-[10px] leading-[16px]">{item.description}</p>
             </div>
 
             <div className="h-px bg-gray-200 w-full" />
@@ -111,7 +110,7 @@ const CartItem = ({ item, onUpdate, onRemove }) => {
                     {/* Image 48×48, rounded-5, no border */}
                     <div className="size-[48px] relative shrink-0 rounded-[5px] overflow-hidden bg-white">
                         {item.image ? (
-                            <Image src={item.image} alt={item.name} fill className="object-contain" />
+                            <Image src={item.image} alt={item.name} fill className="object-cover" />
                         ) : (
                             <div className="w-full h-full flex items-center justify-center text-gray-300 bg-gray-50 text-[10px]">No Img</div>
                         )}
@@ -119,7 +118,6 @@ const CartItem = ({ item, onUpdate, onRemove }) => {
                     {/* Title & Desc */}
                     <div className="flex flex-col min-w-0 text-[#333] tracking-[-0.4px]">
                         <p className="font-bold text-[16px] leading-[23px]">{item.name}</p>
-                        <p className="font-semibold text-[14px] leading-[20px]">{item.description}</p>
                     </div>
                 </div>
                 <button
@@ -164,17 +162,18 @@ const CartItem = ({ item, onUpdate, onRemove }) => {
                     </div>
 
                     {/* Vertical divider */}
-                    <div className="h-[36px] w-px bg-[#e2e2e2]" />
+                    <div className="h-[36px] w-px bg-[#cbcbcb]" />
 
-                    {/* Fixed Quantity Badge (Quantity cannot be changed) */}
-                    <div className="flex items-center gap-[6px] bg-[#f9f9f9] border border-[#cbcbcb] rounded-[8px] px-[12px] py-[6px]">
-                        <span className="text-[14px] font-medium text-[#757575] tracking-[-0.4px]">Qty:</span>
-                        <span className="text-[14px] font-semibold text-[#333] tracking-[-0.4px]">1</span>
+                    {/* Quantity stepper (Figma) — quantity is locked at 1, so the +/- controls are non-interactive */}
+                    <div className="flex items-center gap-[8px] bg-white border border-[#cbcbcb] rounded-[8px] px-[12px] py-[6px]">
+                        <Minus size={15} className="text-[#333] cursor-not-allowed" />
+                        <span className="text-[14px] font-semibold text-[#333] tracking-[-0.4px]">{item.quantity}</span>
+                        <Plus size={15} className="text-[#333] cursor-not-allowed" />
                     </div>
                 </div>
 
                 {/* Middle vertical divider */}
-                <div className="h-[36px] w-px bg-[#e2e2e2]" />
+                <div className="h-[36px] w-px bg-[#cbcbcb]" />
 
                 {/* Right: Pricing */}
                 <div className="flex items-center gap-[13px]">
@@ -182,7 +181,7 @@ const CartItem = ({ item, onUpdate, onRemove }) => {
                         <p className="text-[14px] font-medium text-[#545454] tracking-[-0.4px] leading-[20px]">Monthly Rent</p>
                         <p className="text-[18px] font-bold text-[#333] tracking-[-0.8px] leading-[25px]">₹{(item.monthlyRent || item.price) * item.quantity}</p>
                     </div>
-                    <div className="h-[36px] w-px bg-[#e2e2e2]" />
+                    <div className="h-[36px] w-px bg-[#cbcbcb]" />
                     <div className="flex flex-col gap-[2px] items-center justify-center whitespace-nowrap">
                         <p className="text-[14px] font-medium text-[#545454] tracking-[-0.4px] leading-[20px]">Refundable Amount</p>
                         <p className="text-[18px] font-bold text-[#333] tracking-[-0.8px] leading-[25px]">₹{item.refundableAmount * item.quantity}</p>
@@ -365,7 +364,7 @@ export default function CartPage() {
                             className="flex flex-col gap-[20px] w-full lg:w-[402px] shrink-0"
                         >
                             {/* Coupon Section */}
-                            <div className="bg-white p-5 rounded-2xl border border-[#E3E3E3] shadow-sm">
+                            <div className="bg-white p-5 rounded-2xl shadow-[0px_4px_24px_rgba(0,0,0,0.08)]">
                                 <div
                                     className="flex mb-4 w-full"
                                     style={{ height: '39px', gap: '11px' }}

@@ -150,24 +150,13 @@ const ProductCard = ({ product, mobile }) => {
                         </span>
                     </div>
 
-                    {/* Product Image */}
-                    <div
-                        style={{
-                            position: 'absolute',
-                            top: '24px',
-                            bottom: '36px',
-                            left: '8px',
-                            right: '8px',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center'
-                        }}
-                    >
+                    {/* Product Image — cover to cover, no inset padding */}
+                    <div style={{ position: 'absolute', inset: 0 }}>
                         <Image
                             src={product.image}
                             alt={product.name}
                             fill
-                            className="object-contain mix-blend-multiply"
+                            className="object-cover"
                             style={{
                                 transform: isHoveredOrTapped ? 'scale(1.05)' : 'scale(1)',
                                 transition: 'transform 0.4s ease'
@@ -432,7 +421,7 @@ const ProductCard = ({ product, mobile }) => {
 
                     {/* Product image */}
                     <div style={{ width: 240, height: 220, position: 'relative', transform: isHovered ? 'scale(1.05)' : 'scale(1)', transition: 'transform 0.5s ease' }}>
-                        <Image src={product.image} alt={product.name} fill className="object-contain mix-blend-multiply" sizes="285px" />
+                        <Image src={product.image} alt={product.name} fill className="object-cover" sizes="285px" />
                     </div>
                 </div>
 

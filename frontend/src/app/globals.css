@@ -180,6 +180,17 @@
     @apply transition-all duration-200 ease-out hover:-translate-y-0.5 hover:shadow-md;
   }
 
+  /* Hide the native scrollbar on horizontally/vertically scrollable containers
+     (content stays scrollable — this only removes the visible track/thumb/arrows,
+     which the Figma designs never show). */
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+
   .btn-primary:disabled {
     opacity: 1;
     background-color: var(--theme-primary-disabled);

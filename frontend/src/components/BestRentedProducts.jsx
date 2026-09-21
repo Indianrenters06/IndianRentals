@@ -395,10 +395,9 @@ const ProductCard = ({ product, index, isDesktop, handleAddToCart }) => {
                         aria-pressed={isWishlisted}>
                         <Heart size={21} weight={isWishlisted ? "fill" : "regular"} color={isWishlisted ? "#ED2115" : "#000000"} />
                     </button>
-                    {/* Fixed inset frame: every product image gets the same box and the same
-                        breathing room, whatever aspect ratio was uploaded. */}
-                    <div className="absolute inset-0 flex items-center justify-center" style={{ padding: '26px 10px 10px' }}>
-                        <motion.img variants={{ initial: { scale: 1 }, hover: { scale: 1.05 } }} src={product.image} alt={product.name} className="max-w-full max-h-full object-contain object-center transition-transform duration-700 ease-out" />
+                    {/* Cover to cover: image fills the whole card, edge to edge. */}
+                    <div className="absolute inset-0">
+                        <motion.img variants={{ initial: { scale: 1 }, hover: { scale: 1.05 } }} src={product.image} alt={product.name} className="w-full h-full object-cover transition-transform duration-700 ease-out" />
                     </div>
                 </div>
                 {/* Text Section */}

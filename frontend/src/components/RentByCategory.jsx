@@ -236,7 +236,7 @@ const RentByCategory = () => {
                                         src={cat.image}
                                         alt={cat.name}
                                         fill
-                                        className="object-contain mix-blend-multiply brightness-[1.05] contrast-[1.05]"
+                                        className="object-cover"
                                     />
                                 ) : (
                                     <div className="text-gray-400">
@@ -335,7 +335,7 @@ const RentByCategory = () => {
                                                                 src={cat.image}
                                                                 alt={cat.name}
                                                                 fill
-                                                                className="object-contain"
+                                                                className="object-cover"
                                                             />
                                                         </div>
                                                     ) : (

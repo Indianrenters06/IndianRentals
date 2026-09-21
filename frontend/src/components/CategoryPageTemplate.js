@@ -245,7 +245,7 @@ const CategoryPageTemplate =({ productNamePrefix, productDescription, basePrice,
                                                         src={sub.image}
                                                         alt={sub.name}
                                                         fill
-                                                        className="object-contain"
+                                                        className="object-cover"
                                                         sizes="100px"
                                                     />
                                                 ) : (

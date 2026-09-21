@@ -287,7 +287,7 @@ export default function ProductDetailPage() {
                                 src={product.images?.[0] || '/images/placeholder.png'}
                                 alt={product.name}
                                 fill
-                                className="object-contain"
+                                className="object-cover"
                                 priority
                                 sizes="300px"
                             />
@@ -684,7 +684,7 @@ export default function ProductDetailPage() {
                                         {(product.images && product.images.length > 0 ? product.images : [mainImage, mainImage, mainImage, mainImage]).map((img, index) => (
                                             <SwiperSlide key={index} className="flex items-center justify-center">
                                                 <div
-                                                    className="relative flex items-center justify-center object-contain mix-blend-darken brightness-[1.08] contrast-[1.04] group-hover:scale-105 transition-transform duration-700 ease-out"
+                                                    className="relative flex items-center justify-center group-hover:scale-105 transition-transform duration-700 ease-out overflow-hidden"
                                                     style={{
                                                         width: '100%',
                                                         maxWidth: '516px',
@@ -696,7 +696,7 @@ export default function ProductDetailPage() {
                                                         src={img}
                                                         alt={`${product.name} - ${index}`}
                                                         fill
-                                                        className="object-contain"
+                                                        className="object-cover"
                                                         sizes="(max-width: 768px) 100vw, 50vw"
                                                         priority={index === 0}
                                                     />
@@ -745,8 +745,8 @@ export default function ProductDetailPage() {
                                         >
                                             {(product.images && product.images.length > 0 ? product.images : [mainImage, mainImage, mainImage, mainImage]).map((img, i) => (
                                                 <SwiperSlide key={i}>
-                                                    <div className="w-full h-full bg-white border border-[#EDEDED] rounded-xl p-2 flex items-center justify-center cursor-pointer transition-all hover:border-gray-400 overflow-hidden relative">
-                                                        <Image src={img} alt={`Thumb ${i}`} fill className="object-contain mix-blend-darken brightness-[1.08] contrast-[1.04]" />
+                                                    <div className="w-full h-full bg-white border border-[#EDEDED] rounded-xl cursor-pointer transition-all hover:border-gray-400 overflow-hidden relative">
+                                                        <Image src={img} alt={`Thumb ${i}`} fill className="object-cover" />
                                                     </div>
                                                 </SwiperSlide>
                                             ))}
