@@ -269,7 +269,7 @@ const BannerCarousel = ({ banners = [], current, setCurrent, isDesktop }) => {
 
     return (
         <div
-            className="relative overflow-hidden shadow-xl w-full select-none"
+            className={`relative overflow-hidden w-full select-none ${isDesktop ? '' : 'shadow-xl'}`}
             style={{
                 height: '387px',
                 borderRadius: '20px'
@@ -310,12 +310,14 @@ const BannerCarousel = ({ banners = [], current, setCurrent, isDesktop }) => {
                     <div
                         className="absolute inset-0 z-10 pointer-events-none"
                         style={{
-                            background: 'linear-gradient(180deg, rgba(0, 0, 0, 0.15) 0%, rgba(0, 0, 0, 0.45) 45%, rgba(0, 0, 0, 0.88) 100%)'
+                            background: isDesktop
+                                ? 'linear-gradient(180.44deg, rgba(0, 0, 0, 0) 52.71%, rgba(0, 0, 0, 0.8) 86.37%)'
+                                : 'linear-gradient(180deg, rgba(0, 0, 0, 0.15) 0%, rgba(0, 0, 0, 0.45) 45%, rgba(0, 0, 0, 0.88) 100%)'
                         }}
                     />
 
                     {/* Floating Side Navigation Arrows */}
-                    <div className="absolute inset-y-0 left-0 right-0 z-30 flex items-center justify-between px-3 sm:px-4 pointer-events-none">
+                    {!isDesktop && <div className="absolute inset-y-0 left-0 right-0 z-30 flex items-center justify-between px-3 sm:px-4 pointer-events-none">
                         <button
                             type="button"
                             onClick={(e) => go(-1, e)}
@@ -334,10 +336,48 @@ const BannerCarousel = ({ banners = [], current, setCurrent, isDesktop }) => {
                         >
                             <ChevronRightIcon strokeWidth={2.5} className="w-5 h-5 text-white" />
                         </button>
-                    </div>
+                    </div>}
+
+                    {/* Desktop — Figma: 31/30px padding, title row (24px circle arrows, 12px gap,
+                        27/35 semibold white), 21/28 #CBCBCB subtitle, 10px to 4px dots + 6px ring */}
+                    {isDesktop && (
+                        <div className="absolute inset-0 z-20 flex flex-col items-center justify-end gap-[10px] px-[31px] py-[30px] text-center">
+                            <div className="flex flex-col items-center gap-2 w-full">
+                                <div className="flex items-center gap-3">
+                                    <button type="button" onClick={(e) => go(-1, e)} aria-label="Previous slide" className="shrink-0 cursor-pointer">
+                                        <img src="/icons/circle-chevron-left.svg" alt="" width={24} height={24} />
+                                    </button>
+                                    <h3 className="m-0 text-white font-semibold text-[27px] leading-[35px] tracking-[-0.8px] whitespace-nowrap" style={{ fontFamily: "'Mona Sans', sans-serif" }}>
+                                        {slide.title}
+                                    </h3>
+                                    <button type="button" onClick={(e) => go(1, e)} aria-label="Next slide" className="shrink-0 cursor-pointer">
+                                        <img src="/icons/circle-chevron-right.svg" alt="" width={24} height={24} />
+                                    </button>
+                                </div>
+                                <p className="m-0 text-[#CBCBCB] font-normal text-[21px] leading-[28px] tracking-[-0.8px]" style={{ fontFamily: "'Mona Sans', sans-serif" }}>
+                                    {slide.subtitle}
+                                </p>
+                            </div>
+                            <div className="flex items-center justify-center gap-2 h-5 w-[60px]">
+                                {banners.map((_, i) => (
+                                    <button
+                                        key={i}
+                                        aria-label={`Go to slide ${i + 1}`}
+                                        onClick={(e) => {
+                                            e.preventDefault();
+                                            e.stopPropagation();
+                                            setDirection(i > current ? 1 : -1);
+                                            setCurrent(i);
+                                        }}
+                                        className={`rounded-full ${i === current ? 'w-1.5 h-1.5 border-[1.2px] border-white' : 'w-1 h-1 bg-white'}`}
+                                    />
+                                ))}
+                            </div>
+                        </div>
+                    )}
 
                     {/* Banner Content: positioned cleanly in lower half */}
-                    <div
+                    {!isDesktop && <div
                         className="absolute inset-x-0 bottom-0 z-20 flex flex-col items-center text-center pb-6 px-6 sm:px-8 pointer-events-none"
                         style={{ gap: '8px' }}
                     >
@@ -386,7 +426,7 @@ const BannerCarousel = ({ banners = [], current, setCurrent, isDesktop }) => {
                                 />
                             ))}
                         </div>
-                    </div>
+                    </div>}
                 </motion.div>
             </AnimatePresence>
         </div>
@@ -718,7 +758,7 @@ const ShowcaseProductCard = ({ product, index, isDesktop, handleAddToCart }) => 
         );
     }
 
-    const CARD_W = 285;
+    const CARD_W = 281; // Figma PRODUCT CARD v2 in this section
     const CARD_H = 387;
     const HOVER_H = 440;
     const LIFT = 12;
@@ -781,13 +821,13 @@ const ShowcaseProductCard = ({ product, index, isDesktop, handleAddToCart }) => 
                     }}
                 >
                     <div className="absolute z-20 flex items-center" style={{ top: "14.57px", left: "14.49px", gap: "4px" }}>
-                        <span className="text-white text-[10px] font-bold rounded-full flex items-center justify-center shrink-0"
-                            style={{ height: "24px", background: "hsla(3, 86%, 51%, 1)", fontFamily: "'Mona Sans', sans-serif", fontSize: "10px", fontWeight: 600, paddingLeft: "10px", paddingRight: "10px", borderRadius: "27px" }}>
+                        <span className="rounded-full flex items-center justify-center shrink-0"
+                            style={{ background: "#ED2115", color: "#FFF2F1", fontFamily: "'Mona Sans', sans-serif", fontSize: "12px", lineHeight: "16px", letterSpacing: "-0.4px", fontWeight: 600, padding: "4px 10px", borderRadius: "27px" }}>
                             -20% off
                         </span>
                         {product.isNew && (
-                            <span className="text-white text-[10px] font-bold rounded-full flex items-center justify-center shrink-0"
-                                style={{ height: "24px", paddingLeft: "10px", paddingRight: "10px", backgroundColor: "hsla(122, 100%, 35%, 1)", fontFamily: "'Mona Sans', sans-serif", fontSize: "10px", fontWeight: 600, borderRadius: "27px" }}>
+                            <span className="rounded-full flex items-center justify-center shrink-0"
+                                style={{ backgroundColor: "#00B505", color: "#E8FFE4", fontFamily: "'Mona Sans', sans-serif", fontSize: "12px", lineHeight: "16px", letterSpacing: "-0.4px", fontWeight: 600, padding: "4px 10px", borderRadius: "27px" }}>
                                 New
                             </span>
                         )}
@@ -817,48 +857,46 @@ const ShowcaseProductCard = ({ product, index, isDesktop, handleAddToCart }) => 
                 <div
                     className="flex flex-col relative font-manrope bg-white"
                     style={{
-                        width: '285px',
+                        width: '100%',
                         padding: '8px 12px 12px',
                         gap: '8px',
                     }}
                 >
-                    <h3 className="font-manrope line-clamp-1 shrink-0"
-                        style={{ fontSize: "18px", fontWeight: 600, lineHeight: "25px", letterSpacing: "-0.4px", color: isHovered ? 'hsla(3, 100%, 56%, 1)' : "hsla(0, 0%, 16%, 1)", transition: 'color 0.3s' }}>
+                    <h3 className="line-clamp-1 shrink-0"
+                        style={{ fontFamily: "'Mona Sans', sans-serif", fontSize: "18px", fontWeight: 600, lineHeight: "25px", letterSpacing: "-0.8px", color: isHovered ? 'hsla(3, 100%, 56%, 1)' : "#292929", transition: 'color 0.3s' }}>
                         {product.name}
                     </h3>
 
                     <div className="flex items-center justify-between shrink-0" style={{ height: "16px" }}>
-                        <div className="flex items-center gap-1">
-                            <div className="flex text-[#FF9500]">
-                                {[1, 2, 3, 4, 5].map(s => <Star key={s} size={14} weight="fill" className={s <= Math.round(product.rating || 4) ? "" : "opacity-20"} />)}
+                        <div className="flex items-center justify-between" style={{ width: "128px" }}>
+                            <div className="flex items-center" style={{ gap: "2px" }}>
+                                {[1, 2, 3, 4, 5].map(s => <img key={s} src="/icons/product-star.svg" alt="" width={16} height={16} className={s <= Math.round(product.rating || 4) ? "" : "opacity-20"} />)}
                             </div>
-                            <span className="ml-1" style={{ fontFamily: "'Mona Sans', sans-serif", fontSize: "11px", fontWeight: 500, color: "hsla(0, 0%, 33%, 1)", letterSpacing: "-0.01em" }}>
+                            <span style={{ fontFamily: "'Mona Sans', sans-serif", fontSize: "12px", lineHeight: "16px", fontWeight: 500, color: "#545454", letterSpacing: "-0.4px" }}>
                                 {product.rating || "4.5"} ({product.reviews || 12})
                             </span>
                         </div>
-                        <div className="flex items-center gap-1.5" style={{ color: "hsla(0, 0%, 65%, 1)" }}>
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-[16px] h-[16px]">
-                                <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 18.75a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 0 1-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m3 0h1.125c.621 0 1.129-.504 1.09-1.124a17.902 17.902 0 0 0-3.213-9.193 2.056 2.056 0 0 0-1.58-.86H14.25M16.5 18.75h-2.25m0-11.177v-.958c0-.568-.422-1.048-.987-1.106a48.554 48.554 0 0 0-10.026 0 1.106 1.106 0 0 0-.987 1.106v7.635m12-6.677v6.677m0 4.5v-4.5m0 0h-12" />
-                            </svg>
-                            <span style={{ fontSize: "12px", fontWeight: 400, letterSpacing: "-0.48px" }}>2-4 days</span>
+                        <div className="flex items-center" style={{ gap: "4px" }}>
+                            <img src="/icons/delivery-truck.svg" alt="" width={16} height={16} />
+                            <span className="font-manrope" style={{ fontSize: "12px", lineHeight: 1.2, fontWeight: 500, letterSpacing: "-0.48px", color: "#AFAFAF" }}>2-4 days</span>
                         </div>
                     </div>
 
-                    <div className="flex items-center shrink-0" style={{ gap: "3px", marginTop: "-4px" }}>
-                        <span style={{ fontFamily: "'Mona Sans', sans-serif", fontSize: "11px", fontWeight: 500, color: "hsla(0, 0%, 33%, 1)", letterSpacing: "-0.01em" }}>from</span>
+                    <div className="flex items-center shrink-0" style={{ gap: "3px" }}>
+                        <span style={{ fontFamily: "'Mona Sans', sans-serif", fontSize: "12px", lineHeight: "16px", fontWeight: 500, color: "#000000", letterSpacing: "-0.4px" }}>from</span>
                         {product.originalPrice && (
-                            <span className="line-through decoration-[1.5px]" style={{ fontFamily: "'Mona Sans', sans-serif", fontSize: "16px", fontWeight: 600, color: "hsla(0, 0%, 46%, 1)", letterSpacing: "-0.4px" }}>₹{product.originalPrice}</span>
+                            <span className="line-through" style={{ fontFamily: "'Mona Sans', sans-serif", fontSize: "16px", lineHeight: "23px", fontWeight: 600, color: "#757575", letterSpacing: "-0.4px" }}>₹{product.originalPrice}</span>
                         )}
-                        <span className="font-bold tracking-tight ml-1" style={{ fontFamily: "'Mona Sans', sans-serif", fontSize: "26px", fontWeight: 600, color: "hsla(3, 100%, 56%, 1)", letterSpacing: "-0.04em" }}>₹{product.rentPrice}</span>
-                        <span style={{ fontFamily: "'Mona Sans', sans-serif", fontSize: "11px", fontWeight: 500, color: "hsla(0, 0%, 46%, 1)", letterSpacing: "-0.01em", marginLeft: "2px" }}>/month</span>
+                        <span style={{ fontFamily: "'Mona Sans', sans-serif", fontSize: "21px", lineHeight: "28px", fontWeight: 600, color: "#FF2C20", letterSpacing: "-0.8px" }}>₹{product.rentPrice}</span>
+                        <span style={{ fontFamily: "'Mona Sans', sans-serif", fontSize: "12px", lineHeight: "16px", fontWeight: 500, color: "#757575", letterSpacing: "-0.4px" }}>/month</span>
                     </div>
 
                     {/* Rent Now — slides in as card grows downward */}
-                    <div style={{ overflow: 'hidden', height: isHovered ? '43px' : '0px', opacity: isHovered ? 1 : 0, transition: 'height 0.28s ease, opacity 0.2s ease', display: 'flex', alignItems: 'flex-end' }}>
+                    <div style={{ overflow: 'hidden', height: isHovered ? '40px' : '0px', opacity: isHovered ? 1 : 0, transition: 'height 0.28s ease, opacity 0.2s ease', display: 'flex', alignItems: 'flex-end' }}>
                         <button
                             onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleAddToCart(e, product); }}
-                            className="btn-primary w-full text-[14px] active:scale-95"
-                            style={{ height: '38px', borderRadius: '100px', flexShrink: 0 }}
+                            className="mx-auto flex items-center justify-center bg-transparent text-[#141414] hover:bg-[#141414] hover:text-white transition-colors active:scale-95"
+                            style={{ width: '244px', maxWidth: '100%', height: '35px', borderRadius: '28px', border: '1px solid #141414', flexShrink: 0, fontFamily: "'Mona Sans', sans-serif", fontSize: '16px', lineHeight: '23px', fontWeight: 500, letterSpacing: '-0.4px' }}
                         >
                             Rent Now
                         </button>
@@ -993,15 +1031,15 @@ const FeaturedShowcase = () => {
     return (
         <section className={`bg-white ${isDesktop ? 'py-24' : 'py-6'} overflow-hidden`}>
 
-            <div className={`max-w-[1200px] mx-auto ${isDesktop ? 'px-4 sm:px-6' : 'px-0'}`}>
+            <div className={`max-w-[1200px] mx-auto ${isDesktop ? 'px-4 sm:px-6 xl:px-0' : 'px-0'}`}>
 
                 <div
                     className="flex flex-col lg:flex-row items-stretch"
-                    style={{ gap: isDesktop ? "56px" : "20px" }}
+                    style={{ gap: isDesktop ? "30px" : "20px" }}
                 >
 
                     {/* Left */}
-                    <div className="flex flex-col md:flex-row items-stretch gap-6 transition-all duration-500">
+                    <div className="flex flex-col md:flex-row items-stretch gap-6 lg:gap-5 transition-all duration-500">
                         {products[0] && (
                             <ShowcaseProductCard
                                 product={products[0]}

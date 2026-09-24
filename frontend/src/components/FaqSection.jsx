@@ -1,5 +1,6 @@
 "use client";
 import React, { useState, useEffect } from 'react';
+import Image from 'next/image';
 import { PiCaretDown, PiCaretUp } from 'react-icons/pi';
 
 const faqs = [
@@ -24,26 +25,25 @@ const faqs = [
 import { API } from '@/services/apiConfig';
 
 const FaqSection = ({ cmsData, limit, pageName }) => {
-    const [cms, setCms] = useState(cmsData || null);
-    const [loading, setLoading] = useState(!cmsData);
+    // CMS data fetched here; ignored when the parent passes cmsData directly.
+    const [fetchedCms, setFetchedCms] = useState(null);
+    const [fetching, setFetching] = useState(!cmsData);
     const [enabled, setEnabled] = useState(true);
+    const cms = cmsData || fetchedCms;
+    const loading = !cmsData && fetching;
 
     useEffect(() => {
-        if (cmsData) {
-            setCms(cmsData);
-            setLoading(false);
-            return;
-        }
+        if (cmsData) return;
 
         if (pageName === 'homepage') {
             window.fetch(`${API}/api/cms/homepage?t=${Date.now()}`)
                 .then(res => res.ok ? res.json() : null)
                 .then(data => {
-                    setCms(data);
+                    setFetchedCms(data);
                     if (data && data.homepageFaqEnabled === false) setEnabled(false);
-                    setLoading(false);
+                    setFetching(false);
                 })
-                .catch(() => setLoading(false));
+                .catch(() => setFetching(false));
             return;
         }
 
@@ -59,13 +59,13 @@ const FaqSection = ({ cmsData, limit, pageName }) => {
 
         Promise.all(fetches)
             .then(([faqData, pageData]) => {
-                setCms(faqData);
+                setFetchedCms(faqData);
                 if (pageData && pageData.faqSectionEnabled === false) {
                     setEnabled(false);
                 }
-                setLoading(false);
+                setFetching(false);
             })
-            .catch(() => setLoading(false));
+            .catch(() => setFetching(false));
     }, [cmsData, pageName]);
 
     const isHomepage = pageName === 'homepage';
@@ -84,22 +84,21 @@ const FaqSection = ({ cmsData, limit, pageName }) => {
         displayFaqs = displayFaqs.slice(0, limit);
     }
 
-    const [activeIndices, setActiveIndices] = useState([0]);
-
-    useEffect(() => {
-        // 1st FAQ is mandatorily open by default
-        if (displayFaqs && displayFaqs.length > 0) {
-            setActiveIndices([0]);
-        } else {
-            setActiveIndices([]);
-        }
-    }, [displayFaqs.length]);
+    // 1st FAQ is mandatorily open by default — and again whenever the list
+    // changes size (e.g. CMS items replace the fallback ones). Reset during
+    // render rather than in an effect, so there's no extra flash/re-render.
+    const [activeIndices, setActiveIndices] = useState(displayFaqs.length > 0 ? [0] : []);
+    const [faqCount, setFaqCount] = useState(displayFaqs.length);
+    if (faqCount !== displayFaqs.length) {
+        setFaqCount(displayFaqs.length);
+        setActiveIndices(displayFaqs.length > 0 ? [0] : []);
+    }
 
     const title = isHomepage
-        ? (cms?.homepageFaqTitle || "Frequently Asked Questions")
+        ? (cms?.homepageFaqTitle || "Everything you need to know about renting with IndianRenters.com")
         : (cms?.faqTitle || "Everything you need to know about renting with IndianRenters.com");
     const subtitle = isHomepage
-        ? (cms?.homepageFaqSubtitle || "")
+        ? (cms?.homepageFaqSubtitle || "Welcome to FAQ!")
         : (cms?.faqSubtitle || "Welcome to FAQ!");
 
     const toggleFaq = (index) => {
@@ -115,14 +114,9 @@ const FaqSection = ({ cmsData, limit, pageName }) => {
 
     return (
         <section
-            className="w-full border-t border-gray-100 bg-white"
-            style={{
-                paddingTop: '48px',
-                paddingBottom: '48px',
-                display: 'flex',
-                alignItems: 'center'
-            }}
+            className="w-full bg-white flex items-center py-[48px] lg:py-[100px]"
         >
+            {/* Desktop padding = Figma FAQ frame (node 22774:2807): 100px top/bottom, 120px side margins → 1200px content */}
             <div
                 className="max-w-[1200px] mx-auto px-5 sm:px-6 w-full flex flex-col lg:flex-row items-start gap-6 lg:gap-[40px]"
             >
@@ -155,14 +149,23 @@ const FaqSection = ({ cmsData, limit, pageName }) => {
                                     onClick={() => toggleFaq(index)}
                                 >
                                     <span
-                                        className="flex-1 group-hover:text-blue-600 transition-colors font-bold text-[#333333] tracking-[-0.8px] text-sm md:text-[18px] leading-[20px] md:leading-[25px]"
+                                        className="flex-1 font-bold text-[#333333] tracking-[-0.8px] text-sm md:text-[18px] leading-[20px] md:leading-[25px]"
                                         style={{ fontFamily: "'Mona Sans', sans-serif" }}
                                     >
                                         {faq.question}
                                     </span>
-                                    <span className="shrink-0 flex items-center justify-center size-[20px] md:size-[28px] text-[#333333] group-hover:text-blue-600 transition-colors">
+                                    <span className="md:hidden shrink-0 flex items-center justify-center size-[20px] text-[#333333]">
                                         {open ? <PiCaretUp /> : <PiCaretDown />}
                                     </span>
+                                    {/* Desktop — Figma "Icon" (28×28 chevron, node 22774:2781); points up when open */}
+                                    <Image
+                                        src="/icons/faq-chevron.svg"
+                                        alt=""
+                                        aria-hidden="true"
+                                        width={28}
+                                        height={28}
+                                        className={`hidden md:block shrink-0 transition-transform duration-300 ${open ? '' : 'rotate-180'}`}
+                                    />
                                 </button>
                                 <div
                                     className={`w-full overflow-hidden transition-all duration-300 ease-in-out ${open ? 'max-h-[500px] opacity-100' : 'max-h-0 opacity-0'}`}

@@ -336,7 +336,7 @@ const MobileProductCard = ({ product, handleAddToCart }) => {
     );
 };
 
-const ProductCard = ({ product, index, isDesktop, handleAddToCart }) => {
+const ProductCard = ({ product, index, isDesktop, handleAddToCart, cardW }) => {
     const [isHovered, setIsHovered] = useState(false);
     const router = useRouter();
     const dispatch = useDispatch();
@@ -348,9 +348,9 @@ const ProductCard = ({ product, index, isDesktop, handleAddToCart }) => {
         dispatch(toggleWishlist(product));
     };
 
-    // Figma lays out 4 cards of 285 + 3 gaps of 20 across a flush 1200 frame. The
-    // container here is 1200 *minus* px-6, so the cards shrink to keep 4 per view.
-    const CARD_W = 273;
+    // Figma lays out 4 cards of 285 + 3 gaps of 20 across a flush 1200 frame. Below
+    // 1280px the container loses its 1200px, so cards shrink to 273 to keep 4 per view.
+    const CARD_W = cardW || 273;
     const CARD_H = 387;
     const HOVER_H = 446;
     const LIFT = 12;
@@ -402,25 +402,25 @@ const ProductCard = ({ product, index, isDesktop, handleAddToCart }) => {
                 </div>
                 {/* Text Section */}
                 <div className="flex flex-col relative font-manrope bg-white" style={{ width: '100%', padding: '8px 12px 12px', gap: '8px' }}>
-                    <h3 className="font-manrope line-clamp-1 shrink-0" style={{ fontSize: "18px", fontWeight: 600, lineHeight: "25px", letterSpacing: "-0.4px", color: "hsla(0, 0%, 16%, 1)" }}>{product.name}</h3>
+                    <h3 className="line-clamp-1 shrink-0" style={{ fontFamily: "'Mona Sans', sans-serif", fontSize: "18px", fontWeight: 600, lineHeight: "25px", letterSpacing: "-0.8px", color: "#292929" }}>{product.name}</h3>
                     <div className="flex items-center justify-between shrink-0" style={{ height: "16px" }}>
-                        <div className="flex items-center gap-1">
-                            <div className="flex text-[#FF9500]">{[1, 2, 3, 4, 5].map(s => <Star key={s} size={14} weight="fill" className={s <= Math.round(product.rating || 4) ? "" : "opacity-20"} />)}</div>
-                            <span className="ml-1" style={{ fontFamily: "'Mona Sans', sans-serif", fontSize: "11px", fontWeight: 500, color: "hsla(0, 0%, 33%, 1)", letterSpacing: "-0.01em" }}>{product.rating || "4.5"} ({product.reviews || 12})</span>
+                        <div className="flex items-center justify-between" style={{ width: "128px" }}>
+                            <div className="flex items-center" style={{ gap: "2px" }}>{[1, 2, 3, 4, 5].map(s => <img key={s} src="/icons/product-star.svg" alt="" width={16} height={16} className={s <= Math.round(product.rating || 4) ? "" : "opacity-20"} />)}</div>
+                            <span style={{ fontFamily: "'Mona Sans', sans-serif", fontSize: "12px", lineHeight: "16px", fontWeight: 500, color: "#545454", letterSpacing: "-0.4px" }}>{product.rating || "4.5"} ({product.reviews || 12})</span>
                         </div>
-                        <div className="flex items-center gap-1.5" style={{ color: "hsla(0, 0%, 65%, 1)" }}>
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-[16px] h-[16px]"><path strokeLinecap="round" strokeLinejoin="round" d="M8.25 18.75a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 0 1-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m3 0h1.125c.621 0 1.129-.504 1.09-1.124a17.902 17.902 0 0 0-3.213-9.193 2.056 2.056 0 0 0-1.58-.86H14.25M16.5 18.75h-2.25m0-11.177v-.958c0-.568-.422-1.048-.987-1.106a48.554 48.554 0 0 0-10.026 0 1.106 1.106 0 0 0-.987 1.106v7.635m12-6.677v6.677m0 4.5v-4.5m0 0h-12" /></svg>
-                            <span style={{ fontSize: "12px", fontWeight: 400, letterSpacing: "-0.04em" }}>2-4 days</span>
+                        <div className="flex items-center" style={{ gap: "4px" }}>
+                            <img src="/icons/delivery-truck.svg" alt="" width={16} height={16} />
+                            <span className="font-manrope" style={{ fontSize: "12px", lineHeight: 1.2, fontWeight: 500, letterSpacing: "-0.48px", color: "#AFAFAF" }}>2-4 days</span>
                         </div>
                     </div>
                     <div className="flex items-center shrink-0" style={{ gap: "3px" }}>
                         <span style={{ fontFamily: "'Mona Sans', sans-serif", fontSize: "12px", fontWeight: 500, color: "#000", letterSpacing: "-0.4px" }}>from</span>
-                        {product.originalPrice && (<span className="line-through decoration-[1.5px]" style={{ fontFamily: "'Mona Sans', sans-serif", fontSize: "16px", fontWeight: 600, color: "hsla(0, 0%, 46%, 1)", letterSpacing: "-0.4px" }}>₹{product.originalPrice}</span>)}
-                        <span className="font-bold ml-1" style={{ fontFamily: "'Mona Sans', sans-serif", fontSize: "21px", fontWeight: 600, color: "#ff2c20", letterSpacing: "-0.8px" }}>₹{product.rentPrice}</span>
-                        <span style={{ fontFamily: "'Mona Sans', sans-serif", fontSize: "12px", fontWeight: 500, color: "hsla(0, 0%, 46%, 1)", letterSpacing: "-0.4px", marginLeft: "2px" }}>/month</span>
+                        {product.originalPrice && (<span className="line-through" style={{ fontFamily: "'Mona Sans', sans-serif", fontSize: "16px", lineHeight: "23px", fontWeight: 600, color: "#757575", letterSpacing: "-0.4px" }}>₹{product.originalPrice}</span>)}
+                        <span style={{ fontFamily: "'Mona Sans', sans-serif", fontSize: "21px", lineHeight: "28px", fontWeight: 600, color: "#FF2C20", letterSpacing: "-0.8px" }}>₹{product.rentPrice}</span>
+                        <span style={{ fontFamily: "'Mona Sans', sans-serif", fontSize: "12px", lineHeight: "16px", fontWeight: 500, color: "#757575", letterSpacing: "-0.4px" }}>/month</span>
                     </div>
-                    <div style={{ overflow: 'hidden', height: isHovered ? '43px' : '0px', opacity: isHovered ? 1 : 0, marginTop: isHovered ? 0 : '-8px', transition: 'height 0.28s ease, opacity 0.2s ease, margin-top 0.28s ease', display: 'flex', alignItems: 'flex-end' }}>
-                        <button onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleAddToCart(e, product); }} className="btn-primary w-full text-[14px] active:scale-95" style={{ height: '38px', borderRadius: '100px', flexShrink: 0, fontFamily: "'Mona Sans', sans-serif", fontWeight: 500, color: 'hsla(0, 0%, 12%, 1)' }}>Rent Now</button>
+                    <div style={{ overflow: 'hidden', height: isHovered ? '40px' : '0px', opacity: isHovered ? 1 : 0, marginTop: isHovered ? 0 : '-8px', transition: 'height 0.28s ease, opacity 0.2s ease, margin-top 0.28s ease', display: 'flex', alignItems: 'flex-end' }}>
+                        <button onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleAddToCart(e, product); }} className="mx-auto flex items-center justify-center bg-transparent text-[#141414] hover:bg-[#141414] hover:text-white transition-colors active:scale-95" style={{ width: '244px', maxWidth: '100%', height: '35px', borderRadius: '28px', border: '1px solid #141414', flexShrink: 0, fontFamily: "'Mona Sans', sans-serif", fontSize: '16px', lineHeight: '23px', fontWeight: 500, letterSpacing: '-0.4px' }}>Rent Now</button>
                     </div>
                 </div>
             </motion.div>
@@ -446,13 +446,19 @@ const SLIDE_GAP = 20;
 // this section from its own CMS document instead of the homepage's.
 const BestRentedProducts = ({ type = "bestRented", defaultTitle = "Curated Products", customProducts = null, titleOverride = null, productIdsOverride = null }) => {
     const [isDesktop, setIsDesktop] = useState(false);
-    const [trackBoundsRef, trackWidth, perView] = useWholeCardTrack(SLIDE_W, SLIDE_GAP);
+    // >=1280px the container is the full Figma 1200px, so cards take Figma's 285px.
+    const [isWide, setIsWide] = useState(false);
+    const slideW = isWide ? 285 : SLIDE_W;
+    const [trackBoundsRef, trackWidth, perView] = useWholeCardTrack(slideW, SLIDE_GAP);
     const [swiperInstance, setSwiperInstance] = useState(null);
     const router = useRouter();
     const dispatch = useDispatch();
 
     useEffect(() => {
-        const checkRes = () => setIsDesktop(window.innerWidth >= 1024);
+        const checkRes = () => {
+            setIsDesktop(window.innerWidth >= 1024);
+            setIsWide(window.innerWidth >= 1280);
+        };
         checkRes();
         window.addEventListener('resize', checkRes);
         return () => window.removeEventListener('resize', checkRes);
@@ -583,17 +589,21 @@ const BestRentedProducts = ({ type = "bestRented", defaultTitle = "Curated Produ
         <section
             className="w-full overflow-visible bg-white py-10 lg:py-24"
         >
-            <div className="max-w-[1200px] mx-auto px-4 sm:px-6">
-                <div className="flex flex-col mb-[40px] max-w-[350px] md:max-w-none w-full mx-auto md:mx-0">
+            <div className="max-w-[1200px] mx-auto px-4 sm:px-6 xl:px-0">
+                <div className="flex flex-col mb-[40px] lg:mb-8 max-w-[350px] md:max-w-none w-full mx-auto md:mx-0">
                     <div className="flex items-center justify-between">
-                        <h2 className="font-manrope tracking-tight whitespace-nowrap text-[24px] md:text-[36px] font-semibold text-[#333] leading-tight md:leading-[48px]">
+                        <h2
+                            className="font-manrope tracking-tight lg:tracking-[-0.8px] whitespace-nowrap text-[24px] md:text-[36px] font-semibold text-[#333] leading-tight md:leading-[48px] lg:leading-[45px]"
+                            style={isDesktop ? { fontFamily: "'Mona Sans', sans-serif" } : undefined}
+                        >
                             {cmsConfig.title}
                         </h2>
+                        {/* Figma labels this button "More Categories" on Best Rented */}
                         <Link
-                            href="/products"
-                            className="btn-primary hidden md:inline-flex gap-[2px] text-[14px]"
+                            href={type === 'bestRented' ? '/categories' : '/products'}
+                            className="btn-primary hidden md:inline-flex gap-[2px] text-[14px] lg:text-[16px] lg:leading-[23px] lg:tracking-[-0.4px] lg:h-10"
                         >
-                            View All
+                            {type === 'bestRented' ? 'More Categories' : 'View All'}
                         </Link>
                     </div>
                 </div>
@@ -627,12 +637,13 @@ const BestRentedProducts = ({ type = "bestRented", defaultTitle = "Curated Produ
                             className="!pt-6 !pb-[65px] -mt-6 -mb-[65px] !overflow-x-clip !overflow-y-visible"
                         >
                             {products.map((product, index) => (
-                                <SwiperSlide key={product.id || index} style={{ width: `${SLIDE_W}px` }}>
+                                <SwiperSlide key={product.id || index} style={{ width: `${slideW}px` }}>
                                     <ProductCard
                                         product={product}
                                         index={index}
                                         isDesktop={isDesktop}
                                         handleAddToCart={handleAddToCart}
+                                        cardW={slideW}
                                     />
                                 </SwiperSlide>
                             ))}
@@ -645,7 +656,7 @@ const BestRentedProducts = ({ type = "bestRented", defaultTitle = "Curated Produ
                             className={`swiper-scrollbar-${sectionSuffix} flex-1`}
                             style={{ height: '3.5px', position: 'relative' }}
                         />
-                        <div className="flex items-center gap-2 shrink-0">
+                        <div className="flex items-center gap-2 lg:gap-4 shrink-0">
                             <button
                                 className={`swiper-prev-${sectionSuffix} group w-[34px] h-[34px] rounded-[69px] flex items-center justify-center bg-[#eee] hover:bg-[hsla(0,0%,85%,1)] transition-all cursor-pointer`}
                                 style={{ boxShadow: '0px 8px 2px 0px rgba(133,133,133,0), 0px 5px 2px 0px rgba(133,133,133,0.01), 0px 3px 2px 0px rgba(133,133,133,0.05), 0px 1px 1px 0px rgba(133,133,133,0.09), 0px 0px 1px 0px rgba(133,133,133,0.1)' }}

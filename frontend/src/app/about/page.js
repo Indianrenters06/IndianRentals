@@ -72,16 +72,16 @@ export default function AboutPage() {
 
             {/* On mobile, the banner + story + vision/mission sit on a continuous
                 grey surface (#f6f6f6), matching the Figma mobile design. */}
-            <div className="bg-[#f6f6f6] md:bg-transparent pt-5 md:pt-0">
+            <div className="bg-[#f6f6f6] md:bg-transparent lg:bg-white pt-5 md:pt-0 lg:py-[84px]">
 
                 {/* ── 1. Banner ─────────────────────────────────────────────────── */}
-                <section className="w-full max-w-[1440px] mx-auto mb-6 md:mt-8 md:mb-16">
-                    <div className="max-w-[1200px] mx-auto px-5 md:px-8">
-                        <div className="w-full h-[197px] md:h-[500px] relative bg-gray-200 overflow-hidden rounded-2xl md:rounded-3xl">
+                <section className="w-full max-w-[1440px] mx-auto mb-6 md:mt-8 md:mb-16 lg:mt-0 lg:mb-24">
+                    <div className="max-w-[1200px] mx-auto px-5 md:px-8 xl:px-0">
+                        <div className="w-full h-[197px] md:h-[500px] relative bg-gray-200 overflow-hidden rounded-2xl md:rounded-3xl lg:rounded-[32px]">
                             <Image src={c.bannerImage} alt={c.bannerTitle} fill className="object-cover object-center" />
-                            <div className="absolute inset-0 bg-black/25 md:bg-transparent" />
+                            <div className="absolute inset-0 bg-black/25 md:bg-transparent lg:bg-black/25" />
                             <div className="absolute inset-0 flex items-center justify-center">
-                                <h1 className="text-white text-base md:text-6xl font-semibold drop-shadow-lg font-sans">
+                                <h1 className="text-white text-base md:text-6xl lg:text-[62px] lg:leading-[60px] lg:tracking-[-2px] font-semibold drop-shadow-lg lg:drop-shadow-none font-sans">
                                     {c.bannerTitle}
                                 </h1>
                             </div>
@@ -91,7 +91,7 @@ export default function AboutPage() {
 
                 {/* ── 2. Our Story ──────────────────────────────────────────────── */}
                 <section className="w-full max-w-[1440px] mx-auto mb-6 md:mb-24">
-                    <div className="max-w-[1200px] mx-auto px-5 md:px-8 grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-[57px] items-center">
+                    <div className="max-w-[1200px] mx-auto px-5 md:px-8 xl:px-0 grid grid-cols-1 lg:grid-cols-[1fr_581px] gap-6 lg:gap-[57px] items-center">
                         <div className="flex flex-col gap-3 md:gap-[27px]">
                             <h2
                                 className="text-[25px] md:text-[36px] font-semibold leading-[31px] md:leading-[45px] font-sans tracking-[-0.8px] w-full md:w-[492px] max-w-full"
@@ -103,55 +103,61 @@ export default function AboutPage() {
                             >
                                 {c.aboutStoryTitle}
                             </h2>
-                            <div className="text-gray-600 md:text-gray-900 font-sans font-normal flex flex-col gap-4 md:gap-6">
-                                <p className="leading-relaxed text-xs md:text-[16px]">{c.aboutStoryPara1}</p>
-                                <p className="leading-relaxed text-xs md:text-[16px]">{c.aboutStoryPara2}</p>
+                            {/* Figma: 16/23 medium, -0.4px, #757575, 17px apart */}
+                            <div className="text-gray-600 md:text-gray-900 lg:text-[#757575] font-sans font-normal lg:font-medium flex flex-col gap-4 md:gap-6 lg:gap-[17px]">
+                                <p className="leading-relaxed lg:leading-[23px] lg:tracking-[-0.4px] text-xs md:text-[16px]">{c.aboutStoryPara1}</p>
+                                <p className="leading-relaxed lg:leading-[23px] lg:tracking-[-0.4px] text-xs md:text-[16px]">{c.aboutStoryPara2}</p>
                             </div>
                             {/* Stats */}
-                            <div className="flex flex-wrap gap-12 mt-2 md:mt-4">
+                            <div className="flex flex-wrap gap-12 lg:gap-[110px] mt-2 md:mt-4 lg:mt-0">
                                 {[
                                     { value: c.aboutStat1Value, label: c.aboutStat1Label, Icon: PiGauge },
                                     { value: c.aboutStat2Value, label: c.aboutStat2Label, Icon: PiSmiley },
                                 ].map(({ value, label, Icon }) => (
-                                    <div key={label} className="flex flex-col">
-                                        <div className="w-[76px] h-[76px] bg-[#FF8A00] rounded-[10px] md:rounded-xl flex items-center justify-center text-white mb-2 md:mb-3 shadow-sm">
+                                    // Figma: 76px #FF920A tile (radius 10), then value 27/35 medium black and
+                                    // label 12/16 medium #545454 in a 146px column, 6px apart
+                                    <div key={label} className="flex flex-col lg:gap-[6px] lg:w-[146px]">
+                                        <div className="w-[76px] h-[76px] bg-[#FF8A00] lg:bg-[#FF920A] rounded-[10px] md:rounded-xl lg:rounded-[10px] flex items-center justify-center text-white mb-2 md:mb-3 lg:mb-0 shadow-sm lg:shadow-none">
                                             <Icon size={50} />
                                         </div>
-                                        <h3 className="text-xl md:text-3xl font-bold font-sans text-gray-900">{value}</h3>
-                                        <p className="text-[10px] md:text-sm font-medium text-gray-500 font-sans mt-1">{label}</p>
+                                        <h3 className="text-xl md:text-3xl lg:text-[27px] lg:leading-[35px] lg:tracking-[-0.8px] font-bold lg:font-medium font-sans text-gray-900 lg:text-black">{value}</h3>
+                                        <p className="text-[10px] md:text-sm lg:text-[12px] lg:leading-[16px] lg:tracking-[-0.4px] font-medium text-gray-500 lg:text-[#545454] font-sans mt-1 lg:mt-0">{label}</p>
                                     </div>
                                 ))}
                             </div>
                         </div>
                         {/* Right Image */}
-                        <div className="relative w-full aspect-[581/625] max-h-[625px] rounded-2xl md:rounded-3xl overflow-hidden bg-gray-100 shadow-sm">
+                        <div className="relative w-full aspect-[581/625] lg:aspect-[581/431] max-h-[625px] lg:max-h-[431px] rounded-2xl md:rounded-3xl lg:rounded-[24px] overflow-hidden bg-gray-100 shadow-sm lg:shadow-none">
                             <Image src={c.aboutStoryImage} alt={c.aboutStoryTitle} fill className="object-cover object-center" />
                         </div>
                     </div>
                 </section>
 
                 {/* ── 3. Vision / Mission Tabs ──────────────────────────────────── */}
-                <section className="w-full max-w-[1440px] mx-auto mb-10 md:mb-24">
-                    <div className="max-w-[1200px] mx-auto px-5 md:px-8">
-                        <div className="w-full bg-[#FFE485] md:bg-[#FDE68A] rounded-2xl md:rounded-3xl pt-5 md:pt-10 pb-6 md:pb-14 px-5 md:px-10 flex flex-col lg:flex-row gap-7 md:gap-12 items-start">
+                <section className="w-full max-w-[1440px] mx-auto mb-10 md:mb-24 lg:mb-0">
+                    <div className="max-w-[1200px] mx-auto px-5 md:px-8 xl:px-0">
+                        <div className="w-full bg-[#FFE485] md:bg-[#FDE68A] lg:bg-[#FFE485] rounded-2xl md:rounded-3xl lg:rounded-[28px] pt-5 md:pt-10 lg:pt-9 pb-6 md:pb-14 lg:pb-9 px-5 md:px-10 lg:px-7 flex flex-col lg:flex-row gap-7 md:gap-12 lg:gap-24 items-start">
                             {/* Tab Buttons */}
-                            <div className="flex gap-3 md:gap-4 w-full lg:w-[350px] shrink-0">
+                            <div className="flex gap-3 md:gap-4 lg:gap-5 w-full lg:w-[320px] shrink-0">
                                 {[
                                     { key: 'vision',  label: c.aboutVisionTabLabel },
                                     { key: 'mission', label: c.aboutMissionTabLabel },
                                 ].map(({ key, label }) => (
                                     <button key={key} onClick={() => setActiveTab(key)}
-                                        className={`h-[36px] md:h-[45px] px-4 md:px-8 rounded-full font-medium font-sans text-sm md:text-lg transition-all hover:scale-[1.02] active:scale-95 ${activeTab === key ? 'bg-black text-white shadow-lg' : 'border-2 border-black/10 text-gray-800 hover:bg-black/5'}`}>
+                                        // Mona Sans must be explicit (font-sans falls back to a wider face),
+                                        // and the label must never wrap or the pill squashes.
+                                        style={{ fontFamily: "'Mona Sans', sans-serif" }}
+                                        className={`h-[36px] md:h-[45px] px-4 md:px-8 lg:px-[30px] whitespace-nowrap shrink-0 inline-flex items-center justify-center rounded-full font-medium lg:font-semibold font-sans text-sm md:text-lg lg:leading-[25px] lg:tracking-[-0.8px] transition-[background-color,color,border-color,transform] hover:scale-[1.02] lg:hover:scale-100 active:scale-95 ${activeTab === key ? 'bg-black lg:bg-[#333333] lg:border lg:border-[#333333] text-white shadow-lg lg:shadow-none' : 'border-2 lg:border border-black/10 lg:border-[#333333] text-gray-800 lg:text-[#333333] hover:bg-black/5'}`}>
                                         {label}
                                     </button>
                                 ))}
                             </div>
                             {/* Content Items */}
-                            <div className="flex-1 flex flex-col gap-4 md:gap-8">
+                            <div className="flex-1 min-w-0 flex flex-col gap-4 md:gap-8 lg:gap-0">
                                 {activeItems.map(({ title, text }, i) => (
-                                    <div key={i} className={`flex flex-col md:flex-row items-start gap-1 md:gap-4 ${i < activeItems.length - 1 ? 'border-b border-black/10 pb-4 md:pb-6' : ''}`}>
-                                        <h3 className="text-sm md:text-[20px] font-bold text-gray-900 font-sans md:w-[220px] shrink-0">{title}</h3>
-                                        <p className="text-gray-800 font-sans leading-relaxed text-[10px] md:text-[15px]">{text}</p>
+                                    <div key={i} className={`flex flex-col md:flex-row items-start gap-1 md:gap-4 lg:justify-between lg:gap-6 ${i < activeItems.length - 1 ? 'border-b border-black/10 lg:border-[#545454]/50 pb-4 md:pb-6 lg:pb-5' : ''} ${i > 0 ? 'lg:pt-5' : ''}`}>
+                                        <h3 className="text-sm md:text-[20px] lg:text-[21px] lg:leading-[28px] lg:tracking-[-0.8px] font-bold lg:font-semibold text-gray-900 lg:text-[#333333] font-sans md:w-[220px] lg:w-auto shrink-0">{title}</h3>
+                                        <p className="text-gray-800 lg:text-[#545454] font-sans leading-relaxed lg:leading-[23px] lg:tracking-[-0.4px] lg:font-medium text-[10px] md:text-[15px] lg:text-[16px] lg:w-[500px] lg:shrink-0">{text}</p>
                                     </div>
                                 ))}
                             </div>

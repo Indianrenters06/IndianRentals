@@ -191,7 +191,7 @@ const updateUser = asyncHandler(async (req, res) => {
     if (user) {
         user.name = req.body.name || user.name;
         user.email = req.body.email || user.email;
-        user.role = req.body.role || user.role; // Admin can update role
+        // Role changes go through /api/admin/users/:id/role or Team (admin-only).
 
         const updatedUser = await user.save();
         res.json({

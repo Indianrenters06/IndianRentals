@@ -1,4 +1,5 @@
 const asyncHandler = require('express-async-handler');
+const escapeRegex = require('../utils/escapeRegex');
 const SmsTemplate = require('../models/SmsTemplate');
 
 // GET /api/sms-templates
@@ -6,7 +7,7 @@ const getAll = asyncHandler(async (req, res) => {
     const { type, search } = req.query;
     const filter = {};
     if (type) filter.type = type;
-    if (search) filter.name = { $regex: search, $options: 'i' };
+    if (search) filter.name = { $regex: escapeRegex(search), $options: 'i' };
     const templates = await SmsTemplate.find(filter).sort({ createdAt: -1 });
     res.json(templates);
 });

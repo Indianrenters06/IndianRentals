@@ -16,10 +16,10 @@ const {
     updateAddress,
     deleteAddress,
 } = require('../controllers/userController');
-const { protect, admin } = require('../middleware/authMiddleware');
+const { protect, admin, hasPermission } = require('../middleware/authMiddleware');
 
 router.route('/')
-    .get(protect, admin, getAllUsers);
+    .get(protect, admin, hasPermission('users'), getAllUsers);
 
 router.post('/kyc', protect, submitKYC);
 router.get('/profile', protect, getUserProfile);
@@ -36,11 +36,11 @@ router.route('/addresses/:addressId')
     .put(protect, updateAddress)
     .delete(protect, deleteAddress);
 
-router.put('/:id/kyc', protect, admin, updateKYCStatus);
+router.put('/:id/kyc', protect, admin, hasPermission('kyc'), updateKYCStatus);
 
 router.route('/:id')
-    .delete(protect, admin, deleteUser)
-    .get(protect, admin, getUserById)
-    .put(protect, admin, updateUser);
+    .delete(protect, admin, hasPermission('users'), deleteUser)
+    .get(protect, admin, hasPermission('users'), getUserById)
+    .put(protect, admin, hasPermission('users'), updateUser);
 
 module.exports = router;

@@ -13,7 +13,8 @@ import FaqSection from "@/components/FaqSection";
 export default function Home() {
   console.log("Forcing tailwind reload...");
   return (
-    <main className="min-h-screen bg-gray-50 w-full max-w-full overflow-x-hidden font-sans">
+    <main className="min-h-screen bg-[#F6F6F6] w-full max-w-full overflow-x-hidden font-sans">
+      {/* Page ground = Figma grey-50 (#F6F6F6); it shows behind the hero, every other section paints its own */}
       <Hero />
       <RentByCategory />
       <BestRentedProducts type="bestRented" defaultTitle="Best Rented Products" />

@@ -239,14 +239,14 @@ const CategoryPageTemplate =({ productNamePrefix, productDescription, basePrice,
                                                 boxShadow: '0px 1px 3px 0px hsla(0, 0%, 87%, 0.08), 0px 6px 6px 0px hsla(0, 0%, 87%, 0.07), 0px 13px 8px 0px hsla(0, 0%, 87%, 0.04), 0px 23px 9px 0px hsla(0, 0%, 87%, 0.01), 0px 36px 10px 0px hsla(0, 0%, 87%, 0)',
                                             }}
                                         >
-                                            <div className={`w-[100px] h-[100px] relative transform transition-transform duration-500 ${isSubActive ? 'scale-105' : 'group-hover:scale-105'}`}>
+                                            <div className={`w-full h-full relative transform transition-transform duration-500 ${isSubActive ? 'scale-105' : 'group-hover:scale-105'}`}>
                                                 {sub.image ? (
                                                     <Image
                                                         src={sub.image}
                                                         alt={sub.name}
                                                         fill
                                                         className="object-cover"
-                                                        sizes="100px"
+                                                        sizes="160px"
                                                     />
                                                 ) : (
                                                     <div className="w-full h-full flex items-center justify-center">

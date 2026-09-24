@@ -1,4 +1,5 @@
 const asyncHandler = require('express-async-handler');
+const sanitizeHtml = require('../utils/sanitizeHtml');
 const CMS = require('../models/CMS');
 
 const ALLOWED_PAGES = ['homepage', 'about', 'terms', 'privacy', 'contact', 'shipping', 'refund', 'faq', 'rental-process', 'kyc-policy', 'categories-page', 'delivery-charges', 'late-fee-rules', 'cancellation-rules', 'subscription-rules', 'product-page'];
@@ -50,7 +51,10 @@ const getAllPages = asyncHandler(async (req, res) => {
 const getPage = asyncHandler(async (req, res) => {
     const { page } = req.params;
     const cms = await getOrCreatePage(page);
-    res.json(cms);
+    // pageContent is rendered as raw HTML on the storefront policy pages.
+    const out = cms.toJSON ? cms.toJSON() : cms;
+    if (out.pageContent) out.pageContent = sanitizeHtml(out.pageContent);
+    res.json(out);
 });
 
 // ── @desc   Update (upsert) a CMS page
@@ -170,6 +174,7 @@ const updatePage = asyncHandler(async (req, res) => {
             cms[field] = req.body[field];
         }
     });
+    if (typeof cms.pageContent === 'string') cms.pageContent = sanitizeHtml(cms.pageContent);
 
     if (req.body.clientLogos !== undefined) {
         cms.clientLogos = normaliseOffers(req.body.clientLogos);

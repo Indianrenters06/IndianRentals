@@ -44,7 +44,19 @@ const {
     updateRole,
     deleteRole,
 } = require('../controllers/adminController');
-const { protect, admin } = require('../middleware/authMiddleware');
+const { protect, admin, fullAdmin, hasPermission } = require('../middleware/authMiddleware');
+
+// Staff only reach the sections an admin granted them (adminPermissions).
+// Some screens read another section's data — e.g. Inventory lists products,
+// Customers and Payments list rentals — so those reads accept either permission.
+const products = hasPermission('products');
+const productsRead = hasPermission('products', 'inventory');
+const users = hasPermission('users');
+const rentalsRead = hasPermission('orders', 'users', 'payments');
+const orders = hasPermission('orders');
+const kyc = hasPermission('kyc');
+const payments = hasPermission('payments', 'orders');
+const inventory = hasPermission('inventory');
 const User = require('../models/User');
 const asyncHandler = require('express-async-handler');
 
@@ -53,25 +65,25 @@ router.get('/stats', protect, admin, getDashboardStats);
 
 // Products Management
 router.route('/products')
-    .get(protect, admin, getAllProducts)
-    .post(protect, admin, createProduct);
+    .get(protect, admin, productsRead, getAllProducts)
+    .post(protect, admin, products, createProduct);
 
 router.route('/products/:id')
-    .put(protect, admin, updateProduct)
-    .delete(protect, admin, deleteProduct);
+    .put(protect, admin, products, updateProduct)
+    .delete(protect, admin, products, deleteProduct);
 
 // Users Management
 router.route('/users')
-    .get(protect, admin, getAllUsers);
+    .get(protect, admin, users, getAllUsers);
 
 router.route('/users/:id')
-    .get(protect, admin, getUserById)
-    .put(protect, admin, updateUser)
-    .delete(protect, admin, deleteUser);
+    .get(protect, admin, users, getUserById)
+    .put(protect, admin, users, updateUser)
+    .delete(protect, admin, users, deleteUser);
 
 // ── Orders for a specific user ────────────────────────────────────────────────
 const Rental = require('../models/Rental');
-router.get('/users/:id/orders', protect, admin, asyncHandler(async (req, res) => {
+router.get('/users/:id/orders', protect, admin, rentalsRead, asyncHandler(async (req, res) => {
     const orders = await Rental.find({ user: req.params.id })
         .sort({ createdAt: -1 })
         .lean();
@@ -79,7 +91,7 @@ router.get('/users/:id/orders', protect, admin, asyncHandler(async (req, res) =>
 }));
 
 // ── User Status Management (block / unblock / activate / deactivate) ─────────
-router.patch('/users/:id/status', protect, admin, asyncHandler(async (req, res) => {
+router.patch('/users/:id/status', protect, admin, users, asyncHandler(async (req, res) => {
     const { action, reason } = req.body;
     // action: 'block' | 'unblock' | 'deactivate' | 'activate'
 
@@ -121,11 +133,22 @@ router.patch('/users/:id/status', protect, admin, asyncHandler(async (req, res) 
 }));
 
 // ── Role & Permission Assignment (superadmin only) ────────────────────────────
-router.put('/users/:id/role', protect, admin, asyncHandler(async (req, res) => {
+router.put('/users/:id/role', protect, admin, fullAdmin, asyncHandler(async (req, res) => {
     const { role, adminPermissions } = req.body;
 
     // Determine final role based on permissions
     const finalRole = role || (Array.isArray(adminPermissions) && adminPermissions.length > 0 ? 'staff' : 'customer');
+
+    const target = await User.findById(req.params.id).select('role');
+    if (!target) { res.status(404); throw new Error('User not found'); }
+    if ((finalRole === 'super_admin' || target.role === 'super_admin') && req.user.role !== 'super_admin') {
+        res.status(403);
+        throw new Error('Only Super Admin can grant or change the Super Admin role');
+    }
+    if (!User.schema.path('role').enumValues.includes(finalRole)) {
+        res.status(400);
+        throw new Error('Invalid role');
+    }
 
     const updatePayload = { role: finalRole };
     if (Array.isArray(adminPermissions)) updatePayload.adminPermissions = adminPermissions;
@@ -151,41 +174,41 @@ router.put('/users/:id/role', protect, admin, asyncHandler(async (req, res) => {
 // Team Management
 // Pricing Plans
 router.route('/pricing-plans')
-    .get(protect, admin, getPricingPlans)
-    .post(protect, admin, createPricingPlan);
+    .get(protect, admin, products, getPricingPlans)
+    .post(protect, admin, products, createPricingPlan);
 
-router.delete('/pricing-plans/:id', protect, admin, deletePricingPlan);
+router.delete('/pricing-plans/:id', protect, admin, products, deletePricingPlan);
 
 
 router.route('/team')
-    .get(protect, admin, getTeamMembers)
-    .post(protect, admin, createTeamMember);
+    .get(protect, admin, fullAdmin, getTeamMembers)
+    .post(protect, admin, fullAdmin, createTeamMember);
 
 router.route('/team/:id')
-    .put(protect, admin, updateTeamMember)
-    .delete(protect, admin, deleteTeamMember);
+    .put(protect, admin, fullAdmin, updateTeamMember)
+    .delete(protect, admin, fullAdmin, deleteTeamMember);
 
 // Rentals Management
 router.route('/rentals')
-    .get(protect, admin, getAllRentals);
+    .get(protect, admin, rentalsRead, getAllRentals);
 
 router.route('/rentals/:id')
-    .put(protect, admin, updateRentalStatus);
+    .put(protect, admin, orders, updateRentalStatus);
 
 // KYC Management
 router.route('/kyc')
-    .get(protect, admin, getAllKYC);
+    .get(protect, admin, kyc, getAllKYC);
 
 router.route('/kyc/:id')
-    .put(protect, admin, updateKYCStatus);
+    .put(protect, admin, kyc, updateKYCStatus);
 
 // Invoices Management
 router.route('/invoices')
-    .get(protect, admin, getAllInvoices);
+    .get(protect, admin, payments, getAllInvoices);
 
 // Payments Management
 router.route('/payments')
-    .get(protect, admin, getAllPayments);
+    .get(protect, admin, payments, getAllPayments);
 
 // Calendar Management
 router.route('/calendar')
@@ -193,34 +216,34 @@ router.route('/calendar')
 
 // Inventory Management
 router.route('/inventory/available')
-    .get(protect, admin, getAvailableStock);
+    .get(protect, admin, inventory, getAvailableStock);
 
 router.route('/inventory/assigned')
-    .get(protect, admin, getAssignedInventory);
+    .get(protect, admin, inventory, getAssignedInventory);
 
 router.route('/inventory/returned')
-    .get(protect, admin, getReturnedInventory);
+    .get(protect, admin, inventory, getReturnedInventory);
 
 router.route('/inventory/returned/:rentalId/:itemId')
-    .put(protect, admin, processReturnedInspection);
+    .put(protect, admin, inventory, processReturnedInspection);
 
 router.route('/inventory/damaged')
-    .get(protect, admin, getDamagedInventory);
+    .get(protect, admin, inventory, getDamagedInventory);
 
 router.route('/inventory/alerts')
-    .get(protect, admin, getStockAlerts);
+    .get(protect, admin, inventory, getStockAlerts);
 
 router.route('/inventory/adjustment')
-    .post(protect, admin, adjustStock);
+    .post(protect, admin, inventory, adjustStock);
 
 // Roles Management
 router.route('/roles')
-    .get(protect, admin, getRoles)
-    .post(protect, admin, createRole);
+    .get(protect, admin, fullAdmin, getRoles)
+    .post(protect, admin, fullAdmin, createRole);
 
 router.route('/roles/:id')
-    .put(protect, admin, updateRole)
-    .delete(protect, admin, deleteRole);
+    .put(protect, admin, fullAdmin, updateRole)
+    .delete(protect, admin, fullAdmin, deleteRole);
 
 module.exports = router;
 

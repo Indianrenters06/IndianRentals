@@ -419,8 +419,8 @@ const ProductCard = ({ product, mobile }) => {
                             : <HeartIcon className="w-5 h-5 text-black" strokeWidth={1.5} />}
                     </button>
 
-                    {/* Product image */}
-                    <div style={{ width: 240, height: 220, position: 'relative', transform: isHovered ? 'scale(1.05)' : 'scale(1)', transition: 'transform 0.5s ease' }}>
+                    {/* Product image — cover to cover, no inset padding */}
+                    <div style={{ position: 'absolute', inset: 0, transform: isHovered ? 'scale(1.05)' : 'scale(1)', transition: 'transform 0.5s ease' }}>
                         <Image src={product.image} alt={product.name} fill className="object-cover" sizes="285px" />
                     </div>
                 </div>

@@ -4,7 +4,7 @@ import Image from 'next/image';
 
 import { API } from '@/services/apiConfig';
 
-const WhyChooseUs = ({ cmsData = null, overrideBg, overridePaddingTop, hideBorder }) => {
+const WhyChooseUs = ({ cmsData = null, overrideBg, overridePaddingTop, overridePaddingBottom, hideBorder }) => {
     const [cms, setCms] = useState(cmsData || null);
     const [loading, setLoading] = useState(!cmsData);
     const [viewType, setViewType] = useState('mobile');
@@ -203,7 +203,68 @@ const WhyChooseUs = ({ cmsData = null, overrideBg, overridePaddingTop, hideBorde
         );
     }
 
-    // ── Desktop / Tablet Layout ───────────────────────────────────────────────
+    // ── Desktop Layout — Figma "why-choose-us" (24181:35108) ─────────────────
+    // py 80 on the home page (96 on Rental Process, passed in); 540px text column + 508×336 photo, justify-between across 1200px;
+    // photo sits on a #FFB91B block (radius 32) offset 18px right / 18.5px down.
+    if (viewType === 'desktop') {
+        const RULE = 'rgba(0, 0, 0, 0.2)'; // Figma "Line 9" / "Line 75": black @ 20%
+        return (
+            <section
+                className="px-[120px]"
+                style={{
+                    paddingTop: overridePaddingTop || '80px',
+                    paddingBottom: overridePaddingBottom || '80px',
+                    background: overrideBg || '#FFF1C5',
+                    borderBottom: hideBorder ? 'none' : '1px solid #E2E2E2'
+                }}
+            >
+                <div className="max-w-[1200px] mx-auto flex items-center justify-between gap-10">
+                    {/* Text column */}
+                    <div className="flex flex-col gap-8 w-[540px] shrink min-w-0">
+                        <div className="flex flex-col gap-5">
+                            <h2 className="m-0 font-semibold text-[36px] leading-[45px] tracking-[-0.8px] text-[#333333]">
+                                {title}
+                            </h2>
+                            <p className="m-0 font-normal text-[16px] leading-[23px] tracking-[-0.4px] text-[#545454]">
+                                {subtitle}
+                            </p>
+                        </div>
+
+                        <div style={{ width: '100%', height: '1px', background: RULE }} />
+
+                        <div className="flex items-center justify-between">
+                            {stats.map((s, i) => (
+                                <React.Fragment key={i}>
+                                    {i > 0 && <div style={{ width: '1px', height: '82px', background: RULE }} />}
+                                    <div className="flex flex-col gap-2">
+                                        <span className="font-semibold text-[27px] leading-[35px] tracking-[-0.8px] text-[#333333] whitespace-nowrap">
+                                            {s.value}
+                                        </span>
+                                        <span className="font-medium text-[14px] leading-[20px] tracking-[-0.4px] text-[#757575] whitespace-nowrap">
+                                            {s.label}
+                                        </span>
+                                    </div>
+                                </React.Fragment>
+                            ))}
+                        </div>
+                    </div>
+
+                    {/* Photo on the offset yellow block */}
+                    <div className="relative w-[508px] h-[336px] shrink-0">
+                        <div
+                            className="absolute w-full h-full"
+                            style={{ left: '18px', top: '18.5px', borderRadius: '32px', background: '#FFB91B' }}
+                        />
+                        <div className="relative z-10 w-full h-full" style={{ borderRadius: '24px', overflow: 'hidden' }}>
+                            <Image src={image} alt={title} fill className="object-cover" sizes="508px" />
+                        </div>
+                    </div>
+                </div>
+            </section>
+        );
+    }
+
+    // ── Tablet Layout ─────────────────────────────────────────────────────────
     return (
         <section
             className="overflow-hidden"

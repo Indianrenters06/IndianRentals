@@ -1,5 +1,6 @@
 const asyncHandler = require('express-async-handler');
 const BlogPost = require('../models/BlogPost');
+const sanitizeHtml = require('../utils/sanitizeHtml');
 
 // ── @desc   Get all blog posts
 // ── @route  GET /api/blog
@@ -26,7 +27,10 @@ const getPostById = asyncHandler(async (req, res) => {
         res.status(404);
         throw new Error('Blog post not found');
     }
-    res.json(post);
+    // Also cleans posts saved before sanitising on write existed.
+    const out = post.toJSON();
+    out.content = sanitizeHtml(out.content);
+    res.json(out);
 });
 
 // ── @desc   Create blog post
@@ -40,7 +44,7 @@ const createPost = asyncHandler(async (req, res) => {
         throw new Error('Title is required');
     }
 
-    const post = await BlogPost.create({ title, excerpt, content, coverImage, author, tags, status });
+    const post = await BlogPost.create({ title, excerpt, content: sanitizeHtml(content), coverImage, author, tags, status });
     res.status(201).json(post);
 });
 
@@ -59,6 +63,7 @@ const updatePost = asyncHandler(async (req, res) => {
     fields.forEach((f) => {
         if (req.body[f] !== undefined) post[f] = req.body[f];
     });
+    post.content = sanitizeHtml(post.content);
 
     const updated = await post.save();
     res.json(updated);

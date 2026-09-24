@@ -1,4 +1,5 @@
 const asyncHandler = require('express-async-handler');
+const escapeRegex = require('../utils/escapeRegex');
 const Product = require('../models/Product');
 const Category = require('../models/Category');
 const { PAGE_SIZE } = require('../config/constants');
@@ -8,18 +9,20 @@ const { PAGE_SIZE } = require('../config/constants');
 // @access  Public
 const getProducts = asyncHandler(async (req, res) => {
     const page = Number(req.query.pageNumber) || 1;
-    const limit = Number(req.query.limit) || PAGE_SIZE;
+    // Capped so one request can't pull the whole catalogue (admin asks for ≤2000).
+    const limit = Math.min(Number(req.query.limit) || PAGE_SIZE, 2000);
 
     // Base query object
     const query = {};
 
     // Keyword Search (searches name, description, brand, etc.)
     if (req.query.keyword) {
+        const keyword = escapeRegex(req.query.keyword);
         query.$or = [
-            { name: { $regex: req.query.keyword, $options: 'i' } },
-            { description: { $regex: req.query.keyword, $options: 'i' } },
-            { brand: { $regex: req.query.keyword, $options: 'i' } },
-            { category: { $regex: req.query.keyword, $options: 'i' } },
+            { name: { $regex: keyword, $options: 'i' } },
+            { description: { $regex: keyword, $options: 'i' } },
+            { brand: { $regex: keyword, $options: 'i' } },
+            { category: { $regex: keyword, $options: 'i' } },
         ];
     }
 
@@ -49,10 +52,10 @@ const getProducts = asyncHandler(async (req, res) => {
 
     // Filter by Location (Exact Match for City/State)
     if (req.query.city) {
-        query.city = { $regex: req.query.city, $options: 'i' };
+        query.city = { $regex: escapeRegex(req.query.city), $options: 'i' };
     }
     if (req.query.state) {
-        query.state = { $regex: req.query.state, $options: 'i' };
+        query.state = { $regex: escapeRegex(req.query.state), $options: 'i' };
     }
 
     // Filter by Subcategory ID (e.g., ?subcategory=<ObjectId>)

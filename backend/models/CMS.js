@@ -94,8 +94,8 @@ const cmsSchema = new mongoose.Schema({
 
     // ── Homepage FAQ (homepage) ───────────────────────────────────────────────
     homepageFaqEnabled: { type: Boolean, default: true },
-    homepageFaqTitle: { type: String, default: 'Frequently Asked Questions' },
-    homepageFaqSubtitle: { type: String, default: 'Everything you need to know about renting with us.' },
+    homepageFaqTitle: { type: String, default: 'Everything you need to know about renting with IndianRenters.com' },
+    homepageFaqSubtitle: { type: String, default: 'Welcome to FAQ!' },
     homepageFaqItems: { type: [faqItemSchema], default: [] },
 
     // ── Offer Section (homepage) ──────────────────────────────────────────────

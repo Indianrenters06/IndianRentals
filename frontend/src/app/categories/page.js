@@ -195,7 +195,7 @@ const CategoriesPage = () => {
                                         }}
                                     >
                                         {/* Image Container */}
-                                        <div className="relative w-full flex-1 flex items-center justify-center p-3 md:p-6 bg-[hsla(0,0%,97%,1)] md:bg-transparent">
+                                        <div className="relative w-full flex-1 flex items-center justify-center overflow-hidden">
                                             <div className="relative w-full h-full transform group-hover:scale-105 transition-transform duration-500">
                                                 {category.image ? (
                                                     <Image

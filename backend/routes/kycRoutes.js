@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const upload = require('../middleware/uploadMiddleware');
 const { createOrUpdateKYC, getKYCStatus, uploadKYCDocuments, getAllKYC, updateKYCStatus, downloadKYCDocument } = require('../controllers/kycController');
-const { protect, admin } = require('../middleware/authMiddleware');
+const { protect, admin, hasPermission } = require('../middleware/authMiddleware');
 
 router.post('/', protect, createOrUpdateKYC);
 router.get('/', protect, getKYCStatus);
@@ -19,9 +19,9 @@ router.post('/upload', protect, upload.fields([
 ]), uploadKYCDocuments);
 
 // Admin Routes
-router.get('/admin/all', protect, admin, getAllKYC);
+router.get('/admin/all', protect, admin, hasPermission('kyc'), getAllKYC);
 // Declared before '/admin/:id' so the literal segment is not swallowed by the param route.
-router.get('/admin/:id/document/:field', protect, admin, downloadKYCDocument);
-router.put('/admin/:id', protect, admin, updateKYCStatus);
+router.get('/admin/:id/document/:field', protect, admin, hasPermission('kyc'), downloadKYCDocument);
+router.put('/admin/:id', protect, admin, hasPermission('kyc'), updateKYCStatus);
 
 module.exports = router;

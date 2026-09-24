@@ -1,4 +1,5 @@
 const asyncHandler = require('express-async-handler');
+const escapeRegex = require('../utils/escapeRegex');
 const EmailTemplate = require('../models/EmailTemplate');
 const sendEmail = require('../utils/sendEmail');
 const { render } = require('../utils/sendTemplatedEmail');
@@ -8,7 +9,7 @@ const getAll = asyncHandler(async (req, res) => {
     const { type, search } = req.query;
     const filter = {};
     if (type) filter.type = type;
-    if (search) filter.name = { $regex: search, $options: 'i' };
+    if (search) filter.name = { $regex: escapeRegex(search), $options: 'i' };
     const templates = await EmailTemplate.find(filter).sort({ createdAt: -1 });
     res.json(templates);
 });

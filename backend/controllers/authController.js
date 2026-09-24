@@ -7,9 +7,41 @@ const sendEmail = require('../utils/sendEmail');
 const sendSMS = require('../utils/sendSMS');
 const { sendTemplatedEmail } = require('../utils/sendTemplatedEmail');
 
-// Generate 6-digit OTP
+const crypto = require('crypto');
+
+// Generate 6-digit OTP (crypto RNG — Math.random is predictable)
 const generateOTP = () => {
-    return Math.floor(100000 + Math.random() * 900000).toString();
+    return crypto.randomInt(100000, 1000000).toString();
+};
+
+const MAX_OTP_ATTEMPTS = 5;
+
+// True only when an OTP is actually pending and the submitted one matches.
+// Guards against `undefined === undefined` passing once the OTP was cleared.
+const otpMatches = (stored, given) =>
+    typeof given === 'string' && (given = given.trim()) &&
+    typeof stored === 'string' && stored.length > 0 &&
+    typeof given === 'string' && given.length === stored.length &&
+    crypto.timingSafeEqual(Buffer.from(stored), Buffer.from(given));
+
+const otpExpired = (user) => !user.otpExpires || user.otpExpires < Date.now();
+
+// Count a wrong guess; after MAX_OTP_ATTEMPTS the OTP is voided so a
+// 6-digit code can't be brute-forced within its 10-minute window.
+const rejectWrongOtp = async (user, res, message) => {
+    user.otpAttempts = (user.otpAttempts || 0) + 1;
+    if (user.otpAttempts >= MAX_OTP_ATTEMPTS) {
+        user.emailOtp = undefined;
+        user.phoneOtp = undefined;
+        user.otpExpires = undefined;
+        user.otpAttempts = 0;
+        await user.save();
+        res.status(429);
+        throw new Error('Too many wrong attempts. Please request a new OTP.');
+    }
+    await user.save();
+    res.status(400);
+    throw new Error(message);
 };
 
 // An OTP must never travel back in the HTTP response — /send-otp is public and
@@ -59,7 +91,7 @@ const adminLogin = asyncHandler(async (req, res) => {
 // @route   POST /api/auth/register
 // @access  Public
 const registerUser = asyncHandler(async (req, res) => {
-    const { name, email, password, phone, role } = req.body;
+    const { name, email, password, phone } = req.body;
 
     const userExists = await User.findOne({ email });
 
@@ -84,10 +116,13 @@ const registerUser = asyncHandler(async (req, res) => {
         email,
         password,
         phone,
-        role: role || 'customer',
+        // Never trust a client-sent role — admin/staff accounts are created
+        // only from the admin panel (Settings > Team).
+        role: 'customer',
         emailOtp,
         phoneOtp,
         otpExpires,
+        otpAttempts: 0,
         isEmailVerified: false,
         isPhoneVerified: false,
     });
@@ -158,21 +193,19 @@ const verifyOtp = asyncHandler(async (req, res) => {
         throw new Error('User not found');
     }
 
-    if (user.otpExpires < Date.now()) {
+    if (otpExpired(user)) {
         res.status(400);
         throw new Error('OTP expired. Please resend.');
     }
 
     // Verify Email OTP
-    if (user.emailOtp !== emailOtp) {
-        res.status(400);
-        throw new Error('Invalid Email OTP');
+    if (!otpMatches(user.emailOtp, emailOtp)) {
+        await rejectWrongOtp(user, res, 'Invalid Email OTP');
     }
 
     // Verify Phone OTP (Optional: You can enforce only one or both. Requirements said "both")
-    if (user.phoneOtp !== phoneOtp) {
-        res.status(400);
-        throw new Error('Invalid Phone OTP');
+    if (!otpMatches(user.phoneOtp, phoneOtp)) {
+        await rejectWrongOtp(user, res, 'Invalid Phone OTP');
     }
 
     // If successful
@@ -181,6 +214,7 @@ const verifyOtp = asyncHandler(async (req, res) => {
     user.emailOtp = undefined;
     user.phoneOtp = undefined;
     user.otpExpires = undefined;
+    user.otpAttempts = 0;
     // Verification completes signup and issues a session, so it counts as a login.
     user.lastLogin = new Date();
     await user.save();
@@ -226,6 +260,7 @@ const loginUser = asyncHandler(async (req, res) => {
         user.emailOtp = emailOtp;
         user.phoneOtp = phoneOtp;
         user.otpExpires = otpExpires;
+        user.otpAttempts = 0;
         await user.save();
 
         // Send Email
@@ -306,6 +341,7 @@ const sendLoginOtp = asyncHandler(async (req, res) => {
     const otpExpires = Date.now() + 10 * 60 * 1000; // 10 minutes
 
     user.otpExpires = otpExpires;
+    user.otpAttempts = 0;
 
     if (isEmail) {
         user.emailOtp = otp;
@@ -380,21 +416,15 @@ const verifyLoginOtp = asyncHandler(async (req, res) => {
         throw new Error('User not found');
     }
 
-    if (user.otpExpires < Date.now()) {
+    if (otpExpired(user)) {
         res.status(400);
         throw new Error('OTP expired. Please request a new one.');
     }
 
-    let isValid = false;
-    if (isEmail) {
-        isValid = user.emailOtp === otp;
-    } else {
-        isValid = user.phoneOtp === otp;
-    }
+    const isValid = otpMatches(isEmail ? user.emailOtp : user.phoneOtp, otp);
 
     if (!isValid) {
-        res.status(400);
-        throw new Error('Invalid OTP');
+        await rejectWrongOtp(user, res, 'Invalid OTP');
     }
 
     // Only mark verified the channel the OTP was actually proven on.
@@ -404,6 +434,7 @@ const verifyLoginOtp = asyncHandler(async (req, res) => {
     user.emailOtp = undefined;
     user.phoneOtp = undefined;
     user.otpExpires = undefined;
+    user.otpAttempts = 0;
     // This is the customer login path — the password step above only sends an OTP.
     user.lastLogin = new Date();
     await user.save();
@@ -434,6 +465,7 @@ const adminForgotPassword = asyncHandler(async (req, res) => {
     const otp = generateOTP();
     user.emailOtp = otp;
     user.otpExpires = Date.now() + 10 * 60 * 1000; // 10 minutes
+    user.otpAttempts = 0;
     await user.save();
 
     try {
@@ -464,19 +496,19 @@ const adminResetPassword = asyncHandler(async (req, res) => {
         throw new Error('Admin account not found');
     }
 
-    if (!user.emailOtp || user.otpExpires < Date.now()) {
+    if (!user.emailOtp || otpExpired(user)) {
         res.status(400);
         throw new Error('OTP expired. Please request a new one.');
     }
 
-    if (user.emailOtp !== otp) {
-        res.status(400);
-        throw new Error('Invalid OTP');
+    if (!otpMatches(user.emailOtp, otp)) {
+        await rejectWrongOtp(user, res, 'Invalid OTP');
     }
 
     user.password = newPassword;
     user.emailOtp = undefined;
     user.otpExpires = undefined;
+    user.otpAttempts = 0;
     await user.save();
 
     res.json({ message: 'Password reset successfully. You can now log in.' });
@@ -534,7 +566,6 @@ const googleLogin = asyncHandler(async (req, res) => {
                 throw new Error('New registrations are currently disabled by the administrator.');
             }
 
-            const crypto = require('crypto');
             user = await User.create({
                 name: name || email.split('@')[0],
                 email: email.toLowerCase(),

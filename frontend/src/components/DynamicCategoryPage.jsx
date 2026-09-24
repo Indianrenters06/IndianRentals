@@ -200,7 +200,6 @@ export default function DynamicCategoryPage({
                                                 background: 'hsla(0, 0%, 100%, 1)',
                                                 border: '1px solid hsla(0, 0%, 93%, 1)',
                                                 boxShadow: '0px 1px 3px 0px hsla(0,0%,87%,0.08), 0px 6px 6px 0px hsla(0,0%,87%,0.07), 0px 13px 8px 0px hsla(0,0%,87%,0.04), 0px 23px 9px 0px hsla(0,0%,87%,0.01), 0px 36px 10px 0px hsla(0,0%,87%,0)',
-                                                padding: '8px',
                                             }}
                                         >
                                             <div className="w-full h-full relative transform group-hover:scale-105 transition-transform duration-500">

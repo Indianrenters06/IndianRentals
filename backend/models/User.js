@@ -130,6 +130,11 @@ const userSchema = new mongoose.Schema({
     otpExpires: {
         type: Date,
     },
+    // Wrong guesses against the current OTP; it is voided after MAX_OTP_ATTEMPTS.
+    otpAttempts: {
+        type: Number,
+        default: 0,
+    },
     addresses: {
         type: [addressSchema],
         default: []

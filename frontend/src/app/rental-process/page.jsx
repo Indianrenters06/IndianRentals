@@ -31,37 +31,39 @@ export default function RentalProcessPage() {
 
     return (
         <div className="font-sans text-gray-800 bg-white">
-            {/* 1. Hero Header Banner */}
-            <div className="w-full max-w-[1200px] mx-auto px-5 md:px-8 pt-5 md:pt-7">
-                <div className="relative overflow-hidden flex items-center justify-center w-full mx-auto rounded-2xl md:rounded-[32px] h-[197px] md:h-[400px]">
+            {/* 1. Hero Header Banner — Figma "Header / 144" (24181:35103): pt 28, 120px side margins,
+                1200×500 image, radius 32, 20% black overlay, title 62/60 semibold -2px */}
+            <div className="w-full px-5 md:px-8 lg:px-[120px] pt-5 md:pt-7">
+                <div className="relative overflow-hidden flex items-center justify-center w-full max-w-[1200px] mx-auto rounded-2xl md:rounded-[32px] h-[197px] md:h-[400px] lg:h-[500px]">
                     <Image
                         src={bannerImage}
                         alt={bannerTitle}
                         fill
-                        className="object-cover object-center opacity-80"
+                        className="object-cover object-center"
                     />
                     <div className="absolute inset-0 bg-black/20" />
-                    <h1 className="relative z-10 text-white drop-shadow-md font-semibold text-[16px] md:text-5xl text-center tracking-[-0.8px]">
+                    <h1 className="relative z-10 text-white font-semibold text-[16px] md:text-5xl lg:text-[62px] lg:leading-[60px] text-center tracking-[-0.8px] lg:tracking-[-2px]">
                         {bannerTitle}
                     </h1>
                 </div>
             </div>
 
-            {/* 2. How It Works Section */}
-            <RentalProcess cmsData={cms} />
+            {/* 2. How It Works Section — this page is the rental process, so no link back to itself */}
+            <RentalProcess cmsData={cms} showRentalProcessLink={false} desktopBackground="#F6F6F6" />
 
             {/* 3. Why Choose Us Section */}
-            <WhyChooseUs />
+            <WhyChooseUs overridePaddingTop="96px" overridePaddingBottom="96px" />
 
             {/* 4. Features Section */}
-            <section className="w-full bg-white py-12">
-                <div className="max-w-[1200px] mx-auto px-5 md:px-8 flex flex-col items-center gap-8">
+            {/* Figma "Features" (24181:35109): py 98, gap 32; bottom rule = Figma "Line 44" (#E2E2E2) */}
+            <section className="w-full bg-white py-12 lg:py-[98px] lg:px-[120px] lg:border-b lg:border-[#e2e2e2]">
+                <div className="max-w-[1200px] mx-auto px-5 md:px-8 lg:px-0 flex flex-col items-center gap-8">
                     {/* Header */}
-                    <div className="text-center max-w-2xl mx-auto flex flex-col gap-1 md:gap-3">
-                        <h2 className="font-semibold text-[#333333] tracking-[-0.8px] text-[25px] md:text-[36px] leading-[31px] md:leading-[48px]">
+                    <div className="text-center max-w-2xl lg:max-w-[610px] mx-auto flex flex-col gap-1 md:gap-3 lg:gap-[5px]">
+                        <h2 className="font-semibold text-[#333333] tracking-[-0.8px] text-[25px] md:text-[36px] leading-[31px] md:leading-[48px] lg:leading-[45px]">
                             {featuresTitle}
                         </h2>
-                        <p className="text-[#545454] font-medium text-[12px] md:text-[16px] leading-[18px] md:leading-6 tracking-[-0.4px]">
+                        <p className="text-[#545454] font-medium lg:font-normal text-[12px] md:text-[16px] lg:text-[18px] leading-[18px] md:leading-6 lg:leading-[25px] tracking-[-0.4px] lg:tracking-[-0.8px]">
                             {featuresSubtitle}
                         </p>
                     </div>
@@ -69,30 +71,38 @@ export default function RentalProcessPage() {
                     {/* Features Grid: 2x2 on Mobile, 4x1 on Desktop */}
                     <div className="grid grid-cols-2 lg:grid-cols-4 w-full">
                         {displayFeatures.map((f, i) => {
-                            const isTop = i < 2;
-                            const isLeft = i % 2 === 0;
+                            // Borders: every cell draws top + left; the last column adds right and the
+                            // bottom row adds bottom, so shared edges are never doubled.
+                            // Mobile = 2×2, desktop = 1×4 (Figma: 12px outer radius, 8px top-right).
+                            const edges = [
+                                'border-t border-l',
+                                i % 2 === 1 ? 'border-r' : '',
+                                i >= 2 ? 'border-b' : '',
+                                'lg:border-b',
+                                i === 3 ? 'lg:border-r' : 'lg:border-r-0',
+                            ].join(' ');
+                            const corners = [
+                                'rounded-tl-xl lg:rounded-bl-xl',
+                                'rounded-tr-xl lg:rounded-tr-none',
+                                'rounded-bl-xl lg:rounded-bl-none',
+                                'rounded-br-xl lg:rounded-tr-[8px]',
+                            ][i] || '';
                             return (
                                 <div
                                     key={i}
-                                    className={`border-[#e2e2e2] border-solid flex flex-col items-center justify-center p-3 md:p-6 h-[180px] md:h-[236px] text-center
-                                        ${isTop ? 'border-t' : ''} ${isLeft ? 'border-l' : 'border-r'}
-                                        ${isTop && isLeft ? 'rounded-tl-xl border-r border-b lg:rounded-r-none' : ''}
-                                        ${isTop && !isLeft ? 'rounded-tr-xl border-b lg:rounded-l-none' : ''}
-                                        ${!isTop && isLeft ? 'rounded-bl-xl border-r border-b lg:rounded-r-none' : ''}
-                                        ${!isTop && !isLeft ? 'rounded-br-xl border-b lg:rounded-l-none' : ''}
-                                    `}
+                                    className={`border-[#e2e2e2] border-solid flex flex-col items-center justify-center p-3 md:p-6 lg:px-[45px] lg:py-[10px] h-[180px] md:h-[236px] text-center ${edges} ${corners}`}
                                 >
-                                    <div className="flex flex-col items-center justify-center gap-2 md:gap-3">
-                                        <div className="w-[80px] h-[80px] md:w-[110px] md:h-[110px] relative">
+                                    <div className="flex flex-col items-center justify-center gap-2 md:gap-3 lg:gap-[9px]">
+                                        <div className="w-[80px] h-[80px] md:w-[110px] md:h-[110px] lg:w-[120px] lg:h-[120px] relative">
                                             <img
                                                 src={f.image || "https://res.cloudinary.com/dgkckcdk8/image/upload/v1776714078/64e2ed1925a146151a5bfc674829bb2b3e685b49_4_zpulqn.png"}
                                                 alt={f.title}
-                                                className="w-full h-full object-contain pointer-events-none"
+                                                className="w-full h-full object-contain lg:object-cover pointer-events-none"
                                             />
                                         </div>
-                                        <div className="flex flex-col gap-1">
-                                            <h3 className="font-semibold text-[#333333] text-[14px] md:text-xl tracking-[-0.8px]">{f.title}</h3>
-                                            <p className="text-[#757575] text-[10px] md:text-sm font-normal tracking-[-0.4px]">{f.description}</p>
+                                        <div className="flex flex-col gap-1 lg:gap-[9px]">
+                                            <h3 className="font-semibold text-[#333333] text-[14px] md:text-xl lg:leading-[28px] tracking-[-0.8px]">{f.title}</h3>
+                                            <p className="text-[#757575] text-[10px] md:text-sm lg:leading-[20px] font-normal tracking-[-0.4px]">{f.description}</p>
                                         </div>
                                     </div>
                                 </div>
@@ -102,8 +112,8 @@ export default function RentalProcessPage() {
                 </div>
             </section>
 
-            {/* 5. Testimonials Section */}
-            <Testimonials />
+            {/* 5. Testimonials Section — Figma two-row card layout on desktop */}
+            <Testimonials layout="rows" />
         </div>
     );
 }

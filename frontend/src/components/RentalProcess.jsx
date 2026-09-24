@@ -82,7 +82,7 @@ const STEP_IMAGES = [
     "https://res.cloudinary.com/dgkckcdk8/image/upload/v1769946716/indian-rentals/fj8ptqbhppbstdd0hs4i.png",
 ];
 
-const RentalProcess = ({ cmsData = null }) => {
+const RentalProcess = ({ cmsData = null, showRentalProcessLink = true, desktopBackground = 'linear-gradient(180deg, #FFFFFF 0%, #F6F6F6 100%)' }) => {
     const [cms, setCms] = useState({
         enabled: true,
         title: "How It Works",
@@ -179,9 +179,11 @@ const RentalProcess = ({ cmsData = null }) => {
                             </p>
                         </div>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexShrink: 0, marginTop: '4px' }}>
-                            <Link href="/rental-process" className="btn-secondary text-[13px]" style={{ textDecoration: 'none' }}>
-                                Rental Process
-                            </Link>
+                            {showRentalProcessLink && (
+                                <Link href="/rental-process" className="btn-secondary text-[13px]" style={{ textDecoration: 'none' }}>
+                                    Rental Process
+                                </Link>
+                            )}
                             <Link href="/contact" className="btn-primary text-[13px]" style={{ textDecoration: 'none' }}>
                                 Contact
                             </Link>
@@ -308,30 +310,32 @@ const RentalProcess = ({ cmsData = null }) => {
                     {/* CTA Buttons Row */}
                     <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', gap: '10px' }}>
                         {/* Yellow primary button */}
-                        <Link
-                            href="/rental-process"
-                            style={{
-                                display: 'inline-flex',
-                                flexDirection: 'row',
-                                justifyContent: 'center',
-                                alignItems: 'center',
-                                padding: '4px 12px',
-                                gap: '2px',
-                                height: '26px',
-                                background: '#FFCF46',
-                                borderRadius: '28px',
-                                fontFamily: "'Mona Sans', sans-serif",
-                                fontWeight: 500,
-                                fontSize: '12px',
-                                lineHeight: '18px',
-                                letterSpacing: '-0.4px',
-                                color: '#1F1F1F',
-                                textDecoration: 'none',
-                                whiteSpace: 'nowrap'
-                            }}
-                        >
-                            Rental Process
-                        </Link>
+                        {showRentalProcessLink && (
+                            <Link
+                                href="/rental-process"
+                                style={{
+                                    display: 'inline-flex',
+                                    flexDirection: 'row',
+                                    justifyContent: 'center',
+                                    alignItems: 'center',
+                                    padding: '4px 12px',
+                                    gap: '2px',
+                                    height: '26px',
+                                    background: '#FFCF46',
+                                    borderRadius: '28px',
+                                    fontFamily: "'Mona Sans', sans-serif",
+                                    fontWeight: 500,
+                                    fontSize: '12px',
+                                    lineHeight: '18px',
+                                    letterSpacing: '-0.4px',
+                                    color: '#1F1F1F',
+                                    textDecoration: 'none',
+                                    whiteSpace: 'nowrap'
+                                }}
+                            >
+                                Rental Process
+                            </Link>
+                        )}
                         {/* Dark secondary button */}
                         <Link
                             href="/contact"
@@ -446,88 +450,93 @@ const RentalProcess = ({ cmsData = null }) => {
     }
 
 
+    // ─── DESKTOP VIEW — Figma "rentalProcess" (24181:35107) ───────────────
     return (
-        <section className="w-full bg-[#f6f6f6] py-12 px-4 md:px-8 lg:px-[120px] font-sans">
+        <section className="w-full py-12 px-4 md:px-8 lg:px-[120px] font-sans" style={{ background: desktopBackground }}>
             <div className="max-w-[1200px] mx-auto flex flex-col gap-8">
-                {/* Section Header */}
+                {/* Section Header — title block 500px wide, buttons bottom-aligned */}
                 <div className="flex flex-col md:flex-row items-start md:items-end justify-between gap-4 w-full">
                     <div className="flex flex-col gap-2.5 max-w-[500px]">
                         <h2 className="font-semibold text-[36px] leading-[45px] text-[#333] tracking-[-0.8px] m-0">
                             {cms.title}
                         </h2>
-                        <p className="text-[16px] leading-[23px] text-[#545454] tracking-[-0.4px] m-0">
+                        <p className="text-[16px] leading-[23px] text-[#545454] tracking-[-0.4px] m-0 max-w-[408px]">
                             {cms.subtitle}
                         </p>
                     </div>
                     <div className="flex items-center gap-2.5 shrink-0">
-                        <Link
-                            href="/rental-process"
-                            className="border border-[#141414] rounded-[28px] px-5 py-[6px] text-[#141414] font-medium text-[16px] hover:bg-gray-100 transition-colors no-underline"
-                        >
-                            Rental Process
-                        </Link>
+                        {showRentalProcessLink && (
+                            <Link
+                                href="/rental-process"
+                                className="border border-[#141414] rounded-[28px] h-[35px] px-5 py-[6px] inline-flex items-center text-[#141414] font-medium text-[16px] leading-[23px] tracking-[-0.4px] hover:bg-gray-100 transition-colors no-underline"
+                            >
+                                Rental Process
+                            </Link>
+                        )}
                         <Link
                             href="/contact"
-                            className="bg-[#ffcf46] rounded-full px-5 py-[6px] text-[#1f1f1f] font-medium text-[16px] hover:bg-[#f5c430] transition-colors no-underline"
+                            className="bg-[#ffcf46] rounded-full h-[35px] px-5 py-[6px] inline-flex items-center text-[#1f1f1f] font-medium text-[16px] leading-[23px] tracking-[-0.4px] hover:bg-[#f5c430] transition-colors no-underline"
                         >
                             Contact
                         </Link>
                     </div>
                 </div>
 
-                {/* Steps & Showcase Grid */}
+                {/* Steps & Showcase — both columns 500px tall; the open step stretches to fill */}
                 <div className="flex flex-col lg:flex-row items-stretch gap-5 w-full">
                     {/* Left Column — Steps List */}
-                    <div className="flex-1 flex flex-col gap-3 min-w-0">
+                    <div className="flex-1 flex flex-col gap-3 min-w-0 lg:min-h-[500px]">
                         {cms.steps.slice(0, 4).map((step, index) => {
                             const isActive = activeStep === index;
                             return (
                                 <div
                                     key={`desktop-step-${index}`}
                                     onClick={() => setActiveStep(index)}
-                                    className={`relative cursor-pointer transition-all duration-300 rounded-[20px] overflow-hidden ${isActive
-                                        ? 'bg-gradient-to-br from-[#ffcf46]/50 to-[#ffb91b]/90 shadow-[inset_-3px_-3px_15px_-2px_rgba(226,110,0,0.26)] border-[1.2px] border-[#ffcf46]'
-                                        : 'bg-white border-[1.2px] border-[#eee] hover:border-gray-300'
+                                    // Border width stays 1.2px in both states (transparent when open, as Figma
+                                    // has no border there) and only colours/shadow animate. Animating the
+                                    // border off made it fade through currentColor → a black outline flash.
+                                    className={`relative cursor-pointer transition-[background-color,border-color,box-shadow] duration-300 rounded-[20px] overflow-hidden border-[1.2px] ${isActive
+                                        ? 'lg:flex-1 flex flex-col justify-between border-transparent shadow-[inset_-3px_-3px_15px_-2px_rgba(226,110,0,0.26)]'
+                                        : 'bg-white border-[#eee] hover:border-gray-300 px-[15px] py-4 shrink-0'
                                         }`}
+                                    style={isActive ? { backgroundImage: 'linear-gradient(156.84deg, rgba(255, 207, 70, 0.5) 1.25%, rgba(255, 185, 27, 0.9) 98.94%)' } : undefined}
                                 >
-                                    <div className="flex flex-col w-full">
-                                        {/* Card Header (Icon, Title, Step Badge) */}
-                                        <div className="flex items-start justify-between p-4 w-full">
-                                            <div className="flex flex-col gap-2 items-start">
-                                                <div className={`rounded-lg size-[30px] flex items-center justify-center overflow-hidden transition-colors ${isActive ? 'bg-[#fff1c5]' : 'bg-[#f6f6f6]'}`}>
-                                                    <DynamicIcon name={step.icon} index={index} size={20} isActive={isActive} />
-                                                </div>
-                                                <h3 className={`font-semibold text-[21px] leading-[28px] tracking-[-0.8px] whitespace-nowrap m-0 transition-colors ${isActive ? 'text-[#7c2f0b]' : 'text-[#333]'}`}>
-                                                    {step.title}
-                                                </h3>
+                                    {/* Card Header (Icon, Title, Step Badge) */}
+                                    <div className={`flex items-start justify-between w-full ${isActive ? 'p-4' : 'h-[60px] items-center'}`}>
+                                        <div className="flex flex-col gap-[9px] items-start">
+                                            <div className={`rounded-lg size-[30px] flex items-center justify-center overflow-hidden transition-colors ${isActive ? 'bg-[#fff1c5]' : 'bg-[#f6f6f6]'}`}>
+                                                <DynamicIcon name={step.icon} index={index} size={22} isActive={isActive} />
                                             </div>
-                                            <div className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg shrink-0 transition-colors ${isActive
-                                                ? 'bg-[#fff1c5] border border-[#7c2f0b]'
-                                                : 'border border-[#afafaf]'
-                                                }`}>
-                                                <div className={`size-1.5 rounded-full transition-colors ${isActive ? 'bg-[#7c2f0b]' : 'bg-[#757575]'}`} />
-                                                <span className={`text-[16px] font-medium tracking-[-0.4px] transition-colors ${isActive ? 'text-[#7c2f0b]' : 'text-[#757575]'}`}>
-                                                    Step {index + 1}
-                                                </span>
-                                            </div>
+                                            <h3 className={`font-semibold text-[21px] leading-[28px] tracking-[-0.8px] whitespace-nowrap m-0 transition-colors ${isActive ? 'text-[#7c2f0b]' : 'text-[#333]'}`}>
+                                                {step.title}
+                                            </h3>
                                         </div>
-
-                                        {/* Card Description (shows when active) */}
-                                        {isActive && (
-                                            <div className="bg-[#fff1c5] p-4 rounded-b-[20px] animate-fadeIn">
-                                                <p className="text-[#7c2f0b] opacity-80 text-[16px] leading-[23px] tracking-[-0.4px] m-0">
-                                                    {step.description}
-                                                </p>
-                                            </div>
-                                        )}
+                                        <div className={`flex items-center gap-1 px-2 py-1 rounded-lg shrink-0 transition-colors ${isActive
+                                            ? 'bg-[#fff1c5] border border-[#7c2f0b]'
+                                            : 'border border-[#afafaf]'
+                                            }`}>
+                                            <div className={`size-1.5 rounded-full transition-colors ${isActive ? 'bg-[#7c2f0b]' : 'bg-[#757575]'}`} />
+                                            <span className={`text-[16px] leading-[23px] font-medium tracking-[-0.4px] transition-colors ${isActive ? 'text-[#7c2f0b]' : 'text-[#757575]'}`}>
+                                                Step {index + 1}
+                                            </span>
+                                        </div>
                                     </div>
+
+                                    {/* Card Description (shows when active) */}
+                                    {isActive && (
+                                        <div className="bg-[#fff1c5] p-4 w-full animate-fadeIn">
+                                            <p className="text-[#7c2f0b] opacity-80 text-[16px] leading-[23px] tracking-[-0.4px] m-0">
+                                                {step.description}
+                                            </p>
+                                        </div>
+                                    )}
                                 </div>
                             );
                         })}
                     </div>
 
-                    {/* Right Column — Showcase Image */}
-                    <div className="flex-1 h-[500px] rounded-[32px] overflow-hidden relative bg-white shadow-sm shrink-0">
+                    {/* Right Column — Showcase Image (Figma: 500px tall, radius 32, no shadow) */}
+                    <div className="flex-1 h-[500px] rounded-[32px] overflow-hidden relative bg-white shrink-0">
                         {cms.steps[activeStep] && (
                             <Image
                                 key={activeStep}

@@ -12,24 +12,24 @@ const {
     updateProductFaqs,
     updateProductVariants,
 } = require('../controllers/productController');
-const { protect, admin } = require('../middleware/authMiddleware');
+const { protect, admin, hasPermission } = require('../middleware/authMiddleware');
 
 const upload = multer();
 
 router.route('/')
     .get(getProducts)
-    .post(protect, admin, createProduct);
+    .post(protect, admin, hasPermission('products'), createProduct);
 
 router.route('/bulk')
-    .post(protect, admin, upload.single('file'), uploadProductsBulk);
+    .post(protect, admin, hasPermission('products'), upload.single('file'), uploadProductsBulk);
 
-router.route('/:id/reviews').post(createProductReview);
-router.route('/:id/faqs').patch(protect, admin, updateProductFaqs);
-router.route('/:id/variants').patch(protect, admin, updateProductVariants);
+router.route('/:id/reviews').post(protect, createProductReview);
+router.route('/:id/faqs').patch(protect, admin, hasPermission('products'), updateProductFaqs);
+router.route('/:id/variants').patch(protect, admin, hasPermission('products'), updateProductVariants);
 
 router.route('/:id')
     .get(getProductById)
-    .put(protect, admin, updateProduct)
-    .delete(protect, admin, deleteProduct);
+    .put(protect, admin, hasPermission('products', 'cms'), updateProduct) // CMS > Product Page edits product content too
+    .delete(protect, admin, hasPermission('products'), deleteProduct);
 
 module.exports = router;

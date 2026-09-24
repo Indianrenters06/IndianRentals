@@ -18,8 +18,8 @@ const GoogleLogo = () => (
     </div>
 );
 
-const GoogleGLogo = () => (
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+const GoogleGLogo = ({ size = 20 }) => (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
         <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" fill="#4285F4" />
         <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853" />
         <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05" />
@@ -39,7 +39,44 @@ const staticReviews = [
     { id: 9, name: "John Doe", role: "AI Engineer", text: "Lorem ipsum nunc tortor viverra condimentum faucibus pharetra nunc turpis consequat gravida suspendisse ullamcorper elit ut dignissim mattis egestas odio facilisi sagittis integer morbi dignissim quam risus tellus cras ut ac ornare felis duis et donec et sed tincidunt.", bgColor: "hsla(46, 100%, 89%, 1)", textColor: "text-[#BB4A02]", stars: 5 },
 ];
 
-const Testimonials = ({ overrideBg, overridePadding, overrideHeight, titleOverride, subtitleOverride }) => {
+// Figma "testimonials/Default" (22802:4334) card themes, in on-screen order:
+// row 1 = orange, blue, teal · row 2 = violet, orange, magenta.
+const FIGMA_CARD_THEMES = [
+    { bg: '#FFF1C5', name: '#7C2F0B', role: '#983908', text: '#BB4A02' },
+    { bg: '#D6ECFF', name: '#0E206E', role: '#0E206E', text: '#13309C' },
+    { bg: '#CCFBF1', name: '#042F2E', role: '#042F2E', text: '#115E59' },
+    { bg: '#ECE8FF', name: '#000000', role: '#000000', text: '#5718BF' },
+    { bg: '#FFF1C5', name: '#983908', role: '#983908', text: '#BB4A02' },
+    { bg: '#FEE5F5', name: '#580028', role: '#580028', text: '#AD0755' },
+];
+
+// Fixed 385×220 card from the Figma "testimonials/Default" rows layout.
+const FigmaTestimonialCard = ({ review, theme }) => (
+    <div
+        className="relative shrink-0 w-[385px] h-[220px] rounded-[20px] overflow-hidden"
+        style={{ backgroundColor: theme.bg, fontFamily: "'Mona Sans', sans-serif" }}
+    >
+        <p className="absolute m-0 left-[22px] top-[14px] font-medium text-[18px] leading-[25px] tracking-[-0.8px] whitespace-nowrap" style={{ color: theme.name }}>
+            {review.name}
+        </p>
+        <p className="absolute m-0 left-[21px] top-[40px] font-normal text-[12px] leading-[16px] tracking-[-0.4px] whitespace-nowrap" style={{ color: theme.role }}>
+            {review.role || 'Verified User'}
+        </p>
+        <p className="absolute m-0 left-[22px] top-[66px] w-[329px] font-medium text-[14px] leading-[20px] tracking-[-0.4px] line-clamp-4" style={{ color: theme.text }}>
+            {review.message || review.text}
+        </p>
+        <img src="/icons/google-wordmark.svg" alt="Google" width={54} height={54} className="absolute left-[26px] top-[167px]" />
+        {/* 4½ stars — Figma star frames are 20.65px, 22.59px apart, starting at x=256 */}
+        <div className="absolute left-[256px] top-[183.67px] flex items-center gap-[1.94px]">
+            {[0, 1, 2, 3].map((i) => (
+                <img key={i} src="/icons/testimonial-star.svg" alt="" width={20.65} height={20.65} />
+            ))}
+            <img src="/icons/testimonial-star-half.svg" alt="" width={20.65} height={20.65} />
+        </div>
+    </div>
+);
+
+const Testimonials = ({ overrideBg, overridePadding, overrideHeight, titleOverride, subtitleOverride, layout = 'grid' }) => {
     const [viewType, setViewType] = useState('mobile');
     const [reviewsData, setReviewsData] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -88,14 +125,14 @@ const Testimonials = ({ overrideBg, overridePadding, overrideHeight, titleOverri
         fetchAll();
     }, []);
 
-    const TestimonialCard = ({ review, isMobile }) => (
+    const TestimonialCard = ({ review, isMobile, isDesktop }) => (
         <div
             style={{
                 boxSizing: 'border-box',
                 display: 'flex',
                 flexDirection: 'column',
                 alignItems: 'flex-start',
-                padding: '18px',
+                padding: isDesktop ? '20px' : '18px',
                 gap: '10px',
                 width: isMobile ? '100%' : '100%',
                 borderRadius: '20px',
@@ -147,13 +184,22 @@ const Testimonials = ({ overrideBg, overridePadding, overrideHeight, titleOverri
             </p>
 
             {/* Footer: Google logo + Stars */}
-            <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', width: '100%', marginTop: '4px' }}>
+            <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', width: '100%', marginTop: isDesktop ? '1px' : '4px' }}>
                 <GoogleGLogo />
-                <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', gap: '3px' }}>
-                    {[...Array(5)].map((_, i) => (
-                        <PiStarFill key={i} size={18} style={{ color: '#FFAD32' }} />
-                    ))}
-                </div>
+                {isDesktop ? (
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '1.74px' }}>
+                        {[0, 1, 2, 3].map((i) => (
+                            <img key={i} src="/icons/testimonial-star.svg" alt="" width={20.65} height={20.65} />
+                        ))}
+                        <img src="/icons/testimonial-star-half.svg" alt="" width={20.65} height={20.65} />
+                    </div>
+                ) : (
+                    <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', gap: '3px' }}>
+                        {[...Array(5)].map((_, i) => (
+                            <PiStarFill key={i} size={18} style={{ color: '#FFAD32' }} />
+                        ))}
+                    </div>
+                )}
             </div>
         </div>
     );
@@ -298,6 +344,73 @@ const Testimonials = ({ overrideBg, overridePadding, overrideHeight, titleOverri
         );
     }
 
+    // ─── Desktop "rows" Layout — Figma "testimonials/Default" (22802:4334) ────
+    // Two rows of three 385×220 cards; row 1 is shifted 198px right, and the
+    // pair is centred in the 1200px column so both rows bleed off the edges.
+    if (viewType === 'desktop' && layout === 'rows') {
+        const cards = (reviewsData.length > 0 ? reviewsData : staticReviews);
+        const pick = (i) => cards[i % cards.length];
+        const rows = [[0, 1, 2], [3, 4, 5]];
+        return (
+            <section
+                className="w-full px-[120px] py-[100px] overflow-hidden"
+                style={{ background: overrideBg || '#FFFFFF', fontFamily: "'Mona Sans', sans-serif" }}
+            >
+                <div className="max-w-[1200px] mx-auto flex flex-col items-center gap-6">
+                    {/* Header */}
+                    <div className="w-full flex items-center justify-between">
+                        <div className="flex flex-col items-start gap-[10px] w-[531px]">
+                            <span className="inline-flex items-center justify-center px-3 py-1 rounded-full bg-white border-[0.5px] border-[#989898] font-medium text-[12px] leading-[16px] tracking-[-0.5px] text-[#464646]">
+                                Testimonials
+                            </span>
+                            <div className="flex flex-col gap-5 w-full">
+                                <h2 className="m-0 font-semibold text-[36px] leading-[45px] tracking-[-0.8px] text-[#333333]">
+                                    {titleOverride || 'What Our Customers Say'}
+                                </h2>
+                                <p className="m-0 font-normal text-[16px] leading-[23px] tracking-[-0.4px] text-black">
+                                    {subtitleOverride || 'Real experiences from innovators, businesses, and creators powering their ambitions with IndianRenters.'}
+                                </p>
+                            </div>
+                        </div>
+
+                        {/* Google rating badge */}
+                        <div className="flex items-center gap-[10px] shrink-0">
+                            <div className="w-[25px] h-[26px] flex items-center justify-center"><GoogleGLogo size={25} /></div>
+                            <div className="flex items-end gap-[6px]">
+                                <span className="font-semibold text-[12px] leading-[16px] tracking-[-0.4px] text-[#525252] whitespace-nowrap">5000+ reviews</span>
+                                <span className="w-px h-[15px] bg-[#989898]" />
+                                <span className="flex items-center gap-[3px]">
+                                    <img src="/icons/rating-stars-4-5.svg" alt="4.5 out of 5 stars" width={68.5} height={12.47} />
+                                    <span className="font-light text-[12px] leading-[16px] tracking-[-0.4px] text-[#525252]">4.9</span>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Cards + CTA */}
+                    <div className="w-full flex flex-col items-center gap-6 overflow-hidden">
+                        <div className="flex flex-col gap-5 shrink-0">
+                            {rows.map((row, r) => (
+                                <div key={r} className="flex gap-5" style={{ marginLeft: r === 0 ? '198px' : 0 }}>
+                                    {row.map((i) => (
+                                        <FigmaTestimonialCard key={i} review={pick(i)} theme={FIGMA_CARD_THEMES[i]} />
+                                    ))}
+                                </div>
+                            ))}
+                        </div>
+
+                        <Link
+                            href="/reviews"
+                            className="inline-flex items-center justify-center h-[35px] px-5 py-[6px] rounded-[28px] bg-[#0075FF] text-[#EDFAFF] font-medium text-[16px] leading-[23px] tracking-[-0.4px] no-underline whitespace-nowrap"
+                        >
+                            Read All Reviews
+                        </Link>
+                    </div>
+                </div>
+            </section>
+        );
+    }
+
     // ─── Desktop / Tablet Layout ──────────────────────────────────────────────
     return (
         <section
@@ -312,7 +425,7 @@ const Testimonials = ({ overrideBg, overridePadding, overrideHeight, titleOverri
             }}
         >
             <div
-                className="w-full h-full mx-auto flex flex-col items-center px-4 sm:px-6"
+                className="w-full h-full mx-auto flex flex-col items-center px-4 sm:px-6 xl:px-0"
                 style={{
                     maxWidth: '1200px',
                     paddingTop: overridePadding || '40px',
@@ -323,21 +436,21 @@ const Testimonials = ({ overrideBg, overridePadding, overrideHeight, titleOverri
                 }}
             >
                 <div
-                    className="w-full flex font-sans mb-2 gap-6"
+                    className={`w-full flex font-sans gap-6 ${viewType === 'desktop' ? '' : 'mb-2'}`}
                     style={{
                         flexDirection: viewType === 'desktop' ? 'row' : 'column',
-                        alignItems: viewType === 'desktop' ? 'flex-end' : 'flex-start',
+                        alignItems: viewType === 'desktop' ? 'center' : 'flex-start',
                         justifyContent: viewType === 'desktop' ? 'space-between' : 'flex-start'
                     }}
                 >
-                    <div className="flex flex-col" style={{ width: viewType === 'desktop' ? '600px' : '100%', gap: '8px' }}>
+                    <div className="flex flex-col" style={{ width: viewType === 'desktop' ? '512px' : '100%', gap: viewType === 'desktop' ? '20px' : '8px' }}>
                         <h2
                             style={{
                                 fontFamily: "'Mona Sans', sans-serif",
                                 fontWeight: 600,
                                 fontSize: viewType === 'desktop' ? '36px' : '28px',
                                 lineHeight: viewType === 'desktop' ? '45px' : '36px',
-                                letterSpacing: '-0.02em',
+                                letterSpacing: viewType === 'desktop' ? '-0.8px' : '-0.02em',
                                 color: 'hsla(0, 0%, 20%, 1)',
                                 margin: 0
                             }}
@@ -345,12 +458,13 @@ const Testimonials = ({ overrideBg, overridePadding, overrideHeight, titleOverri
                             {titleOverride || 'What Our Customers Say'}
                         </h2>
                         <p
+                            className={viewType === 'desktop' ? 'font-manrope' : ''}
                             style={{
-                                fontFamily: "'Mona Sans', sans-serif",
+                                fontFamily: viewType === 'desktop' ? undefined : "'Mona Sans', sans-serif",
                                 fontSize: '16px',
-                                fontWeight: 500,
-                                lineHeight: '1.4',
-                                letterSpacing: '-0.02em',
+                                fontWeight: viewType === 'desktop' ? 400 : 500,
+                                lineHeight: viewType === 'desktop' ? 1.2 : '1.4',
+                                letterSpacing: viewType === 'desktop' ? '-0.64px' : '-0.02em',
                                 color: '#545454',
                                 margin: 0
                             }}
@@ -361,15 +475,15 @@ const Testimonials = ({ overrideBg, overridePadding, overrideHeight, titleOverri
 
                     {/* Google Badge — desktop only */}
                     {viewType === 'desktop' && (
-                        <div className="flex items-center gap-2 self-end mb-2">
-                            <GoogleGLogo />
-                            <span className="text-[13px] font-semibold text-[#1D1D1F]">5000+ reviews</span>
-                            <div className="h-4 w-[1px] bg-[#D2D2D7] mx-1" />
-                            <div className="flex items-center gap-1.5">
-                                <div className="flex text-[#1D1D1F]">
-                                    <PiStarFill size={14} /><PiStarFill size={14} /><PiStarFill size={14} /><PiStarFill size={14} /><PiStarHalfFill size={14} />
-                                </div>
-                                <span className="text-[13px] font-bold text-[#1D1D1F]">4.9</span>
+                        <div className="flex items-center gap-[10px] shrink-0">
+                            <div className="w-[25px] h-[26px] flex items-center justify-center"><GoogleGLogo size={25} /></div>
+                            <div className="flex items-end gap-[6px]">
+                                <span className="font-semibold text-[12px] leading-[16px] tracking-[-0.4px] text-[#525252] whitespace-nowrap">5000+ reviews</span>
+                                <span className="w-px h-[15px] bg-[#989898]" />
+                                <span className="flex items-center gap-[3px]">
+                                    <img src="/icons/rating-stars-4-5.svg" alt="4.5 out of 5 stars" width={68.5} height={12.47} />
+                                    <span className="font-light text-[12px] leading-[16px] tracking-[-0.4px] text-[#525252]">4.9</span>
+                                </span>
                             </div>
                         </div>
                     )}
@@ -380,35 +494,38 @@ const Testimonials = ({ overrideBg, overridePadding, overrideHeight, titleOverri
                     className={`${viewType === 'desktop' ? 'grid-cols-3' : 'grid-cols-2'} grid w-full`}
                     style={{
                         gap: viewType === 'desktop' ? '24px' : '20px',
-                        maskImage: viewType === 'desktop' ? 'linear-gradient(to bottom, #000 60%, transparent 100%)' : undefined,
-                        WebkitMaskImage: viewType === 'desktop' ? 'linear-gradient(to bottom, #000 60%, transparent 100%)' : undefined
+                        alignItems: 'start',
+                        height: viewType === 'desktop' ? '734px' : undefined,
+                        overflow: viewType === 'desktop' ? 'hidden' : undefined,
+                        maskImage: viewType === 'desktop' ? 'linear-gradient(to bottom, #000 460px, transparent 744px)' : undefined,
+                        WebkitMaskImage: viewType === 'desktop' ? 'linear-gradient(to bottom, #000 460px, transparent 744px)' : undefined
                     }}
                 >
-                    <div className="flex flex-col" style={{ gap: viewType === 'desktop' ? '24px' : '20px' }}>
-                        <TestimonialCard review={reviewsData[0] || staticReviews[0]} />
-                        <TestimonialCard review={reviewsData[1] || staticReviews[1]} />
-                        <TestimonialCard review={reviewsData[2] || staticReviews[2]} />
+                    <div className="flex flex-col" style={{ gap: '20px' }}>
+                        <TestimonialCard review={reviewsData[0] || staticReviews[0]} isDesktop={viewType === 'desktop'} />
+                        <TestimonialCard review={reviewsData[1] || staticReviews[1]} isDesktop={viewType === 'desktop'} />
+                        <TestimonialCard review={reviewsData[2] || staticReviews[2]} isDesktop={viewType === 'desktop'} />
                     </div>
-                    <div className="flex flex-col" style={{ gap: viewType === 'desktop' ? '24px' : '20px' }}>
-                        <TestimonialCard review={reviewsData[3] || staticReviews[3]} />
-                        <TestimonialCard review={reviewsData[4] || staticReviews[4]} />
-                        <TestimonialCard review={reviewsData[5] || staticReviews[5]} />
+                    <div className="flex flex-col" style={{ gap: '20px' }}>
+                        <TestimonialCard review={reviewsData[3] || staticReviews[3]} isDesktop={viewType === 'desktop'} />
+                        <TestimonialCard review={reviewsData[4] || staticReviews[4]} isDesktop={viewType === 'desktop'} />
+                        <TestimonialCard review={reviewsData[5] || staticReviews[5]} isDesktop={viewType === 'desktop'} />
                     </div>
                     {viewType === 'desktop' && (
-                        <div className="flex flex-col" style={{ gap: '24px' }}>
-                            <TestimonialCard review={reviewsData[6] || staticReviews[6]} />
-                            <TestimonialCard review={reviewsData[7] || staticReviews[7]} />
-                            <TestimonialCard review={reviewsData[8] || staticReviews[8]} />
+                        <div className="flex flex-col" style={{ gap: '20px' }}>
+                            <TestimonialCard review={reviewsData[6] || staticReviews[6]} isDesktop={viewType === 'desktop'} />
+                            <TestimonialCard review={reviewsData[7] || staticReviews[7]} isDesktop={viewType === 'desktop'} />
+                            <TestimonialCard review={reviewsData[8] || staticReviews[8]} isDesktop={viewType === 'desktop'} />
                         </div>
                     )}
                 </div>
 
-                <div className="flex mt-8 md:mt-12 w-full justify-center z-10">
+                <div className={`flex w-full justify-center z-10 ${viewType === 'desktop' ? '' : 'mt-8 md:mt-12'}`}>
                     <Link
                         href="/reviews"
-                        className="inline-flex items-center justify-center rounded-full transition-all hover:brightness-110 shadow-md active:scale-95"
+                        className={`inline-flex items-center justify-center rounded-full transition-all hover:brightness-110 active:scale-95 ${viewType === 'desktop' ? '' : 'shadow-md'}`}
                         style={{
-                            minWidth: '163px',
+                            minWidth: viewType === 'desktop' ? undefined : '163px',
                             height: '40px',
                             padding: '6px 20px',
                             backgroundColor: '#0075FF',

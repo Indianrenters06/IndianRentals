@@ -147,8 +147,9 @@ const RentByCategory = () => {
     // number of cards fills the container edge to edge instead of sitting centred
     // with dead space at both ends. Declared above the early returns below so the
     // hook order stays stable across renders.
-    const catCardW = viewType === 'tablet' ? 165 : 177;
-    const catBaseGap = viewType === 'tablet' ? 15 : 24;
+    // Desktop = Figma: six 183.33px cards 20px apart fill the 1200px frame exactly.
+    const catCardW = viewType === 'tablet' ? 165 : 183;
+    const catBaseGap = viewType === 'tablet' ? 15 : 20;
     const [catBoundsRef, catTrackWidth, catPerView, catGap] = useWholeCardTrack(
         catCardW,
         catBaseGap,
@@ -197,12 +198,12 @@ const RentByCategory = () => {
 
     return (
         <section
-            className="py-6 md:pt-12 md:pb-24 relative overflow-hidden"
+            className="py-6 md:pt-12 md:pb-0 relative overflow-hidden"
             style={{
                 background: 'var(--color-grey-grey-50, hsla(0, 0%, 96%, 1))'
             }}
         >
-            <div className="max-w-[1200px] mx-auto px-4 sm:px-6">
+            <div className="max-w-[1200px] mx-auto px-4 sm:px-6 xl:px-0 md:border-b-[0.7px] md:border-[#E2E2E2] md:pb-24">
                 {/* Figma gap is 32px header→cards; the Swiper below adds 12px of its own
                     top padding (!py-3), so the margin carries only the remaining 20px. */}
                 <div className="flex items-center justify-between mb-4 md:mb-5">
@@ -211,7 +212,7 @@ const RentByCategory = () => {
                         style={{
                             fontFamily: '"Mona Sans", sans-serif',
                             fontWeight: 600,
-                            letterSpacing: '-0.02em',
+                            letterSpacing: '-0.8px',
                             color: 'hsla(0, 0%, 20%, 1)',
                             margin: 0
                         }}
@@ -220,7 +221,7 @@ const RentByCategory = () => {
                     </h2>
                     <Link
                         href="/categories"
-                        className="btn-primary hidden md:inline-flex text-[14px]"
+                        className="btn-primary hidden md:inline-flex text-[14px] lg:text-[16px] lg:leading-[23px] lg:tracking-[-0.4px] lg:h-[35px]"
                     >
                         Explore
                     </Link>
@@ -319,7 +320,7 @@ const RentByCategory = () => {
                                                 <div
                                                     className="cat-card flex items-center justify-center mb-[7px] relative bg-white border-2 border-[#eee] rounded-xl overflow-hidden"
                                                     style={{
-                                                        width: viewType === 'tablet' ? '165px' : '177px',
+                                                        width: viewType === 'tablet' ? '165px' : '183px',
                                                         height: viewType === 'tablet' ? '158px' : '173px',
                                                         // Figma insets the product inside the card rather than
                                                         // bleeding it: 167x128 art in a 183x173 frame, with the
@@ -368,7 +369,7 @@ const RentByCategory = () => {
                     </div>
 
                     {/* Figma: scrollbar row — width 1164, height 34, gap 24px from cards */}
-                    <div className="hidden md:flex items-center gap-6 mt-6">
+                    <div className="hidden md:flex items-center gap-6 mt-6 lg:mt-5">
                         {/* Progress scrollbar — Figma: h=0px border=3.5px solid #333 */}
                         <div
                             className="swiper-scrollbar-cat flex-1"

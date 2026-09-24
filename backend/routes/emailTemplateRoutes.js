@@ -1,9 +1,9 @@
 const express = require('express');
 const router = express.Router();
-const { protect, admin } = require('../middleware/authMiddleware');
+const { protect, admin, hasPermission } = require('../middleware/authMiddleware');
 const { getAll, getOne, create, update, remove, sendTest, importPresets } = require('../controllers/emailTemplateController');
 
-router.use(protect, admin);
+router.use(protect, admin, hasPermission('settings'));
 
 router.post('/test', sendTest);
 router.post('/import', importPresets);

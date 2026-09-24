@@ -206,9 +206,9 @@ export default function SubcategoryProductsPage({ subcategoryId, subcategoryName
                                                 borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', transition: 'all 0.3s',
                                             }}
                                         >
-                                            <div style={{ width: '100px', height: '100px', position: 'relative' }}>
+                                            <div style={{ width: '100%', height: '100%', position: 'relative' }}>
                                                 {sub.image ? (
-                                                    <Image src={sub.image} alt={sub.name} fill className="object-cover" sizes="100px" />
+                                                    <Image src={sub.image} alt={sub.name} fill className="object-cover" sizes="160px" />
                                                 ) : (
                                                     <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                                                         <FiPackage size={24} style={{ color: '#d1d5db' }} />

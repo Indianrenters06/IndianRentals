@@ -235,9 +235,16 @@ const updateUser = asyncHandler(async (req, res) => {
         throw new Error('User not found');
     }
 
+    // Whitelist: role/permissions go through /users/:id/role or Team, and
+    // passwords through the reset flow (findByIdAndUpdate skips the bcrypt hook).
+    const updates = {};
+    for (const field of ['name', 'email', 'phone', 'isBlocked', 'isActive', 'blockedReason']) {
+        if (req.body[field] !== undefined) updates[field] = req.body[field];
+    }
+
     const updatedUser = await User.findByIdAndUpdate(
         req.params.id,
-        req.body,
+        { $set: updates },
         { new: true, runValidators: true }
     ).select('-password');
 
@@ -413,9 +420,14 @@ const updateRentalStatus = asyncHandler(async (req, res) => {
         throw new Error('Rental not found');
     }
 
+    const updates = {};
+    for (const field of ['status', 'isDelivered', 'deliveredAt', 'isReturned', 'returnedAt']) {
+        if (req.body[field] !== undefined) updates[field] = req.body[field];
+    }
+
     const updatedRental = await Rental.findByIdAndUpdate(
         req.params.id,
-        req.body,
+        { $set: updates },
         { new: true, runValidators: true }
     ).populate('user', 'name email');
 

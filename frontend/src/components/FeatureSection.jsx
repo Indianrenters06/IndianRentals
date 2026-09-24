@@ -43,7 +43,7 @@ const FeatureSection = () => {
 
     return (
         <section className="w-full bg-white overflow-hidden text-black py-0">
-            <div className={`w-full max-w-[1200px] mx-auto ${isDesktop ? 'px-4 sm:px-6' : 'px-0'}`}>
+            <div className={`w-full max-w-[1200px] mx-auto ${isDesktop ? 'px-4 sm:px-6 xl:px-0' : 'px-0'}`}>
                 {/* Inner radial gradient container */}
                 <div
                     className="w-full relative flex flex-col lg:flex-row items-center justify-between overflow-hidden"
@@ -69,9 +69,9 @@ const FeatureSection = () => {
                     <div
                         className="lg:w-[32%] w-full z-10 relative order-1 text-left flex flex-col"
                         style={{
-                            width: isDesktop ? 'auto' : '100%',
-                            height: isDesktop ? '243px' : 'auto',
-                            gap: isDesktop ? '8px' : '4px',
+                            width: isDesktop ? '278px' : '100%',
+                            height: isDesktop ? 'auto' : 'auto',
+                            gap: isDesktop ? '24px' : '4px',
                             display: 'flex',
                             flexDirection: 'column',
                             justifyContent: isDesktop ? 'flex-start' : 'center'
@@ -80,9 +80,9 @@ const FeatureSection = () => {
                         <div
                             className="flex flex-col"
                             style={{
-                                width: isDesktop ? 'auto' : '100%',
+                                width: isDesktop ? '278px' : '100%',
                                 height: 'auto',
-                                gap: isDesktop ? '0' : '4px',
+                                gap: isDesktop ? '9px' : '4px',
                                 display: 'flex',
                                 flexDirection: 'column'
                             }}
@@ -94,9 +94,9 @@ const FeatureSection = () => {
                                 style={{
                                     fontFamily: "'Mona Sans', sans-serif",
                                     fontWeight: isDesktop ? 500 : 600,
-                                    fontSize: isDesktop ? '42px' : '25px',
-                                    lineHeight: isDesktop ? '1.1' : '31px',
-                                    letterSpacing: isDesktop ? '-0.02em' : '-0.8px',
+                                    fontSize: isDesktop ? '47px' : '25px',
+                                    lineHeight: isDesktop ? '60px' : '31px',
+                                    letterSpacing: isDesktop ? '-1.5px' : '-0.8px',
                                     background: 'linear-gradient(90deg, #0F2239 0%, #517396 87.77%)',
                                     WebkitBackgroundClip: 'text',
                                     WebkitTextFillColor: 'transparent',
@@ -116,11 +116,11 @@ const FeatureSection = () => {
                                 style={{
                                     fontFamily: "'Mona Sans', sans-serif",
                                     fontWeight: isDesktop ? 400 : 500,
-                                    fontSize: isDesktop ? '14px' : '12px',
-                                    lineHeight: isDesktop ? '1.5' : '18px',
+                                    fontSize: isDesktop ? '16px' : '12px',
+                                    lineHeight: isDesktop ? '23px' : '18px',
                                     letterSpacing: '-0.4px',
-                                    color: '#757575',
-                                    maxWidth: isDesktop ? '235px' : '100%',
+                                    color: isDesktop ? '#0E305D' : '#757575',
+                                    maxWidth: '100%',
                                     margin: 0,
                                     marginBottom: isDesktop ? '0' : '8px'
                                 }}
@@ -144,9 +144,9 @@ const FeatureSection = () => {
                                     justifyContent: 'center',
                                     fontFamily: "'Mona Sans', sans-serif",
                                     fontWeight: 500,
-                                    fontSize: isDesktop ? '14px' : '8.68px',
-                                    lineHeight: isDesktop ? 'normal' : '13px',
-                                    letterSpacing: isDesktop ? 'normal' : '-0.289px',
+                                    fontSize: isDesktop ? '16px' : '8.68px',
+                                    lineHeight: isDesktop ? '23px' : '13px',
+                                    letterSpacing: isDesktop ? '-0.4px' : '-0.289px',
                                     color: '#1F1F1F',
                                     background: isDesktop ? undefined : '#FFCF46',
                                     borderRadius: isDesktop ? '32px' : '20.47px',
@@ -163,19 +163,20 @@ const FeatureSection = () => {
                     </div>
 
                     {/* Center Content (Laptop + Air) (Order 2) */}
-                    <div className="lg:w-[48%] w-full flex items-center justify-center relative z-0 order-2 mt-4 lg:mt-0 lg:-translate-x-10">
+                    <div className="lg:w-[48%] w-full flex items-center justify-center relative lg:static z-0 order-2 mt-4 lg:mt-0">
                         {/* Air watermark inside center */}
                         <div
                             className="absolute left-1/2 pointer-events-none select-none z-0"
                             style={{
-                                transform: 'translate(-50%, -50%)',
+                                transform: isDesktop ? 'translateX(-50%)' : 'translate(-50%, -50%)',
                                 opacity: isDesktop ? 0.2 : 0.18,
-                                width: '100%',
-                                height: 'auto',
+                                width: isDesktop ? '429px' : '100%',
+                                height: isDesktop ? '219px' : 'auto',
                                 display: 'flex',
                                 alignItems: 'center',
                                 justifyContent: 'center',
-                                top: '40%'
+                                left: isDesktop ? '633.5px' : undefined,
+                                top: isDesktop ? '72px' : '40%'
                             }}
                         >
                             <span
@@ -200,15 +201,15 @@ const FeatureSection = () => {
                             whileInView={{ opacity: 1, scale: 1 }}
                             viewport={{ once: true }}
                             transition={{ duration: 0.5, delay: 0.2 }}
-                            className="relative w-[240px] h-[126px] lg:w-full lg:h-auto lg:aspect-16/10 max-w-[600px] flex items-center justify-center drop-shadow-2xl z-10"
+                            className="relative lg:absolute lg:left-[431px] lg:top-[77px] w-[240px] h-[126px] lg:w-[429px] lg:h-[268px] max-w-[600px] flex items-center justify-center drop-shadow-2xl lg:drop-shadow-none z-10"
                         >
                             <Image
                                 src={cms.featureSectionImage || "https://res.cloudinary.com/dgkckcdk8/image/upload/v1769961205/indian-rentals/gfjrzgp5llzcjap30wkt.png"}
                                 alt={cms.featureSectionTitle || "Laptop"}
                                 fill
-                                className={isDesktop ? "object-contain hover:scale-100 transition-transform duration-500 scale-105" : "object-contain scale-110 translate-y-1"}
+                                className={isDesktop ? "object-contain" : "object-contain scale-110 translate-y-1"}
                                 priority
-                                sizes="(max-width: 768px) 100vw, 600px"
+                                sizes="(max-width: 768px) 100vw, 429px"
                             />
                         </motion.div>
                     </div>
@@ -238,7 +239,7 @@ const FeatureSection = () => {
                                     transition={{ delay: 0.3 + (idx * 0.1) }}
                                     className={isDesktop ? "lg:flex-none" : "flex flex-col items-start"}
                                     style={{
-                                        width: isDesktop ? (idx === 0 ? '142px' : '107px') : 'auto',
+                                        width: isDesktop ? ['142px', '107px', '97px'][idx] : 'auto',
                                         height: 'auto',
                                         minWidth: isDesktop ? 'none' : '100px',
                                         display: 'flex',
@@ -250,7 +251,7 @@ const FeatureSection = () => {
                                     <div
                                         className="flex flex-col"
                                         style={{
-                                            width: isDesktop ? '76px' : 'auto',
+                                            width: 'auto',
                                             height: 'auto',
                                             gap: 0,
                                             display: 'flex',
@@ -261,14 +262,14 @@ const FeatureSection = () => {
                                         <p
                                             style={{
                                                 fontFamily: "'Mona Sans', sans-serif",
-                                                fontSize: isDesktop ? '13px' : '10px',
+                                                fontSize: isDesktop ? '14px' : '10px',
                                                 fontWeight: 600,
-                                                lineHeight: '16px',
+                                                lineHeight: isDesktop ? '20px' : '16px',
                                                 letterSpacing: '-0.4px',
-                                                color: isDesktop ? (isThird ? '#2d5d36' : 'hsla(0, 0%, 46%, 1)') : (isThird ? 'transparent' : '#757575'),
-                                                background: (!isDesktop && isThird) ? 'linear-gradient(90deg, #0F3914 0%, #51966A 87.77%)' : 'none',
-                                                WebkitBackgroundClip: (!isDesktop && isThird) ? 'text' : 'none',
-                                                WebkitTextFillColor: (!isDesktop && isThird) ? 'transparent' : 'inherit',
+                                                color: isThird ? 'transparent' : (isDesktop ? '#757575' : '#757575'),
+                                                background: isThird ? 'linear-gradient(90deg, #0F3914 0%, #51966A 87.77%)' : 'none',
+                                                WebkitBackgroundClip: isThird ? 'text' : 'none',
+                                                WebkitTextFillColor: isThird ? 'transparent' : 'inherit',
                                                 marginBottom: 0,
                                             }}
                                         >
@@ -277,10 +278,10 @@ const FeatureSection = () => {
                                         <h4
                                             style={{
                                                 fontFamily: "'Mona Sans', sans-serif",
-                                                fontSize: isDesktop ? '32px' : '20px',
-                                                fontWeight: 600,
-                                                lineHeight: isDesktop ? '1.1' : '26px',
-                                                letterSpacing: isDesktop ? '-0.02em' : '-0.8px',
+                                                fontSize: isDesktop ? '27px' : '20px',
+                                                fontWeight: isDesktop ? 500 : 600,
+                                                lineHeight: isDesktop ? '25px' : '26px',
+                                                letterSpacing: isDesktop ? '-1.5px' : '-0.8px',
                                                 margin: 0,
                                                 background: isThird
                                                     ? 'linear-gradient(90deg, #0F3914 0%, #51966A 87.77%)'
@@ -295,15 +296,15 @@ const FeatureSection = () => {
                                     <p
                                         style={{
                                             fontFamily: "'Mona Sans', sans-serif",
-                                            fontSize: isDesktop ? '12px' : '10px',
-                                            fontWeight: 600,
-                                            lineHeight: '16px',
+                                            fontSize: isDesktop ? '14px' : '10px',
+                                            fontWeight: isDesktop && isThird ? 500 : 600,
+                                            lineHeight: isDesktop ? '20px' : '16px',
                                             letterSpacing: '-0.4px',
-                                            color: isDesktop ? (isThird ? '#2d5d36' : 'hsla(0, 0%, 46%, 1)') : (isThird ? 'transparent' : '#757575'),
-                                            background: (!isDesktop && isThird) ? 'linear-gradient(90deg, #0F3914 0%, #51966A 87.77%)' : 'none',
-                                            WebkitBackgroundClip: (!isDesktop && isThird) ? 'text' : 'none',
-                                            WebkitTextFillColor: (!isDesktop && isThird) ? 'transparent' : 'inherit',
-                                            marginTop: 0,
+                                            color: isThird ? 'transparent' : '#757575',
+                                            background: isThird ? 'linear-gradient(90deg, #0F3914 0%, #51966A 87.77%)' : 'none',
+                                            WebkitBackgroundClip: isThird ? 'text' : 'none',
+                                            WebkitTextFillColor: isThird ? 'transparent' : 'inherit',
+                                            marginTop: isDesktop ? '2px' : 0,
                                             overflow: 'hidden'
                                         }}
                                     >
@@ -320,19 +321,20 @@ const FeatureSection = () => {
                         whileInView={{ opacity: 1 }}
                         viewport={{ once: true }}
                         transition={{ delay: 0.5 }}
-                        className={isDesktop ? "w-full text-center relative z-10 order-4 pt-4 lg:absolute lg:bottom-[2px] lg:left-1/2 lg:-translate-x-1/2 pointer-events-none" : "w-full text-center relative z-20 order-4 mt-auto"}
+                        className={isDesktop ? "absolute left-[520px] top-[335.5px] z-10 pointer-events-none whitespace-nowrap" : "w-full text-center relative z-20 order-4 mt-auto"}
                     >
                         <h3
+                            className={isDesktop ? 'font-manrope' : ''}
                             style={{
-                                fontFamily: "'Mona Sans', sans-serif",
-                                fontWeight: 800,
-                                fontSize: isDesktop ? '14px' : '12px',
-                                lineHeight: '18px',
-                                letterSpacing: '-0.4px',
+                                fontFamily: isDesktop ? undefined : "'Mona Sans', sans-serif",
+                                fontWeight: isDesktop ? 600 : 800,
+                                fontSize: isDesktop ? '24px' : '12px',
+                                lineHeight: isDesktop ? '48px' : '18px',
+                                letterSpacing: isDesktop ? '-1.5px' : '-0.4px',
                                 background: 'linear-gradient(90deg, #3583F0 0%, #BC58E3 47.12%, #E05821 100%)',
                                 WebkitBackgroundClip: 'text',
                                 WebkitTextFillColor: 'transparent',
-                                paddingBottom: '8px',
+                                paddingBottom: isDesktop ? 0 : '8px',
                                 margin: 0
                             }}
                         >

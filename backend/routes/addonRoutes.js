@@ -6,14 +6,14 @@ const {
     updateAddon,
     deleteAddon
 } = require('../controllers/addonController');
-const { protect, admin } = require('../middleware/authMiddleware');
+const { protect, admin, hasPermission } = require('../middleware/authMiddleware');
 
 router.route('/')
     .get(getAddons)
-    .post(protect, admin, createAddon);
+    .post(protect, admin, hasPermission('products'), createAddon);
 
 router.route('/:id')
-    .put(protect, admin, updateAddon)
-    .delete(protect, admin, deleteAddon);
+    .put(protect, admin, hasPermission('products'), updateAddon)
+    .delete(protect, admin, hasPermission('products'), deleteAddon);
 
 module.exports = router;
