@@ -19,10 +19,14 @@ const userSchema = new mongoose.Schema({
         required: [true, 'Please provide your name'],
         trim: true
     },
+    // Mobile-only sign-ups ('phone' provider) have no email until they add one
+    // in their profile. `sparse` lets any number of them leave it unset; the
+    // live index is migrated by scripts/make_email_index_sparse.js.
     email: {
         type: String,
-        required: [true, 'Please provide your email'],
+        required: [function () { return this.authProvider !== 'phone'; }, 'Please provide your email'],
         unique: true,
+        sparse: true,
         lowercase: true,
         match: [/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/, 'Please provide a valid email']
     },
@@ -51,12 +55,13 @@ const userSchema = new mongoose.Schema({
         type: String,
         default: '',
         required: function () {
-            return this.authProvider === 'local';
+            return this.authProvider === 'local' || this.authProvider === 'phone';
         }
     },
+    // local = email + password, google = Google OAuth, phone = mobile OTP only
     authProvider: {
         type: String,
-        enum: ['local', 'google'],
+        enum: ['local', 'google', 'phone'],
         default: 'local'
     },
     googleId: {

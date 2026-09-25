@@ -2,6 +2,8 @@ const express = require('express');
 const router = express.Router();
 const {
     registerUser,
+    sendRegisterOtp,
+    verifyRegisterOtp,
     loginUser,
     logoutUser,
     verifyOtp,
@@ -33,6 +35,8 @@ const sendOtpLimiter = limiter(10, 'Too many OTP requests. Please try again in 1
 const verifyLimiter = limiter(20, 'Too many verification attempts. Please try again in 15 minutes.');
 
 router.post('/register', sendOtpLimiter, registerUser);
+router.post('/register-otp', sendOtpLimiter, sendRegisterOtp);
+router.post('/register-verify', verifyLimiter, verifyRegisterOtp);
 router.post('/login', loginLimiter, sendOtpLimiter, loginUser);
 router.post('/admin-login', loginLimiter, adminLogin);
 router.post('/logout', logoutUser);

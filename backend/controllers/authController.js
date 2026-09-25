@@ -1,5 +1,6 @@
 const asyncHandler = require('express-async-handler');
 const User = require('../models/User');
+const PendingSignup = require('../models/PendingSignup');
 const generateToken = require('../utils/generateToken');
 const { createNotification } = require('./notificationController');
 
@@ -60,9 +61,16 @@ const logOtpForDev = (target, otp) => {
 const adminLogin = asyncHandler(async (req, res) => {
     const { email, password } = req.body;
 
+    // Without an email the query below would be `{}` and match any account —
+    // including mobile-only ones that have no password to compare against.
+    if (typeof email !== 'string' || !email || typeof password !== 'string' || !password) {
+        res.status(401);
+        throw new Error('Invalid email or password');
+    }
+
     const user = await User.findOne({ email }).select('+password');
 
-    if (user && (await user.matchPassword(password))) {
+    if (user && user.password && (await user.matchPassword(password))) {
         if (user.role === 'customer') {
             res.status(401);
             throw new Error('Not authorized to access the admin panel');
@@ -621,8 +629,136 @@ const googleLogin = asyncHandler(async (req, res) => {
     }
 });
 
+// Mobile numbers are stored as "+91XXXXXXXXXX" — the same form /send-otp looks them up by.
+const INDIAN_MOBILE = /^\+91[6-9]\d{9}$/;
+
+// @desc    Mobile sign-up, step 1: hold the details and SMS a code
+// @route   POST /api/auth/register-otp
+// @access  Public
+const sendRegisterOtp = asyncHandler(async (req, res) => {
+    const { name, phone, acceptTerms } = req.body;
+
+    if (typeof name !== 'string' || !name.trim()) {
+        res.status(400);
+        throw new Error('Please enter your name.');
+    }
+    if (typeof phone !== 'string' || !INDIAN_MOBILE.test(phone)) {
+        res.status(400);
+        throw new Error('Please enter a valid 10-digit mobile number.');
+    }
+    if (acceptTerms !== true) {
+        res.status(400);
+        throw new Error('Please accept the Terms and Privacy Policy.');
+    }
+
+    const Settings = require('../models/Settings');
+    const settings = await Settings.findOne();
+    if (settings && settings.allowRegistrations === false) {
+        res.status(403);
+        throw new Error('New registrations are currently disabled by the administrator.');
+    }
+
+    if (await User.exists({ phone })) {
+        res.status(400);
+        throw new Error('An account with this number already exists. Please sign in instead.');
+    }
+
+    const otp = generateOTP();
+    await PendingSignup.findOneAndUpdate(
+        { phone },
+        {
+            name: name.trim(),
+            otp,
+            otpAttempts: 0,
+            termsAcceptedAt: new Date(),
+            expiresAt: new Date(Date.now() + 10 * 60 * 1000), // 10 minutes
+        },
+        { upsert: true, setDefaultsOnInsert: true }
+    );
+
+    try {
+        await sendSMS({ phone, message: `Your IndianRenters verification code is: ${otp}` });
+    } catch (error) {
+        console.error('SMS send failed:', error);
+    }
+    logOtpForDev(phone, otp);
+
+    res.json({ message: 'Verification code sent to your phone' });
+});
+
+// @desc    Mobile sign-up, step 2: check the code, then create the account
+// @route   POST /api/auth/register-verify
+// @access  Public
+const verifyRegisterOtp = asyncHandler(async (req, res) => {
+    const { phone, otp } = req.body;
+
+    if (typeof phone !== 'string' || !INDIAN_MOBILE.test(phone) || !otp) {
+        res.status(400);
+        throw new Error('Please provide your mobile number and the code.');
+    }
+
+    const pending = await PendingSignup.findOne({ phone });
+    if (!pending || pending.expiresAt < Date.now()) {
+        res.status(400);
+        throw new Error('Code expired. Please request a new one.');
+    }
+
+    if (!otpMatches(pending.otp, otp)) {
+        pending.otpAttempts += 1;
+        if (pending.otpAttempts >= MAX_OTP_ATTEMPTS) {
+            await pending.deleteOne();
+            res.status(429);
+            throw new Error('Too many wrong attempts. Please request a new code.');
+        }
+        await pending.save();
+        res.status(400);
+        throw new Error('That code is incorrect. Please check it and try again.');
+    }
+
+    // The number may have been registered while this code was pending.
+    if (await User.exists({ phone })) {
+        await pending.deleteOne();
+        res.status(400);
+        throw new Error('An account with this number already exists. Please sign in instead.');
+    }
+
+    const user = await User.create({
+        name: pending.name,
+        phone,
+        authProvider: 'phone',
+        role: 'customer',
+        isPhoneVerified: true,
+        lastLogin: new Date(),
+    });
+    await pending.deleteOne();
+
+    await createNotification({
+        title: 'New User Registered',
+        message: `User ${user.name} (${user.phone}) just joined IndianRentals.`,
+        type: 'user',
+        relatedId: user._id
+    });
+
+    const token = generateToken(res, user._id);
+
+    res.status(201).json({
+        _id: user._id,
+        name: user.name,
+        email: user.email || '',
+        phone: user.phone,
+        role: user.role,
+        avatar: user.avatar || '',
+        kyc: user.kyc,
+        isEmailVerified: false,
+        isPhoneVerified: true,
+        token: token,
+    });
+});
+
 module.exports = {
     registerUser,
+    sendRegisterOtp,
+    verifyRegisterOtp,
     loginUser,
     logoutUser,
     verifyOtp,

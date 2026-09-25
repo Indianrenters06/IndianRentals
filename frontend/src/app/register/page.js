@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import AuthCard from "../../components/AuthCard";
 
 // /register — the Figma sign-in card opened on its "Create account" tab.
-// After signing up the card switches to "Sign in" itself; a Google sign-in lands home.
+// Verifying the SMS code creates the account and signs in; either way the user lands home.
 const RegisterPage = () => {
   const router = useRouter();
   return (
