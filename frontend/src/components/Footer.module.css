@@ -1,7 +1,9 @@
 .wide { display: none; }
 .compact { display: flex; }
 .wideTop { display: grid; gap: 32px; padding-bottom: 20px; }
-.columns { gap: 28px; }
+.columns { display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 20px; }
+.compactColumns { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px 20px; width: 100%; }
+.compactColumnTitle { color: #555; font-size: 12px; font-weight: 700; line-height: 16px; }
 
 @media (min-width: 768px) {
     .wide { display: flex; }

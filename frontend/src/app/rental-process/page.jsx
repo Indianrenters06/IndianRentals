@@ -32,7 +32,7 @@ export default function RentalProcessPage() {
     return (
         <div className="font-sans text-gray-800 bg-white">
             {/* Shared, CMS-controlled image banner */}
-            <PageBanner image={bannerImage} title={bannerTitle} showText={cms?.bannerShowText !== false} background={cms?.bannerBackground} />
+            <PageBanner image={bannerImage} title={bannerTitle} showText={cms?.bannerShowText !== false} background={cms?.bannerBackground || '#F9FAFB'} />
 
             {/* 2. How It Works Section — this page is the rental process, so no link back to itself */}
             <RentalProcess cmsData={cms} showRentalProcessLink={false} desktopBackground="#F6F6F6" />
@@ -103,4 +103,3 @@ export default function RentalProcessPage() {
         </div>
     );
 }
-

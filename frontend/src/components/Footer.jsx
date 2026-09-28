@@ -62,7 +62,14 @@ const Footer = () => {
     const currentYear = new Date().getFullYear();
     const copyrightName = settings?.footerCopyright || "AAA Rental LLP";
 
-    const footerColumns = (settings?.footerColumns?.length ? settings.footerColumns : DEFAULT_FOOTER_COLUMNS);
+    const configuredColumns = (settings?.footerColumns?.length ? settings.footerColumns : DEFAULT_FOOTER_COLUMNS);
+    const missingCatalogColumns = DEFAULT_FOOTER_COLUMNS.slice(1, 3).filter(defaultColumn =>
+        !configuredColumns.some(column =>
+            column.title?.trim().toLowerCase() === defaultColumn.title.toLowerCase() ||
+            column.links?.some(link => defaultColumn.links.some(defaultLink => defaultLink.href === link.href))
+        )
+    );
+    const footerColumns = [configuredColumns[0], ...missingCatalogColumns, ...configuredColumns.slice(1)];
     const paymentLogos = (settings?.paymentLogos?.length ? settings.paymentLogos : DEFAULT_PAYMENT_LOGOS);
     const primaryColumn = footerColumns[0];
     const secondaryColumns = footerColumns.slice(1);
@@ -117,7 +124,7 @@ const Footer = () => {
 
                         {/* Links — Columns */}
                         <div
-                            className={`${styles.columns} grid grid-cols-4 min-w-0 w-full`}
+                            className={`${styles.columns} min-w-0 w-full`}
                         >
                             {footerColumns.map((col, ci) => (
                                 <ul key={ci} className="flex flex-col gap-[18px] text-[hsla(0,0%,0%,1)] font-sans font-medium text-[13px] tracking-tight leading-[1.5] min-w-0">
@@ -220,11 +227,12 @@ const Footer = () => {
                     {/* Divider */}
                     <div className="w-full h-[1px] bg-[#EEEEEE] shrink-0" />
 
-                    {/* Policies + Support */}
+                    {/* Footer link groups */}
                     {secondaryColumns.length > 0 && (
-                        <div className="flex flex-row items-start w-full gap-[24px]">
+                        <div className={styles.compactColumns}>
                             {secondaryColumns.map((col, ci) => (
-                                <div key={ci} className="flex flex-col items-start gap-[8px]">
+                                <div key={ci} className="flex flex-col items-start gap-[8px] min-w-0">
+                                    {col.title && <h3 className={styles.compactColumnTitle}>{col.title}</h3>}
                                     {(col.links || []).map((link, li) => (
                                         <Link
                                             key={li}
@@ -232,7 +240,7 @@ const Footer = () => {
                                             style={{
                                                 fontFamily: "'Mona Sans', sans-serif",
                                                 fontWeight: 500,
-                                                fontSize: '10px',
+                                                fontSize: '12px',
                                                 lineHeight: '16px',
                                                 letterSpacing: '-0.4px',
                                                 color: '#000000',

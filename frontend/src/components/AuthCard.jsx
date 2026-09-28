@@ -10,7 +10,7 @@ import { API_BASE_URL } from "../services/apiConfig";
  * Sign in / Create account card — Figma login frames (870×575):
  * 377.58px photo panel on the left, form section on the right (30/42/18 padding).
  * Four screens: Sign in → "Enter your code." and Create account → "Verify your mobile."
- * Accounts are mobile-only; the account is created only once the SMS code checks out.
+ * Existing accounts can sign in by email or mobile; new mobile accounts are created after SMS verification.
  * Shared by the navbar modal (AuthModal), /login and /register.
  */
 
@@ -48,6 +48,7 @@ const tenDigits = (v) => {
     return d.length === 12 && d.startsWith("91") ? d.slice(2) : d;
 };
 const isValidPhone = (v) => /^[6-9]\d{9}$/.test(tenDigits(v));
+const isValidEmail = (v) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.trim());
 // "+91 98••••••42"
 const maskedPhone = (v) => {
     const d = tenDigits(v);
@@ -182,6 +183,9 @@ const AuthCard = ({ initialView = "login", onClose, onSuccess, notice }) => {
     const [step, setStep] = useState(1); // 1 = details, 2 = SMS code
 
     // Sign in
+    const [loginMethod, setLoginMethod] = useState("email");
+    const [email, setEmail] = useState("");
+    const [emailError, setEmailError] = useState(false);
     const [phone, setPhone] = useState("");
     const [phoneError, setPhoneError] = useState(false);
     // Create account
@@ -232,13 +236,15 @@ const AuthCard = ({ initialView = "login", onClose, onSuccess, notice }) => {
 
     const isLogin = view === "login";
     const activePhone = isLogin ? phone : reg.phone;
+    const loginIdentifier = loginMethod === "email" ? email.trim().toLowerCase() : `+91${tenDigits(phone)}`;
 
     // Step 1 → send the code (also used by "Resend code")
     const sendCode = async (e) => {
         e?.preventDefault?.();
         setError(null); setInfo(null);
         if (isLogin) {
-            if (!isValidPhone(phone)) { setPhoneError(true); return; }
+            if (loginMethod === "email" && !isValidEmail(email)) { setEmailError(true); return; }
+            if (loginMethod === "mobile" && !isValidPhone(phone)) { setPhoneError(true); return; }
         } else {
             if (!reg.name.trim()) { setError("Please enter your name."); return; }
             if (!isValidPhone(reg.phone)) { setError("Please enter a valid 10-digit mobile number."); return; }
@@ -246,8 +252,7 @@ const AuthCard = ({ initialView = "login", onClose, onSuccess, notice }) => {
         }
         setLoading(true);
         try {
-            // Numbers travel as "+91XXXXXXXXXX" — the form accounts are looked up by
-            if (isLogin) await postJSON("/api/auth/send-otp", { identifier: `+91${tenDigits(phone)}` });
+            if (isLogin) await postJSON("/api/auth/send-otp", { identifier: loginIdentifier });
             else await postJSON("/api/auth/register-otp", { name: reg.name.trim(), phone: `+91${tenDigits(reg.phone)}`, acceptTerms: true });
             setCode("");
             setStep(2);
@@ -266,7 +271,7 @@ const AuthCard = ({ initialView = "login", onClose, onSuccess, notice }) => {
         try {
             const number = `+91${tenDigits(activePhone)}`;
             finish(isLogin
-                ? await postJSON("/api/auth/verify-login", { identifier: number, otp: code })
+                ? await postJSON("/api/auth/verify-login", { identifier: loginIdentifier, otp: code })
                 : await postJSON("/api/auth/register-verify", { phone: number, otp: code }));
         } catch (err) {
             // Keep the number, clear the boxes and say what went wrong inline
@@ -367,13 +372,34 @@ const AuthCard = ({ initialView = "login", onClose, onSuccess, notice }) => {
                         )}
                         <form onSubmit={sendCode} noValidate>
                             <div className="pt-[22px]">
-                                <Field label="Mobile number" htmlFor="auth-phone">
-                                    <PhoneInput id="auth-phone" value={phone} invalid={phoneError} onChange={(e) => { setPhone(e.target.value); setPhoneError(false); }} />
-                                </Field>
-                                {phoneError && <p className="m-0 pt-1 text-[11px] leading-[16px] text-[#C8170D]">Please enter a valid 10-digit mobile number.</p>}
+                                <div className="flex gap-2 pb-4" role="group" aria-label="Sign-in method">
+                                    {[["email", "Email"], ["mobile", "Mobile"]].map(([method, label]) => (
+                                        <button key={method} type="button" aria-pressed={loginMethod === method}
+                                            onClick={() => { setLoginMethod(method); setError(null); setEmailError(false); setPhoneError(false); }}
+                                            className={`min-h-10 rounded-full px-5 text-[13px] font-semibold border transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#141414] ${loginMethod === method ? "bg-[#141414] border-[#141414] text-white" : "bg-white border-[#C9C9C9] text-[#333333] hover:border-[#141414]"}`}>
+                                            {label}
+                                        </button>
+                                    ))}
+                                </div>
+                                {loginMethod === "email" ? (
+                                    <Field label="Email address" htmlFor="auth-email">
+                                        <div className={`${boxClass} ${emailError ? "!border-[#C8170D]" : ""}`}>
+                                            <input id="auth-email" type="email" autoComplete="email" inputMode="email" placeholder="you@example.com"
+                                                value={email} onChange={(e) => { setEmail(e.target.value); setEmailError(false); }}
+                                                aria-invalid={emailError} aria-describedby={emailError ? "auth-email-error" : undefined}
+                                                className={inputClass} style={FONT} />
+                                        </div>
+                                    </Field>
+                                ) : (
+                                    <Field label="Mobile number" htmlFor="auth-phone">
+                                        <PhoneInput id="auth-phone" value={phone} invalid={phoneError} onChange={(e) => { setPhone(e.target.value); setPhoneError(false); }} />
+                                    </Field>
+                                )}
+                                {emailError && loginMethod === "email" && <p id="auth-email-error" role="alert" className="m-0 pt-1 text-[11px] leading-[16px] text-[#C8170D]">Enter a valid email address.</p>}
+                                {phoneError && loginMethod === "mobile" && <p role="alert" className="m-0 pt-1 text-[11px] leading-[16px] text-[#C8170D]">Please enter a valid 10-digit mobile number.</p>}
                             </div>
                             <div className="pt-[15px]">
-                                <PrimaryButton type="submit" loading={loading}>Continue with mobile <ArrowUpRight /></PrimaryButton>
+                                <PrimaryButton type="submit" loading={loading}>Send sign-in code <ArrowUpRight /></PrimaryButton>
                             </div>
                         </form>
                     </>
@@ -447,7 +473,7 @@ const AuthCard = ({ initialView = "login", onClose, onSuccess, notice }) => {
                             {isLogin ? "Enter your code." : "Verify your mobile."}
                         </h3>
                         <p className="m-0 pt-2 text-[14px] leading-[21px] text-[#666666]">
-                            A six-digit code was sent to {maskedPhone(activePhone)}. Change it below.
+                            A six-digit code was sent to {isLogin && loginMethod === "email" ? email.trim() : maskedPhone(activePhone)}. Change it below.
                         </p>
 
                         <div className="pt-[22px]">
@@ -479,7 +505,7 @@ const AuthCard = ({ initialView = "login", onClose, onSuccess, notice }) => {
                                 {isLogin ? "Verify and sign in" : "Verify and create account"} <ArrowUpRight />
                             </PrimaryButton>
                             <button type="button" onClick={backToDetails} className="bg-transparent border-0 p-0 text-[14px] leading-[21px] font-bold text-[#141414] underline cursor-pointer">
-                                Change number
+                                Change {isLogin && loginMethod === "email" ? "email" : "number"}
                             </button>
                         </div>
                     </form>

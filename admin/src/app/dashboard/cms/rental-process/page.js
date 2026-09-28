@@ -169,7 +169,7 @@ export default function RentalProcessCMSPage() {
                 <div className="xl:col-span-1 space-y-5">
                     <Card title="Banner & SEO" accent="indigo">
                         <TextInput label="Banner Title" value={data.bannerTitle} onChange={v => set('bannerTitle', v)} placeholder="Rental Process" />
-                    <BannerAppearanceControls data={data} set={set} />
+                        <BannerAppearanceControls data={data} set={set} defaultColor="#f9fafb" />
                         <ImageUploader label="Banner Image" existingUrl={data.bannerImage} onUpload={url => set('bannerImage', url)} />
                         <hr className="border-slate-100 dark:border-slate-800" />
                         <TextInput label="Meta Title" value={data.metaTitle} onChange={v => set('metaTitle', v)} placeholder="Rental Process – IndianRentals" />
@@ -201,8 +201,8 @@ export default function RentalProcessCMSPage() {
                             {(data.rentalFeatures || []).map((feature, i) => (
                                 <motion.div key={i} initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }}
                                     className="p-4 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 space-y-3 relative group">
-                                    <button onClick={() => removeFeature(i)}
-                                        className="absolute top-3 right-3 p-1.5 text-slate-400 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-500/10 rounded-lg transition-all">
+                                    <button onClick={() => removeFeature(i)} aria-label={`Remove ${feature.title || `feature ${i + 1}`}`}
+                                        className="absolute top-3 right-3 p-1.5 text-slate-500 hover:text-rose-700 hover:bg-rose-50 dark:hover:bg-rose-500/10 rounded-lg transition-all">
                                         <Trash size={16} />
                                     </button>
                                     <div className="flex items-center gap-2 mb-1">
