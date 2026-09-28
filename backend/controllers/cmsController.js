@@ -1,8 +1,9 @@
 const asyncHandler = require('express-async-handler');
 const sanitizeHtml = require('../utils/sanitizeHtml');
 const CMS = require('../models/CMS');
+const { normalizeContent } = require('../utils/contactValidation');
 
-const ALLOWED_PAGES = ['homepage', 'about', 'terms', 'privacy', 'contact', 'shipping', 'refund', 'faq', 'rental-process', 'kyc-policy', 'categories-page', 'delivery-charges', 'late-fee-rules', 'cancellation-rules', 'subscription-rules', 'product-page'];
+const ALLOWED_PAGES = ['homepage', 'about', 'terms', 'privacy', 'contact', 'shipping', 'refund', 'faq', 'rental-process', 'kyc-policy', 'categories-page', 'rules', 'delivery-charges', 'late-fee-rules', 'cancellation-rules', 'subscription-rules', 'product-page'];
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 // Offers live under the legacy `clientLogos` key. Older documents stored a plain
@@ -53,7 +54,9 @@ const getPage = asyncHandler(async (req, res) => {
     const cms = await getOrCreatePage(page);
     // pageContent is rendered as raw HTML on the storefront policy pages.
     const out = cms.toJSON ? cms.toJSON() : cms;
+    if (out.careersContent) out.careersContent = require('../utils/careersValidation').publicContent(out.careersContent);
     if (out.pageContent) out.pageContent = sanitizeHtml(out.pageContent);
+    if (page === 'contact') out.contactContent = normalizeContent(out.contactContent || {});
     res.json(out);
 });
 
@@ -62,7 +65,18 @@ const getPage = asyncHandler(async (req, res) => {
 // ── @access Private/Admin
 const updatePage = asyncHandler(async (req, res) => {
     const { page } = req.params;
+    if (req.body.bannerShowText !== undefined && typeof req.body.bannerShowText !== 'boolean') {
+        res.status(400); throw new Error('Banner text visibility must be true or false.');
+    }
+    if (req.body.bannerBackground !== undefined && (typeof req.body.bannerBackground !== 'string' || (req.body.bannerBackground !== '' && !/^#[\da-f]{6}$/i.test(req.body.bannerBackground)))) {
+        res.status(400); throw new Error('Banner background must be a six-digit hex colour, such as #ffcf46.');
+    }
 
+    let contactContent;
+    if (req.body.contactContent !== undefined) {
+        try { contactContent = normalizeContent(req.body.contactContent); }
+        catch (error) { res.status(400); throw error; }
+    }
     let cms = await CMS.findOne({ pageName: page });
     if (!cms) {
         cms = await CMS.create({ pageName: page });
@@ -106,7 +120,7 @@ const updatePage = asyncHandler(async (req, res) => {
         'featureSectionImage', 'featureSectionCtaText', 'featureSectionCtaLink', 'featureSectionStats',
 
         // Generic Info
-        'pageContent', 'bannerImage', 'bannerTitle',
+        'pageContent', 'bannerImage', 'bannerTitle', 'bannerShowText', 'bannerBackground',
 
         // About Us specific fields
         'aboutStoryTitle', 'aboutStoryPara1', 'aboutStoryPara2', 'aboutStoryImage',
@@ -182,6 +196,7 @@ const updatePage = asyncHandler(async (req, res) => {
         cms.markModified('clientLogos');
     }
 
+    if (contactContent !== undefined) { cms.contactContent = contactContent; cms.markModified('contactContent'); }
     const updated = await cms.save();
     res.json(updated);
 });

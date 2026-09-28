@@ -10,6 +10,7 @@ import {
 } from '@phosphor-icons/react';
 import Toggle from '@/components/Toggle';
 import ImageUploader from '@/components/ImageUploader';
+import BannerAppearanceControls from '@/components/BannerAppearanceControls';
 
 const API = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
 const getToken = () => typeof window !== 'undefined' ? localStorage.getItem('adminToken') : null;
@@ -155,6 +156,7 @@ export default function WebsiteFaqManager() {
                                 <TextInput label="Heading Title" value={data.faqTitle} onChange={v => set('faqTitle', v)} placeholder="FAQs" />
                                 <TextArea label="Heading Subtitle" value={data.faqSubtitle} onChange={v => set('faqSubtitle', v)} placeholder="Everything you need to know about renting…" rows={2} />
                                 <TextInput label="Banner Title" value={data.bannerTitle} onChange={v => set('bannerTitle', v)} placeholder="FAQs" />
+                    <BannerAppearanceControls data={data} set={set} />
                             </div>
                             <div className="space-y-3">
                                 <ImageUploader label="Banner Image" existingUrl={data.bannerImage} onUpload={url => set('bannerImage', url)} />

@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { PiCaretDown, PiCaretUp } from 'react-icons/pi';
+import styles from './FaqSection.module.css';
 
 const faqs = [
     {
@@ -114,9 +115,9 @@ const FaqSection = ({ cmsData, limit, pageName }) => {
 
     return (
         <section
-            className="w-full bg-white flex items-center py-[48px] lg:py-[100px]"
+            className={`w-full bg-white flex items-center ${isHomepage ? styles.homepage : 'py-[48px] lg:py-[100px]'}`}
         >
-            {/* Desktop padding = Figma FAQ frame (node 22774:2807): 100px top/bottom, 120px side margins → 1200px content */}
+            {/* Homepage spacing is responsive; other pages keep their existing section spacing. */}
             <div
                 className="max-w-[1200px] mx-auto px-5 sm:px-6 w-full flex flex-col lg:flex-row items-start gap-6 lg:gap-[40px]"
             >

@@ -1,194 +1,84 @@
 'use client';
 
-import React from 'react';
-import { PiCaretLeft, PiGear } from 'react-icons/pi';
+import { useEffect, useRef } from 'react';
+import { ArrowRight, X } from '@phosphor-icons/react';
 
-const CompareTenures = ({ isOpen, onClose, selectedTenure, onSelect, tenures }) => {
-    // If tenures aren't passed, use hardcoded backups matching the site's logic
-    const displayTenures = tenures || [
-        { label: '1+', months: 1, price: 2560, originalPrice: 3600, discount: '20% OFF' },
-        { label: '3+', months: 3, price: 2304, originalPrice: 3500, discount: '20% OFF' },
-        { label: '6+', months: 6, price: 2048, originalPrice: 3400, discount: '20% OFF' },
-        { label: '9+', months: 9, price: 1920, originalPrice: 3300, discount: '20% OFF' },
-        { label: '12+', months: 12, price: 1792, originalPrice: 3200, discount: '20% OFF' },
-    ];
+const fallbackTenures = [
+    { months: 1, price: 2560 },
+    { months: 3, price: 2304 },
+    { months: 6, price: 2048 },
+    { months: 9, price: 1920 },
+    { months: 12, price: 1792 },
+];
 
-    return (
-        <>
-            {/* Backdrop */}
-            {isOpen && (
-                <div
-                    className="fixed inset-0 bg-black/30 z-[9998] transition-opacity duration-300"
-                    onClick={onClose}
-                />
-            )}
+export default function CompareTenures({ isOpen, onClose, selectedTenure, onSelect, tenures }) {
+    const closeRef = useRef(null);
+    const panelRef = useRef(null);
+    const plans = tenures?.length ? tenures : fallbackTenures;
+    const basePrice = plans[0]?.price || 0;
 
-            {/* Side Panel */}
-            <div
-                className={`fixed top-[50%] left-0 z-[9999] bg-[#EDEDED] shadow-2xl transition-all duration-500 ease-in-out transform`}
-                style={{
-                    width: '506px',
-                    height: 'auto',
-                    minHeight: '600px',
-                    padding: '32px 20px',
-                    borderTopRightRadius: '12px',
-                    borderBottomRightRadius: '12px',
-                    transform: isOpen
-                        ? 'translateY(-50%) translateX(0)'
-                        : 'translateY(-50%) translateX(-100%)',
-                    backgroundColor: 'hsla(0, 0%, 93%, 1)',
-                    boxShadow: '0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1)'
-                }}
-            >
-                <div className="flex flex-col h-full gap-[25px]">
-                    <div className="flex flex-col gap-6">
-                        <button
-                            onClick={onClose}
-                            className="flex items-center hover:opacity-80 transition-opacity"
-                            style={{
-                                width: '77.67px',
-                                height: '29px',
-                                paddingTop: '3px',
-                                paddingRight: '12px',
-                                paddingBottom: '3px',
-                                paddingLeft: '8px',
-                                gap: '2px',
-                                borderRadius: '18px',
-                                backgroundColor: 'hsla(4, 100%, 97%, 1)',
-                                border: '1px solid hsla(3, 88%, 42%, 1)'
-                            }}
-                        >
-                            <PiCaretLeft size={16} color="hsla(3, 88%, 42%, 1)" />
-                            <span
-                                style={{
-                                    fontFamily: "'Mona Sans', sans-serif",
-                                    fontWeight: 500,
-                                    fontSize: '14px',
-                                    color: 'hsla(3, 88%, 42%, 1)'
-                                }}
-                            >
-                                Back
-                            </span>
-                        </button>
+    useEffect(() => {
+        if (!isOpen) return;
+        const previousFocus = document.activeElement;
+        const previousOverflow = document.body.style.overflow;
+        document.body.style.overflow = 'hidden';
+        closeRef.current?.focus();
+        const onKeyDown = (event) => {
+            if (event.key === 'Escape') onClose();
+            if (event.key !== 'Tab') return;
+            const focusables = [...panelRef.current.querySelectorAll('button:not([disabled]), input:not([disabled])')];
+            const first = focusables[0];
+            const last = focusables[focusables.length - 1];
+            if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last.focus(); }
+            else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus(); }
+        };
+        document.addEventListener('keydown', onKeyDown);
+        return () => {
+            document.body.style.overflow = previousOverflow;
+            document.removeEventListener('keydown', onKeyDown);
+            previousFocus?.focus?.();
+        };
+    }, [isOpen, onClose]);
 
-                        <div
-                            className="flex items-center"
-                            style={{
-                                width: '342.67px',
-                                height: '35px',
-                                gap: '8px',
-                                opacity: 1
-                            }}
-                        >
-                            <h2
-                                style={{
-                                    width: '308px',
-                                    height: '35px',
-                                    fontFamily: "'Mona Sans', sans-serif",
-                                    fontWeight: 600,
-                                    fontSize: '24px',
-                                    lineHeight: '35px',
-                                    letterSpacing: '0.01em',
-                                    color: 'hsla(0, 0%, 0%, 1)',
-                                    margin: 0
-                                }}
-                            >
-                                Compare all rental prices
-                            </h2>
-                            <PiGear size={24} className="text-[#3A9CFF] cursor-pointer" />
-                        </div>
+    return <>
+        <div aria-hidden="true" onClick={onClose} className={`fixed inset-0 z-[9998] bg-[#141414]/55 transition-opacity duration-300 ${isOpen ? 'opacity-100' : 'pointer-events-none opacity-0'}`} />
+        <aside ref={panelRef} role="dialog" aria-modal={isOpen ? 'true' : undefined} aria-hidden={!isOpen} aria-labelledby="compare-tenures-title" inert={!isOpen ? true : undefined}
+            className={`fixed inset-y-0 right-0 z-[9999] flex w-full max-w-[520px] flex-col bg-[#f6f6f6] shadow-2xl transition-transform duration-300 ease-out sm:rounded-l-[24px] ${isOpen ? 'translate-x-0' : 'translate-x-full'}`}>
+            <div className="shrink-0 border-b border-[#e2e2e2] bg-white px-5 pb-5 pt-6 sm:px-8 sm:pt-8">
+                <div className="flex items-start justify-between gap-4">
+                    <div>
+                        <p className="mb-2 text-xs font-semibold uppercase tracking-[.12em] text-[#555]">Rental options</p>
+                        <h2 id="compare-tenures-title" className="text-[27px] font-semibold leading-tight tracking-[-.04em] text-[#141414] sm:text-[32px]">Compare rental periods</h2>
+                        <p className="mt-2 text-sm leading-relaxed text-[#555]">Choose the monthly rent that fits your plans.</p>
                     </div>
-
-                    <div
-                        style={{
-                            width: '466px',
-                            height: 'auto', // Allow height to be auto to fit content or set to 369 matching Figma
-                            minHeight: '369px',
-                            padding: '14px',
-                            backgroundColor: '#FFFFFF',
-                            borderRadius: '20px',
-                            border: '2px solid hsla(0, 0%, 96%, 1)',
-                            boxShadow: `
-                                0px 3px 6px 0px hsla(0, 0%, 80%, 0.1),
-                                0px 12px 12px 0px hsla(0, 0%, 80%, 0.09),
-                                0px 26px 16px 0px hsla(0, 0%, 80%, 0.05),
-                                0px 46px 18px 0px hsla(0, 0%, 80%, 0.01),
-                                0px 72px 20px 0px hsla(0, 0%, 80%, 0)
-                            `
-                        }}
-                    >
-                        <div
-                            className="flex flex-col h-full"
-                            style={{ gap: '14px' }}
-                        >
-                            {displayTenures.map((item) => (
-                                <div
-                                    key={item.months}
-                                    onClick={() => onSelect(item.months)}
-                                    className={`flex items-center transition-all cursor-pointer`}
-                                    style={{
-                                        width: '439px',
-                                        height: '57px',
-                                        padding: '12px',
-                                        gap: '20px',
-                                        borderRadius: '12px',
-                                        backgroundColor: selectedTenure === item.months ? '#F0FFF1' : '#FFFFFF',
-                                        border: selectedTenure === item.months
-                                            ? '1px solid #008A02'
-                                            : '1px solid hsla(0, 0%, 89%, 1)',
-                                        opacity: 1
-                                    }}
-                                >
-                                    <div className={`w-6 h-6 rounded-full border flex items-center justify-center transition-all ${selectedTenure === item.months
-                                        ? 'border-[#008A02] bg-[#008A02]'
-                                        : 'border-gray-300'
-                                        }`}>
-                                        {selectedTenure === item.months && (
-                                            <div className="w-1.5 h-1.5 rounded-full bg-white" />
-                                        )}
-                                    </div>
-
-                                    <div className="bg-[#008A02] text-white px-2 py-1 rounded-md text-[14px] font-bold min-w-[80px] text-center">
-                                        {item.months} month
-                                    </div>
-
-                                    <div className="flex items-center gap-2 flex-grow overflow-hidden">
-                                        <span className="text-[14px] font-bold text-[#1A1A1A] whitespace-nowrap">₹{item.price}/mo</span>
-                                        <span className="text-[12px] text-gray-400 line-through whitespace-nowrap">₹{Math.round(item.price * 1.5)}/mo</span>
-                                        <span className="text-[12px] text-[#008A02] font-semibold whitespace-nowrap">{item.discount || '55% OFF'}</span>
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-
-                    {/* Select Button */}
-                    <button
-                        onClick={onClose}
-                        className="flex items-center justify-center hover:opacity-90 transition-opacity"
-                        style={{
-                            width: '86px',
-                            height: '35px',
-                            paddingTop: '6px',
-                            paddingRight: '20px',
-                            paddingBottom: '6px',
-                            paddingLeft: '20px',
-                            gap: '2px',
-                            borderRadius: '9999px',
-                            backgroundColor: 'hsla(44, 100%, 64%, 1)',
-                            border: 'none',
-                            color: '#1A1A1A',
-                            fontFamily: "'Mona Sans', sans-serif",
-                            fontWeight: 600,
-                            fontSize: '14px'
-                        }}
-                    >
-                        Select
-                    </button>
+                    <button ref={closeRef} type="button" onClick={onClose} aria-label="Close comparison" className="grid h-11 w-11 shrink-0 place-items-center rounded-full border border-[#d8d8d8] text-[#141414] hover:bg-[#f6f6f6] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#141414]"><X size={20} aria-hidden="true" /></button>
                 </div>
             </div>
-        </>
-    );
-};
 
-export default CompareTenures;
+            <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-5 py-5 sm:px-8">
+                <fieldset className="space-y-3">
+                    <legend className="mb-3 text-sm font-semibold text-[#333]">Monthly rent by minimum term</legend>
+                    {plans.map((plan) => {
+                        const selected = selectedTenure === plan.months;
+                        const saving = basePrice > plan.price ? Math.round((1 - plan.price / basePrice) * 100) : 0;
+                        return <label key={plan.months} className={`flex cursor-pointer items-center gap-3 rounded-[14px] border bg-white px-4 py-4 transition-colors sm:px-5 ${selected ? 'border-[#141414] ring-2 ring-[#ffcf46]' : 'border-[#dedede] hover:border-[#777]'}`}>
+                            <input type="radio" name="rental-tenure" value={plan.months} checked={selected} onChange={() => onSelect(plan.months)} className="h-5 w-5 shrink-0 accent-[#141414]" />
+                            <span className="min-w-0 flex-1 text-[15px] font-semibold text-[#141414]">{plan.months} {plan.months === 1 ? 'month' : 'months'}</span>
+                            <span className="flex flex-col items-end gap-1 text-right">
+                                <span className="whitespace-nowrap text-[17px] font-semibold text-[#141414]">₹{Number(plan.price).toLocaleString('en-IN')}<span className="text-xs font-normal text-[#666]">/mo</span></span>
+                                {saving > 0 && <span className="whitespace-nowrap rounded-full bg-[#e8f5e9] px-2 py-0.5 text-xs font-semibold text-[#176d2c]">Save {saving}% monthly</span>}
+                            </span>
+                        </label>;
+                    })}
+                </fieldset>
+                <p className="mt-5 text-xs leading-relaxed text-[#666]">Prices shown are monthly rents. Taxes, deposit and delivery charges are confirmed at checkout.</p>
+            </div>
+
+            <div className="shrink-0 border-t border-[#e2e2e2] bg-white px-5 py-4 sm:px-8 sm:py-5">
+                <button type="button" onClick={onClose} className="flex min-h-12 w-full items-center justify-center gap-2 rounded-full bg-[#ffcf46] px-6 text-base font-semibold text-[#141414] transition-colors hover:bg-[#f5bf27] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#141414]">
+                    Use {selectedTenure} {selectedTenure === 1 ? 'month' : 'months'} <ArrowRight size={18} aria-hidden="true" />
+                </button>
+            </div>
+        </aside>
+    </>;
+}

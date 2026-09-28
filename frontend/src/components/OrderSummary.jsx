@@ -1,3 +1,4 @@
+import surface from './CheckoutSurface.module.css';
 import React from "react";
 import { BsCreditCard } from 'react-icons/bs';
 import { SealCheck } from '@phosphor-icons/react';
@@ -19,7 +20,7 @@ const OrderSummary = ({
 }) => {
     const netPayToday = Math.max(0, payToday - couponDiscount);
     return (
-        <div className="w-full bg-white border-2 border-[#eee] rounded-[16px] px-[18px] py-[20px] font-sans flex flex-col gap-[20px]">
+        <div className={`${surface.card} w-full px-[18px] py-[20px] font-sans flex flex-col gap-[20px]`}>
 
             {/* Header + summary group (Figma 23226:12509, gap-11) */}
             <div className="flex flex-col gap-[11px] w-full">

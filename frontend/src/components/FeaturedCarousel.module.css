@@ -1,0 +1,24 @@
+.viewport { position: relative; width: 100%; height: clamp(300px, 40vw, 387px); overflow: hidden; border-radius: 20px; background: var(--color-grey-900); }
+.slide, .link { position: absolute; inset: 0; }
+.link { display: block; }
+.image { width: 100%; height: 100%; object-fit: cover; }
+.copy { position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; text-align: center; gap: 8px; padding: 24px 28px 18px; pointer-events: none; color: white; background: linear-gradient(180deg, transparent 35%, #000c 100%); }
+.copy h3 { font-size: clamp(24px, 2.2vw, 32px); font-weight: 600; line-height: 1.2; letter-spacing: -.03em; }
+.copy p { font-size: clamp(14px, 1.4vw, 18px); line-height: 1.5; color: #eee; }
+.link:focus-visible { outline: 3px solid var(--color-orange-300); outline-offset: -4px; }
+.container { width: 100%; max-width: 1264px; margin-inline: auto; padding-inline: 20px; }
+@media (min-width: 768px) { .container { padding-inline: 32px; } }
+
+.titleRow { display: flex; align-items: center; justify-content: center; gap: 12px; width: 100%; }
+.copy h3 { min-width: 0; font-size: clamp(20px, 2.2vw, 27px); }
+.copy a, .copy button { pointer-events: auto; }
+.arrow { position: relative; display: grid; place-items: center; width: 24px; height: 24px; flex-shrink: 0; border-radius: 50%; color: var(--color-grey-900); background: white; cursor: pointer; }
+.arrow::before { content: ''; position: absolute; inset: -10px; }
+.arrow:hover { background: var(--color-orange-300); }
+.dots { display: flex; justify-content: center; gap: 4px; border-radius: 999px; background: #141414a8; padding: 4px 8px; backdrop-filter: blur(8px); }
+.dots button { display: grid; place-items: center; width: 32px; height: 22px; cursor: pointer; }
+.dots span { width: 24px; height: 5px; border-radius: 999px; background: #ffffff85; transition: background-color 160ms ease; }
+.dots [aria-current] span, .dots button:hover span { background: white; }
+.playback { position: absolute; bottom: 16px; right: 12px; z-index: 2; width: 32px; height: 32px; display: grid; place-items: center; border-radius: 50%; background: #14141470; color: white; cursor: pointer; }
+.viewport button:focus-visible, .copy a:focus-visible { outline: 2px solid var(--color-orange-300); outline-offset: 3px; }
+@media(max-width:639px) { .copy { padding-inline: 20px; } .titleRow { gap: 10px; } }

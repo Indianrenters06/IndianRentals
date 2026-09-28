@@ -1,0 +1,163 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-09-27T18:42:43.549121+00:00",
+  "title": "Design System: IndianRenters homepage proof section",
+  "extensions": {
+    "colorMeta": {
+      "orange-300": {
+        "role": "primary",
+        "displayName": "Brand yellow",
+        "tonalRamp": [
+          "#7c2f0b",
+          "#983908",
+          "#bb4a02",
+          "#e26e00",
+          "#f08c00",
+          "#ffcf46",
+          "#ffe485",
+          "#fffaeb"
+        ]
+      },
+      "grey-900": {
+        "role": "neutral",
+        "displayName": "Charcoal",
+        "tonalRamp": [
+          "#141414",
+          "#1f1f1f",
+          "#333333",
+          "#545454",
+          "#757575",
+          "#afafaf",
+          "#e2e2e2",
+          "#f6f6f6"
+        ]
+      },
+      "white": {
+        "role": "neutral",
+        "displayName": "White",
+        "tonalRamp": [
+          "#141414",
+          "#1f1f1f",
+          "#333333",
+          "#545454",
+          "#757575",
+          "#afafaf",
+          "#e2e2e2",
+          "#f6f6f6"
+        ]
+      },
+      "stat-label": {
+        "role": "neutral",
+        "displayName": "Soft grey",
+        "tonalRamp": [
+          "#141414",
+          "#1f1f1f",
+          "#333333",
+          "#545454",
+          "#757575",
+          "#afafaf",
+          "#e2e2e2",
+          "#f6f6f6"
+        ]
+      },
+      "proof-rule": {
+        "role": "neutral",
+        "displayName": "Translucent white rule",
+        "tonalRamp": [
+          "#141414",
+          "#1f1f1f",
+          "#333333",
+          "#545454",
+          "#757575",
+          "#afafaf",
+          "#e2e2e2",
+          "#f6f6f6"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Proof value",
+        "purpose": "Repeated CMS-backed statistics."
+      },
+      "label": {
+        "displayName": "Statistic label",
+        "purpose": "Describes each value in the definition list."
+      }
+    },
+    "shadows": [],
+    "motion": [
+      {
+        "name": "proof-value-entrance",
+        "value": "y: 14px; duration: .65s; stagger: .08s; ease: expo.out",
+        "purpose": "One entrance upon 18% intersection; skipped for reduced motion."
+      },
+      {
+        "name": "proof-image-entrance",
+        "value": "scale: 1.045; duration: 1.1s; ease: expo.out",
+        "purpose": "Subtle image settling during the proof entrance; skipped for reduced motion."
+      },
+      {
+        "name": "proof-link-transition",
+        "value": "color 180ms ease, border-color 180ms ease",
+        "purpose": "Hover feedback; removed for reduced motion."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "story-columns",
+        "value": "768px"
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Proof row",
+      "kind": "custom",
+      "refersTo": "proof-value",
+      "description": "Three semantic statistics with first-value emphasis; remains three columns on mobile.",
+      "html": "<dl class=\"ds-proof\"><div><dt>Orders Served</dt><dd>90k+</dd></div><div><dt>Happy Customers</dt><dd>30k+</dd></div><div><dt>Products Available</dt><dd>401+</dd></div></dl>",
+      "css": ".ds-proof{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));margin:0;color:#fff;background:var(--color-grey-900,#141414);font-family:var(--font-mona,\"Mona Sans\",ui-sans-serif,system-ui,sans-serif);border-block:1px solid #ffffff30}.ds-proof>div{display:flex;flex-direction:column;align-items:flex-start;min-width:0;gap:10px;padding:26px 0 28px}.ds-proof>div+div{border-left:1px solid #ffffff30;padding-left:clamp(20px,4vw,64px)}.ds-proof dt{color:#d3d3d3;font-size:14px;line-height:1.4}.ds-proof dd{order:-1;margin:0;font-size:clamp(44px,7.5vw,92px);font-weight:500;line-height:1;letter-spacing:-.04em;overflow-wrap:anywhere}.ds-proof>div:first-child dd{color:var(--color-orange-300,#ffcf46)}@media(max-width:767px){.ds-proof>div{padding-block:22px}.ds-proof>div+div{padding-left:14px}.ds-proof dd{font-size:clamp(32px,9vw,64px)}.ds-proof dt{font-size:12px;max-width:10ch}}"
+    },
+    {
+      "name": "Explore rentals link",
+      "kind": "custom",
+      "description": "Underlined rental navigation on the charcoal section with hover and keyboard focus states.",
+      "html": "<div class=\"ds-link-surface\"><a class=\"ds-rental-link\" href=\"/products\">Explore rentals<svg width=\"20\" height=\"20\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.5\" aria-hidden=\"true\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" d=\"M4.5 19.5 19.5 4.5m0 0H8.25m11.25 0v11.25\"/></svg></a></div>",
+      "css": ".ds-link-surface{background:var(--color-grey-900,#141414);padding:12px}.ds-rental-link{display:inline-flex;align-items:center;justify-content:space-between;min-height:48px;gap:36px;padding:12px 0;border-bottom:1px solid #ffffff70;color:#fff;font-family:var(--font-mona,\"Mona Sans\",ui-sans-serif,system-ui,sans-serif);font-size:16px;font-weight:500;text-decoration:none;transition:color 180ms ease,border-color 180ms ease}.ds-rental-link:hover{color:var(--color-orange-300,#ffcf46);border-color:var(--color-orange-300,#ffcf46)}.ds-rental-link:focus-visible{outline:2px solid var(--color-orange-300,#ffcf46);outline-offset:6px;border-radius:2px}@media(prefers-reduced-motion:reduce){.ds-rental-link{transition:none}}"
+    }
+  ],
+  "narrative": {
+    "northStar": "IndianRenters\u2019 existing calm, refined storefront",
+    "overview": "This record covers the homepage branch of `frontend/src/components/WhyChooseUs.jsx` and its `WhyChooseUs.module.css`. It records a stronger expression of the existing Mona Sans, yellow and charcoal identity. It is not an identity replacement or a site-wide composition rule.\n\nThe shipped section gives existing CMS figures typographic prominence, with the current creator photograph and supporting copy beneath. `PRODUCT.md` supplies durable brand commitments; its contact-demo notes are outside this boundary. `../../00_brand/visual-brain.md` remains the parent brand authority.",
+    "keyCharacteristics": [
+      "Oversized, tightly tracked figures with quiet descriptive labels.",
+      "One yellow value within a charcoal section.",
+      "Flat rules separate information; the rounded photograph has a user-requested offset yellow backing.",
+      "Restrained entrance motion with a reduced-motion opt-out."
+    ],
+    "rules": [
+      {
+        "name": "The Single Value Rule",
+        "body": "In the resting proof row, only the first value uses the brand accent.",
+        "section": "colors"
+      },
+      {
+        "name": "The Value Before Label Rule",
+        "body": "Figures visually precede their labels while the definition list retains semantic label/value relationships.",
+        "section": "typography"
+      }
+    ],
+    "dos": [
+      "**Do** preserve the existing Mona Sans and yellow/charcoal identity.",
+      "**Do** retain CMS-sourced values and their descriptive labels.",
+      "**Do** keep visible keyboard focus and the reduced-motion opt-out.",
+      "**Do** preserve three mobile statistic columns while stacking the supporting story."
+    ],
+    "donts": [
+      "**Don't** promote this section\u2019s composition into a site-wide mandate.",
+      "**Don't** introduce new proof claims through visual documentation.",
+      "**Don't** let the decorative image backing overflow the page or cover the photograph."
+    ]
+  }
+}

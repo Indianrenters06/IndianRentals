@@ -1,0 +1,6 @@
+/* One outer-card treatment shared by cart items, coupons and order summaries. */
+.card {
+    background: #fff;
+    border: 2px solid var(--color-grey-100, #eee);
+    border-radius: 16px;
+}

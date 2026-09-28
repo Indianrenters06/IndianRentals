@@ -69,10 +69,10 @@ export default function LocationsPage() {
             <section className="max-w-[1200px] mx-auto px-5 md:px-8">
                 <div className="bg-amber-50 border border-amber-200 rounded-3xl p-8 md:p-12 text-center">
                     <h2 className="text-2xl md:text-4xl font-bold text-gray-900 mb-4">
-                        Don't see your city?
+                        Don&apos;t see your city?
                     </h2>
                     <p className="text-gray-600 text-sm md:text-base mb-6 max-w-lg mx-auto">
-                        We're expanding rapidly. Contact us and we'll do our best to arrange delivery to your location.
+                        We&apos;re expanding rapidly. Contact us and we&apos;ll do our best to arrange delivery to your location.
                     </p>
                     <Link
                         href="/contact"

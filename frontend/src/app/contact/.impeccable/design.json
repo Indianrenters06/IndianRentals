@@ -1,0 +1,253 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-09-27T12:23:44.898163+00:00",
+  "title": "Design System: IndianRenters Contact Page",
+  "extensions": {
+    "colorMeta": {
+      "orange-300": {
+        "role": "primary",
+        "displayName": "Brand Yellow",
+        "tonalRamp": [
+          "#7c2f0b",
+          "#983908",
+          "#bb4a02",
+          "#e26e00",
+          "#f08c00",
+          "#ffcf46",
+          "#ffe485",
+          "#fffaeb"
+        ]
+      },
+      "orange-50": {
+        "role": "primary",
+        "displayName": "Warm Paper",
+        "tonalRamp": [
+          "#7c2f0b",
+          "#983908",
+          "#bb4a02",
+          "#e26e00",
+          "#f08c00",
+          "#ffcf46",
+          "#ffe485",
+          "#fffaeb"
+        ]
+      },
+      "grey-900": {
+        "role": "neutral",
+        "displayName": "Charcoal",
+        "tonalRamp": [
+          "#141414",
+          "#333333",
+          "#545454",
+          "#757575",
+          "#afafaf",
+          "#cbcbcb",
+          "#e2e2e2",
+          "#f6f6f6"
+        ]
+      },
+      "grey-600": {
+        "role": "neutral",
+        "displayName": "Supporting Grey",
+        "tonalRamp": [
+          "#141414",
+          "#333333",
+          "#545454",
+          "#757575",
+          "#afafaf",
+          "#cbcbcb",
+          "#e2e2e2",
+          "#f6f6f6"
+        ]
+      },
+      "grey-300": {
+        "role": "neutral",
+        "displayName": "Field Border",
+        "tonalRamp": [
+          "#141414",
+          "#333333",
+          "#545454",
+          "#757575",
+          "#afafaf",
+          "#cbcbcb",
+          "#e2e2e2",
+          "#f6f6f6"
+        ]
+      },
+      "grey-200": {
+        "role": "neutral",
+        "displayName": "Rule Grey",
+        "tonalRamp": [
+          "#141414",
+          "#333333",
+          "#545454",
+          "#757575",
+          "#afafaf",
+          "#cbcbcb",
+          "#e2e2e2",
+          "#f6f6f6"
+        ]
+      },
+      "grey-50": {
+        "role": "neutral",
+        "displayName": "Soft Grey",
+        "tonalRamp": [
+          "#141414",
+          "#333333",
+          "#545454",
+          "#757575",
+          "#afafaf",
+          "#cbcbcb",
+          "#e2e2e2",
+          "#f6f6f6"
+        ]
+      },
+      "white": {
+        "role": "neutral",
+        "displayName": "White",
+        "tonalRamp": [
+          "#141414",
+          "#333333",
+          "#545454",
+          "#757575",
+          "#afafaf",
+          "#cbcbcb",
+          "#e2e2e2",
+          "#f6f6f6"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "body": {
+        "displayName": "Body",
+        "purpose": "Recurring explanatory copy."
+      },
+      "label": {
+        "displayName": "Label",
+        "purpose": "Visible form labels."
+      },
+      "control": {
+        "displayName": "Control",
+        "purpose": "Native field and select values."
+      }
+    },
+    "shadows": [
+      {
+        "name": "button-hover",
+        "value": "0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1)",
+        "purpose": "Inherited Tailwind shadow-sm on primary-button hover."
+      },
+      {
+        "name": "button-focus-inset",
+        "value": "inset 0 0 0 2px var(--theme-primary-focus)",
+        "purpose": "Inherited primary-button focus treatment."
+      }
+    ],
+    "motion": [
+      {
+        "name": "button-transition",
+        "value": "150ms cubic-bezier(0, 0, 0.2, 1)",
+        "purpose": "Inherited primary-button state transition."
+      },
+      {
+        "name": "branch-art",
+        "value": "300ms opacity crossfade; 240ms copy transition; 3000ms city interval",
+        "purpose": "City selection continuity with looping playback, pause controls and reduced-motion support."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "two-column",
+        "value": "600px"
+      },
+      {
+        "name": "desktop",
+        "value": "1024px"
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Inherited storefront action with scoped contact-demo size.",
+      "html": "<button class=\"ds-primary\">Preview enquiry</button>",
+      "css": ".ds-primary{font-family:var(--font-mona,\"Mona Sans\",ui-sans-serif,system-ui,sans-serif);display:flex;align-items:center;justify-content:center;white-space:nowrap;background:var(--theme-primary);color:#1D1D1F;border:0;border-radius:9999px;padding:12px 24px;min-height:44px;font-size:14px;font-weight:500;transition:all 150ms cubic-bezier(0,0,.2,1)}.ds-primary:hover{background:var(--theme-primary-hover);box-shadow:0 1px 3px 0 rgb(0 0 0 / .1),0 1px 2px -1px rgb(0 0 0 / .1);transform:translateY(-.5px)}.ds-primary:active{background:var(--theme-primary-active);box-shadow:none;transform:translateY(0) scale(.98)}.ds-primary:focus{background:var(--theme-primary);box-shadow:inset 0 0 0 2px var(--theme-primary-focus)}.ds-primary:focus-visible{outline:2px solid var(--color-grey-900);outline-offset:4px;}"
+    },
+    {
+      "name": "Text Field",
+      "kind": "input",
+      "refersTo": "field",
+      "description": "Visible sentence-case label with native input.",
+      "html": "<label class=\"ds-label\">Full name<input class=\"ds-field\" placeholder=\"Your name\" autocomplete=\"name\" required></label>",
+      "css": ".ds-label{font-family:var(--font-mona,\"Mona Sans\",ui-sans-serif,system-ui,sans-serif);display:block;font-size:12px;font-weight:500;color:var(--color-grey-900)}.ds-field{display:block;width:100%;border:1px solid var(--color-grey-300);background:var(--color-white);padding:12px;border-radius:8px;margin-top:8px;font:inherit;font-size:16px;min-height:46px;color:var(--color-grey-900)}.ds-field::placeholder{font-size:13px;font-weight:400;color:var(--color-grey-600);opacity:1}.ds-field:focus-visible{outline:2px solid var(--color-grey-900);outline-offset:4px;}"
+    },
+    {
+      "name": "Intent Selector",
+      "kind": "custom",
+      "refersTo": "intent-selected",
+      "description": "Native radio intent choices with a filled selected state.",
+      "html": "<fieldset class=\"ds-intent\" aria-label=\"Enquiry intent\"><label><input type=\"radio\" name=\"ds-intent\" checked>I want to rent</label><label><input type=\"radio\" name=\"ds-intent\">I need support</label></fieldset>",
+      "css": ".ds-intent{font-family:var(--font-mona,\"Mona Sans\",ui-sans-serif,system-ui,sans-serif);display:flex;gap:4px;padding:4px;width:fit-content;border:1px solid var(--color-grey-200);border-radius:999px;color:var(--color-grey-900)}.ds-intent label{position:relative;padding:9px 14px;border-radius:999px;font-size:12px;font-weight:500;cursor:pointer}.ds-intent input{position:absolute;opacity:0;width:1px;height:1px}.ds-intent label:has(input:checked){background:var(--color-grey-900);color:var(--color-white)}.ds-intent label:has(input:focus-visible){outline:2px solid var(--color-grey-900);outline-offset:3px}"
+    },
+    {
+      "name": "Help Link",
+      "kind": "custom",
+      "description": "Open ruled navigation row with outline arrow.",
+      "html": "<a class=\"ds-help\" href=\"/rental-process\"><span>How renting works</span><svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.6\" aria-hidden=\"true\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" d=\"M4.5 19.5l15-15m0 0H8.25M19.5 4.5v11.25\"/></svg></a>",
+      "css": ".ds-help{font-family:var(--font-mona,\"Mona Sans\",ui-sans-serif,system-ui,sans-serif);display:flex;align-items:center;justify-content:space-between;gap:20px;min-height:44px;border-bottom:1px solid var(--color-grey-200);padding-bottom:12px;font-size:14px;color:var(--color-grey-900);text-decoration:none}.ds-help svg{width:20px;height:20px;flex-shrink:0}.ds-help:focus-visible{outline:2px solid var(--color-grey-900);outline-offset:4px;}"
+    },
+    {
+      "name": "Branch Navigation",
+      "kind": "nav",
+      "description": "Desktop directory selected state; mobile uses a native select.",
+      "html": "<div class=\"ds-cities\" role=\"group\" aria-label=\"Choose a branch city\"><button aria-pressed=\"true\">Delhi<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.6\" aria-hidden=\"true\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" d=\"M4.5 19.5l15-15m0 0H8.25M19.5 4.5v11.25\"/></svg></button><button aria-pressed=\"false\">Noida<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.6\" aria-hidden=\"true\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" d=\"M4.5 19.5l15-15m0 0H8.25M19.5 4.5v11.25\"/></svg></button></div>",
+      "css": ".ds-cities{font-family:var(--font-mona,\"Mona Sans\",ui-sans-serif,system-ui,sans-serif);display:grid;color:var(--color-grey-900)}.ds-cities button{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 0;border:0;border-bottom:1px solid var(--color-grey-200);font:inherit;font-size:16px;background:transparent;color:inherit;text-align:left}.ds-cities svg{width:20px;height:20px;opacity:0}.ds-cities button[aria-pressed=true]{border-color:var(--color-grey-900);font-weight:600}.ds-cities button[aria-pressed=true] svg{opacity:1}.ds-cities button:hover{color:var(--color-grey-600)}.ds-cities button:focus-visible{outline:2px solid var(--color-grey-900);outline-offset:4px;}"
+    },
+    {
+      "name": "Form Surface",
+      "kind": "card",
+      "description": "Tonal container with the recurring form-heading treatment.",
+      "html": "<section class=\"ds-surface\"><h2>Tell us what you need.</h2><p>Share a few details to start your rental enquiry.</p></section>",
+      "css": ".ds-surface{font-family:var(--font-mona,\"Mona Sans\",ui-sans-serif,system-ui,sans-serif);padding:24px 20px;background:var(--color-grey-50);border-radius:16px;color:var(--color-grey-900)}.ds-surface h2{font-size:clamp(25px,3vw,32px);letter-spacing:-.03em;line-height:1.2;font-weight:600;margin:0}.ds-surface p{font-size:13px;line-height:1.5;color:var(--color-grey-600);margin:8px 0 24px}@media(min-width:600px){.ds-surface{padding:28px 24px}}@media(min-width:1024px){.ds-surface{padding:36px}}"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Contact Desk",
+    "overview": "A calm contact desk in the existing IndianRenters visual identity. Mona Sans, charcoal text, white space and yellow accents make actions easy to distinguish; thin rules organize practical details. This record applies only to the contact demo and does not replace the storefront or parent brand system.",
+    "keyCharacteristics": [
+      "Generous heading scale with compact supporting labels.",
+      "Flat neutral surfaces and ruled rows.",
+      "Pill actions and intent controls; softly rounded fields."
+    ],
+    "rules": [
+      {
+        "name": "The Action Accent Rule",
+        "body": "Use yellow for primary actions and brief emphasis; use charcoal for selected intent and directory states.",
+        "section": "colors"
+      },
+      {
+        "name": "The Heading First Rule",
+        "body": "Put the branch name before the office or service-city description. Keep metadata in supporting text.",
+        "section": "typography"
+      },
+      {
+        "name": "The Flat Surface Rule",
+        "body": "Separate content with tone, whitespace and rules. Reserve the inherited soft button shadow for hover feedback.",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "Do inherit Mona Sans and the existing brand color variables.",
+      "Do retain visible labels, native form controls and visible keyboard focus.",
+      "Do stack the form and branch content on narrow screens; keep editable control text at 16px.",
+      "Do use the supplied city illustrations and outline SVG icons."
+    ],
+    "donts": [
+      "Don't promote the demo notice or confirmation copy into reusable brand messaging.",
+      "Don't use branch metadata as an eyebrow above the city heading.",
+      "Don't replace the existing storefront design authority with this scoped demo record."
+    ]
+  }
+}

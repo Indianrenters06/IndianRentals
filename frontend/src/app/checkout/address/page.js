@@ -25,6 +25,7 @@ export default function AddressPage() {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingAddress, setEditingAddress] = useState(null);
     const [isSaving, setIsSaving] = useState(false);
+    const [saveError, setSaveError] = useState('');
 
     // Load the user's saved addresses on mount
     useEffect(() => {
@@ -41,14 +42,34 @@ export default function AddressPage() {
         return () => { active = false; };
     }, []);
 
+    // The sign-in page returns here after a visitor chooses to add an address.
+    useEffect(() => {
+        if (new URLSearchParams(window.location.search).get('add') !== '1') return;
+        try {
+            if (JSON.parse(localStorage.getItem('userInfo') || 'null')?.token) {
+                setEditingAddress(null);
+                setIsModalOpen(true);
+                window.history.replaceState(null, '', '/checkout/address');
+            }
+        } catch { /* An invalid stored session is handled by the sign-in flow. */ }
+    }, []);
+
     const handleAddClick = () => {
+        let token;
+        try { token = JSON.parse(localStorage.getItem('userInfo') || 'null')?.token; } catch { token = null; }
+        if (!token) {
+            router.push('/login?redirect=%2Fcheckout%2Faddress%3Fadd%3D1');
+            return;
+        }
         setEditingAddress(null);
+        setSaveError('');
         setIsModalOpen(true);
     };
 
     const handleEditClick = (e, addr) => {
         e.stopPropagation();
         setEditingAddress(addr);
+        setSaveError('');
         setIsModalOpen(true);
     };
 
@@ -68,6 +89,7 @@ export default function AddressPage() {
     };
 
     const handleSaveAddress = async (formData) => {
+        setSaveError('');
         setIsSaving(true);
         try {
             let list;
@@ -85,7 +107,7 @@ export default function AddressPage() {
             setEditingAddress(null);
         } catch (err) {
             console.error('Failed to save address:', err);
-            alert('Could not save the address. Please make sure you are logged in and try again.');
+            setSaveError('We couldn’t save this address. Check your connection or sign in, then try again.');
         } finally {
             setIsSaving(false);
         }
@@ -126,8 +148,7 @@ export default function AddressPage() {
                 <div className="flex flex-col lg:flex-row items-start w-full min-h-[535px]" style={{ gap: '20px' }}>
                     {/* Left Column: Addresses (Figma 23228:13247) */}
                     <div
-                        className="relative flex flex-col w-full lg:w-[746px] gap-[12px] rounded-[8px] border border-dashed border-[#cbcbcb] px-[20px] py-[30px]"
-                        style={{ minHeight: addresses.length > 0 ? '487px' : '200px' }}
+                        className="relative flex flex-col w-full lg:w-[746px] gap-[12px]"
                     >
                         {/* Header group (title + divider, then Add button — Figma gap-32) */}
                         <div className="flex flex-col gap-[32px] w-full">
@@ -235,6 +256,7 @@ export default function AddressPage() {
                         isOpen={isModalOpen}
                         onClose={() => setIsModalOpen(false)}
                         onSave={handleSaveAddress}
+                        saveError={saveError}
                         initialData={editingAddress}
                         isSubmitting={isSaving}
                     />

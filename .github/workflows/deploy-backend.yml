@@ -15,7 +15,22 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  verify:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: backend/package-lock.json
+      - run: npm ci
+      - run: npm audit --audit-level=high
   deploy:
+    needs: verify
     runs-on: ubuntu-latest
     steps:
       - name: SSH into VPS, pull & restart
@@ -30,7 +45,7 @@ jobs:
             cd /var/www/IndianRentals
             git pull --ff-only
             cd backend
-            npm install --omit=dev
+            npm ci --omit=dev
             pm2 restart indianrentals-api --update-env
             pm2 save --force
             echo "Deployed $(git rev-parse --short HEAD) at $(date -u)"

@@ -1,353 +1,90 @@
 "use client";
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
+import proofStyles from './WhyChooseUs.module.css';
+import Link from 'next/link';
+import { ArrowUpRightIcon } from '@heroicons/react/24/outline';
 
 import { API } from '@/services/apiConfig';
 
-const WhyChooseUs = ({ cmsData = null, overrideBg, overridePaddingTop, overridePaddingBottom, hideBorder }) => {
-    const [cms, setCms] = useState(cmsData || null);
+const WhyChooseUs = ({ cmsData = null, overrideBg, overridePaddingTop, overridePaddingBottom }) => {
+    const sectionRef = useRef(null);
+    const [fetchedCms, setFetchedCms] = useState(null);
     const [loading, setLoading] = useState(!cmsData);
-    const [viewType, setViewType] = useState('mobile');
+    const cms = cmsData || fetchedCms;
 
     useEffect(() => {
-        const checkRes = () => {
-            const w = window.innerWidth;
-            if (w >= 1024) setViewType('desktop');
-            else if (w >= 768) setViewType('tablet');
-            else setViewType('mobile');
-        };
-        checkRes();
-        window.addEventListener('resize', checkRes);
-        return () => window.removeEventListener('resize', checkRes);
-    }, []);
-
-    useEffect(() => {
-        if (cmsData) {
-            setCms(cmsData);
-            setLoading(false);
-            return;
-        }
+        if (cmsData) return;
         fetch(`${API}/api/cms/homepage`)
             .then(res => res.ok ? res.json() : null)
-            .then(data => { setCms(data); setLoading(false); })
+            .then(data => { setFetchedCms(data); setLoading(false); })
             .catch(() => setLoading(false));
     }, [cmsData]);
 
+    useEffect(() => {
+        if (loading || cms?.whyChooseUsEnabled === false || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+        let disposed = false;
+        let context;
+        const observer = new IntersectionObserver(async ([entry]) => {
+            if (!entry.isIntersecting) return;
+            observer.disconnect();
+            const { gsap } = await import('gsap');
+            if (disposed || !sectionRef.current) return;
+            context = gsap.context(() => {
+                gsap.from('[data-proof-value]', { y: 14, duration: .65, stagger: .08, ease: 'expo.out' });
+                gsap.from('[data-proof-image]', { scale: 1.045, duration: 1.1, ease: 'expo.out' });
+            }, sectionRef);
+        }, { threshold: .18 });
+        if (sectionRef.current) observer.observe(sectionRef.current);
+        return () => { disposed = true; observer.disconnect(); context?.revert(); };
+    }, [loading, cms?.whyChooseUsEnabled]);
+
     // Handle both Homepage and About page field mappings
-    const title = cms?.aboutWhyTitle || cms?.whyChooseUsTitle || "Why Choose Us?";
-    const subtitle = cms?.aboutWhyText || cms?.whyChooseUsSubtitle || "Join thousands who've switched to the flexible, affordable way to access high-end tech. IndianRenters delivers AI-ready workstations, laptops, and IT gear with zero ownership hassle and instant support.";
-    const image = cms?.aboutWhyImage || cms?.whyChooseUsImage || "https://res.cloudinary.com/dgkckcdk8/image/upload/v1769961565/indian-rentals/anmpufdlxxxblkxqxpds.jpg";
+    const title = (cmsData ? (cms?.aboutWhyTitle || cms?.whyChooseUsTitle) : cms?.whyChooseUsTitle) || "Why Choose Us?";
+    const subtitle = (cmsData ? (cms?.aboutWhyText || cms?.whyChooseUsSubtitle) : cms?.whyChooseUsSubtitle) || "Join thousands who've switched to the flexible, affordable way to access high-end tech. IndianRenters delivers AI-ready workstations, laptops, and IT gear with zero ownership hassle and instant support.";
+    const configuredImage = cmsData ? (cms?.aboutWhyImage || cms?.whyChooseUsImage) : cms?.whyChooseUsImage;
+    const legacyHomepageImage = "https://res.cloudinary.com/dgkckcdk8/image/upload/v1769961565/indian-rentals/anmpufdlxxxblkxqxpds.jpg";
+    const usesDefaultImage = !cmsData && (!configuredImage || configuredImage === legacyHomepageImage || configuredImage === "/images/rental-equipment-studio.png");
+    const image = usesDefaultImage
+        ? "/images/why-choose-creator.png"
+        : configuredImage || legacyHomepageImage;
+
+    const imageAlt = usesDefaultImage ? "Creative professional working on a laptop with camera equipment nearby" : title;
 
     const stats = [
-        { label: cms?.aboutWhyStat1Label || cms?.statsDevicesLabel || "Devices in Stock", value: cms?.aboutWhyStat1Value || cms?.statsDevices || "90k+" },
-        { label: cms?.aboutWhyStat2Label || cms?.statsCustomersLabel || "Happy Customers", value: cms?.aboutWhyStat2Value || cms?.statsCustomers || "30k+" },
-        { label: cms?.aboutWhyStat3Label || cms?.statsCitiesLabel || "Cities Covered", value: cms?.aboutWhyStat3Value || cms?.statsCities || "401+" },
+        { label: (cmsData ? cms?.aboutWhyStat1Label : cms?.statsDevicesLabel) || "Orders Served", value: (cmsData ? cms?.aboutWhyStat1Value : cms?.statsDevices) || "90k+" },
+        { label: (cmsData ? cms?.aboutWhyStat2Label : cms?.statsCustomersLabel) || "Happy Customers", value: (cmsData ? cms?.aboutWhyStat2Value : cms?.statsCustomers) || "30k+" },
+        { label: (cmsData ? cms?.aboutWhyStat3Label : cms?.statsCitiesLabel) || "Products Available", value: (cmsData ? cms?.aboutWhyStat3Value : cms?.statsCities) || "401+" },
     ];
 
-    if (loading) return <div className="h-96 w-full animate-pulse bg-slate-50 rounded-3xl" />;
+    if (!cmsData && loading) return <div className="h-96 w-full animate-pulse bg-slate-50 rounded-3xl" />;
     if (cms && cms.whyChooseUsEnabled === false) return null;
 
-    // ── Mobile Layout ─────────────────────────────────────────────────────────
-    if (viewType === 'mobile') {
-        return (
-            <section
-                style={{
-                    boxSizing: 'border-box',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'center',
-                    padding: '48px 20px',
-                    gap: '10px',
-                    width: '100%',
-                    background: overrideBg || '#FFF1C5',
-                    borderBottom: hideBorder ? 'none' : '1px solid #E2E2E2',
-                    position: 'relative',
-                    overflow: 'hidden',
-                    isolation: 'isolate'
-                }}
-            >
-                {/* Frame 670 — Yellow background block */}
-                <div
-                    style={{
-                        position: 'absolute',
-                        width: '350px',
-                        height: '197px',
-                        left: '50%',
-                        transform: 'translateX(-50%)',
-                        bottom: '48px',
-                        background: '#FFB91B',
-                        borderRadius: '32px',
-                        zIndex: 0
-                    }}
-                />
-
-                {/* Frame 299 — Main content */}
-                <div
-                    style={{
-                        display: 'flex',
-                        flexDirection: 'column',
-                        alignItems: 'flex-start',
-                        padding: '0px',
-                        gap: '20px',
-                        width: '100%',
-                        maxWidth: '350px',
-                        position: 'relative',
-                        zIndex: 1
-                    }}
-                >
-                    {/* Text block */}
-                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: '10px', width: '100%' }}>
-                        <h2
-                            style={{
-                                fontFamily: "'Mona Sans', sans-serif",
-                                fontWeight: 600,
-                                fontSize: '25px',
-                                lineHeight: '31px',
-                                letterSpacing: '-0.8px',
-                                color: '#333333',
-                                margin: 0
-                            }}
-                        >
-                            {title}
-                        </h2>
-                        <p
-                            style={{
-                                fontFamily: "'Mona Sans', sans-serif",
-                                fontWeight: 400,
-                                fontSize: '12px',
-                                lineHeight: '18px',
-                                letterSpacing: '-0.4px',
-                                color: '#545454',
-                                margin: 0,
-                                width: '100%'
-                            }}
-                        >
-                            {subtitle}
-                        </p>
-                    </div>
-
-                    {/* Divider */}
-                    <div style={{ width: '100%', height: '1px', background: '#E2E2E2', flexShrink: 0 }} />
-
-                    {/* Stats Row */}
-                    <div
-                        style={{
-                            display: 'flex',
-                            flexDirection: 'row',
-                            justifyContent: 'space-between',
-                            alignItems: 'center',
-                            width: '100%',
-                            padding: '0px'
-                        }}
-                    >
-                        {stats.map((s, i) => (
-                            <div
-                                key={i}
-                                style={{
-                                    display: 'flex',
-                                    flexDirection: 'column',
-                                    alignItems: i === 1 ? 'center' : 'flex-start',
-                                    gap: '4px'
-                                }}
-                            >
-                                <span
-                                    style={{
-                                        fontFamily: "'Mona Sans', sans-serif",
-                                        fontWeight: 600,
-                                        fontSize: '20px',
-                                        lineHeight: '26px',
-                                        letterSpacing: '-0.8px',
-                                        color: '#333333',
-                                        whiteSpace: 'nowrap'
-                                    }}
-                                >
-                                    {s.value}
-                                </span>
-                                <span
-                                    style={{
-                                        fontFamily: "'Mona Sans', sans-serif",
-                                        fontWeight: 500,
-                                        fontSize: '8px',
-                                        lineHeight: '14px',
-                                        letterSpacing: '-0.4px',
-                                        color: '#757575',
-                                        whiteSpace: 'nowrap'
-                                    }}
-                                >
-                                    {s.label}
-                                </span>
-                            </div>
-                        ))}
-                    </div>
-
-                    {/* Image */}
-                    <div
-                        style={{
-                            position: 'relative',
-                            width: '100%',
-                            height: '197px',
-                            borderRadius: '24px',
-                            overflow: 'hidden',
-                            flexShrink: 0
-                        }}
-                    >
-                        <Image
-                            src={image}
-                            alt={title}
-                            fill
-                            className="object-cover"
-                        />
-                    </div>
-                </div>
-            </section>
-        );
-    }
-
-    // ── Desktop Layout — Figma "why-choose-us" (24181:35108) ─────────────────
-    // py 80 on the home page (96 on Rental Process, passed in); 540px text column + 508×336 photo, justify-between across 1200px;
-    // photo sits on a #FFB91B block (radius 32) offset 18px right / 18.5px down.
-    if (viewType === 'desktop') {
-        const RULE = 'rgba(0, 0, 0, 0.2)'; // Figma "Line 9" / "Line 75": black @ 20%
-        return (
-            <section
-                className="px-[120px]"
-                style={{
-                    paddingTop: overridePaddingTop || '80px',
-                    paddingBottom: overridePaddingBottom || '80px',
-                    background: overrideBg || '#FFF1C5',
-                    borderBottom: hideBorder ? 'none' : '1px solid #E2E2E2'
-                }}
-            >
-                <div className="max-w-[1200px] mx-auto flex items-center justify-between gap-10">
-                    {/* Text column */}
-                    <div className="flex flex-col gap-8 w-[540px] shrink min-w-0">
-                        <div className="flex flex-col gap-5">
-                            <h2 className="m-0 font-semibold text-[36px] leading-[45px] tracking-[-0.8px] text-[#333333]">
-                                {title}
-                            </h2>
-                            <p className="m-0 font-normal text-[16px] leading-[23px] tracking-[-0.4px] text-[#545454]">
-                                {subtitle}
-                            </p>
-                        </div>
-
-                        <div style={{ width: '100%', height: '1px', background: RULE }} />
-
-                        <div className="flex items-center justify-between">
-                            {stats.map((s, i) => (
-                                <React.Fragment key={i}>
-                                    {i > 0 && <div style={{ width: '1px', height: '82px', background: RULE }} />}
-                                    <div className="flex flex-col gap-2">
-                                        <span className="font-semibold text-[27px] leading-[35px] tracking-[-0.8px] text-[#333333] whitespace-nowrap">
-                                            {s.value}
-                                        </span>
-                                        <span className="font-medium text-[14px] leading-[20px] tracking-[-0.4px] text-[#757575] whitespace-nowrap">
-                                            {s.label}
-                                        </span>
-                                    </div>
-                                </React.Fragment>
-                            ))}
-                        </div>
-                    </div>
-
-                    {/* Photo on the offset yellow block */}
-                    <div className="relative w-[508px] h-[336px] shrink-0">
-                        <div
-                            className="absolute w-full h-full"
-                            style={{ left: '18px', top: '18.5px', borderRadius: '32px', background: '#FFB91B' }}
-                        />
-                        <div className="relative z-10 w-full h-full" style={{ borderRadius: '24px', overflow: 'hidden' }}>
-                            <Image src={image} alt={title} fill className="object-cover" sizes="508px" />
-                        </div>
-                    </div>
-                </div>
-            </section>
-        );
-    }
-
-    // ── Tablet Layout ─────────────────────────────────────────────────────────
     return (
-        <section
-            className="overflow-hidden"
-            style={{
-                paddingTop: overridePaddingTop || '80px',
-                paddingBottom: '80px',
-                background: overrideBg || '#FFF1C5',
-                borderBottom: hideBorder ? 'none' : '1px solid var(--color-grey-grey-200, hsla(0, 0%, 89%, 1))'
-            }}
-        >
-            <div className="max-w-[1200px] mx-auto px-4 sm:px-6">
-                <div className={`grid ${viewType === 'desktop' ? 'grid-cols-2' : 'grid-cols-1'} gap-[10px] items-center`}>
-
-                    {/* Text Content */}
-                    <div
-                        className="flex flex-col"
-                        style={{
-                            gap: viewType === 'tablet' ? '32px' : '24px',
-                            opacity: 1
-                        }}
-                    >
-                        <div className="flex flex-col gap-[10px]">
-                            <h2
-                                className="font-sans"
-                                style={{
-                                    fontFamily: "'Mona Sans', sans-serif",
-                                    fontWeight: 600,
-                                    fontSize: '36px',
-                                    lineHeight: '48px',
-                                    letterSpacing: '-0.02em',
-                                    color: 'hsla(0, 0%, 20%, 1)',
-                                }}
-                            >
-                                {title}
-                            </h2>
-                            <p className="text-gray-600 leading-relaxed text-sm md:text-[15px]">
-                                {subtitle}
-                            </p>
+        <section ref={sectionRef} className={proofStyles.section} aria-labelledby="why-choose-heading"
+            style={{ background: overrideBg, paddingTop: overridePaddingTop, paddingBottom: overridePaddingBottom }}>
+            <div className={proofStyles.container}>
+                <h2 id="why-choose-heading" className={proofStyles.title}>{title}</h2>
+                <dl className={proofStyles.stats}>
+                    {stats.map((stat, index) => (
+                        <div className={proofStyles.stat} key={index}>
+                            <dt>{stat.label}</dt>
+                            <dd data-proof-value>{stat.value}</dd>
                         </div>
-
-                        <div style={{ width: '100%', height: '1px', background: 'var(--color-grey-grey-200, hsla(0, 0%, 89%, 1))' }} />
-
-                        <div className="grid grid-cols-3 gap-4 md:gap-8">
-                            {stats.map((s, i) => (
-                                <div key={i} className="flex flex-col gap-1">
-                                    <h3
-                                        className="font-sans text-2xl font-bold"
-                                        style={{
-                                            fontSize: viewType === 'desktop' ? '27px' : '32px',
-                                            fontWeight: viewType === 'desktop' ? '600' : 'bold',
-                                            lineHeight: viewType === 'desktop' ? '35px' : '40px',
-                                            color: viewType === 'desktop' ? 'hsla(0, 0%, 20%, 1)' : '#111827',
-                                            letterSpacing: viewType === 'desktop' ? '-0.8px' : undefined,
-                                            opacity: 1
-                                        }}
-                                    >
-                                        {s.value}
-                                    </h3>
-                                    <p
-                                        className="font-sans font-medium text-gray-500"
-                                        style={{
-                                            fontSize: viewType === 'desktop' ? '14px' : '13px',
-                                            fontWeight: '500',
-                                            lineHeight: viewType === 'desktop' ? '20px' : '18px',
-                                            letterSpacing: viewType === 'desktop' ? '-0.4px' : undefined
-                                        }}
-                                    >
-                                        {s.label}
-                                    </p>
-                                </div>
-                            ))}
+                    ))}
+                </dl>
+                <div className={proofStyles.story}>
+                    <div className={proofStyles.imageFrame}>
+                        <div className={proofStyles.imageClip}>
+                            <Image src={image} alt={imageAlt} fill data-proof-image className={proofStyles.image}
+                                sizes="(min-width: 1260px) 640px, (min-width: 768px) 55vw, calc(100vw - 52px)" />
                         </div>
                     </div>
-
-                    {/* Image Content */}
-                    <div className={`relative ${viewType === 'desktop' ? 'justify-self-end w-full max-w-[508px]' : 'w-[calc(100%-24px)]'} aspect-[508/336] mt-4 md:mt-2`}>
-                        <div
-                            className="absolute left-[24px] top-[24px] w-full h-full"
-                            style={{ borderRadius: '24px', background: 'hsla(42, 100%, 55%, 1)' }}
-                        />
-                        <div className="relative z-10 w-full h-full" style={{ borderRadius: '24px', overflow: 'hidden' }}>
-                            <Image src={image} alt={title} fill className="object-cover" />
-                        </div>
+                    <div className={proofStyles.copy}>
+                        <p>{subtitle}</p>
+                        <Link href="/products" className={proofStyles.action}>
+                            Explore rentals <ArrowUpRightIcon width={20} height={20} aria-hidden="true" />
+                        </Link>
                     </div>
                 </div>
             </div>

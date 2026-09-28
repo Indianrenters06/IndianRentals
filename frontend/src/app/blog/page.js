@@ -5,6 +5,8 @@ import Link from 'next/link';
 import { Spinner } from "@heroui/react";
 import { FiArrowUpRight } from "react-icons/fi";
 
+const DEFAULT_TABS = ['View all', 'Short term', 'Long term', 'Production on service', 'Next Tech', 'News'];
+
 const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
 
 export default function BlogPage() {
@@ -45,7 +47,7 @@ export default function BlogPage() {
         return new Date(dateString).toLocaleDateString('en-GB', options);
     };
 
-    const tabs = cmsData?.blogTabs || ['View all', 'Short term', 'Long term', 'Production on service', 'Next Tech', 'News'];
+    const tabs = cmsData?.blogTabs || DEFAULT_TABS;
     const [activeTab, setActiveTab] = useState('View all');
 
     // Make sure activeTab falls back correctly if tabs change

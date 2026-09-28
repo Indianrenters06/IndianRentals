@@ -1,0 +1,23 @@
+.section { background: var(--color-grey-50, #f6f6f6); }
+@media (max-width: 767px) {
+    .section { background: linear-gradient(to top, var(--color-orange-100, #fff1c2) 0%, var(--color-grey-50, #f6f6f6) 100%); }
+}
+
+.viewAllTile {
+    width: 100%;
+    max-width: 80px;
+    aspect-ratio: 80 / 78;
+    border-radius: 8px;
+    border: .5px solid var(--color-orange-300, #ffcf46);
+    background: var(--color-orange-100, #fff1c5);
+    color: var(--color-orange-600, #e26e00);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    box-shadow: 0 2px 5px #dedede14, 0 9px 9px #dedede12, 0 21px 13px #dedede0a;
+}
+.viewAllLabel { font-size: 12px; font-weight: 600; line-height: 16px; letter-spacing: -.4px; }
+.viewAllIcon { display: grid; place-items: center; width: 16px; height: 16px; border-radius: 50%; background: var(--color-orange-600, #e26e00); color: #fff; }
+.viewAllIcon svg { width: 12px; height: 12px; }

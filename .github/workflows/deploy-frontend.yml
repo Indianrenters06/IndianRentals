@@ -15,7 +15,23 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  verify:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - run: npm ci
+      - run: npm audit --audit-level=high
+      - run: npm run build
   deploy:
+    needs: verify
     runs-on: ubuntu-latest
     steps:
       - name: SSH into VPS, pull, build & restart
@@ -32,7 +48,7 @@ jobs:
             cd /var/www/IndianRentals
             git pull --ff-only
             cd frontend
-            npm install
+            npm ci
             npm run build
             pm2 restart indianrentals-web --update-env
             pm2 save --force

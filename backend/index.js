@@ -99,7 +99,9 @@ app.use(cors(corsOptions));
 // Handle preflight for every route (use regex — bare '*' breaks newer path-to-regexp)
 app.options(/.*/, cors(corsOptions));
 app.use(cookieParser());
-app.use(morgan('combined'));
+// Consent/analytics payloads intentionally omit identity. Avoid adding IP,
+// referrer, or user agent back through the ordinary access log for these routes.
+app.use(morgan('combined', { skip:req => req.path.startsWith('/api/privacy/') }));
 
 // Serve Static Uploads
 app.use('/uploads', express.static(path.join(__dirname, '/uploads')));
@@ -187,6 +189,9 @@ app.use('/api/testimonials', testimonialRoutes);
 
 const cmsRoutes = require('./routes/cmsRoutes');
 app.use('/api/cms', cmsRoutes);
+app.use('/api/careers', require('./routes/careersRoutes'));
+app.use('/api/contact', require('./routes/contactRoutes'));
+app.use('/api/privacy', require('./routes/privacyRoutes'));
 
 const blogRoutes = require('./routes/blogRoutes');
 app.use('/api/blog', blogRoutes);
@@ -225,5 +230,4 @@ app.use(errorHandler);
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
-
 

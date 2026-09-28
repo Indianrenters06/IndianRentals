@@ -221,7 +221,7 @@ export default async function ServicePage({ params }) {
 
                             {/* Features card */}
                             <div className="bg-amber-50 border border-amber-100 rounded-3xl p-6 sticky top-24">
-                                <h3 className="font-bold text-gray-900 text-lg mb-4">What's Included</h3>
+                                <h3 className="font-bold text-gray-900 text-lg mb-4">What&apos;s Included</h3>
                                 <ul className="space-y-3">
                                     {data.features.map((f) => (
                                         <li key={f} className="flex items-center gap-2.5 text-sm text-gray-700">

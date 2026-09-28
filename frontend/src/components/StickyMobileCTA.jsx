@@ -1,15 +1,21 @@
 "use client";
 import { useEffect, useState } from "react";
+import { useConsent } from "./CookieConsent";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Phone } from "@phosphor-icons/react";
 
 // Pages where the CTA should NOT appear
-const HIDDEN_PATHS = ["/cart", "/checkout", "/login", "/register", "/order-confirmation"];
+const HIDDEN_PATHS = ["/cart", "/checkout", "/login", "/register", "/order-confirmation", "/careers", "/contact", "/contact-demo"];
 
 export default function StickyMobileCTA() {
     const pathname = usePathname() || "";
+    return <RouteCTA key={pathname} pathname={pathname} />;
+}
+
+function RouteCTA({ pathname }) {
+    const { consentVisible } = useConsent();
     const [visible, setVisible] = useState(false);
     const [dismissed, setDismissed] = useState(false);
 
@@ -24,14 +30,9 @@ export default function StickyMobileCTA() {
         return () => window.removeEventListener("scroll", onScroll);
     }, []);
 
-    // Reset dismissed state on page change
-    useEffect(() => {
-        setDismissed(false);
-        setVisible(false);
-    }, [pathname]);
-
     // Hide on specific pages
     const isHidden =
+        consentVisible ||
         dismissed ||
         !visible ||
         HIDDEN_PATHS.some((p) => pathname.startsWith(p)) ||

@@ -4,36 +4,17 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
 import { FaArrowRight } from 'react-icons/fa';
-
-const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+import useHomepageContent from '@/hooks/useHomepageContent';
 
 const FeatureSection = () => {
     const [isDesktop, setIsDesktop] = useState(false);
-    const [cms, setCms] = useState(null);
-    const [loading, setLoading] = useState(true);
+    const {content:cms,loading} = useHomepageContent();
 
     useEffect(() => {
         const checkRes = () => setIsDesktop(window.innerWidth >= 1024);
         checkRes();
         window.addEventListener('resize', checkRes);
         return () => window.removeEventListener('resize', checkRes);
-    }, []);
-
-    useEffect(() => {
-        const fetchCMS = async () => {
-            try {
-                const res = await fetch(`${API}/api/cms/homepage`, { cache: 'no-store' });
-                if (res.ok) {
-                    const data = await res.json();
-                    setCms(data);
-                }
-            } catch (err) {
-                console.error("Failed to fetch feature section CMS:", err);
-            } finally {
-                setLoading(false);
-            }
-        };
-        fetchCMS();
     }, []);
 
     if (loading) return <div className="h-96 w-full animate-pulse bg-gray-50 md:rounded-3xl max-w-[1200px] mx-auto my-12" />;

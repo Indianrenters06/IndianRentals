@@ -1,289 +1,124 @@
-import React, { useState, useEffect } from 'react';
-import { AiOutlineClose } from 'react-icons/ai';
+'use client';
+
+import { useEffect, useRef, useState } from 'react';
+import Image from 'next/image';
+import { House, MapPin, X } from '@phosphor-icons/react';
 
 const emptyForm = {
-    name: '',
-    addressLine: '',
-    city: '',
-    state: '',
-    pincode: '',
-    country: '',
-    phone: '',
-    isBillingSame: false
+    name: '', addressLine: '', city: '', state: '', pincode: '', country: 'India', phone: '', isBillingSame: false,
 };
 
-const AddressModal = ({ isOpen, onClose, onSave, initialData, isSubmitting = false }) => {
-    const [formData, setFormData] = useState(emptyForm);
+function validate(data) {
+    const errors = {};
+    if (!data.name.trim()) errors.name = 'Enter the recipient’s full name.';
+    if (!data.addressLine.trim()) errors.addressLine = 'Enter the street address.';
+    if (!data.city.trim()) errors.city = 'Enter the city.';
+    if (!data.state.trim()) errors.state = 'Enter the state.';
+    if (!/^\d{6}$/.test(data.pincode.trim())) errors.pincode = 'Enter a 6-digit PIN code.';
+    if (!data.country.trim()) errors.country = 'Enter the country.';
+    if (!/^\d{10}$/.test(data.phone.replace(/\s+/g, ''))) errors.phone = 'Enter a 10-digit phone number.';
+    return errors;
+}
+
+export default function AddressModal(props) {
+    if (!props.isOpen) return null;
+    return <AddressForm key={props.initialData?._id || 'new'} {...props} />;
+}
+
+function AddressForm({ onClose, onSave, initialData, isSubmitting = false, saveError = '' }) {
+    const [formData, setFormData] = useState(() => ({ ...emptyForm, ...initialData }));
     const [errors, setErrors] = useState({});
+    const dialogRef = useRef(null);
+    const firstFieldRef = useRef(null);
+    useEffect(() => {
+        const previousFocus = document.activeElement;
+        const previousOverflow = document.body.style.overflow;
+        document.body.style.overflow = 'hidden';
+        firstFieldRef.current?.focus();
+        return () => {
+            document.body.style.overflow = previousOverflow;
+            previousFocus?.focus?.();
+        };
+    }, []);
 
     useEffect(() => {
-        if (initialData) {
-            setFormData({
-                ...initialData,
-                country: initialData.country || '',
-                isBillingSame: initialData.isBillingSame || false
-            });
-        } else {
-            setFormData(emptyForm);
-        }
-        setErrors({});
-    }, [initialData, isOpen]);
+        const onKeyDown = event => {
+            if (event.key === 'Escape' && !isSubmitting) onClose();
+            if (event.key !== 'Tab') return;
+            const focusables = [...dialogRef.current.querySelectorAll('button:not([disabled]), input:not([disabled])')];
+            const first = focusables[0];
+            const last = focusables[focusables.length - 1];
+            if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last.focus(); }
+            else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus(); }
+        };
+        document.addEventListener('keydown', onKeyDown);
+        return () => document.removeEventListener('keydown', onKeyDown);
+    }, [onClose, isSubmitting]);
 
-    const validate = (data) => {
-        const next = {};
+    function change(event) {
+        const { name, value, checked, type } = event.target;
+        setFormData(current => ({ ...current, [name]: type === 'checkbox' ? checked : value }));
+        setErrors(current => ({ ...current, [name]: undefined }));
+    }
 
-        if (!data.name.trim()) {
-            next.name = 'Full name is required.';
-        }
-
-        if (!data.addressLine.trim()) {
-            next.addressLine = 'Street address is required.';
-        }
-
-        if (!data.city.trim()) {
-            next.city = 'City / region is required.';
-        }
-
-        if (!data.pincode.trim()) {
-            next.pincode = 'Zip code is required.';
-        } else if (!/^\d{6}$/.test(data.pincode.trim())) {
-            next.pincode = 'Enter a valid 6-digit PIN code.';
-        }
-
-        if (!data.country.trim()) {
-            next.country = 'Country is required.';
-        }
-
-        if (!data.phone.trim()) {
-            next.phone = 'Phone number is required.';
-        } else if (!/^\d{10}$/.test(data.phone.replace(/\s+/g, ''))) {
-            next.phone = 'Enter a valid 10-digit phone number.';
-        }
-
-        return next;
-    };
-
-    const handleChange = (e) => {
-        const { name, value, type, checked } = e.target;
-        setFormData(prev => ({
-            ...prev,
-            [name]: type === 'checkbox' ? checked : value
-        }));
-        // Clear the error for this field as the user corrects it
-        setErrors(prev => {
-            if (!prev[name]) return prev;
-            const next = { ...prev };
-            delete next[name];
-            return next;
-        });
-    };
-
-    const handleSubmit = (e) => {
-        e.preventDefault();
+    function submit(event) {
+        event.preventDefault();
         if (isSubmitting) return;
-        const validationErrors = validate(formData);
-        if (Object.keys(validationErrors).length > 0) {
-            setErrors(validationErrors);
+        const next = validate(formData);
+        setErrors(next);
+        if (Object.keys(next).length) {
+            document.getElementById(`address-${Object.keys(next)[0]}`)?.focus();
             return;
         }
-        setErrors({});
-        // Parent persists the address and closes the modal on success,
-        // so it stays open (with the data intact) if saving fails.
         onSave(formData);
-    };
+    }
 
-    // Shared helpers so every field reflects its error state consistently
-    // (Figma: Input h-39, rounded-md 8px, border grey-200 #e2e2e2, 12px medium
-    //  placeholder in grey-400 #afafaf, ~8px horizontal padding)
-    const inputClass = "w-full px-2 rounded-[8px] border outline-none transition-all text-[12px] font-medium text-[#333] tracking-[-0.4px] placeholder:text-[#afafaf] placeholder:font-medium";
-    const inputStyle = (field) => ({
-        height: '39px',
-        borderColor: errors[field] ? 'hsla(0, 84%, 60%, 1)' : '#e2e2e2',
-        background: 'hsla(0, 0%, 100%, 1)'
-    });
-    // Label: Figma text-xs Semi Bold — 12px, semibold, grey-600 #545454
-    const labelClass = "flex items-center gap-px text-[12px] font-semibold text-[#545454] tracking-[-0.4px] leading-[16px]";
+    const fields = [
+        ['name', 'Full name', 'Recipient’s full name', 'text', 'name'],
+        ['phone', 'Mobile number', '10-digit mobile number', 'tel', 'tel-national'],
+        ['addressLine', 'Street address', 'House number, building and street', 'text', 'street-address'],
+        ['city', 'City', 'City', 'text', 'address-level2'],
+        ['state', 'State', 'State', 'text', 'address-level1'],
+        ['pincode', 'PIN code', '6-digit PIN', 'text', 'postal-code'],
+        ['country', 'Country', 'Country', 'text', 'country-name'],
+    ];
 
-    if (!isOpen) return null;
-
-    return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
-            <div
-                className="bg-white shadow-2xl flex flex-col md:flex-row relative w-full max-w-[808px] h-auto md:h-[480px] max-h-[90vh] overflow-y-auto md:overflow-hidden"
-                style={{
-                    borderRadius: '18px',
-                    border: '1px solid hsla(0, 0%, 93%, 1)',
-                    padding: '8px',
-                    gap: '21px',
-                    opacity: 1
-                }}
-            >
-                {/* Close Button */}
-                <button
-                    onClick={onClose}
-                    className="absolute top-4 right-4 w-[30px] h-[30px] flex items-center justify-center bg-white border-[0.5px] border-[#f6f6f6] rounded-full text-gray-400 hover:text-gray-600 shadow-sm transition-all z-20"
-                >
-                    <AiOutlineClose size={14} />
-                </button>
-
-                {/* Left Side: Map (desktop only) */}
-                <div className="hidden md:block flex-1 bg-gray-100 rounded-[10px] overflow-hidden relative self-stretch">
-                    <iframe
-                        width="100%"
-                        height="100%"
-                        style={{ border: 0 }}
-                        loading="lazy"
-                        allowFullScreen
-                        referrerPolicy="no-referrer-when-downgrade"
-                        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d224345.83923192776!2d77.06889754721313!3d28.52728034389636!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x390cfd5b347eb62d%3A0x37205b715389640!2sDelhi!5e0!3m2!1sen!2sin!4v1706040000000!5m2!1sen!2sin"
-                        title="Google Map"
-                    ></iframe>
-                    <div className="absolute inset-0 pointer-events-none flex items-center justify-center">
-                        <div className="text-red-500 drop-shadow-lg scale-110">
-                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-10 h-10">
-                                <path fillRule="evenodd" d="M11.54 22.351l.07.04.028.016a.76.76 0 00.723 0l.028-.015.071-.041a16.975 16.975 0 001.144-.742 19.58 19.58 0 002.683-2.282c1.944-1.99 3.963-4.98 3.963-8.827a8.25 8.25 0 00-16.5 0c0 3.846 2.02 6.837 3.963 8.827a19.58 19.58 0 002.682 2.282 16.975 16.975 0 001.145.742zM12 13.5a3 3 0 100-6 3 3 0 000 6z" clipRule="evenodd" />
-                            </svg>
-                        </div>
+    return <div className="fixed inset-0 z-50 flex items-end justify-center bg-[#141414]/60 p-0 sm:items-center sm:p-5" onMouseDown={event => { if (event.target === event.currentTarget && !isSubmitting) onClose(); }}>
+        <div ref={dialogRef} role="dialog" aria-modal="true" aria-labelledby="address-dialog-title" className="flex max-h-[96dvh] w-full max-w-[660px] flex-col overflow-hidden rounded-t-[24px] bg-white shadow-[0_24px_80px_rgba(0,0,0,.25)] sm:max-h-[min(92dvh,820px)] sm:rounded-[24px]">
+            <div className="relative isolate flex min-h-[190px] items-start justify-between gap-5 overflow-hidden bg-[#141414] px-6 py-6 text-white sm:px-8 sm:py-7">
+                <Image src="/images/address-delivery-editorial.png" alt="" fill sizes="(max-width: 660px) 100vw, 660px" className="-z-20 object-cover object-center" priority />
+                <div aria-hidden="true" className="absolute inset-0 -z-10 bg-gradient-to-r from-[#141414]/95 via-[#141414]/80 to-[#141414]/45" />
+                <div className="max-w-[450px]">
+                    <span className="mb-3 inline-flex h-10 w-10 items-center justify-center rounded-xl bg-[#ffcf46] text-[#141414]"><House size={22} weight="regular" aria-hidden="true" /></span>
+                    <h2 id="address-dialog-title" className="text-[26px] font-semibold leading-tight tracking-[-.03em] sm:text-[30px]">{initialData ? 'Edit your address' : 'Add a delivery address'}</h2>
+                    <p className="mt-2 text-sm leading-relaxed text-white/70">We’ll use these details to deliver your rental.</p>
+                </div>
+                <button type="button" onClick={onClose} disabled={isSubmitting} aria-label="Close address form" className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-white/30 text-white hover:bg-white/10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#ffcf46] disabled:opacity-50"><X size={20} aria-hidden="true" /></button>
+            </div>
+            <form onSubmit={submit} noValidate className="overflow-y-auto overscroll-contain">
+                <div className="grid gap-x-5 gap-y-5 px-6 py-6 sm:grid-cols-2 sm:px-8">
+                    <div className="sm:col-span-2 flex items-center gap-2 border-b border-[#e2e2e2] pb-2 text-sm font-semibold text-[#333]"><MapPin size={18} aria-hidden="true" /> Delivery details</div>
+                    {fields.map(([name, label, placeholder, type, autoComplete], index) => <div key={name} className={name === 'addressLine' ? 'sm:col-span-2' : ''}>
+                        <label htmlFor={`address-${name}`} className="mb-2 block text-sm font-medium text-[#333]">{label} <span aria-hidden="true" className="text-[#b14413]">*</span></label>
+                        <input ref={index === 0 ? firstFieldRef : undefined} id={`address-${name}`} name={name} type={type} autoComplete={autoComplete}
+                            inputMode={name === 'phone' || name === 'pincode' ? 'numeric' : undefined} maxLength={name === 'phone' ? 10 : name === 'pincode' ? 6 : undefined}
+                            value={formData[name] || ''} onChange={change} placeholder={placeholder} aria-invalid={Boolean(errors[name])} aria-describedby={errors[name] ? `address-${name}-error` : undefined}
+                            className={`h-12 w-full rounded-lg border px-4 text-base text-[#141414] outline-none transition-colors placeholder:text-[#777] focus:border-[#141414] focus:ring-2 focus:ring-[#ffcf46] ${errors[name] ? 'border-[#b14413]' : 'border-[#cbcbcb]'}`} />
+                        {errors[name] && <p id={`address-${name}-error`} className="mt-1.5 text-sm text-[#b14413]">{errors[name]}</p>}
+                    </div>)}
+                    <label className="flex items-center gap-3 text-sm text-[#333] sm:col-span-2">
+                        <input type="checkbox" name="isBillingSame" checked={Boolean(formData.isBillingSame)} onChange={change} className="h-5 w-5 shrink-0 accent-[#141414]" />
+                        Billing address is the same as delivery address
+                    </label>
+                </div>
+                <div className="sticky bottom-0 border-t border-[#e2e2e2] bg-white px-6 py-4 sm:px-8">
+                    {saveError && <p role="alert" className="mb-3 rounded-xl bg-[#fff1e8] px-4 py-3 text-sm text-[#9a3515]">{saveError}</p>}
+                    <div className="flex items-center gap-3">
+                        <button type="button" onClick={onClose} disabled={isSubmitting} className="flex min-h-12 flex-1 items-center justify-center rounded-full border border-[#cbcbcb] px-5 text-sm font-semibold text-[#333] hover:border-[#141414] disabled:opacity-50">Cancel</button>
+                        <button type="submit" disabled={isSubmitting} className="flex min-h-12 flex-[1.7] items-center justify-center rounded-full bg-[#ffcf46] px-5 text-sm font-semibold text-[#141414] hover:bg-[#f5bf27] disabled:opacity-60">{isSubmitting ? 'Saving address…' : initialData ? 'Save changes' : 'Save address'}</button>
                     </div>
                 </div>
-
-                {/* Right Side: Form */}
-                <div
-                    className="flex flex-col px-2.5 md:pr-2 md:px-0 py-2 overflow-y-auto w-full md:w-[381px] h-auto md:h-[464px]"
-                >
-                    <form onSubmit={handleSubmit} noValidate className="flex flex-col" style={{ height: '430px' }}>
-                        {/* Fields Container (Figma gap-15) */}
-                        <div className="flex flex-col w-full" style={{ gap: '15px', marginTop: '0px' }}>
-                            <div className="flex flex-col w-full" style={{ gap: '4px' }}>
-                                <label className={labelClass}>Full Name</label>
-                                <input
-                                    type="text"
-                                    name="name"
-                                    value={formData.name}
-                                    onChange={handleChange}
-                                    placeholder="Enter your full name"
-                                    className={inputClass}
-                                    style={inputStyle('name')}
-                                />
-                                {errors.name && <span className="text-red-500 text-xs">{errors.name}</span>}
-                            </div>
-
-                            <div className="flex flex-col md:flex-row gap-[15px]">
-                                <div className="flex-1 flex flex-col" style={{ gap: '4px' }}>
-                                    <label className={labelClass}>Street Address <span className="text-[#ed2115] font-medium">*</span></label>
-                                    <input
-                                        type="text"
-                                        name="addressLine"
-                                        value={formData.addressLine}
-                                        onChange={handleChange}
-                                        placeholder="Placeholder"
-                                        className={inputClass}
-                                        style={inputStyle('addressLine')}
-                                    />
-                                    {errors.addressLine && <span className="text-red-500 text-xs">{errors.addressLine}</span>}
-                                </div>
-                                <div className="flex-1 flex flex-col" style={{ gap: '4px' }}>
-                                    <label className={labelClass}>City / Region <span className="text-[#ed2115] font-medium">*</span></label>
-                                    <input
-                                        type="text"
-                                        name="city"
-                                        value={formData.city}
-                                        onChange={handleChange}
-                                        placeholder="Placeholder"
-                                        className={inputClass}
-                                        style={inputStyle('city')}
-                                    />
-                                    {errors.city && <span className="text-red-500 text-xs">{errors.city}</span>}
-                                </div>
-                            </div>
-
-                            <div className="flex flex-col md:flex-row gap-[15px]">
-                                <div className="flex-1 flex flex-col" style={{ gap: '4px' }}>
-                                    <label className={labelClass}>Zip Code <span className="text-[#ed2115] font-medium">*</span></label>
-                                    <input
-                                        type="text"
-                                        name="pincode"
-                                        inputMode="numeric"
-                                        maxLength={6}
-                                        value={formData.pincode}
-                                        onChange={handleChange}
-                                        placeholder="Placeholder"
-                                        className={inputClass}
-                                        style={inputStyle('pincode')}
-                                    />
-                                    {errors.pincode && <span className="text-red-500 text-xs">{errors.pincode}</span>}
-                                </div>
-                                <div className="flex-1 flex flex-col" style={{ gap: '4px' }}>
-                                    <label className={labelClass}>Country <span className="text-[#ed2115] font-medium">*</span></label>
-                                    <input
-                                        type="text"
-                                        name="country"
-                                        value={formData.country}
-                                        onChange={handleChange}
-                                        placeholder="Placeholder"
-                                        className={inputClass}
-                                        style={inputStyle('country')}
-                                    />
-                                    {errors.country && <span className="text-red-500 text-xs">{errors.country}</span>}
-                                </div>
-                            </div>
-
-                            <div className="flex flex-col w-full" style={{ gap: '4px' }}>
-                                <label className={labelClass}>Phone No. <span className="text-[#ed2115] font-medium">*</span></label>
-                                <input
-                                    type="tel"
-                                    name="phone"
-                                    inputMode="numeric"
-                                    maxLength={10}
-                                    value={formData.phone}
-                                    onChange={handleChange}
-                                    placeholder="Placeholder"
-                                    className={inputClass}
-                                    style={inputStyle('phone')}
-                                />
-                                {errors.phone && <span className="text-red-500 text-xs">{errors.phone}</span>}
-                            </div>
-                        </div>
-
-                            <div className="flex items-center mt-[15px] w-full" style={{ gap: '12px' }}>
-                                <input
-                                    type="checkbox"
-                                    id="billing"
-                                    name="isBillingSame"
-                                    checked={formData.isBillingSame}
-                                    onChange={handleChange}
-                                    className="w-[14px] h-[14px] rounded-[4px] border-[#afafaf] text-black focus:ring-0 accent-black cursor-pointer shrink-0"
-                                />
-                                <label htmlFor="billing" className="flex items-start gap-px text-[12px] text-black font-medium tracking-[-0.4px] leading-[16px] cursor-pointer">
-                                    Billing Address is the same as the shipping address<span className="text-[#c8170d]">*</span>
-                                </label>
-                            </div>
-
-                        <div className="pt-[10px]">
-                            <button
-                                type="submit"
-                                disabled={isSubmitting}
-                                className="flex justify-center items-center transition-all font-medium text-[16px] w-full disabled:opacity-50 disabled:cursor-not-allowed"
-                                style={{
-                                    height: '35px',
-                                    gap: '2px',
-                                    borderRadius: '28px', // rounded-4xl
-                                    border: '1px solid #141414',
-                                    padding: '6px 20px',
-                                    background: 'transparent',
-                                    color: '#141414',
-                                    fontFamily: "'Mona Sans', sans-serif",
-                                    letterSpacing: '-0.4px'
-                                }}
-                            >
-                                {isSubmitting ? 'Saving…' : 'Continue to payment'}
-                            </button>
-                        </div>
-                    </form>
-                </div>
-            </div>
+            </form>
         </div>
-    );
-};
-
-export default AddressModal;
+    </div>;
+}

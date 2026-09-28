@@ -1,9 +1,7 @@
 "use client";
 import React, { useState, useEffect } from 'react';
-import { FaChevronDown, FaArrowLeft } from 'react-icons/fa';
-import { ArrowLeft } from '@phosphor-icons/react';
+import { FaChevronDown } from 'react-icons/fa';
 import { ChevronRightIcon } from '@heroicons/react/24/outline';
-import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
 import { getProducts } from '@/services/productService';
@@ -12,6 +10,8 @@ import { FiPackage } from 'react-icons/fi';
 import Sidebar from './Sidebar';
 import ProductCard from './ProductCard';
 import CategoryNavBar, { CATEGORY_PILLS } from './CategoryNavBar';
+import CategoryFilters from './CategoryFilters';
+import styles from './CategoryLayout.module.css';
 
 // Derive which category pill to highlight based on the page title
 const TITLE_KEYWORDS = [
@@ -31,7 +31,6 @@ function getActiveSlug(title = '') {
 }
 
 const CategoryPageTemplate =({ productNamePrefix, productDescription, basePrice, image, title }) => {
-    const router = useRouter();
     const [currentPage, setCurrentPage] = useState(1);
     const [products, setProducts] = useState([]);
     const [subcategories, setSubcategories] = useState([]);
@@ -69,6 +68,8 @@ const CategoryPageTemplate =({ productNamePrefix, productDescription, basePrice,
                         const baseRent = p.rentalPrice || basePrice;
                         return {
                             id: p._id,
+                            rating: p.rating,
+                            reviews: p.numReviews ?? p.reviewCount ?? 0,
                             name: p.name,
                             description: p.description || productDescription,
                             baseOriginalPrice: baseOrigin,
@@ -138,10 +139,6 @@ const CategoryPageTemplate =({ productNamePrefix, productDescription, basePrice,
         fetchSubs();
     }, [isClient, activeCatSlug]);
 
-    if (!isClient && typeof window === 'undefined') {
-        return <div className="min-h-screen bg-white" />;
-    }
-
     const getDurationMultiplier = (duration) => {
         switch (duration) {
             case "1 month": return 1.2;
@@ -176,6 +173,8 @@ const CategoryPageTemplate =({ productNamePrefix, productDescription, basePrice,
         return results;
     }, [products, selectedDuration, selectedSort]);
 
+    if (!isClient) return <div className="min-h-screen bg-white" />;
+
     return (
         <div className="min-h-screen bg-white">
 
@@ -188,7 +187,7 @@ const CategoryPageTemplate =({ productNamePrefix, productDescription, basePrice,
 
             {/* Subcategory Slider Block */}
             {subcategories.length > 0 && (
-                <div className="bg-white relative z-10">
+                <div className="hidden lg:block bg-white relative z-10">
                     <div
                         className="relative mx-auto group/subslider flex items-center max-w-[1200px] w-full px-4 md:px-8"
                         style={{
@@ -295,44 +294,8 @@ const CategoryPageTemplate =({ productNamePrefix, productDescription, basePrice,
                 </div>
             )}
 
-            {/* Page body */}
-            <div
-                className="mx-auto flex flex-col max-w-[1200px] w-full px-4 md:px-8"
-                style={{
-                    paddingTop: '40px',
-                    paddingBottom: '40px',
-                    gap: '30px',
-                }}
-            >
-                {/* Mobile: back arrow + title */}
-                <div className="flex lg:hidden items-center gap-3">
-                    <button
-                        onClick={() => router.back()}
-                        style={{ flexShrink: 0, width: '36px', height: '36px', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', background: 'none', border: 'none', cursor: 'pointer' }}
-                    >
-                        <ArrowLeft size={32} color="#1f2937" />
-                    </button>
-                    <h1 style={{ fontFamily: "'Mona Sans', sans-serif", fontWeight: 600, fontSize: '24px', lineHeight: '1.2', letterSpacing: '-0.01em', color: 'hsla(0, 0%, 12%, 1)', margin: 0 }}>
-                        {title}
-                    </h1>
-                </div>
-
-                {/* Desktop title */}
-                <h1
-                    className="hidden lg:block"
-                    style={{
-                        fontFamily: "'Mona Sans', sans-serif",
-                        fontWeight: 600,
-                        fontSize: '44px',
-                        lineHeight: '58px',
-                        letterSpacing: '-0.01em',
-                        color: 'hsla(0, 0%, 12%, 1)',
-                        maxWidth: '589px',
-                        opacity: 1,
-                    }}
-                >
-                    {title}
-                </h1>
+            <div className={styles.listingBody}>
+                <h1 className={styles.listingTitle}>{title}</h1>
 
                 <div className="flex w-full relative" style={{ gap: '30px' }}>
                     <div className="hidden lg:block">
@@ -343,9 +306,12 @@ const CategoryPageTemplate =({ productNamePrefix, productDescription, basePrice,
                             setSelectedSort={setSelectedSort}
                         />
                     </div>
-                    <div className="flex-1 mt-0" style={{ minWidth: 0 }}>
+                    <div className={styles.listingContent}>
+                        <CategoryFilters count={processedProducts.length}
+                            selectedDuration={selectedDuration} setSelectedDuration={setSelectedDuration}
+                            selectedSort={selectedSort} setSelectedSort={setSelectedSort} />
 
-                    <div className={`grid ${isMobile ? 'grid-cols-2 gap-[8px]' : 'grid-cols-2 lg:grid-cols-3 gap-[30px]'}`}>
+                    <div className={styles.productGrid}>
                         {processedProducts.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage).map((product) => (
                             <ProductCard key={product.id} product={product} mobile={isMobile} />
                         ))}

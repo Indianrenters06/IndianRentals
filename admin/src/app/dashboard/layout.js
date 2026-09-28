@@ -245,6 +245,9 @@ export default function DashboardLayout({ children }) {
         { name: 'Single Product Page', path: '/dashboard/cms/product-page' },
         { name: 'Static Pages', path: '/dashboard/cms/pages' },
         { name: 'FAQ Page', path: '/dashboard/cms/faq' },
+        { name: 'Careers & Applications', path: '/dashboard/cms/careers' },
+        { name: 'Contact Page', path: '/dashboard/cms/contact' },
+        { name: 'Contact Enquiries', path: '/dashboard/cms/contact/messages' },
       ]
     },
     {
@@ -330,6 +333,7 @@ export default function DashboardLayout({ children }) {
         { name: 'Refund Report', path: '/dashboard/reports/refund' },
         { name: 'Vendor Performance', path: '/dashboard/reports/vendor' },
         { name: 'Location Analytics', path: '/dashboard/reports/location' },
+        { name: 'Website & Consent', path: '/dashboard/reports/website' },
       ]
     },
     {

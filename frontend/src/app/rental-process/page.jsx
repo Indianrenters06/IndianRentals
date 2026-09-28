@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import Image from 'next/image';
+import PageBanner from '@/components/PageBanner';
 import Testimonials from '@/components/Testimonials';
 import WhyChooseUs from '@/components/WhyChooseUs';
 import RentalProcess from '@/components/RentalProcess';
@@ -31,22 +31,8 @@ export default function RentalProcessPage() {
 
     return (
         <div className="font-sans text-gray-800 bg-white">
-            {/* 1. Hero Header Banner — Figma "Header / 144" (24181:35103): pt 28, 120px side margins,
-                1200×500 image, radius 32, 20% black overlay, title 62/60 semibold -2px */}
-            <div className="w-full px-5 md:px-8 lg:px-[120px] pt-5 md:pt-7">
-                <div className="relative overflow-hidden flex items-center justify-center w-full max-w-[1200px] mx-auto rounded-2xl md:rounded-[32px] h-[197px] md:h-[400px] lg:h-[500px]">
-                    <Image
-                        src={bannerImage}
-                        alt={bannerTitle}
-                        fill
-                        className="object-cover object-center"
-                    />
-                    <div className="absolute inset-0 bg-black/20" />
-                    <h1 className="relative z-10 text-white font-semibold text-[16px] md:text-5xl lg:text-[62px] lg:leading-[60px] text-center tracking-[-0.8px] lg:tracking-[-2px]">
-                        {bannerTitle}
-                    </h1>
-                </div>
-            </div>
+            {/* Shared, CMS-controlled image banner */}
+            <PageBanner image={bannerImage} title={bannerTitle} showText={cms?.bannerShowText !== false} background={cms?.bannerBackground} />
 
             {/* 2. How It Works Section — this page is the rental process, so no link back to itself */}
             <RentalProcess cmsData={cms} showRentalProcessLink={false} desktopBackground="#F6F6F6" />
@@ -112,8 +98,8 @@ export default function RentalProcessPage() {
                 </div>
             </section>
 
-            {/* 5. Testimonials Section — Figma two-row card layout on desktop */}
-            <Testimonials layout="rows" />
+            {/* Shared homepage testimonials */}
+            <Testimonials />
         </div>
     );
 }

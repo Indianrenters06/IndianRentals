@@ -1,0 +1,27 @@
+.container { width: 100%; max-width: 1260px; margin-inline: auto; padding-inline: 20px; }
+@media (min-width:768px) { .container { padding-inline: 30px; } }
+
+/* Leave room for the lifted card's shadow. Swiper tracks visible slides while
+   dragging, so offscreen cards stay hidden without clipping the visible cards. */
+@media (hover: hover) and (pointer: fine) {
+    .rail:global(.swiper) { overflow: visible; clip-path: inset(-40px -40px -64px); }
+    .rail:global(.swiper-initialized) > :global(.swiper-wrapper) > :global(.swiper-slide:not(.swiper-slide-visible)) { visibility: hidden; }
+    .rail > :global(.swiper-wrapper) > :global(.swiper-slide):hover,
+    .rail > :global(.swiper-wrapper) > :global(.swiper-slide):focus-within { z-index: 1; }
+}
+
+/* Keep mobile CTA spacing compact without counting the hover reveal space twice. */
+.mobileAction { margin-top: 16px; }
+@media (max-width: 767px) and (hover: hover) and (pointer: fine) {
+    .mobileAction { margin-top: 0; }
+}
+
+/* Extend to the viewport edge so a partial third card makes swiping discoverable.
+   Keep the approved shadow space above/below and at the leading edge. */
+@media (max-width: 767px) {
+    .rail.mobilePeek {
+        width: calc(100% + 20px);
+        overflow: visible;
+        clip-path: inset(-40px 0 -64px -20px);
+    }
+}

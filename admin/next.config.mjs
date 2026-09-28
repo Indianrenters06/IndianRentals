@@ -10,6 +10,8 @@ const securityHeaders = [
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   poweredByHeader: false,
+  agentRules: false,
+  turbopack: { root: process.cwd() },
   async headers() {
     return [{ source: '/:path*', headers: securityHeaders }];
   },

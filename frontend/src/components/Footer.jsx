@@ -1,7 +1,9 @@
 "use client";
-import React, { useState, useEffect } from 'react';
+import React from 'react';
+import styles from './Footer.module.css';
 import Link from 'next/link';
 import Image from 'next/image';
+import { useConsent } from "./CookieConsent";
 import { useSettings } from '../context/SettingsContext';
 
 const DEFAULT_PAYMENT_LOGOS = [
@@ -53,6 +55,7 @@ const DEFAULT_FOOTER_COLUMNS = [
 
 const Footer = () => {
     const { settings } = useSettings();
+    const { openSettings } = useConsent();
     const siteLogo = settings?.siteLogo || "https://res.cloudinary.com/dgkckcdk8/image/upload/v1776892240/1d1f7c4e3c0490bcddb69ceb328c67be2f7cf361_6_kufcee.png";
     const siteName = settings?.siteName || "Indian Renters";
     const sitePhone = settings?.contactPhone || "+91 9999999999";
@@ -64,25 +67,11 @@ const Footer = () => {
     const primaryColumn = footerColumns[0];
     const secondaryColumns = footerColumns.slice(1);
 
-    const [viewType, setViewType] = useState('mobile');
-
-    useEffect(() => {
-        const checkRes = () => {
-            const w = window.innerWidth;
-            if (w >= 1024) setViewType('desktop');
-            else if (w >= 768) setViewType('tablet');
-            else setViewType('mobile');
-        };
-        checkRes();
-        window.addEventListener('resize', checkRes);
-        return () => window.removeEventListener('resize', checkRes);
-    }, []);
-
     return (
         <>
             {/* ── Desktop/Tablet Footer ── */}
             <footer
-                className={`${viewType === 'mobile' ? 'hidden' : 'flex'} flex-col w-full items-center`}
+                className={`${styles.wide} flex-col w-full items-center`}
                 style={{
                     background: 'hsla(0, 0%, 96%, 1)',
                     borderTop: '1px solid hsla(0, 0%, 89%, 1)',
@@ -94,8 +83,7 @@ const Footer = () => {
                 {/* Inner container: 1200px wide, space-between */}
                 <div className="w-full max-w-[1200px] mx-auto px-6 md:px-8">
                     <div
-                        className="flex flex-row items-start justify-between"
-                        style={{ height: viewType === 'desktop' ? '176px' : (viewType === 'tablet' ? '216px' : 'auto'), gap: viewType === 'tablet' ? '20px' : '40px' }}
+                        className={styles.wideTop}
                     >
                         {/* Brand Column */}
                         <div className="flex flex-col gap-4 shrink-0">
@@ -129,11 +117,10 @@ const Footer = () => {
 
                         {/* Links — Columns */}
                         <div
-                            className="flex flex-row justify-between"
-                            style={{ width: viewType === 'desktop' ? '600px' : '480px', maxWidth: '600px', height: viewType === 'desktop' ? '176px' : 'auto', gap: viewType === 'tablet' ? '12px' : '30px' }}
+                            className={`${styles.columns} grid grid-cols-4 min-w-0 w-full`}
                         >
                             {footerColumns.map((col, ci) => (
-                                <ul key={ci} className="flex flex-col gap-[18px] text-[hsla(0,0%,0%,1)] font-sans font-medium text-[13px] tracking-tight leading-none">
+                                <ul key={ci} className="flex flex-col gap-[18px] text-[hsla(0,0%,0%,1)] font-sans font-medium text-[13px] tracking-tight leading-[1.5] min-w-0">
                                     {(col.links || []).map((link, li) => (
                                         <li key={li}>
                                             <Link href={link.href || "#"} className="hover:opacity-70 transition-opacity">{link.name}</Link>
@@ -149,7 +136,7 @@ const Footer = () => {
                 <div
                     className="w-full max-w-[1200px] mx-auto px-6 md:px-8 flex flex-col md:flex-row items-center justify-between"
                     style={{
-                        height: viewType === 'desktop' ? '77px' : 'auto',
+                        minHeight: '77px',
                         paddingTop: '24px',
                         paddingBottom: '24px',
                         borderTop: '1px solid hsla(0, 0%, 89%, 1)',
@@ -159,6 +146,7 @@ const Footer = () => {
                     <p className="text-[#666666] font-sans text-[12.5px]">
                         © {currentYear} {copyrightName}. All Rights Reserved
                     </p>
+                    <button type="button" className={styles.cookieSettings} onClick={openSettings}>Cookie settings</button>
                     <div className="flex items-center gap-[6px]">
                         {paymentLogos.map((url, i) => (
                             <img key={i} src={url} alt={`payment-method-${i}`} className="w-[45px] h-[45px] object-contain shrink-0" />
@@ -169,7 +157,7 @@ const Footer = () => {
 
             {/* ── Mobile Footer ── */}
             <footer
-                className={`${viewType === 'mobile' ? 'flex' : 'hidden'} flex-col items-start w-full font-sans`}
+                className={`${styles.compact} flex-col items-start w-full font-sans`}
                 style={{
                     padding: '32px 20px 0px',
                     gap: '20px',
@@ -178,7 +166,7 @@ const Footer = () => {
                     boxSizing: 'border-box'
                 }}
             >
-                <div className="flex flex-col items-start w-full max-w-[350px] gap-[20px] mx-auto">
+                <div className="flex flex-col items-start w-full max-w-[600px] gap-[20px] mx-auto">
                     {/* Logo + tagline */}
                     <div className="flex flex-col items-start gap-[10px] w-[137px]">
                         <Link href="/" className="inline-block">
@@ -302,7 +290,7 @@ const Footer = () => {
                 </div>
 
                 {/* Copyright bar */}
-                <div className="flex flex-col justify-center items-start w-full max-w-[350px] mx-auto border-t border-[#EEEEEE]" style={{ padding: '16px 0px', gap: '10px' }}>
+                <div className="flex flex-col justify-center items-start w-full max-w-[600px] mx-auto border-t border-[#EEEEEE]" style={{ padding: '16px 0px', gap: '10px' }}>
                     <p style={{
                         fontFamily: "'Mona Sans', sans-serif",
                         fontWeight: 300,
@@ -314,6 +302,7 @@ const Footer = () => {
                     }}>
                         © {currentYear} {copyrightName}. All Rights Reserved
                     </p>
+                    <button type="button" className={styles.cookieSettings} onClick={openSettings}>Cookie settings</button>
 
                     {/* Payment logos */}
                     <div className="flex flex-row items-center isolate">

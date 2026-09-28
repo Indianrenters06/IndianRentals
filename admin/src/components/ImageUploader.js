@@ -42,6 +42,11 @@ export default function ImageUploader({
     const [error, setError] = useState("");
     const [success, setSuccess] = useState(false);
 
+    // Keep the preview in sync when a CMS image is removed or steps are reordered.
+    useEffect(() => {
+        if (!multiple) setPreview(existingUrl || "");
+    }, [existingUrl, multiple]);
+
     // Sync when existingUrls load from a network request (e.g. in Edit mode)
     useEffect(() => {
         if (multiple && existingUrls?.length > 0 && previews.length === 0) {
@@ -197,7 +202,7 @@ export default function ImageUploader({
                         alt="Uploaded preview"
                         className="w-full max-h-36 object-contain p-2"
                     />
-                    <button
+                    <button type="button"
                         onClick={(e) => { e.stopPropagation(); removeSingle(); }}
                         className="absolute top-2 right-2 w-7 h-7 rounded-full bg-red-500 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity text-base font-bold shadow-lg hover:bg-red-600"
                         title="Remove image"
@@ -216,7 +221,7 @@ export default function ImageUploader({
                     {previews.map((url, idx) => (
                         <div key={idx} className="relative group aspect-square rounded-xl overflow-hidden border-2 border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900">
                             <img src={url} alt={`img-${idx + 1}`} className="w-full h-full object-cover" />
-                            <button
+                            <button type="button"
                                 onClick={() => removeMulti(idx)}
                                 className="absolute top-1 right-1 w-5 h-5 rounded-full bg-red-500 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity text-xs font-bold shadow-md hover:bg-red-600"
                                 title="Remove"

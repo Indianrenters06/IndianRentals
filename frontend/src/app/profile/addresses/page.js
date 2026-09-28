@@ -168,7 +168,7 @@ export default function AddressesPage() {
                     <div className="text-center py-16 text-gray-400">
                         <PiUserCircle size={52} className="mx-auto mb-3 opacity-30" />
                         <p className="text-sm font-medium">No addresses saved yet.</p>
-                        <p className="text-xs mt-1">Click "Add New Address" to get started.</p>
+                        <p className="text-xs mt-1">Click &quot;Add New Address&quot; to get started.</p>
                     </div>
                 )}
 

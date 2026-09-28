@@ -10,7 +10,9 @@ import {
     TextT, BookOpen, Eye
 } from '@phosphor-icons/react';
 import ImageUploader from '@/components/ImageUploader';
+import BannerAppearanceControls from '@/components/BannerAppearanceControls';
 import Toggle from '@/components/Toggle';
+import RentalStepsEditor from '@/components/RentalStepsEditor';
 
 const API = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
 const getToken = () => typeof window !== 'undefined' ? localStorage.getItem('adminToken') : null;
@@ -75,10 +77,10 @@ const DEFAULTS = {
     rentalProcessTitle: "Rental Process",
     rentalProcessSubtitle: "Choose, secure, receive, and create with zero hassle. No installation, no configuration, no delay.",
     rentalProcessSteps: [
-        { title: "Choose Your Tech", description: "Browse our curated selection...", icon: "Laptop", highlight: true, link: "" },
-        { title: "Complete KYC", description: "Pick a flexible rental tenure...", icon: "IdentificationCard", highlight: false, link: "" },
-        { title: "Secure Your Order", description: "Confirm your rental...", icon: "ShoppingCart", highlight: false, link: "" },
-        { title: "Receive & Create", description: "We deliver your tech...", icon: "Package", highlight: false, link: "" },
+        { title: "Choose Your Tech", description: "Explore the catalogue and choose the equipment and rental duration you need.", icon: "Laptop", highlight: true, link: "" },
+        { title: "Complete KYC", description: "Add your delivery details and submit the documents requested during verification.", icon: "IdentificationCard", highlight: false, link: "" },
+        { title: "Secure Your Order", description: "Review your rental, deposit and payment details before confirming your order.", icon: "ShoppingCart", highlight: false, link: "" },
+        { title: "Receive & Create", description: "Receive your equipment at the confirmed delivery address and get started.", icon: "Package", highlight: false, link: "" },
     ],
     metaTitle: '', metaDescription: '', publishStatus: 'published',
 };
@@ -167,6 +169,7 @@ export default function RentalProcessCMSPage() {
                 <div className="xl:col-span-1 space-y-5">
                     <Card title="Banner & SEO" accent="indigo">
                         <TextInput label="Banner Title" value={data.bannerTitle} onChange={v => set('bannerTitle', v)} placeholder="Rental Process" />
+                    <BannerAppearanceControls data={data} set={set} />
                         <ImageUploader label="Banner Image" existingUrl={data.bannerImage} onUpload={url => set('bannerImage', url)} />
                         <hr className="border-slate-100 dark:border-slate-800" />
                         <TextInput label="Meta Title" value={data.metaTitle} onChange={v => set('metaTitle', v)} placeholder="Rental Process – IndianRentals" />
@@ -190,38 +193,7 @@ export default function RentalProcessCMSPage() {
                             <TextArea label="Section Subtitle" value={data.rentalProcessSubtitle} onChange={v => set('rentalProcessSubtitle', v)} rows={2} />
                         </div>
 
-                        <div className="space-y-4">
-                            {(data.rentalProcessSteps || []).map((step, idx) => (
-                                <div key={idx} className={`p-5 rounded-xl border relative transition-colors ${step.highlight ? 'bg-amber-50 border-amber-200 dark:bg-amber-500/5 dark:border-amber-500/20' : 'bg-white border-slate-200 dark:bg-slate-950 dark:border-slate-800'}`}>
-                                    <div className="flex justify-between items-center mb-4">
-                                        <span className="font-bold text-slate-400 text-sm">Step {idx + 1}</span>
-                                        <div className="flex items-center gap-4">
-                                            <div className="flex items-center gap-2">
-                                                <span className="text-[10px] font-bold text-slate-400 uppercase">Highlight</span>
-                                                <Toggle size="sm" isSelected={step.highlight} onValueChange={v => { const n = [...data.rentalProcessSteps]; n[idx].highlight = v; set('rentalProcessSteps', n); }} />
-                                            </div>
-                                            <button onClick={() => { const n = [...data.rentalProcessSteps]; n.splice(idx, 1); set('rentalProcessSteps', n); }} className="text-red-500 hover:text-red-700 p-1">
-                                                <Trash size={15} />
-                                            </button>
-                                        </div>
-                                    </div>
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                        <div className="space-y-3">
-                                            <TextInput label="Title" value={step.title} onChange={v => { const n = [...data.rentalProcessSteps]; n[idx].title = v; set('rentalProcessSteps', n); }} />
-                                            <TextInput label="Icon Name" value={step.icon} onChange={v => { const n = [...data.rentalProcessSteps]; n[idx].icon = v; set('rentalProcessSteps', n); }} placeholder="Laptop" />
-                                            <TextInput label="Target Link" value={step.link || ""} onChange={v => { const n = [...data.rentalProcessSteps]; n[idx].link = v; set('rentalProcessSteps', n); }} placeholder="/categories/laptops" />
-                                            <ImageUploader label="Step Illustration" existingUrl={step.image} onUpload={url => { const n = [...data.rentalProcessSteps]; n[idx].image = url; set('rentalProcessSteps', n); }} />
-                                        </div>
-                                        <TextArea label="Body Description" value={step.description} onChange={v => { const n = [...data.rentalProcessSteps]; n[idx].description = v; set('rentalProcessSteps', n); }} rows={5} />
-                                    </div>
-                                </div>
-                            ))}
-                            <button onClick={() => set('rentalProcessSteps', [...data.rentalProcessSteps, { title: 'New Step', description: '', icon: 'Laptop', highlight: false, link: '' }])}
-                                className="w-full py-4 border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-xl flex items-center justify-center gap-2 text-slate-400 hover:text-indigo-500 hover:border-indigo-500 transition-all">
-                                <Plus size={18} />
-                                <span className="font-semibold text-sm">Add New Step</span>
-                            </button>
-                        </div>
+                        <RentalStepsEditor steps={data.rentalProcessSteps || []} onChange={steps => set('rentalProcessSteps', steps)} />
                     </Card>
 
                     <Card title="Feature Grid Items" accent="emerald">

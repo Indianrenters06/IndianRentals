@@ -9,7 +9,10 @@ const securityHeaders = [
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  allowedDevOrigins: ['127.0.0.1'],
   poweredByHeader: false,
+  agentRules: false,
+  turbopack: { root: process.cwd() },
   async headers() {
     return [{ source: '/:path*', headers: securityHeaders }];
   },
@@ -28,8 +31,6 @@ const nextConfig = {
       { protocol: 'https', hostname: 'avatars.githubusercontent.com' },
       { protocol: 'https', hostname: 'cdn.jsdelivr.net' },
       { protocol: 'https', hostname: '*.amazonaws.com' },
-      // Fallback: allow any https host (catches any new upload domains)
-      { protocol: 'https', hostname: '**' },
     ],
   },
 };

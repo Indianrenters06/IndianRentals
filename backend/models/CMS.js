@@ -11,9 +11,11 @@ const featuredShowcaseBannerSchema = new mongoose.Schema({
 const rentalProcessStepSchema = new mongoose.Schema({
     title: { type: String, default: '' },
     description: { type: String, default: '' },
-    icon: { type: String, default: 'FaLaptopCode' }, // icon name string
+    icon: { type: String, default: 'Laptop' }, // Phosphor icon name
+    illustration: { type: String, enum: ['auto', 'none', 'choose-your-tech', 'complete-kyc', 'secure-your-order', 'receive-and-create'], default: 'auto' },
     highlight: { type: Boolean, default: false }, // yellow highlight card
     image: { type: String, default: '' },
+    imageAlt: { type: String, default: '' },
     link: { type: String, default: '' },
 }, { _id: false });
 
@@ -43,6 +45,7 @@ const featureItemSchema = new mongoose.Schema({
 }, { _id: false });
 
 const cmsSchema = new mongoose.Schema({
+    careersContent: { type: mongoose.Schema.Types.Mixed, default: undefined },
     pageName: {
         type: String,
         required: true,
@@ -147,6 +150,8 @@ const cmsSchema = new mongoose.Schema({
     // ── About Us — Banner ────────────────────────────────────────────────────
     bannerImage: { type: String, default: '' },
     bannerTitle: { type: String, default: '' },
+    bannerShowText: { type: Boolean, default: true },
+    bannerBackground: { type: String, default: '', validate: { validator: value => value === '' || /^#[\da-f]{6}$/i.test(value), message: 'Banner background must be a six-digit hex colour.' } },
 
     // ── About Us — Our Story ──────────────────────────────────────────────────
     aboutStoryTitle:    { type: String, default: 'Our Story' },
@@ -222,6 +227,7 @@ const cmsSchema = new mongoose.Schema({
     rentalFeatures: { type: [featureItemSchema], default: [] },
 
     // ── Contact Page ──────────────────────────────────────────────────────────
+    contactContent: { type: mongoose.Schema.Types.Mixed, default: undefined },
     contactTitle: { type: String, default: 'Contact Us' },
     contactSubtitle: { type: String, default: 'Have questions? We are here to help.' },
     contactEmail: { type: String, default: '' },

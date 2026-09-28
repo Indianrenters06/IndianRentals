@@ -1,18 +1,17 @@
 "use client";
 import React, { useState, useEffect } from 'react';
-import { useWholeCardTrack } from '../hooks/useWholeCardTrack';
 import { Swiper, SwiperSlide } from 'swiper/react';
-import { Navigation, Autoplay, Scrollbar } from 'swiper/modules';
+import { A11y } from 'swiper/modules';
 import Link from 'next/link';
 import Image from 'next/image';
-import { Laptop, Camera, Desktop, DeviceTablet, DeviceMobile, ArrowRight } from '@phosphor-icons/react';
-import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/outline';
+import { Laptop, Camera, Desktop, DeviceTablet, DeviceMobile } from '@phosphor-icons/react';
+import { ChevronRightIcon } from '@heroicons/react/24/solid';
+import { SwiperControls } from './CarouselControls';
+import styles from './RentByCategory.module.css';
 import { getCategories } from '../services/categoryService';
 
 // Import Swiper styles
 import 'swiper/css';
-import 'swiper/css/scrollbar';
-import 'swiper/css/free-mode';
 
 import { API } from '../services/apiConfig';
 
@@ -143,42 +142,9 @@ const RentByCategory = () => {
         fetchCategories();
     }, []);
 
-    // Card width is fixed by the design; the gap absorbs the remainder so a whole
-    // number of cards fills the container edge to edge instead of sitting centred
-    // with dead space at both ends. Declared above the early returns below so the
-    // hook order stays stable across renders.
-    // Desktop = Figma: six 183.33px cards 20px apart fill the 1200px frame exactly.
     const catCardW = viewType === 'tablet' ? 165 : 183;
-    const catBaseGap = viewType === 'tablet' ? 15 : 20;
-    const [catBoundsRef, catTrackWidth, catPerView, catGap] = useWholeCardTrack(
-        catCardW,
-        catBaseGap,
-        { flexGap: true }
-    );
+    const catGap = viewType === 'tablet' ? 15 : 20;
     const [catSwiper, setCatSwiper] = useState(null);
-
-    // Desktop only — tablet's track is a fixed 708px with no room either side.
-    const catGutter = viewType === 'desktop' ? 64 : 0;
-    // The feather has to finish inside the gap between cards, not span the whole
-    // gutter: the next card starts only `catGap` past the track edge, so a fade
-    // still half-opaque out there leaves a ghost card parked beside the row. Short
-    // feather, then dead transparent for the rest of the card's travel.
-    const catFeather = 20;
-    const catEdgeMask = catGutter
-        ? (() => {
-            const stops = [
-                [catGutter - catFeather, 0],
-                [catGutter - catFeather * 0.55, 0.12],
-                [catGutter - catFeather * 0.3, 0.45],
-                [catGutter - catFeather * 0.12, 0.8],
-                [catGutter, 1],
-            ];
-            const left = stops.map(([px, a]) => `rgba(0,0,0,${a}) ${px}px`).join(', ');
-            const right = [...stops].reverse()
-                .map(([px, a]) => `rgba(0,0,0,${a}) calc(100% - ${px}px)`).join(', ');
-            return `linear-gradient(to right, transparent 0px, ${left}, #000 calc(100% - ${catGutter}px), ${right}, transparent 100%)`;
-        })()
-        : undefined;
 
     const getIconForCategory = (name) => {
         const lowerName = name.toLowerCase();
@@ -193,15 +159,9 @@ const RentByCategory = () => {
     if (loading) return null;
     if (!cmsConfig.enabled) return null;
 
-    // On mobile: show up to 7 categories + 1 "View All" tile in a unified 4-column grid
-    const mobileCats = displayCategories.slice(0, 7);
-
     return (
         <section
-            className="py-6 md:pt-12 md:pb-0 relative overflow-hidden"
-            style={{
-                background: 'var(--color-grey-grey-50, hsla(0, 0%, 96%, 1))'
-            }}
+            className={`${styles.section} py-6 md:pt-12 md:pb-0 relative overflow-hidden`}
         >
             <div className="max-w-[1200px] mx-auto px-4 sm:px-6 xl:px-0 md:border-b-[0.7px] md:border-[#E2E2E2] md:pb-24">
                 {/* Figma gap is 32px header→cards; the Swiper below adds 12px of its own
@@ -230,8 +190,8 @@ const RentByCategory = () => {
                 {/* Mobile Grid View */}
                 <div className={`${viewType === 'mobile' ? 'grid' : 'hidden'} grid-cols-4 gap-[10px]`}>
                     {displayCategories.slice(0, 7).map((cat, index) => (
-                        <Link key={cat._id || index} href={getCategoryRoute(cat)} className="flex flex-col items-center">
-                            <div className="w-[80px] h-[78px] rounded-[10px] bg-white border border-gray-100 flex items-center justify-center overflow-hidden relative shadow-sm">
+                        <Link key={cat._id || index} href={getCategoryRoute(cat)} className="flex flex-col items-center focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#141414] rounded-xl">
+                            <div className="w-full max-w-[80px] aspect-[80/78] rounded-[10px] bg-white border border-gray-100 flex items-center justify-center overflow-hidden relative shadow-sm">
                                 {cat.image ? (
                                     <Image
                                         src={cat.image}
@@ -250,69 +210,26 @@ const RentByCategory = () => {
                     ))}
 
                     {/* View All Tile */}
-                    <Link href="/categories" className="flex flex-col items-center">
-                        <div className="w-[80px] h-[78px] rounded-[10px] bg-[#fff3d4] border border-[#fbd38d]/30 flex flex-col items-center justify-center gap-1 shadow-sm">
-                            <span className="text-[10px] font-semibold font-sans text-[#d97706] leading-tight">View All</span>
-                            <div className="w-6 h-6 rounded-full bg-[#f6ad55] flex items-center justify-center">
-                                <ArrowRight size={8} weight="fill" className="text-white" />
-                            </div>
+                    <Link href="/categories" className="flex flex-col items-center focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#141414] rounded-xl">
+                        <div className={styles.viewAllTile}>
+                            <span className={styles.viewAllLabel}>View All</span>
+                            <span className={styles.viewAllIcon} aria-hidden="true">
+                                <ChevronRightIcon />
+                            </span>
                         </div>
                     </Link>
                 </div>
 
                 {/* Tablet/Desktop Swiper */}
                 <div className={`${viewType === 'mobile' ? 'hidden' : 'block'} relative`}>
-                    {/* Gutters hang outside the container so a card leaving the row has
-                      somewhere to dissolve — the track itself fills the container edge
-                      to edge, leaving no slack inside it. The mask fades the card's own
-                      pixels to transparent rather than covering them with a coloured
-                      overlay, so it melts into whatever is behind it. */}
-                    <div style={{
-                        marginLeft: catGutter ? `-${catGutter}px` : undefined,
-                        marginRight: catGutter ? `-${catGutter}px` : undefined,
-                        paddingLeft: catGutter ? `${catGutter}px` : undefined,
-                        paddingRight: catGutter ? `${catGutter}px` : undefined,
-                        overflow: 'hidden',
-                        WebkitMaskImage: catEdgeMask,
-                        maskImage: catEdgeMask
-                    }}>
-                        <div ref={catBoundsRef} style={{
-                            width: viewType === 'tablet' ? '708px' : '100%',
-                            height: viewType === 'tablet' ? '208px' : 'auto',
-                            margin: viewType === 'tablet' ? '0 auto' : undefined,
-                            // Desktop clips at the gutter edge instead, so slides can travel
-                            // into the fade; tablet has no gutter and still clips here.
-                            overflow: viewType === 'tablet' ? 'hidden' : 'visible',
-                            position: 'relative'
-                        }}>
-                            <div style={{ width: catTrackWidth ? `${catTrackWidth}px` : '100%', margin: '0 auto' }}>
+                    <div className="overflow-hidden">
                                 <Swiper
-                                    modules={[Navigation, Autoplay, Scrollbar]}
+                                    modules={[A11y]}
                                     spaceBetween={catGap}
                                     slidesPerView={'auto'}
-                                    // Explicit step, not slidesPerGroupAuto — every advance moves a
-                                    // whole page of cards, so the transform stays on a card boundary.
-                                    slidesPerGroup={catPerView}
-                                    // Needs a spare page to clone for a seamless wrap; under that
-                                    // Swiper silently falls back to stopping at the ends.
-                                    loop={displayCategories.length >= catPerView * 2}
+                                    slidesPerGroup={1}
                                     onSwiper={setCatSwiper}
-                                    navigation={{
-                                        nextEl: '.swiper-next-cat',
-                                        prevEl: '.swiper-prev-cat',
-                                    }}
-                                    scrollbar={{
-                                        el: '.swiper-scrollbar-cat',
-                                        draggable: true,
-                                        hide: false,
-                                    }}
-                                    autoplay={{
-                                        delay: 3000,
-                                        disableOnInteraction: false,
-                                    }}
-                                    // Swiper clips its own overflow, which would cut a slide dead
-                                    // at the track edge before it ever reaches the fade.
-                                    className={`!py-3 ${viewType === 'tablet' ? '' : '!overflow-visible'}`}
+                                    className="!py-3"
                                 >
                                     {displayCategories.map((cat, index) => (
                                         <SwiperSlide key={cat._id || index} style={{ width: `${catCardW}px` }}>
@@ -322,23 +239,15 @@ const RentByCategory = () => {
                                                     style={{
                                                         width: viewType === 'tablet' ? '165px' : '183px',
                                                         height: viewType === 'tablet' ? '158px' : '173px',
-                                                        // Figma insets the product inside the card rather than
-                                                        // bleeding it: 167x128 art in a 183x173 frame, with the
-                                                        // top inset a shade deeper than the bottom.
-                                                        padding: viewType === 'tablet' ? '20px 7px' : '22px 8px 21px'
                                                     }}
                                                 >
                                                     {cat.image ? (
-                                                        // fill resolves against the padding box, so the inset
-                                                        // needs its own wrapper to bite.
-                                                        <div className="relative w-full h-full">
-                                                            <Image
-                                                                src={cat.image}
-                                                                alt={cat.name}
-                                                                fill
-                                                                className="object-cover"
-                                                            />
-                                                        </div>
+                                                        <Image
+                                                            src={cat.image}
+                                                            alt={cat.name}
+                                                            fill
+                                                            className="object-cover"
+                                                        />
                                                     ) : (
                                                         <div className="text-gray-400 group-hover:text-orange-300 transition-colors">
                                                             {getIconForCategory(cat.name)}
@@ -364,37 +273,9 @@ const RentByCategory = () => {
                                         </SwiperSlide>
                                     ))}
                                 </Swiper>
-                            </div>
-                        </div>
                     </div>
 
-                    {/* Figma: scrollbar row — width 1164, height 34, gap 24px from cards */}
-                    <div className="hidden md:flex items-center gap-6 mt-6 lg:mt-5">
-                        {/* Progress scrollbar — Figma: h=0px border=3.5px solid #333 */}
-                        <div
-                            className="swiper-scrollbar-cat flex-1"
-                            style={{ height: '3.5px', position: 'relative' }}
-                        />
-                        {/* Nav arrows */}
-                        <div className="flex items-center gap-2 shrink-0">
-                            <button
-                                className="swiper-prev-cat group w-[34px] h-[34px] rounded-[69px] flex items-center justify-center bg-[#eee] hover:bg-[hsla(0,0%,85%,1)] transition-all cursor-pointer"
-                                style={{ opacity: 1, boxShadow: '0px 8px 2px 0px rgba(133,133,133,0), 0px 5px 2px 0px rgba(133,133,133,0.01), 0px 3px 2px 0px rgba(133,133,133,0.05), 0px 1px 1px 0px rgba(133,133,133,0.09), 0px 0px 1px 0px rgba(133,133,133,0.1)' }}
-                                aria-label="Previous"
-                                onClick={() => catSwiper?.slidePrev()}
-                            >
-                                <ChevronLeftIcon strokeWidth={2} className="w-6 h-6 text-[#1F1F1F] transition-colors duration-200" />
-                            </button>
-                            <button
-                                className="swiper-next-cat group w-[34px] h-[34px] rounded-[69px] flex items-center justify-center bg-[#eee] hover:bg-[hsla(0,0%,85%,1)] transition-all cursor-pointer"
-                                style={{ opacity: 1, boxShadow: '0px 8px 2px 0px rgba(133,133,133,0), 0px 5px 2px 0px rgba(133,133,133,0.01), 0px 3px 2px 0px rgba(133,133,133,0.05), 0px 1px 1px 0px rgba(133,133,133,0.09), 0px 0px 1px 0px rgba(133,133,133,0.1)' }}
-                                aria-label="Next"
-                                onClick={() => catSwiper?.slideNext()}
-                            >
-                                <ChevronRightIcon strokeWidth={2} className="w-6 h-6 text-[#1F1F1F] transition-colors duration-200" />
-                            </button>
-                        </div>
-                    </div>
+                    <SwiperControls swiper={catSwiper} count={displayCategories.length} label="Categories" />
                 </div>
             </div>
 
@@ -412,45 +293,6 @@ const RentByCategory = () => {
                 }
                 .group:hover .cat-card {
                     transform: scale(1.02);
-                }
-                /* Kill Swiper's default ::after arrow injection on all nav buttons */
-                .swiper-prev-cat::after,
-                .swiper-next-cat::after,
-                .swiper-prev-cat-mobile::after,
-                .swiper-next-cat-mobile::after {
-                    content: none !important;
-                    display: none !important;
-                }
-                /* Scrollbar track — very subtle light line */
-                .swiper-scrollbar-cat,
-                .swiper-scrollbar-cat-mobile {
-                    background: hsla(0, 0%, 20%, 0.12) !important;
-                    border-radius: 0 !important;
-                    height: 3.5px !important;
-                    overflow: hidden;
-                    position: relative;
-                }
-                /* Scrollbar drag thumb — dark charcoal per Figma */
-                .swiper-scrollbar-cat .swiper-scrollbar-drag,
-                .swiper-scrollbar-cat-mobile .swiper-scrollbar-drag {
-                    background: hsla(0, 0%, 20%, 1) !important;
-                    border-radius: 0 !important;
-                    cursor: grab;
-                    height: 100% !important;
-                    top: 0 !important;
-                }
-                .swiper-scrollbar-cat .swiper-scrollbar-drag:active,
-                .swiper-scrollbar-cat-mobile .swiper-scrollbar-drag:active {
-                    cursor: grabbing;
-                }
-                /* Disable arrow when at start/end */
-                .swiper-prev-cat.swiper-button-disabled,
-                .swiper-next-cat.swiper-button-disabled,
-                .swiper-prev-cat-mobile.swiper-button-disabled,
-                .swiper-next-cat-mobile.swiper-button-disabled {
-                    opacity: 0.3;
-                    cursor: not-allowed;
-                    pointer-events: none;
                 }
             `}</style>
         </section>

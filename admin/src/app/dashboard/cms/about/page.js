@@ -9,6 +9,7 @@ import {
     TextT, BookOpen, Eye, Star, Handshake, Target, ChartBar, Lightning, Smiley,
 } from '@phosphor-icons/react';
 import ImageUploader from '@/components/ImageUploader';
+import BannerAppearanceControls from '@/components/BannerAppearanceControls';
 
 const API = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
 const getToken = () => typeof window !== 'undefined' ? localStorage.getItem('adminToken') : null;
@@ -74,10 +75,10 @@ const DEFAULTS = {
     bannerImage: '', bannerTitle: 'About Us',
     aboutStoryTitle: 'Our Story',
     aboutStoryPara1: "From a small computer training room in 1992 to India's go-to rental partner, this journey has been about making access smarter than ownership.",
-    aboutStoryPara2: 'Today, a 100+ product catalog powers startups, enterprises, and events across major cities, backed by fast delivery, clean gear, and dependable support.',
+    aboutStoryPara2: 'Today, a 401+ product catalog powers startups, enterprises, and events across major cities, backed by fast delivery, clean gear, and dependable support.',
     aboutStoryImage: 'https://res.cloudinary.com/dgkckcdk8/image/upload/v1769946716/indian-rentals/fj8ptqbhppbstdd0hs4i.png',
-    aboutStat1Value: '4.8/5.0', aboutStat1Label: 'Customer Satisfaction',
-    aboutStat2Value: '10,000+', aboutStat2Label: 'Happy Clients',
+    aboutStat1Value: '4.9/5', aboutStat1Label: '1,050+ Google reviews',
+    aboutStat2Value: '30,000+', aboutStat2Label: 'Happy Customers',
     aboutVisionTabLabel: 'Our Vision',
     aboutVision1Title: 'Rent Anything', aboutVision1Text: "Laptops, Macs, mobiles, AV, cameras, medical and more—if it's not listed, it's sourced on request.",
     aboutVision2Title: 'Rent Anytime', aboutVision2Text: 'Tenures that fit the job: 1, 3, 6, or 12 months, with easy extensions and mid-term upgrades.',
@@ -89,9 +90,9 @@ const DEFAULTS = {
     aboutWhyTitle: 'Why Choose Us?',
     aboutWhyText: "Join thousands who've switched to the flexible, affordable way to access high-end tech.",
     aboutWhyImage: 'https://res.cloudinary.com/dgkckcdk8/image/upload/v1769961565/indian-rentals/anmpufdlxxxblkxqxpds.jpg',
-    aboutWhyStat1Value: '90k+', aboutWhyStat1Label: 'Devices in Stock',
+    aboutWhyStat1Value: '90k+', aboutWhyStat1Label: 'Orders Served',
     aboutWhyStat2Value: '30k+', aboutWhyStat2Label: 'Happy Customers',
-    aboutWhyStat3Value: '401+', aboutWhyStat3Label: 'Cities Covered',
+    aboutWhyStat3Value: '401+', aboutWhyStat3Label: 'Products Available',
     metaTitle: '', metaDescription: '', publishStatus: 'published',
 };
 
@@ -163,6 +164,7 @@ export default function AboutCMSPage() {
                 {/* ── BANNER ── */}
                 <Card title="Page Banner" accent="indigo">
                     <TextInput label="Banner Title (overlay text)" value={data.bannerTitle} onChange={v => set('bannerTitle', v)} placeholder="About Us" />
+                    <BannerAppearanceControls data={data} set={set} />
                     <ImageUploader label="Banner Image" existingUrl={data.bannerImage} onUpload={url => set('bannerImage', url)} />
                     {!data.bannerImage && (
                         <TextInput label="Or paste image URL" value={data.bannerImage} onChange={v => set('bannerImage', v)} placeholder="https://res.cloudinary.com/…" />
@@ -172,7 +174,7 @@ export default function AboutCMSPage() {
                         <div className="h-32 rounded-xl overflow-hidden relative"
                             style={{ backgroundImage: `url(${data.bannerImage})`, backgroundSize: 'cover', backgroundPosition: 'center' }}>
                             <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
-                                <p className="text-white font-bold text-lg">{data.bannerTitle || 'About Us'}</p>
+                                <p className="text-white font-bold text-lg">{data.bannerShowText !== false && (data.bannerTitle || 'About Us')}</p>
                             </div>
                         </div>
                     )}

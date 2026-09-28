@@ -4,7 +4,6 @@ import "@fontsource/mona-sans/600.css";
 import "@fontsource/mona-sans/700.css";
 import "@fontsource/mona-sans/800.css";
 import "./globals.css";
-import Script from "next/script";
 import { SITE_URL, SITE_NAME, SITE_TAGLINE, SITE_DESCRIPTION, DEFAULT_OG_IMAGE } from "@/config/site";
 
 const GA_ID = process.env.NEXT_PUBLIC_GA_ID || ""; // e.g. G-XXXXXXXXXX
@@ -84,32 +83,11 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <body className={`font-sans bg-gray-50 flex flex-col min-h-screen antialiased overflow-x-hidden max-w-full`}>
-        {/* Google Analytics 4 — only loads when GA_ID env var is set */}
-        {GA_ID && (
-          <>
-            <Script
-              strategy="afterInteractive"
-              src={`https://www.googletagmanager.com/gtag/js?id=${GA_ID}`}
-            />
-            <Script
-              id="gtag-init"
-              strategy="afterInteractive"
-              dangerouslySetInnerHTML={{
-                __html: `
-                  window.dataLayer = window.dataLayer || [];
-                  function gtag(){dataLayer.push(arguments);}
-                  gtag('js', new Date());
-                  gtag('config', '${GA_ID}', { page_path: window.location.pathname });
-                `,
-              }}
-            />
-          </>
-        )}
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(orgJsonLd) }}
         />
-        <Providers>
+        <Providers analyticsId={GA_ID}>
           <ClientLayout>
             {children}
           </ClientLayout>

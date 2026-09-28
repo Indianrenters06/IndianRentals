@@ -1,171 +1,36 @@
 'use client';
-import toast from 'react-hot-toast';
-
-import { useState, useEffect, useCallback } from 'react';
-import { motion } from 'framer-motion';
-import { Spinner, Button } from '@heroui/react';
-import {
-    FloppyDisk, CheckCircle, Phone, EnvelopeSimple,
-    MapPin, WhatsappLogo, Globe, Info, TextT
-} from '@phosphor-icons/react';
+import { useCallback, useEffect, useState } from 'react';
+import Link from 'next/link';
 import ImageUploader from '@/components/ImageUploader';
-
 const API = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
-const getToken = () => typeof window !== 'undefined' ? localStorage.getItem('adminToken') : null;
-
-// ── Reusable components ───────────────────────────────────────────────────────
-const Label = ({ children }) => (
-    <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">{children}</label>
-);
-
-const TextInput = ({ label, value, onChange, placeholder, icon }) => (
-    <div>
-        {label && <Label>{label}</Label>}
-        <div className="relative">
-            {icon && <div className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">{icon}</div>}
-            <input
-                type="text"
-                value={value || ''}
-                onChange={e => onChange(e.target.value)}
-                placeholder={placeholder}
-                className={`w-full h-10 ${icon ? 'pl-10' : 'px-3'} rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-base text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-400 transition-all`}
-            />
-        </div>
-    </div>
-);
-
-const TextArea = ({ label, value, onChange, placeholder, rows = 3 }) => (
-    <div>
-        {label && <Label>{label}</Label>}
-        <textarea
-            value={value || ''}
-            onChange={e => onChange(e.target.value)}
-            placeholder={placeholder}
-            rows={rows}
-            className="w-full px-3 py-2.5 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-base text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-400 transition-all resize-none"
-        />
-    </div>
-);
-
-const Card = ({ icon, title, children, accent = 'indigo' }) => {
-    const accents = {
-        indigo: 'from-indigo-50 to-white dark:from-indigo-950/20 dark:to-slate-900 border-indigo-100 dark:border-indigo-900/30',
-        sky:    'from-sky-50 to-white dark:from-sky-950/20 dark:to-slate-900 border-sky-100 dark:border-sky-900/30',
-        emerald:'from-emerald-50 to-white dark:from-emerald-950/20 dark:to-slate-900 border-emerald-100 dark:border-emerald-900/30',
-    };
-    return (
-        <div className={`rounded-2xl border bg-gradient-to-br ${accents[accent] || accents.indigo} p-6 space-y-5 shadow-sm`}>
-            <h3 className="text-base font-bold text-slate-800 dark:text-slate-100">{title}</h3>
-            {children}
-        </div>
-    );
-};
-
-// ── DEFAULTS ─────────────────────────────────────────────────────────────────
-const DEFAULTS = {
-    bannerImage: '', bannerTitle: 'Contact Us',
-    contactTitle: 'Contact Us',
-    contactSubtitle: 'Have questions? We are here to help.',
-    contactEmail: 'support@indianrentals.com',
-    contactPhone: '+91 1234567890',
-    contactAddress: 'New Delhi, India',
-    contactWhatsApp: '+91 1234567890',
-    contactMapUrl: '',
-    metaTitle: '', metaDescription: '', publishStatus: 'published',
-};
-
+const STOREFRONT = (process.env.NEXT_PUBLIC_STOREFRONT_URL || (process.env.NODE_ENV === 'production' ? 'https://indianrenters.com' : 'http://localhost:3000')).replace(/\/$/, '');
+const imagePreview = value => value?.startsWith('/') ? `${STOREFRONT}${value}` : value;
+const control = 'mt-1 block w-full rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 p-3 text-sm';
+const card = 'rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 p-5 space-y-4';
+function Field({label,value,onChange,multiline=false,type='text'}) { return <label className="block text-sm font-medium">{label}{multiline?<textarea className={control} rows={3} value={value??''} onChange={e=>onChange(e.target.value)}/>:<input className={control} type={type} value={value??''} onChange={e=>onChange(e.target.value)}/>}</label>; }
+const groups = [
+    ['Introduction',[['title','Main heading'],['titleAccent','Underlined heading line'],['intro','Introduction',true],['introClosing','Closing line']]],
+    ['Contact desk',[['contactTitle','Heading',true],['contactDescription','Description',true],['callLabel','Phone link label'],['phone','Phone number'],['emailLabel','Email link label'],['email','Email address'],['hours','Opening hours',true],['branchLinkLabel','Branch directory link label']]],
+    ['Rental & support forms',[['rentalTitle','Rental heading'],['rentalIntro','Rental introduction'],['rentalButton','Rental submit button'],['supportTitle','Support heading'],['supportIntro','Support introduction'],['supportButton','Support submit button'],['successTitle','Confirmation heading'],['successMessage','Confirmation message',true]]],
+    ['Branch directory',[['branchesTitle','Heading',true],['branchesIntro','Introduction',true]]],
+    ['Help section',[['helpTitle','Heading'],['helpDescription','Description',true]]],
+];
 export default function ContactCMSPage() {
-    const [data, setData] = useState(DEFAULTS);
-    const [loading, setLoading] = useState(true);
-    const [saving, setSaving] = useState(false);
-    const [saved, setSaved] = useState(false);
-
-    const set = (k, v) => setData(p => ({ ...p, [k]: v }));
-
-    const load = useCallback(async () => {
-        try {
-            const res = await fetch(`${API}/api/cms/contact`);
-            if (res.ok) {
-                const json = await res.json();
-                setData({ ...DEFAULTS, ...json });
-            }
-        } catch { }
-        finally { setLoading(false); }
-    }, []);
-
-    useEffect(() => { load(); }, [load]);
-
-    const save = async () => {
-        try {
-            setSaving(true);
-            const res = await fetch(`${API}/api/cms/contact`, {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${getToken()}` },
-                body: JSON.stringify(data),
-            });
-            if (!res.ok) throw new Error('Failed to save');
-            setSaved(true);
-            setTimeout(() => setSaved(false), 3000);
-        } catch (e) { toast.error(e.message); }
-        finally { setSaving(false); }
-    };
-
-    if (loading) return (
-        <div className="flex items-center justify-center gap-3 py-24 text-slate-400">
-            <Spinner size="sm" color="secondary" /> Loading Contact CMS…
-        </div>
-    );
-
-    return (
-        <div className="space-y-6 pb-16">
-            <div className="flex items-center justify-between flex-wrap gap-3">
-                <div>
-                    <h1 className="text-3xl font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2">
-                        Contact <span className="text-indigo-600 dark:text-indigo-400 font-extrabold">CMS</span>
-                    </h1>
-                    <p className="text-sm text-slate-500 mt-1">Manage contact information and map settings.</p>
-                </div>
-                <div className="flex items-center gap-3">
-                    {saved && (
-                        <span className="flex items-center gap-1.5 text-emerald-600 text-sm font-semibold bg-emerald-50 border border-emerald-200 rounded-full px-3 py-1.5">
-                            <CheckCircle size={14} weight="fill" /> Saved!
-                        </span>
-                    )}
-                    <button onClick={save} disabled={saving}
-                        className="flex items-center gap-2 h-10 px-5 rounded-xl !bg-indigo-600 hover:!bg-indigo-700 disabled:opacity-60 text-white font-semibold text-sm shadow-lg shadow-indigo-500/20 transition-all">
-                        {saving ? <Spinner size="sm" color="white" /> : <FloppyDisk size={15} weight="bold" />} Save Contact
-                    </button>
-                </div>
-            </div>
-
-            <div className="grid grid-cols-1 xl:grid-cols-2 gap-5">
-                <div className="space-y-5">
-                    <Card title="Banner & Header" accent="indigo">
-                        <TextInput label="Banner Title" value={data.bannerTitle} onChange={v => set('bannerTitle', v)} placeholder="Contact Us" />
-                        <ImageUploader label="Banner Image" existingUrl={data.bannerImage} onUpload={url => set('bannerImage', url)} />
-                        <hr className="border-slate-100 dark:border-slate-800" />
-                        <TextInput label="Main Heading" value={data.contactTitle} onChange={v => set('contactTitle', v)} placeholder="Contact Us" />
-                        <TextArea label="Sub-heading" value={data.contactSubtitle} onChange={v => set('contactSubtitle', v)} placeholder="Have questions?..." rows={2} />
-                    </Card>
-
-                    <Card title="SEO Settings" accent="sky">
-                        <TextInput label="Meta Title" value={data.metaTitle} onChange={v => set('metaTitle', v)} placeholder="Contact – IndianRentals" />
-                        <TextArea label="Meta Description" value={data.metaDescription} onChange={v => set('metaDescription', v)} placeholder="Short SEO description..." rows={3} />
-                    </Card>
-                </div>
-
-                <div className="space-y-5">
-                    <Card title="Contact Details" accent="emerald">
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <TextInput label="Email Address" value={data.contactEmail} onChange={v => set('contactEmail', v)} placeholder="support@..." icon={<EnvelopeSimple size={16} />} />
-                            <TextInput label="Phone Number" value={data.contactPhone} onChange={v => set('contactPhone', v)} placeholder="+91 ..." icon={<Phone size={16} />} />
-                            <TextInput label="WhatsApp" value={data.contactWhatsApp} onChange={v => set('contactWhatsApp', v)} placeholder="+91 ..." icon={<WhatsappLogo size={16} />} />
-                            <TextInput label="Map URL (Google Maps)" value={data.contactMapUrl} onChange={v => set('contactMapUrl', v)} placeholder="https://goo.gl/maps/..." icon={<Globe size={16} />} />
-                        </div>
-                        <TextArea label="Physical Address" value={data.contactAddress} onChange={v => set('contactAddress', v)} placeholder="Full office address..." rows={3} />
-                    </Card>
-                </div>
-            </div>
-        </div>
-    );
+    const [data,setData]=useState(null),[meta,setMeta]=useState({}),[error,setError]=useState(''),[saved,setSaved]=useState(false),[saving,setSaving]=useState(false);
+    const load=useCallback(async()=>{setError('');try{const res=await fetch(`${API}/api/cms/contact`,{cache:'no-store'});const body=await res.json();if(!res.ok||!body.contactContent)throw new Error('Unable to load contact content. Check that the updated backend is running.');setData(body.contactContent);setMeta({metaTitle:body.metaTitle||'',metaDescription:body.metaDescription||''});}catch(e){setError(e.message);}},[]);
+    useEffect(()=>{load();},[load]);
+    const set=(key,value)=>{setData(d=>({...d,[key]:value}));setSaved(false);};
+    async function save(e){e.preventDefault();setSaving(true);setError('');setSaved(false);try{const res=await fetch(`${API}/api/cms/contact`,{method:'PUT',headers:{'Content-Type':'application/json',Authorization:`Bearer ${localStorage.getItem('adminToken')}`},body:JSON.stringify({contactContent:data,...meta})});const body=await res.json();if(!res.ok)throw new Error(body.message||'Could not save contact page.');setData(body.contactContent);setSaved(true);}catch(e){setError(e.message);}finally{setSaving(false);}}
+    if(!data)return <div className="p-6">{error?<><p role="alert">{error}</p><button className="mt-4 underline" onClick={load}>Retry</button></>:<p>Loading contact editor…</p>}</div>;
+    return <form onSubmit={save} className="space-y-6 pb-16">
+        <header className="flex flex-wrap justify-between gap-4"><div><h1 className="text-3xl font-bold">Contact page</h1><p className="text-sm text-slate-500 mt-2">Manage the live contact page. The original design remains at /contact-demo.</p></div><div className="flex gap-4 items-center"><Link href="/dashboard/cms/contact/messages" className="underline">Enquiry inbox</Link><button disabled={saving} className="rounded-lg bg-indigo-600 text-white px-5 py-3 disabled:opacity-50">{saving?'Saving…':'Save changes'}</button></div></header>
+        {error&&<p role="alert" className="p-4 border border-red-300 rounded-lg">{error}</p>}{saved&&<p role="status" className="p-4 border border-green-300 rounded-lg">Contact page saved.</p>}
+        <fieldset disabled={saving} className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+            <section className={card}><h2 className="text-lg font-semibold">Hero image</h2><p className="text-sm text-slate-500">The first section of the page. Image dimensions stay fixed by the responsive template.</p><ImageUploader label="Hero image" existingUrl={imagePreview(data.heroImage)} onUpload={url=>set('heroImage',url)}/><Field label="Image URL" value={data.heroImage} onChange={v=>set('heroImage',v)}/><Field label="Image description" value={data.heroAlt} onChange={v=>set('heroAlt',v)}/><Field label="Text over image" value={data.heroTitle} onChange={v=>set('heroTitle',v)}/><label className="flex gap-3 items-center"><input type="checkbox" checked={data.heroShowText} onChange={e=>set('heroShowText',e.target.checked)}/>Show text over image</label><Field label="Section background colour" type="color" value={data.heroBackground} onChange={v=>set('heroBackground',v)}/><Field label="Background hex value" value={data.heroBackground} onChange={v=>set('heroBackground',v)}/></section>
+            {groups.map(([title,fields])=><section className={card} key={title}><h2 className="text-lg font-semibold">{title}</h2>{fields.map(([key,label,multiline])=><Field key={key} label={label} multiline={multiline} value={data[key]} onChange={value=>set(key,value)}/>)}{title==='Rental & support forms'&&<Field label="Equipment options (one per line)" multiline value={data.equipment.join('\n')} onChange={value=>set('equipment',value.split('\n'))}/>}</section>)}
+            <section className={card}><h2 className="text-lg font-semibold">Help links</h2>{data.helpLinks.map((link,index)=><div className="space-y-3 border-b pb-4" key={index}><Field label={`Link ${index+1} label`} value={link.label} onChange={label=>set('helpLinks',data.helpLinks.map((l,i)=>i===index?{...l,label}:l))}/><Field label="Destination" value={link.href} onChange={href=>set('helpLinks',data.helpLinks.map((l,i)=>i===index?{...l,href}:l))}/></div>)}</section>
+            <section className={card}><h2 className="text-lg font-semibold">Search appearance</h2><Field label="Page title" value={meta.metaTitle} onChange={metaTitle=>{setMeta(m=>({...m,metaTitle}));setSaved(false);}}/><Field label="Meta description" multiline value={meta.metaDescription} onChange={metaDescription=>{setMeta(m=>({...m,metaDescription}));setSaved(false);}}/></section>
+            <section className={`${card} xl:col-span-2`}><h2 className="text-lg font-semibold">Cities and branches</h2><p className="text-sm text-slate-500">These details also populate the form’s city choices. Keep service cities distinct from physical branches. Rotation advances every 3 seconds, with pause and manual selection controls.</p><div className="grid grid-cols-1 lg:grid-cols-2 gap-5">{data.branches.map((branch,index)=>{const update=(key,value)=>set('branches',data.branches.map((b,i)=>i===index?{...b,[key]:value}:b));return <details key={branch.id} className="rounded-lg border border-slate-200 p-4"><summary className="font-semibold cursor-pointer">{branch.name}</summary><div className="space-y-4 pt-4"><Field label="City name" value={branch.name} onChange={v=>update('name',v)}/><label className="block text-sm">Location type<select className={control} value={branch.type} onChange={e=>update('type',e.target.value)}>{['Head office','Branch office','Service city'].map(type=><option key={type}>{type}</option>)}</select></label><Field label="Address" multiline value={branch.address} onChange={v=>update('address',v)}/><Field label="Service city description" multiline value={branch.serviceNote} onChange={v=>update('serviceNote',v)}/><Field label="Phone" value={branch.phone} onChange={v=>update('phone',v)}/><Field label="Directions URL" value={branch.mapUrl} onChange={v=>update('mapUrl',v)}/><ImageUploader label={`${branch.name} illustration`} existingUrl={imagePreview(branch.image)} onUpload={url=>update('image',url)}/><Field label="Illustration URL" value={branch.image} onChange={v=>update('image',v)}/></div></details>;})}</div></section>
+        </fieldset>
+    </form>;
 }

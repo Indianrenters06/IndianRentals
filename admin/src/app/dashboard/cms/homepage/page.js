@@ -1,4 +1,5 @@
 'use client';
+import RentalStepsEditor from '@/components/RentalStepsEditor';
 import toast from 'react-hot-toast';
 
 import { useState, useEffect, useCallback, useRef } from 'react';
@@ -245,10 +246,10 @@ const DEFAULTS = {
     rentalProcessTitle: "Rental Process",
     rentalProcessSubtitle: "Choose, secure, receive, and create with zero hassle. No installation, no configuration, no delay.",
     rentalProcessSteps: [
-        { title: "Choose Your Tech", description: "Browse our curated selection...", icon: "Laptop", highlight: true, link: "" },
-        { title: "Complete KYC", description: "Pick a flexible rental tenure...", icon: "IdentificationCard", highlight: false, link: "" },
-        { title: "Secure Your Order", description: "Confirm your rental...", icon: "ShoppingCart", highlight: false, link: "" },
-        { title: "Receive & Create", description: "We deliver your tech...", icon: "Package", highlight: false, link: "" },
+        { title: "Choose Your Tech", description: "Explore the catalogue and choose the equipment and rental duration you need.", icon: "Laptop", highlight: true, link: "" },
+        { title: "Complete KYC", description: "Add your delivery details and submit the documents requested during verification.", icon: "IdentificationCard", highlight: false, link: "" },
+        { title: "Secure Your Order", description: "Review your rental, deposit and payment details before confirming your order.", icon: "ShoppingCart", highlight: false, link: "" },
+        { title: "Receive & Create", description: "Receive your equipment at the confirmed delivery address and get started.", icon: "Package", highlight: false, link: "" },
     ],
     testimonialsEnabled: true,
     testimonialSectionTitle: "What Our Customers Say",
@@ -338,7 +339,7 @@ export default function CMSHomepage() {
                         slideLink: s.slideLink || "",
                     }));
                 }
-                if (!d.rentalProcessSteps || d.rentalProcessSteps.length === 0) {
+                if (!Array.isArray(d.rentalProcessSteps)) {
                     d.rentalProcessSteps = DEFAULTS.rentalProcessSteps;
                 }
                 if (d.whyChooseUsEnabled === undefined) d.whyChooseUsEnabled = true;
@@ -848,43 +849,7 @@ export default function CMSHomepage() {
                             <Field label="Section Subtitle" value={data.rentalProcessSubtitle} onChange={v => set("rentalProcessSubtitle", v)} rows={2} />
                         </div>
 
-                        {/* Steps */}
-                        <div>
-                            <div className="flex justify-between items-center bg-slate-900 text-white px-5 py-3 rounded-t-xl">
-                                <h4 className="font-semibold text-sm">Flow Steps Configuration</h4>
-                                <button onClick={() => set("rentalProcessSteps", [...data.rentalProcessSteps, { title: "New Step", description: "Write description...", icon: "FaSearch", highlight: false, link: "" }])}
-                                    className="flex items-center gap-1.5 text-xs font-semibold bg-white/20 hover:bg-white/30 px-3 py-1.5 rounded-lg transition-all">
-                                    <Plus size={12} /> Add Step
-                                </button>
-                            </div>
-
-                            <div className="space-y-4 border border-slate-200 dark:border-slate-800 rounded-b-xl p-4 md:p-6 bg-slate-50/50 dark:bg-slate-900/50">
-                                {data.rentalProcessSteps.map((step, idx) => (
-                                    <div key={idx} className={`p-5 rounded-xl border relative transition-colors ${step.highlight ? 'bg-amber-50 border-amber-200 dark:bg-amber-500/5 dark:border-amber-500/20' : 'bg-white border-slate-200 dark:bg-slate-950 dark:border-slate-800'}`}>
-                                        <div className="flex justify-between items-center mb-4">
-                                            <span className="font-bold text-slate-400 text-sm">Step {idx + 1}</span>
-                                            <div className="flex items-center gap-4">
-                                                <Toggle size="sm" isSelected={step.highlight} onValueChange={v => { const n = [...data.rentalProcessSteps]; n[idx].highlight = v; set("rentalProcessSteps", n); }}>
-                                                    Yellow Highlight
-                                                </Toggle>
-                                                <button onClick={() => { const n = [...data.rentalProcessSteps]; n.splice(idx, 1); set("rentalProcessSteps", n); }} className="text-red-500 hover:text-red-700 p-1">
-                                                    <Trash size={15} />
-                                                </button>
-                                            </div>
-                                        </div>
-                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                            <div className="space-y-3">
-                                                <Field label="Title" value={step.title} onChange={v => { const n = [...data.rentalProcessSteps]; n[idx].title = v; set("rentalProcessSteps", n); }} />
-                                                <Field label="Icon (e.g. Laptop, Package, ShoppingCart OR Image URL)" value={step.icon} onChange={v => { const n = [...data.rentalProcessSteps]; n[idx].icon = v; set("rentalProcessSteps", n); }} placeholder="Laptop" />
-                                                <Field label="Target Link (URL)" value={step.link || ""} onChange={v => { const n = [...data.rentalProcessSteps]; n[idx].link = v; set("rentalProcessSteps", n); }} placeholder="/categories/laptops" />
-                                                <ImageUploader label="Step Illustration" existingUrl={step.image} onUpload={url => { const n = [...data.rentalProcessSteps]; n[idx].image = url; set("rentalProcessSteps", n); }} />
-                                            </div>
-                                            <Field label="Body Description" value={step.description} onChange={v => { const n = [...data.rentalProcessSteps]; n[idx].description = v; set("rentalProcessSteps", n); }} rows={5} />
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
+                        <RentalStepsEditor steps={data.rentalProcessSteps || []} onChange={steps => set("rentalProcessSteps", steps)} />
                     </div>
                 </motion.div>
             )}
@@ -930,7 +895,8 @@ export default function CMSHomepage() {
                                 </div>
                             </div>
                             <div>
-                                <ImageUploader label="Corporate Image" existingUrl={data.whyChooseUsImage} onUpload={url => set("whyChooseUsImage", url)} />
+                                <ImageUploader label="Why Choose Us image" existingUrl={data.whyChooseUsImage} onUpload={url => set("whyChooseUsImage", url)} />
+                                <button type="button" onClick={() => set("whyChooseUsImage", "")} className="mt-3 rounded-lg border border-slate-300 px-4 py-2 text-sm">Use default equipment image</button>
                             </div>
                         </div>
                     </div>

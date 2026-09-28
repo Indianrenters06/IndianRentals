@@ -1,0 +1,95 @@
+{
+  "enabled": true,
+  "eyebrow": "CAREERS AT INDIANRENTERS",
+  "title": "Good people. Greater possibilities.",
+  "intro": "Help people get the technology they need to do their best work. Build your next chapter with IndianRenters.",
+  "primaryLabel": "Explore opportunities",
+  "secondaryLabel": "Get to know us",
+  "heroImage": "/images/rental-process/receive-and-create-line-art.webp",
+  "heroImageAlt": "Illustration of a person receiving technology for their next project",
+  "heroCaption": "Behind every rental, there\u2019s a team making it happen.",
+  "cultureEyebrow": "THE WORK WE DO",
+  "cultureTitle": "Make access possible. Every day.",
+  "cultureIntro": "From helping someone choose a laptop to getting a team\u2019s equipment ready, every role is part of the customer experience.",
+  "benefits": [
+    {
+      "title": "Work with technology",
+      "description": "Bring curiosity to the devices and services that keep our customers moving."
+    },
+    {
+      "title": "Solve real problems",
+      "description": "Connect the dots between customers, equipment and everyday operations."
+    },
+    {
+      "title": "Build together",
+      "description": "Contribute your skills across a business where people and practical solutions matter."
+    }
+  ],
+  "jobsTitle": "Find your next role.",
+  "jobsIntro": "Explore opportunities by team or location. Open a role to learn more and apply.",
+  "emptyTitle": "Nothing that fits just yet?",
+  "emptyText": "You can introduce yourself through an open application.",
+  "processTitle": "A clear path to your next chapter.",
+  "steps": [
+    {
+      "title": "Introduce yourself",
+      "description": "Share your experience, interests and a link to your CV."
+    },
+    {
+      "title": "Start a conversation",
+      "description": "If there\u2019s a potential fit, our team will get in touch to learn more."
+    },
+    {
+      "title": "Explore the role",
+      "description": "Discuss the work, the team and what comes next."
+    }
+  ],
+  "generalEnabled": true,
+  "generalTitle": "Start with a hello.",
+  "generalText": "Don\u2019t see a role for you? Tell us what you do and where you\u2019d like to contribute.",
+  "generalButton": "Introduce yourself",
+  "defaultFormId": "standard",
+  "formTitle": "Tell us about yourself",
+  "formIntro": "Share a few details so our team can review your application.",
+  "submitLabel": "Send application",
+  "successTitle": "Application received.",
+  "successText": "Thank you for your interest in IndianRenters. Your application is saved for our team to review.",
+  "consentText": "I agree to IndianRenters using these details to review my application and contact me about career opportunities.",
+  "forms": [
+    {
+      "id": "standard",
+      "name": "Standard application",
+      "fields": [
+        {
+          "id": "phone",
+          "label": "Mobile number",
+          "type": "tel",
+          "required": false,
+          "options": []
+        },
+        {
+          "id": "resume",
+          "label": "CV / resume link",
+          "type": "url",
+          "required": true,
+          "options": []
+        },
+        {
+          "id": "portfolio",
+          "label": "LinkedIn or portfolio link",
+          "type": "url",
+          "required": false,
+          "options": []
+        },
+        {
+          "id": "note",
+          "label": "What would you like us to know?",
+          "type": "textarea",
+          "required": false,
+          "options": []
+        }
+      ]
+    }
+  ],
+  "jobs": []
+}

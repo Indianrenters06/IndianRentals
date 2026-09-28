@@ -1,0 +1,88 @@
+/* Figma 29088:23396: two equal panels; artwork placement scales with its panel. */
+.page {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 20px;
+    width: min(100%, 1440px);
+    margin-inline: auto;
+    padding: 20px;
+    background: var(--color-white);
+}
+.message {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    min-width: 0;
+    min-height: 645px;
+    padding: 50px clamp(32px, 6vw, 77.04px);
+    border-radius: 24px;
+    background: var(--color-grey-900);
+    color: var(--color-white);
+}
+.eyebrow {
+    margin: 0 0 18px;
+    font-size: 12px;
+    font-weight: 700;
+    line-height: 18px;
+    letter-spacing: 1.44px;
+    text-transform: uppercase;
+}
+.message h1 {
+    margin: 0 0 25px;
+    font-size: clamp(44px, 5.5vw, 70.62px);
+    font-weight: 500;
+    line-height: 1.02;
+    letter-spacing: -.055em;
+}
+.description {
+    max-width: 440px;
+    margin: 0 0 29px;
+    color: var(--color-grey-300);
+    font-size: 17px;
+    line-height: 1.5;
+}
+.actions { display: flex; flex-wrap: wrap; gap: 12px; padding-bottom: 44px; }
+.actions .action {
+    width: auto;
+    min-width: 0;
+    height: auto;
+    min-height: 49px;
+    padding: 13px 19px;
+    border-radius: 9999px;
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 21px;
+    gap: 6px;
+    box-shadow: none;
+    transform: none;
+    transition: background-color 180ms ease, border-color 180ms ease;
+}
+.actions .primary { background: var(--color-orange-300); color: var(--color-grey-900); border-color: var(--color-orange-300); }
+.actions .primary:hover { background: var(--color-orange-400); border-color: var(--color-orange-400); }
+.actions .secondary { background: transparent; color: var(--color-white); border-color: #777; }
+.actions .secondary:hover { background: var(--color-grey-700); border-color: var(--color-grey-300); }
+.arrow { display: flex; align-items: center; justify-content: center; width: 21.204px; height: 21.204px; flex-shrink: 0; }
+.arrow img { transform: rotate(-45deg); }
+.shortcuts { border-top: 1px solid #444; padding-top: 25px; }
+.shortcuts p { margin-bottom: 15px; color: #aaa; font-size: 12px; line-height: 18px; letter-spacing: 1.2px; text-transform: uppercase; }
+.shortcuts > div { display: flex; flex-wrap: wrap; gap: 8px; }
+.shortcuts a { display: inline-flex; align-items: center; min-height: 40px; padding: 8px 14px; border: 1px solid #555; border-radius: 30px; color: var(--color-white); font-size: 13px; line-height: 19.5px; transition: background-color 180ms ease, border-color 180ms ease; }
+.shortcuts a:hover { background: var(--color-grey-700); border-color: var(--color-grey-300); }
+.page a:focus-visible { outline: 2px solid var(--color-white); outline-offset: 4px; box-shadow: none; }
+.art { position: relative; container-type: inline-size; min-width: 0; min-height: 530px; overflow: hidden; border-radius: 24px; background: var(--color-grey-50); }
+.illustration { position: absolute; left: -6.046%; top: 34.884%; width: 108.824%; aspect-ratio: 666 / 555; transform: scaleX(-1); }
+.illustration img { object-fit: contain; }
+.number { position: absolute; top: 2px; left: 1.797%; color: #e5e5e5; font-size: 52.451cqw; font-weight: 700; line-height: 1; letter-spacing: -.05081em; pointer-events: none; }
+@media (min-width: 768px) and (max-width: 1100px) {
+    .message { padding-inline: 32px; }
+}
+@media (max-width: 767px) {
+    .page { grid-template-columns: minmax(0, 1fr); padding: 16px; gap: 16px; }
+    .message { min-height: 0; padding: 44px 28px 36px; }
+    .message h1 { font-size: clamp(42px, 9vw, 64px); }
+    .description { font-size: 16px; }
+    .actions { padding-bottom: 32px; }
+    .shortcuts a { min-height: 44px; }
+    .art { min-height: 0; aspect-ratio: 612 / 645; }
+}
+@media (prefers-reduced-motion: reduce) { .actions .action, .shortcuts a { transition: none; } }

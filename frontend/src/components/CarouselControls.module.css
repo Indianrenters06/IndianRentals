@@ -1,0 +1,55 @@
+.controls { container-type: inline-size; display: flex; align-items: center; gap: 20px; width: 100%; min-width: 0; padding: 16px 0 4px; color: var(--color-grey-900); }
+.progress { display: flex; flex: 1; align-items: center; justify-content: center; min-width: 0; gap: 4px; }
+.segment { display: grid; place-items: center; flex: 1; min-width: 0; max-width: 52px; height: 44px; border-radius: 6px; cursor: pointer; }
+.segment span { width: 100%; height: 4px; border-radius: 4px; background: var(--color-grey-300); transition: background-color 160ms ease; }
+.segment[aria-current] span { background: var(--color-grey-900); height: 6px; }
+.segment:hover span { background: var(--color-grey-600); }
+.track { width: 100%; height: 3px; background: var(--color-grey-200); border-radius: 4px; overflow: hidden; }
+.track > span { display: block; height: 100%; background: var(--color-grey-900); transition: width 180ms ease; }
+.actions { display: flex; gap: 8px; flex-shrink: 0; }
+.button { display: grid; place-items: center; width: 44px; height: 44px; flex-shrink: 0; border-radius: 50%; background: var(--color-grey-100); color: var(--color-grey-900); cursor: pointer; transition: background-color 160ms ease, color 160ms ease; }
+.next { background: var(--color-grey-100); color: var(--color-grey-900); }
+.button:hover:not(:disabled) { background: var(--color-orange-300); color: var(--color-grey-900); }
+.button:disabled { background: var(--color-grey-100); color: var(--color-grey-400); cursor: not-allowed; }
+.button:focus-visible, .segment:focus-visible { outline: 2px solid var(--color-grey-900); outline-offset: 3px; }
+@media (prefers-reduced-motion: reduce) { .button, .segment span, .track > span { transition: none; } }
+
+/* Keep the Figma hero arrows beside the image, with a compact in-image indicator. */
+.hero { position: absolute; inset: 0; z-index: 20; padding: 0; pointer-events: none; }
+.hero .progress { position: absolute; bottom: 17px; left: 50%; transform: translateX(-50%); display: flex; flex: none; width: auto; gap: 7px; padding: 4px 10px; border-radius: 999px; background: #141414a8; backdrop-filter: blur(8px); }
+.hero .segment { flex: none; width: 36px; height: 28px; pointer-events: auto; }
+.hero .segment span { height: 5px; background: #ffffff80; box-shadow: 0 1px 3px #0005; }
+.hero .segment[aria-current] span { height: 5px; background: white; }
+.hero .segment:hover span { background: white; }
+.hero .actions { display: contents; }
+.hero .button { position: absolute; top: 50%; transform: translateY(-50%); width: 26px; height: 40px; border-radius: 9px; background: var(--color-grey-100); color: var(--color-grey-700); pointer-events: auto; }
+.hero .button::before { content: ''; position: absolute; inset: -2px -9px; }
+.hero .previous { left: -13px; }
+.hero .next { right: -13px; }
+.hero .playback { top: auto; bottom: 12px; right: 16px; transform: none; width: 32px; height: 32px; background: #14141480; color: white; border-radius: 50%; }
+.hero .button:focus-visible, .hero .segment:focus-visible { outline-color: var(--color-orange-300); }
+@media(min-width:1024px) {
+    .hero .previous { left: -36px; }
+    .hero .next { right: -36px; }
+}
+@media(max-width:767px) {
+    .hero { position: relative; height: 44px; margin-top: 8px; }
+    .hero .progress { position: static; transform: none; margin: 0 auto; }
+    .hero .previous { left: 0; }
+    .hero .next { right: 0; }
+    .hero .playback { right: 36px; bottom: 6px; background: var(--color-grey-100); color: var(--color-grey-700); }
+}
+
+/* Offers and product images retain their own dot indicators and side arrows. */
+.offers, .gallery { position: absolute; inset: 0; z-index: 15; padding: 0; pointer-events: none; }
+.offers .progress, .gallery .progress { position: absolute; inset-inline: 44px; bottom: 0; gap: 0; }
+.offers .segment, .gallery .segment { flex: none; width: 24px; height: 32px; pointer-events: auto; }
+.offers .segment span, .gallery .segment span { width: 4px; height: 4px; background: var(--color-grey-700); }
+.offers .segment[aria-current] span, .gallery .segment[aria-current] span { width: 6px; height: 6px; border: 1px solid var(--color-grey-700); background: transparent; }
+.offers .actions, .gallery .actions { display: contents; }
+.offers .button, .gallery .button { position: absolute; top: 50%; transform: translateY(-50%); pointer-events: auto; width: 34px; height: 40px; }
+.offers .previous, .gallery .previous { left: 8px; }
+.offers .next, .gallery .next { right: 8px; }
+.offers .button { top: calc((100% - 40px) / 2); border-radius: 9px; }
+.offers .playback { top: auto; right: 0; bottom: 0; transform: none; width: 32px; height: 32px; }
+@media(min-width:1280px) { .offers .previous { left: -36px; } .offers .next { right: -36px; } }

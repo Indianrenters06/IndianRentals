@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
-import { PiGauge, PiSmiley } from 'react-icons/pi';
+import PageBanner from '@/components/PageBanner';
 import BestRentedProducts from '../../components/BestRentedProducts';
 import FaqSection from '../../components/FaqSection';
 import WhyChooseUs from '../../components/WhyChooseUs';
@@ -12,12 +12,14 @@ import { API } from '@/services/apiConfig';
 const D = {
     bannerImage: 'https://res.cloudinary.com/dgkckcdk8/image/upload/v1776716131/e92cf0b55a28cc573a6ad7b73d746dd47431bb2e_1_jlph2i.png',
     bannerTitle: 'About Us',
+    bannerShowText: true,
+    bannerBackground: '',
     aboutStoryTitle: 'Our Story',
     aboutStoryPara1: "From a small computer training room in 1992 to India's go-to rental partner, this journey has been about making access smarter than ownership. The promise stays simple: rent anything needed, when it's needed, anywhere it's needed—without friction.",
-    aboutStoryPara2: "Today, a 100+ product catalog powers startups, enterprises, and events across major cities, backed by fast delivery, clean gear, and dependable support. The focus is outcomes — setups that just work, terms that fit, and service that shows up.",
-    aboutStoryImage: 'https://res.cloudinary.com/dgkckcdk8/image/upload/v1769946716/indian-rentals/fj8ptqbhppbstdd0hs4i.png',
-    aboutStat1Value: '4.8/5.0', aboutStat1Label: 'Customer Satisfaction',
-    aboutStat2Value: '10,000+', aboutStat2Label: 'Happy Clients',
+    aboutStoryPara2: "Today, a 401+ product catalog powers startups, enterprises, and events across major cities, backed by fast delivery, clean gear, and dependable support. The focus is outcomes — setups that just work, terms that fit, and service that shows up.",
+    aboutStoryImage: '/images/about-story-editorial.png',
+    aboutStat1Value: '4.9/5', aboutStat1Label: '1,050+ Google reviews',
+    aboutStat2Value: '30,000+', aboutStat2Label: 'Happy Customers',
     aboutVisionTabLabel: 'Our Vision',
     aboutVision1Title: 'Rent Anything', aboutVision1Text: "Laptops, Macs, mobiles, AV, cameras, medical and more—if it's not listed, it's sourced on request.",
     aboutVision2Title: 'Rent Anytime',  aboutVision2Text: 'Tenures that fit the job: 1, 3, 6, or 12 months, with easy extensions and mid-term upgrades.',
@@ -29,9 +31,9 @@ const D = {
     aboutWhyTitle: 'Why Choose Us?',
     aboutWhyText: "Join thousands who've switched to the flexible, affordable way to access high-end tech. IndianRenters delivers AI-ready workstations, laptops, and IT gear with zero ownership hassle and instant support.",
     aboutWhyImage: 'https://res.cloudinary.com/dgkckcdk8/image/upload/v1769961565/indian-rentals/anmpufdlxxxblkxqxpds.jpg',
-    aboutWhyStat1Value: '90k+', aboutWhyStat1Label: 'Devices in Stock',
+    aboutWhyStat1Value: '90k+', aboutWhyStat1Label: 'Orders Served',
     aboutWhyStat2Value: '30k+', aboutWhyStat2Label: 'Happy Customers',
-    aboutWhyStat3Value: '401+', aboutWhyStat3Label: 'Cities Covered',
+    aboutWhyStat3Value: '401+', aboutWhyStat3Label: 'Products Available',
 };
 
 // Merge CMS data with defaults — CMS values win if non-empty
@@ -41,6 +43,13 @@ const merge = (cms) => {
     Object.keys(D).forEach(k => {
         out[k] = (cms[k] !== undefined && cms[k] !== '') ? cms[k] : D[k];
     });
+    // Migrate the two previous story placeholders; future CMS image choices still win.
+    if ([
+        'https://res.cloudinary.com/dgkckcdk8/image/upload/v1769946716/indian-rentals/fj8ptqbhppbstdd0hs4i.png',
+        'https://res.cloudinary.com/dgkckcdk8/image/upload/v1776942887/indian-rentals/ae8su8jftdatjbuww6fu.jpg',
+    ].includes(out.aboutStoryImage)) {
+        out.aboutStoryImage = D.aboutStoryImage;
+    }
     return out;
 };
 
@@ -72,29 +81,17 @@ export default function AboutPage() {
 
             {/* On mobile, the banner + story + vision/mission sit on a continuous
                 grey surface (#f6f6f6), matching the Figma mobile design. */}
-            <div className="bg-[#f6f6f6] md:bg-transparent lg:bg-white pt-5 md:pt-0 lg:py-[84px]">
+            <div className="bg-[#f6f6f6] md:bg-transparent lg:bg-white">
 
                 {/* ── 1. Banner ─────────────────────────────────────────────────── */}
-                <section className="w-full max-w-[1440px] mx-auto mb-6 md:mt-8 md:mb-16 lg:mt-0 lg:mb-24">
-                    <div className="max-w-[1200px] mx-auto px-5 md:px-8 xl:px-0">
-                        <div className="w-full h-[197px] md:h-[500px] relative bg-gray-200 overflow-hidden rounded-2xl md:rounded-3xl lg:rounded-[32px]">
-                            <Image src={c.bannerImage} alt={c.bannerTitle} fill className="object-cover object-center" />
-                            <div className="absolute inset-0 bg-black/25 md:bg-transparent lg:bg-black/25" />
-                            <div className="absolute inset-0 flex items-center justify-center">
-                                <h1 className="text-white text-base md:text-6xl lg:text-[62px] lg:leading-[60px] lg:tracking-[-2px] font-semibold drop-shadow-lg lg:drop-shadow-none font-sans">
-                                    {c.bannerTitle}
-                                </h1>
-                            </div>
-                        </div>
-                    </div>
-                </section>
+                <PageBanner image={c.bannerImage} title={c.bannerTitle} showText={c?.bannerShowText !== false} background={c?.bannerBackground} className="mb-6 md:mb-16" />
 
                 {/* ── 2. Our Story ──────────────────────────────────────────────── */}
                 <section className="w-full max-w-[1440px] mx-auto mb-6 md:mb-24">
-                    <div className="max-w-[1200px] mx-auto px-5 md:px-8 xl:px-0 grid grid-cols-1 lg:grid-cols-[1fr_581px] gap-6 lg:gap-[57px] items-center">
-                        <div className="flex flex-col gap-3 md:gap-[27px]">
+                    <div className="max-w-[1200px] mx-auto px-5 md:px-8 xl:px-0 grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.08fr)] gap-7 lg:gap-14 items-center">
+                        <div className="flex flex-col gap-4 md:gap-6">
                             <h2
-                                className="text-[25px] md:text-[36px] font-semibold leading-[31px] md:leading-[45px] font-sans tracking-[-0.8px] w-full md:w-[492px] max-w-full"
+                                className="text-[32px] md:text-[40px] font-semibold leading-tight font-sans tracking-[-.04em] w-full max-w-full"
                                 style={{
                                     color: 'var(--color-grey-grey-700, #333)',
                                     fontFamily: 'var(--font-family-Mona-Sans, "Mona Sans")',
@@ -103,38 +100,30 @@ export default function AboutPage() {
                             >
                                 {c.aboutStoryTitle}
                             </h2>
-                            {/* Figma: 16/23 medium, -0.4px, #757575, 17px apart */}
-                            <div className="text-gray-600 md:text-gray-900 lg:text-[#757575] font-sans font-normal lg:font-medium flex flex-col gap-4 md:gap-6 lg:gap-[17px]">
-                                <p className="leading-relaxed lg:leading-[23px] lg:tracking-[-0.4px] text-xs md:text-[16px]">{c.aboutStoryPara1}</p>
-                                <p className="leading-relaxed lg:leading-[23px] lg:tracking-[-0.4px] text-xs md:text-[16px]">{c.aboutStoryPara2}</p>
+                            <div className="flex max-w-[540px] flex-col gap-4 text-[15px] leading-relaxed text-[#555] md:text-[16px]">
+                                <p>{c.aboutStoryPara1}</p>
+                                <p>{c.aboutStoryPara2}</p>
                             </div>
-                            {/* Stats */}
-                            <div className="flex flex-wrap gap-12 lg:gap-[110px] mt-2 md:mt-4 lg:mt-0">
+                            <div className="mt-3 grid grid-cols-2 gap-4 border-t border-[#d8d8d8] pt-5 md:mt-5 md:gap-8 md:pt-7">
                                 {[
-                                    { value: c.aboutStat1Value, label: c.aboutStat1Label, Icon: PiGauge },
-                                    { value: c.aboutStat2Value, label: c.aboutStat2Label, Icon: PiSmiley },
-                                ].map(({ value, label, Icon }) => (
-                                    // Figma: 76px #FF920A tile (radius 10), then value 27/35 medium black and
-                                    // label 12/16 medium #545454 in a 146px column, 6px apart
-                                    <div key={label} className="flex flex-col lg:gap-[6px] lg:w-[146px]">
-                                        <div className="w-[76px] h-[76px] bg-[#FF8A00] lg:bg-[#FF920A] rounded-[10px] md:rounded-xl lg:rounded-[10px] flex items-center justify-center text-white mb-2 md:mb-3 lg:mb-0 shadow-sm lg:shadow-none">
-                                            <Icon size={50} />
-                                        </div>
-                                        <h3 className="text-xl md:text-3xl lg:text-[27px] lg:leading-[35px] lg:tracking-[-0.8px] font-bold lg:font-medium font-sans text-gray-900 lg:text-black">{value}</h3>
-                                        <p className="text-[10px] md:text-sm lg:text-[12px] lg:leading-[16px] lg:tracking-[-0.4px] font-medium text-gray-500 lg:text-[#545454] font-sans mt-1 lg:mt-0">{label}</p>
+                                    { value: c.aboutStat1Value, label: c.aboutStat1Label },
+                                    { value: c.aboutStat2Value, label: c.aboutStat2Label },
+                                ].map(({ value, label }) => (
+                                    <div key={label} className="flex min-w-0 flex-col gap-1 border-l-[3px] border-[#ffcf46] pl-3 md:pl-4">
+                                        <strong className="text-[28px] font-semibold leading-none tracking-[-.04em] text-[#141414] md:text-[34px]">{value}</strong>
+                                        <span className="text-xs leading-snug text-[#555] md:text-sm">{label}</span>
                                     </div>
                                 ))}
                             </div>
                         </div>
-                        {/* Right Image */}
-                        <div className="relative w-full aspect-[581/625] lg:aspect-[581/431] max-h-[625px] lg:max-h-[431px] rounded-2xl md:rounded-3xl lg:rounded-[24px] overflow-hidden bg-gray-100 shadow-sm lg:shadow-none">
-                            <Image src={c.aboutStoryImage} alt={c.aboutStoryTitle} fill className="object-cover object-center" />
+                        <div className="relative aspect-[4/3] w-full overflow-hidden rounded-[20px] bg-[#141414] md:rounded-[24px]">
+                            <Image src={c.aboutStoryImage} alt="Rental laptops being prepared in a workshop" fill sizes="(max-width: 1023px) 100vw, 580px" className="object-cover object-center" />
                         </div>
                     </div>
                 </section>
 
                 {/* ── 3. Vision / Mission Tabs ──────────────────────────────────── */}
-                <section className="w-full max-w-[1440px] mx-auto mb-10 md:mb-24 lg:mb-0">
+                <section className="w-full max-w-[1440px] mx-auto pb-10 md:pb-24">
                     <div className="max-w-[1200px] mx-auto px-5 md:px-8 xl:px-0">
                         <div className="w-full bg-[#FFE485] md:bg-[#FDE68A] lg:bg-[#FFE485] rounded-2xl md:rounded-3xl lg:rounded-[28px] pt-5 md:pt-10 lg:pt-9 pb-6 md:pb-14 lg:pb-9 px-5 md:px-10 lg:px-7 flex flex-col lg:flex-row gap-7 md:gap-12 lg:gap-24 items-start">
                             {/* Tab Buttons */}

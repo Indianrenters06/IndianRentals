@@ -14,6 +14,7 @@ import {
 } from '@phosphor-icons/react';
 import Toggle from '@/components/Toggle';
 import ImageUploader from '@/components/ImageUploader';
+import BannerAppearanceControls from '@/components/BannerAppearanceControls';
 
 const API = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
 const getToken = () => typeof window !== 'undefined' ? localStorage.getItem('adminToken') : null;
@@ -28,6 +29,7 @@ const PAGES = [
     { key: 'refund', label: 'Return & Refund Policy', slug: '/refund-policy' },
     { key: 'faq', label: 'FAQ / Help Center', slug: '/faq', specialized: true },
     { key: 'contact', label: 'Contact Us', slug: '/contact', specialized: true },
+    { key: 'rules', label: 'Rules & Charges', slug: '/rules' },
     { key: 'delivery-charges', label: 'Delivery Charges', slug: '/delivery-charges' },
     { key: 'late-fee-rules', label: 'Late Fee Rules', slug: '/late-fee-rules' },
     { key: 'cancellation-rules', label: 'Cancellation Rules', slug: '/cancellation-rules' },
@@ -126,20 +128,19 @@ function HtmlEditor({ value, onChange }) {
     };
 
     const TOOLBAR = [
-        { icon: <span className="font-black text-xs">H2</span>, title: 'Heading 2', fn: () => wrapBlock('h2') },
-        { icon: <span className="font-black text-xs">H3</span>, title: 'Heading 3', fn: () => wrapBlock('h3') },
-        { icon: <span className="font-black text-xs">H4</span>, title: 'Heading 4', fn: () => wrapBlock('h4') },
-        { icon: <span className="font-bold text-xs">¶</span>, title: 'Paragraph', fn: () => wrapBlock('p') },
+        { icon: <span className="font-black text-xs">H2</span>, title: 'Heading 2', action: 'wrapBlock', tag: 'h2' },
+        { icon: <span className="font-black text-xs">H3</span>, title: 'Heading 3', action: 'wrapBlock', tag: 'h3' },
+        { icon: <span className="font-black text-xs">H4</span>, title: 'Heading 4', action: 'wrapBlock', tag: 'h4' },
+        { icon: <span className="font-bold text-xs">¶</span>, title: 'Paragraph', action: 'wrapBlock', tag: 'p' },
         { divider: true },
-        { icon: <TextB size={14} weight="bold" />, title: 'Bold', fn: () => formatInsert('strong') },
-        { icon: <TextItalic size={14} />, title: 'Italic', fn: () => formatInsert('em') },
-        { icon: <TextUnderline size={14} />, title: 'Underline', fn: () => formatInsert('u') },
+        { icon: <TextB size={14} weight="bold" />, title: 'Bold', action: 'formatInsert', tag: 'strong' },
+        { icon: <TextItalic size={14} />, title: 'Italic', action: 'formatInsert', tag: 'em' },
+        { icon: <TextUnderline size={14} />, title: 'Underline', action: 'formatInsert', tag: 'u' },
         { divider: true },
-        { icon: <ListBullets size={14} />, title: 'Bullet List', fn: () => insertList('ul') },
-        { icon: <ListNumbers size={14} />, title: 'Numbered List', fn: () => insertList('ol') },
+        { icon: <ListBullets size={14} />, title: 'Bullet List', action: 'insertList', tag: 'ul' },
+        { icon: <ListNumbers size={14} />, title: 'Numbered List', action: 'insertList', tag: 'ol' },
         { divider: true },
-        { icon: <Quotes size={14} />, title: 'Blockquote', fn: () => wrapBlock('blockquote') },
-        { icon: <span className="text-xs font-mono">—</span>, title: 'Divider', fn: () => { const ta = taRef.current; if (!ta) return; const pos = ta.selectionStart; const newVal = value.substring(0, pos) + '\n<hr />\n' + value.substring(pos); onChange(newVal); } },
+        { icon: <Quotes size={14} />, title: 'Blockquote', action: 'wrapBlock', tag: 'blockquote' },
     ];
 
     return (
@@ -160,8 +161,9 @@ function HtmlEditor({ value, onChange }) {
                         {TOOLBAR.map((btn, i) =>
                             btn.divider
                                 ? <div key={i} className="w-px h-5 bg-slate-200 dark:bg-slate-700 mx-1" />
-                                : <ToolBtn key={i} icon={btn.icon} title={btn.title} onClick={btn.fn} />
+                                : <ToolBtn key={i} icon={btn.icon} title={btn.title} onClick={() => { if (btn.action === 'wrapBlock') wrapBlock(btn.tag); else if (btn.action === 'formatInsert') formatInsert(btn.tag); else if (btn.action === 'insertList') insertList(btn.tag); }} />
                         )}
+                        <ToolBtn icon={<span className="text-xs font-mono">—</span>} title="Divider" onClick={() => { const ta = taRef.current; if (!ta) return; const pos = ta.selectionStart; const newVal = value.substring(0, pos) + '\n<hr />\n' + value.substring(pos); onChange(newVal); }} />
                         <div className="flex-1" />
                         <span className="text-[10px] text-slate-400">{value.length.toLocaleString()} chars</span>
                     </div>
@@ -273,6 +275,7 @@ function PageEditor({ page, onBack }) {
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                         <div className="space-y-4">
                             <Field label="Banner Title" value={data.bannerTitle} onChange={v => set('bannerTitle', v)} placeholder={page.label} />
+                    <BannerAppearanceControls data={data} set={set} />
                             <ImageUploader label="Banner Image" existingUrl={data.bannerImage} onUpload={url => set('bannerImage', url)} />
                             {!data.bannerImage && (
                                 <div>
@@ -291,7 +294,7 @@ function PageEditor({ page, onBack }) {
                             style={data.bannerImage ? { backgroundImage: `url(${data.bannerImage})`, backgroundSize: 'cover', backgroundPosition: 'center' } : {}}>
                             {data.bannerImage ? (
                                 <div className="absolute inset-0 flex items-center justify-center bg-black/50">
-                                    <p className="text-white font-bold text-lg text-center px-4">{data.bannerTitle || page.label}</p>
+                                    <p className="text-white font-bold text-lg text-center px-4">{data.bannerShowText !== false && (data.bannerTitle || page.label)}</p>
                                 </div>
                             ) : (
                                 <span className="text-xs text-slate-400">Banner preview</span>

@@ -1,0 +1,11 @@
+.section { width: 100%; padding-top: 32px; }
+.container { width: min(100% - 60px, 1200px); margin-inline: auto; }
+.frame { position: relative; aspect-ratio: 12 / 5; overflow: hidden; border-radius: 32px; background: var(--color-grey-900); isolation: isolate; }
+.frame img { object-fit: cover; }
+.title { position: absolute; inset: 0; margin: 0; padding: 24px; display: flex; align-items: center; justify-content: center; color: var(--color-white); font-size: clamp(32px, 5vw, 64px); font-weight: 600; letter-spacing: -.03em; line-height: 1.1; text-align: center; overflow-wrap: anywhere; }
+@media (max-width: 599px) {
+    .section { padding-top: 20px; }
+    .container { width: calc(100% - 40px); }
+    .frame { aspect-ratio: 4 / 3; border-radius: 20px; }
+    .title { align-items: flex-end; justify-content: flex-start; text-align: left; background: linear-gradient(transparent 55%, rgb(0 0 0 / .55)); }
+}

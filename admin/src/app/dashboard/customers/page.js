@@ -46,6 +46,11 @@ const STATUS_COLORS = {
     Delivered: 'success', Active: 'success', Returned: 'default', Cancelled: 'danger',
 };
 
+function customerLocation(user) {
+    const address = user.addresses?.find(item => item.isDefault) || user.addresses?.[0];
+    return [user.city || address?.city, user.state || address?.state].filter(Boolean).join(', ') || 'Not provided';
+}
+
 function CustomerOrdersList({ userId }) {
     const [orders, setOrders] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -74,7 +79,7 @@ function CustomerOrdersList({ userId }) {
         <div className="flex flex-col items-center justify-center py-16 text-center">
             <div className="w-16 h-16 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center mb-4 text-slate-400"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 256 256" fill="currentColor"><path d="M223.15,68.72l-88-48.18a14,14,0,0,0-14.3,0l-88,48.17a14,14,0,0,0-7.09,12.29V175a14,14,0,0,0,7.09,12.28l88,48.18a14,14,0,0,0,14.3,0l88-48.18A14,14,0,0,0,230.24,175V81A14,14,0,0,0,223.15,68.72ZM128,34l83.23,45.57L128,125.14,44.77,79.57ZM38,96.28l82,44.89V219.5L38,174.61Zm96,123.22V141.17l82-44.89V174.61Z"/></svg></div>
             <p className="text-slate-700 dark:text-slate-300 font-semibold">No orders found</p>
-            <p className="text-slate-400 text-sm mt-1">This customer hasn't placed any orders yet.</p>
+            <p className="text-slate-500 text-sm mt-1">This customer hasn’t placed any orders yet.</p>
         </div>
     );
 
@@ -359,7 +364,7 @@ export default function CustomersManagement() {
                 return (
                     <div className="flex justify-end items-center gap-2 pr-4">
                         <button type="button" title="Download Report" onClick={() => downloadUser(user)}
-                            className="inline-flex items-center justify-center w-8 h-8 rounded-lg text-slate-400 hover:text-indigo-500 hover:bg-indigo-50 dark:hover:bg-indigo-500/10 transition-colors">
+                            className="inline-flex items-center justify-center w-8 h-8 rounded-lg text-indigo-700 hover:bg-indigo-50 dark:hover:bg-indigo-500/10 transition-colors">
                             <DownloadSimple size={15} />
                         </button>
                         <Dropdown classNames={{ content: "bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 z-50 shadow-xl" }}>
@@ -520,7 +525,7 @@ export default function CustomersManagement() {
                                         <MagnifyingGlass className="w-6 h-6" />
                                     </div>
                                     <h3 className="text-lg font-medium text-slate-900 dark:text-slate-200 mb-1">No customers found</h3>
-                                    <p className="text-slate-500 text-sm text-center">We couldn't find any customers matching your filters or failed to load them.</p>
+                                    <p className="text-slate-500 text-sm text-center">We couldn’t find any customers matching your filters or failed to load them.</p>
                                 </div>
                             }
                         >
@@ -579,7 +584,7 @@ export default function CustomersManagement() {
                                                 <div>
                                                     <span className="text-xs font-bold text-slate-400 tracking-wider mb-1.5 flex items-center gap-1.5"><MapPin size={14} /> Location</span>
                                                     <span className="text-slate-800 dark:text-slate-200 font-medium">
-                                                        {selectedUser.city ? `${selectedUser.city}, ${selectedUser.state}` : 'Not provided'}
+                                                        {customerLocation(selectedUser)}
                                                     </span>
                                                 </div>
                                                 <div>
@@ -597,6 +602,26 @@ export default function CustomersManagement() {
                                                     </span>
                                                 </div>
                                             </div>
+                                        </div>
+
+                                        <div>
+                                            <h4 className="mb-4 flex items-center gap-2 text-sm font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
+                                                <MapPin size={16} /> Saved delivery addresses
+                                            </h4>
+                                            {selectedUser.addresses?.length ? (
+                                                <div className="space-y-3">
+                                                    {selectedUser.addresses.map((address) => (
+                                                        <div key={address._id} className="rounded-xl border border-slate-200 p-4 text-sm dark:border-slate-700">
+                                                            <div className="flex flex-wrap items-center gap-2 font-semibold text-slate-900 dark:text-slate-100">
+                                                                <span>{address.name || selectedUser.name}</span>
+                                                                {address.isDefault && <Chip size="sm" color="primary" variant="flat">Default</Chip>}
+                                                            </div>
+                                                            <p className="mt-1 text-slate-600 dark:text-slate-300">{[address.addressLine, address.city, address.state, address.pincode, address.country].filter(Boolean).join(', ')}</p>
+                                                            {address.phone && <p className="mt-1 text-slate-500">{address.phone}</p>}
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            ) : <p className="text-sm text-slate-500">No saved addresses yet.</p>}
                                         </div>
                                     </div>
                                 )}
@@ -781,4 +806,3 @@ export default function CustomersManagement() {
         </div>
     );
 }
-

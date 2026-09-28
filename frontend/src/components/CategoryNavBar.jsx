@@ -3,6 +3,8 @@ import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { getCategories } from '../services/categoryService';
 import { categorySlug } from '../lib/categoryRoutes';
+import { ChevronRightIcon } from '@heroicons/react/24/outline';
+import styles from './CategoryLayout.module.css';
 
 // Shown before the API responds, and if it fails. Kept in the order the
 // business wants them; anything else from the DB is appended after these.
@@ -77,24 +79,32 @@ export default function CategoryNavBar({ parentSlug, parentLabel, currentLabel }
 
     return (
         <>
-            {/* ── Mobile: pills wrap into rows (hidden on lg+) ── */}
-            <div className="block lg:hidden" style={{ width: '100%', background: 'hsla(0, 0%, 96%, 1)', padding: '10px 14px', borderBottom: '1px solid hsla(0, 0%, 93%, 1)', boxSizing: 'border-box' }}>
-                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', justifyContent: 'center' }}>
-                    {pills.map((cat) => (
-                        <Link
-                            key={cat.slug}
-                            href={`/category/${cat.slug}`}
-                            style={{
-                                ...pillStyle(parentSlug === cat.slug, { height: '34px', padding: '0', radius: '68px' }),
-                                flex: '0 0 calc((100% - 16px) / 3)',
-                                overflow: 'hidden',
-                            }}
-                        >
-                            <span style={{ fontFamily: "'Mona Sans', sans-serif", fontWeight: 600, fontSize: '11px', lineHeight: '16px', letterSpacing: '-0.01em', color: 'hsla(0, 0%, 0%, 1)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', padding: '0 6px' }}>
+            <div className={styles.compactNav}>
+                <div className={styles.compactNavInner}>
+                    <nav className={styles.breadcrumbs} aria-label="Breadcrumb">
+                        <Link href="/">Homepage</Link>
+                        <ChevronRightIcon aria-hidden="true" />
+                        <Link href="/categories">All Categories</Link>
+                        {parentSlug && <>
+                            <ChevronRightIcon aria-hidden="true" />
+                            {currentLabel
+                                ? <Link href={`/category/${parentSlug}`}>{parentName}</Link>
+                                : <span aria-current="page">{parentName}</span>}
+                        </>}
+                        {currentLabel && <>
+                            <ChevronRightIcon aria-hidden="true" />
+                            <span aria-current="page">{currentLabel}</span>
+                        </>}
+                    </nav>
+                    <nav className={styles.pills} aria-label="Product categories">
+                        {pills.map((cat) => (
+                            <Link key={cat.slug} href={`/category/${cat.slug}`}
+                                aria-current={parentSlug === cat.slug ? 'page' : undefined}
+                                className={styles.pill}>
                                 {cat.label}
-                            </span>
-                        </Link>
-                    ))}
+                            </Link>
+                        ))}
+                    </nav>
                 </div>
             </div>
 
