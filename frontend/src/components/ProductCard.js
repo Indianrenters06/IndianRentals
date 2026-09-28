@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useDispatch, useSelector } from 'react-redux';
 import { addToCart } from '../redux/features/cartSlice';
 import { toggleWishlist, selectIsWishlisted } from '../redux/features/wishlistSlice';
-import { Star, Truck } from '@phosphor-icons/react';
+import { Star, Truck, Info } from '@phosphor-icons/react';
 import { HeartIcon } from '@heroicons/react/24/outline';
 import { HeartIcon as HeartIconSolid } from '@heroicons/react/24/solid';
 import Image from 'next/image';

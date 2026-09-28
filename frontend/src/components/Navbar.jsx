@@ -272,8 +272,8 @@ const Navbar = ({ showCategories: propShowCategories } = {}) => {
     return (
         <header className="relative z-50 w-full" style={{ backgroundColor: "hsla(0, 0%, 100%, 1)", borderBottom: "1px solid hsla(0, 0%, 93%, 1)" }}>
             <div
-                className="bg-orange-300 text-black flex items-center justify-center w-full overflow-hidden relative"
-                style={{ height: "24px", paddingTop: "4px", paddingBottom: "4px" }}
+                className="bg-orange-300 text-[#333333] lg:text-black flex items-center justify-center w-full overflow-hidden relative h-[22px] lg:h-[24px] px-[30px] lg:px-0"
+                style={{ paddingTop: "4px", paddingBottom: "4px" }}
             >
                 <AnimatePresence mode="wait">
                     <motion.span
@@ -282,12 +282,10 @@ const Navbar = ({ showCategories: propShowCategories } = {}) => {
                         animate={{ y: 0, opacity: 1 }}
                         exit={{ y: -20, opacity: 0 }}
                         transition={{ duration: 0.5, ease: "easeInOut" }}
-                        className="absolute w-full text-center"
+                        // Mobile (Figma nav-bar 390): 8px / 800 / 14px; desktop keeps 12px / 700 / 16px
+                        className="absolute w-full text-center text-[8px] font-extrabold leading-[14px] lg:text-[12px] lg:font-bold lg:leading-[16px]"
                         style={{
                             fontFamily: "'Mona Sans', sans-serif",
-                            fontWeight: 700,
-                            fontSize: "12px",
-                            lineHeight: "16px",
                             letterSpacing: "-0.4px",
                             whiteSpace: "nowrap",
                         }}
@@ -299,7 +297,7 @@ const Navbar = ({ showCategories: propShowCategories } = {}) => {
 
             <div className="w-full bg-white">
                 <div
-                    className="max-w-[1200px] mx-auto flex items-center justify-between px-4 md:px-8"
+                    className="max-w-[1200px] mx-auto flex items-center justify-between px-5 md:px-8"
                     style={{
                         height: "64px",
                         gap: "10px",
@@ -309,23 +307,24 @@ const Navbar = ({ showCategories: propShowCategories } = {}) => {
                 >
                     <div className="flex items-center gap-8">
                         {/* Left Section: Mobile/Tablet Menu + Logo */}
-                        <div className="flex items-center gap-[6px] md:gap-4">
-                            {/* Mobile/Tablet Menu Toggle */}
+                        <div className="flex items-center gap-2 md:gap-4">
+                            {/* Mobile/Tablet Menu Toggle — Figma: 20px icon, 8px gap to logo */}
                             <button
                                 onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                                className="lg:hidden text-gray-800 focus:outline-none p-1"
+                                className="lg:hidden focus:outline-none flex items-center justify-center w-5 h-5"
+                                aria-label="Open menu"
                             >
-                                {isMobileMenuOpen ? <X size={20} color="hsla(0, 0%, 16%, 1)" /> : <List size={20} color="hsla(0, 0%, 16%, 1)" />}
+                                {isMobileMenuOpen ? <X size={20} color="#292929" /> : <List size={20} color="#292929" />}
                             </button>
 
-                            {/* Logo */}
+                            {/* Logo — Figma: 150x40 */}
                             <Link href="/" className="shrink-0">
                                 <Image
                                     src={siteLogo}
                                     alt={`${siteName} - You Name it We Rent it`}
-                                    width={135}
-                                    height={36}
-                                    className="h-9 md:h-10 w-auto object-contain"
+                                    width={150}
+                                    height={40}
+                                    className="h-10 w-auto max-w-[150px] lg:max-w-none object-contain"
                                     priority
                                 />
                             </Link>
@@ -754,23 +753,36 @@ const Navbar = ({ showCategories: propShowCategories } = {}) => {
                                 if (typeof window !== 'undefined') setIsMobileScreen(window.innerWidth < 1024);
                                 setIsCityDropdownOpen(!isCityDropdownOpen);
                             }}
-                            className="flex items-center gap-1.5 focus:outline-none"
+                            // Figma Frame 137: 28px tall, 1px #CBCBCB, radius 20, padding 4/12/4/8, gap 2
+                            className="flex items-center focus:outline-none shrink-0"
                             style={{
-                                height: "35px",
-                                border: "1px solid #D1D1D1",
-                                borderRadius: "9999px",
-                                paddingLeft: "10px",
-                                paddingRight: "10px",
+                                height: "28px",
+                                border: "1px solid #CBCBCB",
+                                borderRadius: "20px",
+                                padding: "4px 12px 4px 8px",
+                                gap: "2px",
                                 backgroundColor: "#FFFFFF"
                             }}
                         >
-                            <MapPin size={18} weight="fill" color="#667085" className="shrink-0" />
-                            <span className="text-[13px] font-medium truncate max-w-[70px]" style={{ color: "#174378" }}>{selectedCity || "Bangalore"}</span>
+                            <MapPin size={18} weight="regular" color="#292929" className="shrink-0" />
+                            <span
+                                className="truncate max-w-[90px]"
+                                style={{
+                                    fontFamily: "'Mona Sans', sans-serif",
+                                    fontWeight: 500,
+                                    fontSize: "14px",
+                                    lineHeight: "20px",
+                                    letterSpacing: "-0.8px",
+                                    color: "#292929"
+                                }}
+                            >
+                                {selectedCity || "Delhi"}
+                            </span>
                         </button>
 
-                        {/* Mobile Cart */}
-                        <Link href="/cart" className="relative p-1">
-                            <ShoppingCartSimple size={32} weight="regular" color="#000000" />
+                        {/* Mobile Cart — Figma: 20px icon */}
+                        <Link href="/cart" className="relative flex items-center justify-center w-5 h-5 shrink-0" aria-label="Cart">
+                            <ShoppingCartSimple size={20} weight="regular" color="#292929" />
                             {totalQuantity > 0 && (
                                 <span
                                     className="absolute flex items-center justify-center rounded-full font-bold"
@@ -867,7 +879,7 @@ const Navbar = ({ showCategories: propShowCategories } = {}) => {
                                     onClick={() => setIsMobileMenuOpen(false)}
                                     className="p-1.5 rounded-full hover:bg-gray-100 text-gray-700 transition"
                                 >
-                                    <X size={22} color="hsla(0, 0%, 16%, 1)" />
+                                    <X size={22} weight="bold" color="#292929" />
                                 </button>
                             </div>
 
@@ -877,7 +889,7 @@ const Navbar = ({ showCategories: propShowCategories } = {}) => {
                                     <input
                                         type="text"
                                         placeholder="Search products..."
-                                        className="w-full px-4 py-2 rounded-xl bg-gray-50 border border-gray-200 focus:ring-2 focus:ring-amber-500 outline-none text-sm text-gray-800"
+                                        className="w-full pl-4 pr-10 py-2 rounded-full bg-white border-[0.7px] border-[#AFAFAF] focus:ring-2 focus:ring-amber-500 outline-none text-sm text-[#292929] placeholder-[#AFAFAF]"
                                         value={searchQuery}
                                         onChange={(e) => setSearchQuery(e.target.value)}
                                         onKeyDown={(e) => {
@@ -894,7 +906,7 @@ const Navbar = ({ showCategories: propShowCategories } = {}) => {
                                             setIsMobileMenuOpen(false);
                                         }}
                                     >
-                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-[18px] h-[18px] text-gray-400">
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-[18px] h-[18px] text-[#292929]">
                                             <path strokeLinecap="round" strokeLinejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
                                         </svg>
                                     </div>
@@ -908,11 +920,11 @@ const Navbar = ({ showCategories: propShowCategories } = {}) => {
                                             <Link
                                                 key={link.name}
                                                 href={link.href}
-                                                className="text-gray-700 font-medium hover:text-amber-600 px-2 py-2.5 rounded-lg hover:bg-amber-50/50 transition text-sm flex items-center justify-between"
+                                                className="text-[#292929] font-semibold hover:text-amber-600 px-2 py-2.5 rounded-full hover:bg-amber-50/50 transition text-sm flex items-center justify-between"
                                                 onClick={() => setIsMobileMenuOpen(false)}
                                             >
                                                 <span>{link.name}</span>
-                                                <ArrowRight size={14} className="text-gray-400" />
+                                                <ArrowRight size={16} weight="bold" color="#292929" />
                                             </Link>
                                         ))}
                                     </div>
@@ -961,17 +973,17 @@ const Navbar = ({ showCategories: propShowCategories } = {}) => {
                                         <div className="flex flex-col gap-2.5 relative w-full">
                                             <div className="flex gap-2 w-full">
                                                 <div className="relative flex-1">
-                                                    <MapPin size={16} weight="fill" className="absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-400" />
+                                                    <MapPin size={16} weight="bold" color="#292929" className="absolute left-3 top-1/2 -translate-y-1/2" />
                                                     <input
                                                         type="text"
                                                         value={locationInput}
                                                         onChange={(e) => setLocationInput(e.target.value)}
                                                         placeholder="Pincode or city"
-                                                        className="w-full pl-8 pr-2 py-1.5 border border-gray-200 rounded-lg bg-white focus:outline-none focus:ring-1 focus:ring-amber-500 text-xs text-gray-800"
+                                                        className="w-full pl-9 pr-3 py-2 border-[0.7px] border-[#AFAFAF] rounded-full bg-white focus:outline-none focus:ring-1 focus:ring-amber-500 text-xs text-[#292929]"
                                                     />
                                                 </div>
                                                 <button
-                                                    className="bg-black text-white px-3 py-1.5 rounded-lg text-xs font-semibold hover:bg-gray-800 transition disabled:opacity-50"
+                                                    className="bg-black text-white px-4 py-2 rounded-full text-xs font-semibold hover:bg-gray-800 transition disabled:opacity-50"
                                                     disabled={pincodeLoading}
                                                     onClick={async () => {
                                                         const val = locationInput.trim();
@@ -993,7 +1005,7 @@ const Navbar = ({ showCategories: propShowCategories } = {}) => {
                                             {pincodeArea && <p className="text-green-600 text-[10px] mt-1 font-medium">📍 {pincodeArea}</p>}
 
                                             <button
-                                                className="w-full flex items-center justify-center gap-1.5 bg-white text-gray-700 border border-gray-200 font-medium text-xs py-1.5 rounded-lg hover:bg-gray-100 transition"
+                                                className="w-full flex items-center justify-center gap-1.5 bg-white text-[#292929] border border-[#CBCBCB] font-semibold text-xs py-2 rounded-full hover:bg-gray-100 transition"
                                                 onClick={() => {
                                                     fetchLocation();
                                                     setIsMobileMenuOpen(false);

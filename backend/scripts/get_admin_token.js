@@ -24,8 +24,8 @@ const generateToken = (id) => {
 const createAdminToken = async () => {
     await connectDB();
 
-    const email = 'admin@example.com';
-    const password = 'Admin@123';
+    const email = 'shop.indianrenters@gmail.com';
+    const password = 'Admin@1234';
 
     let user = await User.findOne({ email });
 

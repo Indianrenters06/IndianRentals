@@ -202,11 +202,11 @@ const MobileProductCard = ({ product, handleAddToCart }) => {
                 <h3
                     style={{
                         width: '100%',
-                        height: '16px',
+                        height: '18px',
                         fontFamily: "'Mona Sans', sans-serif",
                         fontWeight: 600,
-                        fontSize: '10px',
-                        lineHeight: '16px',
+                        fontSize: '12px',
+                        lineHeight: '18px',
                         letterSpacing: '-0.4px',
                         color: '#333333',
                         margin: 0,
@@ -233,7 +233,7 @@ const MobileProductCard = ({ product, handleAddToCart }) => {
                 >
                     {/* Reviews */}
                     <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', padding: 0, gap: '4px' }}>
-                        <Star size={12} weight="fill" color="#FF920A" />
+                        <Star size={16} weight="fill" color="#FF920A" />
                         <span
                             style={{
                                 fontFamily: "'Mona Sans', sans-serif",
@@ -547,8 +547,10 @@ const BestRentedProducts = ({ type = "bestRented", defaultTitle = "Curated Produ
                     const prodPromises = targetIds.map(id => fetch(`${API}/api/products/${id}`).then(r => r.ok ? r.json() : null));
                     const responses = await Promise.all(prodPromises);
                     fetchedProducts = responses.filter(p => p !== null);
-                } else {
-                    const fallBackRes = await fetch(`${API}/api/products?limit=4`);
+                }
+                // Stale/invalid CMS ids (e.g. deleted products) must not blank the section.
+                if (fetchedProducts.length === 0) {
+                    const fallBackRes = await fetch(`${API}/api/products?limit=8`);
                     if (fallBackRes.ok) {
                         const fallbackData = await fallBackRes.json();
                         fetchedProducts = fallbackData.products || [];
@@ -587,14 +589,15 @@ const BestRentedProducts = ({ type = "bestRented", defaultTitle = "Curated Produ
 
     return (
         <section
-            className="w-full overflow-visible bg-white py-10 lg:py-24"
+            className="w-full overflow-visible bg-white py-6 md:py-10 lg:py-24"
         >
-            <div className="max-w-[1200px] mx-auto px-4 sm:px-6 xl:px-0">
-                <div className="flex flex-col mb-[40px] lg:mb-8 max-w-[350px] md:max-w-none w-full mx-auto md:mx-0">
+            <div className="max-w-[1200px] mx-auto px-5 sm:px-6 xl:px-0">
+                <div className="flex flex-col mb-5 md:mb-[40px] lg:mb-8 w-full">
                     <div className="flex items-center justify-between">
                         <h2
-                            className="font-manrope tracking-tight lg:tracking-[-0.8px] whitespace-nowrap text-[24px] md:text-[36px] font-semibold text-[#333] leading-tight md:leading-[48px] lg:leading-[45px]"
-                            style={isDesktop ? { fontFamily: "'Mona Sans', sans-serif" } : undefined}
+                            // Mobile Figma: 25px / 31px / 600, -0.8px
+                            className="tracking-[-0.8px] md:tracking-tight lg:tracking-[-0.8px] whitespace-nowrap text-[25px] md:text-[36px] font-semibold text-[#333] leading-[31px] md:leading-[48px] lg:leading-[45px]"
+                            style={{ fontFamily: "'Mona Sans', sans-serif" }}
                         >
                             {cmsConfig.title}
                         </h2>
@@ -677,26 +680,27 @@ const BestRentedProducts = ({ type = "bestRented", defaultTitle = "Curated Produ
                     </div>
                 </div>
 
-                {/* Mobile View: horizontal swiper, 2 cards visible */}
+                {/* Mobile View: horizontal swiper of 170px cards, 10px apart (Figma Frame 594) */}
                 <div className="md:hidden">
                     <Swiper
-                        modules={[Scrollbar]}
-                        slidesPerView={2}
-                        spaceBetween={12}
-                        scrollbar={{ el: `.swiper-scrollbar-mob-${sectionSuffix}`, draggable: true, hide: false }}
-                        className="!pb-[36px]"
+                        slidesPerView={'auto'}
+                        spaceBetween={10}
+                        className="!py-[2px]"
                     >
                         {products.map((product, index) => (
-                            <SwiperSlide key={product.id || index}>
+                            <SwiperSlide key={product.id || index} style={{ width: '170px' }}>
                                 <MobileProductCard product={product} handleAddToCart={handleAddToCart} />
                             </SwiperSlide>
                         ))}
                     </Swiper>
-                    <div className={`swiper-scrollbar-mob-${sectionSuffix} w-full`} style={{ height: '3px' }} />
                 </div>
 
-                <div className="mt-6 flex justify-center md:hidden">
-                    <Link href="/products" className="btn-primary text-[14px] px-8">
+                {/* Figma Yellow-primary-btn: 30px tall, 6px 20px, 12px / 500 */}
+                <div className="mt-5 flex justify-center md:hidden">
+                    <Link
+                        href="/products"
+                        className="inline-flex items-center justify-center rounded-full bg-[#FFCF46] text-[#1F1F1F] h-[30px] px-5 text-[12px] leading-[18px] font-medium tracking-[-0.4px]"
+                    >
                         View All
                     </Link>
                 </div>

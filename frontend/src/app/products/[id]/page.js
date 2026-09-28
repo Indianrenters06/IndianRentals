@@ -6,8 +6,9 @@ import { useRouter, useParams } from 'next/navigation';
 import { FaHeart, FaShareAlt, FaMinus, FaPlus, FaShoppingCart, FaStar, FaChevronDown, FaChevronUp } from 'react-icons/fa';
 import { BsTruck, BsBoxSeam, BsCreditCard } from 'react-icons/bs';
 
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { addToCart } from '../../../redux/features/cartSlice';
+import { toggleWishlist, selectIsWishlisted } from '../../../redux/features/wishlistSlice';
 import { getProductById } from '../../../services/productService';
 import { checkServiceability } from '../../../services/serviceabilityService';
 import BestRentedProducts from '../../../components/BestRentedProducts';
@@ -17,9 +18,9 @@ import Testimonials from '../../../components/Testimonials';
 import CompareTenures from '../../../components/CompareTenures';
 import CancellationSidebar from '../../../components/CancellationSidebar';
 
-import { Heart, Export as ExportIcon, Sparkle, Package, Truck, CalendarDots, UserCircle, Bank, MapPin } from '@phosphor-icons/react';
+import { Heart, Export as ExportIcon, Sparkle, Package, Truck, CalendarDots, UserCircle, Bank, MapPin, Minus, Plus } from '@phosphor-icons/react';
 import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/outline';
-import { StarIcon } from '@heroicons/react/24/solid';
+import { StarIcon, MapPinIcon } from '@heroicons/react/24/solid';
 
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation, Thumbs, FreeMode } from 'swiper/modules';
@@ -44,6 +45,8 @@ export default function ProductDetailPage() {
     const [activeTab, setActiveTab] = useState('details');
     const [openFaq, setOpenFaq] = useState(0);
     const [thumbsSwiper, setThumbsSwiper] = useState(null);
+    const [mobileImgIdx, setMobileImgIdx] = useState(0);
+    const isWishlisted = useSelector(selectIsWishlisted(product?._id));
     const [isCompareOpen, setIsCompareOpen] = useState(false);
     const [isCancellationOpen, setIsCancellationOpen] = useState(false);
     const [reviewRating, setReviewRating] = useState(0);
@@ -177,8 +180,8 @@ export default function ProductDetailPage() {
         router.push('/cart');
     };
 
-    const handleCheckPincode = async () => {
-        const pin = pincode.trim();
+    const handleCheckPincode = async (value) => {
+        const pin = (typeof value === 'string' ? value : pincode).trim();
         if (!/^[1-9][0-9]{5}$/.test(pin)) {
             setPinResult({ serviceable: false, message: cms('PincodeInvalidText', 'Please enter a valid 6-digit pincode.') });
             return;
@@ -233,325 +236,330 @@ export default function ProductDetailPage() {
             {/* ══════════════════════════════════════════════
                 MOBILE LAYOUT — hidden on md+ screens
             ══════════════════════════════════════════════ */}
-            <div className="w-full flex flex-col md:hidden bg-white">
+            <div className="w-full flex flex-col md:hidden bg-white pt-5">
 
-                {/* ── Promo Banner ── */}
-                <div style={{ background: '#FFCF46', display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '4px 20px' }}>
-                    <p style={{ fontFamily: "'Mona Sans', sans-serif", fontWeight: 700, fontSize: '12px', lineHeight: '16px', letterSpacing: '-0.4px', color: '#333', whiteSpace: 'nowrap' }}>
-                        🖤 SAVE Extra 5% up to ₹100 on UPI Orders 🖤
-                    </p>
-                </div>
-
-                {/* ── Product Header ── */}
+                {/* ── Product Header — Figma "Product Header": #F6F6F6, 20px padding, 12px gap ── */}
+                {(() => {
+                    const MS = "'Mona Sans', sans-serif";
+                    const images = product.images?.length > 0 ? product.images : ['/images/placeholder.png'];
+                    const imgIdx = mobileImgIdx % images.length;
+                    const maxMonths = Math.max(24, tenures[tenures.length - 1]?.months || 12);
+                    const discountLabel = product.mrp
+                        ? `${Math.round(((product.mrp - (product.rentalPrice || 0)) / product.mrp) * 100)}% off`
+                        : cms('DiscountText', '20% off');
+                    const iconCircle = { width: '22px', height: '22px', background: '#EEEEEE', borderRadius: '9999px', border: 'none', padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' };
+                    const handleShare = async () => {
+                        const url = typeof window !== 'undefined' ? window.location.href : '';
+                        try {
+                            if (navigator.share) await navigator.share({ title: product.name, url });
+                            else await navigator.clipboard?.writeText(url);
+                        } catch { /* user dismissed the share sheet */ }
+                    };
+                    return (
                 <div style={{ background: '#F6F6F6', display: 'flex', flexDirection: 'column', gap: '12px', padding: '20px', width: '100%', boxSizing: 'border-box' }}>
 
-                    {/* Breadcrumb */}
-                    <div style={{ display: 'flex', gap: '6px', alignItems: 'center', flexWrap: 'wrap' }}>
-                        <Link href="/" style={{ fontFamily: "'Mona Sans', sans-serif", fontSize: '8px', color: '#000', textDecoration: 'none' }}>Shop all</Link>
-                        <span style={{ fontSize: '10px', color: '#999' }}>›</span>
-                        <span style={{ fontFamily: "'Mona Sans', sans-serif", fontSize: '8px', color: '#000' }}>{product.category || 'Category'}</span>
-                        <span style={{ fontSize: '10px', color: '#999' }}>›</span>
-                        <span style={{ fontFamily: "'Mona Sans', sans-serif", fontWeight: 600, fontSize: '8px', color: '#000' }}>{product.name?.split(' ').slice(0, 2).join(' ')}</span>
-                    </div>
+                    {/* Breadcrumbs — 8px / 14px, 16px black chevrons, 8px gap */}
+                    <nav style={{ display: 'flex', gap: '8px', alignItems: 'center', flexWrap: 'wrap', minHeight: '16px' }}>
+                        <Link href="/" style={{ fontFamily: MS, fontWeight: 400, fontSize: '8px', lineHeight: '14px', letterSpacing: '-0.4px', color: '#000', textDecoration: 'none' }}>Shop all</Link>
+                        <ChevronRightIcon style={{ width: '16px', height: '16px', color: '#000' }} strokeWidth={2} />
+                        <span style={{ fontFamily: MS, fontWeight: 400, fontSize: '8px', lineHeight: '14px', letterSpacing: '-0.4px', color: '#000' }}>{product.category || 'Category'}</span>
+                        <ChevronRightIcon style={{ width: '16px', height: '16px', color: '#000' }} strokeWidth={2} />
+                        <span style={{ fontFamily: MS, fontWeight: 600, fontSize: '8px', lineHeight: '14px', letterSpacing: '-0.4px', color: '#000' }}>{product.name?.split(' ').slice(0, 2).join(' ')}</span>
+                    </nav>
 
-
-                    {/* Image Card */}
-                    <div style={{ background: '#fff', border: '1px solid #EEE', borderRadius: '16px', height: '300px', position: 'relative', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                        {/* Discount Badge */}
-                        <div style={{ position: 'absolute', top: '13px', left: '14px', background: '#ED2115', borderRadius: '27px', padding: '4px 14px', zIndex: 10, display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0px 3px 2px rgba(120,120,120,0.05), 0px 1px 1px rgba(120,120,120,0.09)' }}>
-                            <span style={{ fontFamily: "'Mona Sans', sans-serif", fontWeight: 600, fontSize: '12px', lineHeight: '1.2', color: '#FFF2F1', letterSpacing: '-0.48px', whiteSpace: 'nowrap' }}>
-                                {product.mrp ? `${Math.round(((product.mrp - (product.rentalPrice || 0)) / product.mrp) * 100)}% off` : cms('DiscountText', '20% off')}
+                    {/* Image Card — Figma "Product Info": 300px, #EEE border, 16px radius */}
+                    <div style={{ background: '#fff', border: '1px solid #EEEEEE', borderRadius: '16px', height: '300px', position: 'relative', overflow: 'hidden', boxSizing: 'border-box' }}>
+                        {/* Discount Badge — left 15 / top 14, 4px 10px, 12px underlined */}
+                        <div style={{ position: 'absolute', top: '14px', left: '15px', background: '#ED2115', borderRadius: '27px', padding: '4px 10px', zIndex: 10, display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0px 5px 2px rgba(120,120,120,0.01), 0px 3px 2px rgba(120,120,120,0.05), 0px 1px 1px rgba(120,120,120,0.09), 0px 0px 1px rgba(120,120,120,0.1)' }}>
+                            <span style={{ fontFamily: MS, fontWeight: 400, fontSize: '12px', lineHeight: '14px', letterSpacing: '-0.04em', textDecoration: 'underline', color: '#FFF2F1', whiteSpace: 'nowrap' }}>
+                                {discountLabel}
                             </span>
                         </div>
-                        {/* Action Icons */}
-                        <div style={{ position: 'absolute', top: '10px', right: '10px', display: 'flex', flexDirection: 'column', gap: '8px', zIndex: 10 }}>
-                            <div style={{ width: '24px', height: '24px', background: '#EEE', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                <Heart size={14} weight="regular" color="#333" />
-                            </div>
-                            <div style={{ width: '24px', height: '24px', background: '#EEE', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                <ExportIcon size={14} color="#333" />
-                            </div>
-                        </div>
-                        {/* Right Chevron Arrow Button — aligned in column with action icons at right: 10px */}
-                        <div style={{ position: 'absolute', right: '10px', top: '50%', transform: 'translateY(-50%)', zIndex: 10 }}>
+                        {/* Wishlist + share — 22px circles, right 11 / top 11.6, 8.8px gap */}
+                        <div style={{ position: 'absolute', top: '11.6px', right: '11px', display: 'flex', flexDirection: 'column', gap: '8.8px', zIndex: 10 }}>
                             <button
-                                style={{ width: '24px', height: '24px', background: '#EEE', borderRadius: '50%', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
-                                aria-label="Next image"
+                                type="button"
+                                aria-label={isWishlisted ? 'Remove from wishlist' : 'Add to wishlist'}
+                                style={iconCircle}
+                                onClick={() => dispatch(toggleWishlist({ id: product._id, name: product.name, image: images[0], rentPrice: product.rentalPrice, originalPrice: product.mrp }))}
                             >
-                                <ChevronRightIcon className="w-[14px] h-[14px] text-[#1F1F1F]" strokeWidth={2.5} />
+                                <Heart size={12.94} weight={isWishlisted ? 'fill' : 'regular'} color={isWishlisted ? '#ED2115' : '#333333'} />
+                            </button>
+                            <button type="button" aria-label="Share" style={iconCircle} onClick={handleShare}>
+                                <ExportIcon size={12.94} color="#333333" />
                             </button>
                         </div>
-                        {/* Main Image */}
-                        <div style={{ position: 'relative', width: '268px', height: '206px' }}>
+                        {/* Main Image — 268×206, offset (-4px, +2px) from centre */}
+                        <div style={{ position: 'absolute', width: '268px', height: '206px', left: 'calc(50% - 134px - 4px)', top: 'calc(50% - 103px + 2px)' }}>
                             <Image
-                                src={product.images?.[0] || '/images/placeholder.png'}
+                                src={images[imgIdx]}
                                 alt={product.name}
                                 fill
                                 className="object-cover"
                                 priority
-                                sizes="300px"
+                                sizes="268px"
                             />
                         </div>
-                        {/* Dot indicator */}
-                        <div style={{ position: 'absolute', bottom: '12px', left: '50%', transform: 'translateX(-50%)', display: 'flex', gap: '6px', alignItems: 'center' }}>
-                            <div style={{ width: '6px', height: '6px', borderRadius: '8px', border: '1.2px solid #333' }} />
-                            <div style={{ width: '4px', height: '4px', borderRadius: '8px', background: '#333' }} />
-                            <div style={{ width: '4px', height: '4px', borderRadius: '8px', background: '#333' }} />
-                            <div style={{ width: '4px', height: '4px', borderRadius: '8px', background: '#333' }} />
-                        </div>
+                        {/* Next arrow — 24px, left 316, vertically centred +5px */}
+                        {images.length > 1 && (
+                            <button
+                                type="button"
+                                onClick={() => setMobileImgIdx((imgIdx + 1) % images.length)}
+                                style={{ position: 'absolute', left: '316px', top: 'calc(50% - 12px + 5px)', width: '24px', height: '24px', background: '#EEEEEE', borderRadius: '9999px', border: 'none', padding: 0, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 10, boxShadow: '0px 3.53px 1.41px rgba(133,133,133,0.01), 0px 2.12px 1.41px rgba(133,133,133,0.05), 0px 0.71px 0.71px rgba(133,133,133,0.09), 0px 0px 0.71px rgba(133,133,133,0.1)' }}
+                                aria-label="Next image"
+                            >
+                                <ChevronRightIcon style={{ width: '16.94px', height: '16.94px', color: '#1F1F1F' }} strokeWidth={1.8} />
+                            </button>
+                        )}
+                        {/* Dot indicator — centred at y=284, 8px gap; active = 6px ring */}
+                        {images.length > 1 && (
+                            <div style={{ position: 'absolute', top: '281px', left: '50%', transform: 'translateX(-50%)', display: 'flex', gap: '8px', alignItems: 'center', zIndex: 10 }}>
+                                {images.slice(0, 6).map((_, i) => (
+                                    <button
+                                        key={i}
+                                        type="button"
+                                        aria-label={`Image ${i + 1}`}
+                                        onClick={() => setMobileImgIdx(i)}
+                                        style={i === imgIdx
+                                            ? { width: '6px', height: '6px', borderRadius: '8px', border: '1.2px solid #333333', background: 'transparent', padding: 0, boxSizing: 'border-box' }
+                                            : { width: '4px', height: '4px', borderRadius: '8px', background: '#333333', border: 'none', padding: 0 }}
+                                    />
+                                ))}
+                            </div>
+                        )}
                     </div>
 
-                    {/* Product Pricing Card */}
-                    <div style={{ background: '#fff', border: '1px solid #E2E2E2', borderRadius: '12px', overflow: 'hidden', width: '100%' }}>
+                    {/* Product Specifications — #E2E2E2 border, 12px radius */}
+                    <div style={{ background: '#fff', border: '1px solid #E2E2E2', borderRadius: '12px', overflow: 'hidden', width: '100%', boxSizing: 'border-box' }}>
 
-                        {/* Title + rating */}
+                        {/* Product Pricing — 10px padding, 10px gap */}
                         <div style={{ padding: '10px', borderBottom: '1px solid #E2E2E2', display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                            <h1 style={{ fontFamily: "'Mona Sans', sans-serif", fontWeight: 600, fontSize: '14px', lineHeight: '20px', letterSpacing: '-0.8px', color: '#292929', margin: 0 }}>
+                            <h1 style={{ fontFamily: MS, fontWeight: 600, fontSize: '14px', lineHeight: '20px', letterSpacing: '-0.8px', color: '#292929', margin: 0, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
                                 {product.name}
                             </h1>
                             <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
-                                {/* Stars */}
-                                <div style={{ display: 'flex', gap: '4px', alignItems: 'center', background: '#FFF3D3', border: '1px solid #FFE485', borderRadius: '8px', padding: '4px 6px' }}>
+                                {/* Reviews chip */}
+                                <div style={{ display: 'flex', gap: '4px', alignItems: 'center', background: '#FFF3D3', border: '1px solid #FFE485', borderRadius: '8px', padding: '4px 6px', height: '24px', boxSizing: 'border-box' }}>
                                     <div style={{ display: 'flex', gap: '2px' }}>
                                         {[1, 2, 3, 4, 5].map(s => (
-                                            <StarIcon key={s} style={{ width: '16px', height: '16px', color: s <= Math.round(product.rating || 4.5) ? '#FF920A' : '#e5e7eb' }} />
+                                            <StarIcon key={s} style={{ width: '16px', height: '16px', color: s <= Math.round(product.rating || 4.5) ? '#FF920A' : '#E2E2E2' }} />
                                         ))}
                                     </div>
-                                    <span style={{ fontFamily: "'Mona Sans', sans-serif", fontWeight: 500, fontSize: '8px', color: '#333', letterSpacing: '-0.4px', whiteSpace: 'nowrap' }}>
+                                    <span style={{ fontFamily: MS, fontWeight: 500, fontSize: '8px', lineHeight: '14px', color: '#333333', letterSpacing: '-0.4px', whiteSpace: 'nowrap' }}>
                                         {product.rating || '4.5'} ({product.numReviews || 12})
                                     </span>
                                 </div>
-                                {/* Delivery */}
-                                <div style={{ display: 'flex', gap: '4px', alignItems: 'center', background: '#00B505', borderRadius: '8px', padding: '4px 6px' }}>
-                                    <BsTruck size={14} color="white" />
-                                    <span style={{ fontFamily: "'Mona Sans', sans-serif", fontWeight: 500, fontSize: '12px', color: '#fff', letterSpacing: '-0.48px', whiteSpace: 'nowrap' }}>
+                                {/* Delivery chip */}
+                                <div style={{ display: 'flex', gap: '4px', alignItems: 'center', justifyContent: 'center', background: '#00B505', borderRadius: '8px', padding: '4px 6px', height: '24px', boxSizing: 'border-box' }}>
+                                    <Truck size={16} color="#FFFFFF" />
+                                    <span style={{ fontFamily: "'Manrope', 'Mona Sans', sans-serif", fontWeight: 500, fontSize: '12px', lineHeight: '14px', color: '#FFFFFF', letterSpacing: '-0.04em', whiteSpace: 'nowrap' }}>
                                         {product.deliveryTime || '2-4 days'}
                                     </span>
                                 </div>
                             </div>
                         </div>
 
-                        {/* Tenure Slider — Mobile */}
-                        <div style={{ padding: '10px 12px', borderBottom: '1px solid #E2E2E2', display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                            {/* Label row */}
-                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                                <span style={{ fontFamily: "'Mona Sans', sans-serif", fontWeight: 500, fontSize: '12px', lineHeight: '20px', letterSpacing: '-0.4px', color: '#1f1f1f', textDecoration: 'underline', textDecorationStyle: 'solid', textUnderlineOffset: '10%', textDecorationThickness: '8%' }}>
-                                    {cms('TenureSliderLabel', 'Select your minimum rental period')}
+                        {/* Price Options — 45px: price on the left, month stepper on the right */}
+                        <div style={{ display: 'flex', height: '45px', padding: '0 10px', borderBottom: '1px solid #E2E2E2', boxSizing: 'border-box' }}>
+                            <div style={{ flex: 1, display: 'flex', alignItems: 'center', gap: '2px', minWidth: 0 }}>
+                                <span style={{ display: 'flex', alignItems: 'center' }}>
+                                    <span style={{ fontFamily: MS, fontWeight: 600, fontSize: '20px', lineHeight: '26px', letterSpacing: '-0.8px', color: '#E11D48' }}>
+                                        ₹{currentPlan.price}
+                                    </span>
+                                    <span style={{ fontFamily: MS, fontWeight: 500, fontSize: '10px', lineHeight: '16px', color: '#757575', letterSpacing: '-0.4px' }}>/mo</span>
                                 </span>
-                                <span style={{ fontFamily: "'Mona Sans', sans-serif", fontWeight: 600, fontSize: '13px', color: '#1f1f1f', letterSpacing: '-0.4px' }}>
-                                    {`${duration} ${duration === 1 ? 'Month' : 'Months'}`}
-                                </span>
-                            </div>
-
-                            {/* Slider track + thumb + labels */}
-                            {(() => {
-                                const stepCount = tenures.length;
-                                const lastIdx = Math.max(stepCount - 1, 1);
-                                const matchIdx = tenures.findIndex(t => duration <= t.months);
-                                const currentStep = (matchIdx === -1 ? stepCount - 1 : matchIdx) + 1;
-                                const activePct = ((currentStep - 1) / lastIdx) * 100;
-                                const labels = tenures.map(t => t.label);
-                                return (
-                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                                        {/* Track */}
-                                        <div style={{ position: 'relative', width: '100%', height: '6px', display: 'flex', alignItems: 'center' }}>
-                                            <div style={{ position: 'absolute', width: '100%', height: '6px', background: '#e26e00', borderRadius: '31px', boxSizing: 'border-box' }} />
-                                            {/* Thumb */}
-                                            <div style={{ position: 'absolute', width: '16px', height: '16px', borderRadius: '50%', background: '#fff', border: '3px solid #e26e00', left: `calc(${activePct}% - 8px)`, transition: 'left 0.2s', zIndex: 10 }} />
-                                            {/* Hidden range input for touch/drag */}
-                                            <input
-                                                type="range"
-                                                min="1"
-                                                max={stepCount}
-                                                step="1"
-                                                value={currentStep}
-                                                onChange={(e) => {
-                                                    const step = parseInt(e.target.value);
-                                                    setDuration(tenures[step - 1]?.months || 1);
-                                                }}
-                                                style={{ position: 'absolute', width: '100%', opacity: 0, cursor: 'pointer', zIndex: 20, height: '24px', top: '-9px' }}
-                                            />
-                                        </div>
-                                        {/* Tick labels */}
-                                        <div style={{ position: 'relative', width: '100%', height: '20px' }}>
-                                            {labels.map((label, i) => {
-                                                const pct = (i / lastIdx) * 100;
-                                                return (
-                                                    <div key={i} style={{ position: 'absolute', left: `${pct}%`, transform: 'translateX(-50%)', display: 'flex', flexDirection: 'column', alignItems: 'center', pointerEvents: 'none' }}>
-                                                        <div style={{ width: '1px', height: '6px', background: '#bfbfbf' }} />
-                                                        <span style={{ fontFamily: "'Mona Sans', sans-serif", fontSize: '10px', fontWeight: 400, color: '#333', lineHeight: 1.2, letterSpacing: '-0.4px' }}>{label}</span>
-                                                    </div>
-                                                );
-                                            })}
-                                        </div>
-                                    </div>
-                                );
-                            })()}
-                        </div>
-
-                        {/* Price row */}
-                        <div style={{ display: 'flex', height: '45px', borderBottom: '1px solid #E2E2E2' }}>
-                            <div style={{ flex: 1, display: 'flex', alignItems: 'center', gap: '4px', padding: '0 10px' }}>
-                                <span style={{ fontFamily: "'Mona Sans', sans-serif", fontWeight: 600, fontSize: '20px', lineHeight: '26px', letterSpacing: '-0.8px', color: '#E11D48' }}>
-                                    ₹{currentPlan.price}
-                                </span>
-                                <span style={{ fontFamily: "'Mona Sans', sans-serif", fontWeight: 500, fontSize: '10px', color: '#757575', letterSpacing: '-0.4px' }}>/mo</span>
-                                <span style={{ fontFamily: "'Mona Sans', sans-serif", fontWeight: 500, fontSize: '10px', color: '#757575', letterSpacing: '-0.4px', marginLeft: '2px' }}>
+                                <span style={{ fontFamily: MS, fontWeight: 500, fontSize: '10px', lineHeight: '16px', color: '#757575', letterSpacing: '-0.4px', whiteSpace: 'nowrap' }}>
                                     for {duration} {duration === 1 ? 'month' : 'months'}
                                 </span>
                             </div>
+                            <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'flex-end', padding: '0 0 0 10px', borderLeft: '1px solid #E2E2E2' }}>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                    <button type="button" aria-label="Fewer months" disabled={duration <= 1} onClick={() => setDuration(d => Math.max(1, d - 1))} style={{ background: 'none', border: 'none', padding: 0, display: 'flex', cursor: 'pointer', opacity: duration <= 1 ? 0.4 : 1 }}>
+                                        <Minus size={15} weight="light" color="#333333" />
+                                    </button>
+                                    <div style={{ minWidth: '29px', height: '28px', padding: '6px 12px', background: '#fff', border: '1px solid #AFAFAF', borderRadius: '8px', boxSizing: 'border-box', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                        <span style={{ fontFamily: MS, fontWeight: 600, fontSize: '10px', lineHeight: '16px', color: '#333333', letterSpacing: '-0.4px' }}>{duration}</span>
+                                    </div>
+                                    <button type="button" aria-label="More months" disabled={duration >= maxMonths} onClick={() => setDuration(d => Math.min(maxMonths, d + 1))} style={{ background: 'none', border: 'none', padding: 0, display: 'flex', cursor: 'pointer', opacity: duration >= maxMonths ? 0.4 : 1 }}>
+                                        <Plus size={15} weight="light" color="#333333" />
+                                    </button>
+                                </div>
+                            </div>
                         </div>
 
-                        {/* View All Benefits */}
-                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '19px' }}>
-                            <span style={{ fontFamily: "'Mona Sans', sans-serif", fontWeight: 700, fontSize: '12px', color: '#333', textDecoration: 'underline', letterSpacing: '-0.4px', cursor: 'pointer' }}>
+                        {/* Plan change link — 19px strip, 8px / 700 underlined */}
+                        <button
+                            type="button"
+                            onClick={() => document.getElementById('mobile-benefits')?.scrollIntoView({ behavior: 'smooth', block: 'center' })}
+                            style={{ width: '100%', height: '19px', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#fff', border: 'none', padding: 0, cursor: 'pointer' }}
+                        >
+                            <span style={{ fontFamily: MS, fontWeight: 700, fontSize: '8px', lineHeight: '14px', color: '#333333', textDecoration: 'underline', letterSpacing: '-0.4px' }}>
                                 View All Benefits
                             </span>
-                        </div>
+                        </button>
                     </div>
 
-                    {/* What's included */}
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                        <h3 style={{ fontFamily: "'Mona Sans', sans-serif", fontWeight: 600, fontSize: '12px', color: '#1F1F1F', letterSpacing: '-0.4px', margin: 0 }}>
+                    {/* Included Features — 2 columns, 48px blue tiles, 8px gap */}
+                    <div id="mobile-benefits" style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                        <h3 style={{ fontFamily: MS, fontWeight: 600, fontSize: '12px', lineHeight: '16px', color: '#1F1F1F', letterSpacing: '-0.4px', margin: 0 }}>
                             {cms('BenefitsHeading', "What's included in your plan")}
                         </h3>
-                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
-                            {(product.benefits?.length > 0 ? product.benefits : (pageLayout?.productPageBenefits || [
+                        {(() => {
+                            const benefits = product.benefits?.length > 0 ? product.benefits : (pageLayout?.productPageBenefits || [
                                 'Fully Functional (100% Tested)', 'Original Accessories Included', 'Free Repairs & Maintenance', 'Professionally sanitized'
-                            ])).map((b, i) => {
+                            ]);
+                            return (
+                        // Figma fills column-first: left = items 1–2, right = items 3–4
+                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gridTemplateRows: `repeat(${Math.ceil(benefits.length / 2)}, 48px)`, gridAutoFlow: 'column', gap: '8px' }}>
+                            {benefits.map((b, i) => {
                                 const text = b.type || b;
                                 const Icon = [Sparkle, Package, UserCircle, Bank][i % 4];
                                 return (
-                                    <div key={i} style={{ background: 'linear-gradient(89.72deg,#0689FF 1.19%,#0075FF 100.13%)', border: '1px solid #B5E9FF', borderRadius: '12px', padding: '8px', display: 'flex', alignItems: 'center', gap: '13px' }}>
-                                        <Icon size={20} color="white" weight="bold" style={{ flexShrink: 0 }} />
-                                        <span style={{ fontFamily: "'Mona Sans', sans-serif", fontWeight: 600, fontSize: '12px', lineHeight: '16px', color: '#fff', letterSpacing: '-0.4px' }}>{text}</span>
+                                    <div key={i} style={{ height: '48px', boxSizing: 'border-box', background: 'linear-gradient(89.92deg, #0689FF -1.19%, #0075FF 100.13%)', border: '1px solid #B5E9FF', borderRadius: '12px', padding: '8px', display: 'flex', alignItems: 'center', gap: '13px' }}>
+                                        <Icon size={20} color="#FFFFFF" style={{ flexShrink: 0 }} />
+                                        <span style={{ fontFamily: MS, fontWeight: 600, fontSize: '12px', lineHeight: '16px', color: '#fff', letterSpacing: '-0.4px', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{text}</span>
                                     </div>
                                 );
                             })}
                         </div>
+                            );
+                        })()}
                     </div>
 
                     {/* Deposit + KYC Cards */}
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                        <div style={{ background: '#D6F1FF', border: '1px solid #B5E9FF', borderRadius: '12px', padding: '4px 8px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', minHeight: '32px' }}>
-                            <span style={{ fontFamily: "'Mona Sans', sans-serif", fontWeight: 500, fontSize: '10px', color: '#0859C5', letterSpacing: '-0.4px' }}>
+                        <div style={{ background: '#D6F1FF', border: '1px solid #B5E9FF', borderRadius: '12px', padding: '4px 8px', height: '26px', boxSizing: 'border-box', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '8px' }}>
+                            <span style={{ fontFamily: MS, fontWeight: 500, fontSize: '10px', lineHeight: '16px', color: '#0859C5', letterSpacing: '-0.4px' }}>
                                 {cms('DepositLabel', '100% Refundable Deposit')}
                             </span>
-                            <span style={{ fontFamily: "'Mona Sans', sans-serif", fontWeight: 600, fontSize: '12px', color: '#0859C5', letterSpacing: '-0.4px', whiteSpace: 'nowrap' }}>
+                            <span style={{ fontFamily: MS, fontWeight: 600, fontSize: '12px', lineHeight: '18px', color: '#0859C5', letterSpacing: '-0.4px', whiteSpace: 'nowrap' }}>
                                 ₹{product.securityDeposit ? `${product.securityDeposit.toLocaleString('en-IN')}/-` : '20,000/-'}
                             </span>
                         </div>
-                        <div style={{ background: '#F3E8FF', border: '1px solid #E9D5FF', borderRadius: '12px', padding: '8px', overflow: 'hidden', position: 'relative', minHeight: '49px', display: 'flex', alignItems: 'center' }}>
-                            <div style={{ flex: 1, minWidth: 0 }}>
-                                <span style={{ fontFamily: "'Mona Sans', sans-serif", fontWeight: 700, fontSize: '14px', lineHeight: '20px', color: '#333', letterSpacing: '-0.4px' }}>
-                                    {cms('KycLine1', 'Place Order & complete KYC anytime ')}
-                                </span>
-                                <span style={{ fontFamily: "'Mona Sans', sans-serif", fontWeight: 400, fontSize: '10px', lineHeight: '16px', color: '#333', letterSpacing: '-0.4px' }}>
-                                    {cms('KycLine2', 'to get your items the next day')}
-                                </span>
+                        <div style={{ background: '#F3E8FF', border: '1px solid #E9D5FF', borderRadius: '12px', padding: '8px', height: '48px', boxSizing: 'border-box', display: 'flex', alignItems: 'center', justifyContent: 'space-between', position: 'relative', overflow: 'hidden' }}>
+                            <p style={{ maxWidth: '207px', margin: 0, fontFamily: MS, fontSize: '10px', lineHeight: '16px', color: '#333333', letterSpacing: '-0.4px' }}>
+                                <span style={{ fontWeight: 700 }}>{cms('KycLine1', 'Place Order & complete KYC anytime ').trim()}</span>{' '}
+                                <span style={{ fontWeight: 400 }}>{cms('KycLine2', 'to get your items the next day').trim()}</span>
+                            </p>
+                            {/* Figma Frame 729: 87×49 GIF slot, #E2E2E2, 6px radius, at left 256 / top -9 inside the padded row */}
+                            <div style={{ position: 'absolute', left: '264px', top: '-1px', width: '87px', height: '49px', background: '#E2E2E2', borderRadius: '6px', overflow: 'hidden' }}>
+                                {cms('KycGif', null) && (
+                                    // eslint-disable-next-line @next/next/no-img-element
+                                    <img src={cms('KycGif', null)} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                )}
                             </div>
                         </div>
                     </div>
 
-                    {/* Book Your Plan CTA */}
+                    {/* Book Your Plan CTA — 30px yellow pill */}
                     <button
                         onClick={handleAddToCart}
-                        style={{ background: '#FFCF46', borderRadius: '9999px', border: 'none', height: '30px', width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
-                        <span style={{ fontFamily: "'Mona Sans', sans-serif", fontWeight: 500, fontSize: '12px', color: '#1F1F1F', letterSpacing: '-0.4px' }}>
+                        style={{ background: '#FFCF46', borderRadius: '9999px', border: 'none', height: '30px', padding: '6px 20px', width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
+                        <span style={{ fontFamily: MS, fontWeight: 500, fontSize: '12px', lineHeight: '18px', color: '#1F1F1F', letterSpacing: '-0.4px' }}>
                             {cms('CtaTextMobile', 'Book Your Plan')}
                         </span>
                     </button>
 
-                    {/* Cancellation + Tenure Info */}
+                    {/* Cancellation + Tenure Info — 40px cards, 11px apart */}
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '11px' }}>
-                        <div style={{ background: '#FFFAEC', border: '1px solid #E26E00', borderRadius: '16px', padding: '6px 8px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                            <div style={{ width: '28px', height: '28px', background: '#FFF3D3', borderRadius: '33px', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                                <Truck size={18} color="#E26E00" />
+                        {[
+                            { icon: <Truck size={18} color="#E26E00" />, text: cms('CancelCardText', 'What if I cancel or return before 6 months?'), linkText: cms('CancelCardLinkText', 'View Details'), onClick: () => setIsCancellationOpen(true) },
+                            { icon: <CalendarDots size={20} color="#E26E00" />, text: cms('ExtendCardText', 'How do I extend tenure after 6 months?'), linkText: cms('ExtendCardLinkText', 'View Details'), href: cms('ExtendCardLink', '#') },
+                        ].map((card, i) => (
+                            <div key={i} style={{ height: '40px', boxSizing: 'border-box', background: '#FFFAEC', border: '1px solid #E26E00', borderRadius: '16px', padding: '6px 8px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                <div style={{ width: '28px', height: '28px', background: '#FFF3D3', borderRadius: '33px', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                                    {card.icon}
+                                </div>
+                                <span style={{ flex: 1, fontFamily: MS, fontWeight: 600, fontSize: '10px', lineHeight: '16px', color: '#E26E00', letterSpacing: '-0.4px' }}>
+                                    {card.text}
+                                </span>
+                                {card.href ? (
+                                    <Link href={card.href} style={{ fontFamily: MS, fontWeight: 600, fontSize: '8px', lineHeight: '14px', letterSpacing: '-0.4px', color: '#ED2115', textDecoration: 'underline', whiteSpace: 'nowrap', flexShrink: 0 }}>
+                                        {card.linkText}
+                                    </Link>
+                                ) : (
+                                    <button onClick={card.onClick} style={{ fontFamily: MS, fontWeight: 600, fontSize: '8px', lineHeight: '14px', letterSpacing: '-0.4px', color: '#ED2115', textDecoration: 'underline', background: 'none', border: 'none', padding: 0, cursor: 'pointer', whiteSpace: 'nowrap', flexShrink: 0 }}>
+                                        {card.linkText}
+                                    </button>
+                                )}
                             </div>
-                            <span style={{ flex: 1, fontFamily: "'Mona Sans', sans-serif", fontWeight: 600, fontSize: '10px', lineHeight: '16px', color: '#E26E00', letterSpacing: '-0.4px' }}>
-                                {cms('CancelCardText', 'What if I cancel or return before 6 months?')}
-                            </span>
-                            <button onClick={() => setIsCancellationOpen(true)} style={{ fontFamily: "'Mona Sans', sans-serif", fontWeight: 600, fontSize: '8px', color: '#ED2115', textDecoration: 'underline', background: 'none', border: 'none', cursor: 'pointer', whiteSpace: 'nowrap', flexShrink: 0 }}>
-                                View Details
-                            </button>
-                        </div>
-                        <div style={{ background: '#FFFAEC', border: '1px solid #E26E00', borderRadius: '16px', padding: '6px 8px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                            <div style={{ width: '28px', height: '28px', background: '#FFF3D3', borderRadius: '33px', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                                <CalendarDots size={20} color="#E26E00" />
-                            </div>
-                            <span style={{ flex: 1, fontFamily: "'Mona Sans', sans-serif", fontWeight: 600, fontSize: '10px', lineHeight: '16px', color: '#E26E00', letterSpacing: '-0.4px' }}>
-                                {cms('ExtendCardText', 'How do I extend tenure after 6 months?')}
-                            </span>
-                            <span style={{ fontFamily: "'Mona Sans', sans-serif", fontWeight: 600, fontSize: '8px', color: '#ED2115', textDecoration: 'underline', whiteSpace: 'nowrap', flexShrink: 0 }}>
-                                View Details
-                            </span>
-                        </div>
+                        ))}
                     </div>
 
-                    {/* Delivery Check */}
-                    <div style={{ background: '#fff', border: '1px solid #E2E2E2', borderRadius: '16px', padding: '8px 10px', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                        <div style={{ width: '28px', height: '28px', background: '#CBFFC5', borderRadius: '25px', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                            <MapPin weight="fill" size={18} color="hsla(120, 100%, 35%, 1)" />
+                    {/* Delivery Check — 46px card, 30px pincode input */}
+                    <div style={{ background: '#fff', border: '1px solid #E2E2E2', borderRadius: '16px', padding: '8px 10px', display: 'flex', alignItems: 'center', gap: '4px', boxSizing: 'border-box' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '4px', flexShrink: 0 }}>
+                            <div style={{ width: '28px', height: '28px', background: '#CBFFC5', borderRadius: '25px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                <MapPinIcon style={{ width: '18px', height: '18px', color: '#00B505' }} />
+                            </div>
+                            <span style={{ fontFamily: MS, fontWeight: 600, fontSize: '8px', lineHeight: '14px', color: '#1F1F1F', letterSpacing: '-0.4px', whiteSpace: 'nowrap' }}>Delivery</span>
                         </div>
-                        <span style={{ fontFamily: "'Mona Sans', sans-serif", fontWeight: 600, fontSize: '8px', color: '#1F1F1F', letterSpacing: '-0.4px', whiteSpace: 'nowrap' }}>Delivery</span>
-                        <div style={{ flex: 1, border: '1px solid #CBCBCB', borderRadius: '8px', padding: '8px 12px', minWidth: 0 }}>
+                        <div style={{ flex: 1, height: '30px', border: '1px solid #CBCBCB', borderRadius: '8px', padding: '0 12px', minWidth: 0, boxSizing: 'border-box', display: 'flex', alignItems: 'center', background: '#fff', overflow: 'hidden' }}>
                             <input
                                 type="text"
                                 inputMode="numeric"
                                 maxLength={6}
                                 value={pincode}
-                                onChange={(e) => { setPincode(e.target.value.replace(/\D/g, '').slice(0, 6)); setPinResult(null); }}
+                                onChange={(e) => {
+                                    const v = e.target.value.replace(/\D/g, '').slice(0, 6);
+                                    setPincode(v);
+                                    setPinResult(null);
+                                    if (v.length === 6) handleCheckPincode(v);
+                                }}
                                 onKeyDown={(e) => { if (e.key === 'Enter') handleCheckPincode(); }}
                                 placeholder={cms('PincodePlaceholder', 'Check availability in your state')}
-                                style={{ border: 'none', outline: 'none', fontSize: '8px', fontFamily: "'Mona Sans', sans-serif", fontWeight: 500, color: '#AFAFAF', width: '100%', background: 'transparent', letterSpacing: '-0.4px' }}
+                                className="placeholder:text-[#AFAFAF]"
+                                style={{ border: 'none', outline: 'none', fontSize: '16px', transform: 'scale(0.5)', transformOrigin: 'left center', width: '200%', fontFamily: MS, fontWeight: 500, lineHeight: '28px', color: '#333333', background: 'transparent', letterSpacing: '-0.8px' }}
                             />
                         </div>
                     </div>
-                    {pinResult && (
-                        <div style={{ fontFamily: "'Mona Sans', sans-serif", fontWeight: 600, fontSize: '11px', color: pinResult.serviceable ? 'green' : '#ED2115', paddingLeft: '4px' }}>
-                            {pinResult.serviceable ? '✓' : '✕'} {pinResult.message}
+                    {(pinChecking || pinResult) && (
+                        <div style={{ fontFamily: MS, fontWeight: 600, fontSize: '10px', lineHeight: '16px', color: pinChecking ? '#757575' : (pinResult.serviceable ? '#00B505' : '#ED2115'), paddingLeft: '4px' }}>
+                            {pinChecking ? cms('PincodeCheckingText', 'Checking…') : `${pinResult.serviceable ? '✓' : '✕'} ${pinResult.message}`}
                         </div>
                     )}
 
-                    {/* Product Details Tabs */}
-                    <div style={{ background: '#fff', border: '1px solid #E2E2E2', borderRadius: '16px', padding: '16px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                        {/* Tab Buttons */}
+                    {/* productPageDescriptions — 16px padding, 12px gap, 24px tab pills */}
+                    <div style={{ background: '#fff', border: '1px solid #E2E2E2', borderRadius: '16px', padding: '16px', display: 'flex', flexDirection: 'column', gap: '12px', boxSizing: 'border-box' }}>
                         <div style={{ display: 'flex', gap: '6px', alignItems: 'center', overflowX: 'auto' }}>
                             {[
-                                { key: 'details', label: 'Product Details', active: activeTab === 'details' },
-                                { key: 'return', label: 'Return Policy', active: activeTab === 'return' },
-                                { key: 'shipping', label: 'Shipping Policy', active: activeTab === 'shipping' },
-                            ].map(tab => (
-                                <button key={tab.key} onClick={() => setActiveTab(tab.key)} style={{ background: tab.active ? '#333' : 'transparent', color: tab.active ? '#fff' : '#333', border: `${tab.active ? 0 : 0.565}px solid #E2E2E2`, borderRadius: '33px', padding: '4px 12px', fontFamily: "'Mona Sans', sans-serif", fontWeight: 600, fontSize: '10px', letterSpacing: '-0.4px', cursor: 'pointer', whiteSpace: 'nowrap', lineHeight: '16px', flexShrink: 0 }}>
-                                    {tab.label}
-                                </button>
-                            ))}
+                                { key: 'details', label: cms('TabDetailsLabel', 'Product Details') },
+                                { key: 'return', label: cms('TabReturnLabel', 'Return Policy') },
+                                { key: 'shipping', label: cms('TabShippingLabel', 'Shipping Policy') },
+                            ].map(tab => {
+                                const active = activeTab === tab.key;
+                                return (
+                                    <button key={tab.key} onClick={() => setActiveTab(tab.key)} style={{ height: '24px', boxSizing: 'border-box', background: active ? '#333333' : 'transparent', color: active ? '#fff' : '#333333', border: active ? 'none' : '0.565px solid #E2E2E2', borderRadius: '33.36px', padding: '4px 12px', fontFamily: MS, fontWeight: 600, fontSize: '10px', lineHeight: '16px', letterSpacing: '-0.4px', cursor: 'pointer', whiteSpace: 'nowrap', flexShrink: 0 }}>
+                                        {tab.label}
+                                    </button>
+                                );
+                            })}
                         </div>
-                        {/* Divider */}
-                        <div style={{ height: '1px', background: '#EEE', width: '100%' }} />
-                        {/* Spec Rows */}
+                        <div style={{ height: 0, borderTop: '1px solid #EEEEEE', width: '100%' }} />
                         {activeTab === 'details' && (
                             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                                 {specRows.map((item, i) => (
                                     <div key={i} style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                                        <span style={{ fontFamily: "'Mona Sans', sans-serif", fontWeight: 600, fontSize: '8px', color: '#333', letterSpacing: '-0.4px', textTransform: 'uppercase' }}>{item.label}</span>
-                                        <span style={{ fontFamily: "'Mona Sans', sans-serif", fontWeight: 400, fontSize: '8px', color: '#545454', letterSpacing: '-0.4px' }}>{item.value}</span>
+                                        <span style={{ fontFamily: MS, fontWeight: 600, fontSize: '8px', lineHeight: '14px', color: '#333333', letterSpacing: '-0.4px', textTransform: 'uppercase' }}>{item.label}</span>
+                                        <span style={{ fontFamily: MS, fontWeight: 400, fontSize: '8px', lineHeight: '14px', color: '#545454', letterSpacing: '-0.4px' }}>{item.value}</span>
                                     </div>
                                 ))}
                             </div>
                         )}
                         {activeTab === 'return' && (
-                            <p style={{ fontFamily: "'Mona Sans', sans-serif", fontSize: '12px', color: '#545454', lineHeight: '1.6' }}>
+                            <p style={{ fontFamily: MS, fontSize: '10px', lineHeight: '16px', letterSpacing: '-0.4px', color: '#545454', margin: 0 }}>
                                 {product.returnPolicy || 'Standard return policy applies. Please contact support for details.'}
                             </p>
                         )}
                         {activeTab === 'shipping' && (
-                            <p style={{ fontFamily: "'Mona Sans', sans-serif", fontSize: '12px', color: '#545454', lineHeight: '1.6' }}>
+                            <p style={{ fontFamily: MS, fontSize: '10px', lineHeight: '16px', letterSpacing: '-0.4px', color: '#545454', margin: 0 }}>
                                 {product.shippingPolicy || 'Standard shipping. Delivery usually takes 2-4 business days.'}
                             </p>
                         )}
                     </div>
                 </div>
+                    );
+                })()}
 
                 {/* ── Best Rented Products (Mobile) ── */}
                 {on('Related') && (

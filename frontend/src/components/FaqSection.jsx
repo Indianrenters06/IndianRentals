@@ -124,7 +124,7 @@ const FaqSection = ({ cmsData, limit, pageName }) => {
                 <div className="w-full lg:w-[442px] lg:shrink-0 flex flex-col gap-5">
                     {subtitle && (
                         <span
-                            className="block text-[#333333] tracking-[-0.8px] text-[20px] leading-[26px] md:text-[27px] md:leading-[35px] font-medium"
+                            className="block text-[#333333] tracking-[-0.8px] text-[20px] leading-[26px] md:text-[27px] md:leading-[35px] font-semibold md:font-medium"
                             style={{ fontFamily: "'Mona Sans', sans-serif" }}
                         >
                             {subtitle}
@@ -145,7 +145,7 @@ const FaqSection = ({ cmsData, limit, pageName }) => {
                         return (
                             <div key={index} className="w-full flex flex-col items-start border-t border-[#EEEEEE]">
                                 <button
-                                    className="w-full flex items-center justify-between text-left focus:outline-none group gap-6 py-4 md:py-5"
+                                    className="w-full flex items-center justify-between text-left focus:outline-none group gap-6 py-2 md:py-5"
                                     onClick={() => toggleFaq(index)}
                                 >
                                     <span
@@ -155,7 +155,7 @@ const FaqSection = ({ cmsData, limit, pageName }) => {
                                         {faq.question}
                                     </span>
                                     <span className="md:hidden shrink-0 flex items-center justify-center size-[20px] text-[#333333]">
-                                        {open ? <PiCaretUp /> : <PiCaretDown />}
+                                        {open ? <PiCaretUp size={20} /> : <PiCaretDown size={20} />}
                                     </span>
                                     {/* Desktop — Figma "Icon" (28×28 chevron, node 22774:2781); points up when open */}
                                     <Image
@@ -171,7 +171,7 @@ const FaqSection = ({ cmsData, limit, pageName }) => {
                                     className={`w-full overflow-hidden transition-all duration-300 ease-in-out ${open ? 'max-h-[500px] opacity-100' : 'max-h-0 opacity-0'}`}
                                 >
                                     <p
-                                        className="flex-1 m-0 pb-6 font-normal text-[#545454] tracking-[-0.4px] text-xs md:text-[16px] leading-[18px] md:leading-[23px]"
+                                        className="flex-1 m-0 pb-3 md:pb-6 font-normal text-[#545454] tracking-[-0.4px] text-xs md:text-[16px] leading-[18px] md:leading-[23px]"
                                         style={{ fontFamily: "'Mona Sans', sans-serif" }}
                                     >
                                         {faq.answer}
