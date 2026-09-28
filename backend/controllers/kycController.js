@@ -153,7 +153,7 @@ exports.getKYCStatus = async (req, res) => {
     try {
         const kyc = await KYC.findOne({ user: req.user._id });
         if (!kyc) {
-            return res.status(404).json({ message: 'KYC not found' });
+            return res.status(200).json({ status: 'not_submitted' });
         }
         res.status(200).json(kyc);
     } catch (err) {
