@@ -8,8 +8,12 @@ const getToken = () => {
     if (typeof window !== 'undefined') {
         const userInfo = localStorage.getItem('userInfo');
         if (userInfo) {
-            const parsed = JSON.parse(userInfo);
-            return parsed.token;
+            try {
+                const parsed = JSON.parse(userInfo);
+                return parsed?.token || null;
+            } catch {
+                return null;
+            }
         }
     }
     return null;
@@ -42,7 +46,7 @@ export const uploadKYCFiles = async (formData) => {
 export const getKYCStatus = async () => {
     const token = getToken();
     if (!token) {
-        return { status: 'not_submitted' };
+        return { status: 'unauthenticated' };
     }
 
     const config = {
@@ -55,13 +59,15 @@ export const getKYCStatus = async () => {
         const response = await axios.get(API_URL, config);
         return response.data;
     } catch (error) {
-        if (error.response && [401, 404].includes(error.response.status)) {
+        if (error.response?.status === 401) {
+            return { status: 'unauthenticated' };
+        }
+        if (error.response?.status === 404) {
             // Older API deployments return 404 when this customer has not
             // submitted KYC yet. That is an empty state, not a console error.
             return { status: 'not_submitted' };
         }
-        console.error("KYC status fetch error:", error);
-        return { status: 'not_submitted' };
+        throw error;
     }
 };
 

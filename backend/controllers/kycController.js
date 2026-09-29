@@ -13,6 +13,9 @@ const DOC_LABELS = {
     aadhaar: 'Aadhaar Card',
     pan: 'PAN Card',
     photo: 'Photograph',
+    aadharFront: 'Aadhaar Card (Front)',
+    aadharBack: 'Aadhaar Card (Back)',
+    panCard: 'PAN Card',
 };
 
 // @desc    Get All KYC Requests (Admin)
@@ -85,14 +88,17 @@ exports.createOrUpdateKYC = async (req, res) => {
         const wasRejected = kyc?.status === 'rejected';
         const wasApproved = kyc?.status === 'approved';
 
-        // Approved customers still submit documents on every order (a fresh bank
-        // statement each time), so a re-submission must not push them back into
-        // the review queue — that would show "Verification In Progress" to a
-        // customer who is already verified. Everything else (first submission,
-        // or a re-submit after rejection) does go back to pending.
+        // Updating a verified record must not send the customer back to review.
         kycFields.status = wasApproved ? 'approved' : 'pending';
 
         if (kyc) {
+            // The account and checkout forms have historically used different
+            // personal-detail keys. Preserve fields from either source when a
+            // customer updates the same KYC record through the other route.
+            if (personalDetails) {
+                const existingDetails = kyc.personalDetails?.toObject?.() ?? kyc.personalDetails ?? {};
+                kycFields.personalDetails = { ...existingDetails, ...personalDetails };
+            }
             // Merge new document URLs on top of existing ones
             if (documents) {
                 const existingDocs = kyc.documents?.toObject?.() ?? kyc.documents ?? {};
@@ -109,7 +115,7 @@ exports.createOrUpdateKYC = async (req, res) => {
         }
 
         // Tell the admin about a first submission, a re-submit after rejection,
-        // or fresh paperwork from an already-verified customer.
+        // or an update from an already-verified customer.
         if (isNew || wasRejected || wasApproved) {
             let title = 'New KYC Submission';
             let message = `User ${req.user.name} submitted their KYC for review.`;

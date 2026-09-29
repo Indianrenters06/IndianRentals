@@ -117,7 +117,8 @@ export default function MyOrdersPage() {
             setLoading(true);
             setFetchError(false);
             try {
-                const [data, kyc] = await Promise.all([getMyOrders(), getKYCStatus()]);
+                // Orders remain available if the separate KYC status request fails.
+                const [data, kyc] = await Promise.all([getMyOrders(), getKYCStatus().catch(() => ({ status: '' }))]);
                 const kycStatus = String(kyc?.status || '').toLowerCase();
                 // shippingAddress carries no name, so "Delivery to" comes from the signed-in user.
                 const stored = typeof window !== 'undefined' ? localStorage.getItem('userInfo') : null;
