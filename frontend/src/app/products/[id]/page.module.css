@@ -16,9 +16,16 @@
 .thumbRail { width: 100%; height: auto; }
 .thumbRail :global(.swiper-slide) { height: auto; }
 
-.tenurePanel { padding: 18px 20px 20px; }
+.tenurePanel { padding: 18px 20px 8px; }
 .tenureScale { padding-inline: 10px; box-sizing: border-box; }
 .tenureScale input { touch-action: none; }
+.tenureActions { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.tenureAction { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 8px 12px; border: 1px solid transparent; border-radius: 10px; cursor: pointer; font: 600 12px/1.25 'Mona Sans', sans-serif; white-space: nowrap; transition: background-color 160ms ease, border-color 160ms ease; }
+.tenureBreakdown { border-color: #e5e5e5; background: #f6f6f6; color: #333; }
+.tenureBreakdown:hover { border-color: #c8c8c8; background: #eee; }
+.tenureCompare { border-color: #f1d78f; background: #fff5d9; color: #614300; }
+.tenureCompare:hover { border-color: #eac767; background: #ffedb9; }
+.tenureAction:focus-visible { outline: 2px solid #141414; outline-offset: 2px; }
 
 .primaryCta {
   width: 100%; min-height: 56px; padding: 14px 24px;
@@ -71,13 +78,13 @@
 .compareHead span { padding: 0 24px 12px; }
 
 @media (max-width: 1023px) {
-  .tenurePanel { padding: 24px 28px 28px; }
+  .tenurePanel { padding: 24px 28px 12px; }
   .benefitGrid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .benefitCard { min-height: 58px; padding: 10px; font-size: 13px; }
   .noticeGrid { grid-template-columns: 1fr; }
 }
 @media (max-width: 767px) {
-  .tenurePanel { padding: 16px 14px 18px; }
+  .tenurePanel { padding: 16px 14px 12px; }
   .primaryCta { min-height: 54px; padding-inline: 20px; font-size: 16px; }
   .benefitGrid { gap: 8px; }
   .benefitCard { min-height: 58px; padding: 8px; font-size: 12px; }

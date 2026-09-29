@@ -900,31 +900,17 @@ export default function ProductDetailPage() {
                                             </div>
 
                                             {/* Links */}
-                                            <div className="flex justify-between items-center">
+                                            <div className={styles.tenureActions}>
                                                 {on('PriceBreakdown') ? (
-                                                    <button type="button" onClick={() => setActiveInfoDrawer('breakdown')} className={styles.infoLink}>
+                                                    <button type="button" onClick={() => setActiveInfoDrawer('breakdown')} className={`${styles.tenureAction} ${styles.tenureBreakdown}`}>
                                                         {cms('PriceBreakdownText', 'price breakdown')}
                                                     </button>
                                                 ) : <span />}
                                                 {on('Compare') && (
                                                     <button
+                                                        type="button"
                                                         onClick={() => setIsCompareOpen(true)}
-                                                        style={{
-                                                            fontSize: 'var(--font-size-1, 12px)',
-                                                            lineHeight: 'var(--font-line-height-1, 16px)',
-                                                            letterSpacing: 'var(--font-letter-spacing-8, normal)',
-                                                            color: 'var(--color-orange-orange-600, hsla(29, 100%, 50%, 1))',
-                                                            textDecoration: 'underline',
-                                                            textDecorationStyle: 'solid',
-                                                            textUnderlineOffset: '8.5%',
-                                                            textDecorationThickness: '11%',
-                                                            opacity: 1,
-                                                            whiteSpace: 'nowrap',
-                                                            background: 'none',
-                                                            border: 'none',
-                                                            cursor: 'pointer',
-                                                            padding: 0
-                                                        }}
+                                                        className={`${styles.tenureAction} ${styles.tenureCompare}`}
                                                     >
                                                         {cms('CompareLinkText', 'compare all tenures')}
                                                     </button>
