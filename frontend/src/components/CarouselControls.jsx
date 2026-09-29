@@ -1,14 +1,13 @@
 "use client";
 
 import { useEffect, useState } from 'react';
-import { CaretLeft, CaretRight, Pause, Play } from '@phosphor-icons/react';
-import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/outline';
+import { Pause, Play } from '@phosphor-icons/react';
+import CarouselArrow from './CarouselArrow';
 import styles from './CarouselControls.module.css';
 
 /** Rail controls stay in normal flow; hero controls sit beside the banner. */
 export default function CarouselControls({ count, current = 0, label = 'Carousel', onPrevious, onNext, onSelect, previousDisabled = false, nextDisabled = false, playing, onTogglePlay, variant = 'rail' }) {
     if (count < 2) return null;
-    const useHeroicons = variant === 'hero' || variant === 'campaign' || label.toLowerCase() === 'categories';
     const index = Math.max(0, Math.min(current, count - 1));
     return (
         <div className={`${styles.controls} ${styles[variant] || ''}`} role="group" aria-label={`${label} controls`}>
@@ -23,8 +22,8 @@ export default function CarouselControls({ count, current = 0, label = 'Carousel
                 {onTogglePlay && <button type="button" className={`${styles.button} ${styles.playback}`} onClick={onTogglePlay} aria-label={`${playing ? 'Pause' : 'Play'} ${label.toLowerCase()} slideshow`}>
                     {playing ? <Pause size={18} weight="fill" aria-hidden="true" /> : <Play size={18} weight="fill" aria-hidden="true" />}
                 </button>}
-                <button type="button" className={`${styles.button} ${styles.previous}`} onClick={onPrevious} disabled={previousDisabled} aria-label={`Previous ${label.toLowerCase()} slide`}>{useHeroicons ? <ChevronLeftIcon width={24} height={24} aria-hidden="true" /> : <CaretLeft size={24} aria-hidden="true" />}</button>
-                <button type="button" className={`${styles.button} ${styles.next}`} onClick={onNext} disabled={nextDisabled} aria-label={`Next ${label.toLowerCase()} slide`}>{useHeroicons ? <ChevronRightIcon width={24} height={24} aria-hidden="true" /> : <CaretRight size={24} aria-hidden="true" />}</button>
+                <CarouselArrow direction="previous" className={`${styles.arrow} ${styles.previous}`} onClick={onPrevious} disabled={previousDisabled} aria-label={`Previous ${label.toLowerCase()} slide`} />
+                <CarouselArrow direction="next" className={`${styles.arrow} ${styles.next}`} onClick={onNext} disabled={nextDisabled} aria-label={`Next ${label.toLowerCase()} slide`} />
             </div>
         </div>
     );

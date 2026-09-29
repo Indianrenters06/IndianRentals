@@ -12,9 +12,6 @@
 .titleRow { display: flex; align-items: center; justify-content: center; gap: 12px; width: 100%; }
 .copy h3 { min-width: 0; font-size: clamp(20px, 2.2vw, 27px); }
 .copy a, .copy button { pointer-events: auto; }
-.arrow { position: relative; display: grid; place-items: center; width: 24px; height: 24px; flex-shrink: 0; border-radius: 50%; color: var(--color-grey-900); background: white; cursor: pointer; }
-.arrow::before { content: ''; position: absolute; inset: -10px; }
-.arrow:hover { background: var(--color-orange-300); }
 .dots { display: flex; justify-content: center; gap: 4px; border-radius: 999px; background: #141414a8; padding: 4px 8px; backdrop-filter: blur(8px); }
 .dots button { display: grid; place-items: center; width: 32px; height: 22px; cursor: pointer; }
 .dots span { width: 24px; height: 5px; border-radius: 999px; background: #ffffff85; transition: background-color 160ms ease; }

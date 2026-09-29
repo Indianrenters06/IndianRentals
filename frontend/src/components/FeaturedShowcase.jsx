@@ -4,8 +4,9 @@ import React, { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
-import { ArrowRight, CaretLeft, CaretRight, Pause, Play } from '@phosphor-icons/react';
+import { ArrowRight, Pause, Play } from '@phosphor-icons/react';
 import carouselStyles from './FeaturedCarousel.module.css';
+import CarouselArrow from './CarouselArrow';
 import { useDispatch } from 'react-redux';
 import { addToCart } from '../redux/features/cartSlice';
 import { ProductCard } from './BestRentedProducts';
@@ -287,9 +288,9 @@ const BannerCarousel = ({ banners = [], current, setCurrent }) => {
                 </AnimatePresence>
                 <div className={carouselStyles.copy}>
                     <div className={carouselStyles.titleRow}>
-                        {banners.length > 1 && <button type="button" className={carouselStyles.arrow} aria-label="Previous collections slide" onClick={() => { setPaused(true); go(-1); }}><CaretLeft size={16} weight="bold" aria-hidden="true" /></button>}
+                        {banners.length > 1 && <CarouselArrow direction="previous" aria-label="Previous collections slide" onClick={() => { setPaused(true); go(-1); }} />}
                         <h3><Link href={resolveCmsHref(slide.href)}>{slide.title}</Link></h3>
-                        {banners.length > 1 && <button type="button" className={carouselStyles.arrow} aria-label="Next collections slide" onClick={() => { setPaused(true); go(1); }}><CaretRight size={16} weight="bold" aria-hidden="true" /></button>}
+                        {banners.length > 1 && <CarouselArrow direction="next" aria-label="Next collections slide" onClick={() => { setPaused(true); go(1); }} />}
                     </div>
                     <p>{slide.subtitle}</p>
                     {banners.length > 1 && <div className={carouselStyles.dots} role="group" aria-label="Collections slides">

@@ -8,7 +8,6 @@
 .track > span { display: block; height: 100%; background: var(--color-grey-900); transition: width 180ms ease; }
 .actions { display: flex; gap: 8px; flex-shrink: 0; }
 .button { display: grid; place-items: center; width: 44px; height: 44px; flex-shrink: 0; border-radius: 50%; background: var(--color-grey-100); color: var(--color-grey-900); cursor: pointer; transition: background-color 160ms ease, color 160ms ease; }
-.next { background: var(--color-grey-100); color: var(--color-grey-900); }
 .button:hover:not(:disabled) { background: var(--color-orange-300); color: var(--color-grey-900); }
 .button:disabled { background: var(--color-grey-100); color: var(--color-grey-400); cursor: not-allowed; }
 .button:focus-visible, .segment:focus-visible { outline: 2px solid var(--color-grey-900); outline-offset: 3px; }
@@ -22,12 +21,11 @@
 .hero .segment[aria-current] span { height: 5px; background: white; }
 .hero .segment:hover span { background: white; }
 .hero .actions { display: contents; }
-.hero .button { position: absolute; top: 50%; transform: translateY(-50%); width: 26px; height: 40px; border-radius: 9px; background: var(--color-grey-100); color: var(--color-grey-700); pointer-events: auto; }
-.hero .button::before { content: ''; position: absolute; inset: -2px -9px; }
+.hero .arrow { position: absolute; top: 50%; transform: translateY(-50%); pointer-events: auto; }
 .hero .previous { left: -13px; }
 .hero .next { right: -13px; }
-.hero .playback { top: auto; bottom: 12px; right: 16px; transform: none; width: 32px; height: 32px; background: #14141480; color: white; border-radius: 50%; }
-.hero .button:focus-visible, .hero .segment:focus-visible { outline-color: var(--color-orange-300); }
+.hero .playback { position: absolute; top: auto; bottom: 12px; right: 16px; transform: none; width: 32px; height: 32px; background: #14141480; color: white; border-radius: 50%; pointer-events: auto; }
+.hero .segment:focus-visible { outline-color: var(--color-orange-300); }
 @media(min-width:1024px) {
     .hero .previous { left: -36px; }
     .hero .next { right: -36px; }
@@ -47,12 +45,11 @@
 .campaign .segment span { height: 5px; background: #9ca3af; }
 .campaign .segment[aria-current] span, .campaign .segment:hover span { background: #141414; }
 .campaign .actions { display: contents; }
-.campaign .button { position: absolute; top: calc((100% - 56px) / 2); transform: translateY(-50%); width: 30px; height: 40px; border-radius: 9px; background: #f9fafb; color: #141414; pointer-events: auto; }
-.campaign .button:hover:not(:disabled) { background: #f3f4f6; color: #141414; }
+.campaign .arrow { position: absolute; top: calc((100% - 56px) / 2); transform: translateY(-50%); pointer-events: auto; }
 .campaign .previous { left: -15px; }
 .campaign .next { right: -15px; }
-.campaign .playback { top: auto; bottom: 6px; right: 0; transform: none; width: 32px; height: 32px; border-radius: 50%; background: #141414; color: #fff; }
-.campaign .button:focus-visible, .campaign .segment:focus-visible { outline-color: #ffcf46; }
+.campaign .playback { position: absolute; top: auto; bottom: 6px; right: 0; transform: none; width: 32px; height: 32px; border-radius: 50%; background: #141414; color: #fff; pointer-events: auto; }
+.campaign .segment:focus-visible { outline-color: #ffcf46; }
 @media(max-width:767px) {
     .campaign .previous { left: -8px; }
     .campaign .next { right: -8px; }
@@ -65,9 +62,9 @@
 .offers .segment span, .gallery .segment span { width: 4px; height: 4px; background: var(--color-grey-700); }
 .offers .segment[aria-current] span, .gallery .segment[aria-current] span { width: 6px; height: 6px; border: 1px solid var(--color-grey-700); background: transparent; }
 .offers .actions, .gallery .actions { display: contents; }
-.offers .button, .gallery .button { position: absolute; top: 50%; transform: translateY(-50%); pointer-events: auto; width: 34px; height: 40px; }
+.offers .arrow, .gallery .arrow { position: absolute; top: 50%; transform: translateY(-50%); pointer-events: auto; }
 .offers .previous, .gallery .previous { left: 8px; }
 .offers .next, .gallery .next { right: 8px; }
-.offers .button { top: calc((100% - 40px) / 2); border-radius: 9px; }
-.offers .playback { top: auto; right: 0; bottom: 0; transform: none; width: 32px; height: 32px; }
+.offers .arrow { top: calc((100% - 40px) / 2); }
+.offers .playback { position: absolute; top: auto; right: 0; bottom: 0; transform: none; width: 32px; height: 32px; pointer-events: auto; }
 @media(min-width:1280px) { .offers .previous { left: -36px; } .offers .next { right: -36px; } }
