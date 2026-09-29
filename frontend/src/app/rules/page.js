@@ -1,4 +1,9 @@
 import PolicyPage from '@/components/PolicyPage';
+import { getPolicyMetadata } from '@/lib/policyMetadata';
+
+export async function generateMetadata() {
+    return getPolicyMetadata("rules", "Rules & Charges", "/rules");
+}
 
 const FALLBACK_CONTENT = `<h2>Rules & Charges</h2>
 <h3>Delivery Charges</h3>

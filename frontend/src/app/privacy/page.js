@@ -1,4 +1,9 @@
 import PolicyPage from '@/components/PolicyPage';
+import { getPolicyMetadata } from '@/lib/policyMetadata';
+
+export async function generateMetadata() {
+    return getPolicyMetadata("privacy", "Privacy Policy", "/privacy", "Read the IndianRenters Privacy Policy to understand how we collect, use, and protect your personal information.");
+}
 
 const FALLBACK_CONTENT = `
 <h2>1. Introduction & Regulatory Scope</h2>

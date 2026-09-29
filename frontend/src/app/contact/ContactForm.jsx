@@ -9,15 +9,27 @@ export default function ContactForm({ content }) {
     const [intent,setIntent] = useState('rental');
     const [values,setValues] = useState(empty);
     const [pending,setPending] = useState(false);
+    const [availability,setAvailability] = useState('checking');
     const [error,setError] = useState('');
     const [receipt,setReceipt] = useState(null);
     const success = useRef(null);
     const attempt = useRef(null);
     const sending = useRef(false);
+    useEffect(() => {
+        if (new URLSearchParams(window.location.search).get('intent') === 'support') setIntent('support');
+    }, []);
+    useEffect(() => {
+        const controller = new AbortController();
+        fetch(`${API}/api/contact/enquiries`, { signal: controller.signal, cache: 'no-store' })
+            .then(response => setAvailability([200, 401, 403].includes(response.status) ? 'ready' : 'unavailable'))
+            .catch(error => { if (error.name !== 'AbortError') setAvailability('unavailable'); });
+        return () => controller.abort();
+    }, []);
     useEffect(()=>{ if(receipt) success.current?.focus(); },[receipt]);
     const set = (key,value) => setValues(previous=>({...previous,[key]:value}));
     async function submit(event) {
         event.preventDefault();
+        if (availability !== 'ready') return;
         if(sending.current) return;
         const payload = { ...values, intent };
         const fingerprint = JSON.stringify(payload);
@@ -32,7 +44,7 @@ export default function ContactForm({ content }) {
         finally { sending.current=false; setPending(false); }
     }
     if(receipt) return <div className={styles.confirmation} ref={success} tabIndex={-1} role="status"><CheckIcon aria-hidden="true" /><h2>{content.successTitle}</h2><p>{content.successMessage}</p><p>Reference: {receipt}</p><button className="btn-primary" onClick={()=>{setReceipt(null);setValues(empty);}}>Send another request</button></div>;
-    return <form onSubmit={submit} aria-busy={pending}>
+    return <form id="contact-form" className="scroll-mt-28" onSubmit={submit} aria-busy={pending}>
         <fieldset disabled={pending} className={styles.intent}><legend className="sr-only">What can we help with?</legend>{[['rental','I want to rent'],['support','I need support']].map(([value,label])=><label key={value} className={intent===value?styles.selected:''}><input type="radio" name="intent" value={value} checked={intent===value} onChange={()=>{setIntent(value);setError('');}}/><span>{label}</span></label>)}</fieldset>
         <h2>{content[`${intent}Title`]}</h2><p className={styles.formIntro}>{content[`${intent}Intro`]}</p>
         <fieldset disabled={pending} className={styles.fields}>
@@ -45,7 +57,8 @@ export default function ContactForm({ content }) {
             <label className={styles.full}>{intent==='rental'?'A little about your plans':'How can we help?'} {intent==='rental'&&<span className={styles.optional}>(optional)</span>}<textarea name="message" rows={3} required={intent==='support'} maxLength={2000} value={values.message} onChange={e=>set('message',e.target.value)} placeholder={intent==='rental'?'Equipment, quantity, dates — anything that helps us understand your needs.':'Tell us what happened and what you need help with.'}/></label>
         </fieldset>
         <label className={styles.consent}><input name="consent" type="checkbox" checked={values.consent} onChange={e=>set('consent',e.target.checked)} required disabled={pending}/><span>I agree to the <Link href="/privacy" target="_blank" rel="noopener noreferrer">privacy policy</Link>.</span></label>
+        {availability==='unavailable'&&<p className={styles.error} role="alert">Online enquiries are temporarily unavailable. Please call <a href={`tel:${content.phone.replace(/[^+\d]/g,'')}`}>{content.phone}</a> or email <a href={`mailto:${content.email}`}>{content.email}</a> instead.</p>}
         {error&&<p className={styles.error} role="alert">{error}</p>}
-        <div className={styles.submit}><button className="btn-primary" type="submit" disabled={pending}>{pending?'Sending…':content[`${intent}Button`]}</button></div>
+        <div className={styles.submit}><button className="btn-primary" type="submit" disabled={pending||availability!=='ready'}>{pending?'Sending…':availability==='checking'?'Checking availability…':content[`${intent}Button`]}</button></div>
     </form>;
 }

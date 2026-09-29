@@ -1,4 +1,9 @@
 import PolicyPage from '@/components/PolicyPage';
+import { getPolicyMetadata } from '@/lib/policyMetadata';
+
+export async function generateMetadata() {
+    return getPolicyMetadata("kyc-policy", "KYC Verification Policy", "/kyc-policy");
+}
 
 const FALLBACK = `<h2>KYC Verification Policy</h2>
 <p>To ensure a secure and trusted rental experience, all customers are required to complete a one-time KYC (Know Your Customer) verification process.</p>

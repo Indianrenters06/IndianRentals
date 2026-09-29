@@ -3,10 +3,10 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { ChevronRightIcon } from '@heroicons/react/24/outline';
 import { useSelector } from 'react-redux';
 import { selectWishlistItems } from '@/redux/features/wishlistSlice';
 import ProductCard from '@/components/ProductCard';
+import { profileTitleClassName } from '../profileTitle';
 
 export default function WishlistPage() {
     const items = useSelector(selectWishlistItems);
@@ -21,35 +21,27 @@ export default function WishlistPage() {
 
     if (!items || items.length === 0) {
         return (
-            <div className="bg-white min-h-[500px] flex flex-col items-center justify-center text-center px-4 py-10 md:py-12">
-                {/* Breadcrumb */}
-                <nav className="w-full max-w-[1200px] mx-auto px-4 md:px-8 mb-6 flex items-center gap-1 flex-wrap">
-                    <Link href="/" className="text-[14px] font-medium text-[#586A84] hover:text-black transition-colors whitespace-nowrap" style={{ fontFamily: "'Mona Sans', sans-serif" }}>Shop all</Link>
-                    <ChevronRightIcon className="w-[12px] h-[12px] text-[#586A84] shrink-0" strokeWidth={2.5} />
-                    <span className="text-[14px] font-semibold text-[#1D1D1F]" style={{ fontFamily: "'Mona Sans', sans-serif" }}>My Wishlist</span>
-                </nav>
-                {/* Illustration */}
-                <div className="relative w-[300px] md:w-[516px] max-w-full aspect-[350/328] md:aspect-[516/328] mb-4">
+            <div className="flex min-h-[540px] flex-col items-center bg-white pb-16 text-center sm:min-h-[560px]">
+                <h1 className={`w-full text-left ${profileTitleClassName}`}>My Wishlist</h1>
+                <div className="relative mb-4 aspect-square w-[min(100%,350px)]">
                     <Image
-                        src="/empty-state-courier.png"
-                        alt="Your wish list is empty"
+                        src="/empty-wishlist-line-art.png"
+                        alt="A hand tapping the heart on a laptop to save it to an empty wishlist"
                         fill
                         className="object-contain"
                         priority
                     />
                 </div>
 
-                <h2 className="text-[25px] md:text-[36px] font-semibold text-black tracking-tight mb-1 leading-tight">
-                    Your wish list is wishless...
-                </h2>
+                <h2 className="mb-1 text-[25px] font-semibold leading-tight tracking-tight text-[#141414] md:text-[36px]">No saved products yet</h2>
 
-                <p className="text-[12px] md:text-[16px] font-semibold text-[#757575] max-w-[300px] md:max-w-none mb-4">
-                    Click on the heart in the corner of any product to save them here.
+                <p className="mb-4 max-w-[330px] text-[14px] leading-5 text-[#545454] md:max-w-[540px] md:text-[16px] md:leading-6">
+                    Select the heart on a product to keep it here for later.
                 </p>
 
                 <Link
                     href="/"
-                    className="btn-primary text-[12px] md:text-[16px] py-1.5 md:py-2 px-5"
+                    className="inline-flex min-h-11 items-center justify-center rounded-full bg-[#ffcf46] px-6 text-[14px] font-semibold text-[#141414] transition-colors hover:bg-[#f3bf35] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#141414] md:text-[16px]"
                 >
                     Explore Products
                 </Link>
@@ -59,18 +51,8 @@ export default function WishlistPage() {
 
     return (
         <div className="bg-white w-full">
-            {/* Breadcrumb */}
-            <nav className="w-full max-w-[1200px] mx-auto px-1 md:px-2 pt-4 pb-0 flex items-center gap-1 flex-wrap">
-                <Link href="/" className="text-[14px] font-medium text-[#586A84] hover:text-black transition-colors whitespace-nowrap" style={{ fontFamily: "'Mona Sans', sans-serif" }}>Shop all</Link>
-                <ChevronRightIcon className="w-[12px] h-[12px] text-[#586A84] shrink-0" strokeWidth={2.5} />
-                <span className="text-[14px] font-semibold text-[#1D1D1F]" style={{ fontFamily: "'Mona Sans', sans-serif" }}>My Wishlist</span>
-            </nav>
-
-            <div className="px-1 md:px-2 py-2 md:py-4">
-            <h1
-                className="text-[24px] md:text-[36px] font-semibold text-black tracking-tight mb-5 md:mb-6"
-                style={{ fontFamily: "'Mona Sans', sans-serif" }}
-            >
+            <div>
+            <h1 className={`${profileTitleClassName} mb-5 md:mb-6`}>
                 My Wishlist <span className="text-[#757575] font-medium">({items.length})</span>
             </h1>
 

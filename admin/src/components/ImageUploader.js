@@ -23,7 +23,9 @@ import { CloudArrowUp, Image as PhosphorImage, CheckCircle, Warning } from "@pho
 const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
 const getToken = () => (typeof window !== "undefined" ? localStorage.getItem("adminToken") : null);
 
-const ACCEPT = "image/jpeg,image/png,image/webp,image/gif";
+const IMAGE_ACCEPT = "image/jpeg,image/png,image/webp,image/gif,image/avif";
+const MEDIA_ACCEPT = `${IMAGE_ACCEPT},video/mp4,video/webm`;
+const isVideoUrl = (url = "") => /\.(mp4|webm)(?:[?#]|$)/i.test(url) || /\/video\/upload\//.test(url);
 
 export default function ImageUploader({
     onUpload,
@@ -33,6 +35,7 @@ export default function ImageUploader({
     existingUrl = "",
     existingUrls = [],
     className = "",
+    allowVideo = false,
 }) {
     const fileRef = useRef(null);
     const [dragging, setDragging] = useState(false);
@@ -150,7 +153,7 @@ export default function ImageUploader({
                 <input
                     ref={fileRef}
                     type="file"
-                    accept={ACCEPT}
+                    accept={allowVideo ? MEDIA_ACCEPT : IMAGE_ACCEPT}
                     multiple={multiple}
                     className="hidden"
                     onChange={handleFileChange}
@@ -175,7 +178,7 @@ export default function ImageUploader({
                                 {dragging ? "Drop to upload" : "Click or drag & drop"}
                             </p>
                             <p className="text-xs text-slate-400 mt-0.5">
-                                JPG, PNG, WebP {multiple ? "· select multiple files" : "· one file"}
+                                {allowVideo ? "JPG, PNG, WebP, AVIF, GIF, MP4 or WebM · max 30 MB" : "JPG, PNG, WebP, AVIF or GIF"} {multiple ? "· select multiple files" : "· one file"}
                             </p>
                         </div>
                     </>
@@ -197,11 +200,8 @@ export default function ImageUploader({
             {/* Single-mode preview */}
             {!multiple && preview && (
                 <div className="relative w-full rounded-2xl overflow-hidden border-2 border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 group">
-                    <img
-                        src={preview}
-                        alt="Uploaded preview"
-                        className="w-full max-h-36 object-contain p-2"
-                    />
+                    {isVideoUrl(preview) ? <video src={preview} muted controls playsInline className="w-full max-h-36 object-contain p-2" />
+                        : <img src={preview} alt="Uploaded preview" className="w-full max-h-36 object-contain p-2" />}
                     <button type="button"
                         onClick={(e) => { e.stopPropagation(); removeSingle(); }}
                         className="absolute top-2 right-2 w-7 h-7 rounded-full bg-red-500 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity text-base font-bold shadow-lg hover:bg-red-600"

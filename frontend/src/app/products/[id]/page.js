@@ -1,4 +1,5 @@
 "use client";
+import { cmsUrl } from '@/lib/cmsPreview';
 import React, { useState, useEffect, useMemo } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -11,12 +12,12 @@ import { addToCart } from '../../../redux/features/cartSlice';
 import { getProductById } from '../../../services/productService';
 import { checkServiceability } from '../../../services/serviceabilityService';
 import BestRentedProducts from '../../../components/BestRentedProducts';
-import RentVsBuy from '../../../components/RentVsBuy';
 import SimpleRentComparison from './SimpleRentComparison';
 import FaqSection from '../../../components/FaqSection';
 import Testimonials from '../../../components/Testimonials';
 import CompareTenures from '../../../components/CompareTenures';
-import CancellationSidebar from '../../../components/CancellationSidebar';
+import ProductDetailDrawer from '../../../components/ProductDetailDrawer';
+import DeliveryCheck from '../../../components/DeliveryCheck';
 
 import { Heart, Export as ExportIcon, Package, Truck, CalendarDots, MapPin, ArrowRight, ShieldCheck, CheckCircle, Wrench } from '@phosphor-icons/react';
 import styles from './page.module.css';
@@ -48,7 +49,7 @@ export default function ProductDetailPage() {
     const [gallerySwiper, setGallerySwiper] = useState(null);
     const [mobileImageIndex, setMobileImageIndex] = useState(0);
     const [isCompareOpen, setIsCompareOpen] = useState(false);
-    const [isCancellationOpen, setIsCancellationOpen] = useState(false);
+    const [activeInfoDrawer, setActiveInfoDrawer] = useState(null);
     const [reviewRating, setReviewRating] = useState(0);
     const [reviewText, setReviewText] = useState('');
     const [reviewSubmitted, setReviewSubmitted] = useState(false);
@@ -89,7 +90,7 @@ export default function ProductDetailPage() {
         const fetchLayout = async () => {
             try {
                 const API = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
-                const cmsRes = await window.fetch(`${API}/api/cms/product-page`);
+                const cmsRes = await window.fetch(cmsUrl('product-page'));
                 if (cmsRes.ok) setGlobalLayout(await cmsRes.json());
             } catch (e) {
                 console.error("Failed to load product page layout", e);
@@ -158,6 +159,7 @@ export default function ProductDetailPage() {
     }));
 
     const currentPlan = tenures.find(t => duration <= t.months) || tenures[tenures.length - 1];
+    const tenureDiscount = basePrice > 0 ? Math.max(0, Math.round((1 - currentPlan.price / basePrice) * 100)) : 0;
     const monthWord = (n) => (n === 1 ? cms('MonthLabel', 'Month') : cms('MonthsLabel', 'Months'));
 
     const handleAddToCart = () => {
@@ -171,7 +173,7 @@ export default function ProductDetailPage() {
             monthlyRent: currentPlan.price,
             duration: duration,
             quantity: 1, // Quantity fixed to 1
-            refundableAmount: product.securityDeposit || 10000,
+            refundableAmount: product.securityDeposit ?? 0,
             description: product.description,
             tenures: tenures,
             sourceUrl: `/products/${product._id}`,
@@ -202,21 +204,11 @@ export default function ProductDetailPage() {
     if (error || !product) return <div className="min-h-screen flex justify-center items-center">{cms('NotFoundText', 'Product not found')}</div>;
 
     // Derived Data
-    const mainImage = product.images && product.images.length > 0 ? product.images[0] : "/images/placeholder.png";
+    const galleryImages = product.images?.length ? product.images : ['/images/placeholder.png'];
+    const mainImage = galleryImages[0];
 
     // Specs fall back to the CMS default list when the product has none.
-    const cmsDefaultSpecs = pageLayout?.productPageDefaultSpecs?.length > 0
-        ? pageLayout.productPageDefaultSpecs
-        : [
-            { label: 'DISPLAY', value: '16.2 inches (3024 x 1964)' },
-            { label: 'GRAPHICS', value: 'Apple Integrated 16-core GPU' },
-            { label: 'DIMENSIONS', value: '35.57 x 35.57 x 1.68 cm * 2.14 kg' },
-            { label: 'OPERATING SYSTEM', value: 'Mac OS' },
-            { label: 'MEMORY', value: '24GB' },
-            { label: 'PROCESSOR', value: 'Apple M4 Pro' },
-            { label: 'STORAGE', value: '512GB SSD' },
-            { label: 'KEYBOARD LANGUAGE', value: 'English (Qwerty)' }
-        ];
+    const cmsDefaultSpecs = pageLayout?.productPageDefaultSpecs || [];
     const specRows = product.specifications && product.specifications.length > 0
         ? product.specifications
         : [{ label: 'MODEL', value: product.name }, ...cmsDefaultSpecs];
@@ -261,11 +253,11 @@ export default function ProductDetailPage() {
                     {/* Image Card */}
                     <div className={styles.mobileGallery} style={{ background: '#fff', border: '1px solid #EEE', borderRadius: '16px', aspectRatio: '1 / 1', width: '100%', marginInline: 'auto', position: 'relative', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                         {/* Discount Badge */}
-                        <div style={{ position: 'absolute', top: '13px', left: '14px', background: '#ED2115', borderRadius: '27px', padding: '4px 14px', zIndex: 10, display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0px 3px 2px rgba(120,120,120,0.05), 0px 1px 1px rgba(120,120,120,0.09)' }}>
+                        {tenureDiscount > 0 && <div style={{ position: 'absolute', top: '13px', left: '14px', background: '#ED2115', borderRadius: '27px', padding: '4px 14px', zIndex: 10, display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0px 3px 2px rgba(120,120,120,0.05), 0px 1px 1px rgba(120,120,120,0.09)' }}>
                             <span style={{ fontFamily: "'Mona Sans', sans-serif", fontWeight: 600, fontSize: '12px', lineHeight: '1.2', color: '#FFF2F1', letterSpacing: '-0.48px', whiteSpace: 'nowrap' }}>
-                                {product.mrp ? `${Math.round(((product.mrp - (product.rentalPrice || 0)) / product.mrp) * 100)}% off` : cms('DiscountText', '20% off')}
+                                {tenureDiscount}% off monthly rent
                             </span>
-                        </div>
+                        </div>}
                         {/* Action Icons */}
                         <div style={{ position: 'absolute', top: '10px', right: '10px', display: 'flex', flexDirection: 'column', gap: '8px', zIndex: 10 }}>
                             <div style={{ width: '24px', height: '24px', background: '#EEE', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
@@ -276,19 +268,19 @@ export default function ProductDetailPage() {
                             </div>
                         </div>
                         {/* Main Image */}
-                        <div style={{ position: 'relative', width: '78%', height: '78%' }}>
+                        <div style={{ position: 'relative', width: '100%', height: '100%' }}>
                             <Image
-                                src={product.images?.[mobileImageIndex] || product.images?.[0] || '/images/placeholder.png'}
+                                src={galleryImages[mobileImageIndex] || mainImage}
                                 alt={product.name}
                                 fill
-                                className="object-contain"
+                                className="object-cover"
                                 priority
                                 sizes="300px"
                             />
                         </div>
-                    <CarouselControls count={product.images?.length || 1} current={mobileImageIndex} label="Product images" variant="gallery"
-                        onPrevious={() => setMobileImageIndex(index => (index - 1 + product.images.length) % product.images.length)}
-                        onNext={() => setMobileImageIndex(index => (index + 1) % product.images.length)}
+                    <CarouselControls count={galleryImages.length} current={mobileImageIndex} label="Product images" variant="gallery"
+                        onPrevious={() => setMobileImageIndex(index => (index - 1 + galleryImages.length) % galleryImages.length)}
+                        onNext={() => setMobileImageIndex(index => (index + 1) % galleryImages.length)}
                         onSelect={setMobileImageIndex}
                     />
                     </div>
@@ -396,11 +388,16 @@ export default function ProductDetailPage() {
                             </div>
                         </div>
 
+                        <div className="flex items-center justify-between gap-4 border-b border-[#e2e2e2] px-3 py-2 text-xs font-semibold text-[#141414]">
+                            {on('PriceBreakdown') && <button type="button" onClick={() => setActiveInfoDrawer('breakdown')} className="min-h-10 underline underline-offset-4">{cms('PriceBreakdownText', 'Full breakdown')}</button>}
+                            {on('Compare') && <button type="button" onClick={() => setIsCompareOpen(true)} className="min-h-10 underline underline-offset-4">{cms('CompareLinkText', 'See all tenures')}</button>}
+                        </div>
+
                         {/* View All Benefits */}
                         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '19px' }}>
-                            <span style={{ fontFamily: "'Mona Sans', sans-serif", fontWeight: 700, fontSize: '12px', color: '#333', textDecoration: 'underline', letterSpacing: '-0.4px', cursor: 'pointer' }}>
+                            <button type="button" onClick={() => document.getElementById('mobile-product-benefits')?.scrollIntoView({ behavior: 'smooth', block: 'center' })} style={{ fontFamily: "'Mona Sans', sans-serif", fontWeight: 700, fontSize: '12px', color: '#333', textDecoration: 'underline', letterSpacing: '-0.4px', cursor: 'pointer' }}>
                                 View All Benefits
-                            </span>
+                            </button>
                         </div>
                     </div>
 
@@ -409,7 +406,7 @@ export default function ProductDetailPage() {
                         <h3 style={{ fontFamily: "'Mona Sans', sans-serif", fontWeight: 600, fontSize: '12px', color: '#1F1F1F', letterSpacing: '-0.4px', margin: 0 }}>
                             {cms('BenefitsHeading', "What's included in your plan")}
                         </h3>
-                        <div className={styles.benefitGrid}>
+                        <div id="mobile-product-benefits" className={styles.benefitGrid}>
                             {(product.benefits?.length > 0 ? product.benefits : (pageLayout?.productPageBenefits || [
                                 'Fully Functional (100% Tested)', 'Original Accessories Included', 'Free Repairs & Maintenance', 'Professionally sanitized'
                             ])).map((b, i) => {
@@ -417,7 +414,7 @@ export default function ProductDetailPage() {
                                 const Icon = [ShieldCheck, Package, Wrench, CheckCircle][i % 4];
                                 return (
                                     <div key={i} className={styles.benefitCard}>
-                                        <Icon size={22} color="#141414" weight="regular" style={{ flexShrink: 0 }} />
+                                        <Icon size={24} color="#fff" weight="regular" style={{ flexShrink: 0 }} />
                                         <span>{text}</span>
                                     </div>
                                 );
@@ -431,8 +428,8 @@ export default function ProductDetailPage() {
                             <span style={{ fontFamily: "'Mona Sans', sans-serif", fontWeight: 600, fontSize: '13px', color: '#333' }}>
                                 {cms('DepositLabel', '100% Refundable Deposit')}
                             </span>
-                            <span style={{ fontFamily: "'Mona Sans', sans-serif", fontWeight: 700, fontSize: '15px', color: '#141414', whiteSpace: 'nowrap' }}>
-                                ₹{product.securityDeposit ? `${product.securityDeposit.toLocaleString('en-IN')}/-` : '20,000/-'}
+                            <span style={{ fontFamily: "'Mona Sans', sans-serif", fontWeight: 700, fontSize: '15px', color: '#141414', textAlign: 'right' }}>
+                                {product.securityDeposit != null ? `₹${Number(product.securityDeposit).toLocaleString('en-IN')}/-` : 'Confirmed at checkout'}
                             </span>
                         </div>
                         <div className={styles.noticeCard}>
@@ -444,6 +441,7 @@ export default function ProductDetailPage() {
                                     {cms('KycLine2', 'to get your items the next day')}
                                 </span>
                             </div>
+                            <Image src={cms('KycImage', '/images/product/kyc-delivery.webp')} alt="" width={76} height={76} unoptimized className={styles.kycImage} />
                         </div>
                     </div>
 
@@ -460,64 +458,46 @@ export default function ProductDetailPage() {
                     {/* Cancellation + Tenure Info */}
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '11px' }}>
                         <div className={styles.infoCard}>
-                            <div style={{ width: '28px', height: '28px', background: '#FFF3D3', borderRadius: '33px', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                                <Truck size={18} color="#E26E00" />
+                            <div className={styles.infoIcon}>
+                                <Truck size={24} weight="regular" />
                             </div>
                             <span style={{ flex: 1, fontFamily: "'Mona Sans', sans-serif", fontWeight: 600, fontSize: '13px', lineHeight: '18px', color: '#333' }}>
                                 {cms('CancelCardText', 'What if I cancel or return before 6 months?')}
                             </span>
-                            <button onClick={() => setIsCancellationOpen(true)} style={{ fontFamily: "'Mona Sans', sans-serif", fontWeight: 600, fontSize: '11px', color: '#141414', textDecoration: 'underline', background: 'none', border: 'none', cursor: 'pointer', whiteSpace: 'nowrap', flexShrink: 0 }}>
-                                View Details
+                            <button type="button" onClick={() => setActiveInfoDrawer('cancel')} className={styles.infoLink}>
+                                {cms('CancelCardLinkText', 'View Details')}
                             </button>
                         </div>
                         <div className={styles.infoCard}>
-                            <div style={{ width: '28px', height: '28px', background: '#FFF3D3', borderRadius: '33px', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                                <CalendarDots size={20} color="#E26E00" />
+                            <div className={styles.infoIcon}>
+                                <CalendarDots size={24} weight="regular" />
                             </div>
                             <span style={{ flex: 1, fontFamily: "'Mona Sans', sans-serif", fontWeight: 600, fontSize: '13px', lineHeight: '18px', color: '#333' }}>
                                 {cms('ExtendCardText', 'How do I extend tenure after 6 months?')}
                             </span>
-                            <Link href={cms('ExtendCardLink', '#')} style={{ fontFamily: "'Mona Sans', sans-serif", fontWeight: 600, fontSize: '11px', color: '#141414', textDecoration: 'underline', whiteSpace: 'nowrap', flexShrink: 0 }}>
-                                View Details
-                            </Link>
+                            <button type="button" onClick={() => setActiveInfoDrawer('extend')} className={styles.infoLink}>{cms('ExtendCardLinkText', 'View Details')}</button>
                         </div>
                     </div>
 
                     {/* Delivery Check */}
-                    <div style={{ background: '#fff', border: '1px solid #E2E2E2', borderRadius: '16px', padding: '8px 10px', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                        <div style={{ width: '28px', height: '28px', background: '#CBFFC5', borderRadius: '25px', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                            <MapPin weight="fill" size={18} color="hsla(120, 100%, 35%, 1)" />
-                        </div>
-                        <span style={{ fontFamily: "'Mona Sans', sans-serif", fontWeight: 600, fontSize: '8px', color: '#1F1F1F', letterSpacing: '-0.4px', whiteSpace: 'nowrap' }}>Delivery</span>
-                        <div style={{ flex: 1, border: '1px solid #CBCBCB', borderRadius: '8px', padding: '8px 12px', minWidth: 0 }}>
-                            <input
-                                type="text"
-                                inputMode="numeric"
-                                maxLength={6}
-                                value={pincode}
-                                onChange={(e) => { setPincode(e.target.value.replace(/\D/g, '').slice(0, 6)); setPinResult(null); }}
-                                onKeyDown={(e) => { if (e.key === 'Enter') handleCheckPincode(); }}
-                                placeholder={cms('PincodePlaceholder', 'Check availability in your state')}
-                                style={{ border: 'none', outline: 'none', fontSize: '8px', fontFamily: "'Mona Sans', sans-serif", fontWeight: 500, color: '#AFAFAF', width: '100%', background: 'transparent', letterSpacing: '-0.4px' }}
-                            />
-                        </div>
-                    </div>
-                    {pinResult && (
-                        <div style={{ fontFamily: "'Mona Sans', sans-serif", fontWeight: 600, fontSize: '11px', color: pinResult.serviceable ? 'green' : '#ED2115', paddingLeft: '4px' }}>
-                            {pinResult.serviceable ? '✓' : '✕'} {pinResult.message}
-                        </div>
-                    )}
+                    <DeliveryCheck
+                        id="delivery-pincode-mobile"
+                        value={pincode}
+                        onChange={(value) => { setPincode(value); setPinResult(null); }}
+                        onCheck={handleCheckPincode}
+                        checking={pinChecking}
+                        result={pinResult}
+                        label={cms('DeliveryLabel', 'Check delivery')}
+                        placeholder={cms('PincodePlaceholder', 'Enter your pincode')}
+                        buttonLabel={cms('PincodeMobileCtaText', 'Check')}
+                    />
 
                     {/* Product Details Tabs */}
-                    <div style={{ background: '#fff', border: '1px solid #E2E2E2', borderRadius: '16px', padding: '16px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                    {on('Tabs') && <div className={styles.detailsPanel}>
                         {/* Tab Buttons */}
                         <div style={{ display: 'flex', gap: '6px', alignItems: 'center', overflowX: 'auto' }}>
-                            {[
-                                { key: 'details', label: 'Product Details', active: activeTab === 'details' },
-                                { key: 'return', label: 'Return Policy', active: activeTab === 'return' },
-                                { key: 'shipping', label: 'Shipping Policy', active: activeTab === 'shipping' },
-                            ].map(tab => (
-                                <button key={tab.key} onClick={() => setActiveTab(tab.key)} style={{ background: tab.active ? '#333' : 'transparent', color: tab.active ? '#fff' : '#333', border: `${tab.active ? 0 : 0.565}px solid #E2E2E2`, borderRadius: '33px', padding: '4px 12px', fontFamily: "'Mona Sans', sans-serif", fontWeight: 600, fontSize: '10px', letterSpacing: '-0.4px', cursor: 'pointer', whiteSpace: 'nowrap', lineHeight: '16px', flexShrink: 0 }}>
+                            {tabs.filter(tab => tab.key !== 'review').map(tab => (
+                                <button key={tab.key} type="button" onClick={() => setActiveTab(tab.key)} className={`${styles.detailTab} ${tab.active ? styles.detailTabActive : ''}`}>
                                     {tab.label}
                                 </button>
                             ))}
@@ -529,23 +509,23 @@ export default function ProductDetailPage() {
                             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                                 {specRows.map((item, i) => (
                                     <div key={i} style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                                        <span style={{ fontFamily: "'Mona Sans', sans-serif", fontWeight: 600, fontSize: '8px', color: '#333', letterSpacing: '-0.4px', textTransform: 'uppercase' }}>{item.label}</span>
-                                        <span style={{ fontFamily: "'Mona Sans', sans-serif", fontWeight: 400, fontSize: '8px', color: '#545454', letterSpacing: '-0.4px' }}>{item.value}</span>
+                                        <span className={styles.specLabel}>{item.label}</span>
+                                        <span className={styles.specValue}>{item.value}</span>
                                     </div>
                                 ))}
                             </div>
                         )}
                         {activeTab === 'return' && (
-                            <p style={{ fontFamily: "'Mona Sans', sans-serif", fontSize: '12px', color: '#545454', lineHeight: '1.6' }}>
-                                {product.returnPolicy || 'Standard return policy applies. Please contact support for details.'}
+                            <p className={styles.policyText}>
+                                {product.returnPolicy || cms('DefaultReturnPolicy', 'Standard return policy applies. Please contact support for details.')}
                             </p>
                         )}
                         {activeTab === 'shipping' && (
-                            <p style={{ fontFamily: "'Mona Sans', sans-serif", fontSize: '12px', color: '#545454', lineHeight: '1.6' }}>
-                                {product.shippingPolicy || 'Standard shipping. Delivery usually takes 2-4 business days.'}
+                            <p className={styles.policyText}>
+                                {product.shippingPolicy || cms('DefaultShippingPolicy', 'Standard shipping policy applies. Contact support for delivery details.')}
                             </p>
                         )}
-                    </div>
+                    </div>}
                 </div>
 
                 {/* ── Best Rented Products (Mobile) ── */}
@@ -629,7 +609,7 @@ export default function ProductDetailPage() {
 
                                 {/* Main Image Slider */}
                                 <div
-                                    className="relative w-full bg-white flex items-center justify-center p-4 lg:p-6 group overflow-hidden shrink-0"
+                                    className="relative w-full bg-white flex items-center justify-center group overflow-hidden shrink-0"
                                     style={{
                                         width: '100%',
                                         aspectRatio: '1 / 1',
@@ -678,12 +658,10 @@ export default function ProductDetailPage() {
                                         {(product.images && product.images.length > 0 ? product.images : [mainImage]).map((img, index) => (
                                             <SwiperSlide key={index} className="flex items-center justify-center">
                                                 <div
-                                                    className="relative flex items-center justify-center group-hover:scale-105 transition-transform duration-700 ease-out overflow-hidden"
+                                                    className="relative flex items-center justify-center overflow-hidden"
                                                     style={{
                                                         width: '100%',
-                                                        maxWidth: '516px',
-                                                        aspectRatio: '1 / 1',
-                                                        maxHeight: '100%',
+                                                        height: '100%',
                                                         opacity: 1
                                                     }}
                                                 >
@@ -691,7 +669,7 @@ export default function ProductDetailPage() {
                                                         src={img}
                                                         alt={`${product.name} - ${index}`}
                                                         fill
-                                                        className="object-contain"
+                                                        className="object-cover"
                                                         sizes="(max-width: 768px) 100vw, 50vw"
                                                         priority={index === 0}
                                                     />
@@ -724,7 +702,7 @@ export default function ProductDetailPage() {
                                             {(product.images && product.images.length > 0 ? product.images : [mainImage]).map((img, i) => (
                                                 <SwiperSlide key={i}>
                                                     <div className="w-full aspect-square bg-white border border-[#EDEDED] rounded-xl cursor-pointer transition-all hover:border-gray-400 overflow-hidden relative">
-                                                        <Image src={img} alt={`Thumb ${i}`} fill className="object-contain p-2" />
+                                                        <Image src={img} alt={`Thumbnail ${i + 1} of ${product.name}`} fill className="object-cover" />
                                                     </div>
                                                 </SwiperSlide>
                                             ))}
@@ -980,27 +958,9 @@ export default function ProductDetailPage() {
                                             {/* Links */}
                                             <div className="flex justify-between items-center">
                                                 {on('PriceBreakdown') ? (
-                                                    <Link
-                                                        href={cms('PriceBreakdownLink', '#')}
-                                                        style={{
-                                                            width: '89px',
-                                                            height: '16px',
-                                                            fontFamily: '"Mona Sans", sans-serif',
-                                                            fontWeight: 500,
-                                                            fontSize: 'var(--font-size-1, 12px)',
-                                                            lineHeight: 'var(--font-line-height-1, 16px)',
-                                                            letterSpacing: 'var(--font-letter-spacing-8, normal)',
-                                                            color: 'var(--color-orange-orange-600, hsla(29, 100%, 50%, 1))',
-                                                            textDecoration: 'underline',
-                                                            textDecorationStyle: 'solid',
-                                                            textUnderlineOffset: '8.5%',
-                                                            textDecorationThickness: '11%',
-                                                            opacity: 1,
-                                                            whiteSpace: 'nowrap'
-                                                        }}
-                                                    >
+                                                    <button type="button" onClick={() => setActiveInfoDrawer('breakdown')} className={styles.infoLink}>
                                                         {cms('PriceBreakdownText', 'price breakdown')}
-                                                    </Link>
+                                                    </button>
                                                 ) : <span />}
                                                 {on('Compare') && (
                                                     <button
@@ -1084,18 +1044,15 @@ export default function ProductDetailPage() {
                                                             {cms('PerMonthLabel', '/month')}
                                                         </span>
                                                     </div>
-                                                    <div className="flex items-center gap-[4px]">
+                                                    {tenureDiscount > 0 && <div className="flex items-center gap-[4px]">
                                                         <span className="text-[16px] font-medium line-through shrink-0" style={{ color: '#757575' }}>
-                                                            ₹{product.mrp ? product.mrp * quantity : Math.round(currentPlan.price * 1.5) * quantity}
+                                                            ₹{basePrice * quantity}
                                                         </span>
                                                         <span className="text-[12px] font-normal flex items-center justify-center whitespace-nowrap shrink-0"
                                                             style={{ height: '22px', borderRadius: '27px', padding: '4px 10px', background: '#ed2115', color: '#fff2f1' }}>
-                                                            {product.mrp
-                                                                ? `${Math.round(((product.mrp - currentPlan.price) / product.mrp) * 100)}% off`
-                                                                : cms('DiscountText', '20% off')
-                                                            }
+                                                            {tenureDiscount}% off monthly rent
                                                         </span>
-                                                    </div>
+                                                    </div>}
                                                 </div>
                                             </div>
 
@@ -1126,6 +1083,8 @@ export default function ProductDetailPage() {
                                                 style={{ borderTop: '1px solid hsla(0, 0%, 93%, 1)' }}
                                             >
                                                 <button
+                                                    type="button"
+                                                    onClick={() => document.getElementById('desktop-product-benefits')?.scrollIntoView({ behavior: 'smooth', block: 'center' })}
                                                     className="hover:opacity-80 transition-opacity"
                                                     style={{
                                                         fontFamily: '"Mona Sans", sans-serif',
@@ -1176,7 +1135,7 @@ export default function ProductDetailPage() {
                                             </h4>
                                         </div>
 
-                                        <div className={styles.benefitGrid}>
+                                        <div id="desktop-product-benefits" className={styles.benefitGrid}>
                                             {(product.benefits && product.benefits.length > 0 ? product.benefits : (pageLayout?.productPageBenefits || [
                                                 "Fully Functional (100% Tested)", "Free Repairs & Maintenance", "Original Accessories Included", "Professionally sanitized"
                                             ])).map((benefit, idx) => {
@@ -1187,7 +1146,7 @@ export default function ProductDetailPage() {
                                                         key={idx}
                                                         className={styles.benefitCard}
                                                     >
-                                                        <div className="shrink-0 flex items-center justify-center"><Icon size={22} weight="regular" /></div>
+                                                        <div className="shrink-0 flex items-center justify-center"><Icon size={24} color="#fff" weight="regular" /></div>
                                                         <span>
                                                             {benefitText}
                                                         </span>
@@ -1217,8 +1176,8 @@ export default function ProductDetailPage() {
                                                 <span style={{ fontFamily: '"Mona Sans", sans-serif', fontWeight: 600, fontSize: '13px', lineHeight: '18px', color: '#333' }}>
                                                     {cms('DepositLabel', '100% Refundable Deposit')}
                                                 </span>
-                                                <span style={{ fontFamily: '"Mona Sans", sans-serif', fontWeight: 700, fontSize: '16px', lineHeight: '23px', color: '#141414', whiteSpace: 'nowrap' }}>
-                                                    ₹{product.securityDeposit ? `${product.securityDeposit.toLocaleString('en-IN')}/-` : '20,000/-'}
+                                                <span style={{ fontFamily: '"Mona Sans", sans-serif', fontWeight: 700, fontSize: '16px', lineHeight: '23px', color: '#141414', textAlign: 'right' }}>
+                                                    {product.securityDeposit != null ? `₹${Number(product.securityDeposit).toLocaleString('en-IN')}/-` : 'Confirmed at checkout'}
                                                 </span>
                                             </div>
                                         )}
@@ -1240,11 +1199,7 @@ export default function ProductDetailPage() {
                                                         {cms('KycLine2', 'to get your items the next day')}
                                                     </span>
                                                 </div>
-                                                {cms('KycImage', '') && (
-                                                    <div style={{ width: '64px', alignSelf: 'stretch', background: 'hsla(0, 0%, 89%, 1)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, overflow: 'hidden' }}>
-                                                        <img src={cms('KycImage', '')} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                                                    </div>
-                                                )}
+                                                <Image src={cms('KycImage', '/images/product/kyc-delivery.webp')} alt="" width={76} height={76} unoptimized className={styles.kycImage} />
                                             </div>
                                         )}
                                     </div>
@@ -1280,15 +1235,13 @@ export default function ProductDetailPage() {
                                             }}
                                         >
                                             <div className="flex items-center w-full gap-[10px]">
-                                                <div className="rounded-full flex items-center justify-center shrink-0"
-                                                    style={{ width: '28px', height: '28px', background: 'hsla(44, 100%, 91%, 1)' }}>
-                                                    <Truck size={20} color="#141414" />
+                                                <div className={styles.infoIcon}>
+                                                    <Truck size={24} weight="regular" />
                                                 </div>
                                                 <span style={{ flex: 1, fontFamily: '"Mona Sans", sans-serif', fontWeight: 600, fontSize: '13px', lineHeight: '18px', color: '#333' }}>
                                                     {cms('CancelCardText', 'What if I cancel or return before 6 months?')}
                                                 </span>
-                                                <button onClick={() => setIsCancellationOpen(true)}
-                                                    style={{ fontFamily: '"Mona Sans", sans-serif', fontSize: '12px', fontWeight: 600, color: 'hsla(3, 86%, 51%, 1)', textDecoration: 'underline', background: 'none', border: 'none', cursor: 'pointer', padding: 0, whiteSpace: 'nowrap', flexShrink: 0 }}>
+                                                <button type="button" onClick={() => setActiveInfoDrawer('cancel')} className={styles.infoLink}>
                                                     {cms('CancelCardLinkText', 'View Details')}
                                                 </button>
                                             </div>
@@ -1303,17 +1256,15 @@ export default function ProductDetailPage() {
                                             }}
                                         >
                                             <div className="flex items-center w-full gap-[10px]">
-                                                <div className="rounded-full flex items-center justify-center shrink-0"
-                                                    style={{ width: '28px', height: '28px', background: 'hsla(44, 100%, 91%, 1)' }}>
-                                                    <CalendarDots size={20} color="#141414" />
+                                                <div className={styles.infoIcon}>
+                                                    <CalendarDots size={24} weight="regular" />
                                                 </div>
                                                 <span style={{ flex: 1, fontFamily: '"Mona Sans", sans-serif', fontWeight: 600, fontSize: '13px', lineHeight: '18px', color: '#333' }}>
                                                     {cms('ExtendCardText', 'How do I extend tenure after 6 months?')}
                                                 </span>
-                                                <Link href={cms('ExtendCardLink', '#')}
-                                                    style={{ fontFamily: '"Mona Sans", sans-serif', fontSize: '12px', fontWeight: 600, color: 'hsla(3, 86%, 51%, 1)', textDecoration: 'underline', whiteSpace: 'nowrap', flexShrink: 0 }}>
+                                                <button type="button" onClick={() => setActiveInfoDrawer('extend')} className={styles.infoLink}>
                                                     {cms('ExtendCardLinkText', 'View Details')}
-                                                </Link>
+                                                </button>
                                             </div>
                                         </div>
                                     </div>
@@ -1321,106 +1272,24 @@ export default function ProductDetailPage() {
 
                                 {/* Delivery Details */}
                                 {on('PincodeCheck') && (
-                                    <div className="w-full flex flex-col gap-[6px]">
-                                        <div
-                                            style={{
-                                                width: '100%',
-                                                display: 'flex',
-                                                alignItems: 'center',
-                                                padding: '10px',
-                                                borderRadius: '16px',
-                                                background: 'hsla(0, 0%, 100%, 1)',
-                                                border: '1px solid hsla(0, 0%, 89%, 1)',
-                                                gap: '8px'
-                                            }}
-                                        >
-                                            <div className="rounded-full flex items-center justify-center shrink-0"
-                                                style={{ width: '28px', height: '28px', background: 'hsla(120, 100%, 95%, 1)' }}>
-                                                <MapPin weight="fill" size={18} color="hsla(120, 100%, 35%, 1)" />
-                                            </div>
-                                            <span style={{ fontFamily: '"Mona Sans", sans-serif', fontWeight: 600, fontSize: '12px', color: '#545454', whiteSpace: 'nowrap' }}>
-                                                {cms('DeliveryLabel', 'Delivery')}
-                                            </span>
-                                            <div className="flex items-center px-3" style={{ border: '1px solid #cbcbcb', borderRadius: '8px', flex: 1, height: '39px' }}>
-                                                <input
-                                                    type="text"
-                                                    inputMode="numeric"
-                                                    maxLength={6}
-                                                    value={pincode}
-                                                    onChange={(e) => {
-                                                        setPincode(e.target.value.replace(/\D/g, '').slice(0, 6));
-                                                        setPinResult(null);
-                                                    }}
-                                                    onKeyDown={(e) => { if (e.key === 'Enter') handleCheckPincode(); }}
-                                                    placeholder={cms('PincodePlaceholder', 'Enter your pincode')}
-                                                    style={{ border: 'none', outline: 'none', fontSize: '12px', letterSpacing: '-0.4px', fontFamily: '"Mona Sans", sans-serif', fontWeight: 500, width: '100%', background: 'transparent', color: '#1D1D1F' }}
-                                                />
-                                            </div>
-                                            <button
-                                                onClick={handleCheckPincode}
-                                                disabled={pinChecking}
-                                                className="hidden lg:flex flex-col items-start justify-center"
-                                                style={{ width: '125px', fontFamily: '"Mona Sans", sans-serif', fontWeight: 700, fontSize: '12px', lineHeight: '16px', letterSpacing: '-0.4px', color: '#757575', background: 'none', border: 'none', cursor: pinChecking ? 'wait' : 'pointer', padding: 0, flexShrink: 0 }}>
-                                                {pinChecking ? (
-                                                    <span>{cms('PincodeCheckingText', 'Checking…')}</span>
-                                                ) : (
-                                                    <>
-                                                        <span>{cms('PincodeCtaLine1', 'Check availability')}</span>
-                                                        <span>{cms('PincodeCtaLine2', 'in your state')}</span>
-                                                    </>
-                                                )}
-                                            </button>
-                                            {/* Mobile check button */}
-                                            <button
-                                                onClick={handleCheckPincode}
-                                                disabled={pinChecking}
-                                                className="lg:hidden shrink-0"
-                                                style={{ height: '38px', padding: '0 14px', borderRadius: '10px', fontFamily: '"Mona Sans", sans-serif', fontWeight: 700, fontSize: '12px', color: '#1D1D1F', background: 'hsla(44, 100%, 64%, 1)', border: 'none', cursor: pinChecking ? 'wait' : 'pointer', whiteSpace: 'nowrap' }}>
-                                                {pinChecking ? '…' : cms('PincodeMobileCtaText', 'Check')}
-                                            </button>
-                                        </div>
-
-                                        {pinResult && (
-                                            <div
-                                                className="flex items-center gap-[6px] px-[8px]"
-                                                style={{
-                                                    fontFamily: '"Mona Sans", sans-serif',
-                                                    fontWeight: 600,
-                                                    fontSize: '12.5px',
-                                                    lineHeight: '16px',
-                                                    color: pinResult.serviceable ? 'hsla(122, 100%, 30%, 1)' : 'hsla(3, 86%, 51%, 1)'
-                                                }}
-                                            >
-                                                <span>{pinResult.serviceable ? '✓' : '✕'}</span>
-                                                <span>{pinResult.message}</span>
-                                            </div>
-                                        )}
-                                    </div>
+                                    <DeliveryCheck
+                                        id="delivery-pincode-desktop"
+                                        value={pincode}
+                                        onChange={(value) => { setPincode(value); setPinResult(null); }}
+                                        onCheck={handleCheckPincode}
+                                        checking={pinChecking}
+                                        result={pinResult}
+                                        label={cms('DeliveryLabel', 'Check delivery')}
+                                        placeholder={cms('PincodePlaceholder', 'Enter your pincode')}
+                                        buttonLabel={cms('PincodeMobileCtaText', 'Check')}
+                                    />
                                 )}
                             </div>
                         </div>
 
                         {/* High-Fidelity Details Tabs Section */}
                         {on('Tabs') && (
-                            <div
-                                className="px-[10px] lg:px-[20px]"
-                                style={{
-                                    width: '100%',
-                                    height: 'auto',
-                                    minHeight: '200px',
-                                    marginTop: '24px',
-                                    background: 'hsla(0, 0%, 100%, 1)',
-                                    border: '1px solid var(--color-grey-grey-200, hsla(0, 0%, 89%, 1))',
-                                    borderRadius: '24px',
-                                    paddingTop: '16px',
-                                    paddingBottom: '20px',
-                                    display: 'flex',
-                                    flexDirection: 'column',
-                                    gap: '16px',
-                                    opacity: 1,
-                                    boxSizing: 'border-box'
-                                }}
-                            >
+                            <div className={styles.detailsPanel}>
                                 {/* Tabs Header */}
                                 <div className="flex items-center gap-[8px] w-full overflow-x-auto no-scrollbar">
                                     {tabs.map(({ key, label }) => {
@@ -1593,7 +1462,7 @@ export default function ProductDetailPage() {
                     />
                 )}
 
-                {on('RentVsBuy') && <><RentVsBuy /><SimpleRentComparison /></>}
+                {on('RentVsBuy') && <SimpleRentComparison />}
 
                 {on('Faq') && (
                     product.faqs && product.faqs.length > 0 ? (
@@ -1607,22 +1476,33 @@ export default function ProductDetailPage() {
                     )
                 )}
 
-                {/* Side Drawers */}
-                <CompareTenures
-                    isOpen={isCompareOpen}
-                    onClose={() => setIsCompareOpen(false)}
-                    selectedTenure={duration}
-                    onSelect={(val) => {
-                        setDuration(val);
-                    }}
-                    tenures={tenures}
-                />
-
-                <CancellationSidebar
-                    isOpen={isCancellationOpen}
-                    onClose={() => setIsCancellationOpen(false)}
-                />
             </div>{/* ── END DESKTOP ── */}
+
+            <CompareTenures
+                isOpen={isCompareOpen}
+                onClose={() => setIsCompareOpen(false)}
+                selectedTenure={duration}
+                onSelect={setDuration}
+                tenures={tenures}
+            />
+            <ProductDetailDrawer isOpen={activeInfoDrawer === 'breakdown'} onClose={() => setActiveInfoDrawer(null)} title="Rental price breakdown">
+                <p className="mb-6 text-[#545454]">Your monthly rent for the selected minimum rental period.</p>
+                <dl className="space-y-4 rounded-2xl border border-[#e2e2e2] p-5">
+                    <div className="flex justify-between gap-4"><dt>Monthly rent</dt><dd className="font-semibold text-[#141414]">₹{currentPlan.price.toLocaleString('en-IN')}</dd></div>
+                    <div className="flex justify-between gap-4"><dt>Minimum rental period</dt><dd className="font-semibold text-[#141414]">{duration} {duration === 1 ? 'month' : 'months'}</dd></div>
+                    <div className="flex justify-between gap-4 border-t border-[#e2e2e2] pt-4"><dt>Rent over this period</dt><dd className="font-semibold text-[#141414]">₹{(currentPlan.price * duration).toLocaleString('en-IN')}</dd></div>
+                    <div className="flex justify-between gap-4"><dt>Refundable deposit</dt><dd className="font-semibold text-[#141414]">{product.securityDeposit != null ? `₹${Number(product.securityDeposit).toLocaleString('en-IN')}` : 'Confirmed at checkout'}</dd></div>
+                </dl>
+                <p className="mt-5 text-sm text-[#545454]">Taxes and any other charges are confirmed at checkout.</p>
+            </ProductDetailDrawer>
+            <ProductDetailDrawer isOpen={activeInfoDrawer === 'cancel'} onClose={() => setActiveInfoDrawer(null)} title="Cancellation and returns">
+                <p>{product.returnPolicy || cms('DefaultReturnPolicy', 'Review the return policy or contact support for the terms that apply to this rental.')}</p>
+                <Link href="/return-policy" className="mt-6 inline-flex min-h-11 items-center font-semibold text-[#141414] underline underline-offset-4">Read return policy</Link>
+            </ProductDetailDrawer>
+            <ProductDetailDrawer isOpen={activeInfoDrawer === 'extend'} onClose={() => setActiveInfoDrawer(null)} title="Extend your rental">
+                <p>{cms('ExtendCardBody', 'Contact support before your current rental period ends to discuss available terms and pricing.')}</p>
+                <Link href={cms('ExtendCardLink', '/contact') === '#' ? '/contact' : cms('ExtendCardLink', '/contact')} className="mt-6 inline-flex min-h-11 items-center font-semibold text-[#141414] underline underline-offset-4">Contact support</Link>
+            </ProductDetailDrawer>
         </div>
     );
 }

@@ -1,4 +1,5 @@
 'use client';
+import { cmsUrl } from '@/lib/cmsPreview';
 
 import React, { useEffect, useState } from 'react';
 import Image from 'next/image';
@@ -25,7 +26,7 @@ export default function ContactPage() {
     const [submitStatus, setSubmitStatus] = useState('');
 
     useEffect(() => {
-        window.fetch(`${API}/api/cms/contact?t=${Date.now()}`)
+        window.fetch(cmsUrl('contact'))
             .then(r => r.ok ? r.json() : null)
             .then(d => { if (d) setCms(d); })
             .catch(() => { });

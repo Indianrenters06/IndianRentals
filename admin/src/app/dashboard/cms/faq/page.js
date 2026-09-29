@@ -61,7 +61,7 @@ export default function WebsiteFaqManager() {
     const load = useCallback(async () => {
         try {
             setLoading(true);
-            const res = await window.fetch(`${API}/api/cms/faq?t=${Date.now()}`);
+            const res = await window.fetch(`${API}/api/cms/faq/draft`, { headers: { Authorization: `Bearer ${getToken()}` }, cache: 'no-store' });
             if (res.ok) {
                 const d = await res.json();
                 setData({ ...DEFAULTS, ...d, faqItems: Array.isArray(d.faqItems) ? d.faqItems : [] });
@@ -97,7 +97,8 @@ export default function WebsiteFaqManager() {
             });
             if (!res.ok) throw new Error((await res.json()).message || 'Failed to save');
             setSaved(true);
-            toast.success('FAQ page saved!');
+            window.dispatchEvent(new CustomEvent('cms:draft-saved', { detail: { page: 'faq' } }));
+            toast.success('FAQ draft saved. Publish it when ready.');
             setTimeout(() => setSaved(false), 3000);
         } catch (e) {
             toast.error(e.message);
@@ -137,7 +138,7 @@ export default function WebsiteFaqManager() {
                     <Chip color="secondary" variant="flat" size="sm">{data.faqItems.length} FAQ{data.faqItems.length !== 1 ? 's' : ''}</Chip>
                     <button onClick={save} disabled={saving || loading}
                         className="flex items-center gap-2 h-9 px-4 rounded-xl !bg-indigo-600 hover:!bg-indigo-700 disabled:opacity-60 text-white font-semibold text-sm shadow-lg shadow-indigo-500/20 transition-all">
-                        {saving ? <Spinner size="sm" color="white" /> : <FloppyDisk size={15} weight="bold" />} Save
+                        {saving ? <Spinner size="sm" color="white" /> : <FloppyDisk size={15} weight="bold" />} Save draft
                     </button>
                 </div>
             </div>

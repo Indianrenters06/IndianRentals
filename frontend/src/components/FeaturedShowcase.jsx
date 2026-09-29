@@ -1,6 +1,8 @@
 "use client";
+import { cmsUrl } from '@/lib/cmsPreview';
 import React, { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { ArrowRight, CaretLeft, CaretRight, Pause, Play } from '@phosphor-icons/react';
 import carouselStyles from './FeaturedCarousel.module.css';
@@ -8,6 +10,7 @@ import { useDispatch } from 'react-redux';
 import { addToCart } from '../redux/features/cartSlice';
 import { ProductCard } from './BestRentedProducts';
 import { productsForShowcaseSlide } from './showcaseProducts';
+import { resolveCmsHref } from '@/lib/cmsLinks';
 
 const API = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
 
@@ -33,7 +36,7 @@ const FALLBACK_BANNERS = [
         title: "Apple Products",
         subtitle: "MacBooks | iPads | iPhones | Mac Studio | Mac Mini",
         image: DEFAULT_CATEGORY_IMAGES.apple,
-        href: "/categories/apple",
+        href: "/category/apple",
         bg: "linear-gradient(135deg, #1f1435 0%, #3b2069 45%, #6a3ea1 80%, #9055d4 100%)",
         category: "MacBook"
     },
@@ -41,7 +44,7 @@ const FALLBACK_BANNERS = [
         title: "Gaming Laptops",
         subtitle: "ASUS ROG | Lenovo Legion | MSI | HP Omen",
         image: DEFAULT_CATEGORY_IMAGES.gaming,
-        href: "/categories/gaming",
+        href: "/products",
         bg: "linear-gradient(135deg, #070d18 0%, #0d2238 45%, #133c5e 80%, #1c5f8a 100%)",
         category: "Gaming"
     },
@@ -49,7 +52,7 @@ const FALLBACK_BANNERS = [
         title: "Smart Devices",
         subtitle: "Tablets | Smartwatches | Earbuds | Accessories",
         image: DEFAULT_CATEGORY_IMAGES.smart,
-        href: "/categories/smart-devices",
+        href: "/products",
         bg: "linear-gradient(135deg, #0b1a14 0%, #153326 45%, #1f523c 80%, #2b7756 100%)",
         category: "SmartPhone"
     }
@@ -60,7 +63,7 @@ const MobileFeaturedCard = ({ banner }) => {
     const router = useRouter();
     return (
         <div
-            onClick={() => router.push(banner?.href || "/products")}
+            onClick={() => router.push(resolveCmsHref(banner?.href))}
             style={{
                 width: '100%',
                 background: 'radial-gradient(181.93% 64.7% at 50% 72.89%, #FFFFFF 0%, #D6F1FF 100%)',
@@ -150,7 +153,7 @@ const MobileFeaturedCard = ({ banner }) => {
                 <button
                     onClick={(e) => {
                         e.stopPropagation();
-                        router.push(banner?.href || "/products");
+                        router.push(resolveCmsHref(banner?.href));
                     }}
                     style={{
                         display: 'inline-flex',
@@ -276,7 +279,7 @@ const BannerCarousel = ({ banners = [], current, setCurrent }) => {
                         initial="enter" animate="center" exit="exit"
                         transition={{ duration: reducedMotion ? 0 : 0.4 }}
                         className={carouselStyles.slide}>
-                        <Link href={slide.href || '/products'} aria-label={`Explore ${slide.title}`} className={carouselStyles.link}>
+                        <Link href={resolveCmsHref(slide.href)} aria-label={`Explore ${slide.title}`} className={carouselStyles.link}>
                             {displayImage && <img src={displayImage} alt="" className={carouselStyles.image} />}
 
                         </Link>
@@ -285,7 +288,7 @@ const BannerCarousel = ({ banners = [], current, setCurrent }) => {
                 <div className={carouselStyles.copy}>
                     <div className={carouselStyles.titleRow}>
                         {banners.length > 1 && <button type="button" className={carouselStyles.arrow} aria-label="Previous collections slide" onClick={() => { setPaused(true); go(-1); }}><CaretLeft size={16} weight="bold" aria-hidden="true" /></button>}
-                        <h3><Link href={slide.href || '/products'}>{slide.title}</Link></h3>
+                        <h3><Link href={resolveCmsHref(slide.href)}>{slide.title}</Link></h3>
                         {banners.length > 1 && <button type="button" className={carouselStyles.arrow} aria-label="Next collections slide" onClick={() => { setPaused(true); go(1); }}><CaretRight size={16} weight="bold" aria-hidden="true" /></button>}
                     </div>
                     <p>{slide.subtitle}</p>
@@ -319,7 +322,7 @@ const FeaturedShowcase = () => {
     useEffect(() => {
         const fetchCms = async () => {
             try {
-                const res = await fetch(`${API}/api/cms/homepage`);
+                const res = await fetch(cmsUrl('homepage'));
                 if (res.ok) {
                     const d = await res.json();
                     const banners = d.featuredShowcaseBanners?.length

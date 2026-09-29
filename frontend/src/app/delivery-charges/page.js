@@ -1,4 +1,9 @@
 import PolicyPage from '@/components/PolicyPage';
+import { getPolicyMetadata } from '@/lib/policyMetadata';
+
+export async function generateMetadata() {
+    return getPolicyMetadata("delivery-charges", "Delivery Charges", "/delivery-charges");
+}
 
 const FALLBACK_CONTENT = `<h2>Delivery Charges</h2>
 <p>We offer doorstep delivery across major cities in India. Delivery charges vary based on your location and order value.</p>

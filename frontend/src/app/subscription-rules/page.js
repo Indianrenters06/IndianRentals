@@ -1,4 +1,9 @@
 import PolicyPage from '@/components/PolicyPage';
+import { getPolicyMetadata } from '@/lib/policyMetadata';
+
+export async function generateMetadata() {
+    return getPolicyMetadata("subscription-rules", "Subscription Rules", "/subscription-rules");
+}
 
 const FALLBACK_CONTENT = `<h2>Subscription Rules</h2>
 <p>Our subscription plans give you access to premium rental products at a predictable monthly cost. Please read the following rules carefully.</p>

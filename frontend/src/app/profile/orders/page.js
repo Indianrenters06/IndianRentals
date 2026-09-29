@@ -3,11 +3,11 @@
 import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { PiSmileySad } from 'react-icons/pi';
+import { ArrowClockwise, ArrowRight, Info, Package } from '@phosphor-icons/react';
 
 import { getMyOrders, cancelOrder } from '../../../services/orderService';
 import { getKYCStatus } from '../../../services/kycService';
-import InfoIcon from '../../../components/common/InfoIcon';
+import { profileTitleClassName } from '../profileTitle';
 
 // Status pill — Figma "Process-tags" shape (rounded-16, px-8 py-4, 12px semibold), colour per status.
 const StatusTag = ({ status }) => {
@@ -106,12 +106,16 @@ export default function MyOrdersPage() {
     const [viewType, setViewType] = useState('orders'); // 'orders' | 'subscriptions'
     const [orders, setOrders] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [fetchError, setFetchError] = useState(false);
+    const [refreshKey, setRefreshKey] = useState(0);
     const [cancelTarget, setCancelTarget] = useState(null);
     const [cancelling, setCancelling] = useState(false);
     const [cancelError, setCancelError] = useState('');
 
     useEffect(() => {
         const fetchOrders = async () => {
+            setLoading(true);
+            setFetchError(false);
             try {
                 const [data, kyc] = await Promise.all([getMyOrders(), getKYCStatus()]);
                 const kycStatus = String(kyc?.status || '').toLowerCase();
@@ -137,12 +141,13 @@ export default function MyOrdersPage() {
                 setOrders(mappedOrders);
             } catch (error) {
                 console.error("Failed to fetch orders:", error);
+                setFetchError(true);
             } finally {
                 setLoading(false);
             }
         };
         fetchOrders();
-    }, []);
+    }, [refreshKey]);
 
     const orderTabs = ['All Orders', 'KYC Pending', 'KYC Under Review', 'Active Orders', 'Inactive Orders', 'Order Failed'];
     const subscriptionTabs = ['All Subscriptions', 'Active Subscriptions', 'Inactive Subscriptions'];
@@ -186,39 +191,53 @@ export default function MyOrdersPage() {
         setActiveTab(type === 'orders' ? 'All Orders' : 'All Subscriptions');
     };
 
-    // Figma varies one word per tab: "…has been failed…" (Order Failed), "…has been cancelled…" (Active Orders).
-    const infoText = viewType === 'subscriptions'
-        ? 'Once you order, Your order is automatically made into a subscription. You can extend your current subscription, cancel or renew your old subscription.'
-        : activeTab === 'Order Failed'
-            ? 'Please note, once the order has been failed your amount will be returned within 24-48 hours of cancellation'
-            : (activeTab === 'Active Orders' || activeTab === 'Inactive Orders')
-                ? 'Please note, once the order has been cancelled your amount will be returned within 24-48 hours of cancellation'
-                : 'Please note, once the order has been your amount will be returned within 24-48 hours of cancellation';
+    const showRefundNote = !loading && !fetchError && filteredOrders.length > 0 &&
+        ['Inactive Orders', 'Order Failed', 'Inactive Subscriptions'].includes(activeTab);
+    const noOrdersAtAll = orders.length === 0;
+    const emptyTitles = {
+        'All Orders': 'No orders yet',
+        'KYC Pending': 'No orders waiting for KYC',
+        'KYC Under Review': 'No KYC reviews in progress',
+        'Active Orders': 'No active orders',
+        'Inactive Orders': 'No inactive orders',
+        'Order Failed': 'No failed orders',
+        'All Subscriptions': 'No subscriptions yet',
+        'Active Subscriptions': 'No active subscriptions',
+        'Inactive Subscriptions': 'No inactive subscriptions',
+    };
+    const emptyTitle = noOrdersAtAll
+        ? (viewType === 'subscriptions' ? 'No subscriptions yet' : 'No orders yet')
+        : emptyTitles[activeTab];
+    const emptyDescription = noOrdersAtAll
+        ? (viewType === 'subscriptions'
+            ? 'Your subscriptions will appear here when available.'
+            : 'When you rent a product, you can track your order here.')
+        : 'Your orders will appear here when they match this status.';
 
     return (
         <div className="flex flex-col gap-3">
+            <h1 className={profileTitleClassName}>My Orders</h1>
             {/* Toggle — My Orders / Subscriptions — Figma "btn-extra" (node 23059:14189/14190): fixed 180x39, px-40 py-7 */}
             <div className="flex items-start gap-[10px]">
                 {[{ key: 'orders', label: 'My Orders' }, { key: 'subscriptions', label: 'Subscriptions' }].map(({ key, label }) => (
                     <button
                         key={key}
                         onClick={() => handleViewChange(key)}
-                        className={`flex flex-1 lg:flex-none lg:w-[180px] items-center justify-center rounded-[59px] px-5 lg:px-[40px] py-[7px] transition-colors ${viewType === key ? 'bg-[#333333]' : 'bg-[#eeeeee]'}`}
-                    >
-                        <p className={`font-sans font-normal text-[14px] lg:text-[18px] leading-[20px] lg:leading-[25px] tracking-[-0.8px] whitespace-nowrap ${viewType === key ? 'text-[#eeeeee]' : 'text-[#333333]'}`}>
-                            {label}
-                        </p>
+                            className={`flex min-h-11 flex-1 cursor-pointer items-center justify-center rounded-full px-5 transition-colors duration-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#141414] lg:flex-none lg:w-[180px] ${viewType === key ? 'bg-[#333333]' : 'bg-[#eeeeee] hover:bg-[#e2e2e2]'}`}
+                        >
+                            <span className={`font-sans text-[16px] font-medium leading-6 tracking-[-0.02em] whitespace-nowrap ${viewType === key ? 'text-white' : 'text-[#333333]'}`}>
+                                {label}
+                            </span>
                     </button>
                 ))}
             </div>
 
-            {/* Tabs — Figma exact: 12px font, flex-wrap, gap-x-6 gap-y-2 */}
-            <div className="flex flex-wrap items-start gap-x-6 gap-y-2 py-[10px]">
+            <div className="flex flex-wrap items-start gap-x-5 gap-y-1 py-2">
                 {currentTabs.map((tab) => {
                     const active = activeTab === tab;
                     return (
-                        <button key={tab} onClick={() => setActiveTab(tab)} className="flex flex-col items-start gap-1 shrink-0">
-                            <span className={`text-[12px] lg:text-[16px] font-semibold leading-[18px] lg:leading-[23px] tracking-[-0.4px] whitespace-nowrap ${active ? 'text-[#0d4e9b]' : 'text-[#1f1f1f]'}`}>
+                        <button key={tab} onClick={() => setActiveTab(tab)} aria-current={active ? 'page' : undefined} className="flex min-h-11 shrink-0 cursor-pointer flex-col items-start justify-center gap-1 rounded-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#141414]">
+                            <span className={`text-[14px] font-semibold leading-5 tracking-[-0.02em] whitespace-nowrap lg:text-[16px] ${active ? 'text-[#0d4e9b]' : 'text-[#1f1f1f]'}`}>
                                 {tab}
                             </span>
                             {active && <span className="h-[2px] w-full rounded-[10px] bg-[#0d4e9b]" />}
@@ -230,20 +249,34 @@ export default function MyOrdersPage() {
             {/* Divider */}
             <div className="h-px w-full bg-[#afafaf]" />
 
-            {/* Info banner */}
-            <div className="flex items-center gap-[9px] self-start rounded-[6px] border border-[#e2e2e2] bg-[#f6f6f6] px-[10px] py-[5px]">
-                <InfoIcon />
-                <p className="text-[8px] lg:text-[12px] font-semibold leading-4 tracking-[-0.4px] text-[#757575]">{infoText}</p>
-            </div>
+            {showRefundNote && (
+                <div className="flex w-full items-start gap-3 rounded-xl bg-[#f6f6f6] px-4 py-3 text-[#333333]">
+                    <Info size={20} weight="regular" className="mt-0.5 shrink-0" aria-hidden="true" />
+                    <p className="text-[14px] leading-6 sm:text-[15px]">Refund timing depends on your order. <Link href="/return-policy" className="font-semibold underline underline-offset-2 hover:text-[#141414] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#141414]">Read the return and refund policy</Link>.</p>
+                </div>
+            )}
 
             {/* Empty / loading state */}
             {loading ? (
-                <p className="text-[14px] font-medium text-[#757575]">Loading your orders…</p>
+                <p className="py-8 text-[16px] font-medium text-[#545454]" role="status">Loading your orders…</p>
+            ) : fetchError ? (
+                <section className="mt-3 flex min-h-[300px] flex-col items-center justify-center rounded-2xl border border-[#e2e2e2] bg-[#f6f6f6] px-6 py-10 text-center" role="alert">
+                    <span className="mb-6 flex size-20 items-center justify-center rounded-[16px] bg-white text-[#141414]"><Package size={38} weight="regular" aria-hidden="true" /></span>
+                    <h2 className="text-[24px] font-semibold leading-tight tracking-[-0.03em] text-[#141414] sm:text-[28px]">We couldn’t load your orders</h2>
+                    <p className="mt-2 max-w-[420px] text-[16px] leading-6 text-[#545454]">Please try again. If the problem continues, our team can help you find an order.</p>
+                    <button type="button" onClick={() => setRefreshKey(key => key + 1)} className="mt-6 inline-flex min-h-11 cursor-pointer items-center justify-center gap-2 rounded-full bg-[#ffcf46] px-6 text-[15px] font-semibold text-[#141414] transition-colors duration-200 hover:bg-[#f3bf35] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#141414]"><ArrowClockwise size={18} weight="bold" aria-hidden="true" />Try again</button>
+                </section>
             ) : filteredOrders.length === 0 ? (
-                <div className="flex items-center gap-2 text-[#757575]">
-                    <PiSmileySad size={22} />
-                    <p className="text-[14px] font-medium">We are unable to find orders.</p>
-                </div>
+                <section className="mt-3 flex min-h-[340px] flex-col items-center justify-center rounded-2xl border border-[#e2e2e2] bg-[#f6f6f6] px-6 py-10 text-center sm:min-h-[380px] sm:px-10">
+                    <span className="mb-6 flex size-20 items-center justify-center rounded-[16px] bg-white text-[#141414]"><Package size={38} weight="regular" aria-hidden="true" /></span>
+                    <h2 className="text-[24px] font-semibold leading-tight tracking-[-0.03em] text-[#141414] sm:text-[28px]">{emptyTitle}</h2>
+                    <p className="mt-2 max-w-[420px] text-[16px] leading-6 text-[#545454]">{emptyDescription}</p>
+                    {noOrdersAtAll ? (
+                        <Link href="/products" className="mt-6 inline-flex min-h-11 items-center justify-center gap-2 rounded-full bg-[#ffcf46] px-6 text-[15px] font-semibold text-[#141414] transition-colors duration-200 hover:bg-[#f3bf35] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#141414]">Explore rentals<ArrowRight size={18} weight="bold" aria-hidden="true" /></Link>
+                    ) : (
+                        <button type="button" onClick={() => setActiveTab(viewType === 'orders' ? 'All Orders' : 'All Subscriptions')} className="mt-6 inline-flex min-h-11 cursor-pointer items-center justify-center gap-2 rounded-full bg-[#ffcf46] px-6 text-[15px] font-semibold text-[#141414] transition-colors duration-200 hover:bg-[#f3bf35] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#141414]">{viewType === 'orders' ? 'View all orders' : 'View all subscriptions'}<ArrowRight size={18} weight="bold" aria-hidden="true" /></button>
+                    )}
+                </section>
             ) : (
                 <div className="flex flex-col gap-3">
                     {filteredOrders.map((order) => (
@@ -402,7 +435,7 @@ export default function MyOrdersPage() {
                     <div role="dialog" aria-modal="true" className="w-full max-w-[400px] rounded-[16px] border-[1.5px] border-[#e2e2e2] bg-white p-5">
                         <p className="text-[16px] font-semibold leading-[23px] tracking-[-0.4px] text-[#333333]">Cancel this order?</p>
                         <p className="mt-2 text-[12px] font-semibold leading-4 tracking-[-0.4px] text-[#757575]">
-                            Order #{cancelTarget.id} — {cancelTarget.productName}. Any amount paid is returned within 24-48 hours of cancellation. This cannot be undone.
+                            Order #{cancelTarget.id} — {cancelTarget.productName}. Refund eligibility and timing depend on your order and our <Link href="/return-policy" className="underline underline-offset-2">return and refund policy</Link>. This cannot be undone.
                         </p>
                         {cancelError && (
                             <p className="mt-3 text-[12px] font-semibold leading-4 tracking-[-0.4px] text-[#ed2115]">{cancelError}</p>
@@ -429,4 +462,3 @@ export default function MyOrdersPage() {
         </div>
     );
 }
-

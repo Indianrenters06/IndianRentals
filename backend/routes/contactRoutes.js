@@ -5,13 +5,14 @@ const CMS = require('../models/CMS');
 const ContactEnquiry = require('../models/ContactEnquiry');
 const { protect, admin, hasPermission } = require('../middleware/authMiddleware');
 const { normalizeContent, validateEnquiry } = require('../utils/contactValidation');
+const { decodeLegacyContactContent } = require('../utils/legacyCmsContent');
 const router = express.Router();
 const statuses = ['new','in_progress','resolved'];
 const adminOnly = [protect, admin, hasPermission('cms')];
 const handle = fn => asyncHandler(async (req,res) => { try { await fn(req,res); } catch(error) { if(error.statusCode) res.status(error.statusCode); throw error; } });
 router.post('/enquiries', rateLimit({ windowMs:15*60*1000, limit:10, standardHeaders:'draft-8', legacyHeaders:false, message:{message:'Too many requests. Please try again in 15 minutes or call us.'} }), handle(async (req,res) => {
     const page = await CMS.findOne({pageName:'contact'}).lean();
-    const values = validateEnquiry(req.body, normalizeContent(page?.contactContent || {}));
+    const values = validateEnquiry(req.body, normalizeContent(page?.contactContent || decodeLegacyContactContent(page?.pageContent) || {}));
     // The unique submission key makes retrying an uncertain network response safe.
     try { await ContactEnquiry.create(values); }
     catch(error) { if (error.code !== 11000 || !error.keyPattern?.submissionId) throw error; }

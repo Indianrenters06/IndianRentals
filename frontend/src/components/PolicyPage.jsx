@@ -1,4 +1,5 @@
 'use client';
+import { cmsUrl } from '@/lib/cmsPreview';
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
@@ -25,7 +26,7 @@ export default function PolicyPage({ cmsKey, title, image, fallbackHtml }) {
     const [loading, setLoading] = useState(true);
     useEffect(() => {
         const controller = new AbortController();
-        fetch(`${API}/api/cms/${cmsKey}`, { signal: controller.signal })
+        fetch(cmsUrl(cmsKey), { signal: controller.signal })
             .then(response => response.ok ? response.json() : null)
             .then(value => { if (!controller.signal.aborted) setCms(value); })
             .catch(() => {})

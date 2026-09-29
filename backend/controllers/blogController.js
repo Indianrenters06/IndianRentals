@@ -6,9 +6,12 @@ const sanitizeHtml = require('../utils/sanitizeHtml');
 // ── @route  GET /api/blog
 // ── @access Public
 const getAllPosts = asyncHandler(async (req, res) => {
-    const { status } = req.query;
-    const filter = status ? { status } : {};
-    const posts = await BlogPost.find(filter).sort({ createdAt: -1 }).lean();
+    const posts = await BlogPost.find({ status: 'published' }).sort({ createdAt: -1 }).lean();
+    res.json(posts);
+});
+
+const getAdminPosts = asyncHandler(async (req, res) => {
+    const posts = await BlogPost.find({}).sort({ createdAt: -1 }).lean();
     res.json(posts);
 });
 
@@ -23,7 +26,7 @@ const getPostById = asyncHandler(async (req, res) => {
         post = await BlogPost.findOne({ slug: req.params.id });
     }
 
-    if (!post) {
+    if (!post || post.status !== 'published') {
         res.status(404);
         throw new Error('Blog post not found');
     }
@@ -82,4 +85,4 @@ const deletePost = asyncHandler(async (req, res) => {
     res.json({ message: 'Blog post deleted' });
 });
 
-module.exports = { getAllPosts, getPostById, createPost, updatePost, deletePost };
+module.exports = { getAllPosts, getAdminPosts, getPostById, createPost, updatePost, deletePost };

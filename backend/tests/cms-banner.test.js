@@ -1,7 +1,7 @@
 const { test } = require('node:test');
 const assert = require('node:assert/strict');
 const CMS = require('../models/CMS');
-const { updatePage, getPage } = require('../controllers/cmsController');
+const { updatePage, getPage, publishPage } = require('../controllers/cmsController');
 
 function invoke(handler, req) {
     return new Promise((resolve, reject) => {
@@ -17,12 +17,14 @@ test('banner appearance survives the CMS write/read path without changing the im
         return doc;
     });
     await invoke(updatePage, { params: { page: 'contact' }, body: { bannerShowText: false, bannerBackground: '#123AbC' } });
+    await invoke(publishPage, { params: { page: 'contact' } });
     const { body } = await invoke(getPage, { params: { page: 'contact' } });
     assert.equal(body.bannerShowText, false);
     assert.equal(body.bannerBackground, '#123AbC');
     assert.equal(body.bannerImage, '/original.jpg');
     assert.equal(body.bannerTitle, 'Contact Us');
     await invoke(updatePage, { params: { page: 'contact' }, body: { bannerShowText: true, bannerBackground: '' } });
+    await invoke(publishPage, { params: { page: 'contact' } });
     const reset = (await invoke(getPage, { params: { page: 'contact' } })).body;
     assert.equal(reset.bannerShowText, true);
     assert.equal(reset.bannerBackground, '');
@@ -43,6 +45,7 @@ test('shared page banners retain independent admin settings', async t => {
     for (const page of pages) {
         const color = page === 'rental-process' ? '#ffcf46' : '#f6f6f6';
         await invoke(updatePage, { params: { page }, body: { bannerShowText: false, bannerBackground: color } });
+        await invoke(publishPage, { params: { page } });
         const { body } = await invoke(getPage, { params: { page } });
         assert.equal(body.bannerShowText, false, page);
         assert.equal(body.bannerBackground, color, page);

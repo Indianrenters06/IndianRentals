@@ -1,0 +1,132 @@
+{
+  "heroImage": "/images/contact-support-hero-v1.png",
+  "heroAlt": "Support specialist wearing a headset at a laptop in a warmly lit workspace",
+  "heroTitle": "Contact Us",
+  "heroShowText": true,
+  "heroBackground": "#ffffff",
+  "title": "Let’s get you",
+  "titleAccent": "set up.",
+  "intro": "A laptop for your next project.\nA full setup for your team.\nA little help along the way.",
+  "introClosing": "Whatever you need, let’s talk.",
+  "contactTitle": "A real conversation.\nA useful next step.",
+  "contactDescription": "Tell us about your plans. We’ll help you find the equipment and rental options that fit.",
+  "phone": "+91-9999819719",
+  "email": "support@indianrenters.com",
+  "hours": "Mon–Sat, 10:00 AM – 7:30 PM\nSunday closed",
+  "callLabel": "Give us a call",
+  "emailLabel": "Drop us a line",
+  "branchLinkLabel": "Find your local team",
+  "rentalTitle": "Tell us what you need.",
+  "rentalIntro": "Share a few details to start your rental enquiry.",
+  "supportTitle": "Let’s sort it out.",
+  "supportIntro": "Tell us about your rental and how we can help.",
+  "rentalButton": "Send rental enquiry",
+  "supportButton": "Send support request",
+  "successTitle": "Thank you. We’ve received your request.",
+  "successMessage": "Our team will review your message and get in touch using the contact details you shared.",
+  "equipment": [
+    "Laptops & workstations",
+    "Apple products",
+    "Cameras & lenses",
+    "Audio & visual",
+    "Office equipment",
+    "Servers & networking",
+    "Help me choose"
+  ],
+  "branchesTitle": "Close by.\nReady to help.",
+  "branchesIntro": "Select your city to find contact details\nand directions to your local branch.",
+  "branches": [
+    {
+      "id": "delhi",
+      "name": "Delhi",
+      "type": "Branch office",
+      "address": "Ground Floor, Unit No. 6, Jumbo Industrial Estate, Dr. Jha Marg, Okhla Phase 3, New Delhi – 110020",
+      "serviceNote": "",
+      "phone": "011-40735568",
+      "image": "/images/cities/delhi.png",
+      "mapUrl": "https://www.google.com/maps/search/?api=1&query=28.5581435,77.2632073"
+    },
+    {
+      "id": "mumbai",
+      "name": "Mumbai",
+      "type": "Branch office",
+      "address": "117, Sai Dham Building, MIDC Road No. 7, Andheri (East), Mumbai – 400093",
+      "serviceNote": "",
+      "phone": "022-46043845",
+      "image": "/images/cities/mumbai.png",
+      "mapUrl": "https://www.google.com/maps/search/?api=1&query=19.117338,72.8694771"
+    },
+    {
+      "id": "bangalore",
+      "name": "Bangalore",
+      "type": "Branch office",
+      "address": "1473, First Floor, 17th A Main Road, 2nd Phase JP Nagar, Bangalore – 560078",
+      "serviceNote": "",
+      "phone": "080-41104733",
+      "image": "/images/cities/bangalore.png",
+      "mapUrl": "https://www.google.com/maps/search/?api=1&query=12.9145466,77.5884224"
+    },
+    {
+      "id": "hyderabad",
+      "name": "Hyderabad",
+      "type": "Branch office",
+      "address": "11-6-837/C Red Hills, Lakdi Ka Pul, Hyderabad, Telangana – 500004",
+      "serviceNote": "",
+      "phone": "+91-9212122233",
+      "image": "/images/cities/hyderabad.png",
+      "mapUrl": "https://www.google.com/maps/search/?api=1&query=17.3993254,78.4635397"
+    },
+    {
+      "id": "noida",
+      "name": "Noida",
+      "type": "Head office",
+      "address": "The Iconic Corenthum, Tower C, L8-802, Block A, Noida Sector 62, Uttar Pradesh – 201301",
+      "serviceNote": "",
+      "phone": "+91-9999819719",
+      "image": "/images/cities/noida.png",
+      "mapUrl": "https://www.google.com/maps/search/?api=1&query=28.6275439,77.3709754"
+    },
+    {
+      "id": "pune",
+      "name": "Pune",
+      "type": "Branch office",
+      "address": "Office No. 3, 1st Floor, Kajale Heights, Paud Phata, Karve Road, Kothrud, Pune – 411038",
+      "serviceNote": "",
+      "phone": "+91-9999819719",
+      "image": "/images/cities/pune.png",
+      "mapUrl": "https://www.google.com/maps/search/?api=1&query=18.5055067,73.8250036"
+    },
+    {
+      "id": "chennai",
+      "name": "Chennai",
+      "type": "Service city",
+      "address": "",
+      "serviceNote": "Our central team can help arrange your rental in Chennai. Contact us to confirm availability at your address.",
+      "phone": "+91-9999819719",
+      "image": "/images/cities/chennai.png",
+      "mapUrl": ""
+    },
+    {
+      "id": "kolkata",
+      "name": "Kolkata",
+      "type": "Service city",
+      "address": "",
+      "serviceNote": "Our central team can help arrange your rental in Kolkata. Contact us to confirm availability at your address.",
+      "phone": "+91-9999819719",
+      "image": "/images/cities/kolkata.png",
+      "mapUrl": ""
+    }
+  ],
+  "helpTitle": "A question before you rent?",
+  "helpDescription": "Get familiar with the process, or talk it through with us.",
+  "helpLinks": [
+    {
+      "label": "How renting works",
+      "href": "/rental-process"
+    },
+    {
+      "label": "Common questions",
+      "href": "/faq"
+    }
+  ]
+}

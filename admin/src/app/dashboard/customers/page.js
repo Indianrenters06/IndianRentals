@@ -307,6 +307,7 @@ export default function CustomersManagement() {
                     <div className="flex items-center gap-3">
                         <Avatar
                             name={user.name?.charAt(0).toUpperCase() || 'U'}
+                            src={user.avatar || undefined}
                             className="bg-indigo-600 text-white font-semibold shrink-0"
                             size="sm"
                         />
@@ -554,6 +555,7 @@ export default function CustomersManagement() {
                                         <div className="flex items-start md:items-center gap-5 border-b border-slate-100 dark:border-slate-800/60 pb-6">
                                             <Avatar
                                                 name={selectedUser.name?.charAt(0).toUpperCase() || 'U'}
+                                                src={selectedUser.avatar || undefined}
                                                 className="bg-indigo-600 text-white w-20 h-20 text-2xl shadow-lg shrink-0"
                                             />
                                             <div className="flex-1 min-w-0">

@@ -1,4 +1,5 @@
 'use client';
+import { cmsUrl } from '@/lib/cmsPreview';
 
 import React, { useState, useEffect } from 'react';
 import PageBanner from '@/components/PageBanner';
@@ -11,7 +12,7 @@ const API = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
 export default function RentalProcessPage() {
     const [cms, setCms] = useState(null);
     useEffect(() => {
-        fetch(`${API}/api/cms/rental-process`)
+        fetch(cmsUrl('rental-process'))
             .then(r => r.ok ? r.json() : null)
             .then(d => { if (d) setCms(d); })
             .catch(() => {});

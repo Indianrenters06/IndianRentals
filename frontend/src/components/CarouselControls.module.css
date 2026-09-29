@@ -40,6 +40,23 @@
     .hero .playback { right: 36px; bottom: 6px; background: var(--color-grey-100); color: var(--color-grey-700); }
 }
 
+/* Campaign card arrows sit over the cards; their pagination sits below them. */
+.campaign { position: absolute; inset: 0; z-index: 20; padding: 0; pointer-events: none; }
+.campaign .progress { position: absolute; bottom: 4px; left: 50%; transform: translateX(-50%); display: flex; flex: none; width: auto; gap: 7px; padding: 4px 10px; border-radius: 999px; background: #141414; }
+.campaign .segment { flex: none; width: 36px; height: 28px; pointer-events: auto; }
+.campaign .segment span { height: 5px; background: #ffffff80; }
+.campaign .segment[aria-current] span, .campaign .segment:hover span { background: #fff; }
+.campaign .actions { display: contents; }
+.campaign .button { position: absolute; top: calc((100% - 56px) / 2); transform: translateY(-50%); width: 40px; height: 44px; border-radius: 11px; background: #f6f6f6; color: #141414; pointer-events: auto; }
+.campaign .previous { left: -20px; }
+.campaign .next { right: -20px; }
+.campaign .playback { top: auto; bottom: 6px; right: 0; transform: none; width: 32px; height: 32px; border-radius: 50%; background: #141414; color: #fff; }
+.campaign .button:focus-visible, .campaign .segment:focus-visible { outline-color: #ffcf46; }
+@media(max-width:767px) {
+    .campaign .previous { left: -8px; }
+    .campaign .next { right: -8px; }
+}
+
 /* Offers and product images retain their own dot indicators and side arrows. */
 .offers, .gallery { position: absolute; inset: 0; z-index: 15; padding: 0; pointer-events: none; }
 .offers .progress, .gallery .progress { position: absolute; inset-inline: 44px; bottom: 0; gap: 0; }

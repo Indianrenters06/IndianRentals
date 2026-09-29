@@ -1,4 +1,9 @@
 import PolicyPage from '@/components/PolicyPage';
+import { getPolicyMetadata } from '@/lib/policyMetadata';
+
+export async function generateMetadata() {
+    return getPolicyMetadata("terms", "Terms & Conditions", "/terms", "Read the IndianRenters Terms & Conditions governing equipment rentals, payments, damage policy, and service usage.");
+}
 
 const FALLBACK_CONTENT = `
 <h2>1. Agreement to Terms</h2>

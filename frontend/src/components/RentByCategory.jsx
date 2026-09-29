@@ -1,4 +1,5 @@
 "use client";
+import { cmsUrl } from '@/lib/cmsPreview';
 import React, { useState, useEffect } from 'react';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { A11y } from 'swiper/modules';
@@ -124,7 +125,7 @@ const RentByCategory = () => {
                 setDisplayCategories(sortedCategories);
 
                 // Fetch CMS Config for the section title/visibility
-                const cmsRes = await fetch(`${API}/api/cms/homepage`);
+                const cmsRes = await fetch(cmsUrl('homepage'));
                 if (cmsRes.ok) {
                     const cmsData = await cmsRes.json();
                     setCmsConfig({

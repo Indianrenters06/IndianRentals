@@ -1,4 +1,5 @@
 "use client";
+import { cmsUrl } from '@/lib/cmsPreview';
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useDispatch } from "react-redux";
@@ -43,7 +44,7 @@ const BestRentedProducts = ({ type = "bestRented", defaultTitle = "Curated Produ
     useEffect(() => {
         const fetchCMSAndProducts = async () => {
             try {
-                const cmsRes = await fetch(`${API}/api/cms/homepage`);
+                const cmsRes = await fetch(cmsUrl('homepage'));
                 let isEnabled = true;
                 let finalTitle = defaultTitle;
                 let targetIds = [];

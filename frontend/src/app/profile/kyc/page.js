@@ -1,296 +1,268 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
-import { FaFingerprint, FaCheck, FaCloudUploadAlt, FaFileAlt, FaSpinner, FaExclamationTriangle, FaEye } from 'react-icons/fa';
-import { saveKYCData, uploadKYCFiles, getKYCStatus } from '../../../services/kycService';
-import Swal from 'sweetalert2';
-import { useRouter } from 'next/navigation';
+import { useEffect, useRef, useState } from 'react';
+import { ArrowLeftIcon, ArrowRightIcon, CheckIcon, ClockIcon, CloudArrowUpIcon, DocumentTextIcon, ExclamationCircleIcon, LockClosedIcon } from '@heroicons/react/24/outline';
+import { getKYCStatus, saveKYCData, uploadKYCFiles } from '../../../services/kycService';
+import { profileTitleClassName } from '../profileTitle';
+
+const INITIAL_DETAILS = {
+    name: '', fatherName: '', fatherPhone: '', email: '', phone: '',
+    permanentAddress: '', currentAddress: '', city: '', state: '',
+    pincode: '', country: 'India'
+};
+
+const DOCUMENTS = [
+    { key: 'aadharFront', title: 'Aadhaar card', side: 'Front side', description: 'The side with your photograph and name.' },
+    { key: 'aadharBack', title: 'Aadhaar card', side: 'Back side', description: 'The side with your address.' },
+    { key: 'panCard', title: 'PAN card', side: 'Front side', description: 'Make sure the PAN number is legible.' },
+];
+
+const STEPS = [
+    { title: 'Personal details', description: 'Your identity and address' },
+    { title: 'Documents', description: 'Aadhaar and PAN' },
+    { title: 'Review', description: 'Check before submitting' },
+];
+
+const inputClass = 'h-12 w-full rounded-xl border border-[#d7d7d7] bg-white px-4 text-[15px] text-[#141414] outline-none transition-colors duration-150 placeholder:text-[#6b6b6b] hover:border-[#969696] focus:border-[#141414] focus:ring-2 focus:ring-[#ffcf46]';
+const primaryButtonClass = 'inline-flex min-h-12 items-center justify-center gap-2 rounded-full bg-[#ffcf46] px-6 text-[15px] font-semibold text-[#141414] transition-colors duration-150 hover:bg-[#f3bf35] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#141414] disabled:cursor-not-allowed disabled:opacity-55';
+
+function validateDetails(details) {
+    const next = {};
+    const required = {
+        name: 'Enter your full name.', fatherName: "Enter your father's name.",
+        fatherPhone: "Enter your father's mobile number.", email: 'Enter your email address.',
+        phone: 'Enter your mobile number.', permanentAddress: 'Enter your permanent address.',
+        city: 'Enter your city.', state: 'Enter your state.', pincode: 'Enter your PIN code.'
+    };
+    Object.entries(required).forEach(([key, message]) => {
+        if (!String(details[key] ?? '').trim()) next[key] = message;
+    });
+    if (!next.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(details.email.trim())) next.email = 'Enter a valid email address.';
+    if (!next.phone && !/^[6-9]\d{9}$/.test(details.phone.replace(/\s/g, ''))) next.phone = 'Enter a valid 10-digit Indian mobile number.';
+    if (!next.fatherPhone && !/^[6-9]\d{9}$/.test(details.fatherPhone.replace(/\s/g, ''))) next.fatherPhone = 'Enter a valid 10-digit Indian mobile number.';
+    if (!next.pincode && !/^\d{6}$/.test(details.pincode.trim())) next.pincode = 'Enter a valid 6-digit PIN code.';
+    return next;
+}
+
+function Field({ id, label, value, onChange, error, required = false, ...props }) {
+    return (
+        <div className="min-w-0">
+            <label htmlFor={id} className="mb-2 block text-[14px] font-medium text-[#333333]">
+                {label}{required && <span className="ml-1 text-[#bb2b1f]" aria-hidden="true">*</span>}
+            </label>
+            <input id={id} name={id} value={value ?? ''} onChange={onChange} aria-invalid={!!error} aria-describedby={error ? `${id}-error` : undefined} required={required} className={`${inputClass} ${error ? 'border-[#bb2b1f] focus:border-[#bb2b1f] focus:ring-[#f3b5b0]' : ''}`} {...props} />
+            {error && <p id={`${id}-error`} role="alert" className="mt-1.5 text-[13px] text-[#a3261c]">{error}</p>}
+        </div>
+    );
+}
+
+function UploadField({ item, file, error, onSelect }) {
+    const inputRef = useRef(null);
+    const fileLabel = typeof file === 'string' ? 'Previously uploaded document' : file?.name;
+    return (
+        <div>
+            <div className={`rounded-2xl border bg-white p-4 sm:p-5 ${error ? 'border-[#bb2b1f]' : 'border-[#d7d7d7]'}`}>
+                <div className="flex items-start gap-3">
+                    <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-[#f6f6f6] text-[#333333]"><DocumentTextIcon className="size-5" aria-hidden="true" /></span>
+                    <div className="min-w-0 flex-1">
+                        <div className="flex flex-wrap items-baseline gap-x-2">
+                            <h3 className="text-[15px] font-semibold text-[#141414]">{item.title}</h3>
+                            <span className="text-[13px] text-[#555555]">{item.side}</span>
+                        </div>
+                        <p className="mt-1 text-[13px] leading-5 text-[#555555]">{item.description}</p>
+                    </div>
+                    {file && <CheckIcon className="size-5 shrink-0 text-[#167a3d]" aria-label="Added" />}
+                </div>
+                <div className="mt-4 flex flex-wrap items-center justify-between gap-3 border-t border-[#e8e8e8] pt-4">
+                    <div className="min-w-0 flex-1">
+                        {file ? <p className="truncate text-[13px] font-medium text-[#333333]" title={fileLabel}>{fileLabel}</p> : <p className="text-[13px] text-[#555555]">JPG, PNG or PDF · up to 10 MB</p>}
+                    </div>
+                    <input ref={inputRef} id={item.key} type="file" className="sr-only" tabIndex={-1} aria-hidden="true" accept="image/jpeg,image/png,application/pdf" onChange={(event) => { onSelect(item.key, event.target.files?.[0]); event.target.value = ''; }} />
+                    <button id={`${item.key}-button`} type="button" aria-label={`${file ? 'Replace' : 'Choose'} ${item.title} ${item.side} file`} aria-describedby={error ? `${item.key}-error` : undefined} onClick={() => inputRef.current?.click()} className="inline-flex min-h-11 items-center gap-2 rounded-full border border-[#bdbdbd] bg-white px-4 text-[13px] font-semibold text-[#141414] transition-colors hover:border-[#141414] hover:bg-[#f6f6f6] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#141414]">
+                        <CloudArrowUpIcon className="size-4" aria-hidden="true" />{file ? 'Replace file' : 'Choose file'}
+                    </button>
+                </div>
+            </div>
+            {error && <p id={`${item.key}-error`} role="alert" className="mt-1.5 text-[13px] text-[#a3261c]">{error}</p>}
+        </div>
+    );
+}
 
 export default function KYCPage() {
-    const router = useRouter();
     const [currentStep, setCurrentStep] = useState(1);
+    const [maxStep, setMaxStep] = useState(1);
     const [loading, setLoading] = useState(false);
     const [errors, setErrors] = useState({});
-
-    // KYC Status State
-    const [kycStatus, setKycStatus] = useState('loading'); // loading, not_submitted, pending, approved, rejected
+    const [submitError, setSubmitError] = useState('');
+    const [kycStatus, setKycStatus] = useState('loading');
     const [kycData, setKycData] = useState(null);
+    const [formData, setFormData] = useState({ personalDetails: INITIAL_DETAILS, documents: { aadharFront: null, aadharBack: null, panCard: null } });
+    const contentRef = useRef(null);
 
     useEffect(() => {
-        fetchKYC();
+        let active = true;
+        getKYCStatus().then((data) => {
+            if (!active) return;
+            const status = String(data?.status || 'not_submitted').toLowerCase();
+            setKycData(data);
+            setKycStatus(status);
+            if (status === 'rejected') {
+                setFormData((previous) => ({
+                    personalDetails: { ...previous.personalDetails, ...data.personalDetails },
+                    documents: { ...previous.documents, ...data.documents }
+                }));
+            }
+        }).catch(() => { if (active) setKycStatus('not_submitted'); });
+        return () => { active = false; };
     }, []);
 
-    const fetchKYC = async () => {
-        try {
-            const data = await getKYCStatus();
-            if (data && (data.status || data.personalDetails)) {
-                setKycData(data);
-                const status = data.status ? data.status.toLowerCase() : 'pending';
-                setKycStatus(status);
+    const changeDetails = (field, value) => {
+        setFormData((previous) => ({ ...previous, personalDetails: { ...previous.personalDetails, [field]: value } }));
+        setMaxStep(1);
+        setErrors((previous) => ({ ...previous, [field]: '' }));
+    };
 
-                if (status === 'rejected') {
-                    setFormData(prev => ({
-                        ...prev,
-                        personalDetails: data.personalDetails || prev.personalDetails,
-                        documents: { ...prev.documents, ...data.documents } // Keep existing uploads if valid, or just simple
-                    }));
-                }
-            } else {
-                setKycStatus('not_submitted');
-            }
-        } catch (err) {
-            console.error('Error fetching KYC:', err);
-            setKycStatus('not_submitted');
+    const selectFile = (field, file) => {
+        if (!file) return;
+        const nextError = !['image/jpeg', 'image/png', 'application/pdf'].includes(file.type)
+            ? 'Choose a JPG, PNG or PDF file.'
+            : file.size > 10 * 1024 * 1024 ? 'Choose a file smaller than 10 MB.' : '';
+        setErrors((previous) => ({ ...previous, [field]: nextError }));
+        if (!nextError) {
+            setFormData((previous) => ({ ...previous, documents: { ...previous.documents, [field]: file } }));
+            setMaxStep(2);
         }
     };
 
-    // Form State
-    const [formData, setFormData] = useState({
-        personalDetails: { name: '', fatherName: '', fatherPhone: '', email: '', phone: '', permanentAddress: '', currentAddress: '', city: '', state: '', pincode: '', country: 'India' },
-        documents: { aadharFront: null, aadharBack: null, panCard: null, other: null }
-    });
-
-    const handleChange = (section, field, value) => {
-        setFormData(prev => ({ ...prev, [section]: { ...prev[section], [field]: value } }));
-        if (errors[field]) setErrors(prev => ({ ...prev, [field]: '' }));
+    const goToStep = (step) => {
+        setCurrentStep(step);
+        setErrors({});
+        setSubmitError('');
+        requestAnimationFrame(() => contentRef.current?.focus({ preventScroll: false }));
     };
 
-    const handleFileChange = (field, file) => {
-        setFormData(prev => ({ ...prev, documents: { ...prev.documents, [field]: file } }));
-        if (errors[field]) setErrors(prev => ({ ...prev, [field]: '' }));
-    };
-
-    const validateStep1 = () => {
-        const { name, email, phone, city, state, pincode, permanentAddress, fatherName, fatherPhone } = formData.personalDetails;
-        let newErrors = {};
-        if (!name) newErrors.name = 'Name is required';
-        if (!fatherName) newErrors.fatherName = "Father's Name is required";
-        if (!fatherPhone) newErrors.fatherPhone = "Father's Phone is required";
-        if (!email) newErrors.email = 'Email is required';
-        if (!phone) newErrors.phone = 'Phone is required';
-        if (!permanentAddress) newErrors.permanentAddress = 'Address is required';
-        if (!city) newErrors.city = 'City is required';
-        if (!state) newErrors.state = 'State is required';
-        if (!pincode) newErrors.pincode = 'Pincode is required';
-        setErrors(newErrors);
-        return Object.keys(newErrors).length === 0;
-    };
-
-    const validateStep2 = () => {
-        const { aadharFront, aadharBack, panCard } = formData.documents;
-        // Only validate if we are NOT in rejected state (where they might just want to update one file)
-        // actually for simplicity, require re-upload if empty, or assume pre-filled if string (URL)
-        let newErrors = {};
-        // If it's a file object or a string (URL), it is valid
-        if (!aadharFront) newErrors.aadharFront = 'Aadhar Front is required';
-        if (!aadharBack) newErrors.aadharBack = 'Aadhar Back is required';
-        if (!panCard) newErrors.panCard = 'PAN Card is required';
-        setErrors(newErrors);
-        return Object.keys(newErrors).length === 0;
-    };
-
-    const handleNext = () => {
-        if (currentStep === 1) {
-            if (!validateStep1()) { return; }
+    const nextStep = () => {
+        const nextErrors = currentStep === 1 ? validateDetails(formData.personalDetails)
+            : Object.fromEntries(DOCUMENTS.filter(({ key }) => !formData.documents[key]).map(({ key }) => [key, 'Add this document to continue.']));
+        setErrors(nextErrors);
+        const firstError = Object.keys(nextErrors)[0];
+        if (firstError) {
+            requestAnimationFrame(() => document.getElementById(currentStep === 2 ? `${firstError}-button` : firstError)?.focus());
+            return;
         }
-        if (currentStep === 2) {
-            if (!validateStep2()) { return; }
-        }
-
-        if (currentStep < 3) {
-            setCurrentStep(prev => prev + 1);
-        }
-        window.scrollTo(0, 0);
+        setMaxStep((previous) => Math.max(previous, currentStep + 1));
+        goToStep(currentStep + 1);
     };
 
-    const handleBack = () => {
-        if (currentStep > 1) setCurrentStep(prev => prev - 1);
-        window.scrollTo(0, 0);
-    };
-
-    const handleSubmit = async () => {
+    const submit = async () => {
         setLoading(true);
+        setSubmitError('');
         try {
-            const docFormData = new FormData();
-            // Append files only if they are File objects (new uploads).
-            // Use the real field names so the admin panel labels each document correctly
-            // (PAN no longer shows up under a "Bank Statement" label, etc.).
-            if (formData.documents.aadharFront instanceof File) docFormData.append('aadharFront', formData.documents.aadharFront);
-            if (formData.documents.aadharBack instanceof File) docFormData.append('aadharBack', formData.documents.aadharBack);
-            if (formData.documents.panCard instanceof File) docFormData.append('panCard', formData.documents.panCard);
-
-            let uploadedDocs = {};
-            if ([...docFormData.entries()].length > 0) {
-                uploadedDocs = await uploadKYCFiles(docFormData);
-            }
-
-            // If we have existing docs and didn't upload new ones, preserve them?
-            // backend should handle merging ideally, or we send existing URLs back?
-            // For now assuming backend handles it or we send just new ones.
-
-            const kycPayload = {
-                personalDetails: { ...formData.personalDetails, idType: 'Aadhar Card' },
-                referenceDetails: {},
-                documents: uploadedDocs // Send only new uploads or merged?
-            };
-
-            await saveKYCData(kycPayload);
-            Swal.fire({ title: 'Application Submitted!', text: 'Your KYC is under review.', icon: 'success', confirmButtonText: 'OK' }).then(() => {
-                fetchKYC(); // Refresh state
+            const files = new FormData();
+            DOCUMENTS.forEach(({ key }) => {
+                if (formData.documents[key] instanceof File) files.append(key, formData.documents[key]);
             });
+            const uploadedDocs = [...files.entries()].length ? await uploadKYCFiles(files) : {};
+            const saved = await saveKYCData({
+                personalDetails: { ...formData.personalDetails, idType: 'Aadhar Card' },
+                referenceDetails: {}, documents: uploadedDocs
+            });
+            setKycData(saved);
+            setKycStatus(String(saved?.status || 'pending').toLowerCase());
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         } catch (error) {
-            console.error(error);
-            Swal.fire({ title: 'Submission Failed', text: error.response?.data?.message || 'Try again.', icon: 'error' });
+            setSubmitError(error.response?.data?.message || 'We could not submit your KYC. Please try again.');
         } finally {
             setLoading(false);
         }
     };
 
-    if (kycStatus === 'loading') {
-        return <div className="flex justify-center items-center h-64"><FaSpinner className="animate-spin text-3xl text-gray-400" /></div>;
-    }
+    if (kycStatus === 'loading') return <div className="flex min-h-64 items-center justify-center" role="status"><span className="size-8 animate-spin rounded-full border-[3px] border-[#dddddd] border-t-[#141414]" /><span className="sr-only">Loading KYC status</span></div>;
 
-    // View for Submitted/Approved/Pending
     if (kycStatus === 'pending' || kycStatus === 'approved') {
-        const isApproved = kycStatus === 'approved';
+        const approved = kycStatus === 'approved';
         return (
-            <div className="relative rounded-2xl p-8 bg-white shadow-sm border border-gray-100">
-                <div className="flex flex-col items-center justify-center text-center py-10">
-                    <div className={`w-20 h-20 rounded-full flex items-center justify-center mb-6 ${isApproved ? 'bg-green-100 text-green-600' : 'bg-blue-100 text-blue-600'}`}>
-                        {isApproved ? <FaCheck size={40} /> : <FaFingerprint size={40} />}
-                    </div>
-                    <h2 className="text-2xl font-semibold text-gray-800 mb-2">
-                        {isApproved ? 'KYC Verified' : 'Verification In Progress'}
-                    </h2>
-                    <p className="text-gray-500 max-w-md mb-8">
-                        {isApproved
-                            ? 'Your identity has been verified. You can now place orders without restriction.'
-                            : 'We are reviewing your documents. This usually takes 24-48 hours.'}
-                    </p>
-
-                    <div className="w-full max-w-2xl text-left bg-gray-50 rounded-xl p-6 border border-gray-200">
-                        <h3 className="font-semibold text-gray-800 mb-4 flex items-center gap-2">
-                            <FaFileAlt className="text-gray-400" /> Submitted Documents
-                        </h3>
-                        <div className="space-y-3">
-                            {kycData?.documents && Object.entries(kycData.documents).map(([key, url]) => (
-                                <div key={key} className="flex items-center justify-between p-3 bg-white rounded-lg border border-gray-200">
-                                    <span className="text-sm font-medium text-gray-600 capitalize">{key.replace(/([A-Z])/g, ' $1').trim()}</span>
-                                    {url ? (
-                                        <a href={url} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-800 text-xs flex items-center gap-1 font-medium">
-                                            <FaEye /> View Document
-                                        </a>
-                                    ) : (
-                                        <span className="text-xs text-gray-400 italic">Not Uploaded</span>
-                                    )}
-                                </div>
-                            ))}
-                        </div>
-                    </div>
+            <section className="mx-auto max-w-[860px] py-6 sm:py-10" aria-labelledby="kyc-status-title">
+                <div className="flex size-14 items-center justify-center rounded-2xl bg-[#ffcf46]">{approved ? <CheckIcon className="size-7 text-[#141414]" aria-hidden="true" /> : <ClockIcon className="size-7 text-[#141414]" aria-hidden="true" />}</div>
+                <h1 id="kyc-status-title" className={`mt-6 ${profileTitleClassName}`}>{approved ? 'Your KYC is verified' : 'Your KYC is under review'}</h1>
+                <p className="mt-3 max-w-[620px] text-[15px] leading-7 text-[#555555]">{approved ? 'Your identity check is complete. Your submitted details are available below.' : 'We have received your details and documents. You can check the status here whenever you need to.'}</p>
+                <div className="mt-8 border-t border-[#dddddd] pt-6">
+                    <h2 className="text-[18px] font-semibold text-[#141414]">Submitted documents</h2>
+                    <ul className="mt-3 divide-y divide-[#e8e8e8]">
+                        {DOCUMENTS.map(({ key, title, side }) => <li key={key} className="flex items-center justify-between gap-4 py-4 text-[14px]"><span className="text-[#333333]">{title} · {side}</span><span className="font-medium text-[#555555]">{kycData?.documents?.[key] ? 'Received' : 'Not provided'}</span></li>)}
+                    </ul>
                 </div>
-            </div>
+            </section>
         );
     }
 
+    const details = formData.personalDetails;
+    const update = (field) => (event) => changeDetails(field, event.target.value);
+
     return (
-        <div className="relative rounded-2xl p-6 bg-white shadow-sm border border-gray-100">
-            {kycStatus === 'rejected' && (
-                <div className="mb-6 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl flex items-start gap-3">
-                    <FaExclamationTriangle className="mt-1 flex-shrink-0" />
-                    <div>
-                        <p className="font-semibold">KYC Application Rejected</p>
-                        <p className="text-sm">Please review the errors and resubmit your documents.</p>
+        <section className="pb-12 sm:pb-16" aria-labelledby="kyc-title">
+            <header className="pb-7 pt-2 sm:pb-9 sm:pt-4">
+                <h1 id="kyc-title" className={profileTitleClassName}>KYC & Documentation</h1>
+                <div className="my-4 h-px w-full bg-[#dedede]" aria-hidden="true" />
+                <p className="max-w-[580px] text-[15px] leading-6 text-[#555555]">Verify your identity to complete your rental. You can review everything before you submit.</p>
+            </header>
+
+            {kycStatus === 'rejected' && <div role="alert" className="mb-7 flex items-start gap-3 rounded-xl border border-[#e9b3ae] bg-[#fff5f3] p-4 text-[#7e211a]"><ExclamationCircleIcon className="mt-0.5 size-5 shrink-0" aria-hidden="true" /><div><p className="font-semibold">Your previous submission needs changes</p><p className="mt-1 text-[14px] leading-6">{kycData?.rejectionReason || 'Please check your details and documents before resubmitting.'}</p></div></div>}
+
+            <div className="grid gap-4 lg:grid-cols-[195px_minmax(0,1fr)] lg:gap-9">
+                <aside aria-label="Verification progress" className="lg:pt-1">
+                    <p className="mb-3 text-[13px] font-semibold text-[#555555]">Step {currentStep} of {STEPS.length}</p>
+                    <div className="mb-5 h-1 overflow-hidden rounded-full bg-[#e8e8e8] lg:hidden"><div className="h-full bg-[#141414] transition-[width] duration-200 motion-reduce:transition-none" style={{ width: `${(currentStep / STEPS.length) * 100}%` }} /></div>
+                    <ol className="hidden space-y-1 lg:block">
+                        {STEPS.map((step, index) => {
+                            const number = index + 1;
+                            const active = currentStep === number;
+                            const completed = number < maxStep;
+                            return <li key={step.title}><button type="button" disabled={number > maxStep} onClick={() => goToStep(number)} aria-current={active ? 'step' : undefined} className={`flex min-h-16 w-full items-start gap-3 rounded-xl px-2 py-2 text-left transition-colors duration-150 focus-visible:outline-2 focus-visible:outline-[#141414] ${active ? 'bg-[#fff4c6]' : 'hover:bg-[#f6f6f6] disabled:hover:bg-transparent'}`}><span className={`mt-0.5 flex size-7 shrink-0 items-center justify-center rounded-full border text-[12px] font-semibold ${active ? 'border-[#141414] bg-[#141414] text-white' : completed ? 'border-[#141414] bg-white text-[#141414]' : 'border-[#c9c9c9] text-[#777777]'}`}>{completed && !active ? <CheckIcon className="size-4" aria-hidden="true" /> : number}</span><span><span className={`block text-[14px] font-semibold ${active ? 'text-[#141414]' : 'text-[#555555]'}`}>{step.title}</span><span className="mt-0.5 block text-[12px] leading-4 text-[#666666]">{step.description}</span></span></button></li>;
+                        })}
+                    </ol>
+                    <p className="hidden border-t border-[#e3e3e3] pt-5 text-[13px] leading-5 text-[#555555] lg:mt-6 lg:block"><LockClosedIcon className="mb-2 size-5 text-[#333333]" aria-hidden="true" />Your documents are used for identity verification.</p>
+                </aside>
+
+                <div className="min-w-0 overflow-hidden rounded-2xl border border-[#e2e2e2] bg-white">
+                    <div ref={contentRef} tabIndex={-1} className="outline-none">
+                        <div className="border-b border-[#ededed] px-5 py-6 sm:px-8 sm:py-7">
+                            <p className="mb-2 text-[13px] font-medium text-[#666666] lg:hidden">{STEPS[currentStep - 1].title}</p>
+                            <h2 className="text-[22px] font-semibold tracking-[-0.02em] text-[#141414] sm:text-[26px]">{currentStep === 1 ? 'Tell us about yourself' : currentStep === 2 ? 'Add your documents' : 'Review your details'}</h2>
+                            <p className="mt-1 text-[14px] leading-6 text-[#555555]">{currentStep === 1 ? 'Enter your details as they appear on your identity documents.' : currentStep === 2 ? 'Upload clear copies so our team can check them.' : 'Make sure your information is correct before sending it for verification.'}</p>
+                        </div>
+
+                        {currentStep === 1 && <div className="grid gap-x-5 gap-y-5 px-5 py-6 sm:grid-cols-2 sm:px-8 sm:py-8">
+                            <div className="sm:col-span-2"><Field id="name" label="Full name" required autoComplete="name" placeholder="As shown on your ID" value={details.name} onChange={update('name')} error={errors.name} /></div>
+                            <Field id="fatherName" label="Father's name" required placeholder="Full name" value={details.fatherName} onChange={update('fatherName')} error={errors.fatherName} />
+                            <Field id="fatherPhone" label="Father's mobile number" required type="tel" inputMode="numeric" autoComplete="off" maxLength={10} placeholder="10-digit number" value={details.fatherPhone} onChange={update('fatherPhone')} error={errors.fatherPhone} />
+                            <Field id="email" label="Email address" required type="email" autoComplete="email" placeholder="you@example.com" value={details.email} onChange={update('email')} error={errors.email} />
+                            <Field id="phone" label="Mobile number" required type="tel" inputMode="numeric" autoComplete="tel-national" maxLength={10} placeholder="10-digit number" value={details.phone} onChange={update('phone')} error={errors.phone} />
+                            <div className="sm:col-span-2"><Field id="permanentAddress" label="Permanent address" required autoComplete="street-address" placeholder="House number, street and area" value={details.permanentAddress} onChange={update('permanentAddress')} error={errors.permanentAddress} /></div>
+                            <div className="sm:col-span-2"><Field id="currentAddress" label="Current address" autoComplete="off" placeholder="If different from your permanent address" value={details.currentAddress} onChange={update('currentAddress')} error={errors.currentAddress} /></div>
+                            <Field id="city" label="City" required autoComplete="address-level2" placeholder="City" value={details.city} onChange={update('city')} error={errors.city} />
+                            <Field id="state" label="State" required autoComplete="address-level1" placeholder="State" value={details.state} onChange={update('state')} error={errors.state} />
+                            <Field id="pincode" label="PIN code" required inputMode="numeric" maxLength={6} autoComplete="postal-code" placeholder="6-digit PIN" value={details.pincode} onChange={update('pincode')} error={errors.pincode} />
+                            <Field id="country" label="Country" value={details.country} onChange={update('country')} autoComplete="country-name" />
+                        </div>}
+
+                        {currentStep === 2 && <div className="space-y-4 px-5 py-6 sm:px-8 sm:py-8">{DOCUMENTS.map((item) => <UploadField key={item.key} item={item} file={formData.documents[item.key]} error={errors[item.key]} onSelect={selectFile} />)}<p className="text-[13px] leading-5 text-[#555555]">Check that all corners are visible and the text is readable. You can replace a file before submitting.</p></div>}
+
+                        {currentStep === 3 && <div className="space-y-7 px-5 py-6 sm:px-8 sm:py-8">
+                            <div><div className="flex items-center justify-between gap-3"><h3 className="text-[17px] font-semibold text-[#141414]">Personal details</h3><button type="button" onClick={() => goToStep(1)} className="min-h-11 text-[13px] font-semibold text-[#333333] underline underline-offset-4 focus-visible:outline-2 focus-visible:outline-[#141414]">Edit</button></div><dl className="mt-2 grid gap-x-5 gap-y-4 border-t border-[#e8e8e8] pt-4 text-[14px] sm:grid-cols-2">{[['Full name', details.name], ['Email', details.email], ['Mobile number', details.phone], ['Father’s name', details.fatherName], ['Father’s mobile', details.fatherPhone], ['Permanent address', details.permanentAddress], ['Current address', details.currentAddress || 'Not provided'], ['City and state', `${details.city}, ${details.state}`], ['PIN code', details.pincode]].map(([label, value]) => <div key={label} className="min-w-0"><dt className="text-[#666666]">{label}</dt><dd className="mt-1 break-words font-medium text-[#141414]">{value}</dd></div>)}</dl></div>
+                            <div><div className="flex items-center justify-between gap-3"><h3 className="text-[17px] font-semibold text-[#141414]">Documents</h3><button type="button" onClick={() => goToStep(2)} className="min-h-11 text-[13px] font-semibold text-[#333333] underline underline-offset-4 focus-visible:outline-2 focus-visible:outline-[#141414]">Edit</button></div><ul className="mt-2 divide-y divide-[#e8e8e8] border-t border-[#e8e8e8]">{DOCUMENTS.map(({ key, title, side }) => <li key={key} className="flex items-center gap-3 py-3 text-[14px]"><CheckIcon className="size-4 shrink-0 text-[#167a3d]" aria-hidden="true" /><span className="min-w-0 truncate text-[#333333]">{title} · {side}</span></li>)}</ul></div>
+                            {submitError && <p role="alert" className="rounded-xl bg-[#fff5f3] p-4 text-[14px] text-[#a3261c]">{submitError}</p>}
+                        </div>}
+
+                        <div className="flex flex-col-reverse gap-3 border-t border-[#ededed] px-5 py-5 sm:flex-row sm:items-center sm:justify-between sm:px-8">
+                            {currentStep > 1 ? <button type="button" onClick={() => goToStep(currentStep - 1)} className="inline-flex min-h-12 items-center justify-center gap-2 rounded-full px-4 text-[14px] font-semibold text-[#333333] transition-colors hover:bg-[#f6f6f6] focus-visible:outline-2 focus-visible:outline-[#141414]"><ArrowLeftIcon className="size-4" aria-hidden="true" />Back</button> : <span className="hidden sm:block" />}
+                            <button type="button" onClick={currentStep === 3 ? submit : nextStep} disabled={loading} className={`${primaryButtonClass} w-full sm:w-auto`}>
+                                {loading ? 'Submitting…' : currentStep === 3 ? 'Submit for verification' : currentStep === 2 ? 'Review details' : 'Continue to documents'}{!loading && <ArrowRightIcon className="size-4" aria-hidden="true" />}
+                            </button>
+                        </div>
                     </div>
                 </div>
-            )}
-
-            <div className="flex items-center justify-between mb-8">
-                <h1 className="text-3xl font-medium text-gray-700">KYC & Documentation</h1>
             </div>
-
-            {/* Steps & Content */}
-            <div className="flex justify-center mb-10 mt-4">
-                <div className="flex items-center w-full max-w-xl relative">
-                    <div className="absolute left-0 top-1/2 w-full h-px bg-gray-200 -z-10"></div>
-                    <div className="absolute left-0 top-1/2 h-px bg-[#00c853] -z-10 transition-all duration-300" style={{ width: `${((currentStep - 1) / 2) * 100}%` }}></div>
-                    {[1, 2, 3].map((step) => {
-                        const isCompleted = step < currentStep;
-                        const isActive = step === currentStep;
-                        return (
-                            <div key={step} className="flex-1 flex justify-center first:justify-start last:justify-end">
-                                <div className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-medium z-10 border transition-all duration-300 ${isCompleted ? 'bg-[#00c853] border-[#00c853] text-white' : isActive ? 'bg-white border-gray-800 text-gray-900 shadow-sm' : 'bg-white border-gray-300 text-gray-400'}`}>
-                                    {isCompleted ? <FaCheck size={14} /> : step}
-                                </div>
-                            </div>
-                        );
-                    })}
-                </div>
-            </div>
-
-            <div className="bg-white rounded-3xl p-1 border border-gray-100">
-                {currentStep === 1 && (
-                    <>
-                        <div className="mb-8"><h2 className="text-2xl font-medium text-gray-700 mb-2">Personal Details</h2><div className="h-px bg-gray-200 w-full"></div></div>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-6 mb-8">
-                            <div className="md:col-span-2"><TextInput label="Full Name" required error={errors.name} value={formData.personalDetails.name} onChange={(e) => handleChange('personalDetails', 'name', e.target.value)} /></div>
-                            <TextInput label="Father's Name" required error={errors.fatherName} value={formData.personalDetails.fatherName} onChange={(e) => handleChange('personalDetails', 'fatherName', e.target.value)} />
-                            <TextInput label="Father's Phone" required error={errors.fatherPhone} value={formData.personalDetails.fatherPhone} onChange={(e) => handleChange('personalDetails', 'fatherPhone', e.target.value)} />
-                            <div className="md:col-span-2"><TextInput label="Email Address" required error={errors.email} value={formData.personalDetails.email} onChange={(e) => handleChange('personalDetails', 'email', e.target.value)} /></div>
-                            <div className="md:col-span-2"><TextInput label="Mobile Number" required error={errors.phone} value={formData.personalDetails.phone} onChange={(e) => handleChange('personalDetails', 'phone', e.target.value)} /></div>
-                            <div className="md:col-span-2"><TextInput label="Permanent Address" required error={errors.permanentAddress} value={formData.personalDetails.permanentAddress} onChange={(e) => handleChange('personalDetails', 'permanentAddress', e.target.value)} /></div>
-                            <TextInput label="City" required error={errors.city} value={formData.personalDetails.city} onChange={(e) => handleChange('personalDetails', 'city', e.target.value)} />
-                            <TextInput label="State" required error={errors.state} value={formData.personalDetails.state} onChange={(e) => handleChange('personalDetails', 'state', e.target.value)} />
-                            <TextInput label="Pincode" required error={errors.pincode} value={formData.personalDetails.pincode} onChange={(e) => handleChange('personalDetails', 'pincode', e.target.value)} />
-                            <TextInput label="Country" required value={formData.personalDetails.country} onChange={(e) => handleChange('personalDetails', 'country', e.target.value)} />
-                        </div>
-                        <div className="flex justify-end"><button onClick={handleNext} className="btn-secondary py-3 px-8 rounded-xl text-lg">Proceed to Documents</button></div>
-                    </>
-                )}
-
-                {currentStep === 2 && (
-                    <>
-                        <div className="mb-8"><h2 className="text-2xl font-medium text-gray-700 mb-2">Upload Documents</h2><p className="text-sm text-gray-500 mb-4">Please upload clear images (JPG/PNG/PDF).</p><div className="h-px bg-gray-200 w-full"></div></div>
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                            <FileUploadInput label="Aadhar Card (Front)" file={formData.documents.aadharFront} error={errors.aadharFront} onChange={(e) => handleFileChange('aadharFront', e.target.files[0])} />
-                            <FileUploadInput label="Aadhar Card (Back)" file={formData.documents.aadharBack} error={errors.aadharBack} onChange={(e) => handleFileChange('aadharBack', e.target.files[0])} />
-                            <FileUploadInput label="PAN Card" file={formData.documents.panCard} error={errors.panCard} onChange={(e) => handleFileChange('panCard', e.target.files[0])} />
-                        </div>
-                        <div className="flex gap-4 justify-end mt-6"><button onClick={handleBack} className="px-6 py-3 bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium rounded-xl">Back</button><button onClick={handleNext} className="px-6 py-3 bg-[#333] hover:bg-black text-white font-medium rounded-xl shadow-lg">Review & Submit</button></div>
-                    </>
-                )}
-
-                {currentStep === 3 && (
-                    <>
-                        <div className="mb-8"><h2 className="text-2xl font-medium text-gray-700 mb-2">Review & Submit</h2><div className="h-px bg-gray-200 w-full"></div></div>
-                        <div className="bg-gray-50 p-6 rounded-xl mb-6">
-                            <h3 className="font-semibold text-lg mb-4">Summary</h3>
-                            <div className="grid grid-cols-2 gap-4 text-sm">
-                                <div><span className="text-gray-500">Name:</span> {formData.personalDetails.name}</div>
-                                <div><span className="text-gray-500">Email:</span> {formData.personalDetails.email}</div>
-                                <div><span className="text-gray-500">Phone:</span> {formData.personalDetails.phone}</div>
-                                <div><span className="text-gray-500">City:</span> {formData.personalDetails.city}</div>
-                            </div>
-                        </div>
-                        <div className="flex gap-4 justify-end mt-6"><button onClick={handleBack} className="px-6 py-3 bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium rounded-xl">Back</button><button onClick={handleSubmit} disabled={loading} className={`px-8 py-3 bg-green-600 hover:bg-green-700 text-white font-medium rounded-xl shadow-lg flex items-center ${loading ? 'opacity-70 cursor-not-allowed' : ''}`}>{loading ? 'Submitting...' : 'Submit Application'}</button></div>
-                    </>
-                )}
-            </div>
-        </div>
+        </section>
     );
 }
-
-const TextInput = ({ label, required, placeholder, value, onChange, error }) => (
-    <div className="w-full">
-        <label className="block text-sm font-medium text-gray-700 mb-2">{label} {required && <span className="text-red-500">*</span>}</label>
-        <input type="text" className={`w-full border rounded-lg px-4 py-3 text-sm focus:outline-none transition-colors placeholder-gray-300 ${error ? 'border-red-500 bg-red-50' : 'border-gray-200 focus:border-black'}`} placeholder={placeholder} value={value} onChange={onChange} />
-        {error && <p className="text-red-500 text-xs mt-1">{error}</p>}
-    </div>
-);
-
-const FileUploadInput = ({ label, file, onChange, error }) => (
-    <div className={`border-2 border-dashed rounded-xl p-6 flex flex-col items-center justify-center text-center hover:bg-gray-50 transition-colors cursor-pointer relative ${error ? 'border-red-400 bg-red-50' : 'border-gray-300'}`}>
-        <input type="file" className="absolute inset-0 w-full h-full opacity-0 cursor-pointer" onChange={onChange} accept="image/*,application/pdf" />
-        {file ? (<div className="text-green-600"><FaFileAlt size={32} className="mb-2 mx-auto" /><p className="text-sm font-medium truncate max-w-[150px]">{typeof file === 'string' ? 'Uploaded Document' : file.name}</p><p className="text-xs text-gray-400">Click to change</p></div>) : (<div className={error ? "text-red-500" : "text-gray-400"}><FaCloudUploadAlt size={32} className="mb-2 mx-auto" /><p className="text-sm font-medium text-gray-600">{label}</p><p className="text-xs">Drag & drop or Click to Upload</p></div>)}
-        {error && <p className="text-red-500 text-xs mt-2 absolute -bottom-5 left-0 w-full text-center">{error}</p>}
-    </div>
-);

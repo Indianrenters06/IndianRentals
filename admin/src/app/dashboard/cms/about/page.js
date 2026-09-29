@@ -107,7 +107,7 @@ export default function AboutCMSPage() {
 
     const load = useCallback(async () => {
         try {
-            const res = await fetch(`${API}/api/cms/about`);
+            const res = await fetch(`${API}/api/cms/about/draft`, { headers: { Authorization: `Bearer ${getToken()}` }, cache: 'no-store' });
             if (res.ok) setData({ ...DEFAULTS, ...(await res.json()) });
         } catch { }
         finally { setLoading(false); }
@@ -125,6 +125,7 @@ export default function AboutCMSPage() {
             });
             if (!res.ok) throw new Error((await res.json()).message || 'Failed to save');
             setSaved(true);
+            window.dispatchEvent(new CustomEvent('cms:draft-saved', { detail: { page: 'about' } }));
             setTimeout(() => setSaved(false), 3000);
         } catch (e) { toast.error(e.message); }
         finally { setSaving(false); }
@@ -144,7 +145,7 @@ export default function AboutCMSPage() {
                     <h1 className="text-3xl font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2">
                         About Us <span className="text-indigo-600 dark:text-indigo-400 font-extrabold">CMS</span>
                     </h1>
-                    <p className="text-sm text-slate-500 mt-1">Edit every section of the About page — changes go live instantly.</p>
+                    <p className="text-sm text-slate-500 mt-1">Edit the About page, then preview and publish the saved draft.</p>
                 </div>
                 <div className="flex items-center gap-3">
                     {saved && (
@@ -154,7 +155,7 @@ export default function AboutCMSPage() {
                     )}
                     <button onClick={save} disabled={saving}
                         className="flex items-center gap-2 h-10 px-5 rounded-xl !bg-indigo-600 hover:!bg-indigo-700 disabled:opacity-60 text-white font-semibold text-sm shadow-lg shadow-indigo-500/20 transition-all">
-                        {saving ? <Spinner size="sm" color="white" /> : <FloppyDisk size={15} weight="bold" />} Save All
+                        {saving ? <Spinner size="sm" color="white" /> : <FloppyDisk size={15} weight="bold" />} Save draft
                     </button>
                 </div>
             </div>
@@ -304,7 +305,7 @@ export default function AboutCMSPage() {
                 <button onClick={save} disabled={saving}
                     className="flex items-center gap-2 h-11 px-8 rounded-xl !bg-indigo-600 hover:!bg-indigo-700 disabled:opacity-60 text-white font-bold text-sm shadow-lg shadow-indigo-500/20 transition-all">
                     {saving ? <Spinner size="sm" color="white" /> : <FloppyDisk size={16} weight="bold" />}
-                    {saving ? 'Saving…' : 'Save All Changes'}
+                    {saving ? 'Saving…' : 'Save draft'}
                 </button>
             </div>
         </div>

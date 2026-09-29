@@ -13,12 +13,27 @@ cloudinary.config({
 });
 
 // Use memory storage for Cloudinary direct upload
-const upload = multer();
+const ALLOWED_TYPES = new Set(['image/jpeg', 'image/png', 'image/webp', 'image/gif', 'image/avif', 'video/mp4', 'video/webm']);
+const upload = multer({
+    limits: { fileSize: 30 * 1024 * 1024, files: 10 },
+    fileFilter: (_req, file, callback) => {
+        if (!ALLOWED_TYPES.has(file.mimetype)) return callback(new Error('Unsupported media type'));
+        callback(null, true);
+    },
+});
 
 // @desc    Upload image(s) to Cloudinary
 // @route   POST /api/upload
 // @access  Private/Admin
-router.post('/', protect, admin, upload.array('image'), async (req, res) => { // Supports single or multiple
+router.post('/', protect, admin, (req, res, next) => {
+    upload.array('image')(req, res, (error) => {
+        if (!error) return next();
+        if (error instanceof multer.MulterError && error.code === 'LIMIT_FILE_SIZE') {
+            return res.status(400).json({ message: 'Media files must be 30 MB or smaller' });
+        }
+        return res.status(400).json({ message: error.message || 'Upload failed' });
+    });
+}, async (req, res) => { // Supports single or multiple
     try {
         if (!req.files || req.files.length === 0) {
             // Fallback check if single file was sent improperly or without 'image' key
@@ -31,6 +46,7 @@ router.post('/', protect, admin, upload.array('image'), async (req, res) => { //
                 const stream = cloudinary.uploader.upload_stream(
                     {
                         folder: 'indian-rentals',
+                        resource_type: 'auto',
                     },
                     (error, result) => {
                         if (result) {
@@ -47,7 +63,7 @@ router.post('/', protect, admin, upload.array('image'), async (req, res) => { //
         const imageUrls = await Promise.all(req.files.map(file => uploadToCloudinary(file)));
 
         res.json({
-            message: 'Images uploaded successfully',
+            message: 'Media uploaded successfully',
             images: imageUrls,
             image: imageUrls[0] // Backward compatibility
         });

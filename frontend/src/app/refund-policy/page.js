@@ -1,4 +1,9 @@
 import PolicyPage from '@/components/PolicyPage';
+import { getPolicyMetadata } from '@/lib/policyMetadata';
+
+export async function generateMetadata() {
+    return getPolicyMetadata("refund", "Return, Cancellation & Refund Policy", "/return-policy");
+}
 
 const FALLBACK = `
 <h2>1. Cancellation Prior to Dispatch</h2>

@@ -1,4 +1,5 @@
 'use client';
+import { cmsUrl } from '@/lib/cmsPreview';
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
@@ -19,7 +20,7 @@ export default function BlogPage() {
             try {
                 const [postsRes, cmsRes] = await Promise.all([
                     fetch(`${API}/api/blog?status=published`),
-                    fetch(`${API}/api/cms/blog`)
+                    fetch(cmsUrl('blog'))
                 ]);
                 
                 if (postsRes.ok) setPosts(await postsRes.json());
@@ -71,27 +72,8 @@ export default function BlogPage() {
         ? posts 
         : posts.filter(p => p.tags && p.tags.some(tag => tag.toLowerCase() === activeTab.toLowerCase()));
 
-    const featuredPost = filteredPosts[0] || {
-        _id: 'placeholder-1',
-        title: 'Long-Term Rentals',
-        excerpt: 'Lorem ipsum dolor sit amet consectetur. Ut cras sit pulvinar dui tristique. Auctor os nullo.',
-        category: 'Category',
-        author: 'John Doe',
-        createdAt: '2022-01-11T00:00:00Z',
-        coverImage: 'https://res.cloudinary.com/dgkckcdk8/image/upload/v1778574729/indian-rentals/qhhhtoouiwurctnypu6z.png'
-    };
-    
-    // Fill the rest with placeholders if not enough posts to match the design visually
-    const defaultGridPosts = [
-        { _id: 'p2', title: 'Long-Term Rentals', excerpt: 'Lorem ipsum dolor sit amet consectetur. Ut cras sit pulvinar dui tristique. Auctor os nullo.', category: 'Category', author: 'John Doe', createdAt: '2022-01-11T00:00:00Z', coverImage: 'https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=800&auto=format&fit=crop&q=60' },
-        { _id: 'p3', title: 'Long-Term Rentals', excerpt: 'Lorem ipsum dolor sit amet consectetur. Ut cras sit pulvinar dui tristique. Auctor os nullo.', category: 'Category', author: 'John Doe', createdAt: '2022-01-11T00:00:00Z', coverImage: 'https://images.unsplash.com/photo-1517336714731-489689fd1ca8?w=800&auto=format&fit=crop&q=60' },
-        { _id: 'p4', title: 'Long-Term Rentals', excerpt: 'Lorem ipsum dolor sit amet consectetur. Ut cras sit pulvinar dui tristique. Auctor os nullo.', category: 'Category', author: 'John Doe', createdAt: '2022-01-11T00:00:00Z', coverImage: 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=800&auto=format&fit=crop&q=60' },
-        { _id: 'p5', title: 'Long-Term Rentals', excerpt: 'Lorem ipsum dolor sit amet consectetur. Ut cras sit pulvinar dui tristique. Auctor os nullo.', category: 'Category', author: 'John Doe', createdAt: '2022-01-11T00:00:00Z', coverImage: 'https://images.unsplash.com/photo-1531297172867-4d5ce290d291?w=800&auto=format&fit=crop&q=60' },
-        { _id: 'p6', title: 'Long-Term Rentals', excerpt: 'Lorem ipsum dolor sit amet consectetur. Ut cras sit pulvinar dui tristique. Auctor os nullo.', category: 'Category', author: 'John Doe', createdAt: '2022-01-11T00:00:00Z', coverImage: 'https://images.unsplash.com/photo-1550751827-4bd374c3f58b?w=800&auto=format&fit=crop&q=60' },
-        { _id: 'p7', title: 'Long-Term Rentals', excerpt: 'Lorem ipsum dolor sit amet consectetur. Ut cras sit pulvinar dui tristique. Auctor os nullo.', category: 'Category', author: 'John Doe', createdAt: '2022-01-11T00:00:00Z', coverImage: 'https://images.unsplash.com/photo-1504384308090-c894fdcc538d?w=800&auto=format&fit=crop&q=60' },
-    ];
-    
-    const gridPosts = filteredPosts.length > 1 ? filteredPosts.slice(1) : (filteredPosts.length === 1 ? [] : defaultGridPosts);
+    const featuredPost = filteredPosts[0];
+    const gridPosts = filteredPosts.slice(1);
 
     return (
         <div className="w-full flex justify-center bg-white pt-3 md:pt-5">
@@ -107,7 +89,7 @@ export default function BlogPage() {
                 </div>
 
                 {/* Featured Hero Post */}
-                <Link href={`/blog/${featuredPost.slug || featuredPost._id}`} className="group flex flex-col gap-3 md:gap-4">
+                {featuredPost && <Link href={`/blog/${featuredPost.slug || featuredPost._id}`} className="group flex flex-col gap-3 md:gap-4">
                     <span className="text-[#0B5ED7] text-[10px] md:text-[12px] font-medium md:font-semibold md:bg-[#E7F0FC] md:px-3 md:py-1 rounded-full w-fit">
                         {featuredPost.tags && featuredPost.tags.length > 0 ? featuredPost.tags[0] : featuredPost.category || "Category"}
                     </span>
@@ -152,7 +134,7 @@ export default function BlogPage() {
                             )}
                         </div>
                     </div>
-                </Link>
+                </Link>}
 
                 {/* Tabs / Filters */}
                 <div className="w-full border-b border-gray-200">
@@ -226,6 +208,13 @@ export default function BlogPage() {
                         </Link>
                     ))}
                 </div>
+
+                {filteredPosts.length === 0 && (
+                    <div className="rounded-2xl border border-gray-200 bg-gray-50 px-6 py-14 text-center" role="status">
+                        <h2 className="text-xl font-semibold text-[#1D1D1F]">No articles here yet</h2>
+                        <p className="mt-2 text-sm text-gray-600">Check back soon for rental guides and updates.</p>
+                    </div>
+                )}
 
             </div>
         </div>

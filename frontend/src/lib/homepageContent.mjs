@@ -18,17 +18,16 @@ export function heroSlidesFor(content) {
 }
 
 const CACHE_LIFETIME = 24*60*60*1000;
-const FIELDS = ['heroEnabled','heroSlides','heroImage','heroTitle','heroSubtitle','featureSectionEnabled','featureSectionTitle','featureSectionSubtitle','featureSectionCtaLink','featureSectionCtaText','featureSectionImage','featureSectionStats'];
+const FIELDS = ['heroEnabled','heroSlides','heroImage','heroTitle','heroSubtitle','featureSectionEnabled','featureSectionTitle','featureSectionSubtitle','featureSectionCtaLink','featureSectionCtaText','featureSectionImage','featureSectionMediaType','featureSectionMobileMedia','featureSectionPosterImage','featureSectionMediaAlt','featureSectionInteraction'];
 function pickContent(value) {
   if (!value || typeof value !== 'object' || Array.isArray(value) || !FIELDS.some(key=>key in value)) throw new Error('Invalid homepage content');
   const content = Object.fromEntries(FIELDS.filter(key=>key in value).map(key=>[key,value[key]]));
   for (const key of ['heroEnabled','featureSectionEnabled']) if (key in content && typeof content[key] !== 'boolean') throw new Error('Invalid homepage visibility');
-  if ('featureSectionStats' in content && !Array.isArray(content.featureSectionStats)) content.featureSectionStats=[];
   return content;
 }
 
 export function createHomepageContentLoader({api,fetcher=fetch,storage=()=>null,now=Date.now,timeout=4000,retryDelay=300,onFallback=()=>{}}) {
-  const key = `ir-homepage-content-v1:${api}`;
+  const key = `ir-homepage-content-v2:${api}`;
   let memory;
   let pending;
   function cached() {

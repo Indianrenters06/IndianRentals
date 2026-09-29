@@ -2,6 +2,8 @@
 import { useCallback, useEffect, useState } from 'react';
 import Link from 'next/link';
 import ImageUploader from '@/components/ImageUploader';
+import defaults from '@/config/contact-defaults.json';
+import { decodeLegacyContactContent, encodeLegacyContactContent } from '@/lib/legacyCmsContent';
 const API = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
 const STOREFRONT = (process.env.NEXT_PUBLIC_STOREFRONT_URL || (process.env.NODE_ENV === 'production' ? 'https://indianrenters.com' : 'http://localhost:3000')).replace(/\/$/, '');
 const imagePreview = value => value?.startsWith('/') ? `${STOREFRONT}${value}` : value;
@@ -16,15 +18,35 @@ const groups = [
     ['Help section',[['helpTitle','Heading'],['helpDescription','Description',true]]],
 ];
 export default function ContactCMSPage() {
-    const [data,setData]=useState(null),[meta,setMeta]=useState({}),[error,setError]=useState(''),[saved,setSaved]=useState(false),[saving,setSaving]=useState(false);
-    const load=useCallback(async()=>{setError('');try{const res=await fetch(`${API}/api/cms/contact`,{cache:'no-store'});const body=await res.json();if(!res.ok||!body.contactContent)throw new Error('Unable to load contact content. Check that the updated backend is running.');setData(body.contactContent);setMeta({metaTitle:body.metaTitle||'',metaDescription:body.metaDescription||''});}catch(e){setError(e.message);}},[]);
+    const [data,setData]=useState(null),[meta,setMeta]=useState({}),[error,setError]=useState(''),[saved,setSaved]=useState(false),[saving,setSaving]=useState(false),[compatibility,setCompatibility]=useState(false);
+    useEffect(()=>{
+        if (!compatibility) return;
+        const detail={page:'contact',path:'/contact',mode:'direct'};
+        let active=true;
+        queueMicrotask(()=>{if(active)window.dispatchEvent(new CustomEvent('cms:active-page',{detail}));});
+        return ()=>{active=false;window.dispatchEvent(new CustomEvent('cms:active-page',{detail:null}));};
+    },[compatibility]);
+    const load=useCallback(async()=>{
+        setError('');
+        try{
+            let res=await fetch(`${API}/api/cms/contact/draft`,{cache:'no-store',headers:{Authorization:`Bearer ${localStorage.getItem('adminToken')}`}});
+            const legacy=res.status===404;
+            if(legacy)res=await fetch(`${API}/api/cms/contact`,{cache:'no-store'});
+            const body=await res.json();
+            if(!res.ok)throw new Error(body.message||'Unable to load contact content.');
+            setCompatibility(legacy);
+            setData({...defaults,...(body.contactContent||decodeLegacyContactContent(body.pageContent)||{})});
+            setMeta({metaTitle:body.metaTitle||'',metaDescription:body.metaDescription||''});
+        }catch(e){setError(e.message);}
+    },[]);
     useEffect(()=>{load();},[load]);
     const set=(key,value)=>{setData(d=>({...d,[key]:value}));setSaved(false);};
-    async function save(e){e.preventDefault();setSaving(true);setError('');setSaved(false);try{const res=await fetch(`${API}/api/cms/contact`,{method:'PUT',headers:{'Content-Type':'application/json',Authorization:`Bearer ${localStorage.getItem('adminToken')}`},body:JSON.stringify({contactContent:data,...meta})});const body=await res.json();if(!res.ok)throw new Error(body.message||'Could not save contact page.');setData(body.contactContent);setSaved(true);}catch(e){setError(e.message);}finally{setSaving(false);}}
+    async function save(e){e.preventDefault();setSaving(true);setError('');setSaved(false);try{const payload=compatibility?{pageContent:encodeLegacyContactContent(data),...meta}:{contactContent:data,...meta};const res=await fetch(`${API}/api/cms/contact`,{method:'PUT',headers:{'Content-Type':'application/json',Authorization:`Bearer ${localStorage.getItem('adminToken')}`},body:JSON.stringify(payload)});const body=await res.json();if(!res.ok)throw new Error(body.message||'Could not save contact page.');setData({...defaults,...(body.contactContent||decodeLegacyContactContent(body.pageContent)||data)});setSaved(true);if(!compatibility)window.dispatchEvent(new CustomEvent('cms:draft-saved',{detail:{page:'contact'}}));}catch(e){setError(e.message);}finally{setSaving(false);}}
     if(!data)return <div className="p-6">{error?<><p role="alert">{error}</p><button className="mt-4 underline" onClick={load}>Retry</button></>:<p>Loading contact editor…</p>}</div>;
     return <form onSubmit={save} className="space-y-6 pb-16">
-        <header className="flex flex-wrap justify-between gap-4"><div><h1 className="text-3xl font-bold">Contact page</h1><p className="text-sm text-slate-500 mt-2">Manage the live contact page. The original design remains at /contact-demo.</p></div><div className="flex gap-4 items-center"><Link href="/dashboard/cms/contact/messages" className="underline">Enquiry inbox</Link><button disabled={saving} className="rounded-lg bg-indigo-600 text-white px-5 py-3 disabled:opacity-50">{saving?'Saving…':'Save changes'}</button></div></header>
-        {error&&<p role="alert" className="p-4 border border-red-300 rounded-lg">{error}</p>}{saved&&<p role="status" className="p-4 border border-green-300 rounded-lg">Contact page saved.</p>}
+        <header className="flex flex-wrap justify-between gap-4"><div><h1 className="text-3xl font-bold">Contact page</h1><p className="text-sm text-slate-500 mt-2">{compatibility?'Changes saved here appear on your local storefront immediately.':'Edit the contact page, then preview and publish the saved draft.'}</p></div><div className="flex gap-4 items-center"><Link href="/dashboard/cms/contact/messages" className="underline">Enquiry inbox</Link><button disabled={saving} className="rounded-full bg-[#ffcf46] px-5 py-3 font-semibold text-[#141414] hover:bg-[#f5c236] disabled:opacity-50">{saving?'Saving…':compatibility?'Save changes':'Save draft'}</button></div></header>
+        {compatibility&&<p role="status" className="rounded-xl border border-amber-300 bg-amber-50 p-4 text-sm text-amber-950">The connected API uses the earlier CMS format. This editor saves content immediately; draft preview and publish become available after the backend update.</p>}
+        {error&&<p role="alert" className="p-4 border border-red-300 rounded-lg">{error}</p>}{saved&&<p role="status" className="p-4 border border-green-300 rounded-lg">{compatibility?'Contact content saved to CMS. Refresh the local storefront to see it.':'Draft saved. Publish it when ready.'}</p>}
         <fieldset disabled={saving} className="grid grid-cols-1 xl:grid-cols-2 gap-6">
             <section className={card}><h2 className="text-lg font-semibold">Hero image</h2><p className="text-sm text-slate-500">The first section of the page. Image dimensions stay fixed by the responsive template.</p><ImageUploader label="Hero image" existingUrl={imagePreview(data.heroImage)} onUpload={url=>set('heroImage',url)}/><Field label="Image URL" value={data.heroImage} onChange={v=>set('heroImage',v)}/><Field label="Image description" value={data.heroAlt} onChange={v=>set('heroAlt',v)}/><Field label="Text over image" value={data.heroTitle} onChange={v=>set('heroTitle',v)}/><label className="flex gap-3 items-center"><input type="checkbox" checked={data.heroShowText} onChange={e=>set('heroShowText',e.target.checked)}/>Show text over image</label><Field label="Section background colour" type="color" value={data.heroBackground} onChange={v=>set('heroBackground',v)}/><Field label="Background hex value" value={data.heroBackground} onChange={v=>set('heroBackground',v)}/></section>
             {groups.map(([title,fields])=><section className={card} key={title}><h2 className="text-lg font-semibold">{title}</h2>{fields.map(([key,label,multiline])=><Field key={key} label={label} multiline={multiline} value={data[key]} onChange={value=>set(key,value)}/>)}{title==='Rental & support forms'&&<Field label="Equipment options (one per line)" multiline value={data.equipment.join('\n')} onChange={value=>set('equipment',value.split('\n'))}/>}</section>)}

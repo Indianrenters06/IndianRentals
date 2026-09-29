@@ -2,6 +2,7 @@
 // Chennai and Kolkata are service cities, not physical branches.
 export const LOCATION_SUPPORT = {
     phone: '+91-9999819719', email: 'support@indianrenters.com',
+    whatsappHref: 'https://wa.me/919711308090?text=Rent',
     hours: 'Mon–Sat, 10:00 AM – 7:30 PM',
 };
 export const LOCATIONS = {

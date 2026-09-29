@@ -14,7 +14,7 @@ const getToken = () => typeof window !== 'undefined' ? localStorage.getItem('adm
 // Default empty state with actual uploaded images
 const DEFAULTS = {
     categoriesPageTitle: 'All Categories',
-    categoriesPageSubtitle: 'Explore our wide range of rental categories across Apple, IT, AV, and more.',
+    categoriesPageSubtitle: "Need equipment for work or an event? Browse laptops and MacBooks, projectors and AV gear, office equipment, and DSLR cameras for rent. Choose a category to see what's available.",
     categoriesGrid: [
         { title: "Apple Products", image: "https://res.cloudinary.com/dgkckcdk8/image/upload/v1769946716/indian-rentals/fj8ptqbhppbstdd0hs4i.png", href: "/category/apple" },
         { title: "IT Products", image: "https://res.cloudinary.com/dgkckcdk8/image/upload/v1778099153/indian-rentals/tqniq6juxhhf1j3svppm.png", href: "/category/it-products" },
@@ -74,10 +74,16 @@ export default function CategoriesPageCMS() {
 
     const load = useCallback(async () => {
         try {
-            const res = await window.fetch(`${API}/api/cms/categories-page?t=${Date.now()}`);
+            const res = await window.fetch(`${API}/api/cms/categories-page/draft`, { headers: { Authorization: `Bearer ${getToken()}` }, cache: 'no-store' });
             if (res.ok) {
                 const json = await res.json();
-                setData({ ...DEFAULTS, ...json });
+                setData({
+                    ...DEFAULTS,
+                    ...json,
+                    categoriesPageSubtitle: json.categoriesPageSubtitle && !/^lorem ipsum\b/i.test(json.categoriesPageSubtitle.trim())
+                        ? json.categoriesPageSubtitle
+                        : DEFAULTS.categoriesPageSubtitle,
+                });
             }
         } catch { }
         finally { setLoading(false); }
@@ -95,8 +101,9 @@ export default function CategoriesPageCMS() {
             });
             if (!res.ok) throw new Error('Failed to save');
             setSaved(true);
+            window.dispatchEvent(new CustomEvent('cms:draft-saved', { detail: { page: 'categories-page' } }));
             setTimeout(() => setSaved(false), 3000);
-            toast.success("Main Category CMS saved successfully!");
+            toast.success('Category draft saved. Publish it when ready.');
         } catch (e) { toast.error(e.message); }
         finally { setSaving(false); }
     };
@@ -141,7 +148,7 @@ export default function CategoriesPageCMS() {
                     )}
                     <button onClick={save} disabled={saving}
                         className="flex items-center gap-2 h-10 px-5 rounded-xl !bg-indigo-600 hover:!bg-indigo-700 disabled:opacity-60 text-white font-semibold text-sm shadow-lg shadow-indigo-500/20 transition-all">
-                        {saving ? <Spinner size="sm" color="white" /> : <FloppyDisk size={15} weight="bold" />} Save Page
+                        {saving ? <Spinner size="sm" color="white" /> : <FloppyDisk size={15} weight="bold" />} Save draft
                     </button>
                 </div>
             </div>

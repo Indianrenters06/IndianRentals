@@ -46,6 +46,7 @@ const featureItemSchema = new mongoose.Schema({
 
 const cmsSchema = new mongoose.Schema({
     careersContent: { type: mongoose.Schema.Types.Mixed, default: undefined },
+    serviceContent: { type: mongoose.Schema.Types.Mixed, default: undefined },
     pageName: {
         type: String,
         required: true,
@@ -121,19 +122,24 @@ const cmsSchema = new mongoose.Schema({
     featuredShowcaseBanners: {
         type: [featuredShowcaseBannerSchema],
         default: [
-            { title: 'Apple Products', subtitle: 'MacBooks | iPads | iPhones | Mac Studio | Mac Mini', image: 'https://res.cloudinary.com/dgkckcdk8/image/upload/v1776108199/f6540bc8c3d4a91dfd954f6fe1cf8d3803b81b4a_3_optlwp.png', bg: 'linear-gradient(135deg, #1f1435 0%, #3b2069 45%, #6a3ea1 80%, #9055d4 100%)', href: '/categories/apple' },
-            { title: 'Gaming Laptops', subtitle: 'ASUS ROG | Lenovo Legion | MSI | HP Omen', image: 'https://images.unsplash.com/photo-1603302576837-37561b2e2302?auto=format&fit=crop&w=1200&q=80', bg: 'linear-gradient(135deg, #070d18 0%, #0d2238 45%, #133c5e 80%, #1c5f8a 100%)', href: '/categories/gaming' },
-            { title: 'Smart Devices', subtitle: 'Tablets | Smartwatches | Earbuds | Accessories', image: 'https://images.unsplash.com/photo-1544244015-0df4b3ffc6b0?auto=format&fit=crop&w=1200&q=80', bg: 'linear-gradient(135deg, #0b1a14 0%, #153326 45%, #1f523c 80%, #2b7756 100%)', href: '/categories/smart-devices' },
+            { title: 'Apple Products', subtitle: 'MacBooks | iPads | iPhones | Mac Studio | Mac Mini', image: 'https://res.cloudinary.com/dgkckcdk8/image/upload/v1776108199/f6540bc8c3d4a91dfd954f6fe1cf8d3803b81b4a_3_optlwp.png', bg: 'linear-gradient(135deg, #1f1435 0%, #3b2069 45%, #6a3ea1 80%, #9055d4 100%)', href: '/category/apple' },
+            { title: 'Gaming Laptops', subtitle: 'ASUS ROG | Lenovo Legion | MSI | HP Omen', image: 'https://images.unsplash.com/photo-1603302576837-37561b2e2302?auto=format&fit=crop&w=1200&q=80', bg: 'linear-gradient(135deg, #070d18 0%, #0d2238 45%, #133c5e 80%, #1c5f8a 100%)', href: '/products' },
+            { title: 'Smart Devices', subtitle: 'Tablets | Smartwatches | Earbuds | Accessories', image: 'https://images.unsplash.com/photo-1544244015-0df4b3ffc6b0?auto=format&fit=crop&w=1200&q=80', bg: 'linear-gradient(135deg, #0b1a14 0%, #153326 45%, #1f523c 80%, #2b7756 100%)', href: '/products' },
         ]
     },
 
     // ── Feature Section (homepage) ────────────────────────────────────────────
     featureSectionEnabled: { type: Boolean, default: true },
-    featureSectionTitle: { type: String, default: 'MacBook Air' },
-    featureSectionSubtitle: { type: String, default: 'Skip the setup hassle. Get high-performance workstations pre-configured with Ollama for instant AI development. Run large language models locally.' },
-    featureSectionImage: { type: String, default: 'https://res.cloudinary.com/dgkckcdk8/image/upload/v1769961205/indian-rentals/gfjrzgp5llzcjap30wkt.png' },
-    featureSectionCtaText: { type: String, default: 'Rent Now' },
-    featureSectionCtaLink: { type: String, default: '/store' },
+    featureSectionTitle: { type: String, default: 'The right tech, right when you need it.' },
+    featureSectionSubtitle: { type: String, default: 'Rent laptops, cameras, and more for the work ahead.' },
+    featureSectionImage: { type: String, default: '/images/home/rental-workspace-offer.webp' },
+    featureSectionMediaType: { type: String, enum: ['image', 'video'], default: 'image' },
+    featureSectionMobileMedia: { type: String, default: '/images/home/rental-workspace-offer-mobile.webp' },
+    featureSectionPosterImage: { type: String, default: '' },
+    featureSectionMediaAlt: { type: String, default: 'Rental laptop and creative equipment ready for work' },
+    featureSectionInteraction: { type: String, enum: ['none', 'hover-zoom'], default: 'none' },
+    featureSectionCtaText: { type: String, default: 'Explore rentals' },
+    featureSectionCtaLink: { type: String, default: '/products' },
     featureSectionStats: {
         type: [{
             value: String,
@@ -199,7 +205,7 @@ const cmsSchema = new mongoose.Schema({
     
     // ── Categories Page ───────────────────────────────────────────────────────
     categoriesPageTitle: { type: String, default: 'All Categories' },
-    categoriesPageSubtitle: { type: String, default: 'Lorem ipsum dolor sit amet consectetur. Vel libero cras laoreet ut dignissim eget. Scelerisque mauris pharetra tristique cras sit malesuada. Egestas pulvinar interdum sapien et. Consequat neque at donec turpis leo. Quis at.' },
+    categoriesPageSubtitle: { type: String, default: "Need equipment for work or an event? Browse laptops and MacBooks, projectors and AV gear, office equipment, and DSLR cameras for rent. Choose a category to see what's available." },
     categoriesGrid: {
         type: [{
             title: String,
@@ -272,7 +278,7 @@ const cmsSchema = new mongoose.Schema({
     productPageKycNote: { type: String, default: "Place Order & complete KYC anytime to get your items the next day" },
     productPageKycLine1: { type: String, default: "Place Order & complete KYC anytime" },
     productPageKycLine2: { type: String, default: "to get your items the next day" },
-    productPageKycImage: { type: String, default: "" },
+    productPageKycImage: { type: String, default: "/images/product/kyc-delivery.webp" },
 
     // Rental tenures offered by the slider / compare drawer. `discountPercent`
     // is applied to the product's base monthly rent.
@@ -293,6 +299,7 @@ const cmsSchema = new mongoose.Schema({
     productPageExtendCardText: { type: String, default: "How do I extend tenure after 6 months?" },
     productPageExtendCardLinkText: { type: String, default: "View Details" },
     productPageExtendCardLink: { type: String, default: "#" },
+    productPageExtendCardBody: { type: String, default: "Contact support before your current rental period ends to discuss available terms and pricing." },
 
     // Pincode / serviceability row.
     productPageDeliveryLabel: { type: String, default: "Delivery" },
@@ -383,6 +390,9 @@ const cmsSchema = new mongoose.Schema({
         default: 'published',
     },
     scheduledPublishTime: { type: Date, default: null },
+    draftData: { type: mongoose.Schema.Types.Mixed, default: undefined },
+    draftUpdatedAt: { type: Date, default: null },
+    publishedAt: { type: Date, default: null },
 }, {
     timestamps: true,
 });

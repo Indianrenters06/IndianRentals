@@ -12,6 +12,7 @@ import {
 } from "@phosphor-icons/react";
 import ImageUploader from "@/components/ImageUploader";
 import Toggle from "@/components/Toggle";
+import { resolveOfferCampaign, offerPreviewUrl } from '@/lib/offerCampaigns';
 
 const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
 const getToken = () => typeof window !== "undefined" ? localStorage.getItem("adminToken") : null;
@@ -42,10 +43,10 @@ const Field = ({ label, value, onChange, placeholder, type = "text", rows, class
 
 // ── Offers ───────────────────────────────────────────────────────────────────
 // Offers are stored under the legacy `clientLogos` key. Older entries are plain
-// image URL strings; new ones are { image, link }.
-const toOffer = (o) => (typeof o === "string"
-    ? { image: o, link: "" }
-    : { image: o?.image || "", link: o?.link || "" });
+// image URL strings; newer entries carry editable campaign copy.
+const toOffer = (o) => resolveOfferCampaign(typeof o === "string"
+    ? { image: o, link: "", title: "", subtitle: "", ctaText: "", altText: "" }
+    : { image: o?.image || "", link: o?.link || "", title: o?.title || "", subtitle: o?.subtitle || "", ctaText: o?.ctaText || "", altText: o?.altText || "" });
 
 // ── Section Header ───────────────────────────────────────────────────────────
 const SectionRow = ({ icon, title, desc, toggle, onToggle }) => (
@@ -231,12 +232,16 @@ const DEFAULTS = {
     bestRentedEnabled: true, bestRentedTitle: "Best Rented Products", bestRentedProductIds: [],
     newLaunchEnabled: true, newLaunchTitle: "New Launches This Week", newLaunchProductIds: [],
     featureSectionEnabled: true,
-    featureSectionTitle: "MacBook Air",
-    featureSectionSubtitle: "Skip the setup hassle. Get high-performance workstations pre-configured with Ollama for instant AI development. Run large language models locally.",
-    featureSectionImage: "https://res.cloudinary.com/dgkckcdk8/image/upload/v1769961205/indian-rentals/gfjrzgp5llzcjap30wkt.png",
-    featureSectionCtaText: "Rent Now",
-    featureSectionCtaLink: "/store",
-    featureSectionLink: "",
+    featureSectionTitle: "The right tech, right when you need it.",
+    featureSectionSubtitle: "Rent laptops, cameras, and more for the work ahead.",
+    featureSectionImage: "/images/home/rental-workspace-offer.webp",
+    featureSectionMediaType: "image",
+    featureSectionMobileMedia: "/images/home/rental-workspace-offer-mobile.webp",
+    featureSectionPosterImage: "",
+    featureSectionMediaAlt: "Rental laptop and creative equipment ready for work",
+    featureSectionInteraction: "none",
+    featureSectionCtaText: "Explore rentals",
+    featureSectionCtaLink: "/products",
     featureSectionStats: [
         { value: '23x', label: 'Up to', sublabel: 'faster than the fastest Intel-based MacBook Air' },
         { value: '2x', label: 'Up to', sublabel: 'faster than MacBook Air(M1)' },
@@ -270,9 +275,9 @@ const DEFAULTS = {
     featuredShowcaseEnabled: true,
     featuredShowcaseProductIds: [],
     featuredShowcaseBanners: [
-        { title: 'Apple Products', subtitle: 'MacBooks | iPads | iPhones | Mac Studio | Mac Mini', image: '', bg: 'linear-gradient(135deg, #2a1a5e 0%, #4c3099 40%, #7c5cbf 70%, #b08ad4 100%)', href: '/categories/apple' },
-        { title: 'Gaming Laptops', subtitle: 'ASUS ROG | Lenovo Legion | MSI | HP Omen', image: '', bg: 'linear-gradient(135deg, #0a1628 0%, #1a3a5c 40%, #1e5f8c 70%, #2a9fd6 100%)', href: '/categories/gaming' },
-        { title: 'Smart Devices', subtitle: 'Tablets | Smartwatches | Earbuds | Accessories', image: '', bg: 'linear-gradient(135deg, #1a2e1a 0%, #1e5c3a 40%, #25874f 70%, #3ac47d 100%)', href: '/categories/smart-devices' },
+        { title: 'Apple Products', subtitle: 'MacBooks | iPads | iPhones | Mac Studio | Mac Mini', image: '', bg: 'linear-gradient(135deg, #2a1a5e 0%, #4c3099 40%, #7c5cbf 70%, #b08ad4 100%)', href: '/category/apple' },
+        { title: 'Gaming Laptops', subtitle: 'ASUS ROG | Lenovo Legion | MSI | HP Omen', image: '', bg: 'linear-gradient(135deg, #0a1628 0%, #1a3a5c 40%, #1e5f8c 70%, #2a9fd6 100%)', href: '/products' },
+        { title: 'Smart Devices', subtitle: 'Tablets | Smartwatches | Earbuds | Accessories', image: '', bg: 'linear-gradient(135deg, #1a2e1a 0%, #1e5c3a 40%, #25874f 70%, #3ac47d 100%)', href: '/products' },
     ],
     metaTitle: "", metaDescription: "",
 };
@@ -294,6 +299,7 @@ export default function CMSHomepage() {
     const [saving, setSaving] = useState(false);
     const [saved, setSaved] = useState(false);
     const [data, setData] = useState(DEFAULTS);
+    const [draftUnavailable, setDraftUnavailable] = useState(false);
     const [availableProducts, setAvailableProducts] = useState([]);
 
     const [offerImageUrl, setOfferImageUrl] = useState("");
@@ -309,7 +315,7 @@ export default function CMSHomepage() {
 
     // ── Offers (stored under the legacy `clientLogos` key) ────────────────────
     const offers = (data.clientLogos || []).map(toOffer);
-    const addOffer = (image, link = "") => set("clientLogos", [...offers, { image, link }]);
+    const addOffer = (image, link = "") => set("clientLogos", [...offers, { image, link, title: "", subtitle: "", ctaText: "", altText: "" }]);
     const updateOffer = (idx, patch) =>
         set("clientLogos", offers.map((o, i) => (i === idx ? { ...o, ...patch } : o)));
     const addOfferFromUrl = () => {
@@ -323,7 +329,13 @@ export default function CMSHomepage() {
     const fetchCMS = useCallback(async () => {
         try {
             setLoading(true);
-            const res = await fetch(`${API}/api/cms/homepage`);
+            let res = await fetch(`${API}/api/cms/homepage/draft`, { headers: { Authorization: `Bearer ${getToken()}` }, cache: 'no-store' });
+            if (res.status === 404) {
+                setDraftUnavailable(true);
+                res = await fetch(`${API}/api/cms/homepage`, { cache: 'no-store' });
+            } else {
+                setDraftUnavailable(false);
+            }
             if (res.ok) {
                 const d = await res.json();
                 if (d.heroSlides?.length === 0 && d.heroTitle) {
@@ -348,6 +360,17 @@ export default function CMSHomepage() {
                 if (d.faqSectionEnabled === undefined) d.faqSectionEnabled = true;
                 if (d.homepageFaqEnabled === undefined) d.homepageFaqEnabled = true;
                 if (!d.homepageFaqItems) d.homepageFaqItems = [];
+                if (d.featureSectionTitle === "MacBook Air" && (!d.featureSectionImage || d.featureSectionImage.includes("gfjrzgp5llzcjap30wkt.png"))) {
+                    Object.assign(d, {
+                        featureSectionTitle: DEFAULTS.featureSectionTitle,
+                        featureSectionSubtitle: DEFAULTS.featureSectionSubtitle,
+                        featureSectionImage: DEFAULTS.featureSectionImage,
+                        featureSectionCtaText: DEFAULTS.featureSectionCtaText,
+                        featureSectionCtaLink: DEFAULTS.featureSectionCtaLink,
+                        featureSectionMediaType: "image",
+                        featureSectionMobileMedia: DEFAULTS.featureSectionMobileMedia,
+                    });
+                }
                 setData({ ...DEFAULTS, ...d });
             }
         } catch (err) { console.error(err); }
@@ -357,6 +380,7 @@ export default function CMSHomepage() {
     useEffect(() => { fetchCMS(); }, [fetchCMS]);
 
     const handleSave = async () => {
+        if (draftUnavailable) { toast.error('Start or deploy the updated CMS backend to save a draft.'); return; }
         try {
             setSaving(true);
             const res = await fetch(`${API}/api/cms/homepage`, {
@@ -366,6 +390,7 @@ export default function CMSHomepage() {
             });
             if (!res.ok) throw new Error((await res.json()).message || "Failed to save");
             setSaved(true);
+            window.dispatchEvent(new CustomEvent('cms:draft-saved', { detail: { page: 'homepage' } }));
             setTimeout(() => setSaved(false), 3000);
         } catch (err) { toast.error(err.message); }
         finally { setSaving(false); }
@@ -381,6 +406,9 @@ export default function CMSHomepage() {
     return (
         <div className="w-full space-y-6 pb-16">
             {/* ── Page Header ── */}
+            {draftUnavailable && <div role="status" className="rounded-xl border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-950">
+                Showing published homepage content. The connected backend does not yet support saved drafts. Changes on this screen cannot be saved or published until the updated backend is running.
+            </div>}
             <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
                 <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }}>
                     <h1 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-slate-100 mb-1">
@@ -391,13 +419,13 @@ export default function CMSHomepage() {
                 <div className="flex items-center gap-3">
                     {saved && (
                         <span className="flex items-center gap-1.5 text-emerald-600 dark:text-emerald-400 text-sm font-semibold bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/20 rounded-full px-3 py-1.5 animate-pulse">
-                            <CheckCircle size={14} weight="fill" /> Saved Successfully!
+                            <CheckCircle size={14} weight="fill" /> Draft saved
                         </span>
                     )}
-                    <button onClick={handleSave} disabled={saving}
+                    <button onClick={handleSave} disabled={saving || draftUnavailable}
                         className="flex items-center gap-2 h-10 px-6 rounded-xl !bg-indigo-600 hover:!bg-indigo-700 disabled:opacity-60 text-white font-semibold text-sm shadow-lg shadow-indigo-500/25 transition-all">
                         {saving ? <Spinner size="sm" color="white" /> : <FloppyDisk size={18} weight="bold" />}
-                        {saving ? "Publishing…" : "Publish Changes"}
+                        {saving ? "Saving…" : "Save draft"}
                     </button>
                 </div>
             </div>
@@ -723,7 +751,7 @@ export default function CMSHomepage() {
                                                 label="Link (href)"
                                                 value={banner.href}
                                                 onChange={v => { const n = [...data.featuredShowcaseBanners]; n[idx].href = v; set("featuredShowcaseBanners", n); }}
-                                                placeholder="/categories/apple"
+                                                placeholder="/category/apple"
                                             />
                                             {/* Gradient bg input */}
                                             <div>
@@ -783,52 +811,41 @@ export default function CMSHomepage() {
                         <SectionRow
                             icon={<Star weight="fill" className="text-pink-500" />}
                             title="Promotional Feature Section"
-                            desc="Customize the high-impact promotional section (e.g. MacBook Air highlight)."
+                            desc="A full-width media banner. Edit the words separately so they remain readable at every screen size."
                             toggle={data.featureSectionEnabled}
                             onToggle={v => set("featureSectionEnabled", v)}
                         />
 
                         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                             <div className="space-y-4">
-                                <Field label="Headline" value={data.featureSectionTitle} onChange={v => set("featureSectionTitle", v)} placeholder="e.g. MacBook Air" />
-                                <Field label="Description" value={data.featureSectionSubtitle} onChange={v => set("featureSectionSubtitle", v)} rows={3} placeholder="Write something compelling..." />
-                                <div className="grid grid-cols-2 gap-4">
-                                    <Field label="CTA Text" value={data.featureSectionCtaText} onChange={v => set("featureSectionCtaText", v)} placeholder="Rent Now" />
-                                    <Field label="CTA Link" value={data.featureSectionCtaLink} onChange={v => set("featureSectionCtaLink", v)} placeholder="/store" />
+                                <Field label="Headline" value={data.featureSectionTitle} onChange={v => set("featureSectionTitle", v)} />
+                                <Field label="Description" value={data.featureSectionSubtitle} onChange={v => set("featureSectionSubtitle", v)} rows={3} />
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                    <Field label="Button text" value={data.featureSectionCtaText} onChange={v => set("featureSectionCtaText", v)} />
+                                    <Field label="Button destination" value={data.featureSectionCtaLink} onChange={v => set("featureSectionCtaLink", v)} placeholder="/products" />
                                 </div>
-                                <Field label="Entire Section Link (Optional)" value={data.featureSectionLink || ""} onChange={v => set("featureSectionLink", v)} placeholder="https://..." />
+                                <Field label="Media description for accessibility" value={data.featureSectionMediaAlt} onChange={v => set("featureSectionMediaAlt", v)} />
+                                <label className="block text-sm font-medium text-slate-700 dark:text-slate-200">Desktop media type
+                                    <select value={data.featureSectionMediaType || "image"} onChange={e => set("featureSectionMediaType", e.target.value)} className="mt-1 block w-full h-10 rounded-xl border border-slate-200 bg-white px-3 text-slate-900 dark:bg-slate-800 dark:border-slate-700 dark:text-white">
+                                        <option value="image">Image or animation</option>
+                                        <option value="video">Video</option>
+                                    </select>
+                                </label>
+                                <label className="block text-sm font-medium text-slate-700 dark:text-slate-200">Interaction
+                                    <select value={data.featureSectionInteraction || "none"} onChange={e => set("featureSectionInteraction", e.target.value)} className="mt-1 block w-full h-10 rounded-xl border border-slate-200 bg-white px-3 text-slate-900 dark:bg-slate-800 dark:border-slate-700 dark:text-white">
+                                        <option value="none">Still</option>
+                                        <option value="hover-zoom">Subtle hover zoom</option>
+                                    </select>
+                                </label>
                             </div>
-                            <div>
-                                <ImageUploader label="Feature Image" existingUrl={data.featureSectionImage} onUpload={url => set("featureSectionImage", url)} />
-                                {data.featureSectionImage && (
-                                    <div className="mt-4 h-40 rounded-xl bg-slate-50 dark:bg-slate-950 flex items-center justify-center p-4 border border-slate-200 dark:border-slate-800">
-                                        <img src={data.featureSectionImage} className="max-h-full max-w-full object-contain drop-shadow-lg" alt="Preview" />
-                                    </div>
-                                )}
-                            </div>
-                        </div>
-
-                        {/* Stats Rows */}
-                        <div className="space-y-4">
-                            <div className="flex justify-between items-center border-t border-slate-100 dark:border-slate-800 pt-6">
-                                <h4 className="text-sm font-bold text-slate-800 dark:text-slate-200 uppercase tracking-tighter">Performance Statistics</h4>
-                                <button onClick={() => set("featureSectionStats", [...(data.featureSectionStats || []), { value: "10x", label: "Up to", sublabel: "Performance" }])}
-                                    className="flex items-center gap-1 text-xs font-semibold text-indigo-600 hover:text-indigo-700">
-                                    <Plus size={14} /> Add Stat
-                                </button>
-                            </div>
-                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                {(data.featureSectionStats || []).map((stat, idx) => (
-                                    <div key={idx} className="p-4 bg-slate-50 dark:bg-slate-950 rounded-xl border border-slate-200 dark:border-slate-800 relative group">
-                                        <button onClick={() => { const n = [...data.featureSectionStats]; n.splice(idx, 1); set("featureSectionStats", n) }}
-                                            className="absolute -top-2 -right-2 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center text-xs opacity-0 group-hover:opacity-100 transition-opacity">×</button>
-                                        <div className="space-y-3">
-                                            <Field label="Label (e.g. Up to)" value={stat.label} onChange={v => { const n = [...data.featureSectionStats]; n[idx].label = v; set("featureSectionStats", n); }} />
-                                            <Field label="Value (e.g. 23x)" value={stat.value} onChange={v => { const n = [...data.featureSectionStats]; n[idx].value = v; set("featureSectionStats", n); }} />
-                                            <Field label="Subtext" value={stat.sublabel} onChange={v => { const n = [...data.featureSectionStats]; n[idx].sublabel = v; set("featureSectionStats", n); }} />
-                                        </div>
-                                    </div>
-                                ))}
+                            <div className="space-y-4">
+                                <p className="text-sm text-slate-500">Use a wide image, animated WebP/AVIF/GIF, or a short muted MP4/WebM. Keep text out of the media; the storefront overlays editable copy. Video viewers get a play/pause control.</p>
+                                <ImageUploader label="Desktop media" allowVideo existingUrl={data.featureSectionImage?.startsWith("/") ? `http://localhost:3000${data.featureSectionImage}` : data.featureSectionImage} onUpload={url => { set("featureSectionImage", url); set("featureSectionMediaType", /\/video\/upload\/|\.(mp4|webm)(?:[?#]|$)/i.test(url) ? "video" : "image"); }} />
+                                <Field label="Desktop media URL" value={data.featureSectionImage} onChange={v => set("featureSectionImage", v)} placeholder="https://... or /images/..." />
+                                <ImageUploader label="Mobile media (optional)" allowVideo existingUrl={data.featureSectionMobileMedia?.startsWith("/") ? `http://localhost:3000${data.featureSectionMobileMedia}` : data.featureSectionMobileMedia} onUpload={url => set("featureSectionMobileMedia", url)} />
+                                <Field label="Mobile media URL (optional)" value={data.featureSectionMobileMedia} onChange={v => set("featureSectionMobileMedia", v)} />
+                                <ImageUploader label="Video poster image (optional)" existingUrl={data.featureSectionPosterImage} onUpload={url => set("featureSectionPosterImage", url)} />
+                                <Field label="Video poster URL" value={data.featureSectionPosterImage} onChange={v => set("featureSectionPosterImage", v)} />
                             </div>
                         </div>
                     </div>
@@ -906,12 +923,12 @@ export default function CMSHomepage() {
                         <SectionRow
                             icon={<Layout weight="fill" className="text-pink-500" />}
                             title="Offers"
-                            desc="Upload an offer banner or paste an image link, and optionally point each offer at a page. The section is hidden on the website until at least one offer is added."
+                            desc="Add a wide image, headline, supporting line and destination for each campaign card. The section is hidden on the website until at least one card is added."
                             toggle={data.clientSectionEnabled}
                             onToggle={v => set("clientSectionEnabled", v)}
                         />
 
-                        <Field label="Section Title" value={data.clientSectionTitle} onChange={v => set("clientSectionTitle", v)} placeholder="e.g. Offers" />
+                        <Field label="Internal section label" value={data.clientSectionTitle} onChange={v => set("clientSectionTitle", v)} placeholder="e.g. Offers" />
 
                         {/* Existing offers */}
                         {offers.length > 0 ? (
@@ -921,15 +938,20 @@ export default function CMSHomepage() {
                                 </label>
                                 <div className="space-y-3">
                                     {offers.map((offer, idx) => (
-                                        <div key={idx} className="flex flex-col sm:flex-row sm:items-center gap-4 p-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-950">
-                                            <div className="w-full sm:w-40 h-24 shrink-0 rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 flex items-center justify-center overflow-hidden">
+                                        <div key={idx} className="grid grid-cols-1 lg:grid-cols-[180px_minmax(0,1fr)_auto] items-start gap-4 p-4 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-950">
+                                            <div className="w-full h-28 rounded-lg bg-[#141414] border border-slate-200 dark:border-slate-800 flex items-center justify-center overflow-hidden">
                                                 {offer.image ? (
-                                                    <img src={offer.image} className="max-w-full max-h-full object-contain" alt={`Offer ${idx + 1}`} />
+                                                    <img src={offerPreviewUrl(offer.image)} className="w-full h-full object-cover" alt={offer.altText || `Offer ${idx + 1}`} />
                                                 ) : (
                                                     <PhosphorImage size={22} className="text-slate-300" />
                                                 )}
                                             </div>
                                             <div className="flex-1 space-y-2 min-w-0">
+                                                <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                                                    <Field label="Headline" value={offer.title} onChange={v => updateOffer(idx, { title: v })} placeholder="The shot starts here." />
+                                                    <Field label="Button label" value={offer.ctaText} onChange={v => updateOffer(idx, { ctaText: v })} placeholder="Explore cameras" />
+                                                </div>
+                                                <Field label="Supporting line" value={offer.subtitle} onChange={v => updateOffer(idx, { subtitle: v })} placeholder="Camera kits for every brief." />
                                                 <Field
                                                     label="Image URL"
                                                     value={offer.image}
@@ -937,11 +959,13 @@ export default function CMSHomepage() {
                                                     placeholder="https://res.cloudinary.com/..."
                                                 />
                                                 <Field
-                                                    label="Click-through Link (Optional)"
+                                                    label="Destination URL"
                                                     value={offer.link}
                                                     onChange={v => updateOffer(idx, { link: v })}
                                                     placeholder="/products or https://..."
                                                 />
+                                                <Field label="Image description (for image-only cards)" value={offer.altText} onChange={v => updateOffer(idx, { altText: v })} placeholder="Describe the image" />
+                                                <ImageUploader label="Replace image (WebP, JPG, PNG, GIF or AVIF)" existingUrl="" onUpload={url => { if (url) updateOffer(idx, { image: url }); }} />
                                             </div>
                                             <button
                                                 onClick={() => set("clientLogos", offers.filter((_, i) => i !== idx))}
@@ -966,7 +990,7 @@ export default function CMSHomepage() {
                             <label className="text-xs font-bold text-slate-500 dark:text-slate-200 uppercase tracking-wider block">
                                 Add Offer
                             </label>
-                            <p className="text-xs text-slate-400 -mt-1">Offers display in a wide carousel, so use landscape banner images. You can add multiple offers one by one, then set a click-through link on each.</p>
+                            <p className="text-xs text-slate-500 -mt-1">Use a landscape image around 1.9:1 with room for text on the left. The website renders the headline separately so it stays readable on phones.</p>
 
                             <div className="max-w-xs">
                                 <ImageUploader

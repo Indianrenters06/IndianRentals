@@ -2,8 +2,10 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { PiSpinnerGap, PiReceipt, PiArrowLeft } from 'react-icons/pi';
+import { ArrowRight, Receipt, ArrowClockwise } from '@phosphor-icons/react';
+import { PiSpinnerGap } from 'react-icons/pi';
 import axios from 'axios';
+import { profileTitleClassName } from '../profileTitle';
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
 
@@ -39,6 +41,8 @@ const inr = (n) => `Rs. ${Number(n || 0).toLocaleString('en-IN', { minimumFracti
 export default function MyInvoicesPage() {
     const [invoices, setInvoices] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [fetchError, setFetchError] = useState(false);
+    const [refreshKey, setRefreshKey] = useState(0);
     // Set by the "Invoices" button on an order card: /profile/invoices?order=XXXXXX
     const [orderFilter, setOrderFilter] = useState(null);
 
@@ -49,6 +53,8 @@ export default function MyInvoicesPage() {
 
     useEffect(() => {
         const fetchRentals = async () => {
+            setLoading(true);
+            setFetchError(false);
             try {
                 const res = await axios.get(`${API_BASE}/api/rentals/myrentals`, {
                     headers: { Authorization: `Bearer ${getToken()}` }
@@ -65,12 +71,13 @@ export default function MyInvoicesPage() {
                 setInvoices(mapped);
             } catch (err) {
                 console.error('Invoices fetch error:', err);
+                setFetchError(true);
             } finally {
                 setLoading(false);
             }
         };
         fetchRentals();
-    }, []);
+    }, [refreshKey]);
 
     const visibleInvoices = orderFilter
         ? invoices.filter(inv => inv.orderNo === orderFilter)
@@ -81,13 +88,8 @@ export default function MyInvoicesPage() {
             {/* Heading block — Figma "Frame 282": 32px down to the column headings, 12px inside. */}
             <div className="flex w-full flex-col gap-8">
                 <div className="flex flex-col gap-3">
-                    <div className="flex items-center gap-3">
-                        <Link href="/profile" aria-label="Back to menu" className="shrink-0 text-[#333333] lg:hidden">
-                            <PiArrowLeft size={24} />
-                        </Link>
-                        <h1 className="text-[27px] font-semibold leading-[35px] tracking-[-0.8px] text-[#333333]">My Invoices</h1>
-                    </div>
-                    <p className="text-[14px] font-medium leading-5 tracking-[-0.4px] text-[#757575]">All the invoices are listed below.</p>
+                    <h1 className={profileTitleClassName}>My Invoices</h1>
+                    <p className="text-[14px] font-medium leading-5 tracking-[-0.4px] text-[#757575]">Find invoices for your rental orders here.</p>
                 </div>
 
                 {orderFilter && (
@@ -107,6 +109,24 @@ export default function MyInvoicesPage() {
                     <PiSpinnerGap className="animate-spin" size={22} />
                     <span className="text-[14px] font-medium leading-5 tracking-[-0.4px]">Loading invoices…</span>
                 </div>
+            ) : fetchError ? (
+                <section className="mt-4 flex min-h-[300px] flex-col items-center justify-center rounded-[24px] border border-[#e2e2e2] bg-[#f6f6f6] px-6 py-10 text-center" role="alert">
+                    <span className="mb-5 flex size-20 items-center justify-center rounded-[22px] border border-[#e2e2e2] bg-white text-[#141414]"><Receipt size={38} weight="regular" aria-hidden="true" /></span>
+                    <h2 className="text-[22px] font-semibold leading-tight tracking-[-0.03em] text-[#141414] sm:text-[28px]">We couldn’t load your invoices</h2>
+                    <p className="mt-2 max-w-[400px] text-[14px] leading-6 text-[#545454] sm:text-[16px]">Please try again. If the problem continues, our team can help you find an invoice.</p>
+                    <button type="button" onClick={() => setRefreshKey(key => key + 1)} className="mt-6 inline-flex min-h-11 items-center justify-center gap-2 rounded-full bg-[#ffcf46] px-6 text-[14px] font-semibold text-[#141414] transition-colors hover:bg-[#f3bf35] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#141414]"><ArrowClockwise size={18} weight="bold" aria-hidden="true" />Try again</button>
+                </section>
+            ) : visibleInvoices.length === 0 ? (
+                <section className="mt-4 flex min-h-[340px] flex-col items-center justify-center rounded-[24px] border border-[#e2e2e2] bg-[#f6f6f6] px-6 py-10 text-center sm:min-h-[380px] sm:px-10">
+                    <span className="mb-6 flex size-20 items-center justify-center rounded-[22px] border border-[#e2e2e2] bg-white text-[#141414] shadow-sm"><Receipt size={38} weight="regular" aria-hidden="true" /></span>
+                    <h2 className="text-[22px] font-semibold leading-tight tracking-[-0.03em] text-[#141414] sm:text-[28px]">{orderFilter ? 'No invoice for this order yet' : 'No invoices yet'}</h2>
+                    <p className="mt-2 max-w-[420px] text-[14px] leading-6 text-[#545454] sm:text-[16px]">{orderFilter ? 'We couldn’t find an invoice for this order. You can check your other invoices or come back later.' : 'After you place a rental order, its invoice will appear here.'}</p>
+                    {orderFilter ? (
+                        <button type="button" onClick={() => setOrderFilter(null)} className="mt-6 inline-flex min-h-11 items-center justify-center gap-2 rounded-full bg-[#ffcf46] px-6 text-[14px] font-semibold text-[#141414] transition-colors hover:bg-[#f3bf35] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#141414]">View all invoices<ArrowRight size={18} weight="bold" aria-hidden="true" /></button>
+                    ) : (
+                        <Link href="/products" className="mt-6 inline-flex min-h-11 items-center justify-center gap-2 rounded-full bg-[#ffcf46] px-6 text-[14px] font-semibold text-[#141414] transition-colors hover:bg-[#f3bf35] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#141414]">Explore rentals<ArrowRight size={18} weight="bold" aria-hidden="true" /></Link>
+                    )}
+                </section>
             ) : (
                 // Scrolls within the panel; scrollbar left visible so the extra columns are findable.
                 <div className="w-full overflow-x-auto">
@@ -126,34 +146,24 @@ export default function MyInvoicesPage() {
                         {/* Divider — Figma "Line 13" */}
                         <div className="my-3 h-px w-full bg-[#afafaf]" />
 
-                        {visibleInvoices.length === 0 ? (
-                            <div className="py-20 text-center text-[#757575]">
-                                <PiReceipt size={52} className="mx-auto mb-3 opacity-25" />
-                                <p className="text-[14px] font-medium leading-5 tracking-[-0.4px]">No invoices found.</p>
-                                <p className="mt-1 text-[12px] font-semibold leading-4 tracking-[-0.4px]">
-                                    {orderFilter ? 'This order has no invoice yet.' : 'Once you place a rental order, invoices will appear here.'}
-                                </p>
-                            </div>
-                        ) : (
-                            /* Rows — Figma "Frame 283": 56px tall, 6px radius, #cbcbcb hairline */
-                            <div className="flex flex-col gap-3">
-                                {visibleInvoices.map((invoice) => (
-                                    <div key={invoice.id} className="h-[56px] w-full rounded-[6px] border border-[#cbcbcb]">
-                                        <div className={`${COLUMNS} h-full w-full pl-[10px] text-[14px] font-semibold leading-5 tracking-[-0.4px] text-[#1f1f1f]`}>
-                                            <p>{invoice.date}</p>
-                                            <p>{invoice.id}</p>
-                                            <p>{invoice.orderNo}</p>
-                                            <p>{invoice.invoiceAmt}</p>
-                                            <p>{invoice.amountDue}</p>
-                                            <Tag label={invoice.status} paid={invoice.status === 'Paid'} />
-                                            <button className="flex h-[24px] w-fit items-center justify-center rounded-[28px] bg-[#0075ff] px-3 py-1 text-[12px] font-semibold leading-4 tracking-[-0.4px] text-[#edfaff]">
-                                                Download
-                                            </button>
-                                        </div>
+                        {/* Rows — Figma "Frame 283": 56px tall, 6px radius, #cbcbcb hairline */}
+                        <div className="flex flex-col gap-3">
+                            {visibleInvoices.map((invoice) => (
+                                <div key={invoice.id} className="h-[56px] w-full rounded-[6px] border border-[#cbcbcb]">
+                                    <div className={`${COLUMNS} h-full w-full pl-[10px] text-[14px] font-semibold leading-5 tracking-[-0.4px] text-[#1f1f1f]`}>
+                                        <p>{invoice.date}</p>
+                                        <p>{invoice.id}</p>
+                                        <p>{invoice.orderNo}</p>
+                                        <p>{invoice.invoiceAmt}</p>
+                                        <p>{invoice.amountDue}</p>
+                                        <Tag label={invoice.status} paid={invoice.status === 'Paid'} />
+                                        <button className="flex h-[24px] w-fit items-center justify-center rounded-[28px] bg-[#0075ff] px-3 py-1 text-[12px] font-semibold leading-4 tracking-[-0.4px] text-[#edfaff]">
+                                            Download
+                                        </button>
                                     </div>
-                                ))}
-                            </div>
-                        )}
+                                </div>
+                            ))}
+                        </div>
                     </div>
                 </div>
             )}

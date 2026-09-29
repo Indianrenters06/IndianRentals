@@ -1,386 +1,146 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
-import { FaCheck } from 'react-icons/fa';
-import { PiTrash, PiUserCircle, PiPencilSimple, PiPlus } from 'react-icons/pi';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { Check, PencilSimple, Plus, Trash, UserCircle } from '@phosphor-icons/react';
+import AddressModal from '../../../components/AddressModal';
 import { getAddresses, addAddress, updateAddress, deleteAddress } from '../../../services/addressService';
-
-const BackArrowIcon = () => (
-    <svg width="25" height="25" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M19 12H5M5 12L12 19M5 12L12 5" stroke="#333333" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-    </svg>
-);
-
-const UserAvatarIcon = () => (
-    <svg width="30" height="30" viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <circle cx="15" cy="15" r="15" fill="#EEEEEE" />
-        <path d="M15 14.5C16.933 14.5 18.5 12.933 18.5 11C18.5 9.067 16.933 7.5 15 7.5C13.067 7.5 11.5 9.067 11.5 11C11.5 12.933 13.067 14.5 15 14.5ZM15 16.5C12.33 16.5 7 17.84 7 20.5V22.5H23V20.5C23 17.84 17.67 16.5 15 16.5Z" fill="#757575"/>
-    </svg>
-);
-
-const CheckIcon = () => (
-    <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M2.5 6L5 8.5L9.5 3.5" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-    </svg>
-);
+import { profileTitleClassName } from '../profileTitle';
 
 export default function AddressesPage() {
     const router = useRouter();
     const [addresses, setAddresses] = useState([]);
-    const [showForm, setShowForm] = useState(false);
-    const [editId, setEditId] = useState(null);
-    const [saving, setSaving] = useState(false);
-    const [form, setForm] = useState({
-        name: '', addressLine: '', city: '', pincode: '', state: '', phone: ''
-    });
+    const [loading, setLoading] = useState(true);
+    const [loadError, setLoadError] = useState('');
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [editingAddress, setEditingAddress] = useState(null);
+    const [isSaving, setIsSaving] = useState(false);
+    const [saveError, setSaveError] = useState('');
 
     useEffect(() => {
         let active = true;
         getAddresses()
-            .then((list) => { if (active) setAddresses(list); })
-            .catch((err) => console.error('Failed to load addresses:', err));
+            .then(list => { if (active) setAddresses(list); })
+            .catch(() => { if (active) setLoadError('Could not load your addresses. Please refresh and try again.'); })
+            .finally(() => { if (active) setLoading(false); });
         return () => { active = false; };
     }, []);
 
+    useEffect(() => {
+        if (new URLSearchParams(window.location.search).get('add') !== '1') return;
+        try {
+            if (JSON.parse(localStorage.getItem('userInfo') || 'null')?.token) {
+                setEditingAddress(null);
+                setIsModalOpen(true);
+                window.history.replaceState(null, '', '/profile/addresses');
+            }
+        } catch { /* The sign-in flow handles an invalid session. */ }
+    }, []);
+
     const openAdd = () => {
-        setForm({ name: '', addressLine: '', city: '', pincode: '', state: '', phone: '' });
-        setEditId(null);
-        setShowForm(true);
+        let token;
+        try { token = JSON.parse(localStorage.getItem('userInfo') || 'null')?.token; } catch { token = null; }
+        if (!token) {
+            router.push('/login?redirect=%2Fprofile%2Faddresses%3Fadd%3D1');
+            return;
+        }
+        setEditingAddress(null);
+        setSaveError('');
+        setIsModalOpen(true);
     };
 
-    const openEdit = (addr) => {
-        setForm({ ...addr });
-        setEditId(addr.id);
-        setShowForm(true);
+    const openEdit = address => {
+        setEditingAddress(address);
+        setSaveError('');
+        setIsModalOpen(true);
     };
 
-    const handleSave = async () => {
-        if (!form.name || !form.addressLine) return;
-        setSaving(true);
+    const handleSave = async formData => {
+        setIsSaving(true);
+        setSaveError('');
         try {
-            const list = editId
-                ? await updateAddress(editId, form)
-                : await addAddress(form);
+            const list = editingAddress
+                ? await updateAddress(editingAddress.id, formData)
+                : await addAddress(formData);
             setAddresses(list);
-            setShowForm(false);
-        } catch (err) {
-            console.error('Failed to save address:', err);
-            alert('Could not save the address. Please make sure you are logged in and try again.');
+            setIsModalOpen(false);
+            setEditingAddress(null);
+        } catch {
+            setSaveError('We couldn’t save this address. Check your connection or sign in, then try again.');
         } finally {
-            setSaving(false);
+            setIsSaving(false);
         }
     };
 
-    const handleDelete = async (id) => {
+    const handleDelete = async id => {
+        if (!window.confirm('Delete this address?')) return;
         try {
-            const list = await deleteAddress(id);
-            setAddresses(list);
-        } catch (err) {
-            console.error('Failed to delete address:', err);
-            alert('Could not delete the address. Please try again.');
+            setAddresses(await deleteAddress(id));
+        } catch {
+            setLoadError('Could not delete the address. Please try again.');
         }
     };
 
-    const setDefault = async (id) => {
+    const setDefault = async id => {
         try {
-            const list = await updateAddress(id, { isDefault: true });
-            setAddresses(list);
-        } catch (err) {
-            console.error('Failed to set default address:', err);
-            alert('Could not update the default address. Please try again.');
+            setAddresses(await updateAddress(id, { isDefault: true }));
+        } catch {
+            setLoadError('Could not change your default address. Please try again.');
         }
     };
 
     return (
-        <>
-            {/* ── DESKTOP VIEW (Original, untouched) ── */}
-            <div className="hidden lg:block bg-white min-h-screen rounded-2xl p-8 shadow-sm border border-gray-100">
-                <h1 className="text-3xl font-medium text-gray-800 mb-8">Your Addresses</h1>
-                <div className="h-px bg-gray-200 w-full mb-8"></div>
+        <section className="w-full bg-white" aria-labelledby="addresses-heading">
+            <div>
+                <h1 id="addresses-heading" className={profileTitleClassName}>Your Addresses</h1>
+            </div>
+            <div className="mb-7 mt-3 h-px w-full bg-[#e2e2e2] lg:mb-8" />
 
-                <button
-                    onClick={openAdd}
-                    className="flex items-center justify-center transition-all active:scale-95 mb-8 group"
-                    style={{
-                        width: '194px',
-                        height: '35px',
-                        borderRadius: '28px',
-                        padding: '6px 20px',
-                        gap: '5px',
-                        background: 'var(--color-grey-700, hsla(0, 0%, 20%, 1))',
-                        border: 'none',
-                        color: '#FFFFFF',
-                        fontSize: '14px',
-                        fontWeight: '500',
-                        fontFamily: "'Mona Sans', sans-serif",
-                        cursor: 'pointer'
-                    }}
-                >
-                    <PiPlus size={18} weight="bold" /> 
-                    <span>Add New Address</span>
-                </button>
+            <button type="button" onClick={openAdd} className="mb-5 inline-flex min-h-11 items-center justify-center gap-2 rounded-full bg-[#333] px-5 text-sm font-medium text-white transition-colors hover:bg-[#141414] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#ffcf46]">
+                <Plus size={18} weight="bold" aria-hidden="true" /> Add New Address
+            </button>
 
-                {/* Inline form */}
-                {showForm && (
-                    <div className="mb-8 p-6 rounded-2xl border border-indigo-200 bg-indigo-50 space-y-4">
-                        <h3 className="font-semibold text-gray-800">{editId ? 'Edit Address' : 'New Address'}</h3>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            {[
-                                { label: 'Full Name', key: 'name' },
-                                { label: 'Phone', key: 'phone' },
-                                { label: 'Address Line', key: 'addressLine' },
-                                { label: 'City', key: 'city' },
-                                { label: 'State', key: 'state' },
-                                { label: 'Pincode', key: 'pincode' },
-                            ].map(({ label, key }) => (
-                                <div key={key}>
-                                    <label className="block text-xs font-medium text-gray-600 mb-1">{label}</label>
-                                    <input
-                                        type="text"
-                                        value={form[key]}
-                                        onChange={e => setForm(p => ({ ...p, [key]: e.target.value }))}
-                                        className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-black transition-colors"
-                                    />
-                                </div>
-                            ))}
-                        </div>
-                        <div className="flex gap-3 pt-2">
-                            <button
-                                onClick={handleSave}
-                                disabled={saving}
-                                className="bg-[#333] hover:bg-black text-white px-6 py-2.5 rounded-full text-sm font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                            >
-                                {saving ? 'Saving…' : 'Save Address'}
-                            </button>
-                            <button
-                                onClick={() => setShowForm(false)}
-                                className="bg-gray-200 hover:bg-gray-300 text-gray-800 px-6 py-2.5 rounded-full text-sm font-medium transition-colors"
-                            >
-                                Cancel
-                            </button>
-                        </div>
-                    </div>
-                )}
-
-                {/* Empty state */}
-                {addresses.length === 0 && !showForm && (
-                    <div className="text-center py-16 text-gray-400">
-                        <PiUserCircle size={52} className="mx-auto mb-3 opacity-30" />
-                        <p className="text-sm font-medium">No addresses saved yet.</p>
-                        <p className="text-xs mt-1">Click &quot;Add New Address&quot; to get started.</p>
-                    </div>
-                )}
-
-                {/* Address list */}
-                <div className="space-y-6">
-                    {addresses.map((addr) => (
-                        <div
-                            key={addr.id}
-                            className={`relative p-6 rounded-2xl border transition-all ${addr.isDefault
-                                    ? 'border-blue-500 bg-white shadow-[0_0_0_1px_rgba(59,130,246,1)]'
-                                    : 'border-gray-200 bg-white hover:border-gray-300'
-                                }`}
-                        >
-                            {addr.isDefault && (
-                                <div className="absolute top-0 right-0 bg-blue-500 text-white p-1.5 rounded-bl-xl rounded-tr-xl">
-                                    <FaCheck size={12} />
-                                </div>
-                            )}
-
-                            <div className="flex items-start justify-between">
-                                <div className="flex gap-4">
-                                    <div className="mt-1 text-gray-700">
-                                        <PiUserCircle size={40} />
-                                    </div>
-                                    <div>
-                                        <h3 className="text-lg font-medium text-gray-800 mb-1">{addr.name}</h3>
-                                        <p className="text-gray-600 mb-1 text-sm">
-                                            {addr.addressLine} | {addr.city} | {addr.pincode} | {addr.state}
-                                        </p>
-                                        <p className="text-gray-500 text-sm font-medium">{addr.phone}</p>
-                                    </div>
-                                </div>
-
-                                <div className="flex items-center gap-3">
-                                    {!addr.isDefault && (
-                                        <button
-                                            onClick={() => setDefault(addr.id)}
-                                            className="text-xs text-blue-500 border border-blue-200 hover:bg-blue-50 px-3 py-1 rounded-full transition-colors"
-                                        >
-                                            Set Default
-                                        </button>
-                                    )}
-                                    <button
-                                        onClick={() => openEdit(addr)}
-                                        className="text-gray-500 hover:text-blue-500 transition-colors"
-                                    >
-                                        <PiPencilSimple size={20} />
-                                    </button>
-                                    <button
-                                        onClick={() => handleDelete(addr.id)}
-                                        className="text-gray-500 hover:text-red-500 transition-colors"
-                                    >
-                                        <PiTrash size={20} />
-                                    </button>
+            {loadError && <p role="alert" className="mb-5 rounded-lg border border-[#e2e2e2] bg-[#f6f6f6] px-4 py-3 text-sm text-[#333]">{loadError}</p>}
+            {loading ? (
+                <p className="py-12 text-sm text-[#757575]">Loading your addresses…</p>
+            ) : addresses.length === 0 ? (
+                <div className="rounded-xl border border-[#e2e2e2] px-6 py-12 text-center sm:py-16">
+                    <UserCircle size={42} className="mx-auto mb-3 text-[#afafaf]" aria-hidden="true" />
+                    <p className="font-medium text-[#333]">No addresses saved yet.</p>
+                    <p className="mt-1 text-sm text-[#757575]">Add a delivery address to make checkout faster.</p>
+                </div>
+            ) : (
+                <div className="space-y-3">
+                    {addresses.map(address => (
+                        <article key={address.id} className={'relative rounded-xl border px-4 py-4 transition-colors sm:px-5 ' + (address.isDefault ? 'border-[#0075ff]' : 'border-[#e2e2e2] hover:border-[#afafaf]')}>
+                            {address.isDefault && <span className="absolute right-0 top-0 inline-flex items-center gap-1 rounded-bl-xl rounded-tr-[11px] bg-[#0075ff] px-2 py-1 text-xs font-semibold text-white"><Check size={14} weight="bold" aria-hidden="true" /><span className="sr-only sm:not-sr-only">Default</span></span>}
+                            <div className="flex items-start gap-3 pr-10 sm:pr-24">
+                                <UserCircle size={30} weight="fill" className="mt-0.5 shrink-0 text-[#333]" aria-hidden="true" />
+                                <div className="min-w-0 space-y-1 text-sm text-[#333]">
+                                    <p className="font-semibold">{address.name}</p>
+                                    <p className="break-words">{address.addressLine}</p>
+                                    <p>{[address.city, address.state, address.pincode, address.country || 'India'].filter(Boolean).join(' · ')}</p>
+                                    {address.phone && <p className="text-[#757575]">{address.phone}</p>}
                                 </div>
                             </div>
-                        </div>
+                            <div className="mt-4 flex flex-wrap items-center gap-4 sm:absolute sm:bottom-4 sm:right-4 sm:mt-0">
+                                {!address.isDefault && <button type="button" onClick={() => setDefault(address.id)} className="text-sm font-medium text-[#333] underline underline-offset-2 hover:text-[#0075ff]">Set as default</button>}
+                                <button type="button" onClick={() => openEdit(address)} className="inline-flex min-h-9 items-center gap-1 text-sm font-medium text-[#333] underline underline-offset-2 hover:text-[#0075ff]" aria-label={'Edit address for ' + address.name}><PencilSimple size={17} aria-hidden="true" /> Edit</button>
+                                <button type="button" onClick={() => handleDelete(address.id)} className="inline-flex min-h-9 items-center gap-1 text-sm font-medium text-[#333] underline underline-offset-2 hover:text-[#b14413]" aria-label={'Delete address for ' + address.name}><Trash size={17} aria-hidden="true" /> Delete</button>
+                            </div>
+                        </article>
                     ))}
                 </div>
-            </div>
+            )}
 
-            {/* ── MOBILE VIEW (Figma exact match) ── */}
-            <div className="flex lg:hidden flex-col gap-[12px] bg-white rounded-[8px] p-0 py-[10px]">
-                {/* Mobile Title with Back Arrow */}
-                <div className="flex items-center gap-[12px]">
-                    <button 
-                        onClick={() => router.back()} 
-                        className="p-1 -ml-1 text-[#333333] hover:opacity-75 transition-opacity"
-                        aria-label="Go back"
-                    >
-                        <BackArrowIcon />
-                    </button>
-                    <h1 className="text-[20px] font-semibold tracking-[-0.8px] text-[#333333] leading-[26px]">
-                        Your Addresses
-                    </h1>
-                </div>
-
-                {/* Divider */}
-                <div className="h-px w-full bg-[#e2e2e2]" />
-
-                {/* Add New Address Button */}
-                <button
-                    onClick={openAdd}
-                    className="bg-[#333333] text-white px-[20px] py-[6px] rounded-[28px] flex items-center justify-center gap-[5px] text-[12px] font-medium tracking-[-0.4px] leading-[18px] self-start shadow-sm hover:bg-[#222222] transition-colors"
-                >
-                    <PiPlus size={16} weight="bold" />
-                    <span>Add New Address</span>
-                </button>
-
-                {/* Mobile Form Modal / Inline Form */}
-                {showForm && (
-                    <div className="p-4 rounded-[12px] border border-[#e2e2e2] bg-[#f9f9f9] flex flex-col gap-3 w-full">
-                        <h3 className="font-semibold text-sm text-[#333]">{editId ? 'Edit Address' : 'New Address'}</h3>
-                        <div className="flex flex-col gap-2">
-                            {[
-                                { label: 'Full Name', key: 'name' },
-                                { label: 'Phone', key: 'phone' },
-                                { label: 'Address Line', key: 'addressLine' },
-                                { label: 'City', key: 'city' },
-                                { label: 'State', key: 'state' },
-                                { label: 'Pincode', key: 'pincode' },
-                            ].map(({ label, key }) => (
-                                <div key={key}>
-                                    <label className="block text-[10px] font-medium text-gray-600 mb-0.5">{label}</label>
-                                    <input
-                                        type="text"
-                                        value={form[key]}
-                                        onChange={e => setForm(p => ({ ...p, [key]: e.target.value }))}
-                                        className="w-full border border-gray-300 rounded-md px-2.5 py-1.5 text-xs bg-white focus:outline-none focus:border-black"
-                                    />
-                                </div>
-                            ))}
-                        </div>
-                        <div className="flex gap-2 pt-1">
-                            <button
-                                onClick={handleSave}
-                                disabled={saving}
-                                className="bg-[#333] text-white px-4 py-1.5 rounded-full text-xs font-semibold"
-                            >
-                                {saving ? 'Saving…' : 'Save Address'}
-                            </button>
-                            <button
-                                onClick={() => setShowForm(false)}
-                                className="bg-gray-200 text-gray-700 px-4 py-1.5 rounded-full text-xs font-semibold"
-                            >
-                                Cancel
-                            </button>
-                        </div>
-                    </div>
-                )}
-
-                {/* Empty State */}
-                {addresses.length === 0 && !showForm && (
-                    <div className="text-center py-10 text-gray-400">
-                        <PiUserCircle size={40} className="mx-auto mb-2 opacity-30" />
-                        <p className="text-xs font-medium">No addresses saved yet.</p>
-                    </div>
-                )}
-
-                {/* Address Cards List */}
-                <div className="flex flex-col gap-[12px] w-full">
-                    {addresses.map((addr) => (
-                        <div
-                            key={addr.id}
-                            className={`relative bg-white border-[1.5px] rounded-[12px] p-[12px] px-[16px] flex items-center justify-between overflow-hidden transition-colors ${
-                                addr.isDefault ? 'border-[#0075ff]' : 'border-[#e2e2e2]'
-                            }`}
-                        >
-                            {/* Default Check Badge (Top Right) */}
-                            {addr.isDefault && (
-                                <div className="absolute top-0 right-0 bg-[#0075ff] rounded-bl-[12px] px-2 py-1 flex items-center justify-center">
-                                    <CheckIcon />
-                                </div>
-                            )}
-
-                            {/* Left Side Details */}
-                            <div className="flex flex-col items-start gap-[4px]">
-                                <UserAvatarIcon />
-                                <div className="flex flex-col gap-[6px] items-start">
-                                    <p className="text-[12px] font-medium text-[#333333] leading-[18px] tracking-[-0.4px]">
-                                        {addr.name}
-                                    </p>
-                                    <div className="flex flex-col gap-[8px] items-start">
-                                        <p className="text-[12px] font-medium text-[#333333] leading-[18px] tracking-[-0.4px]">
-                                            {addr.addressLine}
-                                        </p>
-                                        <div className="flex gap-[8px] items-center text-[12px] font-medium text-[#333333] leading-[18px] tracking-[-0.4px]">
-                                            <span>{addr.city}</span>
-                                            <span className="w-px h-3 bg-[#e2e2e2] inline-block" />
-                                            <span>{addr.pincode}</span>
-                                            <span className="w-px h-3 bg-[#e2e2e2] inline-block" />
-                                            <span>{addr.state || 'India'}</span>
-                                        </div>
-                                    </div>
-                                    <p className="text-[12px] font-medium text-[#757575] leading-[18px] tracking-[-0.4px]">
-                                        {addr.phone}
-                                    </p>
-                                </div>
-                            </div>
-
-                            {/* Right Side Actions */}
-                            <div className="flex flex-col items-center justify-center gap-[6px]">
-                                {!addr.isDefault && (
-                                    <button
-                                        onClick={() => setDefault(addr.id)}
-                                        className="text-[10px] text-[#0075ff] font-semibold underline mb-1"
-                                    >
-                                        Set Default
-                                    </button>
-                                )}
-                                <button
-                                    onClick={() => openEdit(addr)}
-                                    className="flex flex-col items-center gap-[2px] text-[#333333] hover:opacity-75"
-                                >
-                                    <PiPencilSimple size={18} />
-                                    <span className="text-[8px] font-bold underline leading-[14px] tracking-[-0.4px]">
-                                        Click to Edit
-                                    </span>
-                                </button>
-                                <button
-                                    onClick={() => handleDelete(addr.id)}
-                                    className="text-red-500 hover:opacity-75 mt-1"
-                                    title="Delete Address"
-                                >
-                                    <PiTrash size={18} />
-                                </button>
-                            </div>
-                        </div>
-                    ))}
-                </div>
-            </div>
-        </>
+            <AddressModal
+                isOpen={isModalOpen}
+                onClose={() => setIsModalOpen(false)}
+                onSave={handleSave}
+                initialData={editingAddress}
+                isSubmitting={isSaving}
+                saveError={saveError}
+            />
+        </section>
     );
 }
-

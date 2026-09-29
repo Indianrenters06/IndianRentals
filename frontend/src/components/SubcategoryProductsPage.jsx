@@ -1,14 +1,12 @@
 "use client";
 import React, { useState, useEffect } from 'react';
-import Image from 'next/image';
-import Link from 'next/link';
 import { FiPackage } from 'react-icons/fi';
-import { ChevronRightIcon } from '@heroicons/react/24/outline';
 import { getProductsBySubcategory, getProducts } from '../services/productService';
 import ProductCard from './ProductCard';
 import Sidebar from './Sidebar';
 import CategoryNavBar from './CategoryNavBar';
 import CategoryFilters from './CategoryFilters';
+import SubcategoryStrip from './SubcategoryStrip';
 import styles from './CategoryLayout.module.css';
 
 export default function SubcategoryProductsPage({ subcategoryId, subcategoryName, parentName, parentHref }) {
@@ -20,6 +18,7 @@ export default function SubcategoryProductsPage({ subcategoryId, subcategoryName
     const [error, setError] = useState(null);
     const [selectedDuration, setSelectedDuration] = useState("3 months");
     const [selectedSort, setSelectedSort] = useState("Most Popular");
+    const [dealsOnly, setDealsOnly] = useState(false);
     const [isMobile, setIsMobile] = useState(true);
 
     useEffect(() => {
@@ -71,9 +70,9 @@ export default function SubcategoryProductsPage({ subcategoryId, subcategoryName
                         { name: "iMac", slug: "imac", image: "/apple-xdr-display-new.jpg" },
                         { name: "Mac Studio", slug: "mac-studio", image: "/mac-studio-new.jpg" },
                         { name: "Mac Mini", slug: "mac-mini", image: "/mac-mini-new.jpg" },
-                    ].map(f => ({ ...f, href: `/category/${parentName.toLowerCase().replace(/\s+/g, '-')}/${f.slug}` })));
+                    ].map(f => ({ ...f, href: `/category/${parentSlug || 'apple'}/${f.slug}` })));
                 } else {
-                    const activeCatSlug = parentName?.toLowerCase().replace(/\s+/g, '-') || 'all';
+                    const activeCatSlug = parentSlug || parentName?.toLowerCase().replace(/\s+/g, '-') || 'all';
                     setSubcategories(subs.map(s => ({
                         _id: s._id,
                         name: s.name,
@@ -89,7 +88,7 @@ export default function SubcategoryProductsPage({ subcategoryId, subcategoryName
 
         fetchProducts();
         fetchSubcategories();
-    }, [subcategoryId, parentName]);
+    }, [subcategoryId, parentName, parentSlug]);
 
     useEffect(() => {
         const check = () => setIsMobile(window.innerWidth < 1024);
@@ -139,6 +138,8 @@ export default function SubcategoryProductsPage({ subcategoryId, subcategoryName
             originalPrice: Math.round(p.baseOriginalPrice * multiplier)
         }));
 
+        if (dealsOnly) results = results.filter(p => Boolean(p.discount));
+
         if (selectedSort === "Price (low to high)") {
             results.sort((a, b) => a.rentPrice - b.rentPrice);
         } else if (selectedSort === "Price (high to low)") {
@@ -148,7 +149,7 @@ export default function SubcategoryProductsPage({ subcategoryId, subcategoryName
         }
 
         return results;
-    }, [products, selectedDuration, selectedSort]);
+    }, [products, selectedDuration, selectedSort, dealsOnly]);
 
     return (
         <div className="min-h-screen bg-white">
@@ -160,66 +161,7 @@ export default function SubcategoryProductsPage({ subcategoryId, subcategoryName
                 currentLabel={subcategoryName}
             />
 
-            {/* ── Subcategory Slider — desktop only ── */}
-            {!isMobile && subcategories.length > 0 && (
-                <div style={{ background: 'white', position: 'relative', zIndex: 10 }}>
-                    <div
-                        style={{ position: 'relative', margin: '0 auto', display: 'flex', alignItems: 'center', maxWidth: '1200px', width: '100%', padding: '20px 32px 0', height: '167px', gap: '24px', boxSizing: 'border-box' }}
-                    >
-                        <div
-                            id="subcat-slider-dynamic"
-                            style={{ display: 'flex', overflowX: 'auto', scrollSnapType: 'x mandatory', scrollBehavior: 'smooth', width: '100%', height: '147px', gap: '16px', msOverflowStyle: 'none', scrollbarWidth: 'none' }}
-                        >
-                            <style dangerouslySetInnerHTML={{ __html: `#subcat-slider-dynamic::-webkit-scrollbar { display: none; }` }} />
-                            {subcategories.map((sub) => {
-                                const isSubActive = subcategoryName === sub.name;
-                                return (
-                                    <Link
-                                        key={sub.href}
-                                        href={sub.href}
-                                        className="group"
-                                        style={{ display: 'flex', flexDirection: 'column', outline: 'none', flexShrink: 0, scrollSnapAlign: 'start', height: '147.09px', width: '157.71px', boxSizing: 'border-box', gap: '7px', textDecoration: 'none' }}
-                                    >
-                                        <div
-                                            style={{
-                                                height: '120.09px', width: '100%', boxSizing: 'border-box',
-                                                border: isSubActive ? '2px solid hsla(47, 100%, 76%, 1)' : '2px solid hsla(0, 0%, 93%, 1)',
-                                                backgroundColor: isSubActive ? 'hsla(43,100%,95%,1)' : 'hsla(0, 0%, 100%, 1)',
-                                                boxShadow: '0px 1px 3px 0px hsla(0, 0%, 87%, 0.08), 0px 6px 6px 0px hsla(0, 0%, 87%, 0.07)',
-                                                borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', transition: 'all 0.3s',
-                                            }}
-                                        >
-                                            <div style={{ width: '100%', height: '100%', position: 'relative' }}>
-                                                {sub.image ? (
-                                                    <Image src={sub.image} alt={sub.name} fill className="object-cover" sizes="160px" />
-                                                ) : (
-                                                    <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                                        <FiPackage size={24} style={{ color: '#d1d5db' }} />
-                                                    </div>
-                                                )}
-                                            </div>
-                                        </div>
-                                        <p style={{ fontFamily: "'Mona Sans', sans-serif", fontWeight: 600, fontSize: '12px', lineHeight: '20px', letterSpacing: '-0.01em', color: '#1D1D1F', textAlign: 'center', width: '100%', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', margin: 0 }}>
-                                            {sub.name}
-                                        </p>
-                                    </Link>
-                                );
-                            })}
-                        </div>
-                        {subcategories.length > 7 && (
-                            <button
-                                onClick={() => {
-                                    const slider = document.getElementById('subcat-slider-dynamic');
-                                    if (slider) slider.scrollBy({ left: 300, behavior: 'smooth' });
-                                }}
-                                style={{ position: 'absolute', right: 0, top: '50%', transform: 'translateY(-50%)', width: '26px', height: '40px', borderRadius: '9px', background: 'hsla(0, 0%, 93%, 1)', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 10 }}
-                            >
-                                <ChevronRightIcon style={{ width: '16px', height: '16px', color: '#4b5563' }} strokeWidth={2} />
-                            </button>
-                        )}
-                    </div>
-                </div>
-            )}
+            <SubcategoryStrip id="subcat-slider-dynamic" subcategories={subcategories} activeName={subcategoryName} />
 
             <div className={styles.listingBody}>
                 <h1 className={styles.listingTitle}>{subcategoryName}</h1>
@@ -231,13 +173,16 @@ export default function SubcategoryProductsPage({ subcategoryId, subcategoryName
                             setSelectedDuration={setSelectedDuration}
                             selectedSort={selectedSort}
                             setSelectedSort={setSelectedSort}
+                            dealsOnly={dealsOnly}
+                            setDealsOnly={setDealsOnly}
                         />
                     )}
 
                     <div className={styles.listingContent}>
                         <CategoryFilters count={processedProducts.length}
                             selectedDuration={selectedDuration} setSelectedDuration={setSelectedDuration}
-                            selectedSort={selectedSort} setSelectedSort={setSelectedSort} />
+                            selectedSort={selectedSort} setSelectedSort={setSelectedSort}
+                            dealsOnly={dealsOnly} setDealsOnly={setDealsOnly} />
                         {/* Loading skeleton */}
                         {loading && (
                             <div className={styles.productGrid}>

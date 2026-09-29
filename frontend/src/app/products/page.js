@@ -1,4 +1,5 @@
 "use client";
+import { cmsUrl } from '@/lib/cmsPreview';
 import React, { useState, useEffect, Suspense } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
@@ -16,6 +17,7 @@ function ProductsPageContent() {
     const [loading, setLoading] = useState(true);
     const [selectedDuration, setSelectedDuration] = useState("3 months");
     const [selectedSort, setSelectedSort] = useState("Most Popular");
+    const [dealsOnly, setDealsOnly] = useState(false);
     const [cmsConfig, setCmsConfig] = useState({ title: "Most Rented Products" });
     const [isMobile, setIsMobile] = useState(true);
 
@@ -43,7 +45,7 @@ function ProductsPageContent() {
                     }
                 } else {
                     // Default mode: show the CMS-configured "Most Rented Products"
-                    const cmsRes = await fetch(`${API}/api/cms/homepage`).catch(() => null);
+                    const cmsRes = await fetch(cmsUrl('homepage')).catch(() => null);
                     let targetIds = [];
                     let finalTitle = "Most Rented Products";
                     if (cmsRes && cmsRes.ok) {
@@ -131,16 +133,27 @@ function ProductsPageContent() {
             selectedDurationStr: selectedDuration
         }));
 
+        if (dealsOnly) results = results.filter(p => Boolean(p.discount));
+
         if (selectedSort === "Price (high to low)") {
             results.sort((a, b) => b.rentPrice - a.rentPrice);
         } else if (selectedSort === "Price (low to high)") {
             results.sort((a, b) => a.rentPrice - b.rentPrice);
+        } else if (selectedSort === "New Arrivals") {
+            results.sort((a, b) => Number(Boolean(b.isNew)) - Number(Boolean(a.isNew)));
         }
         return results;
-    }, [products, selectedDuration, selectedSort]);
+    }, [products, selectedDuration, selectedSort, dealsOnly]);
 
     return (
         <div className="w-full bg-white min-h-screen">
+            <div className="w-full bg-[#f6f6f6]">
+                <nav aria-label="Breadcrumb" className="mx-auto flex min-h-12 w-full max-w-[1200px] items-center gap-2 px-4 text-xs leading-4 tracking-[-0.025em] md:px-8 lg:min-h-[62px]">
+                    <Link href="/" className="shrink-0 text-[#545454] transition-colors hover:text-[#141414] focus-visible:rounded-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#141414]">Homepage</Link>
+                    <ChevronRightIcon aria-hidden="true" className="h-4 w-4 shrink-0 text-[#777]" />
+                    <span aria-current="page" className="min-w-0 truncate font-semibold text-[#1f1f1f]">{cmsConfig.title}</span>
+                </nav>
+            </div>
             {/* Outer Container */}
             <div style={{ width: '100%', background: 'transparent' }}>
                 {/* Inner Container */}
@@ -155,12 +168,6 @@ function ProductsPageContent() {
                         background: 'hsla(0, 0%, 100%, 1)',
                     }}
                 >
-                    {/* Breadcrumb */}
-                    <nav className="flex items-center gap-1 flex-wrap">
-                        <Link href="/" className="text-[14px] font-medium text-[#586A84] hover:text-black transition-colors whitespace-nowrap" style={{ fontFamily: "'Mona Sans', sans-serif" }}>Shop all</Link>
-                        <ChevronRightIcon className="w-[12px] h-[12px] text-[#586A84] shrink-0" strokeWidth={2.5} />
-                        <span className="text-[14px] font-semibold text-[#1D1D1F] line-clamp-1" style={{ fontFamily: "'Mona Sans', sans-serif" }}>{cmsConfig.title}</span>
-                    </nav>
                     <div className="flex flex-col max-w-[900px]">
                         <h1
                             style={{
@@ -182,7 +189,7 @@ function ProductsPageContent() {
                                 color: 'hsla(0, 0%, 46%, 1)',
                             }}
                         >
-                            Lorem ipsum dolor sit amet consectetur. Vel libero cras laoreet ut dignissim eget. Scelerisque mauris pharetra tristique cras sit malesuada. Egestas pulvinar interdum sapien et. Consequat neque at donec turpis leo. Quis at.
+                            {keyword ? 'Browse the products that match your search.' : 'Explore rental products and compare the options that fit your plans.'}
                         </p>
                     </div>
 
@@ -194,6 +201,8 @@ function ProductsPageContent() {
                                 setSelectedDuration={setSelectedDuration}
                                 selectedSort={selectedSort}
                                 setSelectedSort={setSelectedSort}
+                                dealsOnly={dealsOnly}
+                                setDealsOnly={setDealsOnly}
                             />
                         </div>
 

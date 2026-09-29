@@ -1,4 +1,9 @@
 import PolicyPage from '@/components/PolicyPage';
+import { getPolicyMetadata } from '@/lib/policyMetadata';
+
+export async function generateMetadata() {
+    return getPolicyMetadata("late-fee-rules", "Late Fee Rules", "/late-fee-rules");
+}
 
 const FALLBACK_CONTENT = `<h2>Late Fee Rules</h2>
 <p>We understand that situations can arise. However, to ensure fair access for all customers, late returns are subject to the following fee structure.</p>

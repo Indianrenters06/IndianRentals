@@ -1,4 +1,9 @@
 import PolicyPage from '@/components/PolicyPage';
+import { getPolicyMetadata } from '@/lib/policyMetadata';
+
+export async function generateMetadata() {
+    return getPolicyMetadata("cancellation-rules", "Cancellation Rules", "/cancellation-rules");
+}
 
 const FALLBACK_CONTENT = `<h2>Cancellation Rules</h2>
 <p>We aim to make cancellations as easy as possible while maintaining fairness to our operations team.</p>

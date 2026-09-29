@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useId, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { AdjustmentsHorizontalIcon, XMarkIcon } from '@heroicons/react/24/outline';
+import { AdjustmentsHorizontalIcon, CheckIcon, XMarkIcon } from '@heroicons/react/24/outline';
 import styles from './CategoryFilters.module.css';
 
 const DURATIONS = ['1 month', '3 months', '6 months', '9 months', '18 months', '24 months'];
@@ -13,9 +13,10 @@ const SORT_OPTIONS = [
     { value: 'New Arrivals', label: 'New arrivals' },
 ];
 
-function FilterDialog({ selectedDuration, selectedSort, onApply, onDismiss }) {
+function FilterDialog({ selectedDuration, selectedSort, dealsOnly, onApply, onDismiss }) {
     const [duration, setDuration] = useState(selectedDuration);
     const [sort, setSort] = useState(selectedSort);
+    const [deals, setDeals] = useState(dealsOnly);
     const dialogRef = useRef(null);
     const titleId = useId();
     const groupId = useId();
@@ -44,7 +45,7 @@ function FilterDialog({ selectedDuration, selectedSort, onApply, onDismiss }) {
                 const bounds = event.currentTarget.getBoundingClientRect();
                 if (event.clientX < bounds.left || event.clientX > bounds.right || event.clientY < bounds.top || event.clientY > bounds.bottom) onDismiss();
             }}>
-            <form className={styles.form} onSubmit={event => { event.preventDefault(); onApply(duration, sort); }}>
+            <form className={styles.form} onSubmit={event => { event.preventDefault(); onApply(duration, sort, deals); }}>
                 <header className={styles.header}>
                     <h2 id={titleId}>Filter & sort</h2>
                     <button type="button" className={styles.close} aria-label="Close filters" onClick={onDismiss} autoFocus>
@@ -68,15 +69,26 @@ function FilterDialog({ selectedDuration, selectedSort, onApply, onDismiss }) {
                         <div className={styles.sortOptions}>
                             {SORT_OPTIONS.map(option => (
                                 <label key={option.value} className={styles.sortOption}>
-                                    <span>{option.label}</span>
                                     <input type="radio" name={`${groupId}-sort`} value={option.value} checked={sort === option.value} onChange={() => setSort(option.value)} />
+                                    <span className={styles.radioMark} aria-hidden="true"><CheckIcon /></span>
+                                    <span>{option.label}</span>
                                 </label>
                             ))}
                         </div>
                     </fieldset>
+                    <fieldset className={`${styles.group} ${styles.sortGroup}`}>
+                        <legend>Deals</legend>
+                        <div className={styles.sortOptions}>
+                            <label className={styles.sortOption}>
+                                <input type="checkbox" checked={deals} onChange={event => setDeals(event.target.checked)} />
+                                <span className={styles.checkboxMark} aria-hidden="true"><CheckIcon /></span>
+                                <span>Deals</span>
+                            </label>
+                        </div>
+                    </fieldset>
                 </div>
                 <footer className={styles.footer}>
-                    <button type="button" className="btn-secondary" onClick={() => { setDuration('3 months'); setSort('Most Popular'); }}>Reset</button>
+                    <button type="button" className="btn-secondary" onClick={() => { setDuration('3 months'); setSort('Most Popular'); setDeals(false); }}>Reset</button>
                     <button type="submit" className="btn-primary">Apply filters</button>
                 </footer>
             </form>
@@ -84,14 +96,14 @@ function FilterDialog({ selectedDuration, selectedSort, onApply, onDismiss }) {
     );
 }
 
-export default function CategoryFilters({ count, selectedDuration, setSelectedDuration, selectedSort, setSelectedSort }) {
+export default function CategoryFilters({ count, selectedDuration, setSelectedDuration, selectedSort, setSelectedSort, dealsOnly = false, setDealsOnly }) {
     const [open, setOpen] = useState(false);
     const triggerRef = useRef(null);
     const dismiss = useCallback(() => {
         setOpen(false);
         requestAnimationFrame(() => triggerRef.current?.focus());
     }, []);
-    const changedCount = Number(selectedDuration !== '3 months') + Number(selectedSort !== 'Most Popular');
+    const changedCount = Number(selectedDuration !== '3 months') + Number(selectedSort !== 'Most Popular') + Number(dealsOnly);
     return <>
         <div className={styles.toolbar}>
             <button ref={triggerRef} type="button" className={styles.trigger} aria-haspopup="dialog" aria-expanded={open} onClick={() => setOpen(true)}>
@@ -101,7 +113,7 @@ export default function CategoryFilters({ count, selectedDuration, setSelectedDu
             </button>
             <span className={styles.count} aria-live="polite">{count} {count === 1 ? 'product' : 'products'}</span>
         </div>
-        {open && <FilterDialog selectedDuration={selectedDuration} selectedSort={selectedSort} onDismiss={dismiss}
-            onApply={(duration, sort) => { setSelectedDuration(duration); setSelectedSort(sort); dismiss(); }} />}
+        {open && <FilterDialog selectedDuration={selectedDuration} selectedSort={selectedSort} dealsOnly={dealsOnly} onDismiss={dismiss}
+            onApply={(duration, sort, deals) => { setSelectedDuration(duration); setSelectedSort(sort); setDealsOnly?.(deals); dismiss(); }} />}
     </>;
 }

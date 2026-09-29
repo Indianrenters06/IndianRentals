@@ -45,7 +45,7 @@ function PageConfigEditor({ onBack }) {
     useEffect(() => {
         const fetchConfig = async () => {
             try {
-                const res = await fetch(`${API}/api/cms/blog`);
+                const res = await fetch(`${API}/api/cms/blog/draft`, { headers: { Authorization: `Bearer ${getToken()}` }, cache: 'no-store' });
                 if (res.ok) {
                     const data = await res.json();
                     setConfig({
@@ -79,6 +79,7 @@ function PageConfigEditor({ onBack }) {
             });
             if (!res.ok) throw new Error("Failed to save config");
             setSaved(true);
+            window.dispatchEvent(new CustomEvent('cms:draft-saved', { detail: { page: 'blog' } }));
             setTimeout(() => setSaved(false), 2000);
         } catch (e) {
             toast.error(e.message);
@@ -111,7 +112,7 @@ function PageConfigEditor({ onBack }) {
                         disabled={saving} 
                         className="flex items-center gap-2 h-11 px-6 rounded-xl !bg-indigo-600 hover:!bg-indigo-700 text-white font-bold text-sm shadow-lg shadow-indigo-500/30 transition-all"
                     >
-                        {saving ? <Spinner size="sm" color="white" /> : <FloppyDisk size={16} weight="bold" />} Save Config
+                        {saving ? <Spinner size="sm" color="white" /> : <FloppyDisk size={16} weight="bold" />} Save draft
                     </button>
                 </div>
             </div>
@@ -285,6 +286,15 @@ export default function BlogManagement() {
     const [sortDir, setSortDir] = useState("descending");
     const [statusFilter, setStatusFilter] = useState("published"); // default: hide drafts
 
+    useEffect(() => {
+        const detail = editing === null || editing === 'config'
+            ? { page: 'blog', path: '/blog' }
+            : { mode: 'hide' };
+        let active = true;
+        queueMicrotask(() => { if (active) window.dispatchEvent(new CustomEvent('cms:active-page', { detail })); });
+        return () => { active = false; window.dispatchEvent(new CustomEvent('cms:active-page', { detail: null })); };
+    }, [editing]);
+
     const sortedPosts = useMemo(() => {
         const filtered = statusFilter === "all"
             ? posts
@@ -305,8 +315,11 @@ export default function BlogManagement() {
     const fetchPosts = useCallback(async () => {
         try {
             setLoading(true);
-            const res = await fetch(`${API}/api/blog`);
-            if (res.ok) setPosts(await res.json());
+            const res = await fetch(`${API}/api/blog/admin/all`, {
+                headers: { Authorization: `Bearer ${getToken()}` },
+            });
+            if (!res.ok) throw new Error('Could not load blog posts');
+            setPosts(await res.json());
         } catch (e) { console.error(e); }
         finally { setLoading(false); }
     }, []);
@@ -479,4 +492,3 @@ export default function BlogManagement() {
         </div>
     );
 }
-

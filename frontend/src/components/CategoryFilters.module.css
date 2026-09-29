@@ -20,18 +20,23 @@
 .duration input { position: absolute; width: 1px; height: 1px; opacity: 0; }
 .duration span { display: flex; align-items: center; justify-content: center; min-height: 44px; padding: 10px 8px; border: 1px solid var(--color-grey-200); border-radius: 10px; font-size: 14px; line-height: 20px; transition: border-color 150ms ease, background 150ms ease; }
 .duration:hover span { border-color: var(--color-grey-600); }
-.duration input:checked + span { border-color: var(--color-grey-900); background: var(--color-grey-50); box-shadow: inset 0 0 0 1px var(--color-grey-900); font-weight: 600; }
+.duration input:checked + span { border-color: #333; background: #333; color: white; font-weight: 600; }
 .sortGroup { margin-top: 24px; padding-top: 24px; border-top: 1px solid var(--color-grey-100); }
 .sortGroup legend { float: left; width: 100%; }
 .sortOptions { clear: both; }
-.sortOption { display: flex; align-items: center; justify-content: space-between; gap: 16px; min-height: 48px; font-size: 14px; line-height: 20px; cursor: pointer; }
+.sortOption { position: relative; display: flex; align-items: center; gap: 12px; min-height: 48px; font-size: 14px; line-height: 20px; cursor: pointer; }
 .sortOption + .sortOption { border-top: 1px solid var(--color-grey-100); }
-.sortOption input { appearance: none; flex-shrink: 0; width: 18px; height: 18px; border: 1px solid var(--color-grey-300); border-radius: 50%; background: white; cursor: pointer; }
-.sortOption input:checked { border: 5px solid var(--color-grey-900); }
+.sortOption input { position: absolute; width: 20px; height: 20px; margin: 0; opacity: 0; cursor: pointer; }
+.radioMark, .checkboxMark { display: grid; flex: none; place-items: center; background: white; }
+.radioMark { width: 20px; height: 20px; border: 1.5px solid #b8b8b8; border-radius: 50%; }
+.checkboxMark { width: 18px; height: 18px; margin: 1px; border: 1.5px solid #b8b8b8; border-radius: 4px; }
+.radioMark svg, .checkboxMark svg { width: 13px; height: 13px; color: white; stroke-width: 3; opacity: 0; }
+.sortOption input:checked + .radioMark, .sortOption input:checked + .checkboxMark { border-color: #087bfa; background: #087bfa; }
+.sortOption input:checked + .radioMark svg, .sortOption input:checked + .checkboxMark svg { opacity: 1; }
 .sortOption:has(input:checked) { font-weight: 600; }
 .footer { display: grid; grid-template-columns: 1fr 1.65fr; gap: 12px; flex-shrink: 0; padding: 16px 24px; border-top: 1px solid var(--color-grey-100); background: white; }
 .footer button { min-height: 44px; font-size: 14px; line-height: 20px; cursor: pointer; }
-.trigger:focus-visible, .close:focus-visible, .sortOption input:focus-visible, .duration input:focus-visible + span, .footer button:focus-visible { outline: 2px solid var(--color-grey-900); outline-offset: 3px; }
+.trigger:focus-visible, .close:focus-visible, .sortOption input:focus-visible + .radioMark, .sortOption input:focus-visible + .checkboxMark, .duration input:focus-visible + span, .footer button:focus-visible { outline: 2px solid var(--color-grey-900); outline-offset: 3px; }
 @media (max-width: 599px) {
     .dialog { inset: auto 0 0; width: 100%; max-height: calc(100dvh - 24px); margin: 0; border-radius: 20px 20px 0 0; }
     .header { padding: 12px 16px 12px 20px; }

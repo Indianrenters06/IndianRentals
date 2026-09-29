@@ -95,7 +95,7 @@ export default function RentalProcessCMSPage() {
 
     const load = useCallback(async () => {
         try {
-            const res = await window.fetch(`${API}/api/cms/rental-process?t=${Date.now()}`);
+            const res = await window.fetch(`${API}/api/cms/rental-process/draft`, { headers: { Authorization: `Bearer ${getToken()}` }, cache: 'no-store' });
             if (res.ok) {
                 const json = await res.json();
                 setData({ ...DEFAULTS, ...json });
@@ -116,6 +116,7 @@ export default function RentalProcessCMSPage() {
             });
             if (!res.ok) throw new Error('Failed to save');
             setSaved(true);
+            window.dispatchEvent(new CustomEvent('cms:draft-saved', { detail: { page: 'rental-process' } }));
             setTimeout(() => setSaved(false), 3000);
         } catch (e) { toast.error(e.message); }
         finally { setSaving(false); }
@@ -160,7 +161,7 @@ export default function RentalProcessCMSPage() {
                     )}
                     <button onClick={save} disabled={saving}
                         className="flex items-center gap-2 h-10 px-5 rounded-xl !bg-indigo-600 hover:!bg-indigo-700 disabled:opacity-60 text-white font-semibold text-sm shadow-lg shadow-indigo-500/20 transition-all">
-                        {saving ? <Spinner size="sm" color="white" /> : <FloppyDisk size={15} weight="bold" />} Save Page
+                        {saving ? <Spinner size="sm" color="white" /> : <FloppyDisk size={15} weight="bold" />} Save draft
                     </button>
                 </div>
             </div>

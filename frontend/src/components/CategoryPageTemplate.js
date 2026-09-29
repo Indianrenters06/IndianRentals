@@ -1,16 +1,13 @@
 "use client";
 import React, { useState, useEffect } from 'react';
 import { FaChevronDown } from 'react-icons/fa';
-import { ChevronRightIcon } from '@heroicons/react/24/outline';
-import Link from 'next/link';
-import Image from 'next/image';
 import { getProducts } from '@/services/productService';
 import { getSubcategoriesByParentName } from '@/services/categoryService';
-import { FiPackage } from 'react-icons/fi';
 import Sidebar from './Sidebar';
 import ProductCard from './ProductCard';
 import CategoryNavBar, { CATEGORY_PILLS } from './CategoryNavBar';
 import CategoryFilters from './CategoryFilters';
+import SubcategoryStrip from './SubcategoryStrip';
 import styles from './CategoryLayout.module.css';
 
 // Derive which category pill to highlight based on the page title
@@ -40,6 +37,7 @@ const CategoryPageTemplate =({ productNamePrefix, productDescription, basePrice,
 
     const [selectedDuration, setSelectedDuration] = useState("3 months");
     const [selectedSort, setSelectedSort] = useState("Most Popular");
+    const [dealsOnly, setDealsOnly] = useState(false);
     const [isMobile, setIsMobile] = useState(true);
 
     const activeCatSlug = getActiveSlug(title);
@@ -162,6 +160,8 @@ const CategoryPageTemplate =({ productNamePrefix, productDescription, basePrice,
             selectedDurationStr: selectedDuration
         }));
 
+        if (dealsOnly) results = results.filter(p => Boolean(p.discount));
+
         if (selectedSort === "Price (high to low)") {
             results.sort((a, b) => b.rentPrice - a.rentPrice);
         } else if (selectedSort === "Price (low to high)") {
@@ -171,7 +171,7 @@ const CategoryPageTemplate =({ productNamePrefix, productDescription, basePrice,
         }
 
         return results;
-    }, [products, selectedDuration, selectedSort]);
+    }, [products, selectedDuration, selectedSort, dealsOnly]);
 
     if (!isClient) return <div className="min-h-screen bg-white" />;
 
@@ -185,114 +185,7 @@ const CategoryPageTemplate =({ productNamePrefix, productDescription, basePrice,
                 currentLabel={title}
             />
 
-            {/* Subcategory Slider Block */}
-            {subcategories.length > 0 && (
-                <div className="hidden lg:block bg-white relative z-10">
-                    <div
-                        className="relative mx-auto group/subslider flex items-center max-w-[1200px] w-full px-4 md:px-8"
-                        style={{
-                            height: '167px',
-                            paddingTop: '20px',
-                            gap: '24px'
-                        }}
-                    >
-                        <div
-                            id="subcat-slider-template"
-                            className="flex overflow-x-auto snap-x snap-mandatory scroll-smooth w-full"
-                            style={{
-                                height: '147px',
-                                gap: '16px',
-                                msOverflowStyle: 'none',
-                                scrollbarWidth: 'none',
-                            }}
-                        >
-                            <style dangerouslySetInnerHTML={{
-                                __html: `
-                                #subcat-slider-template::-webkit-scrollbar { display: none; }
-                            `}} />
-                            {subcategories.map((sub) => {
-                                const isSubActive = title === sub.name;
-                                return (
-                                    <Link
-                                        key={sub.href}
-                                        href={sub.href}
-                                        className="group flex flex-col outline-none shrink-0 snap-start"
-                                        style={{
-                                            height: '147.09px',
-                                            width: '157.71px',
-                                            boxSizing: 'border-box',
-                                            gap: '7px',
-                                            textDecoration: 'none'
-                                        }}
-                                    >
-                                        <div
-                                            className="rounded-lg flex items-center justify-center overflow-hidden transition-all duration-300"
-                                            style={{
-                                                height: '120.09px',
-                                                width: '100%',
-                                                boxSizing: 'border-box',
-                                                border: isSubActive
-                                                    ? '2px solid hsla(47, 100%, 76%, 1)'
-                                                    : '2px solid hsla(0, 0%, 93%, 1)',
-                                                backgroundColor: isSubActive ? 'hsla(43,100%,95%,1)' : 'hsla(0, 0%, 100%, 1)',
-                                                boxShadow: '0px 1px 3px 0px hsla(0, 0%, 87%, 0.08), 0px 6px 6px 0px hsla(0, 0%, 87%, 0.07), 0px 13px 8px 0px hsla(0, 0%, 87%, 0.04), 0px 23px 9px 0px hsla(0, 0%, 87%, 0.01), 0px 36px 10px 0px hsla(0, 0%, 87%, 0)',
-                                            }}
-                                        >
-                                            <div className={`w-full h-full relative transform transition-transform duration-500 ${isSubActive ? 'scale-105' : 'group-hover:scale-105'}`}>
-                                                {sub.image ? (
-                                                    <Image
-                                                        src={sub.image}
-                                                        alt={sub.name}
-                                                        fill
-                                                        className="object-cover"
-                                                        sizes="160px"
-                                                    />
-                                                ) : (
-                                                    <div className="w-full h-full flex items-center justify-center">
-                                                        <FiPackage size={24} className="text-gray-300" />
-                                                    </div>
-                                                )}
-                                            </div>
-                                        </div>
-                                        <p
-                                            style={{
-                                                fontFamily: "'Mona Sans', sans-serif",
-                                                fontWeight: 600,
-                                                fontSize: '12px',
-                                                lineHeight: '20px',
-                                                letterSpacing: '-0.01em',
-                                                color: '#1D1D1F',
-                                            }}
-                                            className="text-center transition-colors duration-300 w-full truncate"
-                                        >
-                                            {sub.name}
-                                        </p>
-                                    </Link>
-                                );
-                            })}
-                        </div>
-
-                        {subcategories.length > 7 && (
-                            <button
-                                onClick={() => {
-                                    const slider = document.getElementById('subcat-slider-template');
-                                    if (slider) slider.scrollBy({ left: 300, behavior: 'smooth' });
-                                }}
-                                className="absolute right-0 top-[50%] translate-y-[-50%] flex items-center justify-center transition-all z-10 hidden md:flex hover:brightness-95 active:scale-95"
-                                style={{
-                                    width: '26px',
-                                    height: '40px',
-                                    borderRadius: '9px',
-                                    background: 'hsla(0, 0%, 93%, 1)',
-                                    boxShadow: '0px 0px 1px 0px hsla(0, 0%, 58%, 0.31), 0px 0px 1px 0px hsla(0, 0%, 58%, 0.18), 0px 0px 1px 0px hsla(0, 0%, 58%, 0.05), 0px 0px 1px 0px hsla(0, 0%, 58%, 0.01)',
-                                }}
-                            >
-                                <ChevronRightIcon className="w-4 h-4 text-gray-600" strokeWidth={2} />
-                            </button>
-                        )}
-                    </div>
-                </div>
-            )}
+            <SubcategoryStrip id="subcat-slider-template" subcategories={subcategories} activeName={title} />
 
             <div className={styles.listingBody}>
                 <h1 className={styles.listingTitle}>{title}</h1>
@@ -304,12 +197,15 @@ const CategoryPageTemplate =({ productNamePrefix, productDescription, basePrice,
                             setSelectedDuration={setSelectedDuration}
                             selectedSort={selectedSort}
                             setSelectedSort={setSelectedSort}
+                            dealsOnly={dealsOnly}
+                            setDealsOnly={setDealsOnly}
                         />
                     </div>
                     <div className={styles.listingContent}>
                         <CategoryFilters count={processedProducts.length}
                             selectedDuration={selectedDuration} setSelectedDuration={setSelectedDuration}
-                            selectedSort={selectedSort} setSelectedSort={setSelectedSort} />
+                            selectedSort={selectedSort} setSelectedSort={setSelectedSort}
+                            dealsOnly={dealsOnly} setDealsOnly={setDealsOnly} />
 
                     <div className={styles.productGrid}>
                         {processedProducts.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage).map((product) => (

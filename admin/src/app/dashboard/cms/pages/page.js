@@ -4,15 +4,14 @@ import toast from 'react-hot-toast';
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Chip, Spinner } from '@heroui/react';
+import { Spinner } from '@heroui/react';
 import {
     FileText, LinkSimple, FloppyDisk, PencilSimple,
-    ArrowLeft, CheckCircle, Globe, Warning,
+    ArrowLeft, CheckCircle,
     Image as PhosphorImage, TextB, TextItalic, TextUnderline,
     ListBullets, ListNumbers, Quotes, Link as LinkIcon,
     Eye, Code, ArrowCounterClockwise
 } from '@phosphor-icons/react';
-import Toggle from '@/components/Toggle';
 import ImageUploader from '@/components/ImageUploader';
 import BannerAppearanceControls from '@/components/BannerAppearanceControls';
 
@@ -40,7 +39,7 @@ const PAGE_ICONS = {};
 
 const DEFAULTS = {
     bannerImage: '', bannerTitle: '', pageContent: '',
-    metaTitle: '', metaDescription: '', publishStatus: 'published'
+    metaTitle: '', metaDescription: ''
 };
 
 // ── Field ──────────────────────────────────────────────────────────────────────
@@ -202,10 +201,17 @@ function PageEditor({ page, onBack }) {
     const [data, setData] = useState(DEFAULTS);
     const set = (k, v) => setData(p => ({ ...p, [k]: v }));
 
+    useEffect(() => {
+        const detail = { page: page.key, path: page.slug };
+        let active = true;
+        queueMicrotask(() => { if (active) window.dispatchEvent(new CustomEvent('cms:active-page', { detail })); });
+        return () => { active = false; window.dispatchEvent(new CustomEvent('cms:active-page', { detail: null })); };
+    }, [page.key, page.slug]);
+
     const fetch_ = useCallback(async () => {
         try {
             setLoading(true);
-            const res = await window.fetch(`${API}/api/cms/${page.key}?t=${Date.now()}`);
+            const res = await window.fetch(`${API}/api/cms/${page.key}/draft`, { headers: { Authorization: `Bearer ${getToken()}` }, cache: 'no-store' });
             if (res.ok) setData({ ...DEFAULTS, ...(await res.json()) });
         } catch (e) { console.error(e); }
         finally { setLoading(false); }
@@ -219,10 +225,11 @@ function PageEditor({ page, onBack }) {
             const res = await window.fetch(`${API}/api/cms/${page.key}`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${getToken()}` },
-                body: JSON.stringify(data),
+                body: JSON.stringify(Object.fromEntries(Object.entries(data).filter(([key]) => key !== 'publishStatus'))),
             });
             if (!res.ok) throw new Error((await res.json()).message || 'Failed');
             setSaved(true);
+            window.dispatchEvent(new CustomEvent('cms:draft-saved', { detail: { page: page.key } }));
             setTimeout(() => setSaved(false), 3000);
         } catch (e) { toast.error(e.message); }
         finally { setSaving(false); }
@@ -257,13 +264,10 @@ function PageEditor({ page, onBack }) {
                             <CheckCircle size={12} weight="fill" /> Saved!
                         </span>
                     )}
-                    <Chip size="sm" color={data.publishStatus === 'published' ? 'success' : 'warning'} variant="flat"
-                        startContent={data.publishStatus === 'published' ? <Globe size={11} /> : <Warning size={11} />}>
-                        {data.publishStatus === 'published' ? 'Live' : 'Draft'}
-                    </Chip>
+                    <span className="text-xs text-slate-500">Saving keeps this draft private until you publish</span>
                     <button onClick={save} disabled={saving}
                         className="flex items-center gap-2 h-9 px-4 rounded-xl !bg-indigo-600 hover:!bg-indigo-700 disabled:opacity-60 text-white font-semibold text-sm shadow-lg shadow-indigo-500/20 transition-all">
-                        {saving ? <Spinner size="sm" color="white" /> : <FloppyDisk size={15} weight="bold" />} Save
+                        {saving ? <Spinner size="sm" color="white" /> : <FloppyDisk size={15} weight="bold" />} Save draft
                     </button>
                 </div>
             </div>
@@ -339,14 +343,6 @@ function PageEditor({ page, onBack }) {
 
                 <hr className="border-slate-100 dark:border-slate-800" />
 
-                {/* Publish Toggle */}
-                <div className="flex items-center justify-between">
-                    <div>
-                        <p className="font-semibold text-slate-800 dark:text-slate-100">Publish Status</p>
-                        <p className="text-xs text-slate-500">When disabled the page returns a draft notice.</p>
-                    </div>
-                    <Toggle isSelected={data.publishStatus === 'published'} onValueChange={v => set('publishStatus', v ? 'published' : 'draft')} />
-                </div>
             </div>
         </motion.div>
     );
@@ -412,9 +408,6 @@ export default function StaticPages() {
                             <div className="grid grid-cols-1 gap-3">
                                 {PAGES.map((page, i) => {
                                     const info = statuses[page.key];
-                                    const status = info?.publishStatus || 'published';
-                                    const hasContent = !!(info?.pageContent);
-                                    const hasBanner = !!(info?.bannerImage);
                                     const updated = info?.updatedAt
                                         ? new Date(info.updatedAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })
                                         : 'Never edited';
@@ -438,10 +431,7 @@ export default function StaticPages() {
                                                             <LinkSimple size={10} weight="bold" />{page.slug}
                                                         </div>
                                                     </div>
-                                                    <div className="text-xs text-slate-400 hidden md:block shrink-0">{updated}</div>
-                                                    <Chip size="sm" color={status === 'published' ? 'success' : 'warning'} variant="flat">
-                                                        {status === 'published' ? 'Live' : 'Draft'}
-                                                    </Chip>
+                                                    <div className="flex shrink-0 items-center gap-2"><span className={`rounded-full px-2.5 py-1 text-xs font-semibold ${info?.hasDraft ? 'bg-amber-100 text-amber-900' : 'bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300'}`}>{info?.hasDraft ? 'Unpublished draft' : 'Published'}</span><span className="hidden text-xs text-slate-400 md:block">{updated}</span></div>
                                                     <div className="w-8 h-8 rounded-lg flex items-center justify-center text-slate-400 group-hover:text-indigo-500 group-hover:bg-indigo-50 dark:group-hover:bg-indigo-500/10 transition-all">
                                                         <PencilSimple size={16} />
                                                     </div>

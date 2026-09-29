@@ -1,7 +1,7 @@
 "use client";
+import { cmsUrl } from '@/lib/cmsPreview';
 import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
-import { PiCaretDown, PiCaretUp } from 'react-icons/pi';
 import styles from './FaqSection.module.css';
 
 const faqs = [
@@ -37,7 +37,7 @@ const FaqSection = ({ cmsData, limit, pageName }) => {
         if (cmsData) return;
 
         if (pageName === 'homepage') {
-            window.fetch(`${API}/api/cms/homepage?t=${Date.now()}`)
+            window.fetch(cmsUrl('homepage'))
                 .then(res => res.ok ? res.json() : null)
                 .then(data => {
                     setFetchedCms(data);
@@ -49,12 +49,12 @@ const FaqSection = ({ cmsData, limit, pageName }) => {
         }
 
         const fetches = [
-            window.fetch(`${API}/api/cms/faq?t=${Date.now()}`).then(res => res.ok ? res.json() : null)
+            window.fetch(cmsUrl('faq')).then(res => res.ok ? res.json() : null)
         ];
 
         if (pageName) {
             fetches.push(
-                window.fetch(`${API}/api/cms/${pageName}?t=${Date.now()}`).then(res => res.ok ? res.json() : null)
+                window.fetch(cmsUrl(pageName)).then(res => res.ok ? res.json() : null)
             );
         }
 
@@ -95,11 +95,13 @@ const FaqSection = ({ cmsData, limit, pageName }) => {
         setActiveIndices(displayFaqs.length > 0 ? [0] : []);
     }
 
+    const legacyHomepageHeading = isHomepage && cms?.homepageFaqTitle === 'Frequently Asked Questions'
+        && cms?.homepageFaqSubtitle === 'Everything you need to know about renting with us.';
     const title = isHomepage
-        ? (cms?.homepageFaqTitle || "Everything you need to know about renting with IndianRenters.com")
+        ? (legacyHomepageHeading ? "Everything you need to know about renting with IndianRenters.com" : (cms?.homepageFaqTitle || "Everything you need to know about renting with IndianRenters.com"))
         : (cms?.faqTitle || "Everything you need to know about renting with IndianRenters.com");
     const subtitle = isHomepage
-        ? (cms?.homepageFaqSubtitle || "Welcome to FAQ!")
+        ? (legacyHomepageHeading ? "Welcome to FAQ!" : (cms?.homepageFaqSubtitle || "Welcome to FAQ!"))
         : (cms?.faqSubtitle || "Welcome to FAQ!");
 
     const toggleFaq = (index) => {
@@ -119,7 +121,7 @@ const FaqSection = ({ cmsData, limit, pageName }) => {
         >
             {/* Homepage spacing is responsive; other pages keep their existing section spacing. */}
             <div
-                className="max-w-[1200px] mx-auto px-5 sm:px-6 w-full flex flex-col lg:flex-row items-start gap-6 lg:gap-[40px]"
+                className="max-w-[1200px] mx-auto px-5 sm:px-6 w-full flex flex-col lg:flex-row items-start gap-8 lg:gap-[40px]"
             >
                 {/* Left Column — Figma "Section Title" (node under FAQ frame): gap 20px, eyebrow above heading */}
                 <div className="w-full lg:w-[442px] lg:shrink-0 flex flex-col gap-5">
@@ -143,36 +145,38 @@ const FaqSection = ({ cmsData, limit, pageName }) => {
                 <div className="w-full lg:flex-1 border-b border-[#EEEEEE]">
                     {displayFaqs.map((faq, index) => {
                         const open = activeIndices.includes(index);
+                        const answerId = `faq-answer-${pageName || 'default'}-${index}`;
                         return (
                             <div key={index} className="w-full flex flex-col items-start border-t border-[#EEEEEE]">
                                 <button
-                                    className="w-full flex items-center justify-between text-left focus:outline-none group gap-6 py-2 md:py-5"
+                                    type="button"
+                                    className={styles.question}
                                     onClick={() => toggleFaq(index)}
+                                    aria-expanded={open}
+                                    aria-controls={answerId}
                                 >
                                     <span
-                                        className="flex-1 font-bold text-[#333333] tracking-[-0.8px] text-sm md:text-[18px] leading-[20px] md:leading-[25px]"
+                                        className="flex-1 font-bold text-[#333333] tracking-[-0.8px] text-[16px] md:text-[18px] leading-[24px] md:leading-[25px]"
                                         style={{ fontFamily: "'Mona Sans', sans-serif" }}
                                     >
                                         {faq.question}
                                     </span>
-                                    <span className="md:hidden shrink-0 flex items-center justify-center size-[20px] text-[#333333]">
-                                        {open ? <PiCaretUp size={20} /> : <PiCaretDown size={20} />}
-                                    </span>
-                                    {/* Desktop — Figma "Icon" (28×28 chevron, node 22774:2781); points up when open */}
                                     <Image
                                         src="/icons/faq-chevron.svg"
                                         alt=""
                                         aria-hidden="true"
                                         width={28}
                                         height={28}
-                                        className={`hidden md:block shrink-0 transition-transform duration-300 ${open ? '' : 'rotate-180'}`}
+                                        className={`${styles.chevron} ${open ? '' : styles.closed}`}
                                     />
                                 </button>
                                 <div
-                                    className={`w-full overflow-hidden transition-all duration-300 ease-in-out ${open ? 'max-h-[500px] opacity-100' : 'max-h-0 opacity-0'}`}
+                                    id={answerId}
+                                    className={`${styles.answer} ${open ? styles.open : ''}`}
+                                    aria-hidden={!open}
                                 >
                                     <p
-                                        className="flex-1 m-0 pb-3 md:pb-6 font-normal text-[#545454] tracking-[-0.4px] text-xs md:text-[16px] leading-[18px] md:leading-[23px]"
+                                        className={styles.answerText}
                                         style={{ fontFamily: "'Mona Sans', sans-serif" }}
                                     >
                                         {faq.answer}

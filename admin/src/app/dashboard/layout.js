@@ -238,16 +238,21 @@ export default function DashboardLayout({ children }) {
     {
       name: 'CMS', icon: Layout, path: '/dashboard/cms', permission: 'cms',
       submenu: [
+        { heading: 'Site' },
         { name: 'Homepage', path: '/dashboard/cms/homepage' },
         { name: 'Global Layout', path: '/dashboard/cms/layout' },
+        { heading: 'Catalog pages' },
+        { name: 'Category Landing', path: '/dashboard/cms/categories-page' },
+        { name: 'Product Detail Template', path: '/dashboard/cms/product-page' },
+        { name: 'Service Pages', path: '/dashboard/cms/service-pages' },
+        { heading: 'Content' },
         { name: 'Blog', path: '/dashboard/cms/blog' },
-        { name: 'Main Category', path: '/dashboard/cms/categories-page' },
-        { name: 'Single Product Page', path: '/dashboard/cms/product-page' },
-        { name: 'Static Pages', path: '/dashboard/cms/pages' },
+        { name: 'Policies & Info', path: '/dashboard/cms/pages' },
         { name: 'FAQ Page', path: '/dashboard/cms/faq' },
-        { name: 'Careers & Applications', path: '/dashboard/cms/careers' },
+        { heading: 'Customer contact' },
         { name: 'Contact Page', path: '/dashboard/cms/contact' },
         { name: 'Contact Enquiries', path: '/dashboard/cms/contact/messages' },
+        { name: 'Careers & Applications', path: '/dashboard/cms/careers' },
       ]
     },
     {
@@ -503,6 +508,7 @@ export default function DashboardLayout({ children }) {
                   {hasSubmenu && isSubmenuOpen && (
                     <div className="ml-9 mt-1 mb-2 space-y-1 border-l border-slate-200 dark:border-slate-800 pl-3">
                       {item.submenu.map(subItem => {
+                        if (subItem.heading) return <p key={subItem.heading} className="px-4 pb-1 pt-4 text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-400 dark:text-slate-500">{subItem.heading}</p>;
                         const isSubActive = pathname === subItem.path;
                         return (
                           <Link

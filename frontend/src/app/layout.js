@@ -50,6 +50,7 @@ export const metadata = {
 import ClientLayout from "@/components/ClientLayout";
 import Providers from "@/components/Providers";
 import StickyMobileCTA from "@/components/StickyMobileCTA";
+import CmsPreviewNotice from "@/components/CmsPreviewNotice";
 
 // Organization + WebSite structured data — helps Google and AI assistants
 // understand and cite the brand.
@@ -88,6 +89,7 @@ export default function RootLayout({ children }) {
           dangerouslySetInnerHTML={{ __html: JSON.stringify(orgJsonLd) }}
         />
         <Providers analyticsId={GA_ID}>
+          <CmsPreviewNotice />
           <ClientLayout>
             {children}
           </ClientLayout>

@@ -20,19 +20,32 @@
 .benefitGrid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; width: 100%; }
 .benefitCard {
   display: flex; align-items: center; gap: 12px; min-width: 0; min-height: 68px;
-  padding: 14px 16px; border: 1px solid #e6e6e6; border-radius: 14px;
-  background: #fff; color: #141414; font: 600 13px/1.35 'Mona Sans', sans-serif;
+  padding: 14px 16px; border: 1px solid #56b7ff; border-radius: 14px;
+  background: linear-gradient(135deg, #1597ff 0%, #087bfa 100%); color: #fff; font: 600 14px/1.35 'Mona Sans', sans-serif;
 }
-.benefitCard svg { flex: none; color: #141414; }
-.noticeCard { display: flex; align-items: center; justify-content: space-between; min-height: 64px; padding: 14px 16px; border: 1px solid #e3e3e3; border-radius: 14px; background: #faf9f5; gap: 12px; }
+.benefitCard svg { flex: none; color: #fff; }
+.noticeCard { display: flex; align-items: center; justify-content: space-between; min-height: 64px; padding: 14px 16px; border: 1px solid #f9d9ab; border-radius: 14px; background: #fff1df; gap: 12px; }
 .infoCard { display: flex; align-items: center; min-height: 64px; padding: 14px 16px; border: 1px solid #e3e3e3; border-radius: 14px; background: #fff; gap: 12px; }
+.infoIcon { display: grid; flex: none; place-items: center; width: 42px; height: 42px; border-radius: 12px; background: #fff1df; color: #a64b00; }
+.infoLink { flex: none; min-height: 40px; padding: 10px 2px; border: 0; background: none; color: #141414; font: 600 13px/1.3 'Mona Sans', sans-serif; text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
+.infoLink:hover { color: #9a4a00; }
+.infoLink:focus-visible { outline: 2px solid #141414; outline-offset: 2px; }
+.kycImage { position: relative; flex: none; align-self: center; width: 76px; height: 76px; object-fit: contain; }
+.detailsPanel { display: flex; flex-direction: column; gap: 16px; width: 100%; min-height: 200px; margin-top: 24px; padding: 20px; border: 1px solid #e2e2e2; border-radius: 16px; background: #fff; }
+.detailTab { flex: none; min-height: 44px; padding: 10px 16px; border: 1px solid #e2e2e2; border-radius: 999px; background: #fff; color: #141414; font: 600 13px/1.3 'Mona Sans', sans-serif; white-space: nowrap; cursor: pointer; }
+.detailTabActive { border-color: #141414; background: #141414; color: #fff; }
+.detailTab:focus-visible { outline: 2px solid #141414; outline-offset: 2px; }
+.specLabel { color: #333; font: 700 12px/1.3 'Mona Sans', sans-serif; letter-spacing: .02em; text-transform: uppercase; }
+.specValue { color: #545454; font: 400 14px/1.45 'Mona Sans', sans-serif; }
+.policyText { color: #545454; font: 400 14px/1.6 'Mona Sans', sans-serif; }
 
-.simpleCompare { width: 100%; background: #f6f6f6; padding: 64px 20px; }
+.simpleCompare { width: 100%; background: #f6f6f6; padding: 72px 20px; }
 .simpleCompareInner { max-width: 1120px; margin: 0 auto; }
 .simpleCompare h2 { margin: 0 0 12px; color: #141414; font: 600 clamp(30px, 4vw, 46px)/1.08 'Mona Sans', sans-serif; letter-spacing: -.045em; }
 .simpleCompareIntro { max-width: 640px; margin: 0 0 32px; color: #545454; font: 400 16px/1.5 'Mona Sans', sans-serif; }
-.compareRows { display: grid; gap: 10px; }
-.compareRow { display: grid; grid-template-columns: minmax(150px, .7fr) repeat(2, minmax(0, 1fr)); align-items: stretch; background: #fff; border: 1px solid #e5e5e5; border-radius: 16px; overflow: hidden; }
+.compareRows { display: grid; gap: 0; border: 1px solid #e5e5e5; border-radius: 16px; overflow: hidden; background: #fff; }
+.compareRow { display: grid; grid-template-columns: minmax(150px, .7fr) repeat(2, minmax(0, 1fr)); align-items: stretch; background: #fff; }
+.compareRow + .compareRow { border-top: 1px solid #e5e5e5; }
 .compareRow > * { padding: 20px 24px; }
 .compareRow strong { font: 600 16px/1.35 'Mona Sans', sans-serif; color: #141414; }
 .compareRow span { font: 400 16px/1.45 'Mona Sans', sans-serif; color: #333; border-left: 1px solid #eee; }
@@ -47,7 +60,7 @@
   .tenurePanel { padding: 20px 20px 24px; }
   .primaryCta { min-height: 54px; padding-inline: 20px; font-size: 16px; }
   .benefitGrid { gap: 8px; }
-  .benefitCard { min-height: 64px; padding: 12px; font-size: 12px; }
+  .benefitCard { min-height: 64px; padding: 12px; font-size: 14px; }
   .simpleCompare { padding: 48px 20px; }
   .compareHead { display: none; }
   .compareRow { display: grid; grid-template-columns: 1fr 1fr; }

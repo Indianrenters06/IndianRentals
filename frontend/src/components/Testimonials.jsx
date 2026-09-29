@@ -1,4 +1,5 @@
 'use client';
+import { cmsUrl } from '@/lib/cmsPreview';
 
 import { useEffect, useState } from 'react';
 import { Star } from '@phosphor-icons/react';
@@ -40,7 +41,7 @@ export default function Testimonials({ overrideBg, overridePadding, overrideHeig
         let active = true;
         Promise.all([
             getTestimonials(),
-            fetch(`${API}/api/cms/homepage`).then(response => response.ok ? response.json() : null).catch(() => null),
+            fetch(cmsUrl('homepage')).then(response => response.ok ? response.json() : null).catch(() => null),
         ]).then(([items, cms]) => {
             if (!active) return;
             setEnabled(cms?.testimonialsEnabled !== false);

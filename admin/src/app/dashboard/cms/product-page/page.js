@@ -6,6 +6,7 @@ import { Spinner, Switch } from '@heroui/react';
 import { FloppyDisk, Monitor, Package, Sparkle, ShareNetwork, Heart } from '@phosphor-icons/react';
 import { BsTruck } from 'react-icons/bs';
 import { FaStar } from 'react-icons/fa';
+import ImageUploader from '../../../../components/ImageUploader';
 
 const API = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
 const getToken = () => typeof window !== 'undefined' ? localStorage.getItem('adminToken') : null;
@@ -40,7 +41,7 @@ const DEFAULTS = {
     productPageDepositLabel: "100% Refundable Deposit",
     productPageKycLine1: "Place Order & complete KYC anytime",
     productPageKycLine2: "to get your items the next day",
-    productPageKycImage: "",
+    productPageKycImage: "/images/product/kyc-delivery.webp",
     productPageTenures: [
         { label: "1+", months: 1, discountPercent: 0 },
         { label: "3+", months: 3, discountPercent: 10 },
@@ -53,6 +54,7 @@ const DEFAULTS = {
     productPageExtendCardText: "How do I extend tenure after 6 months?",
     productPageExtendCardLinkText: "View Details",
     productPageExtendCardLink: "#",
+    productPageExtendCardBody: "Contact support before your current rental period ends to discuss available terms and pricing.",
     productPageDeliveryLabel: "Delivery",
     productPagePincodePlaceholder: "Enter your pincode",
     productPagePincodeCtaLine1: "Check availability",
@@ -115,14 +117,12 @@ const CONTENT_GROUPS = [
         fields: [
             ['productPageTenureSliderLabel', 'Tenure slider label'],
             ['productPagePriceBreakdownText', 'Price breakdown link text'],
-            ['productPagePriceBreakdownLink', 'Price breakdown link URL'],
             ['productPageCompareLinkText', 'Compare tenures link text'],
             ['productPagePerMonthLabel', 'Per-month suffix (desktop)'],
             ['productPageMobilePriceSuffix', 'Price suffix (mobile)'],
             ['productPageMonthLabel', 'Word for one month'],
             ['productPageMonthsLabel', 'Word for many months'],
             ['productPageQuantityLabel', 'Quantity label'],
-            ['productPageDiscountText', 'Fallback discount badge'],
             ['productPageDeliveryText', 'Fallback delivery time'],
             ['productPageViewAllBenefitsText', 'View-all-benefits link'],
         ],
@@ -136,7 +136,7 @@ const CONTENT_GROUPS = [
             ['productPageDepositLabel', 'Deposit card label'],
             ['productPageKycLine1', 'KYC card line 1'],
             ['productPageKycLine2', 'KYC card line 2'],
-            ['productPageKycImage', 'KYC card image URL'],
+            ['productPageKycImage', 'KYC card image URL (PNG or WebP)'],
         ],
     },
     {
@@ -147,6 +147,7 @@ const CONTENT_GROUPS = [
             ['productPageExtendCardText', 'Extend-tenure card text'],
             ['productPageExtendCardLinkText', 'Extend-tenure link text'],
             ['productPageExtendCardLink', 'Extend-tenure link URL'],
+            ['productPageExtendCardBody', 'Extension details drawer copy', true],
         ],
     },
     {
@@ -241,7 +242,7 @@ export default function ProductPageCMS() {
     const loadData = useCallback(async () => {
         try {
             setLoading(true);
-            const resCms = await window.fetch(`${API}/api/cms/product-page?t=${Date.now()}`);
+            const resCms = await window.fetch(`${API}/api/cms/product-page/draft`, { headers: { Authorization: `Bearer ${getToken()}` }, cache: 'no-store' });
             if (resCms.ok) {
                 const json = await resCms.json();
                 setGlobalData({ ...DEFAULTS, ...json });
@@ -257,6 +258,17 @@ export default function ProductPageCMS() {
     }, [selectedProductId]);
 
     useEffect(() => { loadData(); }, [loadData]);
+
+    useEffect(() => {
+        const sampleId = selectedProductId === 'GLOBAL' ? products[0]?._id : selectedProductId;
+        const detail = {
+            page: 'product-page', path: sampleId ? `/products/${sampleId}` : '/products',
+            mode: selectedProductId === 'GLOBAL' ? 'cms' : 'direct',
+        };
+        let active = true;
+        queueMicrotask(() => { if (active) window.dispatchEvent(new CustomEvent('cms:active-page', { detail })); });
+        return () => { active = false; window.dispatchEvent(new CustomEvent('cms:active-page', { detail: null })); };
+    }, [selectedProductId, products]);
 
     const handleProductSelect = (e) => {
         const id = e.target.value;
@@ -309,6 +321,7 @@ export default function ProductPageCMS() {
                 });
                 if (!res.ok) throw new Error('Failed to save global template');
                 setGlobalData(data);
+                window.dispatchEvent(new CustomEvent('cms:draft-saved', { detail: { page: 'product-page' } }));
             } else {
                 const payload = {
                     name: selectedProductData.name,
@@ -362,7 +375,6 @@ export default function ProductPageCMS() {
     const mockName = isProduct ? selectedProductData.name : "iMac 24-inch";
     const mockCategory = isProduct ? (selectedProductData.category || "Category") : "iMac";
     const mockPrice = isProduct ? selectedProductData.rentalPrice : "5,000";
-    const mockMrp = isProduct ? selectedProductData.mrp : "7,500";
     const mockImage = isProduct ? (selectedProductData?.images?.[0] || null) : null;
 
     return (
@@ -388,9 +400,9 @@ export default function ProductPageCMS() {
                     </select>
                 </div>
                 <button onClick={save} disabled={saving}
-                    className="flex items-center gap-2 h-10 px-6 rounded-lg bg-[#FF5A00] hover:bg-[#E04D00] disabled:opacity-60 text-white font-bold text-sm transition-all shadow-md">
+                    className="flex items-center gap-2 h-10 rounded-full bg-[#ffcf46] px-6 text-sm font-semibold text-[#141414] transition-colors hover:bg-[#f5c236] disabled:opacity-60">
                     {saving ? <Spinner size="sm" color="white" /> : <FloppyDisk size={18} weight="bold" />}
-                    {saved ? 'Saved!' : 'Save Design'}
+                    {saved ? 'Saved!' : selectedProductId === 'GLOBAL' ? 'Save draft' : 'Save product changes'}
                 </button>
             </div>
 
@@ -408,16 +420,7 @@ export default function ProductPageCMS() {
 
                         {/* ── LEFT: Image ── */}
                         <div className="w-full bg-white rounded-2xl border border-gray-100 overflow-hidden relative" style={{ minHeight: 480 }}>
-                            {/* Discount badge on image */}
-                            <div className="absolute top-4 left-4 z-10">
-                                <input
-                                    value={data.productPageDiscountText}
-                                    onChange={e => set('productPageDiscountText', e.target.value)}
-                                    className="bg-[#FF5A00] text-white text-[12px] font-bold px-3 py-1 rounded-full outline-none border border-transparent focus:border-white focus:ring-2 focus:ring-orange-400/50"
-                                    placeholder="33% off"
-                                    title="Edit discount badge"
-                                />
-                            </div>
+                            {/* Discount badges on the storefront are calculated from the tenure prices below. */}
 
                             {mockImage ? (
                                 <img
@@ -543,7 +546,7 @@ export default function ProductPageCMS() {
                                 </div>
                             </div>
 
-                            {/* Price row: rental + MRP strikethrough + discount badge + quantity */}
+                            {/* The storefront compares rental terms against the monthly base rent. */}
                             <div className="flex items-center gap-3 flex-wrap">
                                 <div className="flex items-baseline gap-1">
                                     <span className="text-[13px] font-semibold text-gray-400">₹</span>
@@ -558,24 +561,7 @@ export default function ProductPageCMS() {
                                     )}
                                     <span className="text-[13px] font-medium text-gray-400 ml-1">/month</span>
                                 </div>
-                                {mockMrp && (
-                                    <div className="flex items-baseline gap-1">
-                                        <span className="text-[15px] text-gray-400 line-through">
-                                            ₹{isProduct ? (
-                                                <input
-                                                    value={selectedProductData?.mrp || ''}
-                                                    onChange={e => setProd('mrp', e.target.value)}
-                                                    className="w-[80px] bg-transparent border-b border-transparent hover:border-gray-300 focus:border-gray-400 outline-none text-[15px] text-gray-400 line-through"
-                                                    placeholder="MRP"
-                                                    title="Edit original price (MRP)"
-                                                />
-                                            ) : mockMrp}
-                                        </span>
-                                    </div>
-                                )}
-                                <div className="bg-[#FF5A00] text-white text-[12px] font-bold px-3 py-1 rounded-full">
-                                    {data.productPageDiscountText}
-                                </div>
+                                <span className="text-xs text-slate-500">Term savings are calculated from the monthly rent.</span>
                                 {/* Quantity */}
                                 <div className={`flex items-center gap-3 ml-auto transition-all ${!data.productPageEnableQuantity ? 'opacity-40 grayscale' : ''}`}>
                                     <span className="text-[13px] font-medium text-gray-600">Quantity</span>
@@ -871,11 +857,21 @@ export default function ProductPageCMS() {
                                                 className="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/30 resize-none"
                                             />
                                         ) : (
-                                            <input
-                                                value={data[key] ?? ''}
-                                                onChange={e => set(key, e.target.value)}
-                                                className="w-full h-10 px-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/30"
-                                            />
+                                            <>
+                                                <input
+                                                    value={data[key] ?? ''}
+                                                    onChange={e => set(key, e.target.value)}
+                                                    className="w-full h-10 px-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/30"
+                                                />
+                                                {key === 'productPageKycImage' && <>
+                                                    <ImageUploader
+                                                        label="Upload a KYC illustration"
+                                                        existingUrl={(data[key] || '').startsWith('/') ? `${process.env.NEXT_PUBLIC_FRONTEND_URL || 'http://localhost:3000'}${data[key]}` : data[key]}
+                                                        onUpload={url => set(key, url)}
+                                                    />
+                                                    <p className="text-xs text-slate-500">Transparent PNG, WebP, AVIF, or a short GIF. Keep the file small so the product page loads quickly.</p>
+                                                </>}
+                                            </>
                                         )}
                                     </div>
                                 ))}
@@ -934,7 +930,7 @@ export default function ProductPageCMS() {
                         <div className="flex items-center justify-between mb-4">
                             <div>
                                 <h3 className="text-sm font-bold text-slate-800 dark:text-slate-100 uppercase tracking-wider">Fallback specifications</h3>
-                                <p className="text-xs text-slate-500 mt-1">Shown under Product Details only when a product has no specifications of its own.</p>
+                                <p className="text-xs text-slate-500 mt-1">Shown under Product Details only when a product has no specifications of its own. Leave blank to show its name without invented specifications.</p>
                             </div>
                             <button
                                 onClick={() => set('productPageDefaultSpecs', [...(data.productPageDefaultSpecs || []), { label: '', value: '' }])}
@@ -962,7 +958,7 @@ export default function ProductPageCMS() {
                                 );
                             })}
                             {(data.productPageDefaultSpecs || []).length === 0 && (
-                                <p className="text-xs text-slate-400 italic">Using the built-in fallback list. Add rows to replace it.</p>
+                                <p className="text-xs text-slate-400 italic">No fallback specifications set. Add rows only if they apply to every product without its own specifications.</p>
                             )}
                         </div>
                     </div>

@@ -1,30 +1,66 @@
 const asyncHandler = require('express-async-handler');
 const sanitizeHtml = require('../utils/sanitizeHtml');
 const CMS = require('../models/CMS');
+const jwt = require('jsonwebtoken');
 const { normalizeContent } = require('../utils/contactValidation');
+const { decodeLegacyContactContent } = require('../utils/legacyCmsContent');
 
-const ALLOWED_PAGES = ['homepage', 'about', 'terms', 'privacy', 'contact', 'shipping', 'refund', 'faq', 'rental-process', 'kyc-policy', 'categories-page', 'rules', 'delivery-charges', 'late-fee-rules', 'cancellation-rules', 'subscription-rules', 'product-page'];
+const SERVICE_SLUGS = ['laptop-rental', 'macbook-rental', 'camera-rental', 'av-equipment-rental', 'server-rental', 'office-equipment-rental'];
+const ALLOWED_PAGES = ['homepage', 'about', 'terms', 'privacy', 'contact', 'shipping', 'refund', 'faq', 'rental-process', 'kyc-policy', 'categories-page', 'rules', 'delivery-charges', 'late-fee-rules', 'cancellation-rules', 'subscription-rules', 'product-page', 'blog', ...SERVICE_SLUGS.map(slug => `service-${slug}`)];
+
+const validateServiceContent = (content) => {
+    const requiredText = ['title', 'headline', 'description', 'image', 'imageAlt', 'categoryHref', 'categoryLabel'];
+    if (!content || Array.isArray(content) || typeof content !== 'object' || requiredText.some(key => typeof content[key] !== 'string' || !content[key].trim())) {
+        throw new Error('Service pages require a title, headline, introduction, image, category and catalogue details.');
+    }
+    if (!content.categoryHref.startsWith('/') || content.categoryHref.startsWith('//') || !/^(\/|https:\/\/)/.test(content.image) || !['browse', 'quote'].includes(content.primaryAction)) {
+        throw new Error('Service page links, image or primary action are invalid.');
+    }
+    if (['catalogueCategory', 'catalogueKeyword'].some(key => content[key] !== undefined && typeof content[key] !== 'string')) throw new Error('Catalogue filters must be text.');
+    for (const [key, first, second] of [['useCases', 'title', 'description'], ['faqs', 'q', 'a']]) {
+        if (!Array.isArray(content[key]) || content[key].some(item => !item || typeof item[first] !== 'string' || !item[first].trim() || typeof item[second] !== 'string' || !item[second].trim())) {
+            throw new Error(`Service page ${key} must contain complete entries.`);
+        }
+    }
+    if (!Array.isArray(content.keywords) || content.keywords.some(word => typeof word !== 'string')) throw new Error('Service page search phrases must be text.');
+};
+
+const assertKnownPage = (req, res) => {
+    if (!ALLOWED_PAGES.includes(req.params.page)) {
+        res.status(404);
+        throw new Error('CMS page not found');
+    }
+};
+
+const publicContent = (pageName, cms, draft = null) => {
+    const out = { ...(cms.toJSON ? cms.toJSON() : cms), ...(draft || {}) };
+    delete out.draftData;
+    delete out.draftUpdatedAt;
+    if (out.careersContent) out.careersContent = require('../utils/careersValidation').publicContent(out.careersContent);
+    if (out.pageContent) out.pageContent = sanitizeHtml(out.pageContent);
+    if (pageName === 'contact') out.contactContent = normalizeContent(out.contactContent || decodeLegacyContactContent(out.pageContent) || {});
+    return out;
+};
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 // Offers live under the legacy `clientLogos` key. Older documents stored a plain
-// image URL string per offer; the editor now sends { image, link }. Accept both
+// image URL string per offer; the editor now sends campaign copy as well. Accept both
 // and always persist the object form.
 const normaliseOffers = (items) =>
     (Array.isArray(items) ? items : [])
         .map((item) =>
             typeof item === 'string'
-                ? { image: item, link: '' }
-                : { image: String(item?.image || ''), link: String(item?.link || '') }
+                ? { image: item.trim(), link: '', title: '', subtitle: '', ctaText: '', altText: '' }
+                : {
+                    image: String(item?.image || '').trim(),
+                    link: String(item?.link || '').trim(),
+                    title: String(item?.title || '').trim().slice(0, 90),
+                    subtitle: String(item?.subtitle || '').trim().slice(0, 160),
+                    ctaText: String(item?.ctaText || '').trim().slice(0, 50),
+                    altText: String(item?.altText || '').trim().slice(0, 160),
+                }
         )
         .filter((offer) => offer.image);
-
-const getOrCreatePage = async (pageName) => {
-    let page = await CMS.findOne({ pageName });
-    if (!page) {
-        page = await CMS.create({ pageName });
-    }
-    return page;
-};
 
 // ── @desc   List all CMS pages (admin overview)
 // ── @route  GET /api/cms
@@ -38,8 +74,8 @@ const getAllPages = asyncHandler(async (req, res) => {
     const result = await Promise.all(
         ALLOWED_PAGES.map(async (name) => {
             const found = pages.find((p) => p.pageName === name);
-            if (found) return found;
-            return { pageName: name, publishStatus: 'published', updatedAt: null };
+            if (found) return { ...found, draftData: undefined, hasDraft: Boolean(found.draftData && Object.keys(found.draftData).length) };
+            return { pageName: name, publishStatus: 'published', hasDraft: false, updatedAt: null };
         })
     );
 
@@ -50,21 +86,32 @@ const getAllPages = asyncHandler(async (req, res) => {
 // ── @route  GET /api/cms/:page   (e.g. /api/cms/homepage)
 // ── @access Public
 const getPage = asyncHandler(async (req, res) => {
+    assertKnownPage(req, res);
     const { page } = req.params;
-    const cms = await getOrCreatePage(page);
-    // pageContent is rendered as raw HTML on the storefront policy pages.
-    const out = cms.toJSON ? cms.toJSON() : cms;
-    if (out.careersContent) out.careersContent = require('../utils/careersValidation').publicContent(out.careersContent);
-    if (out.pageContent) out.pageContent = sanitizeHtml(out.pageContent);
-    if (page === 'contact') out.contactContent = normalizeContent(out.contactContent || {});
-    res.json(out);
+    const cms = await CMS.findOne({ pageName: page }) || new CMS({ pageName: page });
+    res.json(publicContent(page, cms));
+});
+
+const getDraftPage = asyncHandler(async (req, res) => {
+    assertKnownPage(req, res);
+    const cms = await CMS.findOne({ pageName: req.params.page }) || new CMS({ pageName: req.params.page });
+    res.json({ ...publicContent(req.params.page, cms, cms.draftData), _workflow: {
+        hasDraft: Boolean(cms.draftData && Object.keys(cms.draftData).length),
+        draftUpdatedAt: cms.draftUpdatedAt || null,
+        publishedAt: cms.publishedAt || cms.updatedAt || null,
+    } });
 });
 
 // ── @desc   Update (upsert) a CMS page
 // ── @route  PUT /api/cms/:page
 // ── @access Private/Admin
 const updatePage = asyncHandler(async (req, res) => {
+    assertKnownPage(req, res);
     const { page } = req.params;
+    if (page.startsWith('service-') && req.body.serviceContent !== undefined) {
+        try { validateServiceContent(req.body.serviceContent); }
+        catch (error) { res.status(400); throw error; }
+    }
     if (req.body.bannerShowText !== undefined && typeof req.body.bannerShowText !== 'boolean') {
         res.status(400); throw new Error('Banner text visibility must be true or false.');
     }
@@ -117,7 +164,9 @@ const updatePage = asyncHandler(async (req, res) => {
 
         // Feature section
         'featureSectionEnabled', 'featureSectionTitle', 'featureSectionSubtitle', 
-        'featureSectionImage', 'featureSectionCtaText', 'featureSectionCtaLink', 'featureSectionStats',
+        'featureSectionImage', 'featureSectionMediaType', 'featureSectionMobileMedia',
+        'featureSectionPosterImage', 'featureSectionMediaAlt', 'featureSectionInteraction',
+        'featureSectionCtaText', 'featureSectionCtaLink', 'featureSectionStats',
 
         // Generic Info
         'pageContent', 'bannerImage', 'bannerTitle', 'bannerShowText', 'bannerBackground',
@@ -144,6 +193,10 @@ const updatePage = asyncHandler(async (req, res) => {
 
         // Categories Page
         'categoriesPageTitle', 'categoriesPageSubtitle', 'categoriesGrid',
+
+        // Blog landing page
+        'blogTitle', 'blogSubtitle', 'blogTabs',
+        'serviceContent',
 
         // Product Page — every field the editor sends must be listed here, or the
         // save silently drops it while still reporting success.
@@ -180,29 +233,93 @@ const updatePage = asyncHandler(async (req, res) => {
         'productPageEnableRentVsBuy',
 
         // SEO
-        'metaTitle', 'metaDescription', 'publishStatus', 'scheduledPublishTime',
+        'metaTitle', 'metaDescription',
     ];
 
+    const draft = { ...(cms.draftData || {}) };
     fields.forEach((field) => {
         if (req.body[field] !== undefined) {
-            cms[field] = req.body[field];
+            draft[field] = req.body[field];
         }
     });
-    if (typeof cms.pageContent === 'string') cms.pageContent = sanitizeHtml(cms.pageContent);
+    if (typeof draft.pageContent === 'string') draft.pageContent = sanitizeHtml(draft.pageContent);
 
     if (req.body.clientLogos !== undefined) {
-        cms.clientLogos = normaliseOffers(req.body.clientLogos);
-        // Mixed paths need an explicit dirty flag or mongoose skips the write.
-        cms.markModified('clientLogos');
+        draft.clientLogos = normaliseOffers(req.body.clientLogos);
     }
 
-    if (contactContent !== undefined) { cms.contactContent = contactContent; cms.markModified('contactContent'); }
+    if (contactContent !== undefined) draft.contactContent = contactContent;
+    const candidate = new CMS({ ...cms.toObject(), ...draft });
+    await candidate.validate();
+    cms.draftData = draft;
+    cms.draftUpdatedAt = new Date();
+    cms.markModified('draftData');
+    await cms.save();
+    res.json({ ...publicContent(page, cms, draft), _workflow: { hasDraft: true, draftUpdatedAt: cms.draftUpdatedAt, publishedAt: cms.publishedAt || null } });
+});
+
+const publishPage = asyncHandler(async (req, res) => {
+    assertKnownPage(req, res);
+    const cms = await CMS.findOne({ pageName: req.params.page });
+    if (!cms?.draftData || !Object.keys(cms.draftData).length) {
+        res.status(409);
+        throw new Error('There is no saved draft to publish');
+    }
+    for (const [field, value] of Object.entries(cms.draftData)) cms[field] = value;
+    cms.draftData = undefined;
+    cms.draftUpdatedAt = null;
+    cms.publishedAt = new Date();
+    cms.publishStatus = 'published';
     const updated = await cms.save();
-    res.json(updated);
+    res.json(publicContent(req.params.page, updated));
+});
+
+const discardDraft = asyncHandler(async (req, res) => {
+    assertKnownPage(req, res);
+    const cms = await CMS.findOne({ pageName: req.params.page });
+    if (cms) {
+        cms.draftData = undefined;
+        cms.draftUpdatedAt = null;
+        await cms.save();
+    }
+    res.json({ discarded: true });
+});
+
+const getPreviewToken = asyncHandler(async (req, res) => {
+    assertKnownPage(req, res);
+    const cms = await CMS.findOne({ pageName: req.params.page });
+    if (!cms?.draftData) {
+        res.status(409);
+        throw new Error('Save a draft before previewing');
+    }
+    const token = jwt.sign({ purpose: 'cms-preview', page: req.params.page }, process.env.JWT_SECRET, { expiresIn: '10m' });
+    res.json({ token, expiresInSeconds: 600 });
+});
+
+const getPreviewPage = asyncHandler(async (req, res) => {
+    assertKnownPage(req, res);
+    let claims;
+    try { claims = jwt.verify(req.query.token || '', process.env.JWT_SECRET); }
+    catch { res.status(403); throw new Error('Preview link is invalid or expired'); }
+    if (claims.purpose !== 'cms-preview' || claims.page !== req.params.page) {
+        res.status(403);
+        throw new Error('Preview link does not match this page');
+    }
+    const cms = await CMS.findOne({ pageName: req.params.page });
+    if (!cms?.draftData) { res.status(404); throw new Error('Draft not found'); }
+    res.set('Cache-Control', 'private, no-store');
+    res.set('X-Robots-Tag', 'noindex, nofollow');
+    res.set('Referrer-Policy', 'no-referrer');
+    res.json(publicContent(req.params.page, cms, cms.draftData));
 });
 
 module.exports = {
     getAllPages,
     getPage,
+    getDraftPage,
     updatePage,
+    publishPage,
+    discardDraft,
+    getPreviewToken,
+    getPreviewPage,
 };

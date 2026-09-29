@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useDispatch, useSelector } from 'react-redux';
@@ -7,9 +8,11 @@ import { Heart, Info, Star, Truck } from '@phosphor-icons/react';
 import { toggleWishlist, selectIsWishlisted } from '@/redux/features/wishlistSlice';
 import styles from './RentalProductCard.module.css';
 
-export default function RentalProductCard({ product, handleAddToCart, cardW }) {
+export default function RentalProductCard({ product, handleAddToCart, cardW, fallbackImage }) {
     const dispatch = useDispatch();
     const isWishlisted = useSelector(selectIsWishlisted(product.id));
+    const [failedImage, setFailedImage] = useState(null);
+    const imageSrc = failedImage === product.image ? fallbackImage : product.image || fallbackImage;
     const rating = Math.max(0, Math.min(5, Number(product.rating) || 0));
     const reviews = product.reviews ?? product.reviewCount ?? 0;
     const hasOriginalPrice = Number(product.originalPrice) > Number(product.rentPrice);
@@ -18,7 +21,9 @@ export default function RentalProductCard({ product, handleAddToCart, cardW }) {
             <article className={styles.card}>
                 <div className={styles.image}>
                     <Link href={`/products/${product.id}`} aria-label={`View ${product.name}`} className={styles.imageLink}>
-                        <Image src={product.image} alt={product.name} fill unoptimized className={styles.productImage} />
+                        <Image src={imageSrc} alt={product.name} fill unoptimized className={styles.productImage} onError={() => {
+                            if (fallbackImage && imageSrc !== fallbackImage) setFailedImage(product.image);
+                        }} />
                     </Link>
                     <div className={styles.badges}>
                         {product.discount && <span>{product.discount}</span>}

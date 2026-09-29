@@ -1,4 +1,9 @@
 import PolicyPage from '@/components/PolicyPage';
+import { getPolicyMetadata } from '@/lib/policyMetadata';
+
+export async function generateMetadata() {
+    return getPolicyMetadata("shipping", "Shipping & Delivery", "/shipping");
+}
 
 const FALLBACK = `<h2>Shipping &amp; Delivery</h2>
 <p>We deliver rental products across major Indian cities within 48–72 hours of order confirmation and KYC approval.</p>

@@ -1,4 +1,5 @@
 'use client';
+import { cmsUrl } from '@/lib/cmsPreview';
 
 import React, { useEffect, useState } from 'react';
 import PageBanner from '@/components/PageBanner';
@@ -9,7 +10,7 @@ const API = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
 export default function FaqPage() {
     const [cms, setCms] = useState(null);
     useEffect(() => {
-        window.fetch(`${API}/api/cms/faq?t=${Date.now()}`)
+        window.fetch(cmsUrl('faq'))
             .then(r => r.ok ? r.json() : null)
             .then(d => { if (d) setCms(d); })
             .catch(() => {});

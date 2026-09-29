@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
+import { ArrowLeft } from '@phosphor-icons/react';
 import { logout } from '../../services/authService';
 
 // Exact avatar vector from the Figma "side-bar-settings" component (node 23050:11078).
@@ -73,21 +74,7 @@ export default function ProfileLayout({ children }) {
     // Sections that render with an UPPERCASE label + divider (everything except the standalone "Overview" link).
     const labeledSections = sidebarSections.filter((s) => s.label);
 
-    // Map each profile sub-page to a human-readable breadcrumb label.
-    const PAGE_NAMES = {
-        '/profile/overview':  'Overview',
-        '/profile/orders':    'My Orders',
-        '/profile/invoices':  'My Invoices',
-        '/profile/liked':     'Most Liked',
-        '/profile/addresses': 'Your Addresses',
-        '/profile/kyc':       'KYC & Documentation',
-        '/profile/settings':  'Profile Settings',
-        '/profile/methods':   'Payment Methods',
-        '/profile/contact':   'Get In Touch',
-    };
-    const currentPageName = PAGE_NAMES[pathname];
-    // Only show the breadcrumb on sub-pages (not on overview itself).
-    const showBreadcrumb = pathname !== '/profile/overview' && !!currentPageName;
+    const showOverviewBackLink = pathname !== '/profile/overview' && pathname !== '/profile';
 
     return (
         <div className="w-full bg-white min-h-screen" style={{ opacity: 1 }}>
@@ -166,23 +153,14 @@ export default function ProfileLayout({ children }) {
                         width, so a wide child (e.g. the invoices table) pushes the panel off screen
                         instead of scrolling inside it. */}
                     <div className="flex-1 min-w-0 w-full bg-white rounded-none lg:rounded-[20px] py-5 lg:px-5 lg:py-10 h-auto lg:self-start relative overflow-visible">
-                        {/* Breadcrumb — "Overview › Page Name", shown on all sub-pages */}
-                        {showBreadcrumb && (
-                            <div className="flex items-center gap-1.5 bg-[#f6f6f6] rounded-[6px] px-3 py-1.5 mb-4 self-start">
-                                <Link
-                                    href="/profile/overview"
-                                    className="text-[11px] lg:text-[12px] font-semibold text-[#545454] hover:text-[#333333] transition-colors tracking-[-0.4px] whitespace-nowrap"
-                                >
-                                    Overview
-                                </Link>
-                                {/* Chevron › */}
-                                <svg width="8" height="10" viewBox="0 0 8 12" fill="none" xmlns="http://www.w3.org/2000/svg" className="shrink-0">
-                                    <path d="M1.5 1L6.5 6L1.5 11" stroke="#afafaf" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-                                </svg>
-                                <span className="text-[11px] lg:text-[12px] font-semibold text-[#333333] tracking-[-0.4px] whitespace-nowrap">
-                                    {currentPageName}
-                                </span>
-                            </div>
+                        {showOverviewBackLink && (
+                            <Link
+                                href="/profile/overview"
+                                className="mb-3 inline-flex min-h-11 w-fit items-center gap-2 rounded-lg px-2 pr-3 text-[14px] font-semibold text-[#333333] transition-colors hover:bg-[#f6f6f6] hover:text-[#141414] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#141414] lg:hidden"
+                            >
+                                <ArrowLeft size={20} weight="bold" aria-hidden="true" />
+                                Back to overview
+                            </Link>
                         )}
                         {children}
                     </div>

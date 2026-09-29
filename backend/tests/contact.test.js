@@ -9,18 +9,33 @@ const User = require('../models/User');
 const Enquiry = require('../models/ContactEnquiry');
 const defaults = require('../config/contact-defaults.json');
 const { normalizeContent, validateEnquiry } = require('../utils/contactValidation');
+const { decodeLegacyContactContent } = require('../utils/legacyCmsContent');
+const sanitizeHtml = require('../utils/sanitizeHtml');
 const { errorHandler } = require('../middleware/errorMiddleware');
-const { updatePage, getPage } = require('../controllers/cmsController');
+const { updatePage, getPage, getDraftPage, publishPage } = require('../controllers/cmsController');
 const content=()=>normalizeContent({});
 const enquiry=()=>({submissionId:randomUUID(),intent:'rental',fullName:'QA Contact',phone:'+91 9999999999',email:'qa@example.com',city:'delhi',equipment:defaults.equipment[0],message:'Test enquiry',consent:true});
 function invoke(handler, req) { return new Promise((resolve,reject)=>{const res={statusCode:200,status(code){this.statusCode=code;return this;},json(body){resolve({status:this.statusCode,body});}};handler(req,res,error=>reject(Object.assign(error,{status:res.statusCode})));}); }
 test('contact defaults are identical in storefront and backend',()=>assert.deepEqual(require('../../frontend/src/config/contact-defaults.json'),defaults));
+test('contact content saved through the older pageContent field survives sanitizing',()=>{
+    const edited={...content(),title:'Talk to us & plan your rental',helpLinks:[{label:'How renting works',href:'/rental-process'}]};
+    const encoded=`contact-json-v1:${encodeURIComponent(JSON.stringify(edited))}`;
+    const restored=decodeLegacyContactContent(sanitizeHtml(encoded));
+    assert.equal(restored.title,edited.title);
+    assert.deepEqual(restored.helpLinks,edited.helpLinks);
+    assert.equal(normalizeContent(restored).title,edited.title);
+});
 test('CMS persists complete contact content independently of the legacy banner',async t=>{
     let stored={pageName:'contact',bannerImage:'/legacy.png',contactTitle:'Original heading'};
     t.mock.method(CMS,'findOne',async()=>{const doc=new CMS(stored);doc.save=async()=>{await doc.validate();stored=doc.toObject();return doc;};return doc;});
     const changed={...content(),heroShowText:false,heroBackground:'#123abc',title:'Updated heading',phone:'+91-9999819719'};
     changed.branches[0].phone='011-40735568';
     await invoke(updatePage,{params:{page:'contact'},body:{contactContent:changed}});
+    const before=(await invoke(getPage,{params:{page:'contact'}})).body;
+    assert.notEqual(before.contactContent.title,changed.title);
+    const draft=(await invoke(getDraftPage,{params:{page:'contact'}})).body;
+    assert.deepEqual(draft.contactContent,changed);
+    await invoke(publishPage,{params:{page:'contact'}});
     const result=(await invoke(getPage,{params:{page:'contact'}})).body;
     assert.deepEqual(result.contactContent,changed);assert.equal(result.bannerImage,'/legacy.png');assert.equal(result.contactTitle,'Original heading');
 });

@@ -1,0 +1,16 @@
+.card { display: grid; grid-template-columns: auto minmax(0, 1fr); align-items: center; gap: 10px 16px; width: 100%; padding: 12px; border: 1px solid #e2e2e2; border-radius: 14px; background: #fff; }
+.heading { display: flex; align-items: center; gap: 9px; color: #333; font: 600 14px/1.3 'Mona Sans', sans-serif; white-space: nowrap; }
+.icon { display: grid; flex: none; place-items: center; width: 38px; height: 38px; border-radius: 10px; background: #e7f8e9; color: #008f28; }
+.form { display: flex; min-width: 0; gap: 8px; }
+.form input { flex: 1; min-width: 0; min-height: 44px; padding: 10px 12px; border: 1px solid #c9c9c9; border-radius: 9px; background: #fff; color: #141414; font: 500 14px/1.3 'Mona Sans', sans-serif; }
+.form input::placeholder { color: #666; }
+.form input:focus-visible, .form button:focus-visible { outline: 2px solid #141414; outline-offset: 2px; }
+.form button { flex: none; min-width: 86px; min-height: 44px; padding: 10px 16px; border: 0; border-radius: 9px; background: #ffcf46; color: #141414; font: 700 14px/1.3 'Mona Sans', sans-serif; cursor: pointer; transition: background 160ms ease; }
+.form button:hover { background: #f5c332; }
+.form button:disabled { cursor: wait; opacity: .65; }
+.result { grid-column: 1 / -1; margin: 0; padding: 0 2px; font: 500 13px/1.45 'Mona Sans', sans-serif; }
+.success { color: #08712b; }
+.error { color: #b42318; }
+.srOnly { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; }
+@media (max-width: 640px) { .card { grid-template-columns: 1fr; } .form { width: 100%; } }
+@media (prefers-reduced-motion: reduce) { .form button { transition: none; } }
