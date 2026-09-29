@@ -704,7 +704,7 @@ const Navbar = ({ showCategories: propShowCategories } = {}) => {
                                 backgroundColor: "#FFFFFF"
                             }}
                         >
-                            <MapPin size={18} weight="fill" color="#667085" className="shrink-0" />
+                            <MapPin size={20} weight="regular" color="#1D1D1F" className="shrink-0" aria-hidden="true" />
                             <span className="text-[13px] font-medium truncate max-w-[70px]" style={{ color: "#174378" }}>{selectedCity || "Bangalore"}</span>
                         </button>
 
