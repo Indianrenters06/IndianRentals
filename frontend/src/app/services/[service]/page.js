@@ -1,7 +1,8 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { ArrowRightIcon, ArrowUpRightIcon, CheckCircleIcon, PlusIcon } from '@heroicons/react/24/outline';
+import { ArrowRightIcon, ArrowUpRightIcon, CheckCircleIcon } from '@heroicons/react/24/outline';
+import FaqSection from '@/components/FaqSection';
 import { SITE_URL, SITE_NAME } from '@/config/site';
 import ServiceProductPreview from './ServiceProductPreview';
 import { SERVICES, SERVICE_CITIES } from './serviceData';
@@ -158,22 +159,7 @@ export default async function ServicePage({ params, searchParams }) {
                         </div>
                     </section>
 
-                    <section aria-labelledby="faq-heading" className="grid gap-8 pt-16 md:grid-cols-[0.85fr_1.15fr] md:gap-14 md:pt-24">
-                        <div>
-                            <h2 id="faq-heading" className="text-[30px] font-semibold leading-tight tracking-[-0.035em] md:text-[40px]">Good to know</h2>
-                            <p className="mt-4 max-w-[390px] text-[16px] leading-7 text-[#545454]">A few common questions about this rental. Our team can confirm the details for your order.</p>
-                        </div>
-                        <div className="border-t border-[#d8d8d8]">
-                            {data.faqs.map((faq) => (
-                                <details key={faq.q} className="group border-b border-[#d8d8d8]">
-                                    <summary className="flex min-h-16 cursor-pointer list-none items-center justify-between gap-5 py-4 text-[16px] font-semibold leading-6 marker:hidden focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-[#141414] [&::-webkit-details-marker]:hidden">
-                                        {faq.q}<PlusIcon className="size-5 shrink-0 stroke-[1.8] transition-transform duration-200 group-open:rotate-45 motion-reduce:transition-none" aria-hidden="true" />
-                                    </summary>
-                                    <p className="max-w-[650px] pb-6 pr-8 text-[15px] leading-7 text-[#545454]">{faq.a}</p>
-                                </details>
-                            ))}
-                        </div>
-                    </section>
+                    <FaqSection cmsData={{ faqItems: data.faqs.map(({ q, a }) => ({ question: q, answer: a })), faqSubtitle: 'Good to know', faqTitle: `Everything you need to know about ${data.title.replace(/ in India$/, '').toLowerCase()}` }} pageName={`service-${service}`} />
 
                     <section aria-labelledby="quote-heading" className="mt-16 rounded-[26px] bg-[#141414] px-6 py-10 text-white sm:px-9 md:mt-24 md:flex md:items-end md:justify-between md:gap-10 md:rounded-[32px] md:px-12 md:py-12">
                         <div>

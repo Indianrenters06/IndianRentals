@@ -1,13 +1,13 @@
 "use client";
 import { cmsUrl } from '@/lib/cmsPreview';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useId } from 'react';
 import Image from 'next/image';
 import styles from './FaqSection.module.css';
 
 const faqs = [
     {
         question: "What is the minimum rental period?",
-        answer: "The minimum rental period for our products is 1 month. You can choose from flexible tenures of 1, 3, 6, or 12 months."
+        answer: "Rental periods vary by product. Some are available from 1 day, with weekly and monthly options too. Check the product page or ask our team to confirm the available terms."
     },
     {
         question: "Is maintenance included?",
@@ -26,6 +26,7 @@ const faqs = [
 import { API } from '@/services/apiConfig';
 
 const FaqSection = ({ cmsData, limit, pageName }) => {
+    const instanceId = useId().replace(/:/g, '');
     // CMS data fetched here; ignored when the parent passes cmsData directly.
     const [fetchedCms, setFetchedCms] = useState(null);
     const [fetching, setFetching] = useState(!cmsData);
@@ -97,12 +98,14 @@ const FaqSection = ({ cmsData, limit, pageName }) => {
 
     const legacyHomepageHeading = isHomepage && cms?.homepageFaqTitle === 'Frequently Asked Questions'
         && cms?.homepageFaqSubtitle === 'Everything you need to know about renting with us.';
+    const legacyFaqPageHeading = isFaqPage && cms?.faqTitle === 'FAQs'
+        && cms?.faqSubtitle === 'Everything you need to know about renting with IndianRenters.com';
     const title = isHomepage
         ? (legacyHomepageHeading ? "Everything you need to know about renting with IndianRenters.com" : (cms?.homepageFaqTitle || "Everything you need to know about renting with IndianRenters.com"))
-        : (cms?.faqTitle || "Everything you need to know about renting with IndianRenters.com");
+        : (legacyFaqPageHeading ? "Everything you need to know about renting with IndianRenters.com" : (cms?.faqTitle || "Everything you need to know about renting with IndianRenters.com"));
     const subtitle = isHomepage
         ? (legacyHomepageHeading ? "Welcome to FAQ!" : (cms?.homepageFaqSubtitle || "Welcome to FAQ!"))
-        : (cms?.faqSubtitle || "Welcome to FAQ!");
+        : (legacyFaqPageHeading ? "Welcome to FAQ!" : (cms?.faqSubtitle || "Welcome to FAQ!"));
 
     const toggleFaq = (index) => {
         if (activeIndices.includes(index)) {
@@ -145,7 +148,7 @@ const FaqSection = ({ cmsData, limit, pageName }) => {
                 <div className="w-full lg:flex-1 border-b border-[#EEEEEE]">
                     {displayFaqs.map((faq, index) => {
                         const open = activeIndices.includes(index);
-                        const answerId = `faq-answer-${pageName || 'default'}-${index}`;
+                        const answerId = `faq-answer-${instanceId}-${index}`;
                         return (
                             <div key={index} className="w-full flex flex-col items-start border-t border-[#EEEEEE]">
                                 <button

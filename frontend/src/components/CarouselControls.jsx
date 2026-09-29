@@ -8,7 +8,7 @@ import styles from './CarouselControls.module.css';
 /** Rail controls stay in normal flow; hero controls sit beside the banner. */
 export default function CarouselControls({ count, current = 0, label = 'Carousel', onPrevious, onNext, onSelect, previousDisabled = false, nextDisabled = false, playing, onTogglePlay, variant = 'rail' }) {
     if (count < 2) return null;
-    const useHeroicons = variant === 'hero' || label.toLowerCase() === 'categories';
+    const useHeroicons = variant === 'hero' || variant === 'campaign' || label.toLowerCase() === 'categories';
     const index = Math.max(0, Math.min(current, count - 1));
     return (
         <div className={`${styles.controls} ${styles[variant] || ''}`} role="group" aria-label={`${label} controls`}>

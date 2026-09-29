@@ -1,5 +1,6 @@
 "use client";
 import { cmsUrl } from '@/lib/cmsPreview';
+import { categoryHref } from '@/lib/categoryRoutes';
 import React, { useState, useEffect, useMemo } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -19,7 +20,7 @@ import CompareTenures from '../../../components/CompareTenures';
 import ProductDetailDrawer from '../../../components/ProductDetailDrawer';
 import DeliveryCheck from '../../../components/DeliveryCheck';
 
-import { Heart, Export as ExportIcon, Package, Truck, CalendarDots, MapPin, ArrowRight, ShieldCheck, CheckCircle, Wrench } from '@phosphor-icons/react';
+import { Heart, Export as ExportIcon, Package, Truck, CalendarDots, MapPin, ArrowRight, ShieldCheck, CheckCircle, Wrench, Sparkle, Cube, UserCircle, Bank } from '@phosphor-icons/react';
 import styles from './page.module.css';
 import { StarIcon } from '@heroicons/react/24/solid';
 
@@ -221,6 +222,13 @@ export default function ProductDetailPage() {
         { key: 'review', label: cms('TabReviewLabel', 'Give us a Review'), enabled: on('TabReview') },
     ].filter(t => t.enabled);
     const currentTab = tabs.some(t => t.key === activeTab) ? activeTab : 'details';
+    const benefitIcon = (label) => {
+        const name = String(label).toLowerCase();
+        if (/accessor|package/.test(name)) return Cube;
+        if (/repair|maintenance|support/.test(name)) return UserCircle;
+        if (/saniti|clean|hygien/.test(name)) return Bank;
+        return Sparkle;
+    };
 
     return (
         <div className="w-full flex flex-col items-center bg-white font-sans text-[#1D1D1F] tracking-tight antialiased">
@@ -230,23 +238,16 @@ export default function ProductDetailPage() {
             ══════════════════════════════════════════════ */}
             <div className="w-full flex flex-col md:hidden bg-white">
 
-                {/* ── Promo Banner ── */}
-                <div style={{ background: '#FFCF46', display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '4px 20px' }}>
-                    <p style={{ fontFamily: "'Mona Sans', sans-serif", fontWeight: 700, fontSize: '12px', lineHeight: '16px', letterSpacing: '-0.4px', color: '#333', whiteSpace: 'nowrap' }}>
-                        🖤 SAVE Extra 5% up to ₹100 on UPI Orders 🖤
-                    </p>
-                </div>
-
                 {/* ── Product Header ── */}
-                <div style={{ background: '#F6F6F6', display: 'flex', flexDirection: 'column', gap: '16px', padding: '20px', width: '100%', boxSizing: 'border-box', alignItems: 'stretch' }}>
+                <div className={styles.mobileProductHeader}>
 
                     {/* Breadcrumb */}
-                    <div style={{ display: 'flex', gap: '6px', alignItems: 'center', flexWrap: 'wrap' }}>
-                        <Link href="/" style={{ fontFamily: "'Mona Sans', sans-serif", fontSize: '8px', color: '#000', textDecoration: 'none' }}>Shop all</Link>
+                    <div className={styles.productBreadcrumb}>
+                        <Link href="/">Shop all</Link>
                         <span style={{ fontSize: '10px', color: '#999' }}>›</span>
-                        <span style={{ fontFamily: "'Mona Sans', sans-serif", fontSize: '8px', color: '#000' }}>{product.category || 'Category'}</span>
+                        <Link href={categoryHref(product.category || 'all')}>{product.category || 'Category'}</Link>
                         <span style={{ fontSize: '10px', color: '#999' }}>›</span>
-                        <span style={{ fontFamily: "'Mona Sans', sans-serif", fontWeight: 600, fontSize: '8px', color: '#000' }}>{product.name?.split(' ').slice(0, 2).join(' ')}</span>
+                        <strong>{product.name?.split(' ').slice(0, 2).join(' ')}</strong>
                     </div>
 
 
@@ -273,7 +274,7 @@ export default function ProductDetailPage() {
                                 src={galleryImages[mobileImageIndex] || mainImage}
                                 alt={product.name}
                                 fill
-                                className="object-cover"
+                                className="object-contain"
                                 priority
                                 sizes="300px"
                             />
@@ -286,11 +287,11 @@ export default function ProductDetailPage() {
                     </div>
 
                     {/* Product Pricing Card */}
-                    <div style={{ background: '#fff', border: '1px solid #E2E2E2', borderRadius: '12px', overflow: 'hidden', width: '100%', maxWidth: '560px', marginInline: 'auto' }}>
+                    <div className={styles.mobilePricingCard}>
 
                         {/* Title + rating */}
                         <div style={{ padding: '10px', borderBottom: '1px solid #E2E2E2', display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                            <h1 style={{ fontFamily: "'Mona Sans', sans-serif", fontWeight: 600, fontSize: '14px', lineHeight: '20px', letterSpacing: '-0.8px', color: '#292929', margin: 0 }}>
+                            <h1 className={styles.mobileProductTitle}>
                                 {product.name}
                             </h1>
                             <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
@@ -301,7 +302,7 @@ export default function ProductDetailPage() {
                                             <StarIcon key={s} style={{ width: '16px', height: '16px', color: s <= Math.round(product.rating || 4.5) ? '#FF920A' : '#e5e7eb' }} />
                                         ))}
                                     </div>
-                                    <span style={{ fontFamily: "'Mona Sans', sans-serif", fontWeight: 500, fontSize: '8px', color: '#333', letterSpacing: '-0.4px', whiteSpace: 'nowrap' }}>
+                                    <span style={{ fontFamily: "'Mona Sans', sans-serif", fontWeight: 500, fontSize: '11px', color: '#333', letterSpacing: '-0.2px', whiteSpace: 'nowrap' }}>
                                         {product.rating || '4.5'} ({product.numReviews || 12})
                                     </span>
                                 </div>
@@ -315,94 +316,39 @@ export default function ProductDetailPage() {
                             </div>
                         </div>
 
-                        {/* Tenure Slider — Mobile */}
-                        <div className={styles.tenurePanel} style={{ borderBottom: '1px solid #E2E2E2', display: 'flex', flexDirection: 'column', gap: '18px' }}>
-                            {/* Label row */}
-                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                                <span style={{ fontFamily: "'Mona Sans', sans-serif", fontWeight: 500, fontSize: '12px', lineHeight: '20px', letterSpacing: '-0.4px', color: '#1f1f1f', textDecoration: 'underline', textDecorationStyle: 'solid', textUnderlineOffset: '10%', textDecorationThickness: '8%' }}>
-                                    {cms('TenureSliderLabel', 'Select your minimum rental period')}
-                                </span>
-                                <span style={{ fontFamily: "'Mona Sans', sans-serif", fontWeight: 600, fontSize: '13px', color: '#1f1f1f', letterSpacing: '-0.4px' }}>
-                                    {`${duration} ${duration === 1 ? 'Month' : 'Months'}`}
-                                </span>
-                            </div>
-
-                            {/* Slider track + thumb + labels */}
-                            {(() => {
-                                const stepCount = tenures.length;
-                                const lastIdx = Math.max(stepCount - 1, 1);
-                                const matchIdx = tenures.findIndex(t => duration <= t.months);
-                                const currentStep = (matchIdx === -1 ? stepCount - 1 : matchIdx) + 1;
-                                const activePct = ((currentStep - 1) / lastIdx) * 100;
-                                const labels = tenures.map(t => t.label);
-                                return (
-                                    <div className={styles.tenureScale} style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                                        {/* Track */}
-                                        <div style={{ position: 'relative', width: '100%', height: '6px', display: 'flex', alignItems: 'center' }}>
-                                            <div style={{ position: 'absolute', width: '100%', height: '6px', background: '#e6e6e6', borderRadius: '31px', boxSizing: 'border-box' }} />
-                                            <div style={{ position: 'absolute', width: `${activePct}%`, height: '6px', background: '#e26e00', borderRadius: '31px', boxSizing: 'border-box' }} />
-                                            {/* Thumb */}
-                                            <div style={{ position: 'absolute', width: '16px', height: '16px', borderRadius: '50%', background: '#fff', border: '3px solid #e26e00', left: `calc(${activePct}% - 8px)`, transition: 'left 0.2s', zIndex: 10 }} />
-                                            {/* Hidden range input for touch/drag */}
-                                            <input
-                                                aria-label="Minimum rental period"
-                                                type="range"
-                                                min="1"
-                                                max={stepCount}
-                                                step="1"
-                                                value={currentStep}
-                                                onChange={(e) => {
-                                                    const step = parseInt(e.target.value);
-                                                    setDuration(tenures[step - 1]?.months || 1);
-                                                }}
-                                                style={{ position: 'absolute', width: '100%', opacity: 0, cursor: 'pointer', zIndex: 20, height: '24px', top: '-9px' }}
-                                            />
-                                        </div>
-                                        {/* Tick labels */}
-                                        <div style={{ position: 'relative', width: '100%', height: '20px' }}>
-                                            {labels.map((label, i) => {
-                                                const pct = (i / lastIdx) * 100;
-                                                return (
-                                                    <div key={i} style={{ position: 'absolute', left: `${pct}%`, transform: 'translateX(-50%)', display: 'flex', flexDirection: 'column', alignItems: 'center', pointerEvents: 'none' }}>
-                                                        <div style={{ width: '1px', height: '6px', background: '#bfbfbf' }} />
-                                                        <span style={{ fontFamily: "'Mona Sans', sans-serif", fontSize: '12px', fontWeight: 500, color: '#333', lineHeight: 1.2 }}>{label}</span>
-                                                    </div>
-                                                );
-                                            })}
-                                        </div>
-                                    </div>
-                                );
-                            })()}
-                        </div>
+                        {/* On narrow screens the full tenure selector lives in the comparison drawer. */}
+                        {on('Compare') && <button type="button" className={styles.mobileTermButton} onClick={() => setIsCompareOpen(true)}>
+                            <span>{cms('TenureSliderLabel', 'Pick your rental term')}</span>
+                            <strong>{duration} {monthWord(duration)} <FaChevronDown size={11} aria-hidden="true" /></strong>
+                        </button>}
 
                         {/* Price row */}
-                        <div style={{ display: 'flex', height: '45px', borderBottom: '1px solid #E2E2E2' }}>
+                            <div style={{ display: 'flex', minHeight: '52px', borderBottom: '1px solid #E2E2E2' }}>
                             <div style={{ flex: 1, display: 'flex', alignItems: 'center', gap: '4px', padding: '0 10px' }}>
-                                <span style={{ fontFamily: "'Mona Sans', sans-serif", fontWeight: 600, fontSize: '20px', lineHeight: '26px', letterSpacing: '-0.8px', color: '#E11D48' }}>
+                                <span style={{ fontFamily: "'Mona Sans', sans-serif", fontWeight: 600, fontSize: '20px', lineHeight: '26px', letterSpacing: '-0.8px', color: '#ed2115' }}>
                                     ₹{currentPlan.price}
                                 </span>
-                                <span style={{ fontFamily: "'Mona Sans', sans-serif", fontWeight: 500, fontSize: '10px', color: '#757575', letterSpacing: '-0.4px' }}>/mo</span>
-                                <span style={{ fontFamily: "'Mona Sans', sans-serif", fontWeight: 500, fontSize: '10px', color: '#757575', letterSpacing: '-0.4px', marginLeft: '2px' }}>
+                                <span style={{ fontFamily: "'Mona Sans', sans-serif", fontWeight: 500, fontSize: '12px', color: '#757575', letterSpacing: '-0.2px' }}>/mo</span>
+                                <span style={{ fontFamily: "'Mona Sans', sans-serif", fontWeight: 500, fontSize: '12px', color: '#757575', letterSpacing: '-0.2px', marginLeft: '2px' }}>
                                     for {duration} {duration === 1 ? 'month' : 'months'}
                                 </span>
                             </div>
                         </div>
 
-                        <div className="flex items-center justify-between gap-4 border-b border-[#e2e2e2] px-3 py-2 text-xs font-semibold text-[#141414]">
-                            {on('PriceBreakdown') && <button type="button" onClick={() => setActiveInfoDrawer('breakdown')} className="min-h-10 underline underline-offset-4">{cms('PriceBreakdownText', 'Full breakdown')}</button>}
-                            {on('Compare') && <button type="button" onClick={() => setIsCompareOpen(true)} className="min-h-10 underline underline-offset-4">{cms('CompareLinkText', 'See all tenures')}</button>}
-                        </div>
+                        {on('PriceBreakdown') && <div className={styles.mobileBreakdownRow}>
+                            <button type="button" onClick={() => setActiveInfoDrawer('breakdown')}>{cms('PriceBreakdownText', 'Full breakdown')}</button>
+                        </div>}
 
                         {/* View All Benefits */}
-                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '19px' }}>
+                        {on('ViewAllBenefits') && <div className={styles.viewBenefitsRow}>
                             <button type="button" onClick={() => document.getElementById('mobile-product-benefits')?.scrollIntoView({ behavior: 'smooth', block: 'center' })} style={{ fontFamily: "'Mona Sans', sans-serif", fontWeight: 700, fontSize: '12px', color: '#333', textDecoration: 'underline', letterSpacing: '-0.4px', cursor: 'pointer' }}>
-                                View All Benefits
+                                {cms('ViewAllBenefitsText', 'View All Benefits')}
                             </button>
-                        </div>
+                        </div>}
                     </div>
 
                     {/* What's included */}
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                    {on('Benefits') && <div className={styles.benefitsSection}>
                         <h3 style={{ fontFamily: "'Mona Sans', sans-serif", fontWeight: 600, fontSize: '12px', color: '#1F1F1F', letterSpacing: '-0.4px', margin: 0 }}>
                             {cms('BenefitsHeading', "What's included in your plan")}
                         </h3>
@@ -411,39 +357,39 @@ export default function ProductDetailPage() {
                                 'Fully Functional (100% Tested)', 'Original Accessories Included', 'Free Repairs & Maintenance', 'Professionally sanitized'
                             ])).map((b, i) => {
                                 const text = b.type || b;
-                                const Icon = [ShieldCheck, Package, Wrench, CheckCircle][i % 4];
+                                const Icon = benefitIcon(text);
                                 return (
                                     <div key={i} className={styles.benefitCard}>
-                                        <Icon size={24} color="#fff" weight="regular" style={{ flexShrink: 0 }} />
+                                        <Icon size={22} color="#fff" weight="regular" style={{ flexShrink: 0 }} />
                                         <span>{text}</span>
                                     </div>
                                 );
                             })}
                         </div>
-                    </div>
+                    </div>}
 
                     {/* Deposit + KYC Cards */}
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                        <div className={styles.noticeCard}>
-                            <span style={{ fontFamily: "'Mona Sans', sans-serif", fontWeight: 600, fontSize: '13px', color: '#333' }}>
+                    {(on('DepositCard') || on('KycCard')) && <div className={styles.noticeGrid}>
+                        {on('DepositCard') && <div className={`${styles.noticeCard} ${styles.depositCard}`}>
+                            <span style={{ fontFamily: "'Mona Sans', sans-serif", fontWeight: 600, fontSize: '13px' }}>
                                 {cms('DepositLabel', '100% Refundable Deposit')}
                             </span>
-                            <span style={{ fontFamily: "'Mona Sans', sans-serif", fontWeight: 700, fontSize: '15px', color: '#141414', textAlign: 'right' }}>
+                            <span style={{ fontFamily: "'Mona Sans', sans-serif", fontWeight: 700, fontSize: '15px', textAlign: 'right' }}>
                                 {product.securityDeposit != null ? `₹${Number(product.securityDeposit).toLocaleString('en-IN')}/-` : 'Confirmed at checkout'}
                             </span>
-                        </div>
-                        <div className={styles.noticeCard}>
+                        </div>}
+                        {on('KycCard') && <div className={`${styles.noticeCard} ${styles.kycCard}`}>
                             <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column' }}>
-                                <span style={{ fontFamily: "'Mona Sans', sans-serif", fontWeight: 600, fontSize: '13px', lineHeight: '20px', color: '#333' }}>
+                                <span style={{ fontFamily: "'Mona Sans', sans-serif", fontWeight: 600, fontSize: '13px', lineHeight: '20px' }}>
                                     {cms('KycLine1', 'Place Order & complete KYC anytime ')}
                                 </span>
-                                <span style={{ fontFamily: "'Mona Sans', sans-serif", fontWeight: 400, fontSize: '13px', lineHeight: '20px', color: '#333' }}>
+                                <span style={{ fontFamily: "'Mona Sans', sans-serif", fontWeight: 400, fontSize: '13px', lineHeight: '20px' }}>
                                     {cms('KycLine2', 'to get your items the next day')}
                                 </span>
                             </div>
                             <Image src={cms('KycImage', '/images/product/kyc-delivery.webp')} alt="" width={76} height={76} unoptimized className={styles.kycImage} />
-                        </div>
-                    </div>
+                        </div>}
+                    </div>}
 
                     {/* Book Your Plan CTA */}
                     <button
@@ -452,7 +398,6 @@ export default function ProductDetailPage() {
                         <span>
                             {cms('CtaTextMobile', 'Book Your Plan')}
                         </span>
-                        <ArrowRight size={22} aria-hidden="true" />
                     </button>
 
                     {/* Cancellation + Tenure Info */}
@@ -497,7 +442,7 @@ export default function ProductDetailPage() {
                         {/* Tab Buttons */}
                         <div style={{ display: 'flex', gap: '6px', alignItems: 'center', overflowX: 'auto' }}>
                             {tabs.filter(tab => tab.key !== 'review').map(tab => (
-                                <button key={tab.key} type="button" onClick={() => setActiveTab(tab.key)} className={`${styles.detailTab} ${tab.active ? styles.detailTabActive : ''}`}>
+                                <button key={tab.key} type="button" onClick={() => setActiveTab(tab.key)} className={`${styles.detailTab} ${currentTab === tab.key ? styles.detailTabActive : ''}`}>
                                     {tab.label}
                                 </button>
                             ))}
@@ -571,11 +516,11 @@ export default function ProductDetailPage() {
                 >
                     {/* Breadcrumb */}
                     {on('Breadcrumb') && (
-                        <div className="w-full max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8 text-[14px] font-medium text-[#586A84]">
+                        <div className="w-full max-w-[1264px] mx-auto px-4 sm:px-6 lg:px-8 text-[14px] font-medium text-[#586A84]">
                             <div className="flex items-center gap-2">
                                 <Link href={cms('BreadcrumbHomeLink', '/')} className="hover:text-black transition-colors">{cms('BreadcrumbHomeLabel', 'Shop all')}</Link>
                                 <span className="text-gray-300 text-[16px] leading-none mb-0.5">›</span>
-                                <Link href={`/category/${product.category?.toLowerCase() || 'all'}`} className="hover:text-black transition-colors">{product.category || 'Category'}</Link>
+                                <Link href={categoryHref(product.category || 'all')} className="hover:text-black transition-colors">{product.category || 'Category'}</Link>
                                 {product.subcategory?.name && (
                                     <>
                                         <span className="text-gray-300 text-[16px] leading-none mb-0.5">›</span>
@@ -586,12 +531,11 @@ export default function ProductDetailPage() {
                         </div>
                     )}
 
-                    <main className="w-full max-w-[1200px] mx-auto px-4 md:px-8">
+                    <main className="w-full max-w-[1264px] mx-auto px-4 md:px-8">
                         <div
-                            className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_536px] items-start max-w-[680px] lg:max-w-none mx-auto"
+                            className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_536px] items-start max-w-[560px] lg:max-w-none mx-auto"
                             style={{
                                 width: '100%',
-                                minHeight: '809.73px',
                                 gap: '16px',
                                 opacity: 1
                             }}
@@ -599,7 +543,7 @@ export default function ProductDetailPage() {
 
                             {/* Left Column - Images Gallery */}
                             <div
-                                className="flex flex-col"
+                                className={`flex flex-col ${styles.stickyGallery}`}
                                 style={{
                                     width: '100%',
                                     gap: '10px',
@@ -669,7 +613,7 @@ export default function ProductDetailPage() {
                                                         src={img}
                                                         alt={`${product.name} - ${index}`}
                                                         fill
-                                                        className="object-cover"
+                                                        className="object-contain"
                                                         sizes="(max-width: 768px) 100vw, 50vw"
                                                         priority={index === 0}
                                                     />
@@ -1140,13 +1084,13 @@ export default function ProductDetailPage() {
                                                 "Fully Functional (100% Tested)", "Free Repairs & Maintenance", "Original Accessories Included", "Professionally sanitized"
                                             ])).map((benefit, idx) => {
                                                 const benefitText = benefit.type || benefit;
-                                                const Icon = [ShieldCheck, Wrench, Package, CheckCircle][idx % 4];
+                                                const Icon = benefitIcon(benefitText);
                                                 return (
                                                     <div
                                                         key={idx}
                                                         className={styles.benefitCard}
                                                     >
-                                                        <div className="shrink-0 flex items-center justify-center"><Icon size={24} color="#fff" weight="regular" /></div>
+                                                        <div className="shrink-0 flex items-center justify-center"><Icon size={20} color="#fff" weight="regular" /></div>
                                                         <span>
                                                             {benefitText}
                                                         </span>
@@ -1161,22 +1105,22 @@ export default function ProductDetailPage() {
                                 {/* Deposit & KYC Information Row */}
                                 {(on('DepositCard') || on('KycCard')) && (
                                     <div
-                                        className="flex flex-col lg:flex-row gap-[6px] lg:items-center"
+                                        className={styles.noticeGrid}
                                         style={{ width: '100%' }}
                                     >
                                         {/* Refundable Deposit Card */}
                                         {on('DepositCard') && (
                                             <div
-                                                className={`${styles.noticeCard} w-full flex items-center justify-between`}
+                                                className={`${styles.noticeCard} ${styles.depositCard} w-full flex items-center justify-between`}
                                                 style={{
                                                     flex: 1,
                                                     minWidth: 0,
                                                 }}
                                             >
-                                                <span style={{ fontFamily: '"Mona Sans", sans-serif', fontWeight: 600, fontSize: '13px', lineHeight: '18px', color: '#333' }}>
+                                                <span style={{ fontFamily: '"Mona Sans", sans-serif', fontWeight: 600, fontSize: '13px', lineHeight: '18px' }}>
                                                     {cms('DepositLabel', '100% Refundable Deposit')}
                                                 </span>
-                                                <span style={{ fontFamily: '"Mona Sans", sans-serif', fontWeight: 700, fontSize: '16px', lineHeight: '23px', color: '#141414', textAlign: 'right' }}>
+                                                <span style={{ fontFamily: '"Mona Sans", sans-serif', fontWeight: 700, fontSize: '16px', lineHeight: '23px', textAlign: 'right' }}>
                                                     {product.securityDeposit != null ? `₹${Number(product.securityDeposit).toLocaleString('en-IN')}/-` : 'Confirmed at checkout'}
                                                 </span>
                                             </div>
@@ -1185,17 +1129,17 @@ export default function ProductDetailPage() {
                                         {/* KYC & Delivery Card */}
                                         {on('KycCard') && (
                                             <div
-                                                className={`${styles.noticeCard} w-full flex items-center justify-between overflow-hidden`}
+                                                className={`${styles.noticeCard} ${styles.kycCard} w-full flex items-center justify-between overflow-hidden`}
                                                 style={{
                                                     flex: 1,
                                                     minWidth: 0,
                                                 }}
                                             >
                                                 <div className="flex flex-col justify-center" style={{ flex: 1, minWidth: 0 }}>
-                                                    <span style={{ fontFamily: '"Mona Sans", sans-serif', fontWeight: 600, fontSize: '13px', lineHeight: '18px', color: '#333' }}>
+                                                    <span style={{ fontFamily: '"Mona Sans", sans-serif', fontWeight: 600, fontSize: '13px', lineHeight: '18px' }}>
                                                         {cms('KycLine1', 'Place Order & complete KYC anytime')}
                                                     </span>
-                                                    <span style={{ fontFamily: '"Mona Sans", sans-serif', fontWeight: 400, fontSize: '13px', lineHeight: '18px', color: '#333' }}>
+                                                    <span style={{ fontFamily: '"Mona Sans", sans-serif', fontWeight: 400, fontSize: '13px', lineHeight: '18px' }}>
                                                         {cms('KycLine2', 'to get your items the next day')}
                                                     </span>
                                                 </div>
@@ -1210,17 +1154,10 @@ export default function ProductDetailPage() {
                                     onClick={handleAddToCart}
                                     className={styles.primaryCta}
                                 >
-                                    <span style={{
-                                        fontFamily: '"Mona Sans", sans-serif',
-                                        fontWeight: 600,
-                                        fontSize: '16px',
-                                        letterSpacing: '-0.4px',
-                                        color: '#333333'
-                                    }}>
+                                    <span style={{ fontFamily: '"Mona Sans", sans-serif', fontWeight: 600, fontSize: '16px', letterSpacing: '-0.4px', color: '#333333' }}>
                                         <span className="lg:hidden">{cms('CtaTextMobile', 'Book Your Plan')}</span>
                                         <span className="hidden lg:inline">{cms('CtaText', 'Rent Now')}</span>
                                     </span>
-                                    <ArrowRight size={22} aria-hidden="true" />
                                 </button>
 
                                 {/* High-Fidelity Info Row */}
@@ -1479,6 +1416,7 @@ export default function ProductDetailPage() {
             </div>{/* ── END DESKTOP ── */}
 
             <CompareTenures
+                key={duration}
                 isOpen={isCompareOpen}
                 onClose={() => setIsCompareOpen(false)}
                 selectedTenure={duration}
@@ -1495,13 +1433,19 @@ export default function ProductDetailPage() {
                 </dl>
                 <p className="mt-5 text-sm text-[#545454]">Taxes and any other charges are confirmed at checkout.</p>
             </ProductDetailDrawer>
-            <ProductDetailDrawer isOpen={activeInfoDrawer === 'cancel'} onClose={() => setActiveInfoDrawer(null)} title="Cancellation and returns">
-                <p>{product.returnPolicy || cms('DefaultReturnPolicy', 'Review the return policy or contact support for the terms that apply to this rental.')}</p>
-                <Link href="/return-policy" className="mt-6 inline-flex min-h-11 items-center font-semibold text-[#141414] underline underline-offset-4">Read return policy</Link>
+            <ProductDetailDrawer isOpen={activeInfoDrawer === 'cancel'} onClose={() => setActiveInfoDrawer(null)} title="Cancellation & Returns" icon={Truck} description="Review the terms that apply before changing your rental.">
+                <h3 className="text-lg font-semibold text-[#333]">1. Cancellation before delivery</h3>
+                <p className="mt-3 text-sm leading-relaxed text-[#555]">Contact our support team if you need to cancel before your product is delivered. They can confirm the charges, if any, for your order.</p>
+                <h3 className="mt-6 text-lg font-semibold text-[#333]">2. Return policy</h3>
+                <p className="mt-3 text-sm leading-relaxed text-[#555]">{product.returnPolicy || cms('DefaultReturnPolicy', 'Review the return policy or contact support for the terms that apply to this rental.')}</p>
+                <Link href="/return-policy" className="mt-5 inline-flex min-h-11 items-center font-semibold text-[#141414] underline underline-offset-4">Read full return policy</Link>
             </ProductDetailDrawer>
-            <ProductDetailDrawer isOpen={activeInfoDrawer === 'extend'} onClose={() => setActiveInfoDrawer(null)} title="Extend your rental">
-                <p>{cms('ExtendCardBody', 'Contact support before your current rental period ends to discuss available terms and pricing.')}</p>
-                <Link href={cms('ExtendCardLink', '/contact') === '#' ? '/contact' : cms('ExtendCardLink', '/contact')} className="mt-6 inline-flex min-h-11 items-center font-semibold text-[#141414] underline underline-offset-4">Contact support</Link>
+            <ProductDetailDrawer isOpen={activeInfoDrawer === 'extend'} onClose={() => setActiveInfoDrawer(null)} title="Extend your rental" icon={CalendarDots} description="Choose what happens when your current term ends.">
+                <h3 className="text-lg font-semibold text-[#333]">1. Request an extension</h3>
+                <p className="mt-3 text-sm leading-relaxed text-[#555]">{cms('ExtendCardBody', 'Contact support before your current rental period ends to discuss available terms and pricing.')}</p>
+                <h3 className="mt-6 text-lg font-semibold text-[#333]">2. Confirm your new term</h3>
+                <p className="mt-3 text-sm leading-relaxed text-[#555]">Our team will confirm the available tenure and monthly rent for your product before the extension starts.</p>
+                <Link href={cms('ExtendCardLink', '/contact') === '#' ? '/contact' : cms('ExtendCardLink', '/contact')} className="mt-5 inline-flex min-h-11 items-center font-semibold text-[#141414] underline underline-offset-4">Contact support</Link>
             </ProductDetailDrawer>
         </div>
     );
