@@ -112,7 +112,7 @@ export default function AddressesPage() {
             ) : (
                 <div className="space-y-3">
                     {addresses.map(address => (
-                        <article key={address.id} className={'relative rounded-xl border px-4 py-4 transition-colors sm:px-5 ' + (address.isDefault ? 'border-[#0075ff]' : 'border-[#e2e2e2] hover:border-[#afafaf]')}>
+                        <article key={address.id} className={'relative rounded-xl border-2 px-4 py-4 transition-colors sm:px-5 ' + (address.isDefault ? 'border-[#0075ff]' : 'border-[#e2e2e2] hover:border-[#afafaf]')}>
                             {address.isDefault && <span className="absolute right-0 top-0 inline-flex items-center gap-1 rounded-bl-xl rounded-tr-[11px] bg-[#0075ff] px-2 py-1 text-xs font-semibold text-white"><Check size={14} weight="bold" aria-hidden="true" /><span className="sr-only sm:not-sr-only">Default</span></span>}
                             <div className="flex items-start gap-3 pr-10 sm:pr-24">
                                 <UserCircle size={30} weight="fill" className="mt-0.5 shrink-0 text-[#333]" aria-hidden="true" />

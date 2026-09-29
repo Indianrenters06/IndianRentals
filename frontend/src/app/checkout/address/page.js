@@ -26,6 +26,8 @@ export default function AddressPage() {
     const [editingAddress, setEditingAddress] = useState(null);
     const [isSaving, setIsSaving] = useState(false);
     const [saveError, setSaveError] = useState('');
+    const [isSelecting, setIsSelecting] = useState(false);
+    const [selectionError, setSelectionError] = useState('');
 
     // Load the user's saved addresses on mount
     useEffect(() => {
@@ -80,11 +82,26 @@ export default function AddressPage() {
             const list = await deleteAddress(id);
             setAddresses(list);
             if (selectedAddressId === id) {
-                setSelectedAddressId(list[0] ? list[0].id : null);
+                setSelectedAddressId((list.find(a => a.isDefault) || list[0])?.id || null);
             }
         } catch (err) {
             console.error('Failed to delete address:', err);
             alert('Could not delete the address. Please try again.');
+        }
+    };
+
+    const handleSelectAddress = async (id) => {
+        if (isSelecting || id === selectedAddressId) return;
+        setSelectionError('');
+        setIsSelecting(true);
+        try {
+            const list = await updateAddress(id, { isDefault: true });
+            setAddresses(list);
+            setSelectedAddressId(id);
+        } catch {
+            setSelectionError('Could not select this address. Please try again.');
+        } finally {
+            setIsSelecting(false);
         }
     };
 
@@ -97,7 +114,7 @@ export default function AddressPage() {
                 list = await updateAddress(editingAddress.id, formData);
             } else {
                 const before = new Set(addresses.map(a => a.id));
-                list = await addAddress(formData);
+                list = await addAddress({ ...formData, isDefault: true });
                 // Auto-select the newly added address
                 const added = list.find(a => !before.has(a.id));
                 if (added) setSelectedAddressId(added.id);
@@ -179,19 +196,26 @@ export default function AddressPage() {
                             return (
                                 <div
                                     key={addr.id}
-                                    onClick={() => setSelectedAddressId(addr.id)}
-                                    className="relative flex items-center justify-between overflow-hidden rounded-[12px] px-[16px] py-[20px] w-full bg-white cursor-pointer transition-all hover:shadow-md shrink-0"
-                                    style={{ border: isSelected ? '1.5px solid #0075ff' : '1.5px solid #e2e2e2' }}
+                                    className="relative flex items-center justify-between overflow-hidden rounded-[12px] border-2 px-[16px] py-[20px] w-full bg-white transition-colors hover:shadow-md shrink-0"
+                                    style={{ borderColor: isSelected ? '#0075ff' : '#e2e2e2' }}
                                 >
+                                    <button
+                                        type="button"
+                                        onClick={() => handleSelectAddress(addr.id)}
+                                        aria-pressed={isSelected}
+                                        aria-label={`Deliver to ${addr.name}, ${addr.addressLine}, ${addr.city}`}
+                                        disabled={isSelecting}
+                                        className="absolute inset-0 z-0 cursor-pointer rounded-[10px] focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-[#0075ff] disabled:cursor-wait"
+                                    />
                                     {/* Selected corner tab */}
                                     {isSelected && (
-                                        <div className="absolute top-[-0.75px] right-[-0.75px] w-[35px] h-[25px] bg-[#0075ff] rounded-bl-[12px] flex items-center justify-center z-10">
+                                        <div className="pointer-events-none absolute top-[-0.75px] right-[-0.75px] w-[35px] h-[25px] bg-[#0075ff] rounded-bl-[12px] flex items-center justify-center z-10">
                                             <FaCheck className="text-white text-[11px]" />
                                         </div>
                                     )}
 
                                     {/* Left: icon + details */}
-                                    <div className="flex gap-[12px] items-start min-w-0">
+                                    <div className="pointer-events-none relative z-10 flex gap-[12px] items-start min-w-0">
                                         <UserCircle size={40} weight="fill" className="text-[#1f1f1f] shrink-0" />
                                         <div className="flex flex-col gap-[6px] min-w-0">
                                             <p className="font-medium text-[16px] text-[#333] tracking-[-0.4px] leading-[23px]">{addr.name}</p>
@@ -209,7 +233,7 @@ export default function AddressPage() {
                                     </div>
 
                                     {/* Right: trash + edit */}
-                                    <div className="flex flex-col items-center justify-center gap-[5px] shrink-0">
+                                    <div className="relative z-20 flex flex-col items-center justify-center gap-[5px] shrink-0">
                                         <button
                                             onClick={(e) => handleDeleteClick(e, addr.id)}
                                             className="text-[#333] hover:text-red-500 transition-colors"
@@ -225,10 +249,12 @@ export default function AddressPage() {
                             );
                         })}
 
+                        {selectionError && <p role="alert" className="text-sm text-[#b14413]">{selectionError}</p>}
+
                         {/* Continue */}
                         <button
                             onClick={handleContinue}
-                            disabled={!selectedAddressId}
+                            disabled={!selectedAddressId || isSelecting}
                             className="btn-primary self-start h-[35px] disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                             <span className="font-medium text-[16px] text-[#1f1f1f] tracking-[-0.4px] leading-[23px]" style={{ fontFamily: "'Mona Sans', sans-serif" }}>Continue for KYC process</span>

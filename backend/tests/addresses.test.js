@@ -1,7 +1,7 @@
 const { test } = require('node:test');
 const assert = require('node:assert/strict');
 const User = require('../models/User');
-const { getAddresses, addAddress } = require('../controllers/userController');
+const { getAddresses, addAddress, updateAddress } = require('../controllers/userController');
 const { getAllUsers } = require('../controllers/adminController');
 
 function invoke(handler, req) {
@@ -45,8 +45,19 @@ test('a customer address is saved on that user, returned to them, and visible in
     assert.equal(first.addresses[0].role, undefined);
     assert.equal(second.addresses.length, 0);
 
+    await invoke(addAddress, { user: { _id: first._id }, body: { ...address, addressLine: '34 Second Road' } });
+    const selectedId = first.addresses[1]._id;
+    await invoke(updateAddress, {
+        user: { _id: first._id },
+        params: { addressId: String(selectedId) },
+        body: { isDefault: true },
+    });
+    assert.equal(first.addresses[0].isDefault, false);
+    assert.equal(first.addresses[1].isDefault, true);
+
     const own = await invoke(getAddresses, { user: { _id: first._id } });
     assert.equal(own.body[0].addressLine, address.addressLine);
+    assert.equal(own.body[1].isDefault, true);
     const other = await invoke(getAddresses, { user: { _id: second._id } });
     assert.equal(other.body.length, 0);
 
