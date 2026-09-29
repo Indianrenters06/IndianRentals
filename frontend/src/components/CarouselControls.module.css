@@ -13,6 +13,10 @@
 .button:focus-visible, .segment:focus-visible { outline: 2px solid var(--color-grey-900); outline-offset: 3px; }
 @media (prefers-reduced-motion: reduce) { .button, .segment span, .track > span { transition: none; } }
 
+/* Category and product rails use circular, full-size navigation targets. */
+.rail .arrow { width: 44px; height: 44px; border-radius: 50%; }
+.rail .arrow::before { inset: 0; }
+
 /* Keep the Figma hero arrows beside the image, with a compact in-image indicator. */
 .hero { position: absolute; inset: 0; z-index: 20; padding: 0; pointer-events: none; }
 .hero .progress { position: absolute; bottom: 17px; left: 50%; transform: translateX(-50%); display: flex; flex: none; width: auto; gap: 7px; padding: 4px 10px; border-radius: 999px; background: #141414a8; backdrop-filter: blur(8px); }
