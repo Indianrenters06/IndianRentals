@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Check, PencilSimple, Plus, Trash, UserCircle } from '@phosphor-icons/react';
+import { ArrowClockwise, Check, MapPin, PencilSimple, Plus, Trash, UserCircle } from '@phosphor-icons/react';
 import AddressModal from '../../../components/AddressModal';
 import { getAddresses, addAddress, updateAddress, deleteAddress } from '../../../services/addressService';
 import { profileTitleClassName } from '../profileTitle';
@@ -12,6 +12,7 @@ export default function AddressesPage() {
     const [addresses, setAddresses] = useState([]);
     const [loading, setLoading] = useState(true);
     const [loadError, setLoadError] = useState('');
+    const [refreshKey, setRefreshKey] = useState(0);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingAddress, setEditingAddress] = useState(null);
     const [isSaving, setIsSaving] = useState(false);
@@ -19,12 +20,14 @@ export default function AddressesPage() {
 
     useEffect(() => {
         let active = true;
+        setLoading(true);
+        setLoadError('');
         getAddresses()
             .then(list => { if (active) setAddresses(list); })
             .catch(() => { if (active) setLoadError('Could not load your addresses. Please refresh and try again.'); })
             .finally(() => { if (active) setLoading(false); });
         return () => { active = false; };
-    }, []);
+    }, [refreshKey]);
 
     useEffect(() => {
         if (new URLSearchParams(window.location.search).get('add') !== '1') return;
@@ -96,19 +99,28 @@ export default function AddressesPage() {
             </div>
             <div className="mb-7 mt-3 h-px w-full bg-[#e2e2e2] lg:mb-8" />
 
-            <button type="button" onClick={openAdd} className="mb-5 inline-flex min-h-11 items-center justify-center gap-2 rounded-full bg-[#333] px-5 text-sm font-medium text-white transition-colors hover:bg-[#141414] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#ffcf46]">
-                <Plus size={18} weight="bold" aria-hidden="true" /> Add New Address
-            </button>
+            {!loading && !loadError && addresses.length > 0 && (
+                <button type="button" onClick={openAdd} className="mb-5 inline-flex min-h-11 items-center justify-center gap-2 rounded-full bg-[#333] px-5 text-sm font-medium text-white transition-colors hover:bg-[#141414] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#ffcf46]">
+                    <Plus size={18} weight="bold" aria-hidden="true" /> Add New Address
+                </button>
+            )}
 
-            {loadError && <p role="alert" className="mb-5 rounded-lg border border-[#e2e2e2] bg-[#f6f6f6] px-4 py-3 text-sm text-[#333]">{loadError}</p>}
             {loading ? (
-                <p className="py-12 text-sm text-[#757575]">Loading your addresses…</p>
+                <p className="py-12 text-sm text-[#545454]" role="status">Loading your addresses…</p>
+            ) : loadError ? (
+                <section className="mt-3 flex min-h-[300px] flex-col items-center justify-center rounded-2xl border border-[#e2e2e2] bg-[#f6f6f6] px-6 py-10 text-center" role="alert">
+                    <span className="mb-6 flex size-20 items-center justify-center rounded-[16px] bg-white text-[#141414]"><MapPin size={38} weight="regular" aria-hidden="true" /></span>
+                    <h2 className="text-[24px] font-semibold leading-tight tracking-[-0.03em] text-[#141414] sm:text-[28px]">We couldn’t load your addresses</h2>
+                    <p className="mt-2 max-w-[420px] text-[16px] leading-6 text-[#545454]">Please check your connection and try again.</p>
+                    <button type="button" onClick={() => setRefreshKey(key => key + 1)} className="mt-6 inline-flex min-h-11 items-center justify-center gap-2 rounded-full bg-[#ffcf46] px-6 text-[15px] font-semibold text-[#141414] transition-colors hover:bg-[#f3bf35] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#141414]"><ArrowClockwise size={18} weight="bold" aria-hidden="true" />Try again</button>
+                </section>
             ) : addresses.length === 0 ? (
-                <div className="rounded-xl border border-[#e2e2e2] px-6 py-12 text-center sm:py-16">
-                    <UserCircle size={42} className="mx-auto mb-3 text-[#afafaf]" aria-hidden="true" />
-                    <p className="font-medium text-[#333]">No addresses saved yet.</p>
-                    <p className="mt-1 text-sm text-[#757575]">Add a delivery address to make checkout faster.</p>
-                </div>
+                <section className="mt-3 flex min-h-[340px] flex-col items-center justify-center rounded-2xl border border-[#e2e2e2] bg-[#f6f6f6] px-6 py-10 text-center sm:min-h-[380px] sm:px-10">
+                    <span className="mb-6 flex size-20 items-center justify-center rounded-[16px] bg-white text-[#141414]"><MapPin size={38} weight="regular" aria-hidden="true" /></span>
+                    <h2 className="text-[24px] font-semibold leading-tight tracking-[-0.03em] text-[#141414] sm:text-[28px]">No addresses yet</h2>
+                    <p className="mt-2 max-w-[420px] text-[16px] leading-6 text-[#545454]">Save a delivery address so it’s ready when you check out.</p>
+                    <button type="button" onClick={openAdd} className="mt-6 inline-flex min-h-11 items-center justify-center gap-2 rounded-full bg-[#ffcf46] px-6 text-[15px] font-semibold text-[#141414] transition-colors hover:bg-[#f3bf35] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#141414]"><Plus size={18} weight="bold" aria-hidden="true" />Add an address</button>
+                </section>
             ) : (
                 <div className="space-y-3">
                     {addresses.map(address => (
