@@ -1,25 +1,28 @@
 import styles from './page.module.css';
 
-const rows = [
-  { question: 'How do you pay?', buy: 'Pay the purchase price upfront.', rent: 'Pay a monthly rental fee.' },
-  { question: 'Who handles repairs?', buy: 'Arrange and pay for repairs.', rent: 'Repairs and maintenance are included in the rental plan.' },
-  { question: 'What happens later?', buy: 'Keep, sell, or dispose of the device.', rent: 'Return it or discuss a longer rental.' },
+const choices = [
+  { question: 'What do you pay?', buy: 'The full purchase price upfront.', rent: 'Monthly rent and a refundable deposit.' },
+  { question: 'Who handles repairs?', buy: 'You arrange and pay for repairs.', rent: 'Repairs and maintenance are included in the rental plan.' },
+  { question: 'When your plans change?', buy: 'Keep, sell, or dispose of the device.', rent: 'Return it or discuss a longer rental.' },
 ];
 
 export default function SimpleRentComparison() {
   return (
     <section className={styles.simpleCompare} aria-labelledby="simple-rent-comparison-heading">
       <div className={styles.simpleCompareInner}>
-        <h2 id="simple-rent-comparison-heading">A simpler way to compare.</h2>
-        <p className={styles.simpleCompareIntro}>Three practical questions to help you decide whether buying or renting fits your plans.</p>
-        <div className={styles.compareHead} aria-hidden="true"><span /> <span>Buy</span><span>Rent</span></div>
-        <div className={styles.compareRows}>
-          {rows.map((row) => (
-            <div className={styles.compareRow} key={row.question}>
-              <strong>{row.question}</strong>
-              <span data-label="Buy">{row.buy}</span>
-              <span data-label="Rent">{row.rent}</span>
-            </div>
+        <div className={styles.compareIntroBlock}>
+          <h2 id="simple-rent-comparison-heading">Buy or rent? See what changes.</h2>
+          <p className={styles.simpleCompareIntro}>Compare the costs, care, and next step before choosing what fits your plans.</p>
+        </div>
+        <div className={styles.compareBento}>
+          {choices.map((choice, index) => (
+            <article className={`${styles.compareTile} ${index === 0 ? styles.compareTileFeature : ''}`} key={choice.question}>
+              <h3>{choice.question}</h3>
+              <div className={styles.compareChoices}>
+                <div className={styles.compareChoiceBuy}><span>Buy</span><p>{choice.buy}</p></div>
+                <div className={styles.compareChoiceRent}><span>Rent</span><p>{choice.rent}</p></div>
+              </div>
+            </article>
           ))}
         </div>
       </div>

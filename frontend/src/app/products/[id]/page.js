@@ -229,6 +229,9 @@ export default function ProductDetailPage() {
         if (/saniti|clean|hygien/.test(name)) return Bank;
         return Sparkle;
     };
+    const benefitItems = (product.benefits?.length > 0 ? product.benefits : (pageLayout?.productPageBenefits || [
+        'Fully Functional (100% Tested)', 'Original Accessories Included', 'Free Repairs & Maintenance', 'Professionally sanitized'
+    ])).map(benefit => benefit.type || benefit);
 
     return (
         <div className="w-full flex flex-col items-center bg-white font-sans text-[#1D1D1F] tracking-tight antialiased">
@@ -341,7 +344,7 @@ export default function ProductDetailPage() {
 
                         {/* View All Benefits */}
                         {on('ViewAllBenefits') && <div className={styles.viewBenefitsRow}>
-                            <button type="button" onClick={() => document.getElementById('mobile-product-benefits')?.scrollIntoView({ behavior: 'smooth', block: 'center' })} style={{ fontFamily: "'Mona Sans', sans-serif", fontWeight: 700, fontSize: '12px', color: '#333', textDecoration: 'underline', letterSpacing: '-0.4px', cursor: 'pointer' }}>
+                            <button type="button" onClick={() => setActiveInfoDrawer('benefits')} className={styles.viewBenefitsButton}>
                                 {cms('ViewAllBenefitsText', 'View All Benefits')}
                             </button>
                         </div>}
@@ -353,10 +356,7 @@ export default function ProductDetailPage() {
                             {cms('BenefitsHeading', "What's included in your plan")}
                         </h3>
                         <div id="mobile-product-benefits" className={styles.benefitGrid}>
-                            {(product.benefits?.length > 0 ? product.benefits : (pageLayout?.productPageBenefits || [
-                                'Fully Functional (100% Tested)', 'Original Accessories Included', 'Free Repairs & Maintenance', 'Professionally sanitized'
-                            ])).map((b, i) => {
-                                const text = b.type || b;
+                            {benefitItems.map((text, i) => {
                                 const Icon = benefitIcon(text);
                                 return (
                                     <div key={i} className={styles.benefitCard}>
@@ -379,14 +379,7 @@ export default function ProductDetailPage() {
                             </span>
                         </div>}
                         {on('KycCard') && <div className={`${styles.noticeCard} ${styles.kycCard}`}>
-                            <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column' }}>
-                                <span style={{ fontFamily: "'Mona Sans', sans-serif", fontWeight: 600, fontSize: '13px', lineHeight: '20px' }}>
-                                    {cms('KycLine1', 'Place Order & complete KYC anytime ')}
-                                </span>
-                                <span style={{ fontFamily: "'Mona Sans', sans-serif", fontWeight: 400, fontSize: '13px', lineHeight: '20px' }}>
-                                    {cms('KycLine2', 'to get your items the next day')}
-                                </span>
-                            </div>
+                            <p className={styles.kycSentence}>{cms('KycLine1', 'Place Order & complete KYC anytime').trim()} {cms('KycLine2', 'to get your items the next day').trim()}</p>
                             <Image src={cms('KycImage', '/images/product/kyc-delivery.webp')} alt="" width={76} height={76} unoptimized className={styles.kycImage} />
                         </div>}
                     </div>}
@@ -440,9 +433,9 @@ export default function ProductDetailPage() {
                     {/* Product Details Tabs */}
                     {on('Tabs') && <div className={styles.detailsPanel}>
                         {/* Tab Buttons */}
-                        <div style={{ display: 'flex', gap: '6px', alignItems: 'center', overflowX: 'auto' }}>
+                        <div className={styles.detailTabs}>
                             {tabs.filter(tab => tab.key !== 'review').map(tab => (
-                                <button key={tab.key} type="button" onClick={() => setActiveTab(tab.key)} className={`${styles.detailTab} ${currentTab === tab.key ? styles.detailTabActive : ''}`}>
+                                <button key={tab.key} type="button" aria-pressed={currentTab === tab.key} onClick={() => setActiveTab(tab.key)} className={`${styles.detailTab} ${currentTab === tab.key ? styles.detailTabActive : ''}`}>
                                     {tab.label}
                                 </button>
                             ))}
@@ -451,7 +444,7 @@ export default function ProductDetailPage() {
                         <div style={{ height: '1px', background: '#EEE', width: '100%' }} />
                         {/* Spec Rows */}
                         {activeTab === 'details' && (
-                            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                            <div className={styles.specGrid}>
                                 {specRows.map((item, i) => (
                                     <div key={i} style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
                                         <span className={styles.specLabel}>{item.label}</span>
@@ -903,7 +896,7 @@ export default function ProductDetailPage() {
                                             <div className={styles.tenureActions}>
                                                 {on('PriceBreakdown') ? (
                                                     <button type="button" onClick={() => setActiveInfoDrawer('breakdown')} className={`${styles.tenureAction} ${styles.tenureBreakdown}`}>
-                                                        {cms('PriceBreakdownText', 'price breakdown')}
+                                                        {cms('PriceBreakdownText', 'Price breakdown')}
                                                     </button>
                                                 ) : <span />}
                                                 {on('Compare') && (
@@ -912,7 +905,7 @@ export default function ProductDetailPage() {
                                                         onClick={() => setIsCompareOpen(true)}
                                                         className={`${styles.tenureAction} ${styles.tenureCompare}`}
                                                     >
-                                                        {cms('CompareLinkText', 'compare all tenures')}
+                                                        {cms('CompareLinkText', 'Compare rental periods')} <ArrowRight size={16} aria-hidden="true" />
                                                     </button>
                                                 )}
                                             </div>
@@ -1014,23 +1007,8 @@ export default function ProductDetailPage() {
                                             >
                                                 <button
                                                     type="button"
-                                                    onClick={() => document.getElementById('desktop-product-benefits')?.scrollIntoView({ behavior: 'smooth', block: 'center' })}
-                                                    className="hover:opacity-80 transition-opacity"
-                                                    style={{
-                                                        fontFamily: '"Mona Sans", sans-serif',
-                                                        fontWeight: 700,
-                                                        fontSize: '12px',
-                                                        lineHeight: '16px',
-                                                        color: '#333',
-                                                        textDecoration: 'underline',
-                                                        textDecorationStyle: 'solid',
-                                                        textUnderlineOffset: '6%',
-                                                        textDecorationThickness: '1.5%',
-                                                        background: 'none',
-                                                        border: 'none',
-                                                        padding: '0 4px',
-                                                        cursor: 'pointer'
-                                                    }}
+                                                    onClick={() => setActiveInfoDrawer('benefits')}
+                                                    className={styles.viewBenefitsButton}
                                                 >
                                                     {cms('ViewAllBenefitsText', 'View All Benefits')}
                                                 </button>
@@ -1066,10 +1044,7 @@ export default function ProductDetailPage() {
                                         </div>
 
                                         <div id="desktop-product-benefits" className={styles.benefitGrid}>
-                                            {(product.benefits && product.benefits.length > 0 ? product.benefits : (pageLayout?.productPageBenefits || [
-                                                "Fully Functional (100% Tested)", "Free Repairs & Maintenance", "Original Accessories Included", "Professionally sanitized"
-                                            ])).map((benefit, idx) => {
-                                                const benefitText = benefit.type || benefit;
+                                            {benefitItems.map((benefitText, idx) => {
                                                 const Icon = benefitIcon(benefitText);
                                                 return (
                                                     <div
@@ -1121,14 +1096,7 @@ export default function ProductDetailPage() {
                                                     minWidth: 0,
                                                 }}
                                             >
-                                                <div className="flex flex-col justify-center" style={{ flex: 1, minWidth: 0 }}>
-                                                    <span style={{ fontFamily: '"Mona Sans", sans-serif', fontWeight: 600, fontSize: '13px', lineHeight: '18px' }}>
-                                                        {cms('KycLine1', 'Place Order & complete KYC anytime')}
-                                                    </span>
-                                                    <span style={{ fontFamily: '"Mona Sans", sans-serif', fontWeight: 400, fontSize: '13px', lineHeight: '18px' }}>
-                                                        {cms('KycLine2', 'to get your items the next day')}
-                                                    </span>
-                                                </div>
+                                                <p className={styles.kycSentence}>{cms('KycLine1', 'Place Order & complete KYC anytime').trim()} {cms('KycLine2', 'to get your items the next day').trim()}</p>
                                                 <Image src={cms('KycImage', '/images/product/kyc-delivery.webp')} alt="" width={76} height={76} unoptimized className={styles.kycImage} />
                                             </div>
                                         )}
@@ -1214,34 +1182,17 @@ export default function ProductDetailPage() {
                         {on('Tabs') && (
                             <div className={styles.detailsPanel}>
                                 {/* Tabs Header */}
-                                <div className="flex items-center gap-[8px] w-full overflow-x-auto no-scrollbar">
+                                <div className={styles.detailTabs}>
                                     {tabs.map(({ key, label }) => {
                                         const isActive = currentTab === key;
                                         const isReview = key === 'review';
                                         return (
                                             <button
                                                 key={key}
+                                                type="button"
+                                                aria-pressed={isActive}
                                                 onClick={() => setActiveTab(key)}
-                                                style={{
-                                                    flex: '0 0 auto',
-                                                    height: '44px',
-                                                    padding: '10px 22px',
-                                                    borderRadius: '59px',
-                                                    fontFamily: '"Mona Sans", sans-serif',
-                                                    fontWeight: 600,
-                                                    fontSize: '15px',
-                                                    lineHeight: '1',
-                                                    letterSpacing: '-0.01em',
-                                                    whiteSpace: 'nowrap',
-                                                    transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
-                                                    background: isReview ? 'hsla(44, 100%, 64%, 1)' : (isActive ? 'hsla(0, 0%, 20%, 1)' : 'hsla(0, 0%, 100%, 1)'),
-                                                    color: isReview ? '#1D1D1F' : (isActive ? 'white' : '#1D1D1F'),
-                                                    border: isReview ? 'none' : (isActive ? 'none' : '1px solid hsla(0, 0%, 89%, 1)'),
-                                                    cursor: 'pointer',
-                                                    display: 'flex',
-                                                    alignItems: 'center',
-                                                    justifyContent: 'center'
-                                                }}
+                                                className={`${styles.detailTab} ${isActive ? styles.detailTabActive : ''} ${isReview ? styles.detailTabReview : ''}`}
                                             >
                                                 {label}
                                             </button>
@@ -1256,8 +1207,7 @@ export default function ProductDetailPage() {
                                 <div className="flex-1 overflow-hidden" style={{ width: '100%' }}>
                                     {currentTab === 'details' && (
                                         <>
-                                            {/* Mobile: single column list */}
-                                            <div className="flex flex-col gap-[20px] pt-4 lg:hidden">
+                                            <div className={styles.specGrid}>
                                                 {specRows.map((item, idx) => (
                                                     <div key={idx} style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
                                                         <h4 style={{ fontFamily: '"Mona Sans", sans-serif', fontWeight: 700, fontSize: '12px', lineHeight: '16px', letterSpacing: '0.05em', color: '#000', textTransform: 'uppercase' }}>
@@ -1270,26 +1220,6 @@ export default function ProductDetailPage() {
                                                 ))}
                                             </div>
 
-                                            {/* Desktop: horizontal-scroll column grid */}
-                                            <div
-                                                className="hidden lg:grid gap-y-8 gap-x-12 pt-4 overflow-x-auto overflow-y-hidden pr-2 no-scrollbar pb-4"
-                                                style={{
-                                                    gridTemplateRows: 'repeat(4, auto)',
-                                                    gridAutoFlow: 'column',
-                                                    gridAutoColumns: 'minmax(250px, 1fr)'
-                                                }}
-                                            >
-                                                {specRows.map((item, idx) => (
-                                                    <div key={idx} style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
-                                                        <h4 style={{ fontFamily: '"Mona Sans", sans-serif', fontWeight: 600, fontSize: '13px', lineHeight: '18px', letterSpacing: '0.02em', color: '#000', textTransform: 'uppercase' }}>
-                                                            {item.label}
-                                                        </h4>
-                                                        <p style={{ fontFamily: '"Mona Sans", sans-serif', fontWeight: 400, fontSize: '14px', lineHeight: '1.4', letterSpacing: '-0.01em', color: 'hsla(0, 0%, 12%, 1)' }}>
-                                                            {item.value}
-                                                        </p>
-                                                    </div>
-                                                ))}
-                                            </div>
                                         </>
                                     )}
 
@@ -1409,6 +1339,19 @@ export default function ProductDetailPage() {
                 onSelect={setDuration}
                 tenures={tenures}
             />
+            <ProductDetailDrawer isOpen={activeInfoDrawer === 'benefits'} onClose={() => setActiveInfoDrawer(null)} title="Included in your plan" description="The benefits and amounts for this rental, all in one place.">
+                <ul className={styles.benefitDrawerList}>
+                    {benefitItems.map((item, index) => {
+                        const Icon = benefitIcon(item);
+                        return <li key={`${item}-${index}`}><span className={styles.benefitDrawerIcon}><Icon size={21} weight="regular" aria-hidden="true" /></span><span>{item}</span><CheckCircle size={19} weight="fill" className={styles.benefitDrawerCheck} aria-hidden="true" /></li>;
+                    })}
+                </ul>
+                <div className={styles.benefitDrawerSummary}>
+                    <div><span>Monthly rent for {duration} {duration === 1 ? 'month' : 'months'}</span><strong>₹{currentPlan.price.toLocaleString('en-IN')}</strong></div>
+                    <div><span>Refundable deposit</span><strong>{product.securityDeposit != null ? `₹${Number(product.securityDeposit).toLocaleString('en-IN')}` : 'Confirmed at checkout'}</strong></div>
+                </div>
+                <button type="button" className={`${styles.primaryCta} ${styles.benefitDrawerCta}`} onClick={() => { setActiveInfoDrawer(null); handleAddToCart(); }}>Book your plan <ArrowRight size={19} aria-hidden="true" /></button>
+            </ProductDetailDrawer>
             <ProductDetailDrawer isOpen={activeInfoDrawer === 'breakdown'} onClose={() => setActiveInfoDrawer(null)} title="Rental price breakdown">
                 <p className="mb-6 text-[#545454]">Your monthly rent for the selected minimum rental period.</p>
                 <dl className="space-y-4 rounded-2xl border border-[#e2e2e2] p-5">
