@@ -81,7 +81,7 @@
   .primaryCta { min-height: 54px; padding-inline: 20px; font-size: 16px; }
   .benefitGrid { gap: 8px; }
   .benefitCard { min-height: 58px; padding: 8px; font-size: 12px; }
-  .benefitCard svg { width: 20px; height: 20px; }
+  .benefitCard svg { width: 22px; height: 22px; }
   .noticeCard { min-height: 56px; padding: 10px 12px; }
   .simpleCompare { padding: 48px 20px; }
   .compareHead { display: none; }

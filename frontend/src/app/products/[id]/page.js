@@ -360,7 +360,7 @@ export default function ProductDetailPage() {
                                 const Icon = benefitIcon(text);
                                 return (
                                     <div key={i} className={styles.benefitCard}>
-                                        <Icon size={22} color="#fff" weight="regular" style={{ flexShrink: 0 }} />
+                                        <Icon size={22} color="#fff" weight="bold" style={{ flexShrink: 0 }} />
                                         <span>{text}</span>
                                     </div>
                                 );
@@ -1090,7 +1090,7 @@ export default function ProductDetailPage() {
                                                         key={idx}
                                                         className={styles.benefitCard}
                                                     >
-                                                        <div className="shrink-0 flex items-center justify-center"><Icon size={20} color="#fff" weight="regular" /></div>
+                                                        <div className="shrink-0 flex items-center justify-center"><Icon size={22} color="#fff" weight="bold" /></div>
                                                         <span>
                                                             {benefitText}
                                                         </span>
