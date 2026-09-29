@@ -138,12 +138,13 @@ const Navbar = ({ showCategories: propShowCategories } = {}) => {
         };
     }, [isDesktopMenuOpen]);
 
-    const fetchLocation = () => {
+    const fetchLocation = ({ interactive = false } = {}) => {
         if (!navigator.geolocation) {
-            alert("Geolocation is not supported by your browser");
+            if (interactive) setPincodeError("This browser can't find your location. Enter a city or pincode instead.");
             return;
         }
 
+        setPincodeError("");
         setLocationInput("Fetching...");
 
         navigator.geolocation.getCurrentPosition(
@@ -151,6 +152,7 @@ const Navbar = ({ showCategories: propShowCategories } = {}) => {
                 try {
                     const { latitude, longitude } = position.coords;
                     const response = await fetch(`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${latitude}&longitude=${longitude}&localityLanguage=en`);
+                    if (!response.ok) throw new Error("Reverse geocoding failed");
                     const data = await response.json();
 
                     const city = data.city || data.locality || data.principalSubdivision;
@@ -159,20 +161,23 @@ const Navbar = ({ showCategories: propShowCategories } = {}) => {
                         setLocationInput(city);
                         localStorage.setItem('userLocation', city);
                         setIsCityDropdownOpen(false);
+                        if (interactive) setIsMobileMenuOpen(false);
                     } else {
                         setLocationInput("");
-                        alert("Could not determine city from location.");
+                        if (interactive) setPincodeError("We couldn't find your city. Enter a city or pincode instead.");
                     }
-                } catch (error) {
-                    console.error("Error fetching location:", error);
+                } catch {
                     setLocationInput("");
-                    alert("Failed to fetch location data.");
+                    if (interactive) setPincodeError("We couldn't find your city. Enter a city or pincode instead.");
                 }
             },
             (error) => {
-                console.error("Error getting location:", error);
                 setLocationInput("");
-                alert("Please allow location access to use this feature.");
+                if (interactive) {
+                    setPincodeError(error.code === 1
+                        ? "Location access is off. Enter a city or pincode instead."
+                        : "We couldn't find your location. Enter a city or pincode instead.");
+                }
             }
         );
     };
@@ -185,9 +190,7 @@ const Navbar = ({ showCategories: propShowCategories } = {}) => {
                     if (result.state === 'granted') {
                         fetchLocation();
                     }
-                } catch (e) {
-                    console.error("Permission check failed", e);
-                }
+                } catch { /* Permission checks are optional; manual city selection remains available. */ }
             }
         };
         checkAutoLocation();
@@ -903,7 +906,7 @@ const Navbar = ({ showCategories: propShowCategories } = {}) => {
                                     </div>
                                     {pincodeError && <p role="alert" className="mt-1 text-[11px] text-[#B42318]">{pincodeError}</p>}
                                     {pincodeArea && <p className="mt-1 text-[11px] text-[#067647]">{pincodeArea}</p>}
-                                    <button type="button" onClick={() => { fetchLocation(); setIsMobileMenuOpen(false); }} className="mt-2 flex h-[30px] w-full items-center justify-center gap-1 rounded-full border border-[#E2E2E2] bg-white text-[12px] font-medium text-[#333] hover:bg-[#FAFAFA]">
+                                    <button type="button" onClick={() => fetchLocation({ interactive: true })} className="mt-2 flex h-[30px] w-full items-center justify-center gap-1 rounded-full border border-[#E2E2E2] bg-white text-[12px] font-medium text-[#333] hover:bg-[#FAFAFA]">
                                         <NavigationArrow size={12} weight="fill" className="text-[#BB4D00]" aria-hidden="true" />
                                         Use current location
                                     </button>
