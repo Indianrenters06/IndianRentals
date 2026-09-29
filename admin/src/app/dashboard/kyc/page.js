@@ -379,9 +379,13 @@ export default function KYCManagement({ initialFilter = "all" }) {
                                                         { label: 'Father / Guardian', val: selectedKyc.personalDetails?.fatherName },
                                                         { label: 'Father Phone', val: selectedKyc.personalDetails?.fatherPhone },
                                                         { label: 'Date of Birth', val: selectedKyc.personalDetails?.dob },
-                                                        { label: 'Address', val: selectedKyc.personalDetails?.address || selectedKyc.personalDetails?.permanentAddress },
+                                                        { label: 'Permanent Address', val: selectedKyc.personalDetails?.permanentAddress || selectedKyc.personalDetails?.address },
+                                                        { label: 'Earlier Checkout Address', val: selectedKyc.personalDetails?.address && selectedKyc.personalDetails?.address !== selectedKyc.personalDetails?.permanentAddress ? selectedKyc.personalDetails.address : null },
+                                                        { label: 'Current Address', val: selectedKyc.personalDetails?.currentAddress },
+                                                        { label: 'Residence Status', val: selectedKyc.personalDetails?.residenceStatus },
                                                         { label: 'City / State', val: [selectedKyc.personalDetails?.city, selectedKyc.personalDetails?.state].filter(Boolean).join(', ') },
                                                         { label: 'Pincode', val: selectedKyc.personalDetails?.pincode },
+                                                        { label: 'Country', val: selectedKyc.personalDetails?.country },
                                                         { label: 'ID Type', val: selectedKyc.personalDetails?.idType },
                                                         { label: 'ID Number', val: selectedKyc.personalDetails?.idNumber },
                                                     ].map(({ label, val }) => val ? (
@@ -460,6 +464,33 @@ export default function KYCManagement({ initialFilter = "all" }) {
                                                 </div>
                                             </div>
                                         </div>
+
+                                        {/* Reference details are saved with the same KYC record from
+                                            either the profile or checkout form. */}
+                                        <section className="space-y-4" aria-labelledby="kyc-reference-title">
+                                            <h4 id="kyc-reference-title" className="flex items-center gap-2 text-sm font-bold uppercase tracking-widest text-slate-400">
+                                                <User size={16} /> Reference Details
+                                            </h4>
+                                            {selectedKyc.referenceDetails?.name ? (
+                                                <dl className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                                                    {[
+                                                        { label: 'Reference Name', value: selectedKyc.referenceDetails?.name },
+                                                        { label: 'Relationship', value: selectedKyc.referenceDetails?.relation },
+                                                        { label: 'Mobile Number', value: selectedKyc.referenceDetails?.phone },
+                                                        { label: 'Address', value: selectedKyc.referenceDetails?.address },
+                                                        { label: 'City', value: selectedKyc.referenceDetails?.city },
+                                                        { label: 'State', value: selectedKyc.referenceDetails?.state },
+                                                        { label: 'PIN Code', value: selectedKyc.referenceDetails?.pincode },
+                                                        { label: 'Country', value: selectedKyc.referenceDetails?.country },
+                                                    ].filter(({ value }) => value).map(({ label, value }) => (
+                                                        <div key={label} className="rounded-xl border border-slate-100 bg-slate-50 p-3 dark:border-slate-800 dark:bg-slate-950/20">
+                                                            <dt className="mb-0.5 text-xs text-slate-500">{label}</dt>
+                                                            <dd className="break-words text-sm font-semibold">{value}</dd>
+                                                        </div>
+                                                    ))}
+                                                </dl>
+                                            ) : <p className="text-sm text-slate-500">No reference details submitted for this record.</p>}
+                                        </section>
 
                                         {modalMode === 'reject' && (
                                             <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="bg-rose-50 dark:bg-rose-500/10 p-6 rounded-2xl border border-rose-100 dark:border-rose-500/20">

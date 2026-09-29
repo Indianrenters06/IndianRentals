@@ -12,6 +12,13 @@ const INITIAL_DETAILS = {
     pincode: '', country: 'India'
 };
 
+const INITIAL_REFERENCE = {
+    name: '', relation: '', phone: '', address: '', city: '', state: '',
+    pincode: '', country: 'India'
+};
+
+const RELATIONSHIPS = ['Parent', 'Sibling', 'Spouse', 'Relative', 'Friend', 'Colleague', 'Other'];
+
 const DOCUMENTS = [
     { key: 'aadharFront', title: 'Aadhaar card', side: 'Front side', description: 'The side with your photograph and name.' },
     { key: 'aadharBack', title: 'Aadhaar card', side: 'Back side', description: 'The side with your address.' },
@@ -28,6 +35,7 @@ const SUBMITTED_DOCUMENTS = [
 
 const STEPS = [
     { title: 'Personal details', description: 'Your identity and address' },
+    { title: 'Reference', description: 'Someone we can contact' },
     { title: 'Documents', description: 'Aadhaar and PAN' },
     { title: 'Review', description: 'Check before submitting' },
 ];
@@ -53,6 +61,26 @@ function validateDetails(details) {
     return next;
 }
 
+function validateReference(reference) {
+    const next = {};
+    const required = {
+        name: 'Enter your reference’s full name.',
+        relation: 'Select your relationship to this person.',
+        phone: 'Enter your reference’s mobile number.',
+        address: 'Enter your reference’s address.',
+        city: 'Enter your reference’s city.',
+        state: 'Enter your reference’s state.',
+        pincode: 'Enter your reference’s PIN code.',
+        country: 'Enter your reference’s country.',
+    };
+    Object.entries(required).forEach(([key, message]) => {
+        if (!String(reference[key] ?? '').trim()) next[`reference-${key}`] = message;
+    });
+    if (!next['reference-phone'] && !/^[6-9]\d{9}$/.test(reference.phone.replace(/\s/g, ''))) next['reference-phone'] = 'Enter a valid 10-digit Indian mobile number.';
+    if (!next['reference-pincode'] && !/^\d{6}$/.test(reference.pincode.trim())) next['reference-pincode'] = 'Enter a valid 6-digit PIN code.';
+    return next;
+}
+
 function Field({ id, label, value, onChange, error, required = false, ...props }) {
     return (
         <div className="min-w-0">
@@ -64,6 +92,37 @@ function Field({ id, label, value, onChange, error, required = false, ...props }
         </div>
     );
 }
+
+function RelationshipField({ value, onChange, error }) {
+    return <div className="min-w-0">
+        <label htmlFor="reference-relation" className="mb-2 block text-[14px] font-medium text-[#333333]">Relationship <span className="text-[#bb2b1f]" aria-hidden="true">*</span></label>
+        <select id="reference-relation" name="reference-relation" value={value} onChange={onChange} required aria-invalid={!!error} aria-describedby={error ? 'reference-relation-error' : undefined} className={`${inputClass} ${error ? 'border-[#bb2b1f] focus:border-[#bb2b1f]' : ''}`}>
+            <option value="">Select relationship</option>
+            {RELATIONSHIPS.map((item) => <option key={item} value={item}>{item}</option>)}
+        </select>
+        {error && <p id="reference-relation-error" role="alert" className="mt-1.5 text-[13px] text-[#a3261c]">{error}</p>}
+    </div>;
+}
+
+function ReferenceFields({ reference, errors, onChange }) {
+    const update = (field) => (event) => onChange(field, event.target.value);
+    return <div className="grid gap-x-5 gap-y-5 sm:grid-cols-2">
+        <div className="sm:col-span-2"><Field id="reference-name" label="Reference name" required autoComplete="off" placeholder="Full name" value={reference.name} onChange={update('name')} error={errors['reference-name']} /></div>
+        <RelationshipField value={reference.relation} onChange={update('relation')} error={errors['reference-relation']} />
+        <Field id="reference-phone" label="Mobile number" required type="tel" inputMode="numeric" maxLength={10} autoComplete="off" placeholder="10-digit number" value={reference.phone} onChange={update('phone')} error={errors['reference-phone']} />
+        <div className="sm:col-span-2"><Field id="reference-address" label="Reference address" required autoComplete="off" placeholder="House number, street and area" value={reference.address} onChange={update('address')} error={errors['reference-address']} /></div>
+        <Field id="reference-city" label="City" required autoComplete="off" placeholder="City" value={reference.city} onChange={update('city')} error={errors['reference-city']} />
+        <Field id="reference-state" label="State" required autoComplete="off" placeholder="State" value={reference.state} onChange={update('state')} error={errors['reference-state']} />
+        <Field id="reference-pincode" label="PIN code" required inputMode="numeric" maxLength={6} autoComplete="off" placeholder="6-digit PIN" value={reference.pincode} onChange={update('pincode')} error={errors['reference-pincode']} />
+        <Field id="reference-country" label="Country" required autoComplete="off" value={reference.country} onChange={update('country')} error={errors['reference-country']} />
+    </div>;
+}
+
+const referenceSummary = (reference) => [
+    ['Name', reference?.name], ['Relationship', reference?.relation], ['Mobile number', reference?.phone],
+    ['Address', reference?.address], ['City', reference?.city], ['State', reference?.state],
+    ['PIN code', reference?.pincode], ['Country', reference?.country],
+];
 
 function UploadField({ item, file, error, onSelect }) {
     const inputRef = useRef(null);
@@ -104,9 +163,10 @@ export default function KYCExperience({ mode = 'profile' }) {
     const [loading, setLoading] = useState(false);
     const [errors, setErrors] = useState({});
     const [submitError, setSubmitError] = useState('');
+    const [editingReference, setEditingReference] = useState(false);
     const [kycStatus, setKycStatus] = useState('loading');
     const [kycData, setKycData] = useState(null);
-    const [formData, setFormData] = useState({ personalDetails: INITIAL_DETAILS, documents: { aadharFront: null, aadharBack: null, panCard: null } });
+    const [formData, setFormData] = useState({ personalDetails: INITIAL_DETAILS, referenceDetails: INITIAL_REFERENCE, documents: { aadharFront: null, aadharBack: null, panCard: null } });
     const contentRef = useRef(null);
 
     useEffect(() => {
@@ -116,6 +176,7 @@ export default function KYCExperience({ mode = 'profile' }) {
             const status = String(data?.status || 'not_submitted').toLowerCase();
             setKycData(data);
             setKycStatus(status);
+            setFormData((previous) => ({ ...previous, referenceDetails: { ...previous.referenceDetails, ...data?.referenceDetails } }));
             if (status === 'rejected' || status === 'incomplete') {
                 setFormData((previous) => ({
                     personalDetails: {
@@ -123,6 +184,7 @@ export default function KYCExperience({ mode = 'profile' }) {
                         ...data.personalDetails,
                         permanentAddress: data.personalDetails?.permanentAddress || data.personalDetails?.address || '',
                     },
+                    referenceDetails: { ...previous.referenceDetails, ...data.referenceDetails },
                     documents: { ...previous.documents, ...data.documents }
                 }));
             }
@@ -136,6 +198,12 @@ export default function KYCExperience({ mode = 'profile' }) {
         setErrors((previous) => ({ ...previous, [field]: '' }));
     };
 
+    const changeReference = (field, value) => {
+        setFormData((previous) => ({ ...previous, referenceDetails: { ...previous.referenceDetails, [field]: value } }));
+        setMaxStep(2);
+        setErrors((previous) => ({ ...previous, [`reference-${field}`]: '' }));
+    };
+
     const selectFile = (field, file) => {
         if (!file) return;
         const nextError = !['image/jpeg', 'image/png', 'application/pdf'].includes(file.type)
@@ -144,7 +212,7 @@ export default function KYCExperience({ mode = 'profile' }) {
         setErrors((previous) => ({ ...previous, [field]: nextError }));
         if (!nextError) {
             setFormData((previous) => ({ ...previous, documents: { ...previous.documents, [field]: file } }));
-            setMaxStep(2);
+            setMaxStep(3);
         }
     };
 
@@ -157,11 +225,12 @@ export default function KYCExperience({ mode = 'profile' }) {
 
     const nextStep = () => {
         const nextErrors = currentStep === 1 ? validateDetails(formData.personalDetails)
-            : Object.fromEntries(DOCUMENTS.filter(({ key }) => !formData.documents[key]).map(({ key }) => [key, 'Add this document to continue.']));
+            : currentStep === 2 ? validateReference(formData.referenceDetails)
+                : Object.fromEntries(DOCUMENTS.filter(({ key }) => !formData.documents[key]).map(({ key }) => [key, 'Add this document to continue.']));
         setErrors(nextErrors);
         const firstError = Object.keys(nextErrors)[0];
         if (firstError) {
-            requestAnimationFrame(() => document.getElementById(currentStep === 2 ? `${firstError}-button` : firstError)?.focus());
+            requestAnimationFrame(() => document.getElementById(currentStep === 3 ? `${firstError}-button` : firstError)?.focus());
             return;
         }
         setMaxStep((previous) => Math.max(previous, currentStep + 1));
@@ -179,6 +248,7 @@ export default function KYCExperience({ mode = 'profile' }) {
             const uploadedDocs = [...files.entries()].length ? await uploadKYCFiles(files) : {};
             const saved = await saveKYCData({
                 personalDetails: { ...kycData?.personalDetails, ...formData.personalDetails, idType: 'Aadhar Card' },
+                referenceDetails: formData.referenceDetails,
                 documents: uploadedDocs
             });
             setKycData(saved);
@@ -186,6 +256,27 @@ export default function KYCExperience({ mode = 'profile' }) {
             window.scrollTo({ top: 0, behavior: 'smooth' });
         } catch (error) {
             setSubmitError(error.response?.data?.message || 'We could not submit your KYC. Please try again.');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const saveReference = async () => {
+        const nextErrors = validateReference(formData.referenceDetails);
+        setErrors(nextErrors);
+        if (Object.keys(nextErrors).length) {
+            requestAnimationFrame(() => document.getElementById(Object.keys(nextErrors)[0])?.focus());
+            return;
+        }
+        setLoading(true);
+        setSubmitError('');
+        try {
+            const saved = await saveKYCData({ referenceDetails: formData.referenceDetails });
+            setKycData(saved);
+            setKycStatus(String(saved?.status || 'pending').toLowerCase());
+            setEditingReference(false);
+        } catch (error) {
+            setSubmitError(error.response?.data?.message || 'We could not save your reference. Please try again.');
         } finally {
             setLoading(false);
         }
@@ -213,6 +304,12 @@ export default function KYCExperience({ mode = 'profile' }) {
                     </ul>
                     {submittedDocuments.length === 0 && <p className="mt-3 text-[14px] text-[#555555]">No documents are listed on this record. Please contact support if this looks incorrect.</p>}
                 </div>
+                {(kycData?.referenceDetails?.name || !approved) && <div className="mt-8 border-t border-[#dddddd] pt-6">
+                    <h2 className="text-[18px] font-semibold text-[#141414]">Reference details</h2>
+                    {kycData?.referenceDetails?.name ? <dl className="mt-4 grid gap-x-5 gap-y-4 text-[14px] sm:grid-cols-2">{referenceSummary(kycData.referenceDetails).filter(([, value]) => value).map(([label, value]) => <div key={label}><dt className="text-[#666666]">{label}</dt><dd className="mt-1 break-words font-medium text-[#141414]">{value}</dd></div>)}</dl> : <p className="mt-2 text-[14px] leading-6 text-[#555555]">Your submission was received before reference details were added to this form. Add them to complete your record.</p>}
+                    {!approved && !editingReference && <button type="button" onClick={() => setEditingReference(true)} className={`${primaryButtonClass} mt-4`}>{kycData?.referenceDetails?.name ? 'Update reference' : 'Add reference details'}</button>}
+                    {!approved && editingReference && <div className="mt-5 rounded-2xl border border-[#e2e2e2] bg-[#f6f6f6] p-5"><ReferenceFields reference={formData.referenceDetails} errors={errors} onChange={changeReference} />{submitError && <p role="alert" className="mt-4 text-[14px] text-[#a3261c]">{submitError}</p>}<div className="mt-5 flex flex-wrap gap-3"><button type="button" onClick={saveReference} disabled={loading} className={primaryButtonClass}>{loading ? 'Saving…' : 'Save reference'}</button><button type="button" onClick={() => { setEditingReference(false); setErrors({}); setSubmitError(''); }} className="min-h-12 rounded-full px-5 text-[14px] font-semibold text-[#333333] hover:bg-[#e8e8e8]">Cancel</button></div></div>}
+                </div>}
             </section>
         );
     }
@@ -249,8 +346,8 @@ export default function KYCExperience({ mode = 'profile' }) {
                     <div ref={contentRef} tabIndex={-1} className="outline-none">
                         <div className="border-b border-[#ededed] px-5 py-6 sm:px-8 sm:py-7">
                             <p className={`mb-2 text-[13px] font-medium text-[#666666] ${isCheckout ? 'xl:hidden' : 'lg:hidden'}`}>{STEPS[currentStep - 1].title}</p>
-                            <h2 className="text-[22px] font-semibold tracking-[-0.02em] text-[#141414] sm:text-[26px]">{currentStep === 1 ? 'Tell us about yourself' : currentStep === 2 ? 'Add your documents' : 'Review your details'}</h2>
-                            <p className="mt-1 text-[14px] leading-6 text-[#555555]">{currentStep === 1 ? 'Enter your details as they appear on your identity documents.' : currentStep === 2 ? 'Upload clear copies so our team can check them.' : 'Make sure your information is correct before sending it for verification.'}</p>
+                            <h2 className="text-[22px] font-semibold tracking-[-0.02em] text-[#141414] sm:text-[26px]">{currentStep === 1 ? 'Tell us about yourself' : currentStep === 2 ? 'Add a reference' : currentStep === 3 ? 'Add your documents' : 'Review your details'}</h2>
+                            <p className="mt-1 text-[14px] leading-6 text-[#555555]">{currentStep === 1 ? 'Enter your details as they appear on your identity documents.' : currentStep === 2 ? 'Share the details of someone we can contact as a reference.' : currentStep === 3 ? 'Upload clear copies so our team can check them.' : 'Make sure your information is correct before sending it for verification.'}</p>
                         </div>
 
                         {currentStep === 1 && <div className="grid gap-x-5 gap-y-5 px-5 py-6 sm:grid-cols-2 sm:px-8 sm:py-8">
@@ -267,18 +364,21 @@ export default function KYCExperience({ mode = 'profile' }) {
                             <Field id="country" label="Country" value={details.country} onChange={update('country')} autoComplete="country-name" />
                         </div>}
 
-                        {currentStep === 2 && <div className="space-y-4 px-5 py-6 sm:px-8 sm:py-8">{DOCUMENTS.map((item) => <UploadField key={item.key} item={item} file={formData.documents[item.key]} error={errors[item.key]} onSelect={selectFile} />)}<p className="text-[13px] leading-5 text-[#555555]">Check that all corners are visible and the text is readable. You can replace a file before submitting.</p></div>}
+                        {currentStep === 2 && <div className="px-5 py-6 sm:px-8 sm:py-8"><ReferenceFields reference={formData.referenceDetails} errors={errors} onChange={changeReference} /></div>}
 
-                        {currentStep === 3 && <div className="space-y-7 px-5 py-6 sm:px-8 sm:py-8">
+                        {currentStep === 3 && <div className="space-y-4 px-5 py-6 sm:px-8 sm:py-8">{DOCUMENTS.map((item) => <UploadField key={item.key} item={item} file={formData.documents[item.key]} error={errors[item.key]} onSelect={selectFile} />)}<p className="text-[13px] leading-5 text-[#555555]">Check that all corners are visible and the text is readable. You can replace a file before submitting.</p></div>}
+
+                        {currentStep === 4 && <div className="space-y-7 px-5 py-6 sm:px-8 sm:py-8">
                             <div><div className="flex items-center justify-between gap-3"><h3 className="text-[17px] font-semibold text-[#141414]">Personal details</h3><button type="button" onClick={() => goToStep(1)} className="min-h-11 text-[13px] font-semibold text-[#333333] underline underline-offset-4 focus-visible:outline-2 focus-visible:outline-[#141414]">Edit</button></div><dl className="mt-2 grid gap-x-5 gap-y-4 border-t border-[#e8e8e8] pt-4 text-[14px] sm:grid-cols-2">{[['Full name', details.name], ['Email', details.email], ['Mobile number', details.phone], ['Father’s name', details.fatherName], ['Father’s mobile', details.fatherPhone], ['Permanent address', details.permanentAddress], ['Current address', details.currentAddress || 'Not provided'], ['City and state', `${details.city}, ${details.state}`], ['PIN code', details.pincode]].map(([label, value]) => <div key={label} className="min-w-0"><dt className="text-[#666666]">{label}</dt><dd className="mt-1 break-words font-medium text-[#141414]">{value}</dd></div>)}</dl></div>
-                            <div><div className="flex items-center justify-between gap-3"><h3 className="text-[17px] font-semibold text-[#141414]">Documents</h3><button type="button" onClick={() => goToStep(2)} className="min-h-11 text-[13px] font-semibold text-[#333333] underline underline-offset-4 focus-visible:outline-2 focus-visible:outline-[#141414]">Edit</button></div><ul className="mt-2 divide-y divide-[#e8e8e8] border-t border-[#e8e8e8]">{DOCUMENTS.map(({ key, title, side }) => <li key={key} className="flex items-center gap-3 py-3 text-[14px]"><CheckIcon className="size-4 shrink-0 text-[#167a3d]" aria-hidden="true" /><span className="min-w-0 truncate text-[#333333]">{title} · {side}</span></li>)}</ul></div>
+                            <div><div className="flex items-center justify-between gap-3"><h3 className="text-[17px] font-semibold text-[#141414]">Reference details</h3><button type="button" onClick={() => goToStep(2)} className="min-h-11 text-[13px] font-semibold text-[#333333] underline underline-offset-4 focus-visible:outline-2 focus-visible:outline-[#141414]">Edit</button></div><dl className="mt-2 grid gap-x-5 gap-y-4 border-t border-[#e8e8e8] pt-4 text-[14px] sm:grid-cols-2">{referenceSummary(formData.referenceDetails).map(([label, value]) => <div key={label}><dt className="text-[#666666]">{label}</dt><dd className="mt-1 break-words font-medium text-[#141414]">{value}</dd></div>)}</dl></div>
+                            <div><div className="flex items-center justify-between gap-3"><h3 className="text-[17px] font-semibold text-[#141414]">Documents</h3><button type="button" onClick={() => goToStep(3)} className="min-h-11 text-[13px] font-semibold text-[#333333] underline underline-offset-4 focus-visible:outline-2 focus-visible:outline-[#141414]">Edit</button></div><ul className="mt-2 divide-y divide-[#e8e8e8] border-t border-[#e8e8e8]">{DOCUMENTS.map(({ key, title, side }) => <li key={key} className="flex items-center gap-3 py-3 text-[14px]"><CheckIcon className="size-4 shrink-0 text-[#167a3d]" aria-hidden="true" /><span className="min-w-0 truncate text-[#333333]">{title} · {side}</span></li>)}</ul></div>
                             {submitError && <p role="alert" className="rounded-xl bg-[#fff5f3] p-4 text-[14px] text-[#a3261c]">{submitError}</p>}
                         </div>}
 
                         <div className="flex flex-col-reverse gap-3 border-t border-[#ededed] px-5 py-5 sm:flex-row sm:items-center sm:justify-between sm:px-8">
                             {currentStep > 1 ? <button type="button" onClick={() => goToStep(currentStep - 1)} className="inline-flex min-h-12 items-center justify-center gap-2 rounded-full px-4 text-[14px] font-semibold text-[#333333] transition-colors hover:bg-[#f6f6f6] focus-visible:outline-2 focus-visible:outline-[#141414]"><ArrowLeftIcon className="size-4" aria-hidden="true" />Back</button> : <span className="hidden sm:block" />}
-                            <button type="button" onClick={currentStep === 3 ? submit : nextStep} disabled={loading} className={`${primaryButtonClass} w-full sm:w-auto`}>
-                                {loading ? 'Submitting…' : currentStep === 3 ? 'Submit for verification' : currentStep === 2 ? 'Review details' : 'Continue to documents'}{!loading && <ArrowRightIcon className="size-4" aria-hidden="true" />}
+                            <button type="button" onClick={currentStep === 4 ? submit : nextStep} disabled={loading} className={`${primaryButtonClass} w-full sm:w-auto`}>
+                                {loading ? 'Submitting…' : currentStep === 4 ? 'Submit for verification' : currentStep === 3 ? 'Review details' : currentStep === 2 ? 'Continue to documents' : 'Continue to reference'}{!loading && <ArrowRightIcon className="size-4" aria-hidden="true" />}
                             </button>
                         </div>
                     </div>
