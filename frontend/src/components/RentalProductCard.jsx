@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { useDispatch, useSelector } from 'react-redux';
 import { Heart, Info, Star, Truck } from '@phosphor-icons/react';
 import { toggleWishlist, selectIsWishlisted } from '@/redux/features/wishlistSlice';
+import { isProductOutOfStock } from '@/lib/productAvailability';
 import styles from './RentalProductCard.module.css';
 
 export default function RentalProductCard({ product, handleAddToCart, cardW, fallbackImage }) {
@@ -16,9 +17,10 @@ export default function RentalProductCard({ product, handleAddToCart, cardW, fal
     const rating = Math.max(0, Math.min(5, Number(product.rating) || 0));
     const reviews = product.reviews ?? product.reviewCount ?? 0;
     const hasOriginalPrice = Number(product.originalPrice) > Number(product.rentPrice);
+    const outOfStock = isProductOutOfStock(product);
     return (
         <div className={styles.frame} style={cardW ? { width: cardW, maxWidth: '100%' } : undefined}>
-            <article className={styles.card}>
+            <article className={`${styles.card} ${outOfStock ? styles.unavailable : ''}`}>
                 <div className={styles.image}>
                     <Link href={`/products/${product.id}`} aria-label={`View ${product.name}`} className={styles.imageLink}>
                         <Image src={imageSrc} alt={product.name} fill unoptimized className={styles.productImage} onError={() => {
@@ -26,8 +28,12 @@ export default function RentalProductCard({ product, handleAddToCart, cardW, fal
                         }} />
                     </Link>
                     <div className={styles.badges}>
-                        {product.discount && <span>{product.discount}</span>}
-                        {(product.isNew || product.condition === 'New') && <span className={styles.new}>New</span>}
+                        {outOfStock
+                            ? <span className={styles.unavailableBadge}>Out of stock</span>
+                            : <>
+                                {product.discount && <span>{product.discount}</span>}
+                                {(product.isNew || product.condition === 'New') && <span className={styles.new}>New</span>}
+                            </>}
                     </div>
                     <button type="button" className={styles.wishlist} aria-label={isWishlisted ? `Remove ${product.name} from wishlist` : `Save ${product.name} to wishlist`} aria-pressed={isWishlisted} onClick={() => dispatch(toggleWishlist(product))}>
                         <span><Heart size={22} weight={isWishlisted ? 'fill' : 'regular'} aria-hidden="true" /></span>
@@ -45,7 +51,9 @@ export default function RentalProductCard({ product, handleAddToCart, cardW, fal
                             </span>
                             <span>{rating} ({reviews})</span>
                         </span>
-                        <span className={styles.delivery} title="Estimated delivery time"><Truck size={16} aria-hidden="true" />{product.deliveryTime || '2-4 days'}<Info size={12} className={styles.deliveryInfo} aria-hidden="true" /></span>
+                        {outOfStock
+                            ? <span className={styles.availabilityText}>Currently unavailable</span>
+                            : <span className={styles.delivery} title="Estimated delivery time"><Truck size={16} aria-hidden="true" />{product.deliveryTime || '2-4 days'}<Info size={12} className={styles.deliveryInfo} aria-hidden="true" /></span>}
                     </div>
                     <div className={styles.price}>
                         <span className={styles.from}>from</span>
@@ -53,7 +61,9 @@ export default function RentalProductCard({ product, handleAddToCart, cardW, fal
                         <strong>₹{product.rentPrice}</strong><span>/month</span>
                     </div>
                     <div className={styles.action}><div className={styles.actionInner}>
-                        {handleAddToCart
+                        {outOfStock
+                            ? <Link href={`/products/${product.id}`} className={`${styles.rent} ${styles.details}`}>View details</Link>
+                            : handleAddToCart
                             ? <button type="button" className={styles.rent} onClick={event => handleAddToCart(event, product)}>Rent Now</button>
                             : <Link href={`/products/${product.id}`} className={styles.rent}>Rent Now</Link>}
                     </div></div>

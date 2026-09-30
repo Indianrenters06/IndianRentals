@@ -8,6 +8,7 @@ import CategoryNavBar from './CategoryNavBar';
 import CategoryFilters from './CategoryFilters';
 import SubcategoryStrip from './SubcategoryStrip';
 import styles from './CategoryLayout.module.css';
+import { availableFirst } from '@/lib/productAvailability';
 
 export default function SubcategoryProductsPage({ subcategoryId, subcategoryName, parentName, parentHref }) {
     // "/category/it-products" → "it-products"
@@ -123,6 +124,7 @@ export default function SubcategoryProductsPage({ subcategoryId, subcategoryName
                 rentPrice: baseRent,
                 discount: "-20% off",
                 image: (p.images && p.images.length > 0) ? p.images[0] : "/images/placeholder.png",
+                stock: p.stock,
                 isNew: p.condition === 'New',
                 rating: p.rating,
                 reviews: p.numReviews ?? p.reviewCount ?? 0,
@@ -148,7 +150,7 @@ export default function SubcategoryProductsPage({ subcategoryId, subcategoryName
             results.reverse();
         }
 
-        return results;
+        return availableFirst(results);
     }, [products, selectedDuration, selectedSort, dealsOnly]);
 
     return (

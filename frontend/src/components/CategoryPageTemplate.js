@@ -9,6 +9,7 @@ import CategoryNavBar, { CATEGORY_PILLS } from './CategoryNavBar';
 import CategoryFilters from './CategoryFilters';
 import SubcategoryStrip from './SubcategoryStrip';
 import styles from './CategoryLayout.module.css';
+import { availableFirst } from '@/lib/productAvailability';
 
 // Derive which category pill to highlight based on the page title
 const TITLE_KEYWORDS = [
@@ -76,6 +77,7 @@ const CategoryPageTemplate =({ productNamePrefix, productDescription, basePrice,
                             rentPrice: baseRent,
                             discount: "20% off",
                             image: (p.images && p.images.length > 0) ? p.images[0] : image,
+                            stock: p.stock,
                             isNew: p.condition === 'New',
                         };
                     });
@@ -170,7 +172,7 @@ const CategoryPageTemplate =({ productNamePrefix, productDescription, basePrice,
             results.sort((a, b) => (b.isNew === a.isNew) ? 0 : b.isNew ? 1 : -1);
         }
 
-        return results;
+        return availableFirst(results);
     }, [products, selectedDuration, selectedSort, dealsOnly]);
 
     if (!isClient) return <div className="min-h-screen bg-white" />;

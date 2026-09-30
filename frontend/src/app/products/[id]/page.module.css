@@ -39,7 +39,12 @@
   transition: background 160ms ease, transform 160ms ease;
 }
 .primaryCta:hover { background: #f8c53b; transform: translateY(-1px); }
+.primaryCta:disabled, .primaryCta:disabled:hover { background: #ededed; border-color: #d6d6d6; color: #545454; cursor: not-allowed; transform: none; }
 .primaryCta:focus-visible { outline: 3px solid #141414; outline-offset: 3px; }
+.stockNotice { display: flex; align-items: center; flex-wrap: wrap; gap: 6px 10px; color: #545454; font: 500 13px/1.4 'Mona Sans', sans-serif; }
+.stockNotice strong { display: inline-flex; align-items: center; min-height: 26px; padding: 3px 9px; border: 1px solid #d6d6d6; border-radius: 999px; background: #f6f6f6; color: #333; font-weight: 700; }
+.stockNotice a { color: #333; font-weight: 600; text-decoration: underline; text-underline-offset: 3px; }
+.stockNotice a:hover { color: #141414; }
 
 .benefitGrid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; width: 100%; }
 .benefitCard {

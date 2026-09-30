@@ -1,6 +1,7 @@
 "use client";
 import { cmsUrl } from '@/lib/cmsPreview';
 import { categoryHref } from '@/lib/categoryRoutes';
+import { isProductOutOfStock } from '@/lib/productAvailability';
 import React, { useState, useEffect, useMemo } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -164,7 +165,7 @@ export default function ProductDetailPage() {
     const monthWord = (n) => (n === 1 ? cms('MonthLabel', 'Month') : cms('MonthsLabel', 'Months'));
 
     const handleAddToCart = () => {
-        if (!product) return;
+        if (!product || isProductOutOfStock(product)) return;
 
         const item = {
             id: product._id,
@@ -205,6 +206,7 @@ export default function ProductDetailPage() {
     if (error || !product) return <div className="min-h-screen flex justify-center items-center">{cms('NotFoundText', 'Product not found')}</div>;
 
     // Derived Data
+    const outOfStock = isProductOutOfStock(product);
     const galleryImages = product.images?.length ? product.images : ['/images/placeholder.png'];
     const mainImage = galleryImages[0];
 
@@ -297,6 +299,11 @@ export default function ProductDetailPage() {
                             <h1 className={styles.mobileProductTitle}>
                                 {product.name}
                             </h1>
+                            {outOfStock && <div className={styles.stockNotice} role="status">
+                                <strong>Out of stock</strong>
+                                <span>Currently unavailable to rent.</span>
+                                <Link href={categoryHref(product.category || 'all')}>Browse similar products</Link>
+                            </div>}
                             <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
                                 {/* Stars */}
                                 <div style={{ display: 'flex', gap: '4px', alignItems: 'center', background: '#FFF3D3', border: '1px solid #FFE485', borderRadius: '8px', padding: '4px 6px' }}>
@@ -310,12 +317,12 @@ export default function ProductDetailPage() {
                                     </span>
                                 </div>
                                 {/* Delivery */}
-                                <div style={{ display: 'flex', gap: '4px', alignItems: 'center', background: '#00B505', borderRadius: '8px', padding: '4px 6px' }}>
+                                {!outOfStock && <div style={{ display: 'flex', gap: '4px', alignItems: 'center', background: '#00B505', borderRadius: '8px', padding: '4px 6px' }}>
                                     <BsTruck size={14} color="white" />
                                     <span style={{ fontFamily: "'Mona Sans', sans-serif", fontWeight: 500, fontSize: '12px', color: '#fff', letterSpacing: '-0.48px', whiteSpace: 'nowrap' }}>
                                         {product.deliveryTime || '2-4 days'}
                                     </span>
-                                </div>
+                                </div>}
                             </div>
                         </div>
 
@@ -387,9 +394,10 @@ export default function ProductDetailPage() {
                     {/* Book Your Plan CTA */}
                     <button
                         onClick={handleAddToCart}
+                        disabled={outOfStock}
                         className={styles.primaryCta}>
                         <span>
-                            {cms('CtaTextMobile', 'Book Your Plan')}
+                            {outOfStock ? 'Currently unavailable' : cms('CtaTextMobile', 'Book Your Plan')}
                         </span>
                     </button>
 
@@ -687,6 +695,11 @@ export default function ProductDetailPage() {
                                         <h1 className="text-[21px] font-semibold text-[#292929] leading-[28px] tracking-[-0.8px] pr-4">
                                             {product.name}
                                         </h1>
+                                        {outOfStock && <div className={styles.stockNotice} role="status">
+                                            <strong>Out of stock</strong>
+                                            <span>Currently unavailable to rent.</span>
+                                            <Link href={categoryHref(product.category || 'all')}>Browse similar products</Link>
+                                        </div>}
 
                                         {/* Rating & Stock */}
                                         <div
@@ -728,10 +741,10 @@ export default function ProductDetailPage() {
                                                 <span className="text-[12px] font-medium text-[#333333]">{product.rating || "4.5"} ({product.numReviews || 12})</span>
                                             </div>
                                             {/* Delivery Badge — always visible */}
-                                            <div className="bg-[#00b505] text-white text-[12px] font-medium px-2 py-0.5 rounded-[8px] flex items-center justify-center gap-1.5 h-full whitespace-nowrap">
+                                            {!outOfStock && <div className="bg-[#00b505] text-white text-[12px] font-medium px-2 py-0.5 rounded-[8px] flex items-center justify-center gap-1.5 h-full whitespace-nowrap">
                                                 <BsTruck size={13} className="stroke-[0.5]" />
                                                 <span className="mt-[1px]">{product.deliveryTime || cms('DeliveryText', '2-4 days')}</span>
-                                            </div>
+                                            </div>}
                                         </div>
                                     </div>
 
@@ -1106,11 +1119,12 @@ export default function ProductDetailPage() {
                                 {/* Primary CTA */}
                                 <button
                                     onClick={handleAddToCart}
+                                    disabled={outOfStock}
                                     className={styles.primaryCta}
                                 >
                                     <span style={{ fontFamily: '"Mona Sans", sans-serif', fontWeight: 600, fontSize: '16px', letterSpacing: '-0.4px', color: '#333333' }}>
-                                        <span className="lg:hidden">{cms('CtaTextMobile', 'Book Your Plan')}</span>
-                                        <span className="hidden lg:inline">{cms('CtaText', 'Rent Now')}</span>
+                                        <span className="lg:hidden">{outOfStock ? 'Currently unavailable' : cms('CtaTextMobile', 'Book Your Plan')}</span>
+                                        <span className="hidden lg:inline">{outOfStock ? 'Currently unavailable' : cms('CtaText', 'Rent Now')}</span>
                                     </span>
                                 </button>
 
@@ -1350,7 +1364,7 @@ export default function ProductDetailPage() {
                     <div><span>Monthly rent for {duration} {duration === 1 ? 'month' : 'months'}</span><strong>₹{currentPlan.price.toLocaleString('en-IN')}</strong></div>
                     <div><span>Refundable deposit</span><strong>{product.securityDeposit != null ? `₹${Number(product.securityDeposit).toLocaleString('en-IN')}` : 'Confirmed at checkout'}</strong></div>
                 </div>
-                <button type="button" className={`${styles.primaryCta} ${styles.benefitDrawerCta}`} onClick={() => { setActiveInfoDrawer(null); handleAddToCart(); }}>Book your plan <ArrowRight size={19} aria-hidden="true" /></button>
+                <button type="button" className={`${styles.primaryCta} ${styles.benefitDrawerCta}`} disabled={outOfStock} onClick={() => { setActiveInfoDrawer(null); handleAddToCart(); }}>{outOfStock ? 'Currently unavailable' : 'Book your plan'} {!outOfStock && <ArrowRight size={19} aria-hidden="true" />}</button>
             </ProductDetailDrawer>
             <ProductDetailDrawer isOpen={activeInfoDrawer === 'breakdown'} onClose={() => setActiveInfoDrawer(null)} title="Rental price breakdown">
                 <p className="mb-6 text-[#545454]">Your monthly rent for the selected minimum rental period.</p>

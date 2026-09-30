@@ -5,6 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { ArrowRight } from "@phosphor-icons/react";
+import { ChevronRightIcon } from "@heroicons/react/24/outline";
 import { getCategories } from "../../services/categoryService";
 
 const defaultCMS = {
@@ -117,32 +118,23 @@ const CategoriesPage = () => {
 
     return (
         <div className="min-h-screen bg-white w-full">
+            <div className="w-full bg-[#f6f6f6]">
+                <nav aria-label="Breadcrumb" className="mx-auto flex min-h-12 w-full max-w-[1200px] items-center gap-2 px-4 text-xs leading-4 tracking-[-0.025em] md:px-8 lg:min-h-[62px]">
+                    <Link href="/" className="shrink-0 text-[#545454] transition-colors hover:text-[#141414] focus-visible:rounded-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#141414]">Homepage</Link>
+                    <ChevronRightIcon aria-hidden="true" className="h-4 w-4 shrink-0 text-[#777]" />
+                    <span aria-current="page" className="min-w-0 truncate font-semibold text-[#1f1f1f]">All Categories</span>
+                </nav>
+            </div>
             <main className="max-w-[1200px] w-full mx-auto px-4 md:px-8 pt-6 md:pt-10 pb-16 md:pb-20">
 
                 {/* Header Section */}
                 <div className="flex flex-col gap-3 w-full mb-6 md:mb-8">
-
-                    {/* Breadcrumb — desktop only */}
-                    <div className="hidden md:flex items-center gap-[8px] h-[16px] text-[12px] font-medium text-[#64748B]">
-                        <span style={{ fontFamily: "'Mona Sans', sans-serif", fontWeight: 400, fontSize: "12px", lineHeight: "16px", color: "hsla(0, 0%, 33%, 1)" }}>
-                            Homepage
-                        </span>
-                        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" className="text-gray-400">
-                            <path d="M9 18L15 12L9 6" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
-                        </svg>
-                        <span className="text-[#1E293B] font-bold">All Categories</span>
-                    </div>
-
                     <motion.h1
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
-                        className="text-[32px] md:text-[44px]"
+                        className="text-balance text-[30px] font-semibold leading-[1.15] tracking-[-0.035em] text-[#1f1f1f] sm:text-[36px] md:text-[40px] lg:text-[44px]"
                         style={{
                             fontFamily: "'Mona Sans', sans-serif",
-                            fontWeight: 600,
-                            lineHeight: "1.25",
-                            letterSpacing: "-0.01em",
-                            color: "hsla(0, 0%, 12%, 1)",
                         }}
                     >
                         {cmsData.categoriesPageTitle}

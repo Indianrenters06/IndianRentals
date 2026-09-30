@@ -6,6 +6,10 @@
 .badges { position: absolute; left: 13px; top: 14px; right: 54px; display: flex; flex-wrap: wrap; gap: 4px; pointer-events: none; }
 .badges > span { border-radius: 9999px; padding: 4px 10px; background: var(--color-red-600); color: white; font-size: 12px; line-height: 16px; font-weight: 600; box-shadow: 0 2px 3px #78787817; }
 .badges > .new { background: var(--color-green-price); }
+.badges > .unavailableBadge { background: var(--color-grey-50); border: 1px solid var(--color-grey-200); color: var(--color-grey-800); box-shadow: none; }
+.unavailable .productImage { filter: saturate(.45); opacity: .78; }
+.unavailable .price strong { color: var(--color-grey-600); }
+.availabilityText { color: var(--color-grey-700); font-weight: 600; white-space: nowrap; }
 .wishlist { position: absolute; right: 6px; top: 5px; width: 44px; height: 44px; display: grid; place-items: center; border-radius: 50%; cursor: pointer; }
 .wishlist > span { display: grid; place-items: center; width: 33px; height: 33px; border: 1px solid var(--color-grey-100); border-radius: 50%; background: var(--color-grey-50); }
 .wishlist[aria-pressed="true"] { color: var(--color-red-sale); }
@@ -27,9 +31,11 @@
 .actionInner { min-height: 0; overflow: hidden; }
 .rent { display: flex; align-items: center; justify-content: center; width: 100%; min-height: 44px; margin-top: 8px; border: 0; border-radius: 9999px; background: var(--color-orange-300); color: var(--color-grey-900); font-size: 16px; font-weight: 500; cursor: pointer; }
 .rent:hover { background: var(--color-orange-400); }
+.details { background: var(--color-grey-50); border: 1px solid var(--color-grey-200); }
+.details:hover { background: var(--color-grey-100); }
 .card :is(a,button):focus-visible { outline: 2px solid var(--color-grey-900); outline-offset: -3px; }
 /* Reserve reveal space to keep carousel controls and following rows stationary. */
-@media (hover: hover) and (pointer: fine) {
+@media (hover: hover) and (pointer: fine) and (min-width: 1024px) {
     .frame { padding-bottom: var(--reveal-space, 43px); transition: padding-bottom 180ms ease; }
     .action { grid-template-rows: 0fr; opacity: 0; visibility: hidden; transition: grid-template-rows 180ms ease, opacity 180ms ease, visibility 180ms; }
     .rent { min-height: 35px; transform: translateY(14px) scale(.97); transition: transform 280ms cubic-bezier(.16,1,.3,1); }
@@ -37,6 +43,7 @@
     .frame:hover .action, .frame:focus-within .action { grid-template-rows: 1fr; opacity: 1; visibility: visible; }
     .frame:hover .rent, .frame:focus-within .rent { transform: translateY(0) scale(1); }
     .frame:hover .productImage, .frame:focus-within .productImage { transform: scale(1.08); }
+    .unavailable:hover .productImage, .unavailable:focus-within .productImage { transform: none; }
     .frame:hover .deliveryInfo, .frame:focus-within .deliveryInfo { display: block; color: var(--color-green-700); }
     .frame:hover .card, .frame:focus-within .card { transform: translateY(-5px) scale(1.015); box-shadow: 0 16px 30px #14141424, 0 4px 10px #1414140d; }
 }
@@ -87,6 +94,7 @@
     .badges { left: 9px; top: 10px; bottom: auto; right: 40px; }
     .badges > span { padding: 2px 6px; font-size: 8px; line-height: 14px; }
     .badges > .new { display: none; }
+    .badges > .unavailableBadge { font-size: 10px; line-height: 14px; padding: 3px 7px; }
     .wishlist { right: 0; top: 0; }
     .wishlist > span { width: 28px; height: 28px; }
     .wishlist svg { width: 18px; height: 18px; }
@@ -94,10 +102,14 @@
     .rent { min-height: 30px; margin-top: 4px; font-size: 12px; line-height: 18px; transform: translateY(10px); transition: transform 180ms ease; }
     .frame:focus-within .action { grid-template-rows: 1fr; opacity: 1; visibility: visible; }
     .frame:focus-within .rent { transform: translateY(0); }
+    .unavailable .action { grid-template-rows: 1fr; opacity: 1; visibility: visible; }
+    .unavailable .rent { transform: none; }
 }
 @media (max-width: 767px) {
     .content h3 { font-size: 12px; line-height: 16px; }
     .metadata, .price { font-size: 8px; }
+    .unavailable .metadata { flex-wrap: wrap; }
+    .availabilityText { font-size: 10px; line-height: 14px; white-space: normal; }
     .price strong { font-size: 14px; line-height: 20px; }
     .price del { font-size: 10px; }
 }

@@ -9,6 +9,7 @@ import { API } from "@/services/apiConfig";
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { A11y } from 'swiper/modules';
 import styles from './BestRentedProducts.module.css';
+import { isProductOutOfStock } from '@/lib/productAvailability';
 import ProductCard from './RentalProductCard';
 export { default as ProductCard } from './RentalProductCard';
 import 'swiper/css';
@@ -27,6 +28,7 @@ const BestRentedProducts = ({ type = "bestRented", defaultTitle = "Curated Produ
     const handleAddToCart = (e, product) => {
         e.preventDefault();
         e.stopPropagation();
+        if (isProductOutOfStock(product)) return;
         dispatch(addToCart({
             id: product.id,
             name: product.name,
@@ -84,9 +86,10 @@ const BestRentedProducts = ({ type = "bestRented", defaultTitle = "Curated Produ
                         rentPrice: p.rentalPrice,
                         discount: p.pageLayout?.discountText || p.discount || "",
                         deliveryTime: p.deliveryTime || "2-4 days",
+                        stock: p.stock,
                         isNew: p.condition === 'New',
                         tags: ["Quality tested", "Deep Cleaned"],
-                        statusTags: ["Like New", "In Stock"],
+                        statusTags: ["Like New", isProductOutOfStock(p) ? "Out of stock" : "In Stock"],
                     }));
                     setProducts(mappedProducts);
                     setLoading(false);
@@ -117,9 +120,10 @@ const BestRentedProducts = ({ type = "bestRented", defaultTitle = "Curated Produ
                     rentPrice: p.rentalPrice,
                     discount: p.pageLayout?.discountText || p.discount || "",
                     deliveryTime: p.deliveryTime || "2-4 days",
+                    stock: p.stock,
                     isNew: p.condition === 'New',
                     tags: ["Quality tested", "Deep Cleaned"],
-                    statusTags: ["Like New", "In Stock"],
+                    statusTags: ["Like New", isProductOutOfStock(p) ? "Out of stock" : "In Stock"],
                 }));
                 setProducts(mappedProducts);
                 setLoading(false);

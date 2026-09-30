@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation';
 import { useDispatch } from 'react-redux';
 import { addToCart } from '../redux/features/cartSlice';
 import RentalProductCard from './RentalProductCard';
+import { isProductOutOfStock } from '@/lib/productAvailability';
 
 // Keep catalogue duration selection and booking navigation with the shared card UI.
 export default function ProductCard({ product }) {
@@ -12,6 +13,7 @@ export default function ProductCard({ product }) {
     const handleAddToCart = (e) => {
         e.preventDefault();
         e.stopPropagation();
+        if (isProductOutOfStock(product)) return;
         dispatch(addToCart({
             id: product.id,
             name: product.name,

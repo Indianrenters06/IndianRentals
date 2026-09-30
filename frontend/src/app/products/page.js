@@ -7,6 +7,7 @@ import { ChevronRightIcon } from '@heroicons/react/24/outline';
 import Sidebar from "@/components/Sidebar";
 import ProductCard from "@/components/ProductCard";
 import { API } from "@/services/apiConfig";
+import { availableFirst } from "@/lib/productAvailability";
 
 export const dynamic = "force-dynamic";
 
@@ -19,14 +20,6 @@ function ProductsPageContent() {
     const [selectedSort, setSelectedSort] = useState("Most Popular");
     const [dealsOnly, setDealsOnly] = useState(false);
     const [cmsConfig, setCmsConfig] = useState({ title: "Most Rented Products" });
-    const [isMobile, setIsMobile] = useState(true);
-
-    useEffect(() => {
-        const check = () => setIsMobile(window.innerWidth < 1024);
-        check();
-        window.addEventListener('resize', check);
-        return () => window.removeEventListener('resize', check);
-    }, []);
 
     useEffect(() => {
         const fetchCMSAndProducts = async () => {
@@ -81,6 +74,7 @@ function ProductsPageContent() {
                         rentPrice: baseRent,
                         discount: "-20% off",
                         image: (p.images && p.images.length > 0) ? p.images[0] : (p.image || "/images/placeholder.png"),
+                        stock: p.stock,
                         isNew: p.condition === 'New' || p.isNew,
                         rating: p.rating || 4.5,
                         reviewCount: p.numReviews || 12,
@@ -99,7 +93,7 @@ function ProductsPageContent() {
                             items = [...items, ...mappedProducts];
                         }
                     }
-                    setProducts(items.slice(0, 9));
+                    setProducts(availableFirst(items).slice(0, 9));
                 }
                 setLoading(false);
             } catch (error) {
@@ -142,7 +136,7 @@ function ProductsPageContent() {
         } else if (selectedSort === "New Arrivals") {
             results.sort((a, b) => Number(Boolean(b.isNew)) - Number(Boolean(a.isNew)));
         }
-        return results;
+        return availableFirst(results);
     }, [products, selectedDuration, selectedSort, dealsOnly]);
 
     return (
@@ -168,16 +162,9 @@ function ProductsPageContent() {
                         background: 'hsla(0, 0%, 100%, 1)',
                     }}
                 >
-                    <div className="flex flex-col max-w-[900px]">
+                    <div className="flex flex-col gap-2 max-w-[900px]">
                         <h1
-                            style={{
-                                fontFamily: "'Mona Sans', sans-serif",
-                                fontWeight: 600,
-                                letterSpacing: '-0.01em',
-                                color: 'hsla(0, 0%, 12%, 1)',
-                                fontSize: '44px',
-                                lineHeight: '58px',
-                            }}
+                            className="text-balance text-[30px] font-semibold leading-[1.15] tracking-[-0.035em] text-[#1f1f1f] sm:text-[36px] md:text-[40px] lg:text-[44px]"
                         >
                             {cmsConfig.title}
                         </h1>
@@ -218,9 +205,9 @@ function ProductsPageContent() {
                                     <p className="text-sm text-gray-500 mt-1">Try a different search term.</p>
                                 </div>
                             ) : (
-                                <div className={`grid gap-[30px] ${isMobile ? 'grid-cols-2 gap-[8px]' : 'grid-cols-2 lg:grid-cols-3'}`}>
+                                <div className="grid grid-cols-2 gap-x-3 gap-y-4 md:gap-x-4 md:gap-y-5 lg:grid-cols-3 lg:gap-[30px]">
                                     {processedProducts.map((product, idx) => (
-                                        <ProductCard key={`${product.id}-${idx}`} product={product} mobile={isMobile} />
+                                        <ProductCard key={`${product.id}-${idx}`} product={product} />
                                     ))}
                                 </div>
                             )}

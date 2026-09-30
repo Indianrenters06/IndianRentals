@@ -1,12 +1,13 @@
 // Server component: dynamic SEO metadata + Product structured data for each
 // product page. The actual page (page.js) remains a client component.
 import { SITE_NAME, SITE_URL, DEFAULT_OG_IMAGE, API } from "@/config/site";
+import { isProductOutOfStock } from "@/lib/productAvailability";
 
 const stripHtml = (s = "") => s.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim();
 
 async function getProduct(id) {
     try {
-        const res = await fetch(`${API}/api/products/${id}`, { next: { revalidate: 3600 } });
+        const res = await fetch(`${API}/api/products/${id}`, { cache: "no-store" });
         if (!res.ok) return null;
         return await res.json();
     } catch {
@@ -65,7 +66,7 @@ export default async function ProductLayout({ children, params }) {
             url: `${SITE_URL}/products/${id}`,
             priceCurrency: "INR",
             price: product.rentalPrice,
-            availability: product.isActive === false
+            availability: product.isActive === false || isProductOutOfStock(product)
                 ? "https://schema.org/OutOfStock"
                 : "https://schema.org/InStock",
             seller: { "@type": "Organization", name: SITE_NAME },
