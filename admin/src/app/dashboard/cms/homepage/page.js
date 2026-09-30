@@ -1,4 +1,6 @@
 'use client';
+import Link from 'next/link';
+import { API_BASE_URL } from '@/lib/apiConfig';
 import RentalStepsEditor from '@/components/RentalStepsEditor';
 import toast from 'react-hot-toast';
 
@@ -14,11 +16,11 @@ import ImageUploader from "@/components/ImageUploader";
 import Toggle from "@/components/Toggle";
 import { resolveOfferCampaign, offerPreviewUrl } from '@/lib/offerCampaigns';
 
-const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+const API = API_BASE_URL;
 const getToken = () => typeof window !== "undefined" ? localStorage.getItem("adminToken") : null;
 
 // ── Reusable Native Input/Textarea ──────────────────────────────────────────
-const Field = ({ label, value, onChange, placeholder, type = "text", rows, className = "" }) => (
+const Field = ({ label, value, onChange, placeholder, type = "text", rows, min, max, step, className = "" }) => (
     <div className={`flex flex-col gap-1 ${className}`}>
         {label && <label className="text-xs font-bold text-slate-500 dark:text-slate-200 uppercase tracking-wider">{label}</label>}
         {rows ? (
@@ -32,6 +34,9 @@ const Field = ({ label, value, onChange, placeholder, type = "text", rows, class
         ) : (
             <input
                 type={type}
+                min={min}
+                max={max}
+                step={step}
                 value={value}
                 onChange={e => onChange(e.target.value)}
                 placeholder={placeholder}
@@ -259,7 +264,7 @@ const DEFAULTS = {
     testimonialsEnabled: true,
     testimonialSectionTitle: "What Our Customers Say",
     testimonialSectionSubtitle: "Real experiences from innovators, businesses, and creators powering their ambitions with IndianRentals.",
-    testimonialGoogleReviewCount: "5000+",
+    testimonialGoogleReviewCount: "",
     testimonialGoogleRating: "4.9",
     whyChooseUsEnabled: true,
     whyChooseUsTitle: "Why Choose Us?",
@@ -879,17 +884,19 @@ export default function CMSHomepage() {
                         <SectionRow
                             icon={<Star weight="fill" className="text-emerald-500" />}
                             title="Testimonials Section"
-                            desc="Review content is managed in the Testimonials tab. Configure UI here."
+                            desc="Manage published customer reviews below. These section settings are shared across storefront pages."
                             toggle={data.testimonialsEnabled}
                             onToggle={v => set("testimonialsEnabled", v)}
                         />
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <Field label="Section Title" value={data.testimonialSectionTitle} onChange={v => set("testimonialSectionTitle", v)} />
-                            <Field label="Google Review Count Badge" value={data.testimonialGoogleReviewCount} onChange={v => set("testimonialGoogleReviewCount", v)} placeholder="e.g. 5000+" />
+                            <Field label="Google Rating (1–5)" type="number" min={1} max={5} step={0.1} value={data.testimonialGoogleRating} onChange={v => set("testimonialGoogleRating", v)} />
+                            <Field label="Google Review Count Badge" value={data.testimonialGoogleReviewCount} onChange={v => set("testimonialGoogleReviewCount", v)} placeholder="Enter the verified review count" />
                             <div className="md:col-span-2">
                                 <Field label="Section Subtitle" value={data.testimonialSectionSubtitle} onChange={v => set("testimonialSectionSubtitle", v)} rows={2} />
                             </div>
                         </div>
+                        <Link href="/dashboard/cms/testimonials" className="inline-flex min-h-11 items-center rounded-xl bg-indigo-600 px-4 text-sm font-semibold text-white hover:bg-indigo-700">Manage testimonials</Link>
                     </div>
 
                     {/* Why Choose Us */}

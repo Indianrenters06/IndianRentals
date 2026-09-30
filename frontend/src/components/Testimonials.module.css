@@ -1,0 +1,59 @@
+.section { width:100%; padding-block:40px; background:var(--testimonial-background,var(--color-white)); scroll-margin-top:96px; }
+.container { width:calc(100% - 40px); max-width:1200px; margin-inline:auto; }
+.header { display:flex; align-items:center; justify-content:space-between; gap:24px; margin-bottom:24px; }
+.empty .header { margin-bottom:0; }
+.intro { width:512px; max-width:100%; }
+.intro h2 { margin:0; color:var(--color-grey-700); font-size:36px; font-weight:600; line-height:45px; letter-spacing:-.8px; }
+.intro > p { min-height:46px; margin:20px 0 0; color:var(--color-grey-600); font-size:16px; line-height:1.2; letter-spacing:-.64px; }
+.summary { display:flex; flex-shrink:0; align-items:center; gap:10px; color:var(--color-grey-600); font-size:12px; line-height:16px; letter-spacing:-.4px; }
+.summaryRating { display:flex; align-items:center; gap:4px; padding-left:6px; border-left:1px solid var(--color-grey-400); }
+.reviews { columns:3; column-gap:24px; }
+.collapsed { max-height:734px; overflow:hidden; }
+.fade { mask-image:linear-gradient(to bottom,#000 50%,transparent 100%); }
+.expanded { overflow:visible; }
+.card { display:inline-block; width:100%; break-inside:avoid; margin-bottom:20px; padding:20px; border-radius:var(--radius-2xl); background:var(--card-background); color:var(--card-text); overflow-wrap:anywhere; }
+.orange { --card-background:var(--color-orange-100); --card-text:var(--color-orange-700); --author-color:var(--color-orange-900); }
+.violet { --card-background:#ece8ff; --card-text:#5718bf; --author-color:var(--color-black); }
+.blue { --card-background:#d6f1ff; --card-text:#13309c; --author-color:var(--color-blue-950); }
+.pink { --card-background:#ffe2f3; --card-text:#b50569; --author-color:#660037; }
+.teal { --card-background:#c7fbef; --card-text:#115e59; --author-color:#042f2e; }
+.author { color:var(--author-color); }
+.author h3 { margin:0; font-size:18px; font-weight:500; line-height:25px; letter-spacing:-.8px; }
+.author p { margin:1px 0 0; font-size:12px; line-height:16px; letter-spacing:-.4px; }
+.message { margin:10px 0 11px; white-space:pre-line; font-size:14px; font-weight:500; line-height:20px; letter-spacing:-.4px; }
+.cardFooter { display:flex; align-items:center; justify-content:space-between; gap:10px; }
+.sourceLink { display:flex; align-items:center; min-width:44px; min-height:44px; }
+.sourceLabel { font-size:10px; line-height:14px; }
+.stars { display:inline-flex; gap:2.2px; flex-shrink:0; }
+.star { display:block; position:relative; width:20.6512px; height:20.6512px; }
+.star img { max-width:none; }
+.emptyStar { opacity:.2; }
+.starFill { position:absolute; left:0; top:0; height:100%; overflow:hidden; }
+.compactStars { display:flex; gap:0; zoom:.62; filter:grayscale(1) brightness(.35); }
+.actions { display:flex; justify-content:center; margin-top:20px; }
+.button { min-height:44px; border:0; border-radius:var(--radius-4xl); padding:6px 20px; background:var(--color-blue-700); color:var(--color-white); font-size:16px; font-weight:500; line-height:23px; letter-spacing:-.4px; cursor:pointer; transition:background-color 160ms; }
+.button:hover { background:var(--color-blue-800); }
+.button:focus-visible,.sourceLink:focus-visible { outline:2px solid var(--color-blue-800); outline-offset:4px; }
+.state { margin:0; padding-block:24px; color:var(--color-grey-600); font-size:14px; line-height:20px; }
+.state .button { margin-top:16px; }
+@media (max-width:1023px) {
+    .container { width:calc(100% - 60px); }
+    .header { flex-direction:column; align-items:flex-start; gap:16px; }
+    .summary { flex-wrap:wrap; }
+    .intro > p { margin-top:14px; }
+    .reviews { columns:2; }
+    .collapsed { max-height:794px; }
+}
+@media (max-width:599px) {
+    .container { width:calc(100% - 40px); }
+    .intro h2 { font-size:25px; line-height:31px; }
+    .intro > p { min-height:0; font-size:12px; line-height:18px; letter-spacing:-.4px; }
+    .reviews { columns:1; }
+    .collapsed { max-height:590px; }
+    .card { padding:18px; }
+    .author h3 { font-size:16px; line-height:22px; }
+    .author p { font-size:12px; line-height:18px; }
+    .message { font-size:14px; line-height:20px; }
+    .button { font-size:14px; line-height:20px; }
+}
+@media (prefers-reduced-motion:reduce) { .button { transition:none; } }

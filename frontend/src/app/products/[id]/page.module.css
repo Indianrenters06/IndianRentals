@@ -6,7 +6,12 @@
 .productBreadcrumb strong { color: #141414; font-weight: 600; }
 .mobilePricingCard { width: 100%; max-width: 560px; margin-inline: auto; overflow: hidden; border: 1px solid #e2e2e2; border-radius: 12px; background: #fff; }
 .mobileProductTitle { margin: 0; color: #292929; font: 600 16px/1.3 'Mona Sans', sans-serif; letter-spacing: -.02em; }
-.mobileTermButton { display: flex; align-items: center; justify-content: space-between; gap: 12px; width: 100%; min-height: 42px; padding: 10px 12px; border: 0; border-bottom: 1px solid #e2e2e2; background: #fff; color: #333; cursor: pointer; font: 500 12px/1.3 'Mona Sans', sans-serif; }
+.mobileTermButton { display: flex; align-items: center; justify-content: space-between; gap: 12px; width: 100%; min-height: 64px; padding: 12px; border: 0; border-block: 1px solid #e2e2e2; background: #fff8e5; color: #333; cursor: pointer; text-align: left; font: 500 13px/1.4 'Mona Sans', sans-serif; }
+.mobileTermPrompt { display: grid; gap: 2px; }
+.mobileTermPrompt small { color: #665120; font-size: 11px; }
+.mobileTermButton strong { flex-direction: column; align-items: flex-end; }
+.mobileTermValue { display: flex; align-items: center; gap: 6px; }
+.mobileTermChange { color: #665120; font-size: 11px; font-weight: 500; text-decoration: underline; text-underline-offset: 3px; }
 .mobileTermButton strong { display: flex; align-items: center; gap: 5px; white-space: nowrap; color: #141414; font-weight: 700; }
 .mobileTermButton:focus-visible, .mobileBreakdownRow button:focus-visible { outline: 2px solid #141414; outline-offset: -3px; }
 .mobileBreakdownRow { display: flex; justify-content: flex-end; min-height: 30px; padding-inline: 12px; border-bottom: 1px solid #e2e2e2; }
@@ -86,24 +91,39 @@
 .benefitDrawerSummary strong { color: #141414; text-align: right; font-weight: 700; }
 .benefitDrawerCta { margin-top: 4px; }
 
-.simpleCompare { width: 100%; background: #f6f6f6; padding: clamp(48px, 6vw, 80px) 20px; }
-.simpleCompareInner { max-width: 1120px; margin: 0 auto; }
-.compareIntroBlock { margin-bottom: 28px; }
-.simpleCompare h2 { margin: 0 0 12px; color: #141414; font: 600 clamp(30px, 4vw, 46px)/1.08 'Mona Sans', sans-serif; letter-spacing: -.035em; }
-.simpleCompareIntro { max-width: 650px; margin: 0; color: #545454; font: 400 16px/1.5 'Mona Sans', sans-serif; }
-.compareBento { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
-.compareTile { min-width: 0; padding: clamp(20px, 2.4vw, 28px); border: 1px solid #e5e5e5; border-radius: 16px; background: #fff; }
-.compareTileFeature { grid-column: span 2; background: #fff8e5; border-color: #efd998; }
-.compareTile h3 { margin: 0 0 22px; color: #141414; font: 600 clamp(19px, 2vw, 24px)/1.2 'Mona Sans', sans-serif; letter-spacing: -.02em; }
-.compareChoices { display: grid; gap: 0; }
-.compareChoices > div { display: grid; grid-template-columns: 65px minmax(0, 1fr); gap: 12px; align-items: start; padding: 16px 0; border-top: 1px solid #e9e9e9; }
-.compareTileFeature .compareChoices > div { border-color: #eadfbf; }
-.compareChoices span { color: #545454; font: 700 12px/1.45 'Mona Sans', sans-serif; text-transform: uppercase; letter-spacing: .04em; }
-.compareChoiceRent span { color: #805500; }
-.compareChoices p { min-width: 0; margin: 0; color: #333; font: 500 15px/1.5 'Mona Sans', sans-serif; }
-.compareTileFeature .compareChoices p { font-size: clamp(16px, 1.7vw, 19px); }
+.simpleCompare { width: 100%; background: #f6f6f6; padding: clamp(40px, 5vw, 72px) 20px; }
+.simpleCompareInner { display: grid; grid-template-columns: minmax(0, 1fr) minmax(240px, .42fr); align-items: center; gap: 36px; max-width: 1200px; margin: 0 auto; }
+.compareMain { min-width: 0; }
+.compareIntroBlock { margin-bottom: 24px; }
+.simpleCompare h2 { max-width: 720px; margin: 0 0 12px; color: #141414; font: 600 clamp(26px, 3vw, 36px)/1.15 'Mona Sans', sans-serif; letter-spacing: -.025em; text-wrap: balance; }
+.simpleCompare h2 span { color: #765000; }
+.simpleCompareIntro { max-width: 650px; margin: 0; color: #545454; font: 400 15px/1.5 'Mona Sans', sans-serif; }
+.compareTable { width: 100%; table-layout: fixed; border-collapse: separate; border-spacing: 0; color: #333; font: 400 14px/1.5 'Mona Sans', sans-serif; }
+.compareLabelCol { width: 30%; }
+.compareRentCol { width: 39%; }
+.compareTable th, .compareTable td { padding: 20px 16px; vertical-align: middle; text-align: left; overflow-wrap: break-word; }
+.compareTable thead th { color: #141414; font-size: 16px; font-weight: 600; }
+.compareTable tbody th { padding-left: 0; font-weight: 600; }
+.compareTable tbody th, .compareTable tbody td { border-bottom: 1px solid #dedede; }
+.compareTable .compareRentHeading { border-radius: 12px 12px 0 0; background: #ffcf46; }
+.compareRentCell { background: #fff8e5; }
+.compareRentCell > div { display: flex; gap: 10px; align-items: flex-start; }
+.compareRentCell svg { flex: none; margin-top: 1px; color: #765000; }
+.compareTable tbody tr:last-child .compareRentCell { border-radius: 0 0 12px 12px; }
+.compareNote { margin: 16px 0 0; color: #545454; font: 400 12px/1.5 'Mona Sans', sans-serif; }
+.compareStory { min-width: 0; overflow: hidden; border-radius: 16px; background: #101827; color: #fff; }
+.compareStoryImage { position: relative; width: 100%; aspect-ratio: 1; }
+.compareStoryBody { padding: 0 24px 24px; }
+.compareStory h3 { margin: 0 0 12px; color: #fff; font: 600 24px/1.2 'Mona Sans', sans-serif; letter-spacing: -.025em; text-wrap: balance; }
+.compareStory p { margin: 0 0 20px; color: #c5d2e5; font: 400 14px/1.5 'Mona Sans', sans-serif; }
+.compareStory button { width: 100%; min-height: 44px; padding: 12px; border: 0; border-radius: 999px; background: #ffcf46; color: #141414; font: 600 14px/1.3 'Mona Sans', sans-serif; cursor: pointer; transition: background-color 160ms ease; }
+.compareStory button:hover { background: #f5c53c; }
+.compareStory button:focus-visible { outline: 2px solid #fff; outline-offset: 4px; }
 
 @media (max-width: 1023px) {
+  .simpleCompareInner { grid-template-columns: 1fr; }
+  .compareStory { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); align-items: center; }
+  .compareStoryBody { padding: 24px; }
   .tenurePanel { padding: 24px 28px 12px; }
   .benefitGrid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .benefitCard { min-height: 58px; padding: 10px; font-size: 13px; }
@@ -111,6 +131,7 @@
   .specGrid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 @media (max-width: 767px) {
+  .mobileProductHeader > .detailsPanel { margin-top: 0; }
   .tenurePanel { padding: 16px 14px 12px; }
   .primaryCta { min-height: 54px; padding-inline: 20px; font-size: 16px; }
   .benefitGrid { gap: 8px; }
@@ -121,12 +142,23 @@
   .detailTab { width: 100%; padding-inline: 8px; white-space: normal; text-align: center; }
   .detailTabs .detailTab:last-child:nth-child(3) { grid-column: 1 / -1; }
   .specGrid { grid-template-columns: 1fr; gap: 18px; }
-  .simpleCompare { padding: 48px 20px; }
-  .compareBento { grid-template-columns: 1fr; }
-  .compareTileFeature { grid-column: auto; }
-  .compareTile h3 { margin-bottom: 14px; }
+  .simpleCompare { padding: 36px 20px; }
+  .simpleCompareIntro { font-size: 14px; }
+  .compareTable { font-size: 12px; line-height: 1.5; }
+  .compareTable th, .compareTable td { padding: 16px 10px; }
+  .compareTable thead th { font-size: 13px; }
+  .compareRentCell > div { display: grid; gap: 6px; }
+  .compareRentCell svg { width: 18px; height: 18px; }
 }
 @media (max-width: 380px) {
   .tenurePanel { padding-inline: 16px; }
-  .compareChoices > div { grid-template-columns: 54px minmax(0, 1fr); gap: 8px; }
+  .compareTable th, .compareTable td { padding-inline: 8px; }
+}
+@media (max-width: 599px) {
+  .compareStory { display: block; }
+  .compareStoryImage { aspect-ratio: 4 / 3; }
+  .compareStoryBody { padding: 0 20px 24px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .compareStory button { transition: none; }
 }

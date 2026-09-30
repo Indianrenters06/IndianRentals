@@ -20,6 +20,7 @@ import Testimonials from '../../../components/Testimonials';
 import CompareTenures from '../../../components/CompareTenures';
 import ProductDetailDrawer from '../../../components/ProductDetailDrawer';
 import DeliveryCheck from '../../../components/DeliveryCheck';
+import ProductReviewForm from '../../../components/ProductReviewForm';
 
 import { Heart, Export as ExportIcon, Package, Truck, CalendarDots, MapPin, ArrowRight, ShieldCheck, CheckCircle, Wrench, Sparkle, Cube, UserCircle, Bank } from '@phosphor-icons/react';
 import styles from './page.module.css';
@@ -52,9 +53,6 @@ export default function ProductDetailPage() {
     const [mobileImageIndex, setMobileImageIndex] = useState(0);
     const [isCompareOpen, setIsCompareOpen] = useState(false);
     const [activeInfoDrawer, setActiveInfoDrawer] = useState(null);
-    const [reviewRating, setReviewRating] = useState(0);
-    const [reviewText, setReviewText] = useState('');
-    const [reviewSubmitted, setReviewSubmitted] = useState(false);
 
     // Delivery pincode serviceability
     const [pincode, setPincode] = useState('');
@@ -326,10 +324,10 @@ export default function ProductDetailPage() {
                             </div>
                         </div>
 
-                        {/* On narrow screens the full tenure selector lives in the comparison drawer. */}
+                        {/* Compare rental terms in a bottom sheet on narrow screens. */}
                         {on('Compare') && <button type="button" className={styles.mobileTermButton} onClick={() => setIsCompareOpen(true)}>
-                            <span>{cms('TenureSliderLabel', 'Pick your rental term')}</span>
-                            <strong>{duration} {monthWord(duration)} <FaChevronDown size={11} aria-hidden="true" /></strong>
+                            <span className={styles.mobileTermPrompt}><span>{cms('TenureSliderLabel', 'Pick your rental term')}</span><small>Compare monthly prices</small></span>
+                            <strong><span className={styles.mobileTermValue}>{duration} {monthWord(duration)} <FaChevronDown size={11} aria-hidden="true" /></span><span className={styles.mobileTermChange}>Change term</span></strong>
                         </button>}
 
                         {/* Price row */}
@@ -442,8 +440,8 @@ export default function ProductDetailPage() {
                     {on('Tabs') && <div className={styles.detailsPanel}>
                         {/* Tab Buttons */}
                         <div className={styles.detailTabs}>
-                            {tabs.filter(tab => tab.key !== 'review').map(tab => (
-                                <button key={tab.key} type="button" aria-pressed={currentTab === tab.key} onClick={() => setActiveTab(tab.key)} className={`${styles.detailTab} ${currentTab === tab.key ? styles.detailTabActive : ''}`}>
+                            {tabs.map(tab => (
+                                <button key={tab.key} type="button" aria-pressed={currentTab === tab.key} onClick={() => setActiveTab(tab.key)} className={`${styles.detailTab} ${currentTab === tab.key ? styles.detailTabActive : ''} ${tab.key === 'review' ? styles.detailTabReview : ''}`}>
                                     {tab.label}
                                 </button>
                             ))}
@@ -451,7 +449,7 @@ export default function ProductDetailPage() {
                         {/* Divider */}
                         <div style={{ height: '1px', background: '#EEE', width: '100%' }} />
                         {/* Spec Rows */}
-                        {activeTab === 'details' && (
+                        {currentTab === 'details' && (
                             <div className={styles.specGrid}>
                                 {specRows.map((item, i) => (
                                     <div key={i} style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
@@ -461,18 +459,27 @@ export default function ProductDetailPage() {
                                 ))}
                             </div>
                         )}
-                        {activeTab === 'return' && (
+                        {currentTab === 'return' && (
                             <p className={styles.policyText}>
                                 {product.returnPolicy || cms('DefaultReturnPolicy', 'Standard return policy applies. Please contact support for details.')}
                             </p>
                         )}
-                        {activeTab === 'shipping' && (
+                        {currentTab === 'shipping' && (
                             <p className={styles.policyText}>
                                 {product.shippingPolicy || cms('DefaultShippingPolicy', 'Standard shipping policy applies. Contact support for delivery details.')}
                             </p>
                         )}
+                        {currentTab === 'review' && <ProductReviewForm productId={product._id} cms={cms} />}
                     </div>}
                 </div>
+
+                {on('Testimonials') && (
+                    <Testimonials
+                        sectionId="customer-reviews-mobile"
+                        titleOverride={cms('TestimonialsHeading', null)}
+                        subtitleOverride={cms('TestimonialsSubheading', null)}
+                    />
+                )}
 
                 {/* ── Best Rented Products (Mobile) ── */}
                 {on('Related') && (
@@ -483,7 +490,7 @@ export default function ProductDetailPage() {
                     />
                 )}
 
-                {on('RentVsBuy') && <SimpleRentComparison />}
+                {on('RentVsBuy') && <SimpleRentComparison onChooseTerm={on('Compare') ? () => setIsCompareOpen(true) : undefined} />}
 
                 {/* ── FAQ (Mobile) ── */}
                 {on('Faq') && (
@@ -918,7 +925,7 @@ export default function ProductDetailPage() {
                                                         onClick={() => setIsCompareOpen(true)}
                                                         className={`${styles.tenureAction} ${styles.tenureCompare}`}
                                                     >
-                                                        {cms('CompareLinkText', 'Compare rental periods')} <ArrowRight size={16} aria-hidden="true" />
+                                                        {cms('CompareLinkText', 'Compare rental periods')}
                                                     </button>
                                                 )}
                                             </div>
@@ -1249,63 +1256,7 @@ export default function ProductDetailPage() {
                                         </div>
                                     )}
 
-                                    {currentTab === 'review' && (
-                                        <div className="pt-4 flex flex-col gap-4 max-w-[560px]">
-                                            {reviewSubmitted ? (
-                                                <div style={{ fontFamily: '"Mona Sans", sans-serif', fontSize: '15px', color: 'hsla(122, 100%, 30%, 1)', fontWeight: 600 }}>
-                                                    {cms('ReviewThanksText', 'Thanks for your review!')} 🎉
-                                                </div>
-                                            ) : (
-                                                <>
-                                                    <div className="flex flex-col gap-1">
-                                                        <span style={{ fontFamily: '"Mona Sans", sans-serif', fontWeight: 600, fontSize: '15px', color: '#1D1D1F' }}>
-                                                            {cms('ReviewPrompt', 'How was your experience?')}
-                                                        </span>
-                                                        <div className="flex items-center gap-1">
-                                                            {[1, 2, 3, 4, 5].map((s) => (
-                                                                <button
-                                                                    key={s}
-                                                                    type="button"
-                                                                    onClick={() => setReviewRating(s)}
-                                                                    className="transition-transform hover:scale-110"
-                                                                    style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 2, lineHeight: 0 }}
-                                                                    aria-label={`${s} star${s > 1 ? 's' : ''}`}
-                                                                >
-                                                                    <StarIcon style={{ width: 26, height: 26, color: s <= reviewRating ? 'hsla(33, 100%, 52%, 1)' : 'hsla(0, 0%, 85%, 1)' }} />
-                                                                </button>
-                                                            ))}
-                                                        </div>
-                                                    </div>
-                                                    <textarea
-                                                        value={reviewText}
-                                                        onChange={(e) => setReviewText(e.target.value)}
-                                                        placeholder={cms('ReviewPlaceholder', "Tell others what you liked (or didn't)…")}
-                                                        rows={4}
-                                                        style={{ width: '100%', border: '1px solid hsla(0, 0%, 89%, 1)', borderRadius: '12px', padding: '12px', fontFamily: '"Mona Sans", sans-serif', fontSize: '14px', color: '#1D1D1F', outline: 'none', resize: 'vertical' }}
-                                                    />
-                                                    <button
-                                                        type="button"
-                                                        disabled={reviewRating === 0}
-                                                        onClick={() => setReviewSubmitted(true)}
-                                                        style={{
-                                                            alignSelf: 'flex-start',
-                                                            padding: '10px 24px',
-                                                            borderRadius: '9999px',
-                                                            background: reviewRating === 0 ? 'hsla(44, 100%, 80%, 1)' : 'hsla(44, 100%, 64%, 1)',
-                                                            color: '#1D1D1F',
-                                                            fontFamily: '"Mona Sans", sans-serif',
-                                                            fontWeight: 700,
-                                                            fontSize: '14px',
-                                                            border: 'none',
-                                                            cursor: reviewRating === 0 ? 'not-allowed' : 'pointer'
-                                                        }}
-                                                    >
-                                                        {cms('ReviewSubmitText', 'Submit Review')}
-                                                    </button>
-                                                </>
-                                            )}
-                                        </div>
-                                    )}
+                                    {currentTab === 'review' && <ProductReviewForm productId={product._id} cms={cms} />}
                                 </div>
                             </div>
                         )}
@@ -1313,7 +1264,7 @@ export default function ProductDetailPage() {
                 </div>
 
                 {on('Testimonials') && (
-                    <div className="hidden lg:block">
+                    <div className="w-full">
                         <Testimonials
                             titleOverride={cms('TestimonialsHeading', null)}
                             subtitleOverride={cms('TestimonialsSubheading', null)}
@@ -1329,7 +1280,7 @@ export default function ProductDetailPage() {
                     />
                 )}
 
-                {on('RentVsBuy') && <SimpleRentComparison />}
+                {on('RentVsBuy') && <SimpleRentComparison onChooseTerm={on('Compare') ? () => setIsCompareOpen(true) : undefined} />}
 
                 {on('Faq') && (
                     product.faqs && product.faqs.length > 0 ? (
@@ -1346,7 +1297,6 @@ export default function ProductDetailPage() {
             </div>{/* ── END DESKTOP ── */}
 
             <CompareTenures
-                key={duration}
                 isOpen={isCompareOpen}
                 onClose={() => setIsCompareOpen(false)}
                 selectedTenure={duration}

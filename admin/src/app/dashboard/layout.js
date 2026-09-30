@@ -247,6 +247,7 @@ export default function DashboardLayout({ children }) {
         { name: 'Service Pages', path: '/dashboard/cms/service-pages' },
         { heading: 'Content' },
         { name: 'Blog', path: '/dashboard/cms/blog' },
+        { name: 'Testimonials', path: '/dashboard/cms/testimonials' },
         { name: 'Policies & Info', path: '/dashboard/cms/pages' },
         { name: 'FAQ Page', path: '/dashboard/cms/faq' },
         { heading: 'Customer contact' },

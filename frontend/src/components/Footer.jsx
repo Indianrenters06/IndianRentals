@@ -44,11 +44,12 @@ const DEFAULT_FOOTER_COLUMNS = [
     {
         title: "Policies", links: [
             { name: "KYC Policy", href: "/kyc-policy" },
+            { name: "Shipping Policy", href: "/shipping" },
             { name: "Return & Refund Policy", href: "/return-policy" },
             { name: "Privacy Policy", href: "/privacy" },
             { name: "Terms & Conditions", href: "/terms" },
             { name: "FAQs", href: "/faq" },
-            { name: "Customer Reviews", href: "/reviews" },
+            { name: "Customer Reviews", href: "/#customer-reviews" },
         ]
     },
 ];
@@ -69,7 +70,12 @@ const Footer = () => {
             column.links?.some(link => defaultColumn.links.some(defaultLink => defaultLink.href === link.href))
         )
     );
-    const footerColumns = [configuredColumns[0], ...missingCatalogColumns, ...configuredColumns.slice(1)];
+    const normalizeFooterLink = (link) => ({
+        ...link,
+        href: ({ '/shipping-policy': '/shipping', '/ticket': '/contact', '/reviews': '/#customer-reviews' })[link.href] || link.href,
+    });
+    const footerColumns = [configuredColumns[0], ...missingCatalogColumns, ...configuredColumns.slice(1)]
+        .map(column => ({ ...column, links: (column.links || []).map(normalizeFooterLink) }));
     const paymentLogos = (settings?.paymentLogos?.length ? settings.paymentLogos : DEFAULT_PAYMENT_LOGOS);
     const primaryColumn = footerColumns[0];
     const secondaryColumns = footerColumns.slice(1);

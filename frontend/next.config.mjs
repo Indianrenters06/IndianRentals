@@ -9,7 +9,7 @@ const securityHeaders = [
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  allowedDevOrigins: ['127.0.0.1'],
+  allowedDevOrigins: ['127.0.0.1', ...(process.env.LAN_DEV_ORIGIN ? [process.env.LAN_DEV_ORIGIN] : [])],
   poweredByHeader: false,
   agentRules: false,
   turbopack: { root: process.cwd() },

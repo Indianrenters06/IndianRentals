@@ -15,6 +15,13 @@ export const getProductById = async (id) => {
     return response.data;
 };
 
+export const submitProductReview = async (id, review, token) => {
+    const response = await axios.post(`${API_URL}/${id}/reviews`, review, {
+        headers: { Authorization: `Bearer ${token}` },
+    });
+    return response.data;
+};
+
 // Fetch products filtered by top-level category name
 export const getProductsByCategory = async (categoryName, params = {}) => {
     const response = await axios.get(API_URL, {

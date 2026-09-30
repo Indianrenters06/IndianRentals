@@ -13,8 +13,9 @@ import ImageUploader from '@/components/ImageUploader';
 import BannerAppearanceControls from '@/components/BannerAppearanceControls';
 import Toggle from '@/components/Toggle';
 import RentalStepsEditor from '@/components/RentalStepsEditor';
+import { API_BASE_URL } from '@/lib/apiConfig';
 
-const API = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+const API = API_BASE_URL;
 const getToken = () => typeof window !== 'undefined' ? localStorage.getItem('adminToken') : null;
 
 // ── Reusable components ───────────────────────────────────────────────────────
@@ -65,6 +66,8 @@ const Card = ({ icon, title, children, accent = 'indigo' }) => {
 // ── DEFAULTS ─────────────────────────────────────────────────────────────────
 const DEFAULTS = {
     bannerImage: 'https://res.cloudinary.com/dpu9ikeqe/image/upload/v1787305860/9f8d4d5a95b5ff564196928771ca74a7229121d9_jmb6yw.png', bannerTitle: 'Rental Process',
+    bannerShowText: true,
+    bannerBackground: '',
     rentalFeaturesTitle: 'Features',
     rentalFeaturesSubtitle: 'Rent with confidence. Every product comes with transparent pricing, flexible terms, and reliable support—so you focus on your work, not equipment hassles.',
     rentalFeatures: [
@@ -90,23 +93,30 @@ export default function RentalProcessCMSPage() {
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
     const [saved, setSaved] = useState(false);
+    const [loadError, setLoadError] = useState('');
 
     const set = (k, v) => setData(p => ({ ...p, [k]: v }));
 
     const load = useCallback(async () => {
+        setLoading(true);
+        setLoadError('');
         try {
             const res = await window.fetch(`${API}/api/cms/rental-process/draft`, { headers: { Authorization: `Bearer ${getToken()}` }, cache: 'no-store' });
-            if (res.ok) {
-                const json = await res.json();
-                setData({ ...DEFAULTS, ...json });
-            }
-        } catch { }
+            if (!res.ok) throw new Error('Could not load the Rental Process settings. Check your admin sign-in and try again.');
+            const json = await res.json();
+            setData({ ...DEFAULTS, ...json });
+        } catch (error) { setLoadError(error.message || 'Could not load the Rental Process settings. Please try again.'); }
         finally { setLoading(false); }
     }, []);
 
     useEffect(() => { load(); }, [load]);
 
     const save = async () => {
+        if (loadError) return;
+        if (data.bannerBackground && !/^#[\da-f]{6}$/i.test(data.bannerBackground)) {
+            toast.error('Enter a six-digit background colour, such as #ffcf46.');
+            return;
+        }
         try {
             setSaving(true);
             const res = await window.fetch(`${API}/api/cms/rental-process`, {
@@ -114,7 +124,10 @@ export default function RentalProcessCMSPage() {
                 headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${getToken()}` },
                 body: JSON.stringify(data),
             });
-            if (!res.ok) throw new Error('Failed to save');
+            if (!res.ok) {
+                const error = await res.json().catch(() => ({}));
+                throw new Error(error.message || 'Could not save the draft. Please try again.');
+            }
             setSaved(true);
             window.dispatchEvent(new CustomEvent('cms:draft-saved', { detail: { page: 'rental-process' } }));
             setTimeout(() => setSaved(false), 3000);
@@ -159,18 +172,24 @@ export default function RentalProcessCMSPage() {
                             <CheckCircle size={14} weight="fill" /> Saved!
                         </span>
                     )}
-                    <button onClick={save} disabled={saving}
+                    <button onClick={save} disabled={saving || !!loadError}
                         className="flex items-center gap-2 h-10 px-5 rounded-xl !bg-indigo-600 hover:!bg-indigo-700 disabled:opacity-60 text-white font-semibold text-sm shadow-lg shadow-indigo-500/20 transition-all">
                         {saving ? <Spinner size="sm" color="white" /> : <FloppyDisk size={15} weight="bold" />} Save draft
                     </button>
                 </div>
             </div>
 
+            {loadError && <div role="alert" className="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-800 dark:border-red-900 dark:bg-red-950 dark:text-red-200">
+                <p>{loadError}</p>
+                <button type="button" onClick={load} className="mt-2 min-h-10 font-semibold underline underline-offset-4">Retry loading settings</button>
+            </div>}
+
             <div className="grid grid-cols-1 xl:grid-cols-3 gap-5">
                 <div className="xl:col-span-1 space-y-5">
                     <Card title="Banner & SEO" accent="indigo">
                         <TextInput label="Banner Title" value={data.bannerTitle} onChange={v => set('bannerTitle', v)} placeholder="Rental Process" />
                         <BannerAppearanceControls data={data} set={set} defaultColor="#f9fafb" />
+                        <p className="text-xs leading-5 text-slate-500 dark:text-slate-400">Save the draft, then use Publish saved draft above to apply the background colour to the storefront.</p>
                         <ImageUploader label="Banner Image" existingUrl={data.bannerImage} onUpload={url => set('bannerImage', url)} />
                         <hr className="border-slate-100 dark:border-slate-800" />
                         <TextInput label="Meta Title" value={data.metaTitle} onChange={v => set('metaTitle', v)} placeholder="Rental Process – IndianRentals" />

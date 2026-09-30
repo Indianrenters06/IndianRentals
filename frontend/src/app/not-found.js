@@ -12,6 +12,7 @@ const shortcuts = [
 export default function NotFound() {
     return (
         <section className={styles.page} aria-labelledby="not-found-title">
+            <div className={styles.content}>
             <div className={styles.message}>
                 <p className={styles.eyebrow}>404 / Page not found</p>
                 <h1 id="not-found-title">This page took<br />a detour.</h1>
@@ -33,6 +34,7 @@ export default function NotFound() {
                     <Image src="/images/not-found/equipment.png" alt="" fill priority sizes="(max-width: 767px) 100vw, (max-width: 1440px) 55vw, 751px" />
                 </div>
                 <span className={styles.number}>404</span>
+            </div>
             </div>
         </section>
     );

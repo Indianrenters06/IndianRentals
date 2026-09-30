@@ -18,8 +18,8 @@ const getToken = () => typeof window !== 'undefined' ? localStorage.getItem('adm
 const DEFAULTS = {
     bannerImage: '',
     bannerTitle: '',
-    faqTitle: 'FAQs',
-    faqSubtitle: 'Everything you need to know about renting with IndianRenters.com',
+    faqTitle: 'Everything you need to know about renting with IndianRenters.com',
+    faqSubtitle: 'Welcome to FAQ!',
     faqItems: [],
     faqSectionEnabled: true,
     publishStatus: 'published',
@@ -64,7 +64,13 @@ export default function WebsiteFaqManager() {
             const res = await window.fetch(`${API}/api/cms/faq/draft`, { headers: { Authorization: `Bearer ${getToken()}` }, cache: 'no-store' });
             if (res.ok) {
                 const d = await res.json();
-                setData({ ...DEFAULTS, ...d, faqItems: Array.isArray(d.faqItems) ? d.faqItems : [] });
+                const legacyHeading = d.faqTitle === 'FAQs' && d.faqSubtitle === DEFAULTS.faqTitle;
+                setData({
+                    ...DEFAULTS,
+                    ...d,
+                    ...(legacyHeading ? { faqTitle: DEFAULTS.faqTitle, faqSubtitle: DEFAULTS.faqSubtitle } : {}),
+                    faqItems: Array.isArray(d.faqItems) ? d.faqItems : [],
+                });
             }
         } catch (e) {
             console.error('Failed to load FAQ page:', e);
@@ -154,8 +160,8 @@ export default function WebsiteFaqManager() {
                         <h4 className="text-sm font-bold text-slate-700 dark:text-slate-200 uppercase tracking-wider">Page Header</h4>
                         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                             <div className="space-y-4">
-                                <TextInput label="Heading Title" value={data.faqTitle} onChange={v => set('faqTitle', v)} placeholder="FAQs" />
-                                <TextArea label="Heading Subtitle" value={data.faqSubtitle} onChange={v => set('faqSubtitle', v)} placeholder="Everything you need to know about renting…" rows={2} />
+                                <TextInput label="Main heading (large text)" value={data.faqTitle} onChange={v => set('faqTitle', v)} placeholder="Everything you need to know about renting…" />
+                                <TextArea label="Intro text (above heading)" value={data.faqSubtitle} onChange={v => set('faqSubtitle', v)} placeholder="Welcome to FAQ!" rows={2} />
                                 <TextInput label="Banner Title" value={data.bannerTitle} onChange={v => set('bannerTitle', v)} placeholder="FAQs" />
                     <BannerAppearanceControls data={data} set={set} />
                             </div>

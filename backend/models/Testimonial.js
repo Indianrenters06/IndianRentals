@@ -7,7 +7,7 @@ const testimonialSchema = mongoose.Schema({
     },
     role: {
         type: String, // e.g. "Software Engineer", "Student"
-        required: true,
+        default: '',
     },
     message: {
         type: String,
@@ -17,14 +17,18 @@ const testimonialSchema = mongoose.Schema({
         type: Number,
         required: true,
         default: 5,
+        min: 1,
+        max: 5,
     },
     image: {
         type: String,
-        required: true,
+        default: "",
     },
+    source: { type: String, enum: ["indianrenters", "google"], default: "indianrenters" },
+    sourceUrl: { type: String, default: "" },
     isApproved: {
         type: Boolean,
-        default: true,
+        default: false,
     }
 }, {
     timestamps: true,

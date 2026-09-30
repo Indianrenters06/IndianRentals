@@ -4,7 +4,7 @@ export const SITE_NAME = "IndianRenters";
 export const SITE_TAGLINE = "You Name It, We Rent It";
 export const SITE_DESCRIPTION =
     "India's largest tech rental platform. Rent laptops, MacBooks, servers, DSLR cameras, AV equipment and office furniture for business and events — delivered to your door, without the full ownership cost.";
-export const API = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:5000";
+export const API = process.env.NEXT_PUBLIC_API_URL || "/backend";
 
 // Default social/share image (the brand logo on Cloudinary).
 export const DEFAULT_OG_IMAGE =

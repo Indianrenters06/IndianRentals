@@ -12,8 +12,7 @@ import { addToCart } from '../redux/features/cartSlice';
 import { ProductCard } from './BestRentedProducts';
 import { productsForShowcaseSlide } from './showcaseProducts';
 import { resolveCmsHref } from '@/lib/cmsLinks';
-
-const API = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+import { API } from '@/services/apiConfig';
 
 const DEFAULT_CATEGORY_IMAGES = {
     apple: "https://res.cloudinary.com/dgkckcdk8/image/upload/v1776108199/f6540bc8c3d4a91dfd954f6fe1cf8d3803b81b4a_3_optlwp.png",

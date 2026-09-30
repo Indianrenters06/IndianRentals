@@ -98,14 +98,18 @@ const FaqSection = ({ cmsData, limit, pageName }) => {
 
     const legacyHomepageHeading = isHomepage && cms?.homepageFaqTitle === 'Frequently Asked Questions'
         && cms?.homepageFaqSubtitle === 'Everything you need to know about renting with us.';
-    const legacyFaqPageHeading = isFaqPage && cms?.faqTitle === 'FAQs'
+    const legacyFaqHeading = cms?.faqTitle === 'FAQs'
         && cms?.faqSubtitle === 'Everything you need to know about renting with IndianRenters.com';
-    const title = isHomepage
+    const title = pageName === 'about'
+        ? "Everything you need to know about renting with IndianRenters.com"
+        : isHomepage
         ? (legacyHomepageHeading ? "Everything you need to know about renting with IndianRenters.com" : (cms?.homepageFaqTitle || "Everything you need to know about renting with IndianRenters.com"))
-        : (legacyFaqPageHeading ? "Everything you need to know about renting with IndianRenters.com" : (cms?.faqTitle || "Everything you need to know about renting with IndianRenters.com"));
-    const subtitle = isHomepage
+        : (legacyFaqHeading ? "Everything you need to know about renting with IndianRenters.com" : (cms?.faqTitle || "Everything you need to know about renting with IndianRenters.com"));
+    const subtitle = pageName === 'about'
+        ? "Welcome to FAQ!"
+        : isHomepage
         ? (legacyHomepageHeading ? "Welcome to FAQ!" : (cms?.homepageFaqSubtitle || "Welcome to FAQ!"))
-        : (legacyFaqPageHeading ? "Welcome to FAQ!" : (cms?.faqSubtitle || "Welcome to FAQ!"));
+        : (legacyFaqHeading ? "Welcome to FAQ!" : (cms?.faqSubtitle || "Welcome to FAQ!"));
 
     const toggleFaq = (index) => {
         if (activeIndices.includes(index)) {
@@ -120,11 +124,11 @@ const FaqSection = ({ cmsData, limit, pageName }) => {
 
     return (
         <section
-            className={`w-full bg-white flex items-center ${isHomepage ? styles.homepage : 'py-[48px] lg:py-[100px]'}`}
+            className={`w-full bg-white flex items-center ${isHomepage ? styles.homepage : 'py-[48px] md:py-[40px] lg:py-[100px]'}`}
         >
             {/* Homepage spacing is responsive; other pages keep their existing section spacing. */}
             <div
-                className="max-w-[1200px] mx-auto px-5 sm:px-6 w-full flex flex-col lg:flex-row items-start gap-8 lg:gap-[40px]"
+                className="max-w-[1200px] mx-auto px-5 sm:px-6 w-full flex flex-col lg:flex-row items-start gap-6 md:gap-8 lg:gap-[40px]"
             >
                 {/* Left Column — Figma "Section Title" (node under FAQ frame): gap 20px, eyebrow above heading */}
                 <div className="w-full lg:w-[442px] lg:shrink-0 flex flex-col gap-5">

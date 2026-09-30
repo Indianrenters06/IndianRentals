@@ -1,4 +1,4 @@
-const API = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+import { API } from '@/services/apiConfig';
 
 export function cmsUrl(pageName) {
     const params = typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : null;
@@ -10,7 +10,10 @@ export function cmsUrl(pageName) {
 }
 
 export async function loadCmsPage(pageName, previewToken) {
-    const base = `${API}/api/cms/${encodeURIComponent(pageName)}`;
+    // Metadata and server-rendered pages need an absolute URL; browser requests
+    // use the storefront's shared same-origin API path in local development.
+    const serverApi = process.env.API_URL || process.env.NEXT_PUBLIC_API_URL || 'https://indianrentals-3ugl.onrender.com';
+    const base = `${typeof window === 'undefined' ? serverApi : API}/api/cms/${encodeURIComponent(pageName)}`;
     const url = previewToken
         ? `${base}/preview?token=${encodeURIComponent(previewToken)}`
         : base;

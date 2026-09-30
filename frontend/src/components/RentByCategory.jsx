@@ -198,6 +198,7 @@ const RentByCategory = () => {
                                         src={cat.image}
                                         alt={cat.name}
                                         fill
+                                        sizes="(max-width: 767px) 80px, 183px"
                                         className="object-cover"
                                     />
                                 ) : (
@@ -247,6 +248,7 @@ const RentByCategory = () => {
                                                             src={cat.image}
                                                             alt={cat.name}
                                                             fill
+                                                            sizes="(max-width: 1023px) 165px, 183px"
                                                             className="object-cover"
                                                         />
                                                     ) : (

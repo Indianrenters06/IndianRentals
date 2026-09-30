@@ -4,8 +4,9 @@ import { useCallback, useEffect, useState } from 'react';
 import { usePathname } from 'next/navigation';
 import { ArrowSquareOut, Eye, PaperPlaneTilt, Trash } from '@phosphor-icons/react';
 import toast from 'react-hot-toast';
+import { API_BASE_URL } from '@/lib/apiConfig';
 
-const API = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+const API = API_BASE_URL;
 const STOREFRONT = process.env.NEXT_PUBLIC_STOREFRONT_URL || (process.env.NODE_ENV === 'production' ? 'https://indianrenters.com' : 'http://localhost:3000');
 const PAGE_PATHS = {
     homepage: '/', about: '/about', blog: '/blog', 'categories-page': '/categories',

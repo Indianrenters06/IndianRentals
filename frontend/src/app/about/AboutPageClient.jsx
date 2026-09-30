@@ -1,13 +1,13 @@
 'use client';
 import { cmsUrl } from '@/lib/cmsPreview';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useId } from 'react';
 import Image from 'next/image';
 import PageBanner from '@/components/PageBanner';
 import BestRentedProducts from '../../components/BestRentedProducts';
 import FaqSection from '../../components/FaqSection';
 import WhyChooseUs from '../../components/WhyChooseUs';
-import { API } from '@/services/apiConfig';
+import styles from './AboutPage.module.css';
 
 // ── Defaults (exact same content currently hardcoded) ─────────────────────────
 const D = {
@@ -56,6 +56,7 @@ const merge = (cms) => {
 
 export default function AboutPage() {
     const [activeTab, setActiveTab] = useState('vision');
+    const tabsId = useId();
     const [c, setC] = useState(D); // c = merged CMS data
 
     useEffect(() => {
@@ -76,9 +77,16 @@ export default function AboutPage() {
         { title: c.aboutMission3Title, text: c.aboutMission3Text },
     ];
     const activeItems = activeTab === 'vision' ? visionItems : missionItems;
+    const handleTabKey = (event, key) => {
+        if (!['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) return;
+        event.preventDefault();
+        const nextTab = event.key === 'Home' ? 'vision' : event.key === 'End' ? 'mission' : key === 'vision' ? 'mission' : 'vision';
+        setActiveTab(nextTab);
+        document.getElementById(`${tabsId}-${nextTab}`)?.focus();
+    };
 
     return (
-        <div className="text-gray-800 pb-20">
+        <div className="text-gray-800">
 
             {/* On mobile, the banner + story + vision/mission sit on a continuous
                 grey surface (#f6f6f6), matching the Figma mobile design. */}
@@ -124,30 +132,30 @@ export default function AboutPage() {
                 </section>
 
                 {/* ── 3. Vision / Mission Tabs ──────────────────────────────────── */}
-                <section className="w-full max-w-[1440px] mx-auto pb-10 md:pb-24">
-                    <div className="max-w-[1200px] mx-auto px-5 md:px-8 xl:px-0">
-                        <div className="w-full bg-[#FFE485] md:bg-[#FDE68A] lg:bg-[#FFE485] rounded-2xl md:rounded-3xl lg:rounded-[28px] pt-5 md:pt-10 lg:pt-9 pb-6 md:pb-14 lg:pb-9 px-5 md:px-10 lg:px-7 flex flex-col lg:flex-row gap-7 md:gap-12 lg:gap-24 items-start">
+                <section className={styles.visionSection} aria-label="Our vision and mission">
+                    <div className={styles.visionContainer}>
+                        <div className={styles.visionCard}>
                             {/* Tab Buttons */}
-                            <div className="flex gap-3 md:gap-4 lg:gap-5 w-full lg:w-[320px] shrink-0">
+                            <div className={styles.tabs} role="tablist" aria-label="Our vision and mission">
                                 {[
                                     { key: 'vision',  label: c.aboutVisionTabLabel },
                                     { key: 'mission', label: c.aboutMissionTabLabel },
                                 ].map(({ key, label }) => (
-                                    <button key={key} onClick={() => setActiveTab(key)}
-                                        // Mona Sans must be explicit (font-sans falls back to a wider face),
-                                        // and the label must never wrap or the pill squashes.
-                                        style={{ fontFamily: "'Mona Sans', sans-serif" }}
-                                        className={`h-[36px] md:h-[45px] px-4 md:px-8 lg:px-[30px] whitespace-nowrap shrink-0 inline-flex items-center justify-center rounded-full font-medium lg:font-semibold font-sans text-sm md:text-lg lg:leading-[25px] lg:tracking-[-0.8px] transition-[background-color,color,border-color,transform] hover:scale-[1.02] lg:hover:scale-100 active:scale-95 ${activeTab === key ? 'bg-black lg:bg-[#333333] lg:border lg:border-[#333333] text-white shadow-lg lg:shadow-none' : 'border-2 lg:border border-black/10 lg:border-[#333333] text-gray-800 lg:text-[#333333] hover:bg-black/5'}`}>
+                                    <button key={key} type="button" role="tab" id={`${tabsId}-${key}`}
+                                        aria-selected={activeTab === key} aria-controls={`${tabsId}-panel`}
+                                        tabIndex={activeTab === key ? 0 : -1}
+                                        onClick={() => setActiveTab(key)} onKeyDown={event => handleTabKey(event, key)}
+                                        className={styles.tab}>
                                         {label}
                                     </button>
                                 ))}
                             </div>
                             {/* Content Items */}
-                            <div className="flex-1 min-w-0 flex flex-col gap-4 md:gap-8 lg:gap-0">
+                            <div id={`${tabsId}-panel`} role="tabpanel" aria-labelledby={`${tabsId}-${activeTab}`} tabIndex={0} className={styles.tabPanel}>
                                 {activeItems.map(({ title, text }, i) => (
-                                    <div key={i} className={`flex flex-col md:flex-row items-start gap-1 md:gap-4 lg:justify-between lg:gap-6 ${i < activeItems.length - 1 ? 'border-b border-black/10 lg:border-[#545454]/50 pb-4 md:pb-6 lg:pb-5' : ''} ${i > 0 ? 'lg:pt-5' : ''}`}>
-                                        <h3 className="text-sm md:text-[20px] lg:text-[21px] lg:leading-[28px] lg:tracking-[-0.8px] font-bold lg:font-semibold text-gray-900 lg:text-[#333333] font-sans md:w-[220px] lg:w-auto shrink-0">{title}</h3>
-                                        <p className="text-gray-800 lg:text-[#545454] font-sans leading-relaxed lg:leading-[23px] lg:tracking-[-0.4px] lg:font-medium text-[10px] md:text-[15px] lg:text-[16px] lg:w-[500px] lg:shrink-0">{text}</p>
+                                    <div key={i} className={styles.visionRow}>
+                                        <h3>{title}</h3>
+                                        <p>{text}</p>
                                     </div>
                                 ))}
                             </div>

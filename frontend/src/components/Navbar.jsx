@@ -361,7 +361,7 @@ const Navbar = ({ showCategories: propShowCategories } = {}) => {
 
             <div className="w-full bg-white">
                 <div
-                    className="max-w-[1200px] mx-auto flex items-center justify-between px-4 md:px-8"
+                    className="mx-auto w-full max-w-[1200px] flex items-center justify-between px-4 md:px-8 min-[1264px]:px-0"
                     style={{
                         height: "64px",
                         gap: "10px",
@@ -446,17 +446,17 @@ const Navbar = ({ showCategories: propShowCategories } = {}) => {
                                     setIsCityDropdownOpen(!isCityDropdownOpen);
                                 }}
                                 style={{
-                                    border: "1.5px solid #d1d1d1",
+                                    border: "1px solid #AFAFAF",
                                     borderRadius: "9999px",
                                     paddingLeft: "8px",
-                                    paddingRight: "14px",
-                                    gap: "4px",
+                                    paddingRight: "12px",
+                                    gap: "2px",
                                     backgroundColor: "#FFFFFF",
                                     boxShadow: "0 1px 2px rgba(0,0,0,0.02)"
                                 }}
                             >
-                                <MapPin size={18} color="#1D1D1F" weight="regular" />
-                                <span className="text-[14.5px] text-[#1D1D1F] font-medium truncate" style={{ maxWidth: "150px" }}>
+                                <MapPin size={20} color="#292929" weight="regular" aria-hidden="true" />
+                                <span className="text-[16px] text-[#292929] font-medium truncate tracking-[-0.4px]" style={{ maxWidth: "150px" }}>
                                     {selectedCity || "Delhi"}
                                 </span>
                             </button>
@@ -704,7 +704,7 @@ const Navbar = ({ showCategories: propShowCategories } = {}) => {
                                 backgroundColor: "#FFFFFF"
                             }}
                         >
-                            <MapPin size={20} weight="regular" color="#1D1D1F" className="shrink-0" aria-hidden="true" />
+                            <MapPin size={20} weight="regular" color="#292929" className="shrink-0" aria-hidden="true" />
                             <span className="text-[13px] font-medium truncate max-w-[70px]" style={{ color: "#174378" }}>{selectedCity || "Bangalore"}</span>
                         </button>
 
@@ -735,7 +735,7 @@ const Navbar = ({ showCategories: propShowCategories } = {}) => {
             {/* Category Navigation Bar (show/remove category section) */}
             {showCategories && topNavLinks.length > 0 && (
                 <div className="hidden lg:block bg-white w-full border-t border-gray-100">
-                    <div className="max-w-[1200px] mx-auto px-4 md:px-8 h-[28px] flex items-center">
+                    <div className="mx-auto w-full max-w-[1200px] px-4 md:px-8 min-[1264px]:px-0 h-[28px] flex items-center">
                         <div className="flex items-center" style={{ width: "754px", height: "20px", gap: "17px" }}>
                             {topNavLinks.map((link) => (
                                 <React.Fragment key={link.name}>

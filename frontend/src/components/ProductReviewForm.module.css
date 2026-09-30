@@ -1,0 +1,18 @@
+.form { display: flex; flex-direction: column; gap: 12px; max-width: 560px; color: #333; font: 500 14px/1.5 'Mona Sans', sans-serif; }
+.rating { margin: 0; padding: 0; border: 0; }
+.rating legend { margin-bottom: 8px; font-size: 16px; font-weight: 600; }
+.stars { display: flex; align-items: center; gap: 2px; }
+.star { position: relative; display: grid; place-items: center; width: 44px; height: 44px; border-radius: 8px; color: #9a6700; cursor: pointer; }
+.star input { position: absolute; width: 1px; height: 1px; overflow: hidden; opacity: 0; }
+.star:focus-within { outline: 2px solid #141414; outline-offset: 2px; }
+.star:hover { background: #fff8e5; }
+.ratingValue { margin-left: 8px; font-size: 13px; }
+.form textarea { width: 100%; min-height: 110px; padding: 12px; border: 1px solid #999; border-radius: 12px; background: #fff; color: #333; font: 400 16px/1.5 'Mona Sans', sans-serif; resize: vertical; }
+.form textarea::placeholder { color: #666; }
+.form button { align-self: flex-start; min-height: 44px; padding: 10px 24px; border: 0; border-radius: 999px; background: #ffcf46; color: #141414; font: 600 14px/1.5 'Mona Sans', sans-serif; cursor: pointer; }
+.form button:hover { background: #f5c53c; }
+.form button:disabled { background: #e5e5e5; color: #666; cursor: not-allowed; }
+.form button:focus-visible, .form textarea:focus-visible, .error a:focus-visible { outline: 2px solid #141414; outline-offset: 3px; }
+.error { color: #a21c14; font-weight: 400; }
+.error a { color: #333; text-decoration: underline; text-underline-offset: 3px; }
+.success { margin: 0; color: #333; font: 600 16px/1.5 'Mona Sans', sans-serif; }

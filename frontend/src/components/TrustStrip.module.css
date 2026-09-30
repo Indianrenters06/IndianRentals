@@ -1,0 +1,65 @@
+.section {
+    width:100%;
+    background:var(--color-white);
+    border-top:1px solid var(--color-grey-200);
+    padding:32px 20px;
+}
+.benefits {
+    display:grid;
+    grid-template-columns:repeat(4,minmax(0,1fr));
+    gap:24px;
+    width:100%;
+    max-width:1200px;
+    margin:0 auto;
+    padding:0;
+    list-style:none;
+}
+.benefit { display:flex; align-items:center; gap:12px; min-width:0; }
+.illustration {
+    display:block;
+    flex-shrink:0;
+    width:72px;
+    height:72px;
+    background-image:url('/images/trust/rental-benefits.png');
+    background-repeat:no-repeat;
+    background-size:200% 200%;
+}
+.quality { background-position:0 0; }
+.delivery { background-position:100% 0; }
+.repair { background-position:0 100%; }
+.deposit { background-position:100% 100%; }
+.copy { min-width:0; }
+.link {
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    min-height:44px;
+    color:var(--color-grey-900);
+    font-size:16px;
+    line-height:20px;
+    font-weight:600;
+    letter-spacing:-.4px;
+    text-decoration:none;
+    text-underline-offset:4px;
+}
+.link svg { flex-shrink:0; transition:transform 160ms ease-out; }
+.link:hover { text-decoration:underline; }
+.link:hover svg { transform:translate(2px,-2px); }
+.link:focus-visible { outline:2px solid var(--color-grey-900); outline-offset:4px; border-radius:2px; }
+.copy p { margin:0; color:var(--color-grey-600); font-size:13px; line-height:19px; letter-spacing:-.2px; }
+@media (max-width:1023px) {
+    .section { padding-inline:30px; }
+    .benefits { grid-template-columns:repeat(2,minmax(0,1fr)); gap:24px 32px; }
+}
+@media (max-width:599px) {
+    .section { padding:24px 20px; }
+    .benefits { gap:24px 20px; }
+    .benefit { flex-direction:column; align-items:flex-start; gap:4px; }
+    .illustration { width:64px; height:64px; }
+    .link { font-size:14px; line-height:20px; }
+    .copy p { font-size:12px; line-height:18px; }
+}
+@media (prefers-reduced-motion:reduce) {
+    .link svg { transition:none; }
+    .link:hover svg { transform:none; }
+}

@@ -1,0 +1,114 @@
+.visionSection {
+    width: 100%;
+    padding-bottom: 96px;
+}
+
+.visionContainer {
+    width: calc(100% - 40px);
+    max-width: 1200px;
+    margin-inline: auto;
+}
+
+.visionCard {
+    display: grid;
+    grid-template-columns: max-content minmax(0, 1fr);
+    align-items: start;
+    gap: 96px;
+    padding: 36px 28px;
+    border-radius: var(--radius-4xl);
+    background: var(--color-orange-200);
+    color: var(--color-grey-700);
+    font-family: var(--font-family-Mona-Sans);
+}
+
+.tabs {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 20px;
+    min-width: 0;
+}
+
+.tab {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 45px;
+    max-width: 100%;
+    border: 1px solid var(--color-grey-700);
+    border-radius: 70px;
+    padding: 9px 29px;
+    background: transparent;
+    color: inherit;
+    font: inherit;
+    font-size: 18px;
+    font-weight: 600;
+    line-height: 25px;
+    letter-spacing: -.8px;
+    cursor: pointer;
+    transition: background-color 160ms ease-out, color 160ms ease-out;
+}
+
+.tab:hover { background: rgb(51 51 51 / 6%); }
+.tab[aria-selected='true'] { background: var(--color-grey-700); color: var(--color-white); }
+.tab:focus-visible, .tabPanel:focus-visible { outline: 2px solid var(--color-grey-700); outline-offset: 4px; }
+.tabPanel { min-width: 0; }
+
+.visionRow {
+    position: relative;
+    display: grid;
+    grid-template-columns: minmax(0, 204fr) minmax(0, 500fr);
+    align-items: start;
+    gap: 24px;
+    padding-block: 28px;
+}
+
+.visionRow:first-child { padding-top: 0; }
+.visionRow:last-child { padding-bottom: 0; }
+.visionRow + .visionRow::before {
+    content: '';
+    position: absolute;
+    inset: 0 0 auto;
+    height: 1px;
+    background: url('/images/about/vision-divider-desktop.svg') center / 100% 100% no-repeat;
+}
+
+.visionRow h3 {
+    min-width: 0;
+    margin: 0;
+    font-size: 21px;
+    font-weight: 600;
+    line-height: 28px;
+    letter-spacing: -.8px;
+    overflow-wrap: anywhere;
+}
+
+.visionRow p {
+    min-width: 0;
+    margin: 0;
+    color: var(--color-grey-600);
+    font-size: 16px;
+    font-weight: 500;
+    line-height: 23px;
+    letter-spacing: -.4px;
+    overflow-wrap: anywhere;
+}
+
+@media (max-width: 1023px) {
+    .visionCard { grid-template-columns: minmax(0, 1fr); gap: 48px; padding: 20px; }
+    .visionRow { grid-template-columns: minmax(0, 264fr) minmax(0, 400fr); }
+    .visionRow + .visionRow::before { background-image: url('/images/about/vision-divider-tablet.svg'); }
+}
+
+@media (max-width: 599px) {
+    .visionSection { padding-bottom: 40px; }
+    .visionCard { gap: 28px; border-radius: var(--radius-xl); }
+    .tabs { gap: 10px; }
+    .tab { min-height: 36px; padding: 7px 15px; font-size: 14px; line-height: 20px; }
+    .visionRow { grid-template-columns: minmax(0, 1fr); gap: 10px; padding-block: 12px; }
+    .visionRow + .visionRow::before { background-image: url('/images/about/vision-divider-mobile.svg'); }
+    .visionRow h3 { font-size: 16px; line-height: 22px; }
+    .visionRow p { font-size: 12px; line-height: 18px; }
+}
+
+@media (prefers-reduced-motion: reduce) { .tab { transition: none; } }
