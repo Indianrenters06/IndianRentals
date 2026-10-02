@@ -1,0 +1,61 @@
+.statusSummary {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.statusCopy {
+    min-width: 0;
+}
+
+.statusBadge {
+    display: grid;
+    flex: none;
+    width: 72px;
+    height: 72px;
+    place-items: center;
+    border-radius: 20px;
+}
+
+.verifiedBadge {
+    background: linear-gradient(138deg, #9aff92 5%, var(--color-green-700, #028907) 92%);
+    box-shadow:
+        0 6px 16px rgb(2 137 7 / 14%),
+        inset 2px 2px 4px rgb(175 249 170 / 65%),
+        inset -2px -3px 4px rgb(2 137 7 / 24%);
+}
+
+.verifiedCheck {
+    width: 72%;
+    height: 72%;
+    background: url('/images/kyc/verified-check.svg') center / contain no-repeat;
+}
+
+.rejectedBadge {
+    background: linear-gradient(138deg, #ffa29d 5%, #c8170d 92%);
+    box-shadow:
+        0 6px 16px rgb(200 23 13 / 12%),
+        inset 2px 2px 4px rgb(255 225 223 / 60%),
+        inset -2px -3px 4px rgb(200 23 13 / 20%);
+}
+
+.rejectedCross {
+    width: 72%;
+    height: 72%;
+    background: url('/images/kyc/rejected-cross.svg') center / contain no-repeat;
+}
+
+.rejectionNotice {
+    margin-bottom: 28px;
+    padding: 20px;
+    border: 1px solid #e9b3ae;
+    border-radius: 12px;
+    background: #fff5f3;
+    color: #7e211a;
+}
+
+@media (max-width: 639px) {
+    .statusSummary { align-items: flex-start; gap: 16px; }
+    .statusBadge { width: 56px; height: 56px; border-radius: 16px; }
+    .rejectionNotice { padding: 16px; }
+}

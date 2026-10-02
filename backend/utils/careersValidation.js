@@ -1,4 +1,5 @@
 const defaults = require('../config/careers-defaults.json');
+const { createHash, randomUUID } = require('node:crypto');
 const types = ['text', 'email', 'tel', 'url', 'textarea', 'select'];
 const fail = message => { const error = new Error(message); error.statusCode = 400; throw error; };
 const text = (value, max = 5000) => typeof value === 'string' ? value.trim().slice(0, max) : '';
@@ -79,4 +80,17 @@ function validateApplication(input, content) {
     });
     return { jobId, jobTitle: job?.title || 'Open application', formId: form.id, fullName, email, answers, consentText: content.consentText, consentAt: new Date() };
 }
-module.exports = { normalizeContent, publicContent, validateApplication };
+function applicationSubmission(input) {
+    if (!input || typeof input !== 'object' || Array.isArray(input)) fail('Application details are required.');
+    // Older clients remain usable, but only a client-supplied reference supports retries.
+    const submissionId = input.submissionId === undefined ? randomUUID() : input.submissionId;
+    if (typeof submissionId !== 'string' || !/^[a-f\d]{8}-[a-f\d]{4}-[a-f\d]{4}-[a-f\d]{4}-[a-f\d]{12}$/i.test(submissionId)) fail('Invalid submission reference. Please reload the page.');
+    const answers = input.answers ?? {};
+    if (typeof answers !== 'object' || Array.isArray(answers) || Object.keys(answers).length > 20 || Object.entries(answers).some(([key, value]) => !id(key) || typeof value !== 'string' || value.length > 5000)) fail('Invalid application answers.');
+    const payload = {
+        jobId: text(input.jobId, 80), fullName: text(input.fullName, 150), email: text(input.email, 254).toLowerCase(), consent: input.consent === true,
+        answers: Object.fromEntries(Object.keys(answers).sort().map(key => [key, answers[key].trim()]))
+    };
+    return { submissionId: submissionId.toLowerCase(), submissionHash: createHash('sha256').update(JSON.stringify(payload)).digest('hex') };
+}
+module.exports = { normalizeContent, publicContent, validateApplication, applicationSubmission };

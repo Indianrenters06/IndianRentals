@@ -52,8 +52,8 @@ export default function ImageUploader({
 
     // Sync when existingUrls load from a network request (e.g. in Edit mode)
     useEffect(() => {
-        if (multiple && existingUrls?.length > 0 && previews.length === 0) {
-            setPreviews(existingUrls);
+        if (multiple && existingUrls?.length > 0) {
+            setPreviews(current => current.length === 0 ? existingUrls : current);
         }
     }, [existingUrls, multiple]);
 

@@ -1,5 +1,5 @@
 "use client";
-import { cmsUrl } from '@/lib/cmsPreview';
+import { cmsUrl, fetchCmsPage } from '@/lib/cmsPreview';
 import React, { useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
 import proofStyles from './WhyChooseUs.module.css';
@@ -16,7 +16,7 @@ const WhyChooseUs = ({ cmsData = null, overrideBg, overridePaddingTop, overrideP
 
     useEffect(() => {
         if (cmsData) return;
-        fetch(cmsUrl('homepage'))
+        fetchCmsPage('homepage')
             .then(res => res.ok ? res.json() : null)
             .then(data => { setFetchedCms(data); setLoading(false); })
             .catch(() => setLoading(false));

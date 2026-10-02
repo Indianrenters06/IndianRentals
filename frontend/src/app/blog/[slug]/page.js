@@ -1,12 +1,13 @@
 'use client';
+import { API } from '@/services/apiConfig';
 
 import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Spinner } from "@heroui/react";
-import { FiArrowLeft, FiChevronLeft, FiArrowUpRight, FiLink, FiLinkedin, FiTwitter, FiFacebook, FiMail } from "react-icons/fi";
+import { FiArrowLeft, FiChevronLeft, FiArrowUpRight, FiLink, FiLinkedin, FiTwitter, FiFacebook } from "react-icons/fi";
 
-const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+
 
 export default function BlogPostPage() {
     const { slug } = useParams();
@@ -16,8 +17,6 @@ export default function BlogPostPage() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(false);
     const [copied, setCopied] = useState(false);
-    const [email, setEmail] = useState('');
-    const [subscribed, setSubscribed] = useState(false);
 
     useEffect(() => {
         if (!slug) return;
@@ -74,14 +73,6 @@ export default function BlogPostPage() {
 
     const shareUrl = typeof window !== 'undefined' ? encodeURIComponent(window.location.href) : '';
     const shareTitle = post ? encodeURIComponent(post.title) : '';
-
-    const handleSubscribe = (e) => {
-        e.preventDefault();
-        if (!email) return;
-        // No newsletter backend yet — acknowledge locally.
-        setSubscribed(true);
-        setEmail('');
-    };
 
     if (loading) {
         return (
@@ -207,34 +198,6 @@ export default function BlogPostPage() {
                 )}
 
                 {/* Newsletter */}
-                <div className="mt-12 md:mt-16 bg-[#eee] border border-[#e2e2e2] rounded-[16px] p-6 md:p-7">
-                    <FiMail className="w-8 h-8 text-[#333] mb-2" />
-                    <h3 className="text-[22px] md:text-[27px] font-bold text-[#333] tracking-tight leading-tight">Weekly Newsletter</h3>
-                    <p className="text-[14px] md:text-[16px] text-[#333] mt-1 mb-4">Subscribe to receive the latest blog posts to your inbox every week.</p>
-
-                    {subscribed ? (
-                        <p className="text-[14px] font-semibold text-[#0B5ED7]">Thanks for subscribing! 🎉</p>
-                    ) : (
-                        <form onSubmit={handleSubscribe} className="flex flex-col gap-2">
-                            <input
-                                type="email"
-                                required
-                                value={email}
-                                onChange={(e) => setEmail(e.target.value)}
-                                placeholder="Enter your email"
-                                className="w-full h-[39px] bg-white border border-[#e2e2e2] rounded-[8px] px-3 text-[12px] md:text-[14px] text-[#333] placeholder:text-[#afafaf] focus:outline-none focus:border-[#0689ff]"
-                            />
-                            <p className="text-[12px] text-[#333] font-light">
-                                By subscribing you agree to with our{' '}
-                                <Link href="/privacy" className="font-bold underline">Privacy Policy</Link>.
-                            </p>
-                            <button type="submit" className="btn-primary mt-1 text-[12px] md:text-[14px] px-4 py-2 w-full">
-                                Subscribe
-                            </button>
-                        </form>
-                    )}
-                </div>
-
                 {/* Related posts */}
                 {related.length > 0 && (
                     <div className="mt-12 md:mt-20">

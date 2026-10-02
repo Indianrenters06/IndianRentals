@@ -1,21 +1,25 @@
 const jwt = require('jsonwebtoken');
 const asyncHandler = require('express-async-handler');
 const User = require('../models/User');
+const { requireActiveAccount } = require('../utils/accountAccess');
+const { sessionMatches } = require('../utils/sessionVersion');
 
 const FULL_ACCESS_ROLES = ['admin', 'super_admin'];
 
 const protect = asyncHandler(async (req, res, next) => {
     let token;
 
-    token = req.cookies.jwt;
+    token = req.cookies?.jwt;
 
-    if (!token && req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
+    // Explicit bearer credentials take precedence, matching the cookie-origin policy.
+    if (req.headers.authorization && req.headers.authorization.startsWith('Bearer ')) {
         token = req.headers.authorization.split(' ')[1];
     }
 
     if (token) {
+        let decoded;
         try {
-            const decoded = jwt.verify(token, process.env.JWT_SECRET);
+            decoded = jwt.verify(token, process.env.JWT_SECRET);
             req.user = await User.findById(decoded.id).select('-password');
         } catch (error) {
             res.status(401);
@@ -25,6 +29,11 @@ const protect = asyncHandler(async (req, res, next) => {
         if (!req.user) {
             res.status(401);
             throw new Error('Not authorized, user not found');
+        }
+        requireActiveAccount(req.user, res);
+        if (!sessionMatches(req.user, decoded)) {
+            res.status(401);
+            throw new Error('Session ended. Please sign in again');
         }
         next();
     } else {

@@ -10,6 +10,7 @@ function invoke(handler, req) {
             statusCode: 200,
             status(code) { this.statusCode = code; return this; },
             set(name, value) { headers[name] = value; return this; },
+            setHeader(name, value) { headers[name] = value; return this; },
             json(body) { resolve({ status: this.statusCode, body, headers }); },
         };
         handler(req, res, error => reject(Object.assign(error, { status: res.statusCode })));
@@ -36,7 +37,9 @@ test('service page drafts preview privately, publish, and discard without leakin
     const draft = await invoke(getDraftPage, req);
     assert.equal(draft.body.serviceContent.title, 'New laptop rentals');
     assert.equal(draft.body._workflow.hasDraft, true);
-    const { body: { token } } = await invoke(getPreviewToken, req);
+    const { body: { token }, headers: tokenHeaders } = await invoke(getPreviewToken, req);
+    assert.equal(tokenHeaders['Cache-Control'], 'no-store, private');
+    assert.equal(tokenHeaders['Referrer-Policy'], 'no-referrer');
     const preview = await invoke(getPreviewPage, { ...req, query: { token } });
     assert.equal(preview.body.serviceContent.title, 'New laptop rentals');
     assert.equal(preview.headers['X-Robots-Tag'], 'noindex, nofollow');

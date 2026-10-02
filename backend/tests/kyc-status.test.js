@@ -7,10 +7,10 @@ function invoke(handler, userId) {
     return new Promise(resolve => {
         const res = {
             statusCode: 200,
-            status(code) { this.statusCode = code; return this; },
+            status(code) { this.statusCode = code; return this; }, setHeader() {},
             json(body) { resolve({ status: this.statusCode, body }); },
         };
-        handler({ user: { _id: userId } }, res);
+        handler({ user: { _id: userId, role: 'customer' } }, res);
     });
 }
 
@@ -27,6 +27,6 @@ test('KYC status still returns the submitted record', async t => {
     t.mock.method(KYC, 'findOne', async () => submitted);
     assert.deepEqual(await invoke(getKYCStatus, 'customer-2'), {
         status: 200,
-        body: submitted,
+        body: { ...submitted, documents: {}, migrationRequiredFields: [] },
     });
 });

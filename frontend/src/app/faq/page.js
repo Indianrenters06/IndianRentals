@@ -1,11 +1,10 @@
 'use client';
+import { API as API } from '@/services/apiConfig';
 import { cmsUrl } from '@/lib/cmsPreview';
 
 import React, { useEffect, useState } from 'react';
 import PageBanner from '@/components/PageBanner';
 import FaqSection from '../../components/FaqSection';
-
-const API = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
 
 export default function FaqPage() {
     const [cms, setCms] = useState(null);

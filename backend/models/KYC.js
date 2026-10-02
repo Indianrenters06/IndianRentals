@@ -54,7 +54,8 @@ const KYCSchema = new mongoose.Schema({
         country: { type: String, default: 'India' },
     },
 
-    // ── Uploaded Document URLs (Cloudinary) ─────────────────────────────────────
+    // Server-issued KYCAsset references. Legacy URLs are retained until the
+    // separately authorized migration, but are never returned or fetched.
     documents: {
         identityProof: String,      // /api/kyc/upload field: identityProof
         addressProof: String,       // /api/kyc/upload field: addressProof

@@ -8,6 +8,7 @@ import { ArrowClockwise, ArrowRight, Info, Package } from '@phosphor-icons/react
 import { getMyOrders, cancelOrder } from '../../../services/orderService';
 import { getKYCStatus } from '../../../services/kycService';
 import { profileTitleClassName } from '../profileTitle';
+import { previewMoney as money } from '@/lib/checkoutPreviewModel.mjs';
 
 // Status pill — Figma "Process-tags" shape (rounded-16, px-8 py-4, 12px semibold), colour per status.
 const StatusTag = ({ status }) => {
@@ -131,6 +132,12 @@ export default function MyOrdersPage() {
                     monthlyRent: order.orderItems && order.orderItems[0] ? order.orderItems[0].price : 0,
                     securityAmount: order.orderItems && order.orderItems[0] ? order.orderItems[0].securityDeposit : 0,
                     partialAmount: order.totalPrice,
+                    staged: order.checkoutFlow === 'staged' ? order.staged : null,
+                    kycStatus,
+                    isPaid: order.isPaid,
+                    refundReviewRequired: order.refundReviewRequired,
+                    cancelled: order.status === 'Cancelled',
+                    totalPaise: order.staged?.finalQuote?.totalPaise ?? order.pricingSnapshot?.totalPaise ?? Math.round(order.totalPrice * 100),
                     status: deriveStatus(order, kycStatus),
                     productName: order.orderItems && order.orderItems[0] ? order.orderItems[0].name : 'Rental Product',
                     productId: order.orderItems && order.orderItems[0] ? order.orderItems[0].product : null,
@@ -226,6 +233,7 @@ export default function MyOrdersPage() {
                         onClick={() => handleViewChange(key)}
                             className={`flex min-h-11 flex-1 cursor-pointer items-center justify-center rounded-full px-5 transition-colors duration-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#141414] lg:flex-none lg:w-[180px] ${viewType === key ? 'bg-[#333333]' : 'bg-[#eeeeee] hover:bg-[#e2e2e2]'}`}
                         >
+
                             <span className={`font-sans text-[16px] font-medium leading-6 tracking-[-0.02em] whitespace-nowrap ${viewType === key ? 'text-white' : 'text-[#333333]'}`}>
                                 {label}
                             </span>
@@ -285,6 +293,10 @@ export default function MyOrdersPage() {
                             key={order.id}
                             className="w-full overflow-hidden rounded-[16px] border-[1.5px] border-[#e2e2e2] bg-white shadow-[0px_93px_37px_0px_rgba(245,245,245,0.01),0px_53px_32px_0px_rgba(245,245,245,0.05),0px_23px_23px_0px_rgba(245,245,245,0.09),0px_6px_13px_0px_rgba(245,245,245,0.1)]"
                         >
+                            {order.staged && <div className="flex flex-wrap items-center justify-between gap-4 border-b border-[#e2e2e2] bg-[#fffaeb] px-4 py-4 text-sm">
+                                <div><p className="font-semibold">{order.refundReviewRequired ? 'Booking needs review' : order.cancelled ? 'Booking cancelled' : order.staged.advance?.state !== 'paid' ? 'Booking advance due' : order.isPaid ? 'Payment complete' : order.kycStatus === 'approved' ? 'KYC approved · Balance payment next' : order.kycStatus === 'rejected' ? 'Update your KYC' : 'Advance received · Complete verification'}</p><p className="mt-1">Advance received: {money(order.staged.advance?.state === 'paid' ? order.staged.advance.amountPaise : 0)} · Total received: {money(order.staged.paidPaise || 0)} · Balance: {money(Math.max(0, order.totalPaise - (order.staged.paidPaise || 0)))}</p></div>
+                                <Link href={`/checkout/staged?orderId=${order.fullId}`} className="inline-flex min-h-11 items-center rounded-full bg-[#ffcf46] px-5 font-semibold">View booking</Link>
+                            </div>}
                             {/* ── MOBILE CARD: Figma exact layout ── */}
                             <div className="lg:hidden">
                                 {/* Header: all 6 fields flex-wrap, label 8px / value 10px */}
@@ -296,7 +308,7 @@ export default function MyOrdersPage() {
                                             { label: 'Delivery to', value: order.deliveryTo },
                                             { label: 'Monthly Rent', value: `₹${order.monthlyRent}/mo` },
                                             { label: 'Security Amount', value: `₹${parseFloat(order.securityAmount || 0).toFixed(2)}` },
-                                            { label: 'Partial Amount', value: `₹${order.partialAmount}` },
+                                            { label: order.staged ? 'First bill total' : 'Partial Amount', value: `₹${order.partialAmount}` },
                                         ].map(({ label, value }) => (
                                             <div key={label} className="flex flex-col gap-[2px] items-start justify-center">
                                                 <p className="text-[8px] font-semibold text-[#757575] tracking-[-0.4px]">{label}</p>
@@ -373,7 +385,7 @@ export default function MyOrdersPage() {
                                         <HeaderCell label="Delivery to" value={order.deliveryTo} />
                                         <HeaderCell label="Monthly Rent" value={`₹${order.monthlyRent}/mo`} />
                                         <HeaderCell label="Security Amount" value={`₹${parseFloat(order.securityAmount || 0).toFixed(2)}`} />
-                                        <HeaderCell label="Partial Amount" value={`₹${order.partialAmount}`} />
+                                        <HeaderCell label={order.staged ? "First bill total" : "Partial Amount"} value={`₹${order.partialAmount}`} />
                                     </div>
                                     <StatusTag status={order.status} />
                                 </div>

@@ -1,5 +1,5 @@
 "use client";
-import { cmsUrl } from '@/lib/cmsPreview';
+import { cmsUrl, fetchCmsPage } from '@/lib/cmsPreview';
 
 import { useEffect, useState } from 'react';
 import Image from 'next/image';
@@ -42,7 +42,7 @@ export default function RentalProcess({ cmsData = null, showRentalProcessLink = 
     useEffect(() => {
         if (cmsData) return;
         const request = new AbortController();
-        fetch(cmsUrl('homepage'), { cache: 'no-store', signal: request.signal })
+        fetchCmsPage('homepage', { cache: 'no-store', signal: request.signal })
             .then(response => response.ok ? response.json() : null)
             .then(data => { if (!request.signal.aborted) setLoadedCms(data); })
             .catch(() => {})

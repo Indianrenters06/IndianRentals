@@ -6,6 +6,7 @@ import { Lock, EnvelopeSimple, ShieldCheck, ArrowRight, ChartLineUp, Database, H
 import { useRouter } from "next/navigation";
 import { Card, CardBody, Button } from "@heroui/react";
 import { ThemeToggle } from "../components/ThemeToggle";
+import { API_BASE_URL } from "../lib/apiConfig";
 
 export default function AdminLogin() {
   const [email, setEmail] = useState("");
@@ -30,7 +31,7 @@ export default function AdminLogin() {
     setError("");
 
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000"}/api/auth/admin-login`, {
+      const res = await fetch(`${API_BASE_URL}/api/auth/admin-login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -57,15 +58,13 @@ export default function AdminLogin() {
     }
   };
 
-  const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
-
   const handleSendOtp = async (e) => {
     e.preventDefault();
     setIsLoading(true);
     setError("");
     setForgotMessage("");
     try {
-      const res = await fetch(`${API}/api/auth/admin-forgot-password`, {
+      const res = await fetch(`${API_BASE_URL}/api/auth/admin-forgot-password`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email: forgotEmail }),
@@ -90,7 +89,7 @@ export default function AdminLogin() {
     setIsLoading(true);
     setError("");
     try {
-      const res = await fetch(`${API}/api/auth/admin-reset-password`, {
+      const res = await fetch(`${API_BASE_URL}/api/auth/admin-reset-password`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email: forgotEmail, otp: forgotOtp, newPassword }),
@@ -327,7 +326,7 @@ export default function AdminLogin() {
                   <form onSubmit={handleSendOtp} className="space-y-5" autoComplete="off">
                     <div className="mb-2">
                       <h3 className="text-lg font-bold text-slate-900 dark:text-white">Reset Password</h3>
-                      <p className="text-sm text-slate-500 dark:text-white/70 mt-1">Enter your admin email and we'll send you an OTP.</p>
+                      <p className="text-sm text-slate-500 dark:text-white/70 mt-1">Enter your admin email and we&apos;ll send you an OTP.</p>
                     </div>
                     {error && (
                       <div className="bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/50 text-red-600 dark:text-red-400 p-3 rounded-xl text-sm font-medium">{error}</div>

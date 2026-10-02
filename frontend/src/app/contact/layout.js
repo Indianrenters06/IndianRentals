@@ -1,6 +1,7 @@
+import { publicMetadata } from '@/lib/publicMetadata';
 import { SITE_URL, SITE_NAME } from "@/config/site";
 
-export const metadata = {
+const pageMetadata = {
     title: `Contact Us — Get in Touch | ${SITE_NAME}`,
     description:
         "Contact IndianRenters for rental enquiries, quotes, or support. Offices in Delhi, Mumbai, Bangalore, Hyderabad, Pune, Noida, Chennai & Kolkata.",
@@ -11,6 +12,7 @@ export const metadata = {
         url: `${SITE_URL}/contact`,
     },
 };
+export const metadata = publicMetadata({ ...pageMetadata, path: '/contact' });
 
 export default function ContactLayout({ children }) {
     return (

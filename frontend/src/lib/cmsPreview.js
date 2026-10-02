@@ -1,4 +1,6 @@
+import { publicContentRequest } from './publicContentRequest.mjs';
 import { API } from '@/services/apiConfig';
+import { resolveServerApi } from './serverApi.mjs';
 
 export function cmsUrl(pageName) {
     const params = typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : null;
@@ -12,16 +14,17 @@ export function cmsUrl(pageName) {
 export async function loadCmsPage(pageName, previewToken) {
     // Metadata and server-rendered pages need an absolute URL; browser requests
     // use the storefront's shared same-origin API path in local development.
-    const serverApi = process.env.API_URL || process.env.NEXT_PUBLIC_API_URL || 'https://indianrentals-3ugl.onrender.com';
-    const base = `${typeof window === 'undefined' ? serverApi : API}/api/cms/${encodeURIComponent(pageName)}`;
-    const url = previewToken
-        ? `${base}/preview?token=${encodeURIComponent(previewToken)}`
-        : base;
     try {
+        const base = `${typeof window === 'undefined' ? resolveServerApi() : API}/api/cms/${encodeURIComponent(pageName)}`;
+        const url = previewToken ? `${base}/preview?token=${encodeURIComponent(previewToken)}` : base;
         const response = await fetch(url, { cache: 'no-store', signal: AbortSignal.timeout(5000) });
         if (!response.ok) return previewToken ? null : {};
         return response.json();
     } catch {
         return previewToken ? null : {};
     }
+}
+
+export function fetchCmsPage(pageName, options) {
+    return publicContentRequest(cmsUrl(pageName), options);
 }

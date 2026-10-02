@@ -61,6 +61,6 @@ test('a customer address is saved on that user, returned to them, and visible in
     const other = await invoke(getAddresses, { user: { _id: second._id } });
     assert.equal(other.body.length, 0);
 
-    const admin = await invoke(getAllUsers, {});
+    const admin = await invoke(getAllUsers, { user: { role: 'admin' } });
     assert.equal(admin.body.find(user => user._id.equals(first._id)).addresses[0].pincode, address.pincode);
 });

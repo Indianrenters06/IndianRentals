@@ -50,7 +50,7 @@ const { protect, admin, fullAdmin, hasPermission } = require('../middleware/auth
 // Some screens read another section's data — e.g. Inventory lists products,
 // Customers and Payments list rentals — so those reads accept either permission.
 const products = hasPermission('products');
-const productsRead = hasPermission('products', 'inventory');
+const productsRead = hasPermission('products', 'inventory', 'cms');
 const users = hasPermission('users');
 const rentalsRead = hasPermission('orders', 'users', 'payments');
 const orders = hasPermission('orders');
@@ -59,6 +59,7 @@ const payments = hasPermission('payments', 'orders');
 const inventory = hasPermission('inventory');
 const User = require('../models/User');
 const asyncHandler = require('express-async-handler');
+const { requireCustomerTarget, requireUnchangedCustomer } = require('../utils/customerAccess');
 
 // Dashboard
 router.get('/stats', protect, admin, getDashboardStats);
@@ -69,6 +70,12 @@ router.route('/products')
     .post(protect, admin, products, createProduct);
 
 router.route('/products/:id')
+    .get(protect, admin, productsRead, asyncHandler(async (req, res) => {
+        const product = await require('../models/Product').findById(req.params.id).populate('subcategory', 'name slug');
+        if (!product) { res.status(404); throw new Error('Product not found'); }
+        res.setHeader('Cache-Control', 'no-store, private');
+        res.json(product);
+    }))
     .put(protect, admin, products, updateProduct)
     .delete(protect, admin, products, deleteProduct);
 
@@ -84,6 +91,7 @@ router.route('/users/:id')
 // ── Orders for a specific user ────────────────────────────────────────────────
 const Rental = require('../models/Rental');
 router.get('/users/:id/orders', protect, admin, rentalsRead, asyncHandler(async (req, res) => {
+    await requireCustomerTarget(req, res, ['orders', 'users', 'payments']);
     const orders = await Rental.find({ user: req.params.id })
         .sort({ createdAt: -1 })
         .lean();
@@ -92,6 +100,7 @@ router.get('/users/:id/orders', protect, admin, rentalsRead, asyncHandler(async 
 
 // ── User Status Management (block / unblock / activate / deactivate) ─────────
 router.patch('/users/:id/status', protect, admin, users, asyncHandler(async (req, res) => {
+    await requireCustomerTarget(req, res);
     const { action, reason } = req.body;
     // action: 'block' | 'unblock' | 'deactivate' | 'activate'
 
@@ -113,13 +122,13 @@ router.patch('/users/:id/status', protect, admin, users, asyncHandler(async (req
         throw new Error('Invalid action. Use: block, unblock, activate, deactivate');
     }
 
-    const updatedUser = await User.findByIdAndUpdate(
-        req.params.id,
+    const updatedUser = await User.findOneAndUpdate(
+        { _id: req.params.id, role: 'customer' },
         { $set: updatePayload },
         { new: true, runValidators: false }
     ).select('-password');
 
-    if (!updatedUser) { res.status(404); throw new Error('User not found'); }
+    requireUnchangedCustomer(updatedUser, res);
 
     res.json({
         _id: updatedUser._id,
@@ -246,4 +255,3 @@ router.route('/roles/:id')
     .delete(protect, admin, fullAdmin, deleteRole);
 
 module.exports = router;
-

@@ -24,5 +24,31 @@ jobs:
           cache-dependency-path: ${{ matrix.package }}/package-lock.json
       - run: npm ci
       - run: npm audit --audit-level=high
+      - if: matrix.package == 'backend'
+        name: Start disposable MongoDB replica set
+        run: |
+          docker run -d --name ir-test-mongo -p 127.0.0.1:27027:27017 mongo:8.0.15 --replSet irLocalTests --bind_ip_all
+          for attempt in $(seq 1 30); do
+            if docker exec ir-test-mongo mongosh --quiet --eval 'db.adminCommand({ping:1}).ok' >/dev/null 2>&1; then break; fi
+            sleep 1
+          done
+          docker exec ir-test-mongo mongosh --quiet --eval 'rs.initiate({_id:"irLocalTests",members:[{_id:0,host:"127.0.0.1:27017"}]})'
+          for attempt in $(seq 1 30); do
+            if docker exec ir-test-mongo mongosh --quiet --eval 'if (!db.hello().isWritablePrimary) quit(1)' >/dev/null 2>&1; then exit 0; fi
+            sleep 1
+          done
+          exit 1
+      - if: matrix.package == 'backend'
+        run: npm test
+        env:
+          TEST_MONGO_URI: mongodb://127.0.0.1:27027/ir_security_remediation_test?replicaSet=irLocalTests&directConnection=true
+      - if: matrix.package != 'backend'
+        run: npm test
+      - if: matrix.package == 'backend'
+        run: npm run check:syntax
+      - if: matrix.package != 'backend'
+        run: npm run lint
       - if: matrix.package != 'backend'
         run: npm run build
+      - if: always() && matrix.package == 'backend'
+        run: docker rm -f ir-test-mongo || true

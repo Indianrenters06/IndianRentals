@@ -47,15 +47,10 @@ function OverviewCard({ card }) {
 }
 
 import { logout } from '../../../services/authService';
-import { useRouter } from 'next/navigation';
 
 export default function OverviewPage() {
-    const router = useRouter();
-
     const handleLogout = () => {
         logout();
-        router.push('/');
-        window.dispatchEvent(new Event('userInfoChanged'));
     };
 
     return (

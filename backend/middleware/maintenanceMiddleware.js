@@ -6,6 +6,9 @@ const asyncHandler = require('express-async-handler');
 const Settings = require('../models/Settings');
 
 const checkMaintenanceMode = asyncHandler(async (req, res, next) => {
+    // Authentication is still enforced by the webhook's exact raw-body HMAC.
+    // No other payment/customer endpoint bypasses maintenance.
+    if (req.method === 'POST' && req.path === '/api/payments/cashfree/webhook') return next();
     // Exempt routes that need to be accessible during maintenance
     const exemptRoutes = [
         '/api/health',

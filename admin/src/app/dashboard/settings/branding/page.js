@@ -118,7 +118,7 @@ export default function BrandingSettings() {
                         Logo & Branding
                     </h1>
                     <p className="text-slate-500 text-sm mt-1">
-                        Manage your site's logo, title, and the admin panel color theme.
+                        Manage your site&apos;s logo, title, and the admin panel color theme.
                     </p>
                 </div>
                 <Button

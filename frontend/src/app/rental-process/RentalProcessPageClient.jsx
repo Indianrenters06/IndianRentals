@@ -1,4 +1,5 @@
 'use client';
+import { API as API } from '@/services/apiConfig';
 import { cmsUrl } from '@/lib/cmsPreview';
 
 import React, { useState, useEffect } from 'react';
@@ -6,8 +7,6 @@ import PageBanner from '@/components/PageBanner';
 import Testimonials from '@/components/Testimonials';
 import WhyChooseUs from '@/components/WhyChooseUs';
 import RentalProcess from '@/components/RentalProcess';
-
-const API = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
 
 export default function RentalProcessPage() {
     const [cms, setCms] = useState(null);

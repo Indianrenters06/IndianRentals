@@ -1,7 +1,8 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import { X } from '@phosphor-icons/react';
+import useModalFocus from '@/lib/useModalFocus';
 import styles from './CompareTenures.module.css';
 
 export default function CompareTenures({ isOpen, onClose, selectedTenure, onSelect, tenures }) {
@@ -16,32 +17,11 @@ export default function CompareTenures({ isOpen, onClose, selectedTenure, onSele
     }
     const draftTenure = draft.tenure;
 
-    useEffect(() => {
-        if (!isOpen) return;
-        const previousFocus = document.activeElement;
-        const previousOverflow = document.body.style.overflow;
-        document.body.style.overflow = 'hidden';
-        closeRef.current?.focus();
-        const onKeyDown = (event) => {
-            if (event.key === 'Escape') onClose();
-            if (event.key !== 'Tab') return;
-            const focusables = [...panelRef.current.querySelectorAll('button:not([disabled]), input:not([disabled])')];
-            const first = focusables[0];
-            const last = focusables[focusables.length - 1];
-            if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last.focus(); }
-            else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus(); }
-        };
-        document.addEventListener('keydown', onKeyDown);
-        return () => {
-            document.body.style.overflow = previousOverflow;
-            document.removeEventListener('keydown', onKeyDown);
-            previousFocus?.focus?.();
-        };
-    }, [isOpen, onClose]);
+    useModalFocus({ isOpen, onClose, panelRef, initialFocusRef: closeRef });
 
     return <>
         <div aria-hidden="true" onClick={onClose} className={`${styles.backdrop} ${isOpen ? styles.backdropOpen : ''}`} />
-        <aside ref={panelRef} role="dialog" aria-modal={isOpen ? 'true' : undefined} aria-hidden={!isOpen} aria-labelledby="compare-tenures-title" inert={!isOpen ? true : undefined}
+        <aside ref={panelRef} tabIndex={-1} role="dialog" aria-modal={isOpen ? 'true' : undefined} aria-hidden={!isOpen} aria-labelledby="compare-tenures-title" inert={!isOpen ? true : undefined}
             className={`${styles.panel} ${isOpen ? styles.open : ''}`}>
             <div className={styles.handle} aria-hidden="true" />
             <header className={styles.header}>

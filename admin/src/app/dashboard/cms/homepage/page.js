@@ -16,6 +16,8 @@ import ImageUploader from "@/components/ImageUploader";
 import Toggle from "@/components/Toggle";
 import { resolveOfferCampaign, offerPreviewUrl } from '@/lib/offerCampaigns';
 
+import { loadCatalogue } from '@/lib/catalogue.mjs';
+
 const API = API_BASE_URL;
 const getToken = () => typeof window !== "undefined" ? localStorage.getItem("adminToken") : null;
 
@@ -109,16 +111,15 @@ const ProductSelector = ({ label, selectedIds, onChange }) => {
 
     // Fetch all products for easy dropdown selection
     useEffect(() => {
+        const controller = new AbortController();
         const fetchAll = async () => {
             try {
-                const res = await fetch(`${API}/api/products?limit=500`);
-                if (res.ok) {
-                    const data = await res.json();
-                    setAllProducts(data.products || []);
-                }
+                const products = await loadCatalogue(API, { signal: controller.signal });
+                if (!controller.signal.aborted) setAllProducts(products);
             } catch (err) { console.error(err); }
         };
         fetchAll();
+        return () => controller.abort();
     }, []);
 
     const handleSearch = async (val) => {
@@ -312,10 +313,11 @@ export default function CMSHomepage() {
     const set = (key, val) => setData(prev => ({ ...prev, [key]: val }));
 
     useEffect(() => {
-        fetch(`${API}/api/products?limit=500`)
-            .then(r => r.ok ? r.json() : null)
-            .then(d => { if (d?.products) setAvailableProducts(d.products); })
-            .catch(err => console.error("Failed to load products for picker", err));
+        const controller = new AbortController();
+        loadCatalogue(API, { signal: controller.signal })
+            .then(products => { if (!controller.signal.aborted) setAvailableProducts(products); })
+            .catch(() => {});
+        return () => controller.abort();
     }, []);
 
     // ── Offers (stored under the legacy `clientLogos` key) ────────────────────

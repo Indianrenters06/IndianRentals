@@ -12,8 +12,9 @@ import FaqSection from "@/components/FaqSection";
 
 export default function Home() {
   return (
-    <main className="min-h-screen bg-[#F6F6F6] w-full max-w-full overflow-x-hidden font-sans">
+    <div className="min-h-screen bg-[#F6F6F6] w-full max-w-full overflow-x-hidden font-sans">
       {/* Page ground = Figma grey-50 (#F6F6F6); it shows behind the hero, every other section paints its own */}
+      <h1 className="sr-only">Rent laptops, cameras and equipment with IndianRenters</h1>
       <Hero />
       <RentByCategory />
       <BestRentedProducts type="bestRented" defaultTitle="Best Rented Products" />
@@ -29,6 +30,6 @@ export default function Home() {
       <WhyChooseUs />
       <FaqSection pageName="homepage" />
       <Testimonials />
-    </main>
+    </div>
   );
 }

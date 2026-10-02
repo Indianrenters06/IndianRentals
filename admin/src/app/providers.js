@@ -5,9 +5,9 @@ import { ThemeProvider as NextThemesProvider } from "next-themes";
 
 import { Toaster } from "react-hot-toast";
 
-export function Providers({ children }) {
+export function Providers({ children, nonce }) {
     return (
-        <NextThemesProvider attribute="class" defaultTheme="system" enableSystem>
+        <NextThemesProvider nonce={nonce} attribute="class" defaultTheme="system" enableSystem>
             <HeroUIProvider>
                 {children}
                 <Toaster position="top-right" />

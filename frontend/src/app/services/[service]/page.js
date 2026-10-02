@@ -1,3 +1,6 @@
+import { headers } from 'next/headers';
+import { publicMetadata } from '@/lib/publicMetadata';
+import { privateRobots } from '@/lib/seo.mjs';
 import Image from 'next/image';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
@@ -19,20 +22,11 @@ export async function generateMetadata({ params, searchParams }) {
     const cms = SERVICES[service] ? await loadCmsPage(`service-${service}`, previewToken) : null;
     const data = SERVICES[service] && cms !== null ? { ...SERVICES[service], ...(cms.serviceContent || decodeLegacyServiceContent(cms.pageContent) || {}) } : null;
     if (!data) return {};
-    const url = `${SITE_URL}/services/${service}`;
-    const imageUrl = new URL(data.image, SITE_URL).toString();
     return {
-        title: cms.metaTitle || data.title,
-        description: cms.metaDescription || data.description,
+        ...publicMetadata({ title: cms.metaTitle || data.title, description: cms.metaDescription || data.description,
+            path: `/services/${service}`, image: new URL(data.image, SITE_URL).toString() }),
         keywords: data.keywords,
-        alternates: { canonical: url },
-        ...(previewToken ? { robots: { index: false, follow: false } } : {}),
-        openGraph: {
-            title: cms.metaTitle || `${data.title} | ${SITE_NAME}`,
-            description: cms.metaDescription || data.description,
-            url,
-            images: [{ url: imageUrl, width: 1254, height: 1254, alt: data.imageAlt }],
-        },
+        ...(previewToken ? { robots: privateRobots } : {}),
     };
 }
 
@@ -51,6 +45,7 @@ const rentalDetails = [
 const actionClass = 'inline-flex min-h-12 items-center justify-center gap-2 rounded-full px-6 text-[15px] font-semibold transition-[background-color,color,border-color,transform] duration-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#141414] motion-reduce:transition-none';
 
 export default async function ServicePage({ params, searchParams }) {
+    const nonce = (await headers()).get('x-nonce') || undefined;
     const { service } = await params;
     if (!SERVICES[service]) notFound();
     const previewToken = (await searchParams)?.cmsPreview;
@@ -75,7 +70,7 @@ export default async function ServicePage({ params, searchParams }) {
 
     return (
         <>
-            <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(serviceJsonLd).replace(/</g, '\\u003c') }} />
+            <script nonce={nonce} type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(serviceJsonLd).replace(/</g, '\\u003c') }} />
             <div className="bg-white pb-20 font-sans text-[#141414]">
                 <div className="mx-auto w-full max-w-[1200px] px-5 pt-6 md:px-8 md:pt-9">
                     <nav aria-label="Breadcrumb" className="mb-5 flex items-center gap-2 text-[13px] text-[#545454] md:mb-6">

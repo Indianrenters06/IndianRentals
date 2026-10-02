@@ -10,8 +10,9 @@ import { Eye, CheckCircle, WarningCircle, User, IdentificationCard, FileText, In
 import toast from 'react-hot-toast';
 import { DownloadSimple, MagnifyingGlassPlus, X } from "@phosphor-icons/react";
 import SortSelect from "@/components/SortSelect";
+import KYCBookingContext from "@/components/KYCBookingContext";
 
-const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+import { API_BASE_URL as API } from '@/lib/apiConfig';
 
 // Pull the server-supplied filename out of Content-Disposition when present.
 const filenameFromResponse = (res, fallback) => {
@@ -36,7 +37,7 @@ export default function KYCManagement({ initialFilter = "all" }) {
         try {
             setLoading(true);
             const token = localStorage.getItem("adminToken");
-            const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000"}/api/kyc/admin/all`, {
+            const res = await fetch(`${API}/api/kyc/admin/all`, {
                 headers: { "Authorization": `Bearer ${token}` }
             });
             if (res.ok) {
@@ -55,10 +56,7 @@ export default function KYCManagement({ initialFilter = "all" }) {
         fetchKYC();
     }, []);
 
-    /* Documents are fetched through the authenticated admin route rather than
-       straight from Cloudinary: the raw URLs are public, and Cloudinary refuses
-       to deliver PDFs at all (401 "deny or ACL failure") unless the account has
-       PDF delivery switched on. The server re-signs and streams the file. */
+    // Only authorized API responses become local blob previews.
     const fetchDocument = async (kycId, field) => {
         const token = localStorage.getItem("adminToken");
         const res = await fetch(`${API}/api/kyc/admin/${kycId}/document/${field}`, {
@@ -99,6 +97,7 @@ export default function KYCManagement({ initialFilter = "all" }) {
             const res = await fetchDocument(kycId, field);
             const blob = await res.blob();
             const objectUrl = URL.createObjectURL(blob);
+            if (blob.type.startsWith('image/')) { setZoomedDoc({ url: objectUrl, field }); return; }
             const opened = window.open(objectUrl, '_blank', 'noopener');
             if (!opened) toast.error('Your browser blocked the popup. Use Download instead.');
             // Revoked late so the new tab has time to load the blob.
@@ -110,6 +109,8 @@ export default function KYCManagement({ initialFilter = "all" }) {
         }
     };
 
+    useEffect(() => () => { if (zoomedDoc?.url) URL.revokeObjectURL(zoomedDoc.url); }, [zoomedDoc]);
+
     const filteredRequests = statusFilter === "all"
         ? kycRequests
         : kycRequests.filter(req => req.status?.toLowerCase() === statusFilter);
@@ -118,13 +119,13 @@ export default function KYCManagement({ initialFilter = "all" }) {
     const handleUpdateStatus = async (id, status) => {
         try {
             const token = localStorage.getItem("adminToken");
-            const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000"}/api/kyc/admin/${id}`, {
+            const res = await fetch(`${API}/api/kyc/admin/${id}`, {
                 method: "PUT",
                 headers: {
                     "Content-Type": "application/json",
                     "Authorization": `Bearer ${token}`
                 },
-                body: JSON.stringify({ status, rejectionReason: status === 'rejected' ? rejectionReason : '' })
+                body: JSON.stringify({ status, expectedUpdatedAt: selectedKyc?.updatedAt, rejectionReason: status === 'rejected' ? rejectionReason : '' })
             });
 
             if (res.ok) {
@@ -132,7 +133,8 @@ export default function KYCManagement({ initialFilter = "all" }) {
                 onClose();
                 toast.success(status === 'approved' ? 'KYC approved successfully' : 'KYC rejected');
             } else {
-                throw new Error("Failed to update KYC");
+                const failure = await res.json().catch(() => ({}));
+                throw new Error(failure.message || 'Failed to update KYC');
             }
         } catch (err) {
             toast.error(err.message || 'Failed to update KYC status');
@@ -346,6 +348,7 @@ export default function KYCManagement({ initialFilter = "all" }) {
                             <ModalBody className="py-6">
                                 {selectedKyc && (
                                     <div className="space-y-8">
+                                        <KYCBookingContext key={selectedKyc._id} userId={selectedKyc.user?._id} />
                                         {/* User & Status Header */}
                                         <div className="flex flex-col md:flex-row justify-between gap-4 bg-slate-50 dark:bg-slate-950/40 p-4 rounded-2xl border border-slate-100 dark:border-slate-800">
                                             <div className="flex items-center gap-4">
@@ -406,60 +409,18 @@ export default function KYCManagement({ initialFilter = "all" }) {
                                                     <FileText size={16} /> Verification Documents
                                                 </h4>
                                                 <div className="grid grid-cols-1 gap-4">
-                                                    {Object.entries(selectedKyc.documents || {}).filter(([, url]) => url && url.startsWith('http')).length === 0 && (
-                                                        <p className="text-xs text-slate-400 italic">No documents uploaded yet.</p>
-                                                    )}
-                                                    {Object.entries(selectedKyc.documents || {}).map(([key, url]) => {
-                                                        if (!url || !url.startsWith('http')) return null;
-                                                        const isPDF = url.toLowerCase().includes('.pdf') || url.includes('/raw/');
-                                                        const label = key.replace(/([A-Z])/g, ' $1').replace(/^./, s => s.toUpperCase());
-                                                        return isPDF ? (
-                                                            // PDF: show a card with open link
-                                                            <div key={key} className="flex items-center justify-between p-4 rounded-2xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900">
-                                                                <div className="flex items-center gap-3">
-                                                                    <div className="w-10 h-10 rounded-xl bg-red-50 dark:bg-red-500/10 flex items-center justify-center">
-                                                                        <FileText size={20} className="text-red-500" weight="fill" />
-                                                                    </div>
-                                                                    <div>
-                                                                        <p className="text-sm font-bold text-slate-800 dark:text-slate-100">{label}</p>
-                                                                        <p className="text-[10px] text-slate-400">PDF Document</p>
-                                                                    </div>
-                                                                </div>
-                                                                <div className="flex items-center gap-2">
-                                                                    <Button
-                                                                        size="sm"
-                                                                        variant="flat"
-                                                                        className="font-bold text-xs text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-500/10"
-                                                                        isLoading={busyDoc === `${selectedKyc._id}:${key}:open`}
-                                                                        onPress={() => handleOpenDocument(selectedKyc._id, key)}
-                                                                    >
-                                                                        Open
-                                                                    </Button>
-                                                                    <Button
-                                                                        size="sm"
-                                                                        variant="flat"
-                                                                        className="font-bold text-xs"
-                                                                        startContent={busyDoc === `${selectedKyc._id}:${key}` ? null : <DownloadSimple size={14} weight="bold" />}
-                                                                        isLoading={busyDoc === `${selectedKyc._id}:${key}`}
-                                                                        onPress={() => handleDownloadDocument(selectedKyc._id, key)}
-                                                                    >
-                                                                        Download
-                                                                    </Button>
-                                                                </div>
+                                                    {selectedKyc.migrationRequiredFields?.length > 0 && <p role="alert" className="text-sm text-amber-800 dark:text-amber-300">Some legacy documents need a private storage migration or customer re-upload before review.</p>}
+                                                    {Object.entries(selectedKyc.documents || {}).filter(([, reference]) => typeof reference === 'string' && /^[a-f\d]{24}$/i.test(reference)).length === 0 && <p className="text-xs text-slate-500">No private documents uploaded yet.</p>}
+                                                    {Object.entries(selectedKyc.documents || {}).map(([key, reference]) => {
+                                                        if (typeof reference !== 'string' || !/^[a-f\d]{24}$/i.test(reference)) return null;
+                                                        const label = key.replace(/([A-Z])/g, ' $1').replace(/^./, value => value.toUpperCase());
+                                                        return <div key={key} className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-slate-200 bg-slate-50 p-4 dark:border-slate-700 dark:bg-slate-900">
+                                                            <div className="flex items-center gap-3"><FileText size={24} aria-hidden="true" /><div><p className="text-sm font-bold">{label}</p><p className="text-xs text-slate-500">Private verification document</p></div></div>
+                                                            <div className="flex gap-2">
+                                                                <Button size="sm" variant="flat" isLoading={busyDoc === `${selectedKyc._id}:${key}:open`} onPress={() => handleOpenDocument(selectedKyc._id, key)}>View</Button>
+                                                                <Button size="sm" variant="flat" startContent={<DownloadSimple size={14} aria-hidden="true" />} isLoading={busyDoc === `${selectedKyc._id}:${key}`} onPress={() => handleDownloadDocument(selectedKyc._id, key)}>Download</Button>
                                                             </div>
-                                                        ) : (
-                                                            // Image: show thumbnail with zoom
-                                                            <div key={key} className="group relative rounded-2xl overflow-hidden border border-slate-200 dark:border-slate-800 bg-slate-100 dark:bg-slate-950 aspect-video">
-                                                                <img src={url} alt={label} className="w-full h-full object-cover" />
-                                                                <div className="absolute inset-0 bg-black/40 group-hover:bg-black/60 transition-colors flex flex-col items-center justify-center gap-2">
-                                                                    <p className="text-white text-xs font-bold uppercase tracking-widest drop-shadow-md">{label}</p>
-                                                                    <Button size="sm" color="primary" variant="solid" className="shadow-lg" startContent={<MagnifyingGlassPlus weight="bold" />} onPress={() => setZoomedDoc({ url, field: key })}>Zoom & View</Button>
-                                                                </div>
-                                                                <div className="absolute top-2 left-2 px-2 py-1 bg-black/40 backdrop-blur-md rounded-lg text-[10px] text-white font-bold uppercase tracking-tighter">
-                                                                    {label}
-                                                                </div>
-                                                            </div>
-                                                        );
+                                                        </div>;
                                                     })}
                                                 </div>
                                             </div>
@@ -552,6 +513,7 @@ export default function KYCManagement({ initialFilter = "all" }) {
                         <>
                             {/* Close button */}
                             <button
+                                aria-label="Close document preview"
                                 onClick={() => setZoomedDoc(null)}
                                 className="absolute top-0 right-0 z-50 w-10 h-10 flex items-center justify-center rounded-full bg-white/20 hover:bg-white/40 text-white transition-all backdrop-blur-sm border border-white/20"
                             >

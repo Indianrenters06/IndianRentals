@@ -80,7 +80,7 @@ export default function EditProduct() {
         if (!id) return;
         try {
             setLoading(true);
-            const res = await fetch(`${API}/api/products/${id}`);
+            const res = await fetch(`${API}/api/admin/products/${id}`, { headers: { Authorization: `Bearer ${getToken()}` }, cache: 'no-store' });
             if (!res.ok) throw new Error("Product not found");
             const p = await res.json();
 

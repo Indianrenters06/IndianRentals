@@ -1,5 +1,7 @@
 const mongoose = require('mongoose');
 const schema = new mongoose.Schema({
+    submissionId: { type: String, unique: true, sparse: true },
+    submissionHash: { type: String, select: false },
     jobId: String, jobTitle: String, formId: String,
     fullName: { type: String, required: true }, email: { type: String, required: true },
     answers: [{ fieldId: String, label: String, value: String, _id: false }],

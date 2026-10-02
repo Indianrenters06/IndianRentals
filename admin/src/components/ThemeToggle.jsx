@@ -1,18 +1,18 @@
 "use client";
 
 import { useTheme } from "next-themes";
-import { useEffect, useState } from "react";
+import { useSyncExternalStore } from "react";
 import { Moon, Sun } from "@phosphor-icons/react";
 import { Button } from "@heroui/react";
 
+const subscribe = () => () => {};
+const clientSnapshot = () => true;
+const serverSnapshot = () => false;
+
 export function ThemeToggle() {
-    const [mounted, setMounted] = useState(false);
+    const mounted = useSyncExternalStore(subscribe, clientSnapshot, serverSnapshot);
     const { theme, setTheme } = useTheme();
 
-    // useEffect only runs on the client, so now we can safely show the UI
-    useEffect(() => {
-        setMounted(true);
-    }, []);
 
     if (!mounted) {
         return <div className="w-10 h-10" />; // placeholder

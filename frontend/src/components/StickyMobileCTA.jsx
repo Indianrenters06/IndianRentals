@@ -1,12 +1,13 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useConsent } from "./CookieConsent";
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { motion, AnimatePresence } from "framer-motion";
-import { X, Phone } from "@phosphor-icons/react";
+import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
+import { X } from "@phosphor-icons/react";
+import styles from "./StickyMobileCTA.module.css";
 
-// Pages where the CTA should NOT appear
 const HIDDEN_PATHS = ["/cart", "/checkout", "/login", "/register", "/order-confirmation", "/careers", "/contact", "/contact-demo"];
 
 export default function StickyMobileCTA() {
@@ -18,89 +19,74 @@ function RouteCTA({ pathname }) {
     const { consentVisible } = useConsent();
     const [visible, setVisible] = useState(false);
     const [dismissed, setDismissed] = useState(false);
+    const barRef = useRef(null);
+    const spacerRef = useRef(null);
+    const reduceMotion = useReducedMotion();
 
-    // Show after user has scrolled 200px — don't distract on initial load
     useEffect(() => {
+        let active = true;
         const onScroll = () => {
-            if (window.scrollY > 200) {
-                setVisible(true);
-            }
+            if (active && window.scrollY > 200) setVisible(true);
         };
         window.addEventListener("scroll", onScroll, { passive: true });
-        return () => window.removeEventListener("scroll", onScroll);
+        queueMicrotask(onScroll);
+        return () => {
+            active = false;
+            window.removeEventListener("scroll", onScroll);
+        };
     }, []);
 
-    // Hide on specific pages
-    const isHidden =
-        consentVisible ||
-        dismissed ||
-        !visible ||
-        HIDDEN_PATHS.some((p) => pathname.startsWith(p)) ||
-        pathname.startsWith("/profile") ||
-        pathname.startsWith("/admin");
+    const isHidden = consentVisible || dismissed || !visible ||
+        HIDDEN_PATHS.some((path) => pathname.startsWith(path)) ||
+        pathname.startsWith("/profile") || pathname.startsWith("/admin");
 
-    return (
+    // Match the actual responsive height so footer links remain reachable.
+    useEffect(() => {
+        if (isHidden || !barRef.current) return;
+        const bar = barRef.current;
+        const spacer = spacerRef.current;
+        const reserveSpace = () => {
+            if (spacer) spacer.style.height = `${bar.getBoundingClientRect().height}px`;
+        };
+        const observer = new ResizeObserver(reserveSpace);
+        observer.observe(bar);
+        reserveSpace();
+        return () => {
+            observer.disconnect();
+            if (spacer) spacer.style.height = "0px";
+        };
+    }, [isHidden]);
+
+    return <>
+        <div ref={spacerRef} className={styles.spacer} aria-hidden="true" />
         <AnimatePresence>
-            {!isHidden && (
-                <motion.div
-                    initial={{ y: 100, opacity: 0 }}
-                    animate={{ y: 0, opacity: 1 }}
-                    exit={{ y: 100, opacity: 0 }}
-                    transition={{ type: "spring", stiffness: 300, damping: 30 }}
-                    className="fixed bottom-0 left-0 right-0 z-[990] md:hidden"
-                    style={{
-                        background: "linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%)",
-                        borderTop: "1px solid rgba(255,207,70,0.3)",
-                        boxShadow: "0 -4px 24px rgba(0,0,0,0.25)",
-                    }}
-                >
-                    {/* Dismiss button */}
-                    <button
-                        onClick={() => setDismissed(true)}
-                        className="absolute top-2 right-3 text-gray-400 hover:text-white transition-colors"
-                        aria-label="Dismiss CTA"
-                    >
-                        <X size={16} />
+            {!isHidden && <motion.div
+                ref={barRef}
+                role="region"
+                aria-label="Rental help"
+                initial={reduceMotion ? false : { y: "100%", opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                exit={{ y: "100%", opacity: 0 }}
+                transition={reduceMotion ? { duration: 0 } : { type: "spring", stiffness: 300, damping: 30 }}
+                className={styles.bar}
+            >
+                <div className={styles.inner}>
+                    <button type="button" onClick={() => setDismissed(true)} className={styles.dismiss} aria-label="Dismiss rental help">
+                        <X size={20} aria-hidden="true" />
                     </button>
-
-                    <div className="flex items-center gap-3 px-4 py-3.5 pr-8">
-                        {/* Icon */}
-                        <div
-                            className="w-9 h-9 rounded-full flex items-center justify-center shrink-0"
-                            style={{ background: "rgba(255,207,70,0.15)", border: "1px solid rgba(255,207,70,0.4)" }}
-                        >
-                            <Phone size={18} weight="fill" color="#FFCF46" />
+                    <div className={styles.content}>
+                        <Image src="/images/rental-help-headset-v1.webp" width={56} height={56} unoptimized loading="eager" className={styles.illustration} alt="" />
+                        <div className={styles.copy}>
+                            <p className={styles.title}>Need help choosing?</p>
+                            <p className={styles.description}>Free advice from our rental experts.</p>
                         </div>
-
-                        {/* Text */}
-                        <div className="flex-1 min-w-0">
-                            <p className="text-white text-xs font-semibold leading-tight">
-                                Need help choosing?
-                            </p>
-                            <p className="text-gray-400 text-[10px] leading-tight mt-0.5">
-                                Talk to our rental experts — free advice!
-                            </p>
-                        </div>
-
-                        {/* CTA Buttons */}
-                        <div className="flex items-center gap-2 shrink-0">
-                            <Link
-                                href="/products"
-                                className="text-[11px] font-medium text-gray-300 whitespace-nowrap px-3 py-1.5 rounded-full border border-gray-600 hover:border-gray-400 transition-colors"
-                            >
-                                Browse
-                            </Link>
-                            <Link
-                                href="/contact"
-                                className="text-[11px] font-bold text-black whitespace-nowrap px-3 py-1.5 rounded-full transition-all hover:opacity-90 active:scale-95"
-                                style={{ background: "#FFCF46" }}
-                            >
-                                Get Quote
-                            </Link>
+                        <div className={styles.actions}>
+                            <Link href="/products" className={styles.browse}>Browse</Link>
+                            <Link href="/contact" className={styles.quote}>Get Quote</Link>
                         </div>
                     </div>
-                </motion.div>
-            )}
+                </div>
+            </motion.div>}
         </AnimatePresence>
-    );
+    </>;
 }

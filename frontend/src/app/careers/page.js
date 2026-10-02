@@ -6,6 +6,7 @@ import { ArrowRight, ArrowUpRight, X, MapPin, Briefcase, MagnifyingGlass, CheckC
 import { API } from '@/services/apiConfig';
 import defaults from '@/lib/careers-defaults.json';
 import styles from './page.module.css';
+import { careersSubmissionAttempt, supportsCareersSubmission } from '@/lib/careersSubmission.mjs';
 
 export default function CareersPage() {
     const [content, setContent] = useState(defaults);
@@ -20,6 +21,7 @@ export default function CareersPage() {
     const [error, setError] = useState('');
     const dialog = useRef(null);
     const requestPending = useRef(false);
+    const submissionAttempt = useRef(null);
     useEffect(() => {
         const controller = new AbortController();
         fetch(`${API}/api/careers`, { signal: controller.signal, cache: 'no-store' })
@@ -39,22 +41,31 @@ export default function CareersPage() {
     const jobs = content.enabled ? content.jobs.filter(j => j.status === 'published') : [];
     const filtered = jobs.filter(j => (!team || j.department === team) && (!location || j.location === location) && `${j.title} ${j.department} ${j.description}`.toLowerCase().includes(search.toLowerCase()));
     const form = content.forms.find(f => f.id === (active?.formId || content.defaultFormId));
+    const submissionsAvailable = loaded && !loadError && supportsCareersSubmission(content);
     const open = job => { setSubmitted(false); setError(''); setActive(job); };
     const close = () => { if (!requestPending.current) setActive(null); };
     const submit = async event => {
         event.preventDefault();
         if (requestPending.current) return;
+        if (!submissionsAvailable) { setError('Applications are temporarily unavailable. Please try again later.'); return; }
         requestPending.current = true; setSending(true); setError('');
         const values = new FormData(event.currentTarget);
         try {
+            const payload = { jobId: active.id, fullName: values.get('fullName'), email: values.get('email'), consent: values.get('consent') === 'on', answers: Object.fromEntries((form?.fields || []).map(f => [f.id, values.get(`field-${f.id}`)])) };
+            submissionAttempt.current = careersSubmissionAttempt(submissionAttempt.current, payload);
             const response = await fetch(`${API}/api/careers/applications`, {
                 method: 'POST', headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ jobId: active.id, fullName: values.get('fullName'), email: values.get('email'), consent: values.get('consent') === 'on', answers: Object.fromEntries((form?.fields || []).map(f => [f.id, values.get(`field-${f.id}`)])) })
+                body: JSON.stringify({ ...payload, submissionId: submissionAttempt.current.submissionId }),
+                signal: AbortSignal.timeout(15000)
             });
             const data = await response.json().catch(() => ({}));
             if (!response.ok) throw new Error(data.message || (response.status === 429 ? 'Too many attempts. Please try again later.' : 'We could not save your application. Please try again.'));
+            if (response.status !== 201 || typeof data.id !== 'string' || !/^[a-f\d]{24}$/i.test(data.id) || data.reference !== submissionAttempt.current.submissionId) {
+                throw new Error('We could not confirm receipt. Please try again with the same details.');
+            }
+            submissionAttempt.current = null;
             setSubmitted(true);
-        } catch (e) { setError(e.message); }
+        } catch (e) { setError(e.name === 'TimeoutError' || e.name === 'TypeError' ? 'We could not confirm receipt. Please try again; retrying the same details will not create a duplicate application.' : e.message); }
         finally { requestPending.current = false; setSending(false); }
     };
     return <div className={styles.page}>
@@ -83,6 +94,7 @@ export default function CareersPage() {
             <div className={styles.container}>
                 <div className={styles.sectionHeading}><h2>{content.jobsTitle}</h2><p>{content.jobsIntro}</p></div>
                 {!loaded ? <p role="status">Loading opportunities…</p> : loadError ? <div className={styles.empty} role="alert"><h3>Opportunities are temporarily unavailable.</h3><p>Please try again shortly.</p><button className="btn-secondary" onClick={() => window.location.reload()}>Try again</button></div> : !content.enabled ? <div className={styles.empty}><h3>Applications are currently closed.</h3><p>Please check back for future opportunities.</p></div> : <>
+                    {!submissionsAvailable && <p role="status">Applications are temporarily unavailable. You can still browse roles; please try again later.</p>}
                     {jobs.length > 0 && <><div className={styles.filters}>
                         <label className={styles.search}><span className={styles.srOnly}>Search roles</span><MagnifyingGlass size={20}/><input placeholder="Search by role or keyword" value={search} onChange={e => setSearch(e.target.value)}/></label>
                         <label><span className={styles.srOnly}>Team</span><select value={team} onChange={e => setTeam(e.target.value)}><option value="">All teams</option>{[...new Set(jobs.map(j => j.department))].map(v => <option key={v}>{v}</option>)}</select></label>
@@ -97,7 +109,7 @@ export default function CareersPage() {
             </div>
         </section>
         {content.steps.length > 0 && <section className={`${styles.container} ${styles.section}`}><p className={styles.eyebrow}>WHAT COMES NEXT</p><h2>{content.processTitle}</h2><ol className={styles.steps}>{content.steps.map((step, i) => <li key={i}><span className={styles.number}>0{i + 1}</span><h3>{step.title}</h3><p>{step.description}</p></li>)}</ol></section>}
-        {loaded && !loadError && content.enabled && content.generalEnabled && <section className={`${styles.container} ${styles.general}`}><div><p className={styles.eyebrow}>OPEN APPLICATION</p><h2>{content.generalTitle}</h2><p>{content.generalText}</p></div><button className="btn-primary" onClick={() => open({ id: '', title: 'Open application' })}>{content.generalButton}<ArrowUpRight size={20}/></button></section>}
+        {loaded && !loadError && content.enabled && content.generalEnabled && <section className={`${styles.container} ${styles.general}`}><div><p className={styles.eyebrow}>OPEN APPLICATION</p><h2>{content.generalTitle}</h2><p>{content.generalText}</p></div><button className="btn-primary" disabled={!submissionsAvailable} onClick={() => open({ id: '', title: 'Open application' })}>{content.generalButton}<ArrowUpRight size={20}/></button></section>}
         {active && <dialog ref={dialog} className={styles.dialog} onCancel={e => { e.preventDefault(); close(); }} onClick={e => { if (e.target === e.currentTarget) close(); }} aria-labelledby="application-title">
             <div className={styles.dialogBody}>
                 <button className={styles.close} type="button" aria-label="Close application" onClick={close} disabled={sending}><X size={22}/></button>
@@ -111,7 +123,8 @@ export default function CareersPage() {
                         </div>
                         <label className={styles.consent}><input type="checkbox" name="consent" required/><span>{content.consentText} <Link href="/privacy" target="_blank">Privacy policy</Link></span></label>
                         {error && <p className={styles.error} role="alert">{error}</p>}
-                        <div className={styles.actions}><button className="btn-primary" type="submit" disabled={sending || !form}>{sending ? 'Sending…' : content.submitLabel}<ArrowRight size={18}/></button><button className="btn-secondary" type="button" onClick={close} disabled={sending}>Cancel</button></div>
+                        {!submissionsAvailable && <p role="status">Applications are temporarily unavailable. Please try again later.</p>}
+                        <div className={styles.actions}><button className="btn-primary" type="submit" disabled={sending || !form || !submissionsAvailable}>{sending ? 'Sending…' : content.submitLabel}<ArrowRight size={18}/></button><button className="btn-secondary" type="button" onClick={close} disabled={sending}>Cancel</button></div>
                     </form>
                 </>}
             </div>

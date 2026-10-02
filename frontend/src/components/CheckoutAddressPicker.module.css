@@ -1,0 +1,41 @@
+.section { color: var(--color-grey-700, #333); min-width: 0; }
+.header { display: flex; flex-direction: column; gap: 12px; }
+.header h2 { margin: 0; font-size: 27px; font-weight: 600; line-height: 35px; letter-spacing: -0.8px; }
+.divider { width: 100%; height: 1px; background-image: url('/images/checkout-address/divider.svg'); background-repeat: repeat-x; }
+.addButton { display: inline-flex; align-items: center; justify-content: center; gap: 5px; min-height: 44px; padding: 6px 20px; margin-top: 32px; border: 0; border-radius: 28px; background: var(--color-grey-700, #333); color: #fff; font: inherit; font-size: 16px; font-weight: 500; line-height: 23px; letter-spacing: -0.4px; box-shadow: 0 1px 2px #8c8c8c1a, 0 3px 3px #8c8c8c17, 0 8px 5px #8c8c8c0d; cursor: pointer; }
+.addButton:hover:not(:disabled) { background: var(--color-grey-900, #141414); }
+.list { display: grid; gap: 12px; margin-top: 20px; }
+.card { position: relative; display: flex; align-items: center; justify-content: space-between; gap: 16px; min-width: 0; padding: 20px 16px; border: 1.5px solid var(--color-grey-200, #e2e2e2); border-radius: 12px; background: #fff; overflow: hidden; transition: border-color 160ms ease; }
+.card:hover { border-color: var(--color-grey-400, #afafaf); }
+.selected, .selected:hover { border-color: var(--color-blue-700, #0075ff); }
+.radio { position: absolute; z-index: 1; inset: 0; margin: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; }
+.card:has(.radio:focus-visible) { outline: 2px solid var(--color-blue-700, #0075ff); outline-offset: 3px; }
+.details { display: flex; align-items: flex-start; gap: 12px; min-width: 0; pointer-events: none; }
+.recipient { flex: 0 0 auto; }
+.copy { display: grid; gap: 6px; min-width: 0; font-size: 16px; font-weight: 500; line-height: 23px; letter-spacing: -0.4px; overflow-wrap: anywhere; }
+.copy p { margin: 0; }
+.name { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; }
+.name strong { font-weight: 500; }
+.defaultTag { color: var(--color-grey-500, #757575); background: var(--color-grey-50, #f6f6f6); padding: 1px 7px; border-radius: 4px; font-size: 11px; line-height: 18px; }
+.address { display: flex; align-items: flex-start; flex-wrap: wrap; column-gap: 8px; row-gap: 2px; }
+.address > span { display: inline-flex; gap: 8px; align-items: flex-start; max-width: 100%; }
+.separator { position: relative; width: 1px; height: 23px; flex: 0 0 auto; }
+.separator::before { content: ''; position: absolute; width: 23px; height: 1px; left: -11px; top: 11px; transform: rotate(90deg); background-image: url('/images/checkout-address/separator.svg'); }
+.phone { color: var(--color-grey-500, #757575); }
+.actions { position: relative; z-index: 2; display: flex; flex-direction: column; align-items: center; flex: 0 0 68px; }
+.actions button { color: inherit; font: inherit; border: 0; background: none; cursor: pointer; }
+.deleteButton { min-height: 44px; width: 44px; display: grid; place-items: center; padding: 0; }
+.editButton { min-height: 44px; padding: 4px 0; font-size: 12px !important; font-weight: 700 !important; line-height: 16px !important; letter-spacing: -0.4px; text-decoration: underline; text-underline-offset: 2px; }
+.corner { position: absolute; top: -0.75px; right: -0.75px; z-index: 3; width: 35px; height: 25px; display: grid; place-items: center; background: var(--color-blue-700, #0075ff); border-bottom-left-radius: 12px; pointer-events: none; }
+.section button:focus-visible { outline: 2px solid var(--color-grey-900, #141414); outline-offset: 3px; }
+.section button:disabled, .radio:disabled { cursor: wait; opacity: 0.5; }
+@media (max-width: 599px) {
+  .header h2 { font-size: 24px; line-height: 32px; }
+  .addButton { margin-top: 24px; }
+  .card { align-items: flex-start; flex-wrap: wrap; gap: 8px; }
+  .details { flex: 1 1 100%; padding-right: 10px; }
+  .copy { font-size: 15px; line-height: 23px; }
+  .actions { margin-left: auto; flex-direction: row; flex-basis: auto; gap: 8px; }
+  .editButton { padding: 4px 8px; }
+}
+@media (prefers-reduced-motion: reduce) { .card { transition: none; } }

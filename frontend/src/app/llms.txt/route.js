@@ -1,7 +1,8 @@
 // Dynamic llms.txt — an LLM-friendly Markdown summary of the site, managed from
 // the admin panel (Settings → SEO & robots.txt) and stored on the backend.
 // See https://llmstxt.org for the proposed standard.
-const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+import { resolveServerApi } from '@/lib/serverApi.mjs';
+const API = resolveServerApi();
 
 export const revalidate = 3600;
 

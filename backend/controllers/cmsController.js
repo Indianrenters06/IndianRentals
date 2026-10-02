@@ -2,6 +2,7 @@ const asyncHandler = require('express-async-handler');
 const sanitizeHtml = require('../utils/sanitizeHtml');
 const CMS = require('../models/CMS');
 const jwt = require('jsonwebtoken');
+const { validateProductReferences } = require('../utils/cmsProductReferences');
 const { normalizeContent } = require('../utils/contactValidation');
 const { decodeLegacyContactContent } = require('../utils/legacyCmsContent');
 
@@ -265,6 +266,10 @@ const publishPage = asyncHandler(async (req, res) => {
         res.status(409);
         throw new Error('There is no saved draft to publish');
     }
+    if (req.params.page === 'homepage') {
+        try { await validateProductReferences({ ...(cms.toObject?.() || cms), ...cms.draftData }); }
+        catch (error) { res.status(error.statusCode || 503); throw error; }
+    }
     for (const [field, value] of Object.entries(cms.draftData)) cms[field] = value;
     cms.draftData = undefined;
     cms.draftUpdatedAt = null;
@@ -286,6 +291,8 @@ const discardDraft = asyncHandler(async (req, res) => {
 });
 
 const getPreviewToken = asyncHandler(async (req, res) => {
+    res.setHeader('Cache-Control', 'no-store, private');
+    res.setHeader('Referrer-Policy', 'no-referrer');
     assertKnownPage(req, res);
     const cms = await CMS.findOne({ pageName: req.params.page });
     if (!cms?.draftData) {

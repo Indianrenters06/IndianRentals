@@ -1,5 +1,6 @@
 "use client";
 
+import { lockBodyScroll } from '../lib/bodyScrollLock.mjs';
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import Image from "next/image";
@@ -22,13 +23,12 @@ export default function LocationSelector({ currentLocation, onSave, onClose }) {
     useEffect(() => {
         const dialog = dialogRef.current;
         const trigger = document.activeElement;
-        const previousOverflow = document.body.style.overflow;
+        const unlockScroll = lockBodyScroll();
         dialog.showModal();
-        document.body.style.overflow = "hidden";
         return () => {
             requestRef.current?.abort();
             dialog.close();
-            document.body.style.overflow = previousOverflow;
+            unlockScroll();
             if (trigger instanceof HTMLElement && trigger.isConnected) trigger.focus();
         };
     }, []);

@@ -1,5 +1,5 @@
 "use client";
-import { cmsUrl } from '@/lib/cmsPreview';
+import { fetchCmsPage } from '@/lib/cmsPreview';
 import React, { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -13,6 +13,7 @@ import { ProductCard } from './BestRentedProducts';
 import { productsForShowcaseSlide } from './showcaseProducts';
 import { resolveCmsHref } from '@/lib/cmsLinks';
 import { API } from '@/services/apiConfig';
+import { loadShowcaseCatalogue } from '@/lib/showcaseCatalogue.mjs';
 
 const DEFAULT_CATEGORY_IMAGES = {
     apple: "https://res.cloudinary.com/dgkckcdk8/image/upload/v1776108199/f6540bc8c3d4a91dfd954f6fe1cf8d3803b81b4a_3_optlwp.png",
@@ -304,6 +305,7 @@ const BannerCarousel = ({ banners = [], current, setCurrent }) => {
 
 const FeaturedShowcase = () => {
     const dispatch = useDispatch();
+    const router = useRouter();
     const [cms, setCms] = useState(null); // null = still loading CMS
     const [legacyProductIds, setLegacyProductIds] = useState([]);
     const [products, setProducts] = useState([]);
@@ -322,7 +324,7 @@ const FeaturedShowcase = () => {
     useEffect(() => {
         const fetchCms = async () => {
             try {
-                const res = await fetch(cmsUrl('homepage'));
+                const res = await fetchCmsPage('homepage');
                 if (res.ok) {
                     const d = await res.json();
                     const banners = d.featuredShowcaseBanners?.length
@@ -356,30 +358,19 @@ const FeaturedShowcase = () => {
             duration: 1,
             sourceUrl: `/products/${product.id}`
         }));
+        router.push('/checkout/staged?new=1');
     };
 
-    // Load the catalog once. The active slide selects its own two cards below.
+    // Load only selected IDs and targeted collections; the active slide selects two cards.
     useEffect(() => {
-        if (!cms) return;
+        if (!cms || cms.enabled === false) return;
 
         let isCancelled = false;
 
         const loadProducts = async () => {
             try {
-                const res = await fetch(`${API}/api/products?limit=2000`);
-                if (!res.ok) throw new Error(`Product request failed: ${res.status}`);
-                const data = await res.json();
-                const fetchedProducts = data.products || [];
-                const knownIds = new Set(fetchedProducts.map(product => String(product._id)));
-                const selectedIds = [...legacyProductIds, ...cms.banners.flatMap(banner => banner.productIds || [])];
-                const missingIds = [...new Set(selectedIds.filter(id => !knownIds.has(String(id))))];
-                const selectedProducts = await Promise.all(missingIds.map(id =>
-                    fetch(`${API}/api/products/${id}`).then(response => response.ok ? response.json() : null).catch(() => null)
-                ));
-
-                if (!isCancelled) {
-                    setProducts([...fetchedProducts, ...selectedProducts.filter(Boolean)]);
-                }
+                const catalogue = await loadShowcaseCatalogue(API, cms.banners, legacyProductIds);
+                if (!isCancelled) setProducts(catalogue);
             } catch (err) {
                 console.error("Showcase fetch error:", err);
             } finally {

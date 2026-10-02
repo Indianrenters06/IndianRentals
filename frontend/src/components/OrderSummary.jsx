@@ -2,6 +2,7 @@ import surface from './CheckoutSurface.module.css';
 import React from "react";
 import { BsCreditCard } from 'react-icons/bs';
 import { SealCheck } from '@phosphor-icons/react';
+import { previewMoney as money } from '@/lib/checkoutPreviewModel.mjs';
 
 const OrderSummary = ({
     securityAmount,
@@ -17,8 +18,12 @@ const OrderSummary = ({
     btnText = "Continue to checkout",
     showButton = true,
     paymentConfirmed = false,
+    checkoutFlow = 'legacy',
 }) => {
     const netPayToday = Math.max(0, payToday - couponDiscount);
+    const isStaged = checkoutFlow === 'staged';
+    const estimatedTotalPaise = Math.round(Math.max(0, totalOneTime - couponDiscount) * 100);
+    const estimatedAdvancePaise = Math.round(estimatedTotalPaise / 10);
     return (
         <div className={`${surface.card} w-full px-[18px] py-[20px] font-sans flex flex-col gap-[20px]`}>
 
@@ -81,8 +86,8 @@ const OrderSummary = ({
                                     <span>-₹{couponDiscount}</span>
                                 </div>
                                 <div className="flex items-center justify-between w-full text-[12px] font-bold text-[#333] tracking-[-0.4px]">
-                                    <span>Net Payable</span>
-                                    <span>₹{netPayToday}</span>
+                                    <span>{isStaged ? 'Estimated first bill' : 'Net Payable'}</span>
+                                    <span>{isStaged ? money(estimatedTotalPaise) : `₹${netPayToday}`}</span>
                                 </div>
                             </>
                         )}
@@ -96,17 +101,17 @@ const OrderSummary = ({
                                 <div className="flex flex-col gap-[2px] flex-1 min-w-0">
                                     <div className="flex items-start gap-[3px]">
                                         <SealCheck size={20} weight="fill" color="#00b505" className="shrink-0" />
-                                        <p className="font-bold text-[16px] text-[#333] tracking-[-0.4px] leading-[23px]">Total Amount To Pay Today</p>
+                                        <p className="font-bold text-[16px] text-[#333] tracking-[-0.4px] leading-[23px]">{isStaged ? 'Estimated booking advance · 10%' : 'Total Amount To Pay Today'}</p>
                                     </div>
-                                    <p className="font-medium text-[12px] text-[#545454] tracking-[-0.4px] leading-[16px]">Partial Monthly Rental Fees</p>
+                                    <p className="font-medium text-[12px] text-[#545454] tracking-[-0.4px] leading-[16px]">{isStaged ? 'Of your first bill, including the refundable deposit' : 'Partial Monthly Rental Fees'}</p>
                                 </div>
-                                <span className="font-semibold text-[21px] text-[#00b505] tracking-[-0.8px] leading-[28px] whitespace-nowrap">₹{netPayToday}</span>
+                                <span className="font-semibold text-[21px] text-[#00b505] tracking-[-0.8px] leading-[28px] whitespace-nowrap">{isStaged ? money(estimatedAdvancePaise) : `₹${netPayToday}`}</span>
                             </div>
                             {/* Yellow dashed KYC note */}
                             <div className="bg-[#ffffe7] border-l border-r border-b border-dashed border-[#d19d00] rounded-b-[8px] flex gap-[8px] pt-[16px] pb-[8px] px-[18px] w-full">
                                 <BsCreditCard size={15} className="shrink-0 mt-0.5 text-[#9A7F40]" />
                                 <p className="font-bold text-[12px] text-[#545454] tracking-[-0.4px] leading-[16px] flex-1">
-                                    By paying this amount, you are securing your order and proceeding to KYC verification. The remaining balance of your monthly rental will be charged only after your KYC is approved.
+                                    {isStaged ? 'Review your exact first bill at checkout. Pay a 10% advance, complete KYC, then review and pay the remaining balance after approval. Your advance is deducted from the final bill.' : 'By paying this amount, you are securing your order and proceeding to KYC verification. The remaining balance of your monthly rental will be charged only after your KYC is approved.'}
                                 </p>
                             </div>
                         </div>

@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
+const { userResponse } = require('../utils/userResponse');
 
 const addressSchema = new mongoose.Schema({
     name: { type: String, trim: true, default: '' },
@@ -78,12 +79,22 @@ const userSchema = new mongoose.Schema({
         enum: ['customer', 'admin', 'staff', 'super_admin', 'operations_manager', 'sales_executive', 'finance_executive'],
         default: 'customer'
     },
+    sessionVersion: {
+        type: Number,
+        // Do not hydrate a default onto legacy records: a later unrelated save
+        // must never overwrite a concurrent logout's increment with zero.
+        default: function () { return this.isNew ? 0 : undefined; },
+        min: 0,
+        validate: { validator: Number.isSafeInteger, message: 'Invalid session version' },
+    },
     // For staff members: which admin sections they can access
     // e.g. ['cms', 'products', 'orders', 'inventory', 'users', 'kyc', 'payments', 'coupons', 'reports', 'notifications', 'settings']
     adminPermissions: {
         type: [String],
         default: []
     },
+    // Transaction write lock shared with KYC review/resubmission.
+    checkoutGuardRevision: { type: Number, default: 0, select: false },
     kyc: {
         status: {
             type: String,
@@ -116,9 +127,11 @@ const userSchema = new mongoose.Schema({
     },
     emailOtp: {
         type: String,
+        select: false,
     },
     phoneOtp: {
         type: String,
+        select: false,
     },
     isBlocked: {
         type: Boolean,
@@ -134,12 +147,16 @@ const userSchema = new mongoose.Schema({
     },
     otpExpires: {
         type: Date,
+        select: false,
     },
     // Wrong guesses against the current OTP; it is voided after MAX_OTP_ATTEMPTS.
     otpAttempts: {
         type: Number,
         default: 0,
+        select: false,
     },
+    // Existing pending codes without a purpose require a new OTP request.
+    otpPurpose: { type: String, enum: ['signup', 'login', 'admin_reset'], select: false },
     addresses: {
         type: [addressSchema],
         default: []
@@ -152,16 +169,21 @@ const userSchema = new mongoose.Schema({
         type: Date
     }
 }, {
-    timestamps: true
+    timestamps: true,
+    toJSON: { transform: (doc, value) => userResponse(value) },
+    toObject: { transform: (doc, value) => userResponse(value) },
 });
 
-// Encrypt password before saving
+// Hash password before saving
 userSchema.pre('save', async function () {
     if (!this.password || !this.isModified('password')) {
         return;
     }
     const salt = await bcrypt.genSalt(10);
     this.password = await bcrypt.hash(this.password, salt);
+    // Password hash and revocation are one MongoDB update. $inc preserves a
+    // concurrent logout/password change, unlike assigning oldVersion + 1.
+    if (!this.isNew) this.$inc('sessionVersion', 1);
 });
 
 // Method to match password

@@ -1,54 +1,38 @@
+import { headers } from 'next/headers';
+import { cache } from 'react';
+import { notFound } from 'next/navigation';
+import { fetchPublicJson } from '@/lib/serverApi.mjs';
+import { publicMetadata } from '@/lib/publicMetadata';
+import { validProductId } from '@/lib/seo.mjs';
 // Server component: dynamic SEO metadata + Product structured data for each
 // product page. The actual page (page.js) remains a client component.
-import { SITE_NAME, SITE_URL, DEFAULT_OG_IMAGE, API } from "@/config/site";
+import { SITE_NAME, SITE_URL, DEFAULT_OG_IMAGE } from "@/config/site";
+import { serializeJsonLd } from "@/lib/serializeJsonLd.mjs";
 import { isProductOutOfStock } from "@/lib/productAvailability";
 
 const stripHtml = (s = "") => s.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim();
 
-async function getProduct(id) {
-    try {
-        const res = await fetch(`${API}/api/products/${id}`, { cache: "no-store" });
-        if (!res.ok) return null;
-        return await res.json();
-    } catch {
-        return null;
-    }
-}
+const getProduct = cache(async id => {
+    if (!validProductId(id)) notFound();
+    const product = await fetchPublicJson(`/api/products/${id}`, { cache: 'no-store' });
+    if (!product) notFound();
+    return product;
+});
 
 export async function generateMetadata({ params }) {
     const { id } = await params;
     const product = await getProduct(id);
-    if (!product) {
-        return {
-            title: "Product",
-            description: `Rent premium tech and equipment from ${SITE_NAME}.`,
-        };
-    }
-    const desc =
-        stripHtml(product.description).slice(0, 160) ||
+    const desc = product.seoDescription || stripHtml(product.description).slice(0, 160) ||
         `Rent ${product.name} from ${SITE_NAME} — flexible plans with doorstep delivery across India.`;
-    const image = product.images?.[0] || DEFAULT_OG_IMAGE;
     return {
-        title: product.name,
-        description: desc,
-        alternates: { canonical: `/products/${id}` },
-        openGraph: {
-            type: "website",
-            title: `${product.name} | ${SITE_NAME}`,
-            description: desc,
-            url: `/products/${id}`,
-            images: [{ url: image, alt: product.name }],
-        },
-        twitter: {
-            card: "summary_large_image",
-            title: product.name,
-            description: desc,
-            images: [image],
-        },
+        ...publicMetadata({ title: product.seoTitle || product.name, description: desc,
+            path: `/products/${id}`, image: product.images?.[0] || DEFAULT_OG_IMAGE }),
+        ...(product.seoKeywords ? { keywords: product.seoKeywords } : {}),
     };
 }
 
 export default async function ProductLayout({ children, params }) {
+    const nonce = (await headers()).get('x-nonce') || undefined;
     const { id } = await params;
     const product = await getProduct(id);
 
@@ -77,8 +61,9 @@ export default async function ProductLayout({ children, params }) {
         <>
             {jsonLd && (
                 <script
+                    nonce={nonce}
                     type="application/ld+json"
-                    dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+                    dangerouslySetInnerHTML={{ __html: serializeJsonLd(jsonLd) }}
                 />
             )}
             {children}

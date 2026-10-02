@@ -100,9 +100,9 @@ const Hero = () => {
                                         // Desktop: Figma "Frame 54" — 599px block at (81, 115), 17px gaps,
                                         // no scrim (the artwork carries the contrast).
                                         <div className={styles.copy}>
-                                            <h1 className="text-[16px] leading-[20px] md:text-[27px] md:leading-[35px] lg:text-[47px] lg:leading-[58px] font-bold lg:font-semibold tracking-tight lg:tracking-[-1.5px] lg:max-w-[599px]" style={{ fontFamily: "'Mona Sans', sans-serif" }}>
+                                            <h2 className="text-[16px] leading-[20px] md:text-[27px] md:leading-[35px] lg:text-[47px] lg:leading-[58px] font-bold lg:font-semibold tracking-tight lg:tracking-[-1.5px] lg:max-w-[599px]" style={{ fontFamily: "'Mona Sans', sans-serif" }}>
                                                 {slide.title}
-                                            </h1>
+                                            </h2>
                                             <p className="text-[10px] leading-[14px] md:text-[14px] md:leading-[20px] lg:text-[18px] lg:leading-[25px] font-medium md:font-semibold text-white/95 lg:text-white lg:tracking-[-0.8px] line-clamp-3 lg:max-w-[599px]">
                                                 {slide.subtitle}
                                             </p>

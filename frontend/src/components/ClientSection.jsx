@@ -1,5 +1,5 @@
 "use client";
-import { cmsUrl } from '@/lib/cmsPreview';
+import { cmsUrl, fetchCmsPage } from '@/lib/cmsPreview';
 import React, { useEffect, useState } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Autoplay, A11y } from "swiper/modules";
@@ -18,7 +18,7 @@ const ClientSection = () => {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        fetch(cmsUrl('homepage'))
+        fetchCmsPage('homepage')
             .then(res => res.ok ? res.json() : null)
             .then(data => { setCms(data); setLoading(false); })
             .catch(() => setLoading(false));

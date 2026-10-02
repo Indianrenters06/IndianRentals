@@ -128,7 +128,6 @@ function CountUp({ value = 0, prefix = "", duration = 1 }) {
   useEffect(() => {
     const to = Number(value) || 0;
     if (reduceMotion || !inView) {
-      if (reduceMotion) setDisplay(to);
       return;
     }
     let raf;
@@ -146,7 +145,7 @@ function CountUp({ value = 0, prefix = "", duration = 1 }) {
   return (
     <span ref={ref}>
       {prefix}
-      {Math.round(display).toLocaleString("en-IN")}
+      {Math.round(reduceMotion ? Number(value) || 0 : display).toLocaleString("en-IN")}
     </span>
   );
 }

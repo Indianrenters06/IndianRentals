@@ -1,4 +1,5 @@
 'use client';
+import { API as API } from '@/services/apiConfig';
 import { cmsUrl } from '@/lib/cmsPreview';
 
 import React, { useEffect, useState } from 'react';
@@ -6,8 +7,6 @@ import Image from 'next/image';
 import { BannerText, bannerStyle } from '@/components/BannerAppearance';
 import { FaWhatsapp, FaFacebookF, FaInstagram, FaLinkedinIn } from 'react-icons/fa';
 import { MapPinIcon, PhoneIcon, EnvelopeIcon, ClockIcon, ChevronDownIcon } from '@heroicons/react/24/outline';
-
-const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
 
 export default function ContactPage() {
     const [selectedCity, setSelectedCity] = useState('Delhi');

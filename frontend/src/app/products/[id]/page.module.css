@@ -55,7 +55,7 @@
 .benefitCard {
   display: flex; align-items: center; gap: 6px; min-width: 0; min-height: 48px;
   padding: 7px; border: 1px solid #b5e9ff; border-radius: 12px;
-  background: linear-gradient(90deg, #0689ff 0%, #0075ff 100%); color: #fff; font: 600 11px/1.2 'Mona Sans', sans-serif;
+  background: linear-gradient(90deg, #0066d8 0%, #005bc1 100%); color: #fff; font: 600 11px/1.2 'Mona Sans', sans-serif;
 }
 .benefitCard svg { flex: none; color: #fff; }
 .noticeGrid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: stretch; gap: 6px; width: 100%; }
@@ -162,3 +162,7 @@
 @media (prefers-reduced-motion: reduce) {
   .compareStory button { transition: none; }
 }
+
+.galleryAction { display: grid; place-items: center; width: 36px; height: 36px; border: 0; border-radius: 50%; background: #eee; color: #333; cursor: pointer; }
+.galleryAction:focus-visible, .galleryThumbnail:focus-visible { outline: 2px solid #141414; outline-offset: -3px; }
+.galleryThumbnail[aria-pressed="true"] { border-color: #141414; }

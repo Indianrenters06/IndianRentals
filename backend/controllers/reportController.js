@@ -3,6 +3,10 @@ const Rental = require('../models/Rental');
 const User = require('../models/User');
 const Product = require('../models/Product');
 
+// Staged totals report captured cash, while legacy records retain their existing basis.
+const capturedTotal = { $cond: [{ $eq: ['$checkoutFlow', 'staged'] }, { $divide: [{ $ifNull: ['$staged.paidPaise', 0] }, 100] }, { $cond: ['$isPaid', '$totalPrice', 0] }] };
+const capturedOrders = { $or: [{ isPaid: true }, { checkoutFlow: 'staged', 'staged.paidPaise': { $gt: 0 } }] };
+
 // ── helpers ───────────────────────────────────────────────────────────────────
 const yearRange = (year) => ({
     $gte: new Date(`${year}-01-01`),
@@ -23,15 +27,15 @@ const getRevenueReport = asyncHandler(async (req, res) => {
 
     const [monthlyRaw, byStatus, totals] = await Promise.all([
         Rental.aggregate([
-            { $match: { isPaid: true, createdAt: yearRange(year) } },
-            { $group: { _id: { month: { $month: '$createdAt' } }, revenue: { $sum: '$totalPrice' }, orders: { $sum: 1 } } },
+            { $match: { ...capturedOrders, createdAt: yearRange(year) } },
+            { $group: { _id: { month: { $month: '$createdAt' } }, revenue: { $sum: capturedTotal }, orders: { $sum: 1 } } },
             { $sort: { '_id.month': 1 } },
         ]),
         Rental.aggregate([
-            { $group: { _id: '$status', count: { $sum: 1 }, revenue: { $sum: '$totalPrice' } } },
+            { $group: { _id: '$status', count: { $sum: 1 }, revenue: { $sum: { $cond: [{ $eq: ['$checkoutFlow', 'staged'] }, { $divide: [{ $ifNull: ['$staged.paidPaise', 0] }, 100] }, '$totalPrice'] } } } },
         ]),
         Rental.aggregate([
-            { $group: { _id: null, totalRevenue: { $sum: { $cond: ['$isPaid', '$totalPrice', 0] } }, totalOrders: { $sum: 1 }, paidOrders: { $sum: { $cond: ['$isPaid', 1, 0] } } } },
+            { $group: { _id: null, totalRevenue: { $sum: capturedTotal }, totalOrders: { $sum: 1 }, paidOrders: { $sum: { $cond: ['$isPaid', 1, 0] } } } },
         ]),
     ]);
 
@@ -47,7 +51,7 @@ const getRevenueReport = asyncHandler(async (req, res) => {
 const getRentalDurationReport = asyncHandler(async (req, res) => {
     const raw = await Rental.aggregate([
         { $match: { 'rentalPeriod.durationMonths': { $exists: true, $ne: null } } },
-        { $group: { _id: '$rentalPeriod.durationMonths', count: { $sum: 1 }, revenue: { $sum: '$totalPrice' } } },
+        { $group: { _id: '$rentalPeriod.durationMonths', count: { $sum: 1 }, revenue: { $sum: { $cond: [{ $eq: ['$checkoutFlow', 'staged'] }, { $divide: [{ $ifNull: ['$staged.paidPaise', 0] }, 100] }, '$totalPrice'] } } } },
         { $sort: { _id: 1 } },
     ]);
 
@@ -100,8 +104,8 @@ const getCategoryReport = asyncHandler(async (req, res) => {
 const getCustomerLTVReport = asyncHandler(async (req, res) => {
     const [topCustomers, segments] = await Promise.all([
         Rental.aggregate([
-            { $match: { isPaid: true } },
-            { $group: { _id: '$user', totalSpend: { $sum: '$totalPrice' }, orderCount: { $sum: 1 }, avgOrder: { $avg: '$totalPrice' }, lastOrder: { $max: '$createdAt' } } },
+            { $match: capturedOrders },
+            { $group: { _id: '$user', totalSpend: { $sum: capturedTotal }, orderCount: { $sum: 1 }, avgOrder: { $avg: capturedTotal }, lastOrder: { $max: '$createdAt' } } },
             { $sort: { totalSpend: -1 } },
             { $limit: 15 },
             { $lookup: { from: 'users', localField: '_id', foreignField: '_id', as: 'u' } },
@@ -109,8 +113,8 @@ const getCustomerLTVReport = asyncHandler(async (req, res) => {
             { $project: { name: { $ifNull: ['$u.name', 'Unknown'] }, email: '$u.email', totalSpend: 1, orderCount: 1, avgOrder: 1, lastOrder: 1 } },
         ]),
         Rental.aggregate([
-            { $match: { isPaid: true } },
-            { $group: { _id: '$user', spend: { $sum: '$totalPrice' } } },
+            { $match: capturedOrders },
+            { $group: { _id: '$user', spend: { $sum: capturedTotal } } },
             { $bucket: {
                 groupBy: '$spend',
                 boundaries: [0, 1000, 5000, 15000, 50000],
@@ -240,22 +244,22 @@ const getCancellationReport = asyncHandler(async (req, res) => {
 const getRefundReport = asyncHandler(async (req, res) => {
     const year = parseInt(req.query.year) || new Date().getFullYear();
 
-    const [monthlyRaw, refundTotals, allRevenue, topRefunded] = await Promise.all([
+    const [monthlyRaw, refundTotals, allRevenue, topRefunded, manualReview] = await Promise.all([
         Rental.aggregate([
-            { $match: { isPaid: true, status: 'Cancelled', createdAt: yearRange(year) } },
+            { $match: { isPaid: true, checkoutFlow: { $ne: 'staged' }, status: 'Cancelled', createdAt: yearRange(year) } },
             { $group: { _id: { month: { $month: '$createdAt' } }, amount: { $sum: '$totalPrice' }, count: { $sum: 1 } } },
             { $sort: { '_id.month': 1 } },
         ]),
         Rental.aggregate([
-            { $match: { isPaid: true, status: 'Cancelled' } },
+            { $match: { isPaid: true, checkoutFlow: { $ne: 'staged' }, status: 'Cancelled' } },
             { $group: { _id: null, totalAmount: { $sum: '$totalPrice' }, totalCount: { $sum: 1 } } },
         ]),
         Rental.aggregate([
-            { $match: { isPaid: true } },
-            { $group: { _id: null, total: { $sum: '$totalPrice' }, count: { $sum: 1 } } },
+            { $match: capturedOrders },
+            { $group: { _id: null, total: { $sum: capturedTotal }, count: { $sum: 1 } } },
         ]),
         Rental.aggregate([
-            { $match: { isPaid: true, status: 'Cancelled' } },
+            { $match: { isPaid: true, checkoutFlow: { $ne: 'staged' }, status: 'Cancelled' } },
             { $unwind: '$orderItems' },
             { $lookup: { from: 'products', localField: 'orderItems.product', foreignField: '_id', as: 'prod' } },
             { $unwind: { path: '$prod', preserveNullAndEmptyArrays: true } },
@@ -267,6 +271,10 @@ const getRefundReport = asyncHandler(async (req, res) => {
             }},
             { $sort: { amount: -1 } },
             { $limit: 10 },
+        ]),
+        Rental.aggregate([
+            { $match: { checkoutFlow: 'staged', refundReviewRequired: true } },
+            { $group: { _id: null, capturedAmount: { $sum: capturedTotal }, count: { $sum: 1 } } },
         ]),
     ]);
 
@@ -280,6 +288,8 @@ const getRefundReport = asyncHandler(async (req, res) => {
 
     res.json({
         monthly,
+        // Review exposure is not evidence that a refund was sent.
+        manualReview: manualReview[0] || { capturedAmount: 0, count: 0 },
         totalRefunds: rt.totalAmount || 0,
         refundCount: rt.totalCount || 0,
         totalRevenue: ar.total || 0,
@@ -335,7 +345,7 @@ const getLocationReport = asyncHandler(async (req, res) => {
             { $group: {
                 _id: '$shippingAddress.city',
                 orders: { $sum: 1 },
-                revenue: { $sum: { $cond: ['$isPaid', '$totalPrice', 0] } },
+                revenue: { $sum: capturedTotal },
                 customers: { $addToSet: '$user' },
             }},
             { $project: { city: { $ifNull: ['$_id', 'Unknown'] }, orders: 1, revenue: 1, customers: { $size: '$customers' } } },
@@ -347,7 +357,7 @@ const getLocationReport = asyncHandler(async (req, res) => {
                 _id: null,
                 cities: { $addToSet: '$shippingAddress.city' },
                 totalOrders: { $sum: 1 },
-                totalRevenue: { $sum: { $cond: ['$isPaid', '$totalPrice', 0] } },
+                totalRevenue: { $sum: capturedTotal },
             }},
             { $project: { citiesCount: { $size: '$cities' }, totalOrders: 1, totalRevenue: 1 } },
         ]),

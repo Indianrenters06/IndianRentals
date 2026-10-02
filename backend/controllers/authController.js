@@ -9,6 +9,16 @@ const sendSMS = require('../utils/sendSMS');
 const { sendTemplatedEmail } = require('../utils/sendTemplatedEmail');
 
 const crypto = require('crypto');
+const { userResponse } = require('../utils/userResponse');
+const { requireActiveAccount } = require('../utils/accountAccess');
+const { currentVersionFilter } = require('../utils/sessionVersion');
+const OTP_SELECTION = '+emailOtp +phoneOtp +otpExpires +otpAttempts +otpPurpose';
+const requireOtpPurpose = (user, purposes, res) => {
+    if (!purposes.includes(user.otpPurpose)) {
+        res.status(400);
+        throw new Error('Please request a new code for this verification');
+    }
+};
 
 // Generate 6-digit OTP (crypto RNG — Math.random is predictable)
 const generateOTP = () => {
@@ -35,6 +45,7 @@ const rejectWrongOtp = async (user, res, message) => {
         user.emailOtp = undefined;
         user.phoneOtp = undefined;
         user.otpExpires = undefined;
+        user.otpPurpose = undefined;
         user.otpAttempts = 0;
         await user.save();
         res.status(429);
@@ -51,7 +62,7 @@ const rejectWrongOtp = async (user, res, message) => {
 // still works when email/SMS delivery is down.
 const logOtpForDev = (target, otp) => {
     if (process.env.NODE_ENV !== 'production') {
-        console.log(`[DEV OTP] ${target} -> ${otp}`);
+        console.log('[DEV OTP] Verification code generated; delivery details are not logged.');
     }
 };
 
@@ -71,12 +82,13 @@ const adminLogin = asyncHandler(async (req, res) => {
     const user = await User.findOne({ email }).select('+password');
 
     if (user && user.password && (await user.matchPassword(password))) {
+        requireActiveAccount(user, res);
         if (user.role === 'customer') {
             res.status(401);
             throw new Error('Not authorized to access the admin panel');
         }
 
-        const token = generateToken(res, user._id);
+        const token = generateToken(res, user);
 
         // Admin sign-in has no OTP step, so the session starts here.
         await User.updateOne({ _id: user._id }, { $set: { lastLogin: new Date() } });
@@ -131,6 +143,7 @@ const registerUser = asyncHandler(async (req, res) => {
         phoneOtp,
         otpExpires,
         otpAttempts: 0,
+        otpPurpose: 'signup',
         isEmailVerified: false,
         isPhoneVerified: false,
     });
@@ -153,7 +166,7 @@ const registerUser = asyncHandler(async (req, res) => {
                 });
             }
         } catch (error) {
-            console.error('Email send failed:', error);
+            console.error('Email send failed:');
             // Don't fail the registration, just let them resend or handle it
         }
 
@@ -164,7 +177,7 @@ const registerUser = asyncHandler(async (req, res) => {
                 message: `Your Phone OTP is: ${phoneOtp}`,
             });
         } catch (error) {
-            console.error('SMS send failed:', error);
+            console.error('SMS send failed:');
         }
 
         await createNotification({
@@ -194,13 +207,15 @@ const registerUser = asyncHandler(async (req, res) => {
 const verifyOtp = asyncHandler(async (req, res) => {
     const { userId, emailOtp, phoneOtp } = req.body;
 
-    const user = await User.findById(userId).select('+password'); // select if needed, but we just need otps
+    const user = await User.findById(userId).select(OTP_SELECTION);
 
     if (!user) {
         res.status(404);
         throw new Error('User not found');
     }
 
+    requireActiveAccount(user, res);
+    requireOtpPurpose(user, ['signup', 'login'], res);
     if (otpExpired(user)) {
         res.status(400);
         throw new Error('OTP expired. Please resend.');
@@ -222,6 +237,7 @@ const verifyOtp = asyncHandler(async (req, res) => {
     user.emailOtp = undefined;
     user.phoneOtp = undefined;
     user.otpExpires = undefined;
+    user.otpPurpose = undefined;
     user.otpAttempts = 0;
     // Verification completes signup and issues a session, so it counts as a login.
     user.lastLogin = new Date();
@@ -233,7 +249,7 @@ const verifyOtp = asyncHandler(async (req, res) => {
         email: user.email,
     });
 
-    const token = generateToken(res, user._id);
+    const token = generateToken(res, user);
 
     res.json({
         _id: user._id,
@@ -242,7 +258,7 @@ const verifyOtp = asyncHandler(async (req, res) => {
         role: user.role,
         phone: user.phone,
         avatar: user.avatar,
-        kyc: user.kyc,
+        kyc: userResponse(user).kyc,
         isEmailVerified: user.isEmailVerified,
         isPhoneVerified: user.isPhoneVerified,
         token: token,
@@ -258,6 +274,7 @@ const loginUser = asyncHandler(async (req, res) => {
     const user = await User.findOne({ email }).select('+password');
 
     if (user && (await user.matchPassword(password))) {
+        requireActiveAccount(user, res);
 
         // Generate new OTPs even for login (2FA)
         const emailOtp = generateOTP();
@@ -269,6 +286,7 @@ const loginUser = asyncHandler(async (req, res) => {
         user.phoneOtp = phoneOtp;
         user.otpExpires = otpExpires;
         user.otpAttempts = 0;
+        user.otpPurpose = 'login';
         await user.save();
 
         // Send Email
@@ -287,7 +305,7 @@ const loginUser = asyncHandler(async (req, res) => {
                 });
             }
         } catch (error) {
-            console.error('Email send failed:', error);
+            console.error('Email send failed:');
         }
 
         // Send SMS
@@ -297,7 +315,7 @@ const loginUser = asyncHandler(async (req, res) => {
                 message: `Your Login OTP is: ${phoneOtp}`,
             });
         } catch (error) {
-            console.error('SMS send failed:', error);
+            console.error('SMS send failed:');
         }
 
         res.json({
@@ -312,16 +330,33 @@ const loginUser = asyncHandler(async (req, res) => {
     }
 });
 
-// @desc    Logout user / clear cookie
+// @desc    Revoke all account sessions, then clear this browser's cookie
 // @route   POST /api/auth/logout
-// @access  Public
-const logoutUser = (req, res) => {
+// @access  Private
+const logoutUser = asyncHandler(async (req, res) => {
+    let result;
+    try {
+        result = await User.updateOne(
+            { _id: req.user._id, ...currentVersionFilter(req.user) },
+            { $inc: { sessionVersion: 1 } },
+        );
+    } catch {
+        res.status(503);
+        throw new Error('Could not end your sessions. Please try again');
+    }
+    if (result.matchedCount !== 1) {
+        res.status(401);
+        throw new Error('Session already ended. Please sign in again');
+    }
     res.cookie('jwt', '', {
         httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'strict',
         expires: new Date(0),
     });
+    res.setHeader('Cache-Control', 'no-store, private');
     res.status(200).json({ message: 'Logged out successfully' });
-};
+});
 
 // @desc    Send OTP for Login (Email or Phone)
 // @route   POST /api/auth/send-otp
@@ -345,11 +380,14 @@ const sendLoginOtp = asyncHandler(async (req, res) => {
         throw new Error('User not found');
     }
 
+    requireActiveAccount(user, res);
+
     const otp = generateOTP();
     const otpExpires = Date.now() + 10 * 60 * 1000; // 10 minutes
 
     user.otpExpires = otpExpires;
     user.otpAttempts = 0;
+    user.otpPurpose = 'login';
 
     if (isEmail) {
         user.emailOtp = otp;
@@ -372,7 +410,7 @@ const sendLoginOtp = asyncHandler(async (req, res) => {
                 });
             }
         } catch (error) {
-            console.error('Email send failed (Network Error?):', error);
+            console.error('Email send failed (Network Error?):');
             // Non-blocking failure: proceed so user can still login using Network Tab OTP
         }
         logOtpForDev(user.email, otp);
@@ -391,7 +429,7 @@ const sendLoginOtp = asyncHandler(async (req, res) => {
                 message: `Your Login OTP is: ${otp}`,
             });
         } catch (error) {
-            console.error('SMS send failed:', error);
+            console.error('SMS send failed:');
             // res.status(500);
             // throw new Error('SMS could not be sent');
         }
@@ -417,13 +455,15 @@ const verifyLoginOtp = asyncHandler(async (req, res) => {
     const isEmail = identifier.includes('@');
     const query = isEmail ? { email: identifier } : { phone: identifier };
 
-    const user = await User.findOne(query);
+    const user = await User.findOne(query).select(OTP_SELECTION);
 
     if (!user) {
         res.status(404);
         throw new Error('User not found');
     }
 
+    requireActiveAccount(user, res);
+    requireOtpPurpose(user, ['login'], res);
     if (otpExpired(user)) {
         res.status(400);
         throw new Error('OTP expired. Please request a new one.');
@@ -442,12 +482,13 @@ const verifyLoginOtp = asyncHandler(async (req, res) => {
     user.emailOtp = undefined;
     user.phoneOtp = undefined;
     user.otpExpires = undefined;
+    user.otpPurpose = undefined;
     user.otpAttempts = 0;
     // This is the customer login path — the password step above only sends an OTP.
     user.lastLogin = new Date();
     await user.save();
 
-    const token = generateToken(res, user._id);
+    const token = generateToken(res, user);
 
     res.json({
         _id: user._id,
@@ -470,8 +511,12 @@ const adminForgotPassword = asyncHandler(async (req, res) => {
         return res.json({ message: 'If that email belongs to an admin account, an OTP has been sent.' });
     }
 
+    requireActiveAccount(user, res);
+
     const otp = generateOTP();
     user.emailOtp = otp;
+    user.phoneOtp = undefined;
+    user.otpPurpose = 'admin_reset';
     user.otpExpires = Date.now() + 10 * 60 * 1000; // 10 minutes
     user.otpAttempts = 0;
     await user.save();
@@ -483,7 +528,7 @@ const adminForgotPassword = asyncHandler(async (req, res) => {
             message: `Your password reset OTP is: ${otp}\n\nThis OTP is valid for 10 minutes. Do not share it with anyone.`,
         });
     } catch (err) {
-        console.error('Failed to send reset OTP email:', err);
+        console.error('Failed to send reset OTP email:');
         res.status(500);
         throw new Error('Failed to send OTP email. Please try again.');
     }
@@ -498,12 +543,14 @@ const adminResetPassword = asyncHandler(async (req, res) => {
         throw new Error('Please provide email, OTP, and new password');
     }
 
-    const user = await User.findOne({ email }).select('+password');
+    const user = await User.findOne({ email }).select(`+password ${OTP_SELECTION}`);
     if (!user || user.role === 'customer') {
         res.status(404);
         throw new Error('Admin account not found');
     }
 
+    requireActiveAccount(user, res);
+    requireOtpPurpose(user, ['admin_reset'], res);
     if (!user.emailOtp || otpExpired(user)) {
         res.status(400);
         throw new Error('OTP expired. Please request a new one.');
@@ -514,16 +561,30 @@ const adminResetPassword = asyncHandler(async (req, res) => {
     }
 
     user.password = newPassword;
+    // Consume exactly the verified recovery code in the same update as the
+    // password hash and the model's atomic session-version increment.
+    user.$where = { ...(user.$where || {}), emailOtp: user.emailOtp,
+        otpPurpose: 'admin_reset', otpExpires: user.otpExpires };
     user.emailOtp = undefined;
+    user.phoneOtp = undefined;
+    user.otpPurpose = undefined;
     user.otpExpires = undefined;
     user.otpAttempts = 0;
-    await user.save();
+    try { await user.save(); }
+    catch (error) {
+        if (error.name === 'DocumentNotFoundError' || error.name === 'VersionError') {
+            res.status(409);
+            throw new Error('This recovery code was already used or changed. Please request a new one');
+        }
+        throw error;
+    }
 
     res.json({ message: 'Password reset successfully. You can now log in.' });
 });
 
 const { OAuth2Client } = require('google-auth-library');
-const googleClient = new OAuth2Client(process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || 'dummy-client-id');
+const googleAudience = process.env.GOOGLE_CLIENT_ID || process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
+const googleClient = new OAuth2Client(googleAudience);
 
 // @desc    Google Sign In / Register
 // @route   POST /api/auth/google-login
@@ -536,30 +597,32 @@ const googleLogin = asyncHandler(async (req, res) => {
         throw new Error('No Google access_token provided');
     }
 
+    if (!googleAudience) { res.status(503); throw new Error('Google sign-in is not configured'); }
     let payload;
     try {
+        const info = await googleClient.getTokenInfo(access_token);
+        if (info.aud !== googleAudience || info.expiry_date <= Date.now()) throw new Error('Invalid Google token audience');
         const userInfoRes = await fetch("https://www.googleapis.com/oauth2/v3/userinfo", {
             headers: { Authorization: `Bearer ${access_token}` },
         });
 
         if (!userInfoRes.ok) {
-            const errText = await userInfoRes.text();
-            console.error('Google userInfo endpoint failed:', userInfoRes.status, errText);
+            console.error('Google userInfo endpoint failed');
             res.status(401);
-            throw new Error('Failed to verify token with Google: ' + (errText || userInfoRes.statusText));
+            throw new Error('Invalid Google access token');
         }
 
         payload = await userInfoRes.json();
     } catch (googleErr) {
-        console.error('Google API error:', googleErr);
+        console.error('Google API error:');
         res.status(401);
-        throw new Error(googleErr.message || 'Invalid Google access_token');
+        throw new Error('Invalid Google access token');
     }
 
     const { email, name, picture, sub } = payload;
-    if (!email) {
+    if (!email || !sub || payload.email_verified !== true) {
         res.status(400);
-        throw new Error('Google account did not return an email address');
+        throw new Error('A verified Google email is required');
     }
 
     try {
@@ -582,7 +645,6 @@ const googleLogin = asyncHandler(async (req, res) => {
                 googleId: sub || '',
                 isEmailVerified: true,
                 avatar: picture || '',
-                password: `GoogleAuth_${crypto.randomBytes(8).toString('hex')}!Aa1`,
                 role: 'customer',
             });
 
@@ -593,6 +655,8 @@ const googleLogin = asyncHandler(async (req, res) => {
                 relatedId: user._id
             });
         } else {
+            requireActiveAccount(user, res);
+            if (user.googleId && user.googleId !== sub) { res.status(401); throw new Error('Google identity does not match this account'); }
             // Existing user: link Google ID, verify email, update avatar if empty
             if (!user.avatar && picture) {
                 user.avatar = picture;
@@ -608,7 +672,7 @@ const googleLogin = asyncHandler(async (req, res) => {
         user.lastLogin = new Date();
         await user.save();
 
-        const token = generateToken(res, user._id);
+        const token = generateToken(res, user);
 
         res.json({
             _id: user._id,
@@ -617,14 +681,14 @@ const googleLogin = asyncHandler(async (req, res) => {
             role: user.role,
             phone: user.phone || '',
             avatar: user.avatar || '',
-            kyc: user.kyc,
+            kyc: userResponse(user).kyc,
             isEmailVerified: user.isEmailVerified,
             isPhoneVerified: user.isPhoneVerified || false,
             token: token,
         });
     } catch (dbErr) {
-        console.error('Database error during Google login:', dbErr);
-        res.status(500);
+        console.error('Database error during Google login:');
+        res.status(dbErr.statusCode || (res.statusCode >= 400 ? res.statusCode : 500));
         throw new Error(dbErr.message || 'Error processing Google login in database');
     }
 });
@@ -679,7 +743,7 @@ const sendRegisterOtp = asyncHandler(async (req, res) => {
     try {
         await sendSMS({ phone, message: `Your IndianRenters verification code is: ${otp}` });
     } catch (error) {
-        console.error('SMS send failed:', error);
+        console.error('SMS send failed:');
     }
     logOtpForDev(phone, otp);
 
@@ -739,7 +803,7 @@ const verifyRegisterOtp = asyncHandler(async (req, res) => {
         relatedId: user._id
     });
 
-    const token = generateToken(res, user._id);
+    const token = generateToken(res, user);
 
     res.status(201).json({
         _id: user._id,
@@ -748,7 +812,7 @@ const verifyRegisterOtp = asyncHandler(async (req, res) => {
         phone: user.phone,
         role: user.role,
         avatar: user.avatar || '',
-        kyc: user.kyc,
+        kyc: userResponse(user).kyc,
         isEmailVerified: false,
         isPhoneVerified: true,
         token: token,

@@ -34,10 +34,11 @@ const loadScript = () => {
 };
 
 // Returns a ready-to-use Cashfree checkout instance.
-// mode: 'production' | 'sandbox' — defaults to NEXT_PUBLIC_CASHFREE_MODE.
+// Controlled remediation: no frontend environment value can enable live SDK.
 export const getCashfree = async (mode) => {
+    if (mode !== 'sandbox') throw new Error('Only sandbox checkout is available');
     const Cashfree = await loadScript();
     return Cashfree({
-        mode: mode || process.env.NEXT_PUBLIC_CASHFREE_MODE || 'production',
+        mode: 'sandbox',
     });
 };

@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const { randomUUID } = require('node:crypto');
 
 const rentalSchema = new mongoose.Schema({
     user: {
@@ -13,6 +14,7 @@ const rentalSchema = new mongoose.Schema({
             image: { type: String, required: true },
             price: { type: Number, required: true },
             securityDeposit: { type: Number, required: true },
+            tenureMonths: { type: Number },
             product: {
                 type: mongoose.Schema.Types.ObjectId,
                 required: true,
@@ -53,6 +55,42 @@ const rentalSchema = new mongoose.Schema({
     couponCode: { type: String, default: null },
     couponDiscount: { type: Number, default: 0.0 },
     totalPrice: { type: Number, required: true, default: 0.0 },
+    depositPrice: { type: Number, default: 0 },
+    pricingSnapshot: { type: mongoose.Schema.Types.Mixed, immutable: true },
+    checkoutFlow: { type: String, enum: ['legacy', 'staged'], default: 'legacy', immutable: true },
+    // The estimate remains immutable. A separate reviewed bill may change only
+    // before the first balance provider session has been reserved.
+    staged: {
+        advancePaise: Number,
+        paidPaise: { type: Number, default: 0 },
+        finalQuote: mongoose.Schema.Types.Mixed,
+        advance: {
+            providerOrderId: String, requestKey: String, mode: String,
+            amountPaise: Number, quoteHash: String, state: String,
+            providerPaymentId: String, paidAt: Date,
+            receiptState: String, receiptClaimedAt: Date,
+        },
+        balance: {
+            providerOrderId: String, requestKey: String, mode: String,
+            amountPaise: Number, quoteHash: String, state: String,
+            providerPaymentId: String, paidAt: Date,
+            receiptState: String, receiptClaimedAt: Date,
+        },
+    },
+    checkoutKey: { type: String, immutable: true },
+    selectionHash: { type: String, immutable: true },
+    paymentState: { type: String, enum: ['created', 'payment_pending', 'payment_failed', 'confirmed', 'cancelled', 'manual_review'], default: 'created' },
+    payment: {
+        providerOrderId: String,
+        mode: { type: String, enum: ['sandbox'] },
+        requestKey: { type: String, default: randomUUID },
+        providerPaymentId: String,
+    },
+    refundReviewRequired: { type: Boolean, default: false },
+    paymentReceipt: {
+        state: { type: String, enum: ['pending', 'dispatching', 'sent', 'delivery_unknown'] },
+        claimedAt: Date,
+    },
 
     // Status Tracking
     status: {
@@ -88,4 +126,17 @@ const rentalSchema = new mongoose.Schema({
     timestamps: true
 });
 
+// Legacy records without a checkout key are not backfilled or repriced.
+rentalSchema.index({ user: 1, checkoutKey: 1 }, { unique: true,
+    partialFilterExpression: { checkoutKey: { $type: 'string' } } });
+rentalSchema.index({ 'payment.providerPaymentId': 1 }, { unique: true,
+    partialFilterExpression: { 'payment.providerPaymentId': { $type: 'string' } } });
+
+for (const stage of ['advance', 'balance']) {
+    for (const field of ['providerOrderId', 'providerPaymentId']) {
+        const path = `staged.${stage}.${field}`;
+        rentalSchema.index({ [path]: 1 }, { unique: true,
+            partialFilterExpression: { [path]: { $type: 'string' } } });
+    }
+}
 module.exports = mongoose.model('Rental', rentalSchema);

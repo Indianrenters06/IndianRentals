@@ -3,11 +3,33 @@ import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { FiPackage } from 'react-icons/fi';
+import CategoryPlaceholderIcon from './CategoryPlaceholderIcon';
 import { getSubcategoriesByParentName } from '../services/categoryService';
 import CategoryNavBar from './CategoryNavBar';
 import styles from './CategoryLayout.module.css';
 
 const EMPTY_ITEMS = [];
+
+function CategoryTileImage({ image, name, slug }) {
+    const [failedImage, setFailedImage] = useState(null);
+    const hasImage = Boolean(image) && failedImage !== image;
+
+    return (
+        <div className={`${styles.categoryImage} ${hasImage ? '' : styles.categoryImagePlaceholder}`}>
+            {hasImage ? (
+                <Image src={image} alt="" fill
+                    className={styles.categoryPhoto}
+                    onError={() => setFailedImage(image)}
+                    sizes="(max-width: 767px) calc((100vw - 64px) / 2), (max-width: 1023px) calc((100vw - 108px) / 3), 208px" />
+            ) : (
+                <div className={styles.imageFallback} aria-hidden="true">
+                    <CategoryPlaceholderIcon name={name} slug={slug} className={styles.imageFallbackIcon} />
+                    <span className={styles.imageFallbackLabel}>Image unavailable</span>
+                </div>
+            )}
+        </div>
+    );
+}
 
 /**
  * DynamicCategoryPage
@@ -96,13 +118,7 @@ export default function DynamicCategoryPage({
                     <div className={styles.categoryGrid}>
                         {subcategories.map((sub) => (
                             <Link key={sub.href} href={sub.href} className={styles.categoryTile}>
-                                <div className={styles.categoryImage}>
-                                    {sub.image ? (
-                                        <Image src={sub.image} alt="" fill
-                                            className={styles.categoryPhoto}
-                                            sizes="(max-width: 767px) calc((100vw - 64px) / 2), (max-width: 1023px) calc((100vw - 108px) / 3), 208px" />
-                                    ) : <FiPackage size={32} className="text-gray-300" aria-hidden="true" />}
-                                </div>
+                                <CategoryTileImage image={sub.image} name={sub.name} slug={sub.slug} />
                                 <span className={styles.categoryName}>{sub.name}</span>
                             </Link>
                         ))}

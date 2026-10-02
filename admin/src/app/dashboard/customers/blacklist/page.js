@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useMemo } from "react";
+import { useState, useSyncExternalStore, useMemo } from "react";
 import { motion } from "framer-motion";
 import {
     Card, CardBody, Button, Table, TableHeader, TableColumn, TableBody,
@@ -12,12 +12,22 @@ import SortSelect from "@/components/SortSelect";
 import toast from 'react-hot-toast';
 
 const LOCAL_KEY = "admin_blacklist";
-const loadBlacklist = () => { try { return JSON.parse(localStorage.getItem(LOCAL_KEY) || "[]"); } catch { return []; } };
-const saveBlacklist = (list) => localStorage.setItem(LOCAL_KEY, JSON.stringify(list));
+const getSnapshot = () => { try { return localStorage.getItem(LOCAL_KEY) || "[]"; } catch { return "[]"; } };
+const serverSnapshot = () => "[]";
+const subscribe = (notify) => {
+    window.addEventListener('storage', notify);
+    window.addEventListener('blacklist-updated', notify);
+    return () => { window.removeEventListener('storage', notify); window.removeEventListener('blacklist-updated', notify); };
+};
+const saveBlacklist = (list) => {
+    localStorage.setItem(LOCAL_KEY, JSON.stringify(list));
+    window.dispatchEvent(new Event('blacklist-updated'));
+};
 
 export default function BlacklistManagement() {
-    const [blacklist, setBlacklist] = useState([]);
-    const [loading, setLoading] = useState(true);
+    const storedBlacklist = useSyncExternalStore(subscribe, getSnapshot, serverSnapshot);
+    const blacklist = useMemo(() => { try { const list = JSON.parse(storedBlacklist); return Array.isArray(list) ? list : []; } catch { return []; } }, [storedBlacklist]);
+    const loading = false;
     const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure();
     const [form, setForm] = useState({ identifier: "", type: "Email Address", reason: "" });
     const [formError, setFormError] = useState("");
@@ -25,11 +35,6 @@ export default function BlacklistManagement() {
     const [page, setPage] = useState(1);
     const [rowsPerPage] = useState(10);
     const [sortDescriptor, setSortDescriptor] = useState({ column: "date", direction: "descending" });
-
-    useEffect(() => {
-        setBlacklist(loadBlacklist());
-        setLoading(false);
-    }, []);
 
     const handleAdd = () => {
         if (!form.identifier.trim()) return setFormError("Identifier is required.");
@@ -44,7 +49,6 @@ export default function BlacklistManagement() {
             dateRaw: new Date().toISOString(),
         };
         const updated = [newEntry, ...blacklist];
-        setBlacklist(updated);
         saveBlacklist(updated);
         setForm({ identifier: "", type: "Email Address", reason: "" });
         onClose();
@@ -53,7 +57,6 @@ export default function BlacklistManagement() {
 
     const handleRemove = (id) => {
         const updated = blacklist.filter(b => b.id !== id);
-        setBlacklist(updated);
         saveBlacklist(updated);
         toast.success("Removed from blacklist");
     };
@@ -86,7 +89,7 @@ export default function BlacklistManagement() {
                     <h1 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-slate-100 mb-1">
                         Security <span className="text-indigo-600 dark:text-indigo-400 font-extrabold">Blacklist</span>
                     </h1>
-                    <p className="text-slate-600 dark:text-slate-200">Manage identifiers banned from accessing platform services.</p>
+                    <p className="text-slate-600 dark:text-slate-200">Keep a browser-local list of identifiers. This list does not enforce account access.</p>
                 </motion.div>
                 <div className="flex items-center gap-3">
                     {!loading && blacklist.length > 0 && (

@@ -2,69 +2,21 @@ const asyncHandler = require('express-async-handler');
 const escapeRegex = require('../utils/escapeRegex');
 const Product = require('../models/Product');
 const Category = require('../models/Category');
+const mongoose = require('mongoose');
+const { catalogueQuery, reviewInput } = require('../utils/catalogueQuery');
 const { PAGE_SIZE } = require('../config/constants');
 
 // @desc    Fetch all products with advanced filtering
 // @route   GET /api/products
 // @access  Public
 const getProducts = asyncHandler(async (req, res) => {
-    const page = Number(req.query.pageNumber) || 1;
-    // Capped so one request can't pull the whole catalogue (admin asks for ≤2000).
-    const limit = Math.min(Number(req.query.limit) || PAGE_SIZE, 2000);
-
-    // Base query object
-    const query = {};
-
-    // Keyword Search (searches name, description, brand, etc.)
-    if (req.query.keyword) {
-        const keyword = escapeRegex(req.query.keyword);
-        query.$or = [
-            { name: { $regex: keyword, $options: 'i' } },
-            { description: { $regex: keyword, $options: 'i' } },
-            { brand: { $regex: keyword, $options: 'i' } },
-            { category: { $regex: keyword, $options: 'i' } },
-        ];
-    }
-
-    // Filter by Categories (e.g., ?category=Electronics,Furniture)
-    if (req.query.category) {
-        const categories = req.query.category.split(',');
-        query.category = { $in: categories };
-    }
-
-    // Filter by Brand (e.g., ?brand=Dell,HP)
-    if (req.query.brand) {
-        const brands = req.query.brand.split(',');
-        query.brand = { $in: brands };
-    }
-
-    // Filter by Price Range (e.g., ?minPrice=100&maxPrice=5000)
-    if (req.query.minPrice || req.query.maxPrice) {
-        query.rentalPrice = {};
-        if (req.query.minPrice) query.rentalPrice.$gte = Number(req.query.minPrice);
-        if (req.query.maxPrice) query.rentalPrice.$lte = Number(req.query.maxPrice);
-    }
-
-    // Filter by Minimum Rating (e.g., ?rating=4)
-    if (req.query.rating) {
-        query.rating = { $gte: Number(req.query.rating) };
-    }
-
-    // Filter by Location (Exact Match for City/State)
-    if (req.query.city) {
-        query.city = { $regex: escapeRegex(req.query.city), $options: 'i' };
-    }
-    if (req.query.state) {
-        query.state = { $regex: escapeRegex(req.query.state), $options: 'i' };
-    }
-
-    // Filter by Subcategory ID (e.g., ?subcategory=<ObjectId>)
-    if (req.query.subcategory) {
-        query.subcategory = req.query.subcategory;
-    }
-
+    let filters;
+    try { filters = catalogueQuery(req.query, PAGE_SIZE); }
+    catch (error) { res.status(error.statusCode || 400); throw error; }
+    const { page, limit, query } = filters;
     const count = await Product.countDocuments(query);
     const products = await Product.find(query)
+        .select('-reviews -description -specifications -faqs -returnPolicy -shippingPolicy')
         .populate('subcategory', 'name slug')
         .sort({ createdAt: -1 })
         .limit(limit)
@@ -79,9 +31,9 @@ const getProducts = asyncHandler(async (req, res) => {
 const getProductById = asyncHandler(async (req, res) => {
     const product = await Product.findById(req.params.id)
         .populate('subcategory', 'name slug')
-        .populate('pageLayout.relatedProducts', 'name images rentalPrice category');
+        .populate({ path: 'pageLayout.relatedProducts', select: 'name images rentalPrice category', match: { isActive: { $ne: false } } });
 
-    if (product) {
+    if (product && product.isActive !== false) {
         res.json(product);
     } else {
         res.status(404);
@@ -284,41 +236,22 @@ const deleteProduct = asyncHandler(async (req, res) => {
 // @route   POST /api/products/:id/reviews
 // @access  Private
 const createProductReview = asyncHandler(async (req, res) => {
-    const { rating, comment } = req.body;
-
-    const product = await Product.findById(req.params.id);
-
-    if (product) {
-        const alreadyReviewed = product.reviews.find(
-            (r) => r.user.toString() === req.user._id.toString()
-        );
-
-        if (alreadyReviewed) {
-            res.status(400);
-            throw new Error('Product already reviewed');
-        }
-
-        const review = {
-            name: req.user.name,
-            rating: Number(rating),
-            comment,
-            user: req.user._id,
-        };
-
-        product.reviews.push(review);
-
-        product.numReviews = product.reviews.length;
-
-        product.rating =
-            product.reviews.reduce((acc, item) => item.rating + acc, 0) /
-            product.reviews.length;
-
-        await product.save();
-        res.status(201).json({ message: 'Review added' });
-    } else {
-        res.status(404);
-        throw new Error('Product not found');
+    if (req.user.role !== 'customer') { res.status(403); throw new Error('Customer review access required'); }
+    let input;
+    try { input = reviewInput(req.body); } catch (error) { res.status(400); throw error; }
+    const review = { ...input, name: String(req.user.name || 'Customer').slice(0, 100), user: req.user._id,
+        _id: new mongoose.Types.ObjectId(), createdAt: new Date(), updatedAt: new Date() };
+    // The duplicate predicate and append are one atomic database operation.
+    const product = await Product.findOneAndUpdate({ _id: req.params.id, isActive: { $ne: false }, 'reviews.user': { $ne: req.user._id } }, [
+        { $set: { reviews: { $concatArrays: [{ $ifNull: ['$reviews', []] }, { $literal: [review] }] } } },
+        { $set: { numReviews: { $size: '$reviews' }, rating: { $avg: '$reviews.rating' } } },
+    ], { new: true, updatePipeline: true });
+    if (!product) {
+        const existing = await Product.findById(req.params.id);
+        res.status(existing && existing.isActive !== false ? 409 : 404);
+        throw new Error(existing && existing.isActive !== false ? 'Product already reviewed' : 'Product not found');
     }
+    res.status(201).json({ message: 'Review added' });
 });
 
 const parseCSV = (csvString) => {

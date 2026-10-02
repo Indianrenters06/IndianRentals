@@ -1,7 +1,11 @@
 const jwt = require('jsonwebtoken');
+const { requireActiveAccount } = require('./accountAccess');
+const { sessionVersion } = require('./sessionVersion');
 
-const generateToken = (res, userId) => {
-    const token = jwt.sign({ id: userId }, process.env.JWT_SECRET, {
+const generateToken = (res, user) => {
+    requireActiveAccount(user, res);
+    if (!user._id) throw new Error('A verified account is required to issue a session');
+    const token = jwt.sign({ id: user._id, sessionVersion: sessionVersion(user.sessionVersion) }, process.env.JWT_SECRET, {
         expiresIn: '30d',
     });
 
