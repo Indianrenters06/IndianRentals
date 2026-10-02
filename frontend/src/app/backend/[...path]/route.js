@@ -1,5 +1,5 @@
-const DEFAULT_BACKEND = 'https://indianrentals-3ugl.onrender.com';
-const REQUEST_HEADER_OMIT = ['host', 'origin', 'referer', 'content-length', 'connection', 'accept-encoding'];
+import { resolveServerApi } from '@/lib/serverApi.mjs';
+const REQUEST_HEADER_OMIT = ['host', 'referer', 'content-length', 'connection', 'accept-encoding'];
 const RESPONSE_HEADER_OMIT = ['connection', 'content-encoding', 'content-length', 'transfer-encoding'];
 
 export const dynamic = 'force-dynamic';
@@ -10,7 +10,7 @@ async function forward(request, { params }) {
     return new Response('Not found', { status: 404 });
   }
 
-  const backend = (process.env.API_URL || process.env.NEXT_PUBLIC_API_URL || DEFAULT_BACKEND).replace(/\/$/, '');
+  const backend = resolveServerApi();
   const target = new URL(`${backend}/${path.map(encodeURIComponent).join('/')}`);
   target.search = request.nextUrl.search;
 

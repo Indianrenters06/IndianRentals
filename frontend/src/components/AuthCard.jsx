@@ -104,7 +104,7 @@ const PrimaryButton = ({ children, loading, gap = "gap-[2px]", ...props }) => (
 const OrDivider = ({ className }) => (
     <div className={`flex items-center gap-[14px] w-full ${className}`}>
         <span className="flex-1 h-px bg-[#DDDDDD]" />
-        <span className="text-[12px] leading-[18px] uppercase text-[#777777]" style={FONT}>or</span>
+        <span className="text-[12px] leading-[18px] uppercase text-[#666666]" style={FONT}>or</span>
         <span className="flex-1 h-px bg-[#DDDDDD]" />
     </div>
 );
@@ -177,8 +177,9 @@ const CodeInput = ({ value, onChange, invalid }) => {
 };
 
 /* ═══════════════════════════════════════════════════════════════════════ */
-const AuthCard = ({ initialView = "login", onClose, onSuccess, notice }) => {
+const AuthCard = ({ initialView = "login", onClose, onSuccess, notice, headingLevel = 2 }) => {
     const router = useRouter();
+    const Heading = headingLevel === 1 ? "h1" : "h2";
     const [view, setView] = useState(initialView); // 'login' | 'register'
     const [step, setStep] = useState(1); // 1 = details, 2 = SMS code
 
@@ -351,7 +352,7 @@ const AuthCard = ({ initialView = "login", onClose, onSuccess, notice }) => {
                                     role="tab"
                                     aria-selected={active}
                                     onClick={() => switchView(key)}
-                                    className={`-mb-px pb-[11px] text-[14px] leading-[21px] bg-transparent border-0 cursor-pointer ${active ? "font-bold text-[#141414] border-b-2 border-[#141414]" : "font-normal text-[#777777] border-b-2 border-transparent hover:text-[#141414]"}`}
+                                    className={`-mb-px pb-[11px] text-[14px] leading-[21px] bg-transparent border-0 cursor-pointer ${active ? "font-bold text-[#141414] border-b-2 border-[#141414]" : "font-normal text-[#666666] border-b-2 border-transparent hover:text-[#141414]"}`}
                                 >
                                     {label}
                                 </button>
@@ -363,7 +364,7 @@ const AuthCard = ({ initialView = "login", onClose, onSuccess, notice }) => {
                 {/* ── Step 1: Sign in ── */}
                 {isLogin && step === 1 && (
                     <>
-                        <h3 className="m-0 text-[31px] leading-[36px] font-medium tracking-[-1.085px] text-[#141414]">Welcome back.</h3>
+                        <Heading className="m-0 text-[31px] leading-[36px] font-medium tracking-[-1.085px] text-[#141414]">Welcome back.</Heading>
                         <p className="m-0 pt-2 text-[14px] leading-[21px] text-[#666666]">Sign in to continue your rental journey.</p>
                         {(error || info) && (
                             <p role={error ? "alert" : "status"} className={`m-0 mt-3 px-3 py-2 rounded-[8px] text-[12px] leading-[18px] ${error ? "bg-[#FFF2F1] text-[#C8170D]" : "bg-[#E8FFE4] text-[#0B7A10]"}`}>
@@ -408,7 +409,7 @@ const AuthCard = ({ initialView = "login", onClose, onSuccess, notice }) => {
                 {/* ── Step 1: Create account ── */}
                 {!isLogin && step === 1 && (
                     <>
-                        <h3 className="m-0 text-[28px] leading-[32px] font-medium tracking-[-0.98px] text-[#141414]">Create your account.</h3>
+                        <Heading className="m-0 text-[28px] leading-[32px] font-medium tracking-[-0.98px] text-[#141414]">Create your account.</Heading>
                         <p className="m-0 pt-2 text-[14px] leading-[21px] text-[#666666]">A few details, then you&apos;re ready to plan.</p>
                         {error && (
                             <p role="alert" className="m-0 mt-3 px-3 py-2 rounded-[8px] text-[12px] leading-[18px] bg-[#FFF2F1] text-[#C8170D]">{error}</p>
@@ -469,9 +470,9 @@ const AuthCard = ({ initialView = "login", onClose, onSuccess, notice }) => {
                         <span className="flex items-center justify-center w-10 h-[39px] rounded-[8px] bg-[#FFF1C5]" aria-hidden="true">
                             <Users size={20} color="#F08C00" />
                         </span>
-                        <h3 className="m-0 pt-[13px] text-[31px] leading-[36px] font-medium tracking-[-1.085px] text-[#141414]">
+                        <Heading className="m-0 pt-[13px] text-[31px] leading-[36px] font-medium tracking-[-1.085px] text-[#141414]">
                             {isLogin ? "Enter your code." : "Verify your mobile."}
-                        </h3>
+                        </Heading>
                         <p className="m-0 pt-2 text-[14px] leading-[21px] text-[#666666]">
                             A six-digit code was sent to {isLogin && loginMethod === "email" ? email.trim() : maskedPhone(activePhone)}. Change it below.
                         </p>
@@ -485,7 +486,7 @@ const AuthCard = ({ initialView = "login", onClose, onSuccess, notice }) => {
 
                         {/* Resend row — 12/18, space-between */}
                         <div className="flex items-start justify-between gap-[10px] pt-[14px] text-[12px] leading-[18px]">
-                            <span className="text-[#777777]">Didn&apos;t get it?</span>
+                            <span className="text-[#666666]">Didn&apos;t get it?</span>
                             {resendTimer > 0
                                 ? <span className="font-semibold text-[#555555]">Resend code in {mmss(resendTimer)}</span>
                                 : <button type="button" onClick={sendCode} disabled={loading} className="bg-transparent border-0 p-0 font-semibold text-[#141414] underline cursor-pointer disabled:opacity-60">Resend code</button>}
@@ -536,7 +537,7 @@ const AuthCard = ({ initialView = "login", onClose, onSuccess, notice }) => {
                 {/* Footer — 1px #E5E5E5 rule, 11/16 #777 (sign-in only; Create account has the Terms checkbox) */}
                 {isLogin && step === 1 && (
                     <div className="pt-[17px]">
-                        <p className="m-0 pt-3 border-t border-[#E5E5E5] text-[11px] leading-[16px] text-[#777777]">
+                        <p className="m-0 pt-3 border-t border-[#E5E5E5] text-[11px] leading-[16px] text-[#666666]">
                             By continuing you agree to our{" "}
                             <button type="button" onClick={() => goTo("/terms")} className="bg-transparent border-0 p-0 text-[#141414] underline cursor-pointer">Terms &amp; Conditions</button>
                             {" "}and{" "}

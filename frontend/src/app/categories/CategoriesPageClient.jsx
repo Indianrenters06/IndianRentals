@@ -1,4 +1,5 @@
 "use client";
+import { API as API } from '@/services/apiConfig';
 import { cmsUrl } from '@/lib/cmsPreview';
 import React, { useEffect, useState } from "react";
 import Image from "next/image";
@@ -28,7 +29,6 @@ const CategoriesPage = () => {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const API = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
 
                 const res = await fetch(cmsUrl('categories-page'));
                 if (res.ok) {

@@ -16,7 +16,7 @@ cms.update({
     ],
     'bestRentedProductIds': [], 'newLaunchProductIds': [],
 })
-images = ['/macbook-pro-new.jpg', '/ipad-new.jpg', '/mac-pro-new.jpg', '/it-products-new.jpg', '/office-equipment-new.jpg', '/images/macbook-pro.png']
+images = ['/macbook-pro-new.jpg', '/ipad-new.jpg', '/mac-pro-new.jpg', '/it-products-new.jpg', '/office-equipment-new.jpg', '/images/macbook-pro.jpg']
 names = ['MacBook Pro', 'iPad', 'Desktop Workstation', 'All In One Computer', 'Office Equipment', 'MacBook']
 products = [dict(_id=str(i+1), name=name, slug=name.lower().replace(' ', '-'), category='IT Products', images=[images[i]], rentalPrice=2499 + i*700, rating=4.8, numReviews=12+i*4, stock=8, condition='New', discount='20% off') for i,name in enumerate(names)]
 def child(name, i):

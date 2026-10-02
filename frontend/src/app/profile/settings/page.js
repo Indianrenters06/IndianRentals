@@ -1,4 +1,5 @@
 'use client';
+import { API as API_BASE } from '@/services/apiConfig';
 
 import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
@@ -6,8 +7,6 @@ import { PiUserCircleFill, PiSpinnerGap } from 'react-icons/pi';
 import axios from 'axios';
 
 import { profileTitleClassName } from '../profileTitle';
-
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
 
 const getToken = () => {
     if (typeof window === 'undefined') return null;

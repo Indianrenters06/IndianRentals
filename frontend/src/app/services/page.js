@@ -1,12 +1,14 @@
+import { publicMetadata } from '@/lib/publicMetadata';
 import Link from "next/link";
 import { SITE_URL, SITE_NAME } from "@/config/site";
 
-export const metadata = {
+const pageMetadata = {
     title: `Our Rental Services | ${SITE_NAME}`,
     description:
         "Explore all rental services offered by IndianRenters — laptops, MacBooks, cameras, AV equipment, servers, and office equipment. Flexible monthly plans across India.",
     alternates: { canonical: `${SITE_URL}/services` },
 };
+export const metadata = publicMetadata({ ...pageMetadata, path: '/services' });
 
 const SERVICES = [
     {

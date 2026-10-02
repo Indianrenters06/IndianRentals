@@ -1,11 +1,14 @@
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
+import { isStagedOrder, stagedFinancials } from './stagedPayments.mjs';
 
 export function downloadPDFInvoice(order) {
     if (!order) return;
     
     const doc = new jsPDF();
-    const invoiceNo = `INV-${order._id?.slice(-8).toUpperCase()}`;
+    const staged = isStagedOrder(order) ? stagedFinancials(order) : null;
+    const statement = staged && !staged.fullyPaid;
+    const invoiceNo = `${statement ? 'BKG' : 'INV'}-${order._id?.slice(-8).toUpperCase()}`;
     
     // Header
     doc.setFontSize(22);
@@ -14,11 +17,11 @@ export function downloadPDFInvoice(order) {
     
     doc.setFontSize(10);
     doc.setFont("helvetica", "normal");
-    doc.text("INVOICE", 14, 28);
+    doc.text(statement ? "BOOKING PAYMENT STATEMENT" : "INVOICE", 14, 28);
     
     // Invoice Details
     doc.setFontSize(10);
-    doc.text(`Invoice No: ${invoiceNo}`, 140, 20);
+    doc.text(`${statement ? 'Statement' : 'Invoice'} No: ${invoiceNo}`, 140, 20);
     doc.text(`Date: ${new Date().toLocaleDateString("en-IN")}`, 140, 26);
     doc.text(`Status: ${order.status}`, 140, 32);
     
@@ -77,11 +80,18 @@ export function downloadPDFInvoice(order) {
     doc.setFontSize(10);
     doc.setFont("helvetica", "normal");
     doc.text(`Payment Method: ${order.paymentMethod}`, 14, finalY + 8);
-    doc.text(`Payment Status: ${order.isPaid ? "PAID" : "UNPAID"}`, 14, finalY + 14);
+    doc.text(`Payment Status: ${staged ? staged.fullyPaid ? 'FULLY PAID' : staged.paidPaise ? 'PARTIALLY PAID' : 'UNPAID' : order.isPaid ? "PAID" : "UNPAID"}`, 14, finalY + 14);
     
     doc.setFontSize(14);
     doc.setFont("helvetica", "bold");
-    doc.text(`Total Amount: Rs. ${order.totalPrice?.toLocaleString("en-IN")}`, 14, finalY + 24);
+    doc.text(`Total Amount: Rs. ${(staged ? staged.totalPaise / 100 : order.totalPrice)?.toLocaleString("en-IN")}`, 14, finalY + 24);
+    if (staged) {
+        doc.setFontSize(10); doc.setFont('helvetica', 'normal');
+        doc.text(`Verified advance: Rs. ${(staged.advancePaidPaise / 100).toLocaleString('en-IN')}`, 14, finalY + 33);
+        doc.text(`Verified balance payment: Rs. ${(staged.balancePaidPaise / 100).toLocaleString('en-IN')}`, 14, finalY + 40);
+        doc.text(`Outstanding: Rs. ${(staged.balancePaise / 100).toLocaleString('en-IN')}`, 14, finalY + 47);
+        if (statement) doc.text('Booking payment statement. Full payment has not been confirmed.', 14, finalY + 56);
+    }
     
     // Footer
     doc.setFontSize(9);
@@ -89,5 +99,5 @@ export function downloadPDFInvoice(order) {
     doc.text("Thank you for choosing Indian Rentals!", 14, 280);
     
     // Save
-    doc.save(`invoice-${invoiceNo}.pdf`);
+    doc.save(`${statement ? 'booking-statement' : 'invoice'}-${invoiceNo}.pdf`);
 }

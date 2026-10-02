@@ -1,5 +1,6 @@
 'use client';
 
+import { lockBodyScroll } from '../lib/bodyScrollLock.mjs';
 import { useCallback, useEffect, useId, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { AdjustmentsHorizontalIcon, CheckIcon, XMarkIcon } from '@heroicons/react/24/outline';
@@ -23,9 +24,8 @@ function FilterDialog({ selectedDuration, selectedSort, dealsOnly, onApply, onDi
 
     useEffect(() => {
         const dialog = dialogRef.current;
-        const previousOverflow = document.body.style.overflow;
+        const unlockScroll = lockBodyScroll();
         dialog.showModal();
-        document.body.style.overflow = 'hidden';
         // The desktop layout already has a persistent filter sidebar.
         const desktop = window.matchMedia('(min-width: 1024px)');
         const handleResize = () => { if (desktop.matches) onDismiss(); };
@@ -33,7 +33,7 @@ function FilterDialog({ selectedDuration, selectedSort, dealsOnly, onApply, onDi
         return () => {
             desktop.removeEventListener('change', handleResize);
             dialog.close();
-            document.body.style.overflow = previousOverflow;
+            unlockScroll();
         };
     }, [onDismiss]);
 

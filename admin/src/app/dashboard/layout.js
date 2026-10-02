@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useSyncExternalStore } from "react";
 import { Link } from "@heroui/react";
 import { usePathname } from 'next/navigation';
 import { motion, AnimatePresence } from "framer-motion";
@@ -24,14 +24,30 @@ import {
 
 import { useRouter } from "next/navigation";
 import { ThemeToggle } from "../../components/ThemeToggle";
+import { API_BASE_URL } from '@/lib/apiConfig';
+import { verifyAdminSession } from '@/lib/adminSession.mjs';
+import { availableAdminNavigation } from '@/lib/adminNavigation.mjs';
+import { revokeSession } from '@/lib/revokeSession.mjs';
+import toast from 'react-hot-toast';
+
+const mobileSnapshot = () => window.matchMedia('(max-width: 767px)').matches;
+const mobileServerSnapshot = () => false;
+const subscribeMobile = (notify) => {
+  const query = window.matchMedia('(max-width: 767px)');
+  query.addEventListener('change', notify);
+  return () => query.removeEventListener('change', notify);
+};
 
 export default function DashboardLayout({ children }) {
-  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [sidebarOpen, setIsSidebarOpen] = useState(null);
   const [openMenus, setOpenMenus] = useState({});
-  const [adminInfo, setAdminInfo] = useState({ name: 'Admin', role: 'admin', adminPermissions: [] });
+  const [adminInfo, setAdminInfo] = useState(null);
+  const [sessionError, setSessionError] = useState('');
+  const [sessionRetry, setSessionRetry] = useState(0);
   const [notifications, setNotifications] = useState([]);
   const [unreadCount, setUnreadCount] = useState(0);
-  const [isMobile, setIsMobile] = useState(false);
+  const isMobile = useSyncExternalStore(subscribeMobile, mobileSnapshot, mobileServerSnapshot);
+  const isSidebarOpen = sidebarOpen ?? !isMobile;
   const [branding, setBranding] = useState({ siteLogo: null, siteName: 'IndianRentals', theme: { activeTheme: 'default' } });
   const [maintenanceBanner, setMaintenanceBanner] = useState(false);
 
@@ -44,7 +60,7 @@ export default function DashboardLayout({ children }) {
       const token = localStorage.getItem("adminToken");
       if (!token) return;
 
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000"}/api/alerts`, {
+      const res = await fetch(`${API_BASE_URL}/api/alerts`, {
         headers: { "Authorization": `Bearer ${token}` }
       });
       if (res.ok) {
@@ -52,7 +68,7 @@ export default function DashboardLayout({ children }) {
         setNotifications(data);
       }
 
-      const countRes = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000"}/api/alerts/unread-count`, {
+      const countRes = await fetch(`${API_BASE_URL}/api/alerts/unread-count`, {
         headers: { "Authorization": `Bearer ${token}` }
       });
       if (countRes.ok) {
@@ -68,7 +84,7 @@ export default function DashboardLayout({ children }) {
   const markAllAsRead = async () => {
     try {
       const token = localStorage.getItem("adminToken");
-      await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000"}/api/alerts/read-all`, {
+      await fetch(`${API_BASE_URL}/api/alerts/read-all`, {
         method: 'PUT',
         headers: { "Authorization": `Bearer ${token}` }
       });
@@ -81,7 +97,7 @@ export default function DashboardLayout({ children }) {
   const markAsRead = async (id) => {
     try {
       const token = localStorage.getItem("adminToken");
-      await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000"}/api/alerts/${id}/read`, {
+      await fetch(`${API_BASE_URL}/api/alerts/${id}/read`, {
         method: 'PUT',
         headers: { "Authorization": `Bearer ${token}` }
       });
@@ -92,32 +108,40 @@ export default function DashboardLayout({ children }) {
   };
 
   useEffect(() => {
-    if (typeof window !== "undefined") {
-      const storedInfo = localStorage.getItem("adminInfo");
-      if (storedInfo) {
-        try {
-          const parsed = JSON.parse(storedInfo);
-          // Support multiple API response shapes: { user: {...} }, { admin: {...} }, or flat
-          const info = parsed.user || parsed.admin || parsed;
-          setAdminInfo(info);
-        } catch (err) {
-          console.error("Failed to parse admin data", err);
-        }
-      }
-
-      const checkMobile = () => {
-        setIsMobile(window.innerWidth < 768);
-        if (window.innerWidth < 768) {
-          setIsSidebarOpen(false);
+    const token = localStorage.getItem('adminToken');
+    if (!token) { router.replace('/'); return; }
+    const controller = new AbortController();
+    verifyAdminSession(API_BASE_URL, token, { signal: controller.signal })
+      .then(info => { if (!controller.signal.aborted) { setAdminInfo(info); setSessionError(''); } })
+      .catch(error => {
+        if (controller.signal.aborted) return;
+        if (error.code === 'UNAUTHORIZED') {
+          localStorage.removeItem('adminToken');
+          localStorage.removeItem('adminInfo');
+          router.replace('/');
         } else {
-          setIsSidebarOpen(true);
+          setSessionError('Unable to verify your session. Check the connection and retry.');
         }
+      });
+    return () => controller.abort();
+  }, [router, sessionRetry]);
+
+  useEffect(() => {
+    if (adminInfo) {
+      const controller = new AbortController();
+      const fetchAlerts = async () => {
+        try {
+          const token = localStorage.getItem('adminToken');
+          const headers = { Authorization: `Bearer ${token}` };
+          const [alerts, count] = await Promise.all([
+            fetch(`${API_BASE_URL}/api/alerts`, { headers, signal: controller.signal }),
+            fetch(`${API_BASE_URL}/api/alerts/unread-count`, { headers, signal: controller.signal }),
+          ]);
+          if (alerts.ok) setNotifications(await alerts.json());
+          if (count.ok) setUnreadCount((await count.json()).count);
+        } catch { /* Connection failures leave the last verified view in place. */ }
       };
-
-      checkMobile();
-      window.addEventListener('resize', checkMobile);
-
-      fetchNotifications();
+      fetchAlerts();
 
       const applyBrandingTheme = (data) => {
         if (!data?.theme?.activeTheme) return;
@@ -152,17 +176,17 @@ export default function DashboardLayout({ children }) {
           const cached = localStorage.getItem('adminBranding');
           if (cached) {
             const parsed = JSON.parse(cached);
-            setBranding(parsed);
+            if (skipRemote) setBranding(parsed);
             applyBrandingTheme(parsed);
           }
         } catch {}
         if (skipRemote) return;
         const token = localStorage.getItem('adminToken');
         if (!token) return;
-        fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/settings`, {
-          headers: { Authorization: `Bearer ${token}` }
+        fetch(`${API_BASE_URL}/api/settings`, {
+          headers: { Authorization: `Bearer ${token}` }, signal: controller.signal
         }).then(res => res.ok ? res.json() : null).then(data => {
-          if (!data) return;
+          if (!data || controller.signal.aborted) return;
           const cached = (() => { try { return JSON.parse(localStorage.getItem('adminBranding') || '{}'); } catch { return {}; } })();
           const bd = { siteLogo: data.siteLogo, siteName: data.siteName, theme: data.theme || cached.theme };
           setBranding(bd);
@@ -177,16 +201,16 @@ export default function DashboardLayout({ children }) {
       window.addEventListener('branding-updated', handleBrandingUpdated);
 
       const interval = setInterval(() => {
-        fetchNotifications();
+        fetchAlerts();
       }, 30000);
 
       return () => {
         clearInterval(interval);
-        window.removeEventListener('resize', checkMobile);
+        controller.abort();
         window.removeEventListener('branding-updated', handleBrandingUpdated);
       };
     }
-  }, []);
+  }, [adminInfo]);
 
   const toggleMenu = (menuName) => {
     setOpenMenus(prev => ({
@@ -200,38 +224,14 @@ export default function DashboardLayout({ children }) {
   const roleRaw = (adminInfo?.role || '').toLowerCase().trim();
   const isAdmin = FULL_ACCESS_ROLES.includes(roleRaw);
   const perms = adminInfo?.adminPermissions || [];
+  const requiredPermission = pathname?.match(/^\/dashboard\/(cms|products|inventory|customers|kyc|orders|payments|coupons|reports|notifications|settings)(?:\/|$)/)?.[1];
+  const permissionKey = requiredPermission === 'customers' ? 'users' : requiredPermission;
   const can = (section) => isAdmin || perms.includes(section);
 
-  // Map URL prefixes to required permission keys
-  const PATH_PERMISSION_MAP = [
-    { prefix: '/dashboard/cms', permission: 'cms' },
-    { prefix: '/dashboard/products', permission: 'products' },
-    { prefix: '/dashboard/inventory', permission: 'inventory' },
-    { prefix: '/dashboard/customers', permission: 'users' },
-    { prefix: '/dashboard/kyc', permission: 'kyc' },
-    { prefix: '/dashboard/orders', permission: 'orders' },
-    { prefix: '/dashboard/payments', permission: 'payments' },
-    { prefix: '/dashboard/coupons', permission: 'coupons' },
-    { prefix: '/dashboard/reports', permission: 'reports' },
-    { prefix: '/dashboard/notifications', permission: 'notifications' },
-    { prefix: '/dashboard/settings', permission: 'settings' },
-  ];
-
-  // Guard: redirect non-admin roles away from sections they don't have permission for
+  const isBlocked = Boolean(adminInfo && !isAdmin && permissionKey && !perms.includes(permissionKey));
   useEffect(() => {
-    if (!adminInfo || isAdmin) return; // super_admin and admin are never restricted
-    const matched = PATH_PERMISSION_MAP.find(({ prefix }) => pathname?.startsWith(prefix));
-    if (matched && !perms.includes(matched.permission)) {
-      router.replace('/dashboard');
-    }
-  }, [pathname, adminInfo, isAdmin]);
-
-  // Determine if current page is blocked for this user (for inline fallback)
-  const isBlocked = (() => {
-    if (isAdmin) return false; // super_admin and admin are never blocked
-    const matched = PATH_PERMISSION_MAP.find(({ prefix }) => pathname?.startsWith(prefix));
-    return matched ? !perms.includes(matched.permission) : false;
-  })();
+    if (isBlocked) router.replace('/dashboard');
+  }, [isBlocked, router]);
 
   const allMenuItems = [
     { name: 'Dashboard', icon: House, path: '/dashboard' },
@@ -372,13 +372,17 @@ export default function DashboardLayout({ children }) {
     },
   ];
 
-  const menuItems = allMenuItems.filter(item => !item.permission || can(item.permission));
+  const menuItems = availableAdminNavigation(allMenuItems, can);
 
-  const handleLogout = () => {
-    localStorage.removeItem("adminToken");
-    localStorage.removeItem("adminInfo");
-    localStorage.removeItem("adminBranding");
-    router.push("/");
+  const handleLogout = async () => {
+    try {
+      await revokeSession(API_BASE_URL, localStorage.getItem('adminToken'));
+      localStorage.removeItem("adminToken");
+      localStorage.removeItem("adminInfo");
+      localStorage.removeItem("adminBranding");
+      setAdminInfo(null);
+      window.location.assign('/');
+    } catch { toast.error('Could not end your sessions. Please try signing out again.'); }
   };
 
   // Sidebar display modes:
@@ -387,6 +391,13 @@ export default function DashboardLayout({ children }) {
   //  - else: full sidebar docked in flow (desktop, opened)
   const mobileOverlay = isMobile && isSidebarOpen;
   const collapsed = !isSidebarOpen;
+
+  if (!adminInfo) {
+    return <main className="min-h-screen flex flex-col items-center justify-center gap-4 p-6" aria-live="polite">
+      <p>{sessionError || 'Verifying your session…'}</p>
+      {sessionError && <button className="rounded-lg px-4 py-2 bg-amber-400 text-black" onClick={() => setSessionRetry(value => value + 1)}>Retry</button>}
+    </main>;
+  }
 
   return (
     <div className="flex bg-slate-50 dark:bg-slate-900 border-none m-0 p-0 text-slate-800 dark:text-slate-100 h-screen overflow-hidden relative z-10 w-full transition-colors duration-300">

@@ -1,6 +1,7 @@
 const asyncHandler = require('express-async-handler');
 const axios = require('axios');
 const Settings = require('../models/Settings');
+const { publicSettings } = require('../utils/publicSettings');
 
 // @desc    Get site settings
 // @route   GET /api/admin/settings
@@ -9,10 +10,10 @@ const getSettings = asyncHandler(async (req, res) => {
     let settings = await Settings.findOne();
 
     if (!settings) {
-        settings = await Settings.create({}); // default config
+        settings = new Settings(); // read-only defaults; GET must not write
     }
 
-    res.json(settings);
+    res.json(publicSettings(settings));
 });
 
 // @desc    Update site settings

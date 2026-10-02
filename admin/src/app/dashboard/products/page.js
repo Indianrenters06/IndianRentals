@@ -16,6 +16,8 @@ import {
 import ConfirmDeleteModal from "@/components/ConfirmDeleteModal";
 import toast from 'react-hot-toast';
 
+import { loadCatalogue } from '@/lib/catalogue.mjs';
+
 const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
 const FRONTEND = process.env.NEXT_PUBLIC_FRONTEND_URL || "https://indian-rentals.vercel.app";
 const getToken = () => localStorage.getItem("adminToken");
@@ -52,13 +54,10 @@ export default function AllProducts() {
     const fetchProducts = useCallback(async () => {
         try {
             setLoading(true);
-            const res = await fetch(`${API}/api/products?limit=200`);
-            if (res.ok) {
-                const data = await res.json();
-                setProducts(Array.isArray(data.products) ? data.products : []);
-            } else {
-                console.error(`API returned ${res.status}`);
-            }
+            setProducts(await loadCatalogue(API, {
+                administrative: true,
+                headers: { Authorization: `Bearer ${getToken()}` },
+            }));
         } catch (err) {
             console.error("Network Fetch Error:", err);
             setProducts([]);

@@ -110,7 +110,7 @@ export default function GeneralSettings() {
                 <h1 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-slate-100 mb-1">
                     General <span className="text-indigo-600 dark:text-indigo-400 font-extrabold">Settings</span>
                 </h1>
-                <p className="text-slate-600 dark:text-slate-200">Configure your platform's core identity and behaviour.</p>
+                <p className="text-slate-600 dark:text-slate-200">Configure your platform&apos;s core identity and behaviour.</p>
             </motion.div>
 
             <Card className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm">

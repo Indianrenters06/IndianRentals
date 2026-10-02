@@ -116,8 +116,8 @@ const productSchema = new mongoose.Schema({
 
 const reviewSchema = mongoose.Schema({
     name: { type: String, required: true },
-    rating: { type: Number, required: true },
-    comment: { type: String, required: true },
+    rating: { type: Number, required: true, min: 1, max: 5, validate: Number.isInteger },
+    comment: { type: String, required: true, trim: true, maxlength: 2000 },
     user: {
         type: mongoose.Schema.Types.ObjectId,
         required: true,

@@ -30,16 +30,16 @@ async function sendTemplatedEmail(templateName, toEmail, variables = {}) {
         if (!toEmail) return false;
         const template = await EmailTemplate.findOne({ name: templateName, isActive: true });
         if (!template) {
-            console.log(`[email] No active template "${templateName}" — skipped`);
+            console.log('[email] No active template — skipped');
             return false;
         }
         const subject = render(template.subject, variables);
         const html = render(template.body, variables);
         await sendEmail({ email: toEmail, subject, html });
-        console.log(`[email] Sent "${templateName}" to ${toEmail}`);
+        console.log('[email] Template delivery accepted');
         return true;
     } catch (err) {
-        console.log(`[email] Failed "${templateName}" to ${toEmail}: ${err.message}`);
+        console.log('[email] Template delivery failed');
         return false;
     }
 }

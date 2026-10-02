@@ -9,10 +9,11 @@ import {
 import { CurrencyInr, CheckCircle, XCircle, Clock, WarningCircle, DownloadSimple } from "@phosphor-icons/react";
 import { downloadPDFReport } from "@/utils/pdfReport";
 import SortSelect from "@/components/SortSelect";
+import { rentalTransactions } from "@/utils/stagedPayments.mjs";
 
 const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
 
-export default function AllTransactions() {
+export default function AllTransactions({ statusFilter = 'all' }) {
     const [transactions, setTransactions] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -25,22 +26,7 @@ export default function AllTransactions() {
                 const res = await fetch(`${API}/api/admin/rentals`, { headers: { Authorization: `Bearer ${token}` } });
                 if (!res.ok) throw new Error("Failed to fetch");
                 const data = await res.json();
-                setTransactions(data.map(r => ({
-                    _id: r._id,
-                    // Prefer the real Cashfree transaction id (stored in paymentResult.id
-                    // when the payment settles); fall back to a synthetic ref for
-                    // unpaid/pending rentals that have no gateway id yet.
-                    txnId: r.paymentResult?.id
-                        ? String(r.paymentResult.id)
-                        : `TXN-${r._id.toString().slice(-8).toUpperCase()}`,
-                    user: r.user?.name || "Unknown",
-                    email: r.user?.email || "",
-                    amount: r.totalPrice || 0,
-                    method: r.paymentMethod || "Cashfree",
-                    status: r.isPaid ? "Success" : "Pending",
-                    date: new Date(r.createdAt).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" }),
-                    createdAt: new Date(r.createdAt).getTime(),
-                })));
+                setTransactions(rentalTransactions(data));
             } catch (err) { setError(err.message); }
             finally { setLoading(false); }
         };
@@ -50,7 +36,7 @@ export default function AllTransactions() {
     const total = transactions.filter(t => t.status === "Success").reduce((s, t) => s + t.amount, 0);
 
     const sortedItems = useMemo(() => {
-        return [...transactions].sort((a, b) => {
+        return transactions.filter(item => statusFilter === 'all' || item.status === statusFilter).sort((a, b) => {
             const col = sortDescriptor.column;
             let first, second;
             if (col === "amount") { first = Number(a.amount) || 0; second = Number(b.amount) || 0; }
@@ -59,12 +45,12 @@ export default function AllTransactions() {
             const cmp = first < second ? -1 : first > second ? 1 : 0;
             return sortDescriptor.direction === "descending" ? -cmp : cmp;
         });
-    }, [transactions, sortDescriptor]);
+    }, [transactions, sortDescriptor, statusFilter]);
 
     const exportPDF = () => {
-        const headers = ["TXN ID", "User", "Email", "Amount", "Method", "Status", "Date"];
-        const data = transactions.map(t => [
-            t.txnId, t.user, t.email, `Rs. ${t.amount}`, t.method, t.status, t.date
+        const headers = ["TXN ID", "Payment stage", "User", "Email", "Amount", "Method", "Status", "Date"];
+        const data = sortedItems.map(t => [
+            t.txnId, t.stage, t.user, t.email, `Rs. ${t.amount}`, t.method, t.status, t.date
         ]);
         downloadPDFReport("Transactions Report", headers, data, "transactions_report");
     };
@@ -74,9 +60,9 @@ export default function AllTransactions() {
             <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
                 <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }}>
                     <h1 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-slate-100 mb-1">
-                        All <span className="text-indigo-600 dark:text-indigo-400 font-extrabold">Transactions</span>
+                        {statusFilter === "all" ? "All" : statusFilter === "Success" ? "Successful" : "Failed"} <span className="text-indigo-600 dark:text-indigo-400 font-extrabold">Transactions</span>
                     </h1>
-                    <p className="text-slate-600 dark:text-slate-200">Complete financial audit log across all payment methods.</p>
+                    <p className="text-slate-600 dark:text-slate-200">Gateway payment records, with booking advances and final balances shown separately.</p>
                 </motion.div>
                 <div className="flex items-center gap-3">
                     {!loading && <div className="inline-flex items-center gap-2 bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-500/20 rounded-full px-3 py-1.5 font-bold text-sm">₹{total.toLocaleString("en-IN")} Collected</div>}
@@ -101,7 +87,7 @@ export default function AllTransactions() {
             {/* Stats row */}
             <div className="grid grid-cols-3 gap-4">
                 {[
-                    { label: "Total Revenue", value: `₹${total.toLocaleString("en-IN")}`, icon: CurrencyInr, color: "text-emerald-500" },
+                    { label: "Verified collections", value: `₹${total.toLocaleString("en-IN")}`, icon: CurrencyInr, color: "text-emerald-500" },
                     { label: "Successful", value: transactions.filter(t => t.status === "Success").length, icon: CheckCircle, color: "text-emerald-500" },
                     { label: "Pending", value: transactions.filter(t => t.status === "Pending").length, icon: Clock, color: "text-amber-500" },
                 ].map(s => (
@@ -140,7 +126,7 @@ export default function AllTransactions() {
                             <TableBody items={sortedItems} emptyContent="No transactions found.">
                                 {(item) => (
                                     <TableRow key={item._id}>
-                                        <TableCell><span className="font-mono text-xs font-bold text-slate-500">{item.txnId}</span></TableCell>
+                                        <TableCell><span className="font-mono text-xs font-bold text-slate-500">{item.txnId}</span><p className="mt-1 text-xs text-slate-500">{item.stage} · #{item.orderId?.slice(-8).toUpperCase()}</p></TableCell>
                                         <TableCell>
                                             <div className="flex flex-col">
                                                 <span className="text-sm font-semibold">{item.user}</span>

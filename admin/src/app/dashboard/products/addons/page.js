@@ -291,12 +291,12 @@ export default function AddonsManagement() {
                             <h3 className="text-lg font-bold">Upgrade Logic</h3>
                         </div>
                         <p className="text-sm text-slate-600 dark:text-slate-200 mb-4">
-                            Implement the "Upgrade Option" for loyal customers:
+                            Implement the &quot;Upgrade Option&quot; for loyal customers:
                         </p>
                         <div className="p-3 rounded-lg bg-white dark:bg-slate-900 border border-amber-200 dark:border-amber-900/50">
                             <p className="text-xs font-semibold text-amber-700 dark:text-amber-400">Rule Recommendation:</p>
                             <p className="text-xs text-slate-500 mt-1 italic">
-                                "Users can upgrade the product if they have rented for around 6 months or more."
+                                &quot;Users can upgrade the product if they have rented for around 6 months or more.&quot;
                             </p>
                         </div>
                     </CardBody>

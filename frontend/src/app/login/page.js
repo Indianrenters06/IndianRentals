@@ -25,6 +25,7 @@ const LoginCard = () => {
   return (
     <AuthCard
       initialView="login"
+      headingLevel={1}
       notice={notice}
       onSuccess={() => router.push(safeRedirect(params.get("redirect")))}
     />
@@ -33,11 +34,11 @@ const LoginCard = () => {
 
 // /login — the same Figma sign-in card as the navbar pop-up, centred on the page.
 const LoginPage = () => (
-  <main className="min-h-[calc(100vh-120px)] flex items-center justify-center px-4 py-10 bg-[#F6F6F6]">
+  <div className="min-h-[calc(100vh-120px)] flex items-center justify-center px-4 py-10 bg-[#F6F6F6]">
     <Suspense fallback={null}>
       <LoginCard />
     </Suspense>
-  </main>
+  </div>
 );
 
 export default LoginPage;

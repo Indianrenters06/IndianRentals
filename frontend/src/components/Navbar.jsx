@@ -7,6 +7,7 @@ import Image from "next/image";
 import { MapPin, Heart, ShoppingCartSimple, List, MagnifyingGlass, X, CaretDown, NavigationArrow } from "@phosphor-icons/react";
 import { motion, AnimatePresence } from "framer-motion";
 import AuthModal from "./AuthModal";
+import { lockBodyScroll } from "../lib/bodyScrollLock.mjs";
 import LocationSelector from "./LocationSelector";
 import { checkServiceability } from "../services/serviceabilityService";
 import { useSelector } from "react-redux";
@@ -28,6 +29,12 @@ const Navbar = ({ showCategories: propShowCategories } = {}) => {
     const [locationInput, setLocationInput] = useState("");
     const [isCityDropdownOpen, setIsCityDropdownOpen] = useState(false);
     const [userInfo, setUserInfo] = useState(null);
+    const [logoutError, setLogoutError] = useState('');
+    useEffect(() => {
+        const onError = event => setLogoutError(event.detail);
+        window.addEventListener('sessionEndError', onError);
+        return () => window.removeEventListener('sessionEndError', onError);
+    }, []);
     const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
     const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
     const [searchQuery, setSearchQuery] = useState("");
@@ -102,7 +109,7 @@ const Navbar = ({ showCategories: propShowCategories } = {}) => {
     useEffect(() => {
         if (isMobileMenuOpen) {
             const trigger = mobileMenuTriggerRef.current;
-            document.body.style.overflow = "hidden";
+            const unlockScroll = lockBodyScroll();
             mobileMenuCloseRef.current?.focus();
             const handleEscape = (event) => {
                 if (event.key === "Escape") setIsMobileMenuOpen(false);
@@ -110,14 +117,11 @@ const Navbar = ({ showCategories: propShowCategories } = {}) => {
             window.addEventListener("keydown", handleEscape);
             return () => {
                 window.removeEventListener("keydown", handleEscape);
-                document.body.style.overflow = "";
+                unlockScroll();
                 trigger?.focus();
             };
         }
-        return () => {
-            document.body.style.overflow = "";
-        };
-    }, [isMobileMenuOpen, isMobileScreen]);
+    }, [isMobileMenuOpen]);
 
     useEffect(() => {
         if (!isDesktopMenuOpen) return;
@@ -224,11 +228,13 @@ const Navbar = ({ showCategories: propShowCategories } = {}) => {
         }
     };
 
-    const handleLogout = () => {
-        setUserInfo(null);
-        setIsProfileDropdownOpen(false);
-        setIsMobileMenuOpen(false);
-        logout();
+    const handleLogout = async () => {
+        setLogoutError('');
+        if (await logout()) {
+            setUserInfo(null);
+            setIsProfileDropdownOpen(false);
+            setIsMobileMenuOpen(false);
+        }
     };
 
     let navLinks = [];
@@ -333,6 +339,7 @@ const Navbar = ({ showCategories: propShowCategories } = {}) => {
 
     return (
         <header className="relative z-50 w-full" style={{ backgroundColor: "hsla(0, 0%, 100%, 1)", borderBottom: "1px solid hsla(0, 0%, 93%, 1)" }}>
+            {logoutError && <div role="alert" className="bg-[#fff2f1] p-3 text-center text-sm text-[#9b1c16]">{logoutError}</div>}
             <div
                 className="bg-orange-300 text-black flex items-center justify-center w-full overflow-hidden relative"
                 style={{ height: "24px", paddingTop: "4px", paddingBottom: "4px" }}
@@ -643,7 +650,7 @@ const Navbar = ({ showCategories: propShowCategories } = {}) => {
                         )}
 
                         {/* Cart */}
-                        <Link href="/cart" className="relative flex items-center justify-center hover:opacity-80 transition-opacity shrink-0" style={{ width: "30px", height: "30px" }}>
+                        <Link href="/cart" aria-label={`Shopping cart, ${totalQuantity} ${totalQuantity === 1 ? 'item' : 'items'}`} className="relative flex items-center justify-center hover:opacity-80 transition-opacity shrink-0" style={{ width: "30px", height: "30px" }}>
                             <ShoppingCartSimple size={26.25} color="#000000" weight="regular" />
                             {totalQuantity > 0 && (
                                 <span
@@ -709,7 +716,7 @@ const Navbar = ({ showCategories: propShowCategories } = {}) => {
                         </button>
 
                         {/* Mobile Cart */}
-                        <Link href="/cart" className="relative p-1">
+                        <Link href="/cart" aria-label={`Shopping cart, ${totalQuantity} ${totalQuantity === 1 ? 'item' : 'items'}`} className="relative p-1">
                             <ShoppingCartSimple size={26.25} weight="regular" color="#000000" />
                             {totalQuantity > 0 && (
                                 <span

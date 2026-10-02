@@ -1,8 +1,9 @@
 "use client";
-import { cmsUrl } from '@/lib/cmsPreview';
+import { fetchCmsPage } from '@/lib/cmsPreview';
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useDispatch } from "react-redux";
+import { useRouter } from "next/navigation";
 import { SwiperControls } from "./CarouselControls";
 import { addToCart } from "@/redux/features/cartSlice";
 import { API } from "@/services/apiConfig";
@@ -16,6 +17,7 @@ import 'swiper/css';
 
 const BestRentedProducts = ({ type = "bestRented", defaultTitle = "Curated Products", customProducts = null, titleOverride = null, productIdsOverride = null }) => {
     const dispatch = useDispatch();
+    const router = useRouter();
     const [products, setProducts] = useState([]);
     const [swiper, setSwiper] = useState(null);
     const [cmsConfig, setCmsConfig] = useState({
@@ -41,12 +43,13 @@ const BestRentedProducts = ({ type = "bestRented", defaultTitle = "Curated Produ
             description: product.name,
             sourceUrl: `/products/${product.id}`
         }));
+        router.push('/checkout/staged?new=1');
     };
 
     useEffect(() => {
         const fetchCMSAndProducts = async () => {
             try {
-                const cmsRes = await fetch(cmsUrl('homepage'));
+                const cmsRes = await fetchCmsPage('homepage');
                 let isEnabled = true;
                 let finalTitle = defaultTitle;
                 let targetIds = [];
@@ -98,9 +101,20 @@ const BestRentedProducts = ({ type = "bestRented", defaultTitle = "Curated Produ
 
                 let fetchedProducts = [];
                 if (targetIds.length > 0) {
-                    const prodPromises = targetIds.map(id => fetch(`${API}/api/products/${id}`).then(r => r.ok ? r.json() : null));
-                    const responses = await Promise.all(prodPromises);
-                    fetchedProducts = responses.filter(p => p !== null);
+                    const ids = [...new Set(targetIds.filter(id => typeof id === 'string' && /^[a-f0-9]{24}$/i.test(id)))].slice(0, 40);
+                    if (ids.length) {
+                        const response = await fetch(`${API}/api/products?ids=${ids.join(',')}&limit=40`);
+                        if (!response.ok) throw new Error('Selected products are unavailable');
+                        const data = await response.json();
+                        const byId = new Map((data.products || []).map(product => [String(product._id), product]));
+                        fetchedProducts = ids.map(id => byId.get(id)).filter(Boolean);
+                    }
+                    // An obsolete CMS selection must not leave an empty homepage rail.
+                    // Only real, public catalogue products are used as the fallback.
+                    if (!fetchedProducts.length) {
+                        const response = await fetch(`${API}/api/products?limit=4`);
+                        if (response.ok) fetchedProducts = (await response.json()).products || [];
+                    }
                 } else {
                     const fallBackRes = await fetch(`${API}/api/products?limit=4`);
                     if (fallBackRes.ok) {
@@ -140,7 +154,7 @@ const BestRentedProducts = ({ type = "bestRented", defaultTitle = "Curated Produ
 
     return (
         <section
-            className="w-full overflow-visible bg-white py-12"
+            className={`${styles.section} bg-white py-12`}
         >
             <div className={styles.container}>
                 <div className="flex flex-col mb-3 md:mb-4 lg:mb-8 w-full">

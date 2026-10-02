@@ -13,6 +13,8 @@ import {
     ArrowClockwise, Warning, Checks, MagnifyingGlass, DownloadSimple
 } from "@phosphor-icons/react";
 import { downloadPDFInvoice } from "@/utils/pdfInvoice";
+import StagedOrderPayment from "@/components/StagedOrderPayment";
+import { isStagedOrder, stagedFinancials, canFulfilOrder, formatPaise } from "@/utils/stagedPayments.mjs";
 
 const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
 
@@ -44,7 +46,7 @@ function StatusChip({ status }) {
     return <Chip size="sm" color={c.color} variant="flat" className="font-semibold text-xs">{c.label}</Chip>;
 }
 
-function OrderModal({ order, isOpen, onClose, onAction }) {
+function OrderModal({ order, isOpen, onClose, onAction, onUpdated }) {
     if (!order) return null;
     const items  = order.orderItems || [];
     const addr   = order.shippingAddress || {};
@@ -94,9 +96,10 @@ function OrderModal({ order, isOpen, onClose, onAction }) {
                             <div>
                                 <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1 flex items-center gap-1"><CurrencyDollar size={11}/> Payment</p>
                                 <p className="text-sm font-bold">₹{order.totalPrice?.toLocaleString("en-IN")}</p>
-                                <p className="text-xs text-slate-500">{order.paymentMethod} · {order.isPaid ? "Paid" : "Unpaid"}</p>
+                                <p className="text-xs text-slate-500">{order.paymentMethod} · {isStagedOrder(order) ? stagedFinancials(order).fullyPaid ? "Fully paid" : stagedFinancials(order).paidPaise ? "Partially paid" : "Unpaid" : order.isPaid ? "Paid" : "Unpaid"}</p>
                             </div>
                         </div>
+                        {isStagedOrder(order) && <StagedOrderPayment key={order._id} order={order} onUpdated={onUpdated} />}
                         {addr.address && (<>
                             <Divider />
                             <div>
@@ -115,6 +118,7 @@ function OrderModal({ order, isOpen, onClose, onAction }) {
                                     variant={a.danger ? "flat" : "solid"}
                                     startContent={a.icon}
                                     className="font-semibold text-xs"
+                                    isDisabled={isStagedOrder(order) && ["Approved", "Shipped", "Delivered", "Active"].includes(a.s) && !canFulfilOrder(order)}
                                     onPress={() => { onAction(order._id, a.s); close(); }}>
                                     {a.label}
                                 </Button>
@@ -127,13 +131,14 @@ function OrderModal({ order, isOpen, onClose, onAction }) {
     );
 }
 
-export default function OrdersTable({ initialStatus = "all", title = "Orders" }) {
+export default function OrdersTable({ initialStatus = "all", title = "All", showSummary = false }) {
     const [orders, setOrders]     = useState([]);
     const [loading, setLoading]   = useState(true);
     const [updating, setUpdating] = useState(null);
     const [search, setSearch]     = useState("");
     const [selected, setSelected] = useState(null);
     const [toast, setToast]       = useState(null);
+    const [loadError, setLoadError] = useState('');
     const { isOpen, onOpen, onOpenChange } = useDisclosure();
 
     const showToast = (msg, type = "success") => {
@@ -146,16 +151,27 @@ export default function OrdersTable({ initialStatus = "all", title = "Orders" })
             setLoading(true);
             const token = localStorage.getItem("adminToken");
             const res = await fetch(`${API}/api/admin/rentals`, {
-                headers: { Authorization: `Bearer ${token}` }
+                headers: { Authorization: `Bearer ${token}` }, cache: 'no-store'
             });
-            if (res.ok) setOrders(await res.json());
-        } catch (err) { console.error(err); }
+            const list = await res.json();
+            if (!res.ok) throw new Error(list.message || 'Could not load orders. Please retry.');
+            if (!Array.isArray(list)) throw new Error('Could not load orders. Please retry.');
+            setLoadError(''); setOrders(list);
+            setSelected(previous => previous ? list.find(order => order._id === previous._id) || null : null);
+        } catch (err) { setLoadError(err.message || 'Could not load orders. Please retry.'); }
         finally { setLoading(false); }
     };
 
     useEffect(() => { fetchOrders(); }, []);
 
     const handleStatusChange = async (id, status) => {
+        const current = orders.find(order => order._id === id);
+        if (["Approved", "Shipped", "Delivered", "Active"].includes(status) && !canFulfilOrder(current)) {
+            showToast("Full payment and current approved KYC are required before fulfilment.", "error");
+            return;
+        }
+        if (status === 'Cancelled' && isStagedOrder(current) && stagedFinancials(current).paidPaise > 0
+            && !window.confirm(`Cancel this booking with ${formatPaise(stagedFinancials(current).paidPaise)} received? The payment will require manual refund review; cancellation does not issue a refund.`)) return;
         try {
             setUpdating(id);
             const token = localStorage.getItem("adminToken");
@@ -166,7 +182,8 @@ export default function OrdersTable({ initialStatus = "all", title = "Orders" })
             });
             if (res.ok) {
                 const updated = await res.json();
-                setOrders(prev => prev.map(o => o._id === id ? { ...o, status: updated.status } : o));
+                setOrders(prev => prev.map(o => o._id === id ? { ...o, ...updated } : o));
+                setSelected(previous => previous?._id === id ? { ...previous, ...updated } : previous);
                 showToast(`Order marked as ${status}`);
             } else {
                 const e = await res.json();
@@ -234,12 +251,12 @@ export default function OrdersTable({ initialStatus = "all", title = "Orders" })
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                 <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }}>
                     <h1 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-slate-100 mb-1">
-                        {title} <span className="text-indigo-600 dark:text-indigo-400 font-extrabold">Orders</span>
+                        {showSummary ? 'Rental' : title} <span className="text-indigo-600 dark:text-indigo-400 font-extrabold">{showSummary ? 'Operations' : 'Orders'}</span>
                     </h1>
                     <p className="text-slate-600 dark:text-slate-200 text-sm">Track and manage rental order lifecycle.</p>
                 </motion.div>
                 <div className="flex items-center gap-3">
-                    <Button isIconOnly variant="flat" size="sm" onPress={fetchOrders} isLoading={loading} className="text-slate-500">
+                    <Button isIconOnly aria-label="Refresh orders" variant="flat" size="sm" onPress={fetchOrders} isLoading={loading} className="text-slate-500">
                         <ArrowClockwise size={16}/>
                     </Button>
                     <div className="relative group w-60">
@@ -267,6 +284,14 @@ export default function OrdersTable({ initialStatus = "all", title = "Orders" })
                     </select>
                 </div>
             </div>
+
+            {showSummary && <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                {["Pending", "Approved", "Shipped", "Delivered"].map(status => <Card key={status} className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm">
+                    <CardBody className="p-4"><p className="text-2xl font-black text-slate-900 dark:text-white">{loading || loadError ? '—' : orders.filter(order => order.status === status).length}</p><StatusChip status={status} /></CardBody>
+                </Card>)}
+            </div>}
+
+            {loadError && <p role="alert" className="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700 dark:border-red-800 dark:bg-red-900/10 dark:text-red-300">{loadError}</p>}
 
             {/* Column header row */}
             <div className="hidden sm:grid grid-cols-[140px_1fr_1fr_100px_auto] gap-4 px-5 py-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl">
@@ -298,13 +323,15 @@ export default function OrdersTable({ initialStatus = "all", title = "Orders" })
                                     <div className="min-w-0">
                                         <p className="text-sm font-semibold text-slate-800 dark:text-slate-100 truncate">{order.user?.name || "—"}</p>
                                         <p className="text-xs text-slate-500 truncate">{order.user?.email}</p>
+                                        {showSummary && <p className="mt-1 text-xs text-slate-500">{order.orderItems?.map(item => `${item.name} × ${item.qty}`).join(', ')}</p>}
                                     </div>
                                     {/* Total + payment */}
                                     <div>
                                         <p className="text-sm font-bold text-slate-900 dark:text-slate-100">₹{order.totalPrice?.toLocaleString("en-IN")}</p>
                                         <span className={`text-[10px] font-semibold mt-0.5 inline-block ${order.isPaid ? 'text-emerald-500' : 'text-red-500'}`}>
-                                            {order.isPaid ? '● Paid' : '● Unpaid'}
+                                            {isStagedOrder(order) ? stagedFinancials(order).fullyPaid ? '● Fully paid' : stagedFinancials(order).paidPaise ? '● Advance received' : '● Unpaid' : order.isPaid ? '● Paid' : '● Unpaid'}
                                         </span>
+                                        {isStagedOrder(order) && <p className="mt-1 text-xs text-slate-500">Received {formatPaise(stagedFinancials(order).paidPaise)} · Due {formatPaise(stagedFinancials(order).balancePaise)}<br />KYC: {order.kycStatus || "unknown"}<br />{stagedFinancials(order).nextAction}</p>}
                                     </div>
                                     {/* Status */}
                                     <StatusChip status={order.status}/>
@@ -319,9 +346,9 @@ export default function OrdersTable({ initialStatus = "all", title = "Orders" })
                                                 </DropdownTrigger>
                                                 <DropdownMenu aria-label="Order Actions" variant="flat">
                                                     <DropdownItem key="view" startContent={<Eye weight="bold"/>} onPress={() => openModal(order)}>View Details</DropdownItem>
-                                                    <DropdownItem key="invoice" startContent={<DownloadSimple weight="bold"/>} onPress={() => downloadPDFInvoice(order)}>Download Invoice</DropdownItem>
+                                                    <DropdownItem key="invoice" startContent={<DownloadSimple weight="bold"/>} onPress={() => downloadPDFInvoice(order)}>{isStagedOrder(order) && !stagedFinancials(order).fullyPaid ? "Download payment statement" : "Download Invoice"}</DropdownItem>
                                                     {(ACTIONS[order.status] || []).map(a => (
-                                                        <DropdownItem key={a.s} color={a.danger ? "danger" : "default"} className={a.danger ? "text-danger" : ""} startContent={a.icon} onPress={() => handleStatusChange(order._id, a.s)}>{a.label}</DropdownItem>
+                                                        <DropdownItem key={a.s} color={a.danger ? "danger" : "default"} className={a.danger ? "text-danger" : ""} isDisabled={isStagedOrder(order) && ["Approved", "Shipped", "Delivered", "Active"].includes(a.s) && !canFulfilOrder(order)} startContent={a.icon} onPress={() => handleStatusChange(order._id, a.s)}>{a.label}</DropdownItem>
                                                     ))}
                                                 </DropdownMenu>
                                             </Dropdown>
@@ -342,9 +369,9 @@ export default function OrdersTable({ initialStatus = "all", title = "Orders" })
                                                     </DropdownTrigger>
                                                     <DropdownMenu aria-label="Actions" variant="flat">
                                                         <DropdownItem key="view" startContent={<Eye weight="bold"/>} onPress={() => openModal(order)}>View Details</DropdownItem>
-                                                        <DropdownItem key="invoice" startContent={<DownloadSimple weight="bold"/>} onPress={() => downloadPDFInvoice(order)}>Download Invoice</DropdownItem>
+                                                        <DropdownItem key="invoice" startContent={<DownloadSimple weight="bold"/>} onPress={() => downloadPDFInvoice(order)}>{isStagedOrder(order) && !stagedFinancials(order).fullyPaid ? "Download payment statement" : "Download Invoice"}</DropdownItem>
                                                         {(ACTIONS[order.status] || []).map(a => (
-                                                            <DropdownItem key={a.s} color={a.danger ? "danger" : "default"} className={a.danger ? "text-danger" : ""} startContent={a.icon} onPress={() => handleStatusChange(order._id, a.s)}>{a.label}</DropdownItem>
+                                                            <DropdownItem key={a.s} color={a.danger ? "danger" : "default"} className={a.danger ? "text-danger" : ""} isDisabled={isStagedOrder(order) && ["Approved", "Shipped", "Delivered", "Active"].includes(a.s) && !canFulfilOrder(order)} startContent={a.icon} onPress={() => handleStatusChange(order._id, a.s)}>{a.label}</DropdownItem>
                                                         ))}
                                                     </DropdownMenu>
                                                 </Dropdown>
@@ -355,9 +382,11 @@ export default function OrdersTable({ initialStatus = "all", title = "Orders" })
                                     <div className="flex items-center gap-2">
                                         <span className="text-sm font-bold">₹{order.totalPrice?.toLocaleString("en-IN")}</span>
                                         <span className={`text-xs font-semibold ${order.isPaid ? 'text-emerald-500' : 'text-red-500'}`}>
-                                            {order.isPaid ? '● Paid' : '● Unpaid'}
+                                            {isStagedOrder(order) ? stagedFinancials(order).fullyPaid ? '● Fully paid' : stagedFinancials(order).paidPaise ? '● Advance received' : '● Unpaid' : order.isPaid ? '● Paid' : '● Unpaid'}
                                         </span>
                                     </div>
+                                    {isStagedOrder(order) && <p className="text-xs text-slate-500">Received {formatPaise(stagedFinancials(order).paidPaise)} · Due {formatPaise(stagedFinancials(order).balancePaise)} · KYC: {order.kycStatus || "unknown"}</p>}
+                                    {isStagedOrder(order) && <p className="text-xs font-medium text-slate-600 dark:text-slate-300">{stagedFinancials(order).nextAction}</p>}
                                 </div>
                             </CardBody>
                         </Card>
@@ -381,7 +410,7 @@ export default function OrdersTable({ initialStatus = "all", title = "Orders" })
                 </div>
             )}
 
-            <OrderModal order={selected} isOpen={isOpen} onClose={onOpenChange} onAction={handleStatusChange}/>
+            <OrderModal order={selected} isOpen={isOpen} onClose={onOpenChange} onAction={handleStatusChange} onUpdated={fetchOrders}/>
         </div>
     );
 }

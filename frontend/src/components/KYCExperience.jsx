@@ -2,9 +2,10 @@
 
 import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
-import { ArrowLeftIcon, ArrowRightIcon, CheckIcon, ClockIcon, CloudArrowUpIcon, DocumentTextIcon, ExclamationCircleIcon, LockClosedIcon } from '@heroicons/react/24/outline';
+import { ArrowLeftIcon, ArrowRightIcon, CheckIcon, ClockIcon, CloudArrowUpIcon, DocumentTextIcon, LockClosedIcon } from '@heroicons/react/24/outline';
 import { getKYCStatus, saveKYCData, uploadKYCFiles } from '../services/kycService';
 import { profileTitleClassName } from '../app/profile/profileTitle';
+import styles from './KYCExperience.module.css';
 
 const INITIAL_DETAILS = {
     name: '', fatherName: '', fatherPhone: '', email: '', phone: '',
@@ -156,7 +157,7 @@ function UploadField({ item, file, error, onSelect }) {
     );
 }
 
-export default function KYCExperience({ mode = 'profile' }) {
+export default function KYCExperience({ mode = 'profile', onStatusChange, approvedHref = '/checkout/payment', onApproved, loginReturnHref }) {
     const isCheckout = mode === 'checkout';
     const [currentStep, setCurrentStep] = useState(1);
     const [maxStep, setMaxStep] = useState(1);
@@ -168,6 +169,13 @@ export default function KYCExperience({ mode = 'profile' }) {
     const [kycData, setKycData] = useState(null);
     const [formData, setFormData] = useState({ personalDetails: INITIAL_DETAILS, referenceDetails: INITIAL_REFERENCE, documents: { aadharFront: null, aadharBack: null, panCard: null } });
     const contentRef = useRef(null);
+    const statusCallbackRef = useRef(onStatusChange);
+
+    // Notify the embedding checkout without making callback identity reload documents.
+    useEffect(() => { statusCallbackRef.current = onStatusChange; }, [onStatusChange]);
+    useEffect(() => {
+        if (kycStatus !== 'loading') statusCallbackRef.current?.(kycStatus, kycData);
+    }, [kycStatus, kycData]);
 
     useEffect(() => {
         let active = true;
@@ -284,19 +292,31 @@ export default function KYCExperience({ mode = 'profile' }) {
 
     if (kycStatus === 'loading') return <div className="flex min-h-64 items-center justify-center" role="status"><span className="size-8 animate-spin rounded-full border-[3px] border-[#dddddd] border-t-[#141414]" /><span className="sr-only">Loading KYC status</span></div>;
 
-    if (kycStatus === 'unauthenticated') return <section className="rounded-2xl border border-[#e2e2e2] bg-white p-6 sm:p-8"><h1 className={profileTitleClassName}>Sign in to verify your identity</h1><p className="mt-3 text-[15px] leading-6 text-[#555555]">Your KYC details are saved to your account, so they appear in both checkout and your profile.</p><Link href={`/login?redirect=${encodeURIComponent(isCheckout ? '/checkout/kyc' : '/profile/kyc')}`} className={`${primaryButtonClass} mt-6`}>Sign in <ArrowRightIcon className="size-4" aria-hidden="true" /></Link></section>;
+    if (kycStatus === 'unauthenticated') return <section className="rounded-2xl border border-[#e2e2e2] bg-white p-6 sm:p-8"><h1 className={profileTitleClassName}>Sign in to verify your identity</h1><p className="mt-3 text-[15px] leading-6 text-[#555555]">Your KYC details are saved to your account, so they appear in both checkout and your profile.</p><Link href={`/login?redirect=${encodeURIComponent(loginReturnHref || (isCheckout ? '/checkout/kyc' : '/profile/kyc'))}`} className={`${primaryButtonClass} mt-6`}>Sign in <ArrowRightIcon className="size-4" aria-hidden="true" /></Link></section>;
 
     if (kycStatus === 'error') return <section role="alert" className="rounded-2xl border border-[#e2e2e2] bg-white p-6 sm:p-8"><h1 className={profileTitleClassName}>We could not load your KYC</h1><p className="mt-3 text-[15px] leading-6 text-[#555555]">Please try again before entering your details.</p><button type="button" onClick={() => window.location.reload()} className={`${primaryButtonClass} mt-6`}>Try again</button></section>;
 
-    if (kycStatus === 'pending' || kycStatus === 'review' || kycStatus === 'approved') {
+    if (['pending', 'review', 'approved'].includes(kycStatus) && !kycData?.migrationRequiredFields?.length) {
         const approved = kycStatus === 'approved';
         const submittedDocuments = SUBMITTED_DOCUMENTS.filter(({ key }) => kycData?.documents?.[key]);
         return (
             <section className="mx-auto max-w-[860px] py-6 sm:py-10" aria-labelledby="kyc-status-title">
-                <div className="flex size-14 items-center justify-center rounded-2xl bg-[#ffcf46]">{approved ? <CheckIcon className="size-7 text-[#141414]" aria-hidden="true" /> : <ClockIcon className="size-7 text-[#141414]" aria-hidden="true" />}</div>
-                <h1 id="kyc-status-title" className={`mt-6 ${profileTitleClassName}`}>{approved ? 'Your KYC is verified' : 'Your KYC is under review'}</h1>
-                <p className="mt-3 max-w-[620px] text-[15px] leading-7 text-[#555555]">{approved ? 'Your identity check is complete. Your submitted details are available below.' : isCheckout ? 'We have received your details and documents. You can continue checkout once your KYC is approved. Check the status here or in your account.' : 'We have received your details and documents. You can check the status here whenever you need to.'}</p>
-                {isCheckout && approved && <Link href="/checkout/payment" className={`${primaryButtonClass} mt-6`}>Continue to payment <ArrowRightIcon className="size-4" aria-hidden="true" /></Link>}
+                <div className={styles.statusSummary}>
+                    {approved ? (
+                        <div className={`${styles.statusBadge} ${styles.verifiedBadge}`} aria-hidden="true">
+                            <span className={styles.verifiedCheck} />
+                        </div>
+                    ) : (
+                        <div className={`${styles.statusBadge} bg-[#ffcf46]`}>
+                            <ClockIcon className="size-7 text-[#141414]" aria-hidden="true" />
+                        </div>
+                    )}
+                    <div className={styles.statusCopy}>
+                        <h1 id="kyc-status-title" className={profileTitleClassName}>{approved ? 'Your KYC is verified' : 'Your KYC is under review'}</h1>
+                        <p className="mt-2 max-w-[620px] text-[15px] leading-7 text-[#555555]">{approved ? 'Your identity check is complete. Your submitted details are available below.' : isCheckout ? 'We have received your details and documents. You can continue checkout once your KYC is approved. Check the status here or in your account.' : 'We have received your details and documents. You can check the status here whenever you need to.'}</p>
+                    </div>
+                </div>
+                {isCheckout && approved && (onApproved ? <button type="button" onClick={onApproved} className={`${primaryButtonClass} mt-6`}>Continue to payment <ArrowRightIcon className="size-4" aria-hidden="true" /></button> : <Link href={approvedHref} className={`${primaryButtonClass} mt-6`}>Continue to payment <ArrowRightIcon className="size-4" aria-hidden="true" /></Link>)}
                 <div className="mt-8 border-t border-[#dddddd] pt-6">
                     <h2 className="text-[18px] font-semibold text-[#141414]">Submitted documents</h2>
                     <ul className="mt-3 divide-y divide-[#e8e8e8]">
@@ -325,7 +345,11 @@ export default function KYCExperience({ mode = 'profile' }) {
                 <p className="max-w-[580px] text-[15px] leading-6 text-[#555555]">Verify your identity to complete your rental. Your details and status will also appear {isCheckout ? 'in your account' : 'at checkout'}.</p>
             </header>
 
-            {kycStatus === 'rejected' && <div role="alert" className="mb-7 flex items-start gap-3 rounded-xl border border-[#e9b3ae] bg-[#fff5f3] p-4 text-[#7e211a]"><ExclamationCircleIcon className="mt-0.5 size-5 shrink-0" aria-hidden="true" /><div><p className="font-semibold">Your previous submission needs changes</p><p className="mt-1 text-[14px] leading-6">{kycData?.rejectionReason || 'Please check your details and documents before resubmitting.'}</p></div></div>}
+            {kycData?.migrationRequiredFields?.length > 0 && <div role="alert" className="mb-7 rounded-xl border border-[#e9b3ae] bg-[#fff5f3] p-4 text-[#7e211a]">Please upload fresh copies of your documents using the private verification form below.</div>}
+            {kycStatus === 'rejected' && <div role="alert" className={`${styles.statusSummary} ${styles.rejectionNotice}`}>
+                <div className={`${styles.statusBadge} ${styles.rejectedBadge}`} aria-hidden="true"><span className={styles.rejectedCross} /></div>
+                <div className={styles.statusCopy}><p className="font-semibold">Your previous submission needs changes</p><p className="mt-2 break-words text-[14px] leading-6">{kycData?.rejectionReason || 'Please check your details and documents before resubmitting.'}</p></div>
+            </div>}
 
             <div className={`grid gap-4 ${isCheckout ? 'xl:grid-cols-[175px_minmax(0,1fr)] xl:gap-6' : 'lg:grid-cols-[195px_minmax(0,1fr)] lg:gap-9'}`}>
                 <aside aria-label="Verification progress" className={isCheckout ? 'xl:pt-1' : 'lg:pt-1'}>

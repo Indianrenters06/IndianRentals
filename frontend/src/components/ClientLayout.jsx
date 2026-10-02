@@ -21,25 +21,31 @@ export default function ClientLayout({ children }) {
     }, []);
     // Use CartHeader for cart and all checkout pages
     const isCheckoutFlow = pathname === "/cart" || pathname.startsWith("/checkout");
-    const hasPageTestimonials = pathname === "/" || pathname === "/rental-process" || pathname.startsWith("/products/");
     const marketingRoutes = [
         '/about', '/products', '/categories', '/category', '/faq', '/contact',
         '/blog', '/locations', '/services', '/careers', '/terms', '/privacy',
         '/kyc-policy', '/shipping', '/return-policy', '/refund-policy', '/rules',
         '/delivery-charges', '/late-fee-rules', '/cancellation-rules', '/subscription-rules',
     ];
-    // These page families intentionally omit the shared customer reviews section.
-    const routesWithoutTestimonials = ['/contact', '/locations', '/services', '/faq', '/blog'];
-    const showSharedTestimonials = !isCheckoutFlow && !hasPageTestimonials
-        && !routesWithoutTestimonials.some(route => pathname === route || pathname.startsWith(`${route}/`))
-        && marketingRoutes.some(route => pathname === route || pathname.startsWith(`${route}/`));
+    // Homepage and How It Works render their own section; only About inherits it.
+    const showSharedTestimonials = pathname === '/about';
 
     const showTrustStrip = !isCheckoutFlow && (pathname === '/' || pathname === '/rental-process'
         || marketingRoutes.some(route => pathname === route || pathname.startsWith(`${route}/`)));
 
+    // Preview and staged checkout supply their own state-aware headers.
+    if (pathname === '/checkout/preview' || pathname === '/checkout/staged') return children;
+    const isLegacyPreview = pathname.startsWith('/checkout/legacy/');
+
     return (
         <div className="flex flex-col min-h-screen">
             {isCheckoutFlow ? <CheckoutHeader /> : <Navbar />}
+            {isLegacyPreview && <aside className="border-b border-[#e2e2e2] bg-[#edfaff] px-5 py-3 text-sm text-[#0e305d]">
+                <div className="mx-auto flex max-w-[1200px] flex-wrap items-center justify-between gap-3">
+                    <span>Original checkout backup</span>
+                    <a href="/checkout/staged?new=1" className="font-semibold underline underline-offset-4">Return to current checkout</a>
+                </div>
+            </aside>}
             <main className="flex-grow">
                 {children}
                 {showSharedTestimonials && <Testimonials />}

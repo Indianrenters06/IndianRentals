@@ -1,5 +1,6 @@
 'use client';
 
+import { lockBodyScroll } from '../lib/bodyScrollLock.mjs';
 import { createContext, useContext, useEffect, useRef, useState } from 'react';
 import { usePathname } from 'next/navigation';
 import { XMarkIcon } from '@heroicons/react/24/outline';
@@ -75,12 +76,11 @@ export default function ConsentProvider({ children, analyticsId = '' }) {
   useEffect(() => {
     if (!settingsOpen) return;
     const modal = dialog.current;
-    const previousOverflow = document.body.style.overflow;
+    const unlockScroll = lockBodyScroll();
     modal.showModal();
-    document.body.style.overflow = 'hidden';
     return () => {
       modal.close();
-      document.body.style.overflow = previousOverflow;
+      unlockScroll();
       if (opener.current?.isConnected) opener.current.focus();
     };
   }, [settingsOpen]);

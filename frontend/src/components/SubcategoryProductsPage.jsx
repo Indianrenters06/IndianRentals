@@ -1,6 +1,7 @@
 "use client";
 import React, { useState, useEffect } from 'react';
-import { FiPackage } from 'react-icons/fi';
+import Image from 'next/image';
+import Link from 'next/link';
 import { getProductsBySubcategory, getProducts } from '../services/productService';
 import ProductCard from './ProductCard';
 import Sidebar from './Sidebar';
@@ -207,10 +208,15 @@ export default function SubcategoryProductsPage({ subcategoryId, subcategoryName
 
                         {/* Empty */}
                         {!loading && !error && processedProducts.length === 0 && (
-                            <div style={{ textAlign: 'center', padding: '80px 0' }}>
-                                <FiPackage size={48} style={{ margin: '0 auto 16px', color: '#d1d5db', display: 'block' }} />
-                                <h2 style={{ fontSize: '18px', fontWeight: 600, color: '#374151' }}>No products available</h2>
-                            </div>
+                            <section className={styles.emptyState} aria-labelledby="empty-products-title">
+                                <Image src="/images/empty-states/catalogue-empty.webp" width={160} height={160} alt="" className={styles.emptyIllustration} />
+                                <h2 id="empty-products-title" className={styles.emptyTitle}>No products available</h2>
+                                <p className={styles.emptyDescription}>There are no products listed in this category right now. Explore other categories or ask our team about what you need.</p>
+                                <div className={styles.emptyActions}>
+                                    <Link href={parentHref || '/categories'} className={styles.emptyPrimary}>Browse other categories</Link>
+                                    <Link href="/contact" className={styles.emptySecondary}>Contact our team</Link>
+                                </div>
+                            </section>
                         )}
 
                         {/* Products grid */}

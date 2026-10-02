@@ -1,4 +1,5 @@
 'use client';
+import { API as API_BASE } from '@/services/apiConfig';
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
@@ -6,8 +7,6 @@ import { ArrowRight, Receipt, ArrowClockwise } from '@phosphor-icons/react';
 import { PiSpinnerGap } from 'react-icons/pi';
 import axios from 'axios';
 import { profileTitleClassName } from '../profileTitle';
-
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
 
 const getToken = () => {
     if (typeof window === 'undefined') return null;
@@ -61,12 +60,14 @@ export default function MyInvoicesPage() {
                 });
                 const data = Array.isArray(res.data) ? res.data : [];
                 const mapped = data.map((r, i) => ({
-                    id: `DEL/25-26/${String(i + 1001)}`,
+                    id: r.checkoutFlow === 'staged' ? `Booking ${r._id.toString().slice(-6).toUpperCase()}` : `DEL/25-26/${String(i + 1001)}`,
+                    staged: r.checkoutFlow === 'staged',
+                    fullId: r._id,
                     date: new Date(r.createdAt).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: '2-digit' }).replace(/ /g, '-'),
                     orderNo: r._id.toString().slice(-6).toUpperCase(),
-                    invoiceAmt: inr(r.totalPrice),
-                    amountDue: r.isPaid ? inr(0) : inr(r.totalPrice),
-                    status: r.isPaid ? 'Paid' : 'Pending',
+                    invoiceAmt: inr(r.checkoutFlow === 'staged' ? (r.staged?.finalQuote?.totalPaise ?? r.pricingSnapshot?.totalPaise ?? Math.round(r.totalPrice * 100)) / 100 : r.totalPrice),
+                    amountDue: r.checkoutFlow === 'staged' ? inr(Math.max(0, (r.staged?.finalQuote?.totalPaise ?? r.pricingSnapshot?.totalPaise ?? Math.round(r.totalPrice * 100)) - (r.staged?.paidPaise || 0)) / 100) : r.isPaid ? inr(0) : inr(r.totalPrice),
+                    status: r.refundReviewRequired ? 'Review' : r.isPaid ? 'Paid' : r.staged?.paidPaise > 0 ? 'Part paid' : 'Pending',
                 }));
                 setInvoices(mapped);
             } catch (err) {
@@ -90,6 +91,7 @@ export default function MyInvoicesPage() {
                 <div className="flex flex-col gap-3">
                     <h1 className={profileTitleClassName}>My Invoices</h1>
                     <p className="text-[14px] font-medium leading-5 tracking-[-0.4px] text-[#757575]">Find invoices for your rental orders here.</p>
+                    {invoices.some(invoice => invoice.staged) && <p className="text-sm text-[#545454]">Staged bookings show a payment statement here. The balance includes credit for payments already received.</p>}
                 </div>
 
                 {orderFilter && (
@@ -157,9 +159,9 @@ export default function MyInvoicesPage() {
                                         <p>{invoice.invoiceAmt}</p>
                                         <p>{invoice.amountDue}</p>
                                         <Tag label={invoice.status} paid={invoice.status === 'Paid'} />
-                                        <button className="flex h-[24px] w-fit items-center justify-center rounded-[28px] bg-[#0075ff] px-3 py-1 text-[12px] font-semibold leading-4 tracking-[-0.4px] text-[#edfaff]">
+                                        {invoice.staged ? <Link href={`/checkout/staged?orderId=${invoice.fullId}`} className="flex min-h-11 w-fit items-center justify-center rounded-full bg-[#ffcf46] px-3 text-xs font-semibold">View</Link> : <button className="flex h-[24px] w-fit items-center justify-center rounded-[28px] bg-[#0075ff] px-3 py-1 text-[12px] font-semibold leading-4 tracking-[-0.4px] text-[#edfaff]">
                                             Download
-                                        </button>
+                                        </button>}
                                     </div>
                                 </div>
                             ))}

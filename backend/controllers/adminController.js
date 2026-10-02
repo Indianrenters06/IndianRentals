@@ -1,4 +1,7 @@
+const stagedCheckout = require('../services/stagedCheckout');
 const asyncHandler = require('express-async-handler');
+const { assertCustomerActor, requireCustomerTarget, requireUnchangedCustomer } = require('../utils/customerAccess');
+const { userResponse } = require('../utils/userResponse');
 const User = require('../models/User');
 const Product = require('../models/Product');
 const Rental = require('../models/Rental');
@@ -21,10 +24,10 @@ const getDashboardStats = asyncHandler(async (req, res) => {
     // 3. Total Rentals (Orders)
     const totalRentals = await Rental.countDocuments();
 
-    // 4. Total Revenue (Sum of paid rentals)
+    // 4. Captured receipts (advance + balance, without double-counting).
     const revenueAggregation = await Rental.aggregate([
-        { $match: { isPaid: true } },
-        { $group: { _id: null, total: { $sum: "$totalPrice" } } }
+        { $match: { $or: [{ isPaid: true }, { checkoutFlow: 'staged', 'staged.paidPaise': { $gt: 0 } }] } },
+        { $group: { _id: null, total: { $sum: { $cond: [{ $eq: ['$checkoutFlow', 'staged'] }, { $divide: ['$staged.paidPaise', 100] }, '$totalPrice'] } } } }
     ]);
     const totalRevenue = revenueAggregation.length > 0 ? revenueAggregation[0].total : 0;
 
@@ -54,24 +57,13 @@ const getDashboardStats = asyncHandler(async (req, res) => {
     oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
 
     const revenueByDayAgg = await Rental.aggregate([
-        {
-            $match: {
-                isPaid: true,
-                $expr: { $gte: [{ $ifNull: ['$paidAt', '$createdAt'] }, oneYearAgo] }
-            }
-        },
-        {
-            $group: {
-                _id: {
-                    $dateToString: {
-                        format: '%Y-%m-%d',
-                        date: { $ifNull: ['$paidAt', '$createdAt'] },
-                        timezone: 'Asia/Kolkata'
-                    }
-                },
-                total: { $sum: '$totalPrice' }
-            }
-        },
+        { $project: { receipts: { $cond: [{ $eq: ['$checkoutFlow', 'staged'] },
+            [{ amount: { $divide: [{ $ifNull: ['$staged.advance.amountPaise', 0] }, 100] }, state: '$staged.advance.state', date: '$staged.advance.paidAt' },
+             { amount: { $divide: [{ $ifNull: ['$staged.balance.amountPaise', 0] }, 100] }, state: '$staged.balance.state', date: '$staged.balance.paidAt' }],
+            [{ amount: '$totalPrice', state: { $cond: ['$isPaid', 'paid', 'pending'] }, date: { $ifNull: ['$paidAt', '$createdAt'] } }] ] } } },
+        { $unwind: '$receipts' },
+        { $match: { 'receipts.state': 'paid', 'receipts.date': { $gte: oneYearAgo } } },
+        { $group: { _id: { $dateToString: { format: '%Y-%m-%d', date: '$receipts.date', timezone: 'Asia/Kolkata' } }, total: { $sum: '$receipts.amount' } } },
         { $sort: { _id: 1 } }
     ]);
     const revenueByDay = revenueByDayAgg.map(d => ({ date: d._id, total: d.total }));
@@ -121,7 +113,18 @@ const getDashboardStats = asyncHandler(async (req, res) => {
 // @route   GET /api/admin/products
 // @access  Private/Admin
 const getAllProducts = asyncHandler(async (req, res) => {
+    if (req.query?.page !== undefined || req.query?.limit !== undefined) {
+        let filters;
+        try { filters = require('../utils/catalogueQuery').catalogueQuery({ pageNumber: req.query.page || '1', limit: req.query.limit || '100' }); }
+        catch (error) { res.status(400); throw error; }
+        const { page, limit } = filters;
+        const count = await Product.countDocuments({});
+        const products = await Product.find({}).select('-reviews').sort({ createdAt: -1 }).limit(limit).skip((page - 1) * limit);
+        res.setHeader('Cache-Control', 'no-store, private');
+        return res.json({ products, page, pages: Math.ceil(count / limit) });
+    }
     const products = await Product.find({}).sort({ createdAt: -1 });
+    res.setHeader('Cache-Control', 'no-store, private');
     res.json(products);
 });
 
@@ -206,34 +209,24 @@ const deleteProduct = asyncHandler(async (req, res) => {
 // @route   GET /api/admin/users
 // @access  Private/Admin
 const getAllUsers = asyncHandler(async (req, res) => {
+    assertCustomerActor(req, res);
     const users = await User.find({ role: 'customer' }).select('-password').sort({ createdAt: -1 });
-    res.json(users);
+    res.json(users.map(userResponse));
 });
 
 // @desc    Get user by ID
 // @route   GET /api/admin/users/:id
 // @access  Private/Admin
 const getUserById = asyncHandler(async (req, res) => {
-    const user = await User.findById(req.params.id).select('-password');
-
-    if (!user) {
-        res.status(404);
-        throw new Error('User not found');
-    }
-
-    res.json(user);
+    const user = await requireCustomerTarget(req, res);
+    res.json(userResponse(user));
 });
 
 // @desc    Update user
 // @route   PUT /api/admin/users/:id
 // @access  Private/Admin
 const updateUser = asyncHandler(async (req, res) => {
-    const user = await User.findById(req.params.id);
-
-    if (!user) {
-        res.status(404);
-        throw new Error('User not found');
-    }
+    await requireCustomerTarget(req, res);
 
     // Whitelist: role/permissions go through /users/:id/role or Team, and
     // passwords through the reset flow (findByIdAndUpdate skips the bcrypt hook).
@@ -242,27 +235,21 @@ const updateUser = asyncHandler(async (req, res) => {
         if (req.body[field] !== undefined) updates[field] = req.body[field];
     }
 
-    const updatedUser = await User.findByIdAndUpdate(
-        req.params.id,
+    const updatedUser = await User.findOneAndUpdate(
+        { _id: req.params.id, role: 'customer' },
         { $set: updates },
         { new: true, runValidators: true }
     ).select('-password');
 
-    res.json(updatedUser);
+    res.json(userResponse(requireUnchangedCustomer(updatedUser, res)));
 });
 
 // @desc    Delete user
 // @route   DELETE /api/admin/users/:id
 // @access  Private/Admin
 const deleteUser = asyncHandler(async (req, res) => {
-    const user = await User.findById(req.params.id);
-
-    if (!user) {
-        res.status(404);
-        throw new Error('User not found');
-    }
-
-    await User.findByIdAndDelete(req.params.id);
+    await requireCustomerTarget(req, res);
+    requireUnchangedCustomer(await User.findOneAndDelete({ _id: req.params.id, role: 'customer' }), res);
     res.json({ message: 'User removed successfully' });
 });
 
@@ -273,7 +260,7 @@ const deleteUser = asyncHandler(async (req, res) => {
 // @access  Private/Admin
 const getTeamMembers = asyncHandler(async (req, res) => {
     const team = await User.find({ role: { $ne: 'customer' } }).select('-password').sort({ createdAt: -1 });
-    res.json(team);
+    res.json(team.map(userResponse));
 });
 
 const ALL_PERMISSIONS = ["cms", "products", "inventory", "users", "kyc", "orders", "payments", "coupons", "reports", "notifications", "settings"];
@@ -406,7 +393,13 @@ const getAllRentals = asyncHandler(async (req, res) => {
     const rentals = await Rental.find({})
         .populate('user', 'name email')
         .sort({ createdAt: -1 });
-    res.json(rentals);
+    res.json(await Promise.all(rentals.map(async rental => {
+        if (rental.checkoutFlow !== 'staged') return rental;
+        const state = await stagedCheckout.stateFor(rental);
+        return { ...(rental.toObject?.() || rental), kycStatus: state.kycStatus,
+            advancePaise: state.advancePaise, paidPaise: state.paidPaise, balancePaise: state.balancePaise,
+            amountPaid: state.paidPaise / 100, balanceDue: state.balancePaise / 100, canPayBalance: state.canPayBalance };
+    })));
 });
 
 // @desc    Update rental status
@@ -421,15 +414,29 @@ const updateRentalStatus = asyncHandler(async (req, res) => {
     }
 
     const updates = {};
+    const fulfilling = ['Approved', 'Shipped', 'Delivered', 'Active'].includes(req.body.status) || req.body.isDelivered === true;
+    if (fulfilling && (!rental.isPaid || rental.refundReviewRequired || rental.status === 'Cancelled')) {
+        res.status(409); throw new Error('Verified payment and an active order are required before fulfilment');
+    }
+    if (fulfilling) { try { await stagedCheckout.assertFulfillment(rental); } catch (error) { res.status(error.statusCode || 503); throw error; } }
     for (const field of ['status', 'isDelivered', 'deliveredAt', 'isReturned', 'returnedAt']) {
         if (req.body[field] !== undefined) updates[field] = req.body[field];
     }
+    if (updates.status === 'Cancelled') {
+        updates.paymentState = stagedCheckout.moneyRecorded(rental) ? 'manual_review' : 'cancelled';
+        updates.refundReviewRequired = stagedCheckout.moneyRecorded(rental);
+    }
 
-    const updatedRental = await Rental.findByIdAndUpdate(
-        req.params.id,
-        { $set: updates },
-        { new: true, runValidators: true }
-    ).populate('user', 'name email');
+    const filter = { status: rental.status, isPaid: rental.isPaid,
+        ...(fulfilling ? { isPaid: true, refundReviewRequired: { $ne: true } } : {}),
+        ...(rental.checkoutFlow === 'staged' ? { 'staged.paidPaise': rental.staged.paidPaise } : {}) };
+    let updatedRental;
+    if (rental.checkoutFlow === 'staged') {
+        try { updatedRental = await stagedCheckout.lockedUpdate(rental, filter, updates, fulfilling); }
+        catch (error) { res.status(error.statusCode || 503); throw error; }
+    } else updatedRental = await Rental.findOneAndUpdate({ _id: req.params.id, ...filter }, { $set: updates }, { new: true, runValidators: true }).populate('user', 'name email');
+
+    if (!updatedRental) { res.status(409); throw new Error('Order changed while processing this request'); }
 
     res.json(updatedRental);
 });
@@ -439,73 +446,9 @@ const updateRentalStatus = asyncHandler(async (req, res) => {
 // @desc    Get all KYC submissions
 // @route   GET /api/admin/kyc
 // @access  Private/Admin
-const getAllKYC = asyncHandler(async (req, res) => {
-    const kycList = await KYC.find({})
-        .populate('user', 'name email phone')
-        .sort({ createdAt: -1 });
-    res.json(kycList);
-});
-
-// @desc    Update KYC status (Approve/Reject)
-// @route   PUT /api/admin/kyc/:id
-// @access  Private/Admin
-const updateKYCStatus = asyncHandler(async (req, res) => {
-    const { status, remarks } = req.body;
-
-    // Validate status
-    if (!['approved', 'rejected', 'pending'].includes(status)) {
-        res.status(400);
-        throw new Error('Invalid status. Must be approved, rejected, or pending');
-    }
-
-    // Find KYC record
-    const kyc = await KYC.findById(req.params.id);
-    if (!kyc) {
-        res.status(404);
-        throw new Error('KYC record not found');
-    }
-
-    // Update KYC status
-    kyc.status = status;
-    if (remarks) {
-        kyc.remarks = remarks;
-    }
-    await kyc.save();
-
-    // Update user's KYC status
-    const user = await User.findById(kyc.user);
-    if (user) {
-        user.kyc = user.kyc || {};
-        user.kyc.status = status;
-        if (remarks && status === 'rejected') {
-            user.kyc.rejectionReason = remarks;
-        }
-        await user.save();
-    }
-
-    // Populate user data for response
-    await kyc.populate('user', 'name email phone');
-
-    // Notify the customer of the decision (non-blocking).
-    const custName = kyc.user?.name || kyc.personalDetails?.name || 'Customer';
-    const custEmail = kyc.user?.email || kyc.personalDetails?.email;
-    if (status === 'approved') {
-        sendTemplatedEmail('KYC Approved', custEmail, {
-            CUSTOMER_NAME: custName,
-            RENTAL_LIMIT: (kyc.rentalLimit ? Number(kyc.rentalLimit).toLocaleString('en-IN') : '50,000'),
-        });
-    } else if (status === 'rejected') {
-        sendTemplatedEmail('KYC Rejected — Action Required', custEmail, {
-            CUSTOMER_NAME: custName,
-            REJECTION_REASON: remarks || 'Your documents could not be verified. Please resubmit clear, valid documents.',
-        });
-    }
-
-    res.json({
-        message: `KYC ${status} successfully`,
-        kyc
-    });
-});
+// Both administrative route families share the same transactional review and
+// private-document response boundary.
+const { getAllKYC, updateKYCStatus } = require('./kycController');
 
 // @desc    Get all invoices
 // @route   GET /api/admin/invoices
@@ -522,7 +465,10 @@ const getAllInvoices = asyncHandler(async (req, res) => {
         invoiceNumber: `INV-${rental._id.toString().slice(-6).toUpperCase()}`,
         customer: rental.user,
         amount: rental.totalPrice,
-        status: rental.isPaid ? 'paid' : 'pending',
+        status: rental.isPaid ? 'paid' : rental.checkoutFlow === 'staged' && stagedCheckout.moneyRecorded(rental) ? 'partially_paid' : 'pending',
+        checkoutFlow: rental.checkoutFlow,
+        amountPaid: rental.checkoutFlow === 'staged' ? (rental.staged.paidPaise || 0) / 100 : rental.isPaid ? rental.totalPrice : 0,
+        balanceDue: rental.checkoutFlow === 'staged' ? Math.max(0, (rental.staged.finalQuote?.totalPaise ?? rental.pricingSnapshot.totalPaise) - (rental.staged.paidPaise || 0)) / 100 : rental.isPaid ? 0 : rental.totalPrice,
         createdAt: rental.createdAt,
         product: rental.product
     }));
@@ -540,16 +486,20 @@ const getAllPayments = asyncHandler(async (req, res) => {
         .sort({ createdAt: -1 });
 
     // Transform rentals to payment format
-    const payments = rentals.map(rental => ({
-        _id: rental._id,
-        transactionId: `TXN-${rental._id.toString().slice(-8).toUpperCase()}`,
-        customer: rental.user,
-        amount: rental.totalPrice,
-        paymentMethod: rental.paymentMethod || 'card',
-        status: rental.isPaid ? 'completed' : 'pending',
-        createdAt: rental.createdAt,
-        product: rental.product
-    }));
+    const payments = rentals.flatMap(rental => {
+        const common = { customer: rental.user, paymentMethod: rental.paymentMethod || 'Cashfree', product: rental.product,
+            rentalId: rental._id, checkoutFlow: rental.checkoutFlow };
+        if (rental.checkoutFlow === 'staged') return ['advance', 'balance'].filter(stage => rental.staged?.[stage]?.providerOrderId).map(stage => {
+            const payment = rental.staged[stage];
+            return { ...common, _id: `${rental._id}-${stage}`, stage, transactionId: payment.providerPaymentId || payment.providerOrderId,
+                amount: payment.amountPaise / 100, status: payment.state === 'paid' ? 'completed' : 'pending',
+                amountPaid: payment.state === 'paid' ? payment.amountPaise / 100 : 0,
+                balanceDue: Math.max(0, (rental.staged.finalQuote?.totalPaise ?? rental.pricingSnapshot.totalPaise) - (rental.staged.paidPaise || 0)) / 100,
+                refundReviewRequired: rental.refundReviewRequired, createdAt: payment.paidAt || rental.createdAt };
+        });
+        return [{ ...common, _id: rental._id, transactionId: rental.payment?.providerPaymentId || `TXN-${rental._id.toString().slice(-8).toUpperCase()}`,
+            amount: rental.totalPrice, status: rental.isPaid ? 'completed' : 'pending', createdAt: rental.createdAt }];
+    });
 
     res.json(payments);
 });

@@ -16,6 +16,7 @@ const {
 } = require('../controllers/authController');
 
 const rateLimit = require('express-rate-limit');
+const { protect } = require('../middleware/authMiddleware');
 
 // Per-IP limits (req.ip is the real client — see 'trust proxy' in index.js).
 // Kept loose enough for offices behind one shared IP; OTP brute force is
@@ -39,7 +40,7 @@ router.post('/register-otp', sendOtpLimiter, sendRegisterOtp);
 router.post('/register-verify', verifyLimiter, verifyRegisterOtp);
 router.post('/login', loginLimiter, sendOtpLimiter, loginUser);
 router.post('/admin-login', loginLimiter, adminLogin);
-router.post('/logout', logoutUser);
+router.post('/logout', protect, logoutUser);
 router.post('/verify', verifyLimiter, verifyOtp);
 router.post('/send-otp', sendOtpLimiter, sendLoginOtp);
 router.post('/verify-login', verifyLimiter, verifyLoginOtp);

@@ -1,5 +1,6 @@
 "use client";
 import React from 'react';
+import { socialDestination, whatsappDestination, footerDestination } from '@/lib/footerDestinations.mjs';
 import styles from './Footer.module.css';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -59,7 +60,8 @@ const Footer = () => {
     const { openSettings } = useConsent();
     const siteLogo = settings?.siteLogo || "https://res.cloudinary.com/dgkckcdk8/image/upload/v1776892240/1d1f7c4e3c0490bcddb69ceb328c67be2f7cf361_6_kufcee.png";
     const siteName = settings?.siteName || "Indian Renters";
-    const sitePhone = settings?.contactPhone || "+91 9999999999";
+    const whatsapp = whatsappDestination(settings?.contactPhone);
+    const socialLinks = Object.fromEntries(['facebook', 'instagram', 'linkedin'].map(platform => [platform, socialDestination(settings?.socialLinks?.[platform], platform)]));
     const currentYear = new Date().getFullYear();
     const copyrightName = settings?.footerCopyright || "AAA Rental LLP";
 
@@ -70,12 +72,9 @@ const Footer = () => {
             column.links?.some(link => defaultColumn.links.some(defaultLink => defaultLink.href === link.href))
         )
     );
-    const normalizeFooterLink = (link) => ({
-        ...link,
-        href: ({ '/shipping-policy': '/shipping', '/ticket': '/contact', '/reviews': '/#customer-reviews' })[link.href] || link.href,
-    });
     const footerColumns = [configuredColumns[0], ...missingCatalogColumns, ...configuredColumns.slice(1)]
-        .map(column => ({ ...column, links: (column.links || []).map(normalizeFooterLink) }));
+        .filter(Boolean).map(column => ({ ...column, links: (column.links || [])
+            .map(link => ({ ...link, href: footerDestination(link.href) })).filter(link => link.href) }));
     const paymentLogos = (settings?.paymentLogos?.length ? settings.paymentLogos : DEFAULT_PAYMENT_LOGOS);
     const primaryColumn = footerColumns[0];
     const secondaryColumns = footerColumns.slice(1);
@@ -113,18 +112,18 @@ const Footer = () => {
                                 {settings?.footerDescription || "Rent Anything, Anytime, Anywhere"}
                             </p>
                             <div className="flex items-center gap-[5px] pt-1">
-                                <a href={`https://wa.me/${sitePhone.replace(/[^\d]/g, '')}`} className="w-[35px] h-[35px] rounded-full bg-white flex items-center justify-center shrink-0 transition-opacity hover:opacity-70" target="_blank" rel="noopener noreferrer" aria-label="WhatsApp">
+                                {whatsapp && <a href={whatsapp} className="w-[35px] h-[35px] rounded-full bg-white flex items-center justify-center shrink-0 transition-opacity hover:opacity-70" target="_blank" rel="noopener noreferrer" aria-label="WhatsApp">
                                     <img src="/social/whatsapp.svg" alt="WhatsApp" className="w-5 h-5" />
-                                </a>
-                                <a href={settings?.socialLinks?.facebook || "#"} className="w-[35px] h-[35px] rounded-full bg-white flex items-center justify-center shrink-0 transition-opacity hover:opacity-70" aria-label="Facebook">
+                                </a>}
+                                {socialLinks.facebook && <a href={socialLinks.facebook} className="w-[35px] h-[35px] rounded-full bg-white flex items-center justify-center shrink-0 transition-opacity hover:opacity-70" aria-label="Facebook">
                                     <img src="/social/facebook.svg" alt="Facebook" className="w-5 h-5" />
-                                </a>
-                                <a href={settings?.socialLinks?.instagram || "#"} className="w-[35px] h-[35px] rounded-full bg-white flex items-center justify-center shrink-0 transition-opacity hover:opacity-70" aria-label="Instagram">
+                                </a>}
+                                {socialLinks.instagram && <a href={socialLinks.instagram} className="w-[35px] h-[35px] rounded-full bg-white flex items-center justify-center shrink-0 transition-opacity hover:opacity-70" aria-label="Instagram">
                                     <img src="/social/instagram.svg" alt="Instagram" className="w-5 h-5" />
-                                </a>
-                                <a href={settings?.socialLinks?.linkedin || "#"} className="w-[35px] h-[35px] rounded-full bg-white flex items-center justify-center shrink-0 transition-opacity hover:opacity-70" aria-label="LinkedIn">
+                                </a>}
+                                {socialLinks.linkedin && <a href={socialLinks.linkedin} className="w-[35px] h-[35px] rounded-full bg-white flex items-center justify-center shrink-0 transition-opacity hover:opacity-70" aria-label="LinkedIn">
                                     <img src="/social/linkedin.svg" alt="LinkedIn" className="w-5 h-5" />
-                                </a>
+                                </a>}
                             </div>
                         </div>
 
@@ -266,8 +265,7 @@ const Footer = () => {
 
                     {/* Social icons */}
                     <div className="flex flex-row items-center gap-[5px]">
-                        <a
-                            href={`https://wa.me/${sitePhone.replace(/[^\d]/g, '')}`}
+                        {whatsapp && <a href={whatsapp}
                             target="_blank"
                             rel="noopener noreferrer"
                             aria-label="WhatsApp"
@@ -275,31 +273,28 @@ const Footer = () => {
                             style={{ width: '34.9px', height: '34.9px' }}
                         >
                             <img src="/social/whatsapp.svg" alt="WhatsApp" style={{ width: '20px', height: '20px' }} />
-                        </a>
-                        <a
-                            href={settings?.socialLinks?.facebook || '#'}
+                        </a>}
+                        {socialLinks.facebook && <a href={socialLinks.facebook}
                             aria-label="Facebook"
                             className="flex items-center justify-center bg-white rounded-full shrink-0"
                             style={{ width: '34.9px', height: '34.9px' }}
                         >
                             <img src="/social/facebook.svg" alt="Facebook" style={{ width: '20px', height: '20px' }} />
-                        </a>
-                        <a
-                            href={settings?.socialLinks?.instagram || '#'}
+                        </a>}
+                        {socialLinks.instagram && <a href={socialLinks.instagram}
                             aria-label="Instagram"
                             className="flex items-center justify-center bg-white rounded-full shrink-0"
                             style={{ width: '34.9px', height: '34.9px' }}
                         >
                             <img src="/social/instagram.svg" alt="Instagram" style={{ width: '20px', height: '20px' }} />
-                        </a>
-                        <a
-                            href={settings?.socialLinks?.linkedin || '#'}
+                        </a>}
+                        {socialLinks.linkedin && <a href={socialLinks.linkedin}
                             aria-label="LinkedIn"
                             className="flex items-center justify-center bg-white rounded-full shrink-0"
                             style={{ width: '34.9px', height: '34.9px' }}
                         >
                             <img src="/social/linkedin.svg" alt="LinkedIn" style={{ width: '20px', height: '20px' }} />
-                        </a>
+                        </a>}
                     </div>
                 </div>
 

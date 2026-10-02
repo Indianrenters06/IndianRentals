@@ -1,3 +1,4 @@
+import { headers } from 'next/headers';
 import "@fontsource/mona-sans/400.css";
 import "@fontsource/mona-sans/500.css";
 import "@fontsource/mona-sans/600.css";
@@ -16,11 +17,12 @@ export const metadata = {
 // static export phase under React 19. Force dynamic rendering for all routes.
 export const dynamic = "force-dynamic";
 
-export default function RootLayout({ children }) {
+export default async function RootLayout({ children }) {
+  const nonce = (await headers()).get('x-nonce') || undefined;
   return (
     <html lang="en" suppressHydrationWarning>
       <body style={{ fontFamily: '"Mona Sans", sans-serif' }}>
-        <Providers>
+        <Providers nonce={nonce}>
           <div className="relative min-h-screen bg-slate-50 dark:bg-slate-900 overflow-hidden text-slate-800 dark:text-slate-100 transition-colors duration-300">
             {/* Background animated elements */}
             <div className="fixed top-[-10%] left-[-10%] w-[50vw] h-[50vw] rounded-full bg-indigo-600/10 dark:bg-indigo-600/10 blur-[120px] pointer-events-none" />

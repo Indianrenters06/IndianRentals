@@ -1,5 +1,5 @@
 "use client";
-import { cmsUrl } from '@/lib/cmsPreview';
+import { cmsUrl, fetchCmsPage } from '@/lib/cmsPreview';
 import React, { useState, useEffect, useId } from 'react';
 import Image from 'next/image';
 import styles from './FaqSection.module.css';
@@ -38,7 +38,7 @@ const FaqSection = ({ cmsData, limit, pageName }) => {
         if (cmsData) return;
 
         if (pageName === 'homepage') {
-            window.fetch(cmsUrl('homepage'))
+            fetchCmsPage('homepage')
                 .then(res => res.ok ? res.json() : null)
                 .then(data => {
                     setFetchedCms(data);

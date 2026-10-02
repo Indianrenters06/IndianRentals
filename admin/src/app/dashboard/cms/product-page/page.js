@@ -8,6 +8,8 @@ import { BsTruck } from 'react-icons/bs';
 import { FaStar } from 'react-icons/fa';
 import ImageUploader from '../../../../components/ImageUploader';
 
+import { loadCatalogue } from '@/lib/catalogue.mjs';
+
 const API = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
 const getToken = () => typeof window !== 'undefined' ? localStorage.getItem('adminToken') : null;
 
@@ -248,11 +250,7 @@ export default function ProductPageCMS() {
                 setGlobalData({ ...DEFAULTS, ...json });
                 if (selectedProductId === 'GLOBAL') setData({ ...DEFAULTS, ...json });
             }
-            const resProd = await window.fetch(`${API}/api/products?limit=500`);
-            if (resProd.ok) {
-                const prodJson = await resProd.json();
-                setProducts(prodJson.products || []);
-            }
+            setProducts(await loadCatalogue(API, { administrative: true, headers: { Authorization: `Bearer ${getToken()}` } }));
         } catch (e) { console.error(e); }
         finally { setLoading(false); }
     }, [selectedProductId]);

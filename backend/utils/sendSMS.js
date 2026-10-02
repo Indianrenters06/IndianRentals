@@ -34,10 +34,10 @@ const sendSMS = async (options) => {
             },
         });
 
-        console.log('Fast2SMS Response:', response.data);
+        console.log('SMS delivery accepted');
         return response.data;
     } catch (error) {
-        console.error('Fast2SMS Error:', error.response?.data || error.message);
+        console.error('SMS delivery failed');
         // Don't throw if you want to fail gracefully in the controller
         // but typically we might want to know if it failed.
         throw new Error('SMS could not be sent');

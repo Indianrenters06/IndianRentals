@@ -50,58 +50,14 @@ app.use((req, res, next) => {
   if (req.body) stripMongoOperators(req.body);
   next();
 });
-// CORS — allow local dev + deployed frontends
-const allowedOrigins = [
-  // Local dev (hardcoded + from .env)
-  'http://localhost:3000',
-  'http://127.0.0.1:3000',
-  'http://localhost:3001',
-  'http://127.0.0.1:3001',
-  process.env.LOCAL_FRONTEND_URL,   // http://localhost:3000
-  process.env.LOCAL_ADMIN_URL,      // http://localhost:3001
-  // Live deployed (Netlify frontend + Vercel admin)
-  process.env.FRONTEND_URL,         // https://<your-site>.netlify.app
-  process.env.ADMIN_URL,            // https://indian-rentals-vert.vercel.app
-  process.env.FRONTEND_URL_2,       // optional second frontend URL
-].filter(Boolean);
-
-// Regex for this project's Vercel deployments (main + preview branches)
-// Matches: https://indian-rentals<anything>.vercel.app — not every Vercel site,
-// since CORS here allows credentials.
-const VERCEL_PATTERN = /^https:\/\/indian-rentals[a-z0-9-]*\.vercel\.app$/;
-
-// Regex for Netlify deployments (main + preview branches)
-const NETLIFY_PATTERN = /^https:\/\/[a-z0-9-]+\.netlify\.app$/;
-
-// Regex for sslip.io / nip.io IP-based domains (e.g. https://31-97-202-194.sslip.io)
-const SSLIP_PATTERN = /^https?:\/\/[\d-]+\.sslip\.io$/;
-
-// Regex for custom domains passed via EXTRA_ORIGINS env (comma-separated)
-const extraOrigins = (process.env.EXTRA_ORIGINS || '').split(',').map(o => o.trim()).filter(Boolean);
-
-const corsOptions = {
-  origin: (origin, callback) => {
-    if (!origin) return callback(null, true); // curl, Postman, mobile apps
-    if (allowedOrigins.includes(origin)) return callback(null, true);
-    if (extraOrigins.includes(origin)) return callback(null, true);
-    if (VERCEL_PATTERN.test(origin)) return callback(null, true);
-    if (NETLIFY_PATTERN.test(origin)) return callback(null, true);
-    if (SSLIP_PATTERN.test(origin)) return callback(null, true);
-    console.warn(`[CORS] Blocked origin: ${origin}`);
-    callback(new Error(`CORS: Origin ${origin} not allowed`));
-  },
-  credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
-};
-
-app.use(cors(corsOptions));
-// Handle preflight for every route (use regex — bare '*' breaks newer path-to-regexp)
-app.options(/.*/, cors(corsOptions));
+// Credentialed browser access is limited to explicitly configured owned origins.
+const { allowedOrigins, corsOptions, cookieOriginGuard, accessLog } = require('./utils/httpPolicy');
+const origins = allowedOrigins();
+app.use(cors(corsOptions(origins)));
+app.options(/.*/, cors(corsOptions(origins)));
 app.use(cookieParser());
-// Consent/analytics payloads intentionally omit identity. Avoid adding IP,
-// referrer, or user agent back through the ordinary access log for these routes.
-app.use(morgan('combined', { skip:req => req.path.startsWith('/api/privacy/') }));
+app.use(cookieOriginGuard(origins));
+app.use(morgan(accessLog, { skip: req => req.path.startsWith('/api/privacy/') }));
 
 // Serve Static Uploads
 app.use('/uploads', express.static(path.join(__dirname, '/uploads')));

@@ -1,4 +1,5 @@
 'use client';
+import { API } from '@/services/apiConfig';
 import { cmsUrl } from '@/lib/cmsPreview';
 
 import { useState, useEffect } from 'react';
@@ -8,7 +9,7 @@ import { FiArrowUpRight } from "react-icons/fi";
 
 const DEFAULT_TABS = ['View all', 'Short term', 'Long term', 'Production on service', 'Next Tech', 'News'];
 
-const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+
 
 export default function BlogPage() {
     const [posts, setPosts] = useState([]);

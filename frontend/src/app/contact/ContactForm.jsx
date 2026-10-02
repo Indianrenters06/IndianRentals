@@ -1,9 +1,9 @@
 'use client';
+import { API as API } from '@/services/apiConfig';
 import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { CheckIcon, ChevronDownIcon } from '@heroicons/react/24/outline';
 import styles from './page.module.css';
-const API = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
 const empty = { fullName:'',phone:'',email:'',city:'',equipment:'',order:'',message:'',consent:false };
 export default function ContactForm({ content }) {
     const [intent,setIntent] = useState('rental');

@@ -1,10 +1,15 @@
+import { headers } from 'next/headers';
 import "@fontsource/mona-sans/400.css";
 import "@fontsource/mona-sans/500.css";
 import "@fontsource/mona-sans/600.css";
 import "@fontsource/mona-sans/700.css";
 import "@fontsource/mona-sans/800.css";
 import "./globals.css";
-import { SITE_URL, SITE_NAME, SITE_TAGLINE, SITE_DESCRIPTION, DEFAULT_OG_IMAGE } from "@/config/site";
+import { serializeJsonLd } from "@/lib/serializeJsonLd.mjs";
+
+// Per-request script nonces require dynamic HTML; data/static asset caching remains independent.
+export const dynamic = "force-dynamic";
+import { SITE_URL, SITE_NAME, SITE_TAGLINE, SITE_DESCRIPTION, DEFAULT_OG_IMAGE, LOGO_IMAGE } from "@/config/site";
 
 const GA_ID = process.env.NEXT_PUBLIC_GA_ID || ""; // e.g. G-XXXXXXXXXX
 const GSC_TOKEN = process.env.NEXT_PUBLIC_GSC_TOKEN || ""; // Google Search Console HTML-tag token
@@ -62,7 +67,7 @@ const orgJsonLd = {
       "@id": `${SITE_URL}/#organization`,
       name: SITE_NAME,
       url: SITE_URL,
-      logo: DEFAULT_OG_IMAGE,
+      logo: LOGO_IMAGE,
       description: SITE_DESCRIPTION,
     },
     {
@@ -80,15 +85,17 @@ const orgJsonLd = {
   ],
 };
 
-export default function RootLayout({ children }) {
+export default async function RootLayout({ children }) {
+  const nonce = (await headers()).get('x-nonce') || undefined;
   return (
     <html lang="en">
       <body className={`font-sans bg-gray-50 flex flex-col min-h-screen antialiased overflow-x-hidden max-w-full`}>
         <script
+          nonce={nonce}
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(orgJsonLd) }}
+          dangerouslySetInnerHTML={{ __html: serializeJsonLd(orgJsonLd) }}
         />
-        <Providers analyticsId={GA_ID}>
+        <Providers analyticsId={GA_ID} nonce={nonce}>
           <CmsPreviewNotice />
           <ClientLayout>
             {children}

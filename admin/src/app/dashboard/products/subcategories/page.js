@@ -370,7 +370,7 @@ export default function SubcategoriesManagement() {
         setTimeout(() => setToasts((prev) => prev.filter((t) => t.id !== id)), 3500);
     }, []);
 
-    const fetchCategories = async () => {
+    const fetchCategories = useCallback(async () => {
         try {
             const res = await fetch(`${API}/api/categories/admin`, {
                 headers: { Authorization: `Bearer ${getToken()}` },
@@ -379,14 +379,12 @@ export default function SubcategoriesManagement() {
                 const data = await res.json();
                 const cats = Array.isArray(data) ? data : data.categories || [];
                 setCategories(cats);
-                if (cats.length > 0 && !selectedParent) {
-                    setSelectedParent(cats[0]._id);
-                }
+                if (cats.length > 0) setSelectedParent(current => current || cats[0]._id);
             }
         } catch (err) {
             console.error(err);
         }
-    };
+    }, []);
 
     const fetchSubcategories = async (parentId) => {
         if (!parentId) return;
@@ -406,7 +404,7 @@ export default function SubcategoriesManagement() {
         }
     };
 
-    useEffect(() => { fetchCategories(); }, []);
+    useEffect(() => { fetchCategories(); }, [fetchCategories]);
     useEffect(() => { if (selectedParent) fetchSubcategories(selectedParent); }, [selectedParent]);
 
     // Reset to first page whenever the parent changes or a new list loads
@@ -577,7 +575,7 @@ export default function SubcategoriesManagement() {
                 ) : subcategories.length === 0 ? (
                     <div className="text-center py-16 text-slate-400">
                         <Tag size={40} className="mx-auto mb-3 opacity-30" weight="duotone" />
-                        <p>No subcategories yet. Click "Add Subcategory" to get started.</p>
+                        <p>No subcategories yet. Click &quot;Add Subcategory&quot; to get started.</p>
                     </div>
                 ) : (
                     <>

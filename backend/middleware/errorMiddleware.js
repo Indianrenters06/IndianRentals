@@ -1,5 +1,5 @@
 const notFound = (req, res, next) => {
-    const error = new Error(`Not Found - ${req.originalUrl}`);
+    const error = new Error('Resource not found');
     res.status(404);
     next(error);
 };
@@ -26,6 +26,7 @@ const errorHandler = (err, req, res, next) => {
         statusCode = 400;
     }
 
+    if (process.env.NODE_ENV === 'production' && statusCode >= 500) message = 'The request could not be completed. Please retry.';
     res.status(statusCode);
     res.json({
         message,

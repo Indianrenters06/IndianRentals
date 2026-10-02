@@ -4,22 +4,20 @@
 // Required env vars:
 //   CASHFREE_APP_ID      – "AppID" from the Cashfree dashboard
 //   CASHFREE_SECRET_KEY  – "Secret Key" from the Cashfree dashboard
-//   CASHFREE_ENV         – "production" (live) or "sandbox" (test). Defaults to sandbox.
+//   CASHFREE_ENV         – sandbox only during controlled remediation.
 //   CASHFREE_API_VERSION – Cashfree PG API version. Defaults to 2023-08-01.
 
 const ENV = (process.env.CASHFREE_ENV || 'sandbox').toLowerCase();
-
-const IS_PRODUCTION = ENV === 'production' || ENV === 'prod' || ENV === 'live';
 
 const cashfreeConfig = {
     appId: process.env.CASHFREE_APP_ID,
     secretKey: process.env.CASHFREE_SECRET_KEY,
     apiVersion: process.env.CASHFREE_API_VERSION || '2023-08-01',
-    isProduction: IS_PRODUCTION,
+    isProduction: false,
     // Base URL for the Cashfree PG REST API
-    baseUrl: IS_PRODUCTION ? 'https://api.cashfree.com/pg' : 'https://sandbox.cashfree.com/pg',
+    baseUrl: 'https://sandbox.cashfree.com/pg',
     // "mode" value the frontend JS SDK expects
-    mode: IS_PRODUCTION ? 'production' : 'sandbox',
+    mode: 'sandbox',
 };
 
 // Headers required on every authenticated Cashfree API request.
@@ -33,8 +31,13 @@ const cashfreeHeaders = () => ({
 // Throws a clear error if the gateway isn't configured, so failures are
 // obvious instead of surfacing as opaque 401s from Cashfree.
 const assertCashfreeConfigured = () => {
+    if (ENV !== 'sandbox') {
+        const error = new Error('Live Cashfree is disabled. Configure CASHFREE_ENV=sandbox.');
+        error.statusCode = 503; throw error;
+    }
     if (!cashfreeConfig.appId || !cashfreeConfig.secretKey) {
-        throw new Error('Cashfree is not configured — set CASHFREE_APP_ID and CASHFREE_SECRET_KEY in the environment.');
+        const error = new Error('Sandbox payment configuration is unavailable.');
+        error.statusCode = 503; throw error;
     }
 };
 

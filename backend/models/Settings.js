@@ -113,6 +113,13 @@ const settingsSchema = new mongoose.Schema({
     allowRegistrations: { type: Boolean, default: true },
     requireKYC: { type: Boolean, default: true },
 
+    // Server checkout policy. Defaults preserve the existing rent/GST/delivery
+    // rates; refundable deposits are included in the reviewed upfront quote.
+    checkoutPricing: {
+        taxRateBps: { type: Number, default: 1800, min: 0, max: 10000 },
+        deliveryChargePaise: { type: Number, default: 40000, min: 0 },
+    },
+
     // Gateway Keys (Mock)
     paymentGatewaySecret: { type: String, default: '' },
 

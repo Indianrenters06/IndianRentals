@@ -2,7 +2,8 @@
 
 import { useEffect, useId, useRef, useState } from 'react';
 import Image from 'next/image';
-import { cmsUrl } from '@/lib/cmsPreview';
+import { usePathname } from 'next/navigation';
+import { cmsUrl, fetchCmsPage } from '@/lib/cmsPreview';
 import { getTestimonials } from '@/services/testimonialService';
 import styles from './Testimonials.module.css';
 
@@ -47,6 +48,9 @@ function ReviewCard({ review, index }) {
 }
 
 export default function Testimonials({ overrideBg, overridePadding, overrideHeight, titleOverride, subtitleOverride, sectionId = 'customer-reviews' }) {
+    const pathname = usePathname();
+    const allowedPage = ['/', '/about', '/rental-process'].includes(pathname)
+        || /^\/products\/[^/]+$/.test(pathname || '');
     const headingId = useId();
     const reviewsId = useId();
     const [reviews, setReviews] = useState([]);
@@ -58,10 +62,11 @@ export default function Testimonials({ overrideBg, overridePadding, overrideHeig
     const [overflows, setOverflows] = useState(false);
 
     useEffect(() => {
+        if (!allowedPage) return;
         let active = true;
         Promise.allSettled([
             getTestimonials(),
-            fetch(cmsUrl('homepage'), { cache: 'no-store' }).then(res => {
+            fetchCmsPage('homepage', { cache: 'no-store' }).then(res => {
                 if (!res.ok) throw new Error('Section settings unavailable');
                 return res.json();
             }),
@@ -74,7 +79,7 @@ export default function Testimonials({ overrideBg, overridePadding, overrideHeig
             } else setStatus('error');
         });
         return () => { active = false; };
-    }, [reload]);
+    }, [reload, allowedPage]);
 
     useEffect(() => {
         const preview = previewRef.current;
@@ -87,7 +92,7 @@ export default function Testimonials({ overrideBg, overridePadding, overrideHeig
         return () => observer.disconnect();
     }, [reviews, showAll, cms?.testimonialsEnabled]);
 
-    if (cms?.testimonialsEnabled === false) return null;
+    if (!allowedPage || cms?.testimonialsEnabled === false) return null;
 
     const rating = Number(cms?.testimonialGoogleRating);
     const hasRating = rating > 0 && rating <= 5 && Boolean(cms?.testimonialGoogleReviewCount?.trim());

@@ -1,17 +1,13 @@
 "use client";
-import React, { useEffect } from "react";
+import React, { useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import AuthCard from "./AuthCard";
+import useModalFocus from "@/lib/useModalFocus";
 
 // Navbar sign-in pop-up: the shared Figma AuthCard on a dimmed backdrop.
 const AuthModal = ({ isOpen, onClose, initialView = "login" }) => {
-    // Close on Escape
-    useEffect(() => {
-        if (!isOpen) return;
-        const onKey = (e) => e.key === "Escape" && onClose();
-        window.addEventListener("keydown", onKey);
-        return () => window.removeEventListener("keydown", onKey);
-    }, [isOpen, onClose]);
+    const panelRef = useRef(null);
+    useModalFocus({ isOpen, onClose, panelRef });
 
     return (
         <AnimatePresence>
@@ -29,7 +25,9 @@ const AuthModal = ({ isOpen, onClose, initialView = "login" }) => {
                             initial={{ opacity: 0, scale: 0.95, y: 20 }}
                             animate={{ opacity: 1, scale: 1, y: 0 }}
                             exit={{ opacity: 0, scale: 0.95, y: 20 }}
-                            className="pointer-events-auto w-full flex justify-center"
+                            ref={panelRef}
+                            tabIndex={-1}
+                            className="pointer-events-auto w-full max-h-[calc(100dvh-32px)] overflow-y-auto overscroll-contain flex justify-center"
                             role="dialog"
                             aria-modal="true"
                             aria-label="Sign in or create an account"

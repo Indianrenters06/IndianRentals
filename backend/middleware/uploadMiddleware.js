@@ -14,9 +14,9 @@ cloudinary.config({
 const storage = multer.memoryStorage();
 
 function checkFileType(file, cb) {
-    const filetypes = /jpg|jpeg|png|pdf/;
+    const filetypes = /^\.(jpg|jpeg|png|pdf)$/;
     const extname = filetypes.test(path.extname(file.originalname).toLowerCase());
-    const mimetype = /image\/(jpeg|jpg|png)|application\/pdf/.test(file.mimetype);
+    const mimetype = /^(image\/(jpeg|jpg|png)|application\/pdf)$/.test(file.mimetype);
 
     if (extname && mimetype) {
         return cb(null, true);
@@ -36,9 +36,9 @@ const upload = multer({
 /**
  * Upload a single file buffer to Cloudinary.
  * Returns the secure_url string.
- * `folder` defaults to the KYC folder so existing callers are unaffected.
+ * Public avatar uploader. KYC uses services/kycAssets instead.
  */
-const uploadToCloudinary = (fileBuffer, fieldName, folder = 'indian-rentals/kyc') => {
+const uploadToCloudinary = (fileBuffer, fieldName, folder = 'indian-rentals/avatars') => {
     return new Promise((resolve, reject) => {
         const stream = cloudinary.uploader.upload_stream(
             {

@@ -1,3 +1,5 @@
+import { headers } from 'next/headers';
+import { publicMetadata } from '@/lib/publicMetadata';
 import { notFound } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -23,16 +25,11 @@ export async function generateMetadata({ params }) {
     const slug = (await params).city.toLowerCase();
     const data = LOCATIONS[slug];
     if (!data) return {};
-    return {
-        title: { absolute: `Tech Rentals in ${data.name} | ${SITE_NAME}` },
-        description: description(data.name),
-        alternates: { canonical: `${SITE_URL}/locations/${slug}` },
-        openGraph: { title: `Tech Rentals in ${data.name} | ${SITE_NAME}`, description: description(data.name),
-            url: `${SITE_URL}/locations/${slug}`,
-            images: [{ url: `${SITE_URL}/images/cities/${slug}.png`, alt: `${data.name} city illustration` }] },
-    };
+    return publicMetadata({ title: `Tech Rentals in ${data.name}`, description: description(data.name),
+        path: `/locations/${slug}`, image: `${SITE_URL}/images/cities/${slug}.png` });
 }
 export default async function LocationPage({ params }) {
+    const nonce = (await headers()).get('x-nonce') || undefined;
     const slug = (await params).city.toLowerCase();
     const data = LOCATIONS[slug];
     if (!data) notFound();
@@ -49,7 +46,7 @@ export default async function LocationPage({ params }) {
         } : { provider: { '@type': 'Organization', name: SITE_NAME, telephone: phoneHref.slice(4), email: LOCATION_SUPPORT.email }, areaServed: { '@type': 'City', name: data.name } }),
     };
     return <div className={styles.page}>
-        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, '\\u003c') }} />
+        <script nonce={nonce} type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, '\\u003c') }} />
         <div className={styles.heroBand}>
             <div className={styles.container}>
                 <nav aria-label="Breadcrumb" className={styles.breadcrumbs}>

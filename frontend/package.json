@@ -6,8 +6,9 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint",
-    "preview": "node scripts/preview.mjs"
+    "lint": "eslint src scripts next.config.mjs eslint.config.mjs",
+    "preview": "node scripts/preview.mjs",
+    "test": "node --test tests/*.test.mjs"
   },
   "dependencies": {
     "@fontsource/mona-sans": "^5.2.8",

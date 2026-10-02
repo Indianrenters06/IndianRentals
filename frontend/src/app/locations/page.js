@@ -1,13 +1,15 @@
+import { publicMetadata } from '@/lib/publicMetadata';
 import Link from "next/link";
 import Image from "next/image";
 import { SITE_URL, SITE_NAME } from "@/config/site";
 
-export const metadata = {
+const pageMetadata = {
     title: `Rental Locations Across India | ${SITE_NAME}`,
     description:
         "IndianRenters delivers tech equipment rentals — laptops, MacBooks, cameras, AV gear, and servers — across 8+ major Indian cities. Find your nearest location.",
     alternates: { canonical: `${SITE_URL}/locations` },
 };
+export const metadata = publicMetadata({ ...pageMetadata, path: '/locations' });
 
 const CITIES = [
     { slug: "delhi",     name: "Delhi",     state: "Delhi",         image: "https://images.unsplash.com/photo-1587474260584-136574528ed5?w=600&q=80" },

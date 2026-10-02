@@ -6,6 +6,9 @@ const {
     cashfreeWebhook,
 } = require('../controllers/paymentController');
 const { protect } = require('../middleware/authMiddleware');
+const { createStagedPayment, verifyStagedPayment } = require('../controllers/stagedCheckoutController');
+router.post('/staged/order', protect, createStagedPayment);
+router.post('/staged/verify', protect, verifyStagedPayment);
 
 // Create a Cashfree order for a rental the logged-in user owns.
 router.post('/cashfree/order', protect, createCashfreeOrder);

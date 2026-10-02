@@ -1,3 +1,5 @@
+import { API } from './apiConfig';
+import { revokeSession } from '../lib/revokeSession.mjs';
 // Single source of truth for ending a session. Every logout path (navbar menu,
 // profile sidebar, the 401 interceptor) goes through this so they all clear the
 // same keys and notify the same listeners.
@@ -16,12 +18,23 @@ export const clearSession = () => {
 // Full logout: clear the session and leave the page. A hard navigation is used
 // on purpose so in-memory client state (redux, cached profile data) is dropped
 // too, instead of lingering on a soft router.push.
+let ending;
 export const logout = ({ redirectTo = '/' } = {}) => {
     if (typeof window === 'undefined') return;
-
-    clearSession();
-
-    if (redirectTo) window.location.href = redirectTo;
+    if (ending) return ending;
+    ending = (async () => {
+        try {
+            const token = JSON.parse(localStorage.getItem('userInfo') || 'null')?.token;
+            await revokeSession(API, token);
+            clearSession();
+            if (redirectTo) window.location.href = redirectTo;
+            return true;
+        } catch {
+            window.dispatchEvent(new CustomEvent('sessionEndError', { detail: 'Could not end your sessions. Please try signing out again.' }));
+            return false;
+        } finally { ending = null; }
+    })();
+    return ending;
 };
 
 export default logout;

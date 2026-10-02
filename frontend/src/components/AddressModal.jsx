@@ -1,5 +1,6 @@
 'use client';
 
+import { lockBodyScroll } from '../lib/bodyScrollLock.mjs';
 import { useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
 import { House, MapPin, X } from '@phosphor-icons/react';
@@ -32,11 +33,10 @@ function AddressForm({ onClose, onSave, initialData, isSubmitting = false, saveE
     const firstFieldRef = useRef(null);
     useEffect(() => {
         const previousFocus = document.activeElement;
-        const previousOverflow = document.body.style.overflow;
-        document.body.style.overflow = 'hidden';
+        const unlockScroll = lockBodyScroll();
         firstFieldRef.current?.focus();
         return () => {
-            document.body.style.overflow = previousOverflow;
+            unlockScroll();
             previousFocus?.focus?.();
         };
     }, []);

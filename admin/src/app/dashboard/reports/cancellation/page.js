@@ -20,16 +20,19 @@ const STATUS_COLORS = {
 
 export default function CancellationReport() {
     const [data, setData] = useState(null);
-    const [loading, setLoading] = useState(true);
+    const [loadedYear, setLoadedYear] = useState(null);
     const [year, setYear] = useState(String(new Date().getFullYear()));
 
+    const loading = loadedYear !== year;
+
     useEffect(() => {
-        setLoading(true);
+        const controller = new AbortController();
         const token = localStorage.getItem('adminToken');
-        fetch(`${API}/api/reports/cancellations?year=${year}`, { headers: { Authorization: `Bearer ${token}` } })
+        fetch(`${API}/api/reports/cancellations?year=${year}`, { headers: { Authorization: `Bearer ${token}` }, signal: controller.signal })
             .then(r => r.ok ? r.json() : null)
-            .then(d => { setData(d); setLoading(false); })
-            .catch(() => setLoading(false));
+            .then(d => { if (!controller.signal.aborted) { setData(d); setLoadedYear(year); } })
+            .catch(() => { if (!controller.signal.aborted) { setData(null); setLoadedYear(year); } });
+        return () => controller.abort();
     }, [year]);
 
     const kpis = data ? [

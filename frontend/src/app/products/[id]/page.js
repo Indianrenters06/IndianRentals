@@ -1,5 +1,5 @@
 "use client";
-import { cmsUrl } from '@/lib/cmsPreview';
+import { fetchCmsPage } from '@/lib/cmsPreview';
 import { categoryHref } from '@/lib/categoryRoutes';
 import { isProductOutOfStock } from '@/lib/productAvailability';
 import React, { useState, useEffect, useMemo } from 'react';
@@ -9,7 +9,8 @@ import { useRouter, useParams } from 'next/navigation';
 import { FaHeart, FaShareAlt, FaMinus, FaPlus, FaShoppingCart, FaStar, FaChevronDown, FaChevronUp } from 'react-icons/fa';
 import { BsTruck, BsBoxSeam, BsCreditCard } from 'react-icons/bs';
 
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
+import { toggleWishlist, selectIsWishlisted } from '@/redux/features/wishlistSlice';
 import { addToCart } from '../../../redux/features/cartSlice';
 import { getProductById } from '../../../services/productService';
 import { checkServiceability } from '../../../services/serviceabilityService';
@@ -41,6 +42,9 @@ export default function ProductDetailPage() {
     // Product Data State
     const [product, setProduct] = useState(null);
     const [loading, setLoading] = useState(true);
+    const isWishlisted = useSelector(selectIsWishlisted(product?._id));
+    const [shareNotice, setShareNotice] = useState('');
+    const [desktopImageIndex, setDesktopImageIndex] = useState(0);
     const [error, setError] = useState(null);
 
     // UI States
@@ -89,8 +93,7 @@ export default function ProductDetailPage() {
     useEffect(() => {
         const fetchLayout = async () => {
             try {
-                const API = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
-                const cmsRes = await window.fetch(cmsUrl('product-page'));
+                const cmsRes = await fetchCmsPage('product-page');
                 if (cmsRes.ok) setGlobalLayout(await cmsRes.json());
             } catch (e) {
                 console.error("Failed to load product page layout", e);
@@ -179,7 +182,24 @@ export default function ProductDetailPage() {
             sourceUrl: `/products/${product._id}`,
         };
         dispatch(addToCart(item));
-        router.push('/cart');
+        router.push('/checkout/staged?new=1');
+    };
+
+    const handleWishlist = () => {
+        if (!product) return;
+        dispatch(toggleWishlist({ ...product, id: product._id, image: product.images?.[0], rentPrice: product.rentalPrice }));
+    };
+    const handleShare = async () => {
+        try {
+            const url = `${window.location.origin}/products/${product._id}`;
+            if (navigator.share) await navigator.share({ title: product.name, url });
+            else {
+                await navigator.clipboard.writeText(url);
+                setShareNotice('Product link copied.');
+            }
+        } catch (error) {
+            if (error.name !== 'AbortError') setShareNotice('Unable to share. Copy this page address from your browser.');
+        }
     };
 
     const handleCheckPincode = async () => {
@@ -236,6 +256,8 @@ export default function ProductDetailPage() {
     return (
         <div className="w-full flex flex-col items-center bg-white font-sans text-[#1D1D1F] tracking-tight antialiased">
 
+            <p className="sr-only" role="status" aria-live="polite">{shareNotice}</p>
+
             {/* ══════════════════════════════════════════════
                 MOBILE LAYOUT — hidden on md+ screens
             ══════════════════════════════════════════════ */}
@@ -257,19 +279,19 @@ export default function ProductDetailPage() {
                     {/* Image Card */}
                     <div className={styles.mobileGallery} style={{ background: '#fff', border: '1px solid #EEE', borderRadius: '16px', aspectRatio: '1 / 1', width: '100%', marginInline: 'auto', position: 'relative', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                         {/* Discount Badge */}
-                        {tenureDiscount > 0 && <div style={{ position: 'absolute', top: '13px', left: '14px', background: '#ED2115', borderRadius: '27px', padding: '4px 14px', zIndex: 10, display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0px 3px 2px rgba(120,120,120,0.05), 0px 1px 1px rgba(120,120,120,0.09)' }}>
+                        {tenureDiscount > 0 && <div style={{ position: 'absolute', top: '13px', left: '14px', background: '#d9231a', borderRadius: '27px', padding: '4px 14px', zIndex: 10, display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0px 3px 2px rgba(120,120,120,0.05), 0px 1px 1px rgba(120,120,120,0.09)' }}>
                             <span style={{ fontFamily: "'Mona Sans', sans-serif", fontWeight: 600, fontSize: '12px', lineHeight: '1.2', color: '#FFF2F1', letterSpacing: '-0.48px', whiteSpace: 'nowrap' }}>
                                 {tenureDiscount}% off monthly rent
                             </span>
                         </div>}
                         {/* Action Icons */}
                         <div style={{ position: 'absolute', top: '10px', right: '10px', display: 'flex', flexDirection: 'column', gap: '8px', zIndex: 10 }}>
-                            <div style={{ width: '24px', height: '24px', background: '#EEE', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                <Heart size={14} weight="regular" color="#333" />
-                            </div>
-                            <div style={{ width: '24px', height: '24px', background: '#EEE', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                <ExportIcon size={14} color="#333" />
-                            </div>
+                            {on('Wishlist') && <button type="button" className={styles.galleryAction} onClick={handleWishlist} aria-label={isWishlisted ? `Remove ${product.name} from wishlist` : `Save ${product.name} to wishlist`} aria-pressed={isWishlisted}>
+                                <Heart size={20} weight={isWishlisted ? 'fill' : 'regular'} aria-hidden="true" />
+                            </button>}
+                            {on('Share') && <button type="button" className={styles.galleryAction} onClick={handleShare} aria-label={`Share ${product.name}`}>
+                                <ExportIcon size={20} aria-hidden="true" />
+                            </button>}
                         </div>
                         {/* Main Image */}
                         <div style={{ position: 'relative', width: '100%', height: '100%' }}>
@@ -307,15 +329,15 @@ export default function ProductDetailPage() {
                                 <div style={{ display: 'flex', gap: '4px', alignItems: 'center', background: '#FFF3D3', border: '1px solid #FFE485', borderRadius: '8px', padding: '4px 6px' }}>
                                     <div style={{ display: 'flex', gap: '2px' }}>
                                         {[1, 2, 3, 4, 5].map(s => (
-                                            <StarIcon key={s} style={{ width: '16px', height: '16px', color: s <= Math.round(product.rating || 4.5) ? '#FF920A' : '#e5e7eb' }} />
+                                            <StarIcon key={s} style={{ width: '16px', height: '16px', color: s <= Math.round(product.rating ?? 0) ? '#FF920A' : '#e5e7eb' }} />
                                         ))}
                                     </div>
                                     <span style={{ fontFamily: "'Mona Sans', sans-serif", fontWeight: 500, fontSize: '11px', color: '#333', letterSpacing: '-0.2px', whiteSpace: 'nowrap' }}>
-                                        {product.rating || '4.5'} ({product.numReviews || 12})
+                                        {product.rating ?? 0} ({product.numReviews ?? 0})
                                     </span>
                                 </div>
                                 {/* Delivery */}
-                                {!outOfStock && <div style={{ display: 'flex', gap: '4px', alignItems: 'center', background: '#00B505', borderRadius: '8px', padding: '4px 6px' }}>
+                                {!outOfStock && <div style={{ display: 'flex', gap: '4px', alignItems: 'center', background: '#008004', borderRadius: '8px', padding: '4px 6px' }}>
                                     <BsTruck size={14} color="white" />
                                     <span style={{ fontFamily: "'Mona Sans', sans-serif", fontWeight: 500, fontSize: '12px', color: '#fff', letterSpacing: '-0.48px', whiteSpace: 'nowrap' }}>
                                         {product.deliveryTime || '2-4 days'}
@@ -333,7 +355,7 @@ export default function ProductDetailPage() {
                         {/* Price row */}
                             <div style={{ display: 'flex', minHeight: '52px', borderBottom: '1px solid #E2E2E2' }}>
                             <div style={{ flex: 1, display: 'flex', alignItems: 'center', gap: '4px', padding: '0 10px' }}>
-                                <span style={{ fontFamily: "'Mona Sans', sans-serif", fontWeight: 600, fontSize: '20px', lineHeight: '26px', letterSpacing: '-0.8px', color: '#ed2115' }}>
+                                <span style={{ fontFamily: "'Mona Sans', sans-serif", fontWeight: 600, fontSize: '20px', lineHeight: '26px', letterSpacing: '-0.8px', color: '#d9231a' }}>
                                     ₹{currentPlan.price}
                                 </span>
                                 <span style={{ fontFamily: "'Mona Sans', sans-serif", fontWeight: 500, fontSize: '12px', color: '#757575', letterSpacing: '-0.2px' }}>/mo</span>
@@ -357,9 +379,9 @@ export default function ProductDetailPage() {
 
                     {/* What's included */}
                     {on('Benefits') && <div className={styles.benefitsSection}>
-                        <h3 style={{ fontFamily: "'Mona Sans', sans-serif", fontWeight: 600, fontSize: '12px', color: '#1F1F1F', letterSpacing: '-0.4px', margin: 0 }}>
+                        <h2 style={{ fontFamily: "'Mona Sans', sans-serif", fontWeight: 600, fontSize: '12px', color: '#1F1F1F', letterSpacing: '-0.4px', margin: 0 }}>
                             {cms('BenefitsHeading', "What's included in your plan")}
-                        </h3>
+                        </h2>
                         <div id="mobile-product-benefits" className={styles.benefitGrid}>
                             {benefitItems.map((text, i) => {
                                 const Icon = benefitIcon(text);
@@ -473,6 +495,8 @@ export default function ProductDetailPage() {
                     </div>}
                 </div>
 
+                {on('RentVsBuy') && <SimpleRentComparison onChooseTerm={on('Compare') ? () => setIsCompareOpen(true) : undefined} />}
+
                 {on('Testimonials') && (
                     <Testimonials
                         sectionId="customer-reviews-mobile"
@@ -481,17 +505,6 @@ export default function ProductDetailPage() {
                     />
                 )}
 
-                {/* ── Best Rented Products (Mobile) ── */}
-                {on('Related') && (
-                    <BestRentedProducts
-                        customProducts={product.pageLayout?.relatedProducts?.length > 0 ? product.pageLayout.relatedProducts : null}
-                        titleOverride={cms('RelatedHeading', null)}
-                        productIdsOverride={pageLayout?.productPageGlobalRelatedIds || null}
-                    />
-                )}
-
-                {on('RentVsBuy') && <SimpleRentComparison onChooseTerm={on('Compare') ? () => setIsCompareOpen(true) : undefined} />}
-
                 {/* ── FAQ (Mobile) ── */}
                 {on('Faq') && (
                     product.faqs && product.faqs.length > 0 ? (
@@ -499,6 +512,13 @@ export default function ProductDetailPage() {
                     ) : (
                         <FaqSection limit={5} />
                     )
+                )}
+                {on('Related') && (
+                    <BestRentedProducts
+                        customProducts={product.pageLayout?.relatedProducts?.length > 0 ? product.pageLayout.relatedProducts : null}
+                        titleOverride={cms('RelatedHeading', null)}
+                        productIdsOverride={pageLayout?.productPageGlobalRelatedIds || null}
+                    />
                 )}
             </div>
             {/* ── END MOBILE ── */}
@@ -509,7 +529,6 @@ export default function ProductDetailPage() {
             <div className="hidden md:flex w-full flex-col items-center">
                 <div
                     style={{
-                        maxWidth: '1440px',
                         width: '100%',
                         paddingTop: '40px',
                         paddingBottom: '40px',
@@ -539,7 +558,7 @@ export default function ProductDetailPage() {
                         </div>
                     )}
 
-                    <main className="w-full max-w-[1264px] mx-auto px-4 md:px-8">
+                    <div className="w-full max-w-[1264px] mx-auto px-4 md:px-8">
                         <div
                             className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_536px] items-start max-w-[560px] lg:max-w-none mx-auto"
                             style={{
@@ -582,13 +601,13 @@ export default function ProductDetailPage() {
                                         }}
                                     >
                                         {on('Wishlist') && (
-                                            <button className="flex items-center justify-center rounded-full transition-colors border border-transparent hover:border-gray-200"
+                                            <button type="button" onClick={handleWishlist} aria-label={isWishlisted ? `Remove ${product.name} from wishlist` : `Save ${product.name} to wishlist`} aria-pressed={isWishlisted} className="flex items-center justify-center rounded-full transition-colors border border-transparent hover:border-gray-200"
                                                 style={{ width: '34px', height: '34px', background: 'hsla(0, 0%, 93%, 1)', color: 'hsla(0, 0%, 16%, 1)' }}>
-                                                <Heart size={20} weight="regular" />
+                                                <Heart size={20} weight={isWishlisted ? 'fill' : 'regular'} aria-hidden="true" />
                                             </button>
                                         )}
                                         {on('Share') && (
-                                            <button className="flex items-center justify-center rounded-full transition-colors border border-transparent hover:border-gray-200"
+                                            <button type="button" onClick={handleShare} aria-label={`Share ${product.name}`} className="flex items-center justify-center rounded-full transition-colors border border-transparent hover:border-gray-200"
                                                 style={{ width: '34px', height: '34px', background: 'hsla(0, 0%, 93%, 1)', color: 'hsla(0, 0%, 16%, 1)' }}>
                                                 <ExportIcon size={20} />
                                             </button>
@@ -597,6 +616,7 @@ export default function ProductDetailPage() {
 
                                     <Swiper
                                         onSwiper={setGallerySwiper}
+                                        onSlideChange={swiper => setDesktopImageIndex(swiper.realIndex)}
                                         style={{
                                             width: "100%",
                                             height: "100%"
@@ -653,9 +673,9 @@ export default function ProductDetailPage() {
                                         >
                                             {(product.images && product.images.length > 0 ? product.images : [mainImage]).map((img, i) => (
                                                 <SwiperSlide key={i}>
-                                                    <div className="w-full aspect-square bg-white border border-[#EDEDED] rounded-xl cursor-pointer transition-all hover:border-gray-400 overflow-hidden relative">
-                                                        <Image src={img} alt={`Thumbnail ${i + 1} of ${product.name}`} fill className="object-cover" />
-                                                    </div>
+                                                    <button type="button" aria-label={`Show image ${i + 1} of ${product.name}`} aria-pressed={desktopImageIndex === i} onClick={() => gallerySwiper?.slideToLoop(i)} className={`w-full aspect-square bg-white border border-[#EDEDED] rounded-xl cursor-pointer transition-all hover:border-gray-400 overflow-hidden relative ${styles.galleryThumbnail}`}>
+                                                        <Image src={img} alt="" fill className="object-cover" />
+                                                    </button>
                                                 </SwiperSlide>
                                             ))}
                                         </Swiper>
@@ -740,15 +760,15 @@ export default function ProductDetailPage() {
                                                                 width: '13.21px',
                                                                 height: '12.65px',
                                                                 color: 'var(--color-orange-orange-500, hsla(33, 100%, 52%, 1))',
-                                                                opacity: s <= Math.round(product.rating || 4.5) ? 1 : 0.3
+                                                                opacity: s <= Math.round(product.rating ?? 0) ? 1 : 0.3
                                                             }}
                                                         />
                                                     ))}
                                                 </div>
-                                                <span className="text-[12px] font-medium text-[#333333]">{product.rating || "4.5"} ({product.numReviews || 12})</span>
+                                                <span className="text-[12px] font-medium text-[#333333]">{product.rating ?? 0} ({product.numReviews ?? 0})</span>
                                             </div>
                                             {/* Delivery Badge — always visible */}
-                                            {!outOfStock && <div className="bg-[#00b505] text-white text-[12px] font-medium px-2 py-0.5 rounded-[8px] flex items-center justify-center gap-1.5 h-full whitespace-nowrap">
+                                            {!outOfStock && <div className="bg-[#008004] text-white text-[12px] font-medium px-2 py-0.5 rounded-[8px] flex items-center justify-center gap-1.5 h-full whitespace-nowrap">
                                                 <BsTruck size={13} className="stroke-[0.5]" />
                                                 <span className="mt-[1px]">{product.deliveryTime || cms('DeliveryText', '2-4 days')}</span>
                                             </div>}
@@ -771,15 +791,15 @@ export default function ProductDetailPage() {
                                                 className="flex items-center"
                                                 style={{
                                                     width: '100%',
-                                                    height: '20px',
-                                                    justifyContent: 'space-between',
+                                                    minHeight: '20px',
+                                                    justifyContent: 'space-between', gap: '12px',
                                                     opacity: 1
                                                 }}
                                             >
-                                                <h3
+                                                <h2
                                                     style={{
-                                                        width: '216px',
-                                                        height: '20px',
+                                                        flex: 1, minWidth: 0,
+                                                        minHeight: '20px',
                                                         fontFamily: '"Mona Sans", sans-serif',
                                                         fontWeight: 500,
                                                         fontSize: 'var(--font-size-2, 14px)',
@@ -788,7 +808,7 @@ export default function ProductDetailPage() {
                                                         color: 'var(--color-grey-grey-800, hsla(0, 0%, 12%, 1))',
                                                         opacity: 1,
                                                         margin: 0,
-                                                        whiteSpace: 'nowrap'
+                                                        whiteSpace: 'normal'
                                                     }}
                                                 >
                                                     <span
@@ -802,7 +822,7 @@ export default function ProductDetailPage() {
                                                     >
                                                         {cms('TenureSliderLabel', 'Select your minimum rental period')}
                                                     </span>
-                                                </h3>
+                                                </h2>
                                                 <span className="text-[16px] font-semibold text-[#1f1f1f] tracking-[-0.4px]">{`${duration} ${monthWord(duration)}`}</span>
                                             </div>
 
@@ -969,7 +989,7 @@ export default function ProductDetailPage() {
                                             >
                                                 {/* Mobile: simplified price */}
                                                 <div className="flex lg:hidden items-baseline gap-1 flex-wrap">
-                                                    <span style={{ fontFamily: '"Mona Sans", sans-serif', fontWeight: 600, fontSize: '22px', lineHeight: 1, letterSpacing: '-0.8px', color: 'hsla(3, 86%, 51%, 1)' }}>
+                                                    <span style={{ fontFamily: '"Mona Sans", sans-serif', fontWeight: 600, fontSize: '22px', lineHeight: 1, letterSpacing: '-0.8px', color: '#d9231a' }}>
                                                         ₹{currentPlan.price * quantity}
                                                     </span>
                                                     <span style={{ fontFamily: 'Manrope, sans-serif', fontWeight: 400, fontSize: '13px', color: 'hsla(0, 0%, 46%, 1)', whiteSpace: 'nowrap' }}>
@@ -980,7 +1000,7 @@ export default function ProductDetailPage() {
                                                 {/* Desktop: price + MRP + discount — single inline row (matches Figma) */}
                                                 <div className="hidden lg:flex items-center gap-[20px]">
                                                     <div className="flex items-center gap-1">
-                                                        <span style={{ fontFamily: '"Mona Sans", sans-serif', fontWeight: 600, fontSize: '27px', lineHeight: 1, letterSpacing: '-0.8px', color: '#ed2115' }}>
+                                                        <span style={{ fontFamily: '"Mona Sans", sans-serif', fontWeight: 600, fontSize: '27px', lineHeight: 1, letterSpacing: '-0.8px', color: '#d9231a' }}>
                                                             ₹{currentPlan.price * quantity}
                                                         </span>
                                                         <span style={{ fontFamily: 'Manrope, sans-serif', fontWeight: 400, fontSize: '16px', lineHeight: 1, letterSpacing: '-0.04em', color: '#757575' }}>
@@ -1047,7 +1067,7 @@ export default function ProductDetailPage() {
                                         }}
                                     >
                                         <div style={{ height: '16px', display: 'flex', alignItems: 'center' }}>
-                                            <h4
+                                            <h2
                                                 className="px-1"
                                                 style={{
                                                     fontFamily: '"Mona Sans", sans-serif',
@@ -1060,7 +1080,7 @@ export default function ProductDetailPage() {
                                                 }}
                                             >
                                                 {cms('BenefitsHeading', 'What’s included in your plan')}
-                                            </h4>
+                                            </h2>
                                         </div>
 
                                         <div id="desktop-product-benefits" className={styles.benefitGrid}>
@@ -1231,9 +1251,9 @@ export default function ProductDetailPage() {
                                             <div className={styles.specGrid}>
                                                 {specRows.map((item, idx) => (
                                                     <div key={idx} style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                                                        <h4 style={{ fontFamily: '"Mona Sans", sans-serif', fontWeight: 700, fontSize: '12px', lineHeight: '16px', letterSpacing: '0.05em', color: '#000', textTransform: 'uppercase' }}>
+                                                        <div style={{ fontFamily: '"Mona Sans", sans-serif', fontWeight: 700, fontSize: '12px', lineHeight: '16px', letterSpacing: '0.05em', color: '#000', textTransform: 'uppercase' }}>
                                                             {item.label}
-                                                        </h4>
+                                                        </div>
                                                         <p style={{ fontFamily: '"Mona Sans", sans-serif', fontWeight: 400, fontSize: '14px', lineHeight: '1.5', letterSpacing: '-0.01em', color: 'hsla(0, 0%, 12%, 1)' }}>
                                                             {item.value}
                                                         </p>
@@ -1260,8 +1280,10 @@ export default function ProductDetailPage() {
                                 </div>
                             </div>
                         )}
-                    </main>
+                    </div>
                 </div>
+
+                {on('RentVsBuy') && <SimpleRentComparison onChooseTerm={on('Compare') ? () => setIsCompareOpen(true) : undefined} />}
 
                 {on('Testimonials') && (
                     <div className="w-full">
@@ -1271,16 +1293,6 @@ export default function ProductDetailPage() {
                         />
                     </div>
                 )}
-
-                {on('Related') && (
-                    <BestRentedProducts
-                        customProducts={product.pageLayout?.relatedProducts?.length > 0 ? product.pageLayout.relatedProducts : null}
-                        titleOverride={cms('RelatedHeading', null)}
-                        productIdsOverride={pageLayout?.productPageGlobalRelatedIds || null}
-                    />
-                )}
-
-                {on('RentVsBuy') && <SimpleRentComparison onChooseTerm={on('Compare') ? () => setIsCompareOpen(true) : undefined} />}
 
                 {on('Faq') && (
                     product.faqs && product.faqs.length > 0 ? (
@@ -1294,6 +1306,13 @@ export default function ProductDetailPage() {
                     )
                 )}
 
+                {on('Related') && (
+                    <BestRentedProducts
+                        customProducts={product.pageLayout?.relatedProducts?.length > 0 ? product.pageLayout.relatedProducts : null}
+                        titleOverride={cms('RelatedHeading', null)}
+                        productIdsOverride={pageLayout?.productPageGlobalRelatedIds || null}
+                    />
+                )}
             </div>{/* ── END DESKTOP ── */}
 
             <CompareTenures

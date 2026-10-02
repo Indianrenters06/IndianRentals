@@ -4,15 +4,15 @@
 .imageLink { display: block; position: absolute; inset: 0; }
 .productImage { object-fit: cover; transition: transform 380ms cubic-bezier(.2,.8,.2,1); }
 .badges { position: absolute; left: 13px; top: 14px; right: 54px; display: flex; flex-wrap: wrap; gap: 4px; pointer-events: none; }
-.badges > span { border-radius: 9999px; padding: 4px 10px; background: var(--color-red-600); color: white; font-size: 12px; line-height: 16px; font-weight: 600; box-shadow: 0 2px 3px #78787817; }
-.badges > .new { background: var(--color-green-price); }
+.badges > span { border-radius: 9999px; padding: 4px 10px; background: #d9231a; color: white; font-size: 12px; line-height: 16px; font-weight: 600; box-shadow: 0 2px 3px #78787817; }
+.badges > .new { background: #008004; }
 .badges > .unavailableBadge { background: var(--color-grey-50); border: 1px solid var(--color-grey-200); color: var(--color-grey-800); box-shadow: none; }
 .unavailable .productImage { filter: saturate(.45); opacity: .78; }
 .unavailable .price strong { color: var(--color-grey-600); }
 .availabilityText { color: var(--color-grey-700); font-weight: 600; white-space: nowrap; }
 .wishlist { position: absolute; right: 6px; top: 5px; width: 44px; height: 44px; display: grid; place-items: center; border-radius: 50%; cursor: pointer; }
 .wishlist > span { display: grid; place-items: center; width: 33px; height: 33px; border: 1px solid var(--color-grey-100); border-radius: 50%; background: var(--color-grey-50); }
-.wishlist[aria-pressed="true"] { color: var(--color-red-sale); }
+.wishlist[aria-pressed="true"] { color: #d9231a; }
 .content { position: relative; padding: 8px 12px 12px; }
 .content h3 { font-size: 18px; font-weight: 600; line-height: 25px; letter-spacing: -.04em; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
 .metadata { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 6px; margin-top: 8px; font-size: 12px; line-height: 16px; color: var(--color-grey-600); }
@@ -25,7 +25,7 @@
 .star svg { display: block; width: 16px; height: 16px; max-width: none; }
 .price { display: flex; align-items: baseline; flex-wrap: wrap; gap: 3px; margin-top: 8px; font-size: 12px; line-height: 16px; color: var(--color-grey-500); }
 .price del { font-size: 16px; font-weight: 600; }
-.price strong { font-size: 21px; line-height: 28px; font-weight: 600; letter-spacing: -.035em; color: var(--color-red-sale); }
+.price strong { font-size: 21px; line-height: 28px; font-weight: 600; letter-spacing: -.035em; color: #d9231a; }
 .from { color: var(--color-grey-900); }
 .action { display: grid; grid-template-rows: 1fr; }
 .actionInner { min-height: 0; overflow: hidden; }

@@ -13,7 +13,7 @@
 .copy h3 { min-width: 0; font-size: clamp(20px, 2.2vw, 27px); }
 .copy a, .copy button { pointer-events: auto; }
 .dots { display: flex; justify-content: center; gap: 4px; border-radius: 999px; background: #141414a8; padding: 4px 8px; backdrop-filter: blur(8px); }
-.dots button { display: grid; place-items: center; width: 32px; height: 22px; cursor: pointer; }
+.dots button { display: grid; place-items: center; width: 32px; height: 28px; cursor: pointer; }
 .dots span { width: 24px; height: 5px; border-radius: 999px; background: #ffffff85; transition: background-color 160ms ease; }
 .dots [aria-current] span, .dots button:hover span { background: white; }
 .playback { position: absolute; bottom: 16px; right: 12px; z-index: 2; width: 32px; height: 32px; display: grid; place-items: center; border-radius: 50%; background: #14141470; color: white; cursor: pointer; }

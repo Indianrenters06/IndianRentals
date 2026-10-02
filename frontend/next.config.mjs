@@ -1,6 +1,8 @@
-// Baseline security headers on every page. (No CSP yet — Cashfree, Google
-// sign-in and inline JSON-LD would all need allow-listing first.)
+import { buildCsp } from './src/lib/csp.mjs';
+
+// Enforcing baseline; the request proxy supplies per-response script nonces for HTML.
 const securityHeaders = [
+  { key: 'Content-Security-Policy', value: buildCsp({ admin: false, development: process.env.NODE_ENV !== 'production', env: process.env }) },
   { key: 'X-Frame-Options', value: 'SAMEORIGIN' },
   { key: 'X-Content-Type-Options', value: 'nosniff' },
   { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
@@ -13,6 +15,9 @@ const nextConfig = {
   poweredByHeader: false,
   agentRules: false,
   turbopack: { root: process.cwd() },
+  async redirects() {
+    return [{ source: '/images/macbook-pro.png', destination: '/images/macbook-pro.jpg', permanent: true }];
+  },
   async headers() {
     return [{ source: '/:path*', headers: securityHeaders }];
   },

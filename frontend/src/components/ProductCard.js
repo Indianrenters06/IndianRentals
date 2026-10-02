@@ -26,7 +26,7 @@ export default function ProductCard({ product }) {
             description: product.description,
             sourceUrl: `/products/${product.id}`
         }));
-        router.push(`/products/${product.id}`);
+        router.push('/checkout/staged?new=1');
     };
 
     return <RentalProductCard product={product} handleAddToCart={handleAddToCart} />;

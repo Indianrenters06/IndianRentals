@@ -26,3 +26,7 @@ frontend/*_dump.json
 frontend/*_check.json
 frontend/*_log.txt
 .gstack/
+**/token.txt
+**/tokens.txt
+**/*.token
+**/.credentials*

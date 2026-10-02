@@ -1,0 +1,68 @@
+.bar {
+    position: fixed;
+    inset: auto 0 0;
+    z-index: 990;
+    color: #fff;
+    background: #141414;
+    border-top: 1px solid #3b3b3b;
+    box-shadow: 0 -4px 24px rgb(0 0 0 / 16%);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+.inner { position: relative; max-width: 960px; margin: 0 auto; }
+.content { display: flex; align-items: center; gap: 14px; padding: 14px 64px 14px 24px; }
+.illustration { width: 56px; height: 56px; flex-shrink: 0; object-fit: contain; }
+.copy { flex: 1; min-width: 0; }
+.title { margin: 0; font-size: 16px; font-weight: 600; line-height: 1.35; letter-spacing: -0.02em; }
+.description { margin: 4px 0 0; color: #c4c4c4; font-size: 13px; line-height: 1.5; }
+.actions { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+.browse, .quote {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 44px;
+    padding: 10px 20px;
+    border-radius: 999px;
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 1.4;
+    white-space: nowrap;
+    text-decoration: none;
+    transition: background-color 160ms ease, border-color 160ms ease;
+}
+.browse { color: #fff; border: 1px solid #727272; }
+.browse:hover { background: #292929; border-color: #afafaf; }
+.quote { background: var(--theme-primary, #ffcf46); color: #141414; border: 1px solid transparent; }
+.quote:hover { background: #f7c538; }
+.dismiss {
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    display: grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    border: 0;
+    border-radius: 50%;
+    background: transparent;
+    color: #c4c4c4;
+    cursor: pointer;
+}
+.dismiss:hover { color: #fff; background: #292929; }
+.bar :is(a, button):focus-visible { outline: 2px solid #fff; outline-offset: 3px; }
+.spacer { flex-shrink: 0; height: 0; }
+
+@media (max-width: 599px) {
+    .content { display: grid; grid-template-columns: 48px minmax(0, 1fr); gap: 12px; padding: 14px 20px; }
+    .illustration { width: 48px; height: 48px; }
+    .copy { padding-right: 36px; }
+    .description { font-size: 13px; }
+    .actions { grid-column: 1 / -1; display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .dismiss { top: 8px; right: 4px; transform: none; }
+}
+@media (min-width: 1024px) {
+    .bar, .spacer { display: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+    .browse, .quote { transition: none; }
+}

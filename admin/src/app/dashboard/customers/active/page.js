@@ -30,6 +30,8 @@ function Toast({ toasts }) {
     );
 }
 
+const getLocation = resolveUserLocation;
+
 export default function ActiveUsers() {
     const [users, setUsers] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -89,7 +91,7 @@ export default function ActiveUsers() {
         });
     };
 
-    const getLocation = resolveUserLocation;
+
 
     const downloadUser = async (user) => {
         try {

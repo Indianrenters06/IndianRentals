@@ -1,6 +1,7 @@
+import { publicMetadata } from '@/lib/publicMetadata';
 import { SITE_URL, SITE_NAME } from "@/config/site";
 
-export const metadata = {
+const pageMetadata = {
     title: `FAQs — Rental Process, Policies & Support | ${SITE_NAME}`,
     description:
         "Find answers to the most common questions about renting laptops, cameras, and AV equipment from IndianRenters — delivery, KYC, damage policy, and more.",
@@ -11,6 +12,7 @@ export const metadata = {
         url: `${SITE_URL}/faq`,
     },
 };
+export const metadata = publicMetadata({ ...pageMetadata, path: '/faq' });
 
 export default function FaqLayout({ children }) {
     return children;
