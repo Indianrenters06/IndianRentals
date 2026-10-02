@@ -19,6 +19,7 @@ const getCategories = asyncHandler(async (req, res) => {
         })
     );
 
+    res.set('Cache-Control', 'public, max-age=300, stale-while-revalidate=900');
     res.json(result);
 });
 
@@ -33,6 +34,7 @@ const getSubcategories = asyncHandler(async (req, res) => {
     }
 
     const subcategories = await Category.find({ parent: req.params.id, isActive: true });
+    res.set('Cache-Control', 'public, max-age=300, stale-while-revalidate=900');
     res.json(subcategories);
 });
 

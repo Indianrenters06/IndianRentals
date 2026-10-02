@@ -22,6 +22,7 @@ const getProducts = asyncHandler(async (req, res) => {
         .limit(limit)
         .skip(limit * (page - 1));
 
+    res.set('Cache-Control', 'public, max-age=60, stale-while-revalidate=300');
     res.json({ products, page, pages: Math.ceil(count / limit) });
 });
 
@@ -34,6 +35,7 @@ const getProductById = asyncHandler(async (req, res) => {
         .populate({ path: 'pageLayout.relatedProducts', select: 'name images rentalPrice category', match: { isActive: { $ne: false } } });
 
     if (product && product.isActive !== false) {
+        res.set('Cache-Control', 'public, max-age=120, stale-while-revalidate=600');
         res.json(product);
     } else {
         res.status(404);

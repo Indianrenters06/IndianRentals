@@ -116,6 +116,12 @@ app.get('/api/health', (req, res) => {
   });
 });
 
+// ── Keep-alive ping (used by uptime monitors to prevent Render cold starts) ─
+app.get('/api/ping', (_req, res) => {
+  res.set('Cache-Control', 'no-store');
+  res.json({ pong: true, t: Date.now() });
+});
+
 // Routes
 const { checkMaintenanceMode } = require('./middleware/maintenanceMiddleware');
 app.use(checkMaintenanceMode);

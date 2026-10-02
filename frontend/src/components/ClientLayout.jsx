@@ -19,6 +19,14 @@ export default function ClientLayout({ children }) {
     useEffect(() => {
         setupAuthInterceptor();
     }, []);
+
+    // Warm up backend (prevents Render cold-start delay for first real user request)
+    useEffect(() => {
+        const api = process.env.NEXT_PUBLIC_API_URL;
+        if (api && typeof fetch !== 'undefined') {
+            fetch(`${api}/api/ping`, { method: 'GET', cache: 'no-store' }).catch(() => {});
+        }
+    }, []);
     // Use CartHeader for cart and all checkout pages
     const isCheckoutFlow = pathname === "/cart" || pathname.startsWith("/checkout");
     const marketingRoutes = [

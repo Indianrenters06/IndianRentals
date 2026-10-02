@@ -105,6 +105,28 @@ function RelationshipField({ value, onChange, error }) {
     </div>;
 }
 
+const COUNTRIES = ['India', 'USA', 'UK', 'Canada', 'Australia', 'UAE', 'Singapore', 'Germany', 'France', 'Japan', 'Other'];
+
+function CountryField({ value, onChange, error }) {
+    return <div className="min-w-0">
+        <label htmlFor="country" className="mb-2 block text-[14px] font-medium text-[#333333]">Country</label>
+        <select id="country" name="country" value={value || 'India'} onChange={onChange} className={`${inputClass} ${error ? 'border-[#bb2b1f] focus:border-[#bb2b1f]' : ''}`}>
+            {COUNTRIES.map((c) => <option key={c} value={c}>{c}</option>)}
+        </select>
+        {error && <p id="country-error" role="alert" className="mt-1.5 text-[13px] text-[#a3261c]">{error}</p>}
+    </div>;
+}
+
+function ReferenceCountryField({ value, onChange, error }) {
+    return <div className="min-w-0">
+        <label htmlFor="reference-country" className="mb-2 block text-[14px] font-medium text-[#333333]">Country</label>
+        <select id="reference-country" name="reference-country" value={value || 'India'} onChange={onChange} className={`${inputClass} ${error ? 'border-[#bb2b1f] focus:border-[#bb2b1f]' : ''}`}>
+            {COUNTRIES.map((c) => <option key={c} value={c}>{c}</option>)}
+        </select>
+        {error && <p id="reference-country-error" role="alert" className="mt-1.5 text-[13px] text-[#a3261c]">{error}</p>}
+    </div>;
+}
+
 function ReferenceFields({ reference, errors, onChange }) {
     const update = (field) => (event) => onChange(field, event.target.value);
     return <div className="grid gap-x-5 gap-y-5 sm:grid-cols-2">
@@ -115,7 +137,7 @@ function ReferenceFields({ reference, errors, onChange }) {
         <Field id="reference-city" label="City" required autoComplete="off" placeholder="City" value={reference.city} onChange={update('city')} error={errors['reference-city']} />
         <Field id="reference-state" label="State" required autoComplete="off" placeholder="State" value={reference.state} onChange={update('state')} error={errors['reference-state']} />
         <Field id="reference-pincode" label="PIN code" required inputMode="numeric" maxLength={6} autoComplete="off" placeholder="6-digit PIN" value={reference.pincode} onChange={update('pincode')} error={errors['reference-pincode']} />
-        <Field id="reference-country" label="Country" required autoComplete="off" value={reference.country} onChange={update('country')} error={errors['reference-country']} />
+        <ReferenceCountryField value={reference.country} onChange={update('country')} error={errors['reference-country']} />
     </div>;
 }
 
@@ -381,11 +403,11 @@ export default function KYCExperience({ mode = 'profile', onStatusChange, approv
                             <Field id="email" label="Email address" required type="email" autoComplete="email" placeholder="you@example.com" value={details.email} onChange={update('email')} error={errors.email} />
                             <Field id="phone" label="Mobile number" required type="tel" inputMode="numeric" autoComplete="tel-national" maxLength={10} placeholder="10-digit number" value={details.phone} onChange={update('phone')} error={errors.phone} />
                             <div className="sm:col-span-2"><Field id="permanentAddress" label="Permanent address" required autoComplete="street-address" placeholder="House number, street and area" value={details.permanentAddress} onChange={update('permanentAddress')} error={errors.permanentAddress} /></div>
-                            <div className="sm:col-span-2"><Field id="currentAddress" label="Current address" autoComplete="off" placeholder="If different from your permanent address" value={details.currentAddress} onChange={update('currentAddress')} error={errors.currentAddress} /></div>
+                            <div className="sm:col-span-2"><Field id="currentAddress" label="Current address (optional)" autoComplete="off" placeholder="If different from your permanent address" value={details.currentAddress} onChange={update('currentAddress')} error={errors.currentAddress} /></div>
                             <Field id="city" label="City" required autoComplete="address-level2" placeholder="City" value={details.city} onChange={update('city')} error={errors.city} />
                             <Field id="state" label="State" required autoComplete="address-level1" placeholder="State" value={details.state} onChange={update('state')} error={errors.state} />
                             <Field id="pincode" label="PIN code" required inputMode="numeric" maxLength={6} autoComplete="postal-code" placeholder="6-digit PIN" value={details.pincode} onChange={update('pincode')} error={errors.pincode} />
-                            <Field id="country" label="Country" value={details.country} onChange={update('country')} autoComplete="country-name" />
+                            <CountryField value={details.country} onChange={update('country')} error={errors.country} />
                         </div>}
 
                         {currentStep === 2 && <div className="px-5 py-6 sm:px-8 sm:py-8"><ReferenceFields reference={formData.referenceDetails} errors={errors} onChange={changeReference} /></div>}
