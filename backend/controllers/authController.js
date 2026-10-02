@@ -597,7 +597,7 @@ const googleLogin = asyncHandler(async (req, res) => {
         throw new Error('No Google access_token provided');
     }
 
-    if (!googleAudience) { res.status(503); throw new Error('Google sign-in is not configured'); }
+    if (!googleAudience) { res.status(400); throw new Error('Google sign-in is not configured on the server. Please add GOOGLE_CLIENT_ID to your environment variables.'); }
     let payload;
     try {
         const info = await googleClient.getTokenInfo(access_token);
